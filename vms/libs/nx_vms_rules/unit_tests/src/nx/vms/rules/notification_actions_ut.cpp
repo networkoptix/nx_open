@@ -5,6 +5,8 @@
 
 #include <QtNetwork/QHostAddress>
 
+#include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
 #include <nx/vms/rules/actions/push_notification_action.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
@@ -24,6 +26,7 @@ namespace {
 const FieldDescriptor kTestCaptionActionFieldDescriptor{.type = "testCaption"};
 const FieldDescriptor kTestDescriptionActionFieldDescriptor{.type = "testDescription"};
 const FieldDescriptor kTestTooltipActionFieldDescriptor{.type = "testTooltip"};
+constexpr auto kSiteName = "SiteName";
 
 /** Return timestamp from time like: "15:46:29" with an example date. */
 std::chrono::milliseconds makeTimestamp(const QString& time)
@@ -35,13 +38,28 @@ std::chrono::milliseconds makeTimestamp(const QString& time)
     return std::chrono::milliseconds(dt.toMSecsSinceEpoch());
 }
 
+QString sourceTag(const QString& source)
+{
+    return QString{"[%1: %2]"}.arg(kSiteName).arg(source);
+}
+
+QString descriptionWithSourceTag(const QString& description, const QString& source)
+{
+    return QString{"%1\n%2"}.arg(description).arg(sourceTag(source));
+}
+
 } // namespace
 
+
+// Desktop and mobile notification contents are checked in the given tests.
 class NotificationActionsTest: public EventDetailsTestBase
 {
 protected:
     virtual void SetUp() override
     {
+        const auto settings = systemContext()->globalSettings();
+        settings->setSystemName(kSiteName);
+
         m_captionField = std::make_unique<TextWithFields>(
             systemContext(),
             &kTestCaptionActionFieldDescriptor);
@@ -52,6 +70,11 @@ protected:
             &kTestDescriptionActionFieldDescriptor);
         m_descriptionField->setText("{event.description}");
 
+        m_pushDescriptionField = std::make_unique<TextWithFields>(
+            systemContext(),
+            &kTestDescriptionActionFieldDescriptor);
+        m_pushDescriptionField->setText("{event.description}\n[{site.name}: {event.source}]");
+
         m_tooltipField = std::make_unique<TextWithFields>(
             systemContext(),
             &kTestTooltipActionFieldDescriptor);
@@ -60,23 +83,27 @@ protected:
 
     void thenNotificationIs(
         const QString& expectedCaption,
-        const QString& expectedDescription,
+        const QString& expectedNotificationDescription,
+        const QString& expectedPushDescription,
         const QString& expectedTooltip)
     {
         auto event = buildEvent();
 
         const auto caption = m_captionField->build(event).value<QString>();
-        const auto description = m_descriptionField->build(event).value<QString>();
+        const auto notificationDescription = m_descriptionField->build(event).value<QString>();
+        const auto pushDescription = m_pushDescriptionField->build(event).value<QString>();
         const auto tooltip = m_tooltipField->build(event).value<QString>();
 
         EXPECT_EQ(expectedCaption, caption);
-        EXPECT_EQ(expectedDescription.trimmed(), description);
+        EXPECT_EQ(expectedNotificationDescription.trimmed(), notificationDescription);
+        EXPECT_EQ(expectedPushDescription.trimmed(), pushDescription.trimmed());
         EXPECT_EQ(expectedTooltip.trimmed(), tooltip);
     }
 
 protected:
     std::unique_ptr<TextWithFields> m_captionField;
     std::unique_ptr<TextWithFields> m_descriptionField;
+    std::unique_ptr<TextWithFields> m_pushDescriptionField;
     std::unique_ptr<TextWithFields> m_tooltipField;
 
 };
@@ -130,13 +157,15 @@ TEST_F(NotificationActionsTest, content_pushNotificationAction)
         auto descriptionField = std::ranges::find_if(manifest.fields,
             [](const auto& f) { return f.fieldName == utils::kDescriptionFieldName; });
         ASSERT_NE(descriptionField, manifest.fields.end());
-        ASSERT_EQ(descriptionField->properties["text"].toString(), m_descriptionField->text());
+        ASSERT_EQ(descriptionField->properties["text"].toString(), m_pushDescriptionField->text());
     }
 }
 
 TEST_F(NotificationActionsTest, content_eventsPerDayLimit)
 {
     static constexpr auto kExpectedCaption = "Server Started";
+
+    static const auto kExpectedPushDescription = sourceTag("Server1");
 
     static constexpr auto kExpectedTooltip = R"(
 Server1 Started
@@ -154,7 +183,7 @@ Total number of events: 60
         givenEvent(QSharedPointer<ServerStartedEvent>::create(timestamp + (1s * i), kServerId));
 
     whenEventsLimitSetTo(4);
-    thenNotificationIs(kExpectedCaption, {}, kExpectedTooltip);
+    thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -166,6 +195,8 @@ TEST_F(NotificationActionsTest, event_analytics)
 
     static constexpr auto kExpectedCaption = "Caption 1";
     static constexpr auto kExpectedDescription = "Description 1";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Entrance");
 
     static constexpr auto kExpectedTooltip = R"(
 Analytics Event at Entrance
@@ -205,7 +236,8 @@ Analytics Event at Entrance
         /*boundingBox*/ QRectF{}
     ));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 TEST_F(NotificationActionsTest, event_analytics_descriptionOnly)
@@ -214,6 +246,8 @@ TEST_F(NotificationActionsTest, event_analytics_descriptionOnly)
 
     static constexpr auto kExpectedCaption = "Analytics Event";
     static constexpr auto kExpectedDescription = "Description 1";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Entrance");
 
     static constexpr auto kExpectedTooltip = R"(
 Analytics Event at Entrance
@@ -235,7 +269,8 @@ Analytics Event at Entrance
         /*boundingBox*/ QRectF{}
     ));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 TEST_F(NotificationActionsTest, event_analytics_captionOnly)
@@ -243,7 +278,7 @@ TEST_F(NotificationActionsTest, event_analytics_captionOnly)
     static const QString kEventTypeId = "nx.LineCrossing";
 
     static constexpr auto kExpectedCaption = "Caption 1";
-
+    static const auto kExpectedPushDescription = sourceTag("Entrance");
     static constexpr auto kExpectedTooltip = R"(
 Analytics Event at Entrance
 15:46:29
@@ -264,7 +299,7 @@ Analytics Event at Entrance
         /*boundingBox*/ QRectF{}
     ));
 
-    thenNotificationIs(kExpectedCaption, {}, kExpectedTooltip);
+    thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -277,7 +312,7 @@ TEST_F(NotificationActionsTest, event_analyticsObject)
     static const QString kObjectTypeId2 = "nx.Face";
 
     static constexpr auto kExpectedCaption = "Object detected";
-
+    static const auto kExpectedPushDescription = sourceTag("Entrance");
     static constexpr auto kExpectedTooltip = R"(
 Object detected at Entrance
 15:46:29
@@ -304,7 +339,7 @@ Object detected at Entrance
         nx::common::metadata::Attributes()
     ));
 
-    thenNotificationIs(kExpectedCaption, {}, kExpectedTooltip);
+    thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -316,6 +351,8 @@ TEST_F(NotificationActionsTest, event_cameraInput_C112754)
 
     static constexpr auto kExpectedCaption = "Input Signal on Camera";
     static constexpr auto kExpectedDescription = "Input Port: Port_1";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Entrance");
 
     static constexpr auto kExpectedTooltip = R"(
 Input on Entrance
@@ -339,7 +376,8 @@ Input on Entrance
         "Port_2"
     ));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -350,7 +388,7 @@ TEST_F(NotificationActionsTest, event_deviceDisconnected_C112752)
     RecordProperty("testrail", "C112752");
 
     static constexpr auto kExpectedCaption = "Camera disconnected";
-
+    static const auto kExpectedPushDescription = sourceTag("Entrance");
     static constexpr auto kExpectedTooltip = R"(
 Camera disconnected at Server1
 15:46:29
@@ -372,7 +410,7 @@ Camera disconnected at Server1
     ));
 
     // Device name is already displayed in the source.
-    thenNotificationIs(kExpectedCaption, /*description*/{}, kExpectedTooltip);
+    thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -387,8 +425,10 @@ TEST_F(NotificationActionsTest, event_deviceIpConflict_C112756)
     static constexpr auto kExpectedDescription = R"(
 Conflicting Address: 10.0.0.1
 Camera #1: Entrance (2a:cf:c7:04:c7:c9)
-Camera #2: Camera2 (51:dc:54:02:3a:8e)
-)";
+Camera #2: Camera2 (51:dc:54:02:3a:8e))";
+
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Server1");
 
     static constexpr auto kExpectedTooltip = R"(
 Camera IP Conflict at Server1
@@ -418,7 +458,8 @@ Camera IP Conflict at Server1
             {.id = kCamera2Id, .mac = kCamera2PhysicalId}},
         /*address*/ QHostAddress("10.0.0.2")));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -427,6 +468,7 @@ Camera IP Conflict at Server1
 TEST_F(NotificationActionsTest, event_fanError)
 {
     static constexpr auto kExpectedCaption = "Fan Failure";
+    static const auto kExpectedPushDescription = sourceTag("Server1");
 
     static constexpr auto kExpectedTooltip = R"(
 Fan failure at Server1
@@ -442,7 +484,7 @@ Fan failure at Server1
         makeTimestamp("15:48:30"),
         kServerId));
 
-    thenNotificationIs(kExpectedCaption, {}, kExpectedTooltip);
+    thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -452,6 +494,8 @@ TEST_F(NotificationActionsTest, event_generic)
 {
     static constexpr auto kExpectedCaption = "Caption 1";
     static constexpr auto kExpectedDescription = "Description 1";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Source 1");
 
     static constexpr auto kExpectedTooltip = R"(
 Generic Event at Server1
@@ -498,12 +542,14 @@ Generic Event at Server1
         kServerId,
         UuidList{kCamera1Id}));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 TEST_F(NotificationActionsTest, event_generic_captionOnly)
 {
     static constexpr auto kExpectedCaption = "Caption 1";
+    static const auto kExpectedPushDescription = sourceTag("Source 1");
 
     static constexpr auto kExpectedTooltip = R"(
 Generic Event at Server1
@@ -524,13 +570,15 @@ Generic Event at Server1
         kServerId,
         UuidList{kCamera1Id, kCamera2Id}));
 
-    thenNotificationIs(kExpectedCaption, {}, kExpectedTooltip);
+    thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
 }
 
 TEST_F(NotificationActionsTest, event_generic_descriptionOnly)
 {
     static constexpr auto kExpectedCaption = "Generic Event";
     static constexpr auto kExpectedDescription = "Description 1";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Source 1");
 
     static constexpr auto kExpectedTooltip = R"(
 Generic Event at Server1
@@ -551,7 +599,8 @@ Generic Event at Server1
         kServerId,
         UuidList{kCamera1Id, kCamera2Id}));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -560,9 +609,10 @@ Generic Event at Server1
 TEST_F(NotificationActionsTest, event_ldapSyncIssue)
 {
     static constexpr auto kExpectedCaption = "LDAP Sync Issue";
-
     static constexpr auto kExpectedDescription =
         "Failed to complete the sync within a 5 minutes timeout.";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Server1");
 
     static constexpr auto kExpectedTooltip = R"(
 LDAP Sync Issue at Server1
@@ -608,7 +658,8 @@ LDAP Sync Issue at Server1
         30s,
         kServerId));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -622,8 +673,9 @@ TEST_F(NotificationActionsTest, event_licenseIssue_C112760)
 
     static constexpr auto kExpectedDescription = R"(
 Recording has been disabled on the following cameras:
-- Entrance (10.0.0.1)
-)";
+- Entrance (10.0.0.1))";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Server1");
 
     static constexpr auto kExpectedTooltip = R"(
 Not enough licenses on Server1
@@ -646,7 +698,8 @@ Not enough licenses on Server1
         kServerId,
         /*disabledCameras*/ UuidSet{kCamera1Id, kCamera2Id}));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -657,6 +710,7 @@ TEST_F(NotificationActionsTest, event_motion_C112753)
     RecordProperty("testrail", "C112753");
 
     static constexpr auto kExpectedCaption = "Motion on Camera";
+    static const auto kExpectedPushDescription = sourceTag("Entrance");
 
     static constexpr auto kExpectedTooltip = R"(
 Motion on Entrance
@@ -675,7 +729,7 @@ Motion on Entrance
         kCamera1Id
     ));
 
-    thenNotificationIs(kExpectedCaption, {}, kExpectedTooltip);
+    thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -686,8 +740,9 @@ TEST_F(NotificationActionsTest, event_networkIssue)
     static constexpr auto kExpectedCaption = "Network Issue";
 
     static constexpr auto kExpectedDescription = R"(
-Multicast address conflict detected. Address 10.0.0.1:5555 is already in use by testcamera on secondary stream.
-)";
+Multicast address conflict detected. Address 10.0.0.1:5555 is already in use by testcamera on secondary stream.)";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Entrance");
 
     static constexpr auto kExpectedTooltip = R"(
 Network Issue at Server1
@@ -747,7 +802,8 @@ Network Issue at Server1
             .message = "Some more details"
         }));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -757,6 +813,8 @@ TEST_F(NotificationActionsTest, event_integrationDiagnostic_deviceAgent)
 {
     static constexpr auto kExpectedCaption = "Caption 1";
     static constexpr auto kExpectedDescription = "Description 1";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Entrance");
 
     static constexpr auto kExpectedTooltip = R"(
 Integration Diagnostic at Entrance
@@ -786,13 +844,15 @@ Integration Diagnostic at Entrance
         nx::vms::api::EventLevel::info
     ));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 
 TEST_F(NotificationActionsTest, event_integrationDiagnostic_deviceAgent_captionOnly)
 {
     static constexpr auto kExpectedCaption = "Caption 1";
+    static const auto kExpectedPushDescription = sourceTag("Entrance");
     static constexpr auto kExpectedTooltip = R"(
 Integration Diagnostic at Entrance
 15:46:29
@@ -807,13 +867,15 @@ Integration Diagnostic at Entrance
         kEngine1Id,
         nx::vms::api::EventLevel::error
     ));
-    thenNotificationIs(kExpectedCaption, {}, kExpectedTooltip);
+    thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
 }
 
 TEST_F(NotificationActionsTest, event_integrationDiagnostic_deviceAgent_descriptionOnly)
 {
     static constexpr auto kExpectedCaption = "Integration Diagnostic";
     static constexpr auto kExpectedDescription = "Description 1";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Entrance");
     static constexpr auto kExpectedTooltip = R"(
 Integration Diagnostic at Entrance
 15:46:29
@@ -829,13 +891,16 @@ Integration Diagnostic at Entrance
         nx::vms::api::EventLevel::error
     ));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 TEST_F(NotificationActionsTest, event_integrationDiagnostic_plugin)
 {
     static constexpr auto kExpectedCaption = "Caption 1";
     static constexpr auto kExpectedDescription = "Description 1";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Engine1");
     static constexpr auto kExpectedTooltip = R"(
 Integration Diagnostic at Engine1
 15:46:29
@@ -864,7 +929,8 @@ Integration Diagnostic at Engine1
         nx::vms::api::EventLevel::info
     ));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -877,8 +943,9 @@ TEST_F(NotificationActionsTest, event_poeOverBudget)
     static constexpr auto kExpectedDescription = R"(
 Current power consumption: 0.5 watts
 Upper consumption limit: 0.3 watts
-Lower consumption limit: 0.2 watts
-)";
+Lower consumption limit: 0.2 watts)";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Server1");
 
     static constexpr auto kExpectedTooltip = R"(
 PoE over budget on Server1
@@ -891,7 +958,6 @@ PoE over budget on Server1
   Upper consumption limit: 0.2 watts
   Lower consumption limit: 0.1 watts
 )";
-
 
     givenEvent(QSharedPointer<PoeOverBudgetEvent>::create(
         makeTimestamp("15:46:29"),
@@ -909,7 +975,8 @@ PoE over budget on Server1
         /*upperLimitW*/ 0.2,
         /*lowerLimitW*/ 0.1));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -922,8 +989,9 @@ TEST_F(NotificationActionsTest, event_saasIssue)
     static constexpr auto kExpectedDescription = R"(
 Failed to migrate licenses.
 - key1
-- key2
-)";
+- key2)";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Server1");
 
     static constexpr auto kExpectedTooltip = R"(
 Services Issue on Server1
@@ -949,7 +1017,8 @@ Services Issue on Server1
         /*deviceIds*/ UuidList{kCamera1Id, kCamera2Id},
         nx::vms::api::EventReason::notEnoughIntegrationServices));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -958,7 +1027,7 @@ Services Issue on Server1
 TEST_F(NotificationActionsTest, event_serverCertificateError)
 {
     static constexpr auto kExpectedCaption = "Server Certificate Error";
-
+    static const auto kExpectedPushDescription = sourceTag("Server1");
     static constexpr auto kExpectedTooltip = R"(
 Server1 certificate error
 15:46:29
@@ -973,7 +1042,7 @@ Server1 certificate error
         makeTimestamp("15:48:30"),
         kServerId));
 
-    thenNotificationIs(kExpectedCaption, {}, kExpectedTooltip);
+    thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -987,8 +1056,9 @@ TEST_F(NotificationActionsTest, event_serverConflict_C112758)
 
     static constexpr auto kExpectedDescription = R"(
 Discovered a server with the same ID in the same local network:
-Server: 10.0.1.15
-)";
+Server: 10.0.1.15)";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Server1");
 
     static constexpr auto kExpectedTooltip = R"(
 Server1 Conflict
@@ -1026,7 +1096,8 @@ Server1 Conflict
             }
         }));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1037,10 +1108,9 @@ TEST_F(NotificationActionsTest, event_serverFailure_C112757)
     RecordProperty("testrail", "C112757");
 
     static constexpr auto kExpectedCaption = "Server Failure";
-
-    static constexpr auto kExpectedDescription = R"(
-Server stopped unexpectedly.
-)";
+    static constexpr auto kExpectedDescription = "Server stopped unexpectedly.";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Server1");
 
     static constexpr auto kExpectedTooltip = R"(
 Server1 Failure
@@ -1060,7 +1130,8 @@ Server1 Failure
         kServerId,
         nx::vms::api::EventReason::serverTerminated));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1071,7 +1142,7 @@ TEST_F(NotificationActionsTest, event_serverStarted_C112759)
     RecordProperty("testrail", "C112759");
 
     static constexpr auto kExpectedCaption = "Server Started";
-
+    static const auto kExpectedPushDescription = sourceTag("Server1");
     static constexpr auto kExpectedTooltip = R"(
 Server1 Started
 15:46:29
@@ -1086,7 +1157,7 @@ Server1 Started
         makeTimestamp("15:48:30"),
         kServerId));
 
-    thenNotificationIs(kExpectedCaption, {}, kExpectedTooltip);
+    thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1099,10 +1170,9 @@ Server1 Started
 TEST_F(NotificationActionsTest, event_softTrigger)
 {
     static constexpr auto kExpectedCaption = "Button 1";
-
-    static constexpr auto kExpectedDescription = R"(
-User: User1
-)";
+    static constexpr auto kExpectedDescription = "User: User1";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Entrance");
 
     static constexpr auto kExpectedTooltip = R"(
 Soft Trigger Button 1
@@ -1133,7 +1203,8 @@ Soft Trigger Button 1
         "Button 1",
         "some_icon"));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1144,10 +1215,9 @@ TEST_F(NotificationActionsTest, event_storageIssue_C112755)
     RecordProperty("testrail", "C112755");
 
     static constexpr auto kExpectedCaption = "Storage Issue";
-
-    static constexpr auto kExpectedDescription = R"(
-System disk "C" is almost full.
-)";
+    static constexpr auto kExpectedDescription = R"(System disk "C" is almost full.)";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Server1");
 
     static constexpr auto kExpectedTooltip = R"(
 Storage Issue at Server1
@@ -1169,7 +1239,8 @@ Storage Issue at Server1
         nx::vms::api::EventReason::storageIoError,
         /*reasonText*/ "disk D"));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
 }
 
 } // namespace nx::vms::rules::test
