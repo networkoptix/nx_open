@@ -60,7 +60,7 @@ Page
                 && sessionsScreen.rootType !== OrganizationsModel.ChannelPartner
                 && !searchField.visible
                 && !breadcrumb.visible
-            onClicked: breadcrumb.openWith(linearizationListModel.sourceRoot)
+            onClicked: breadcrumb.openWith(linearizationListModel.sourceRoot?.parent)
         },
 
         SearchEdit
@@ -183,7 +183,7 @@ Page
 
         onItemClicked: (nodeId) =>
         {
-            goInto(organizationsModel.indexFromNodeId(nodeId))
+            goBack(organizationsModel.indexFromNodeId(nodeId))
         }
 
         function openWith(root)
@@ -730,7 +730,8 @@ Page
 
         newIndex = NxGlobals.toPersistent(newIndex)
 
-        siteListContainer.slideLeft(() => {
+        siteListContainer.slideLeft(() =>
+        {
             linearizationListModel.sourceRoot = newIndex
             sessionsScreen.rootIndex = newIndex
             sessionsScreen.rootType = rootType
@@ -738,7 +739,7 @@ Page
         })
     }
 
-    function goBack()
+    function goBack(index)
     {
         if (searchField.visible)
         {
@@ -746,10 +747,13 @@ Page
             return
         }
 
-        siteListContainer.slideRight(() => {
+        if (index === sessionsScreen.rootIndex)
+            return
 
-            const newIndex = linearizationListModel.sourceRoot
-                && linearizationListModel.sourceRoot.parent
+        siteListContainer.slideRight(() =>
+        {
+            const newIndex = index ||
+                linearizationListModel.sourceRoot && linearizationListModel.sourceRoot.parent
 
             const currentId = accessor.getData(siteList.currentRoot, "nodeId") ?? d.kRootId
             d.listPosition.delete(currentId)
