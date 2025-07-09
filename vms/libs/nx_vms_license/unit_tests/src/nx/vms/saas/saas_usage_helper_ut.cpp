@@ -637,8 +637,6 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationCamerasByService)
 
 TEST_F(SaasServiceUsageHelperTest, LocalRecordingUsage)
 {
-    auto manager = systemContext()->saasServiceManager();
-
     auto cameras = addCameras(/*size*/ 50);
     for (const auto& camera: cameras)
         camera->setScheduleEnabled(true);

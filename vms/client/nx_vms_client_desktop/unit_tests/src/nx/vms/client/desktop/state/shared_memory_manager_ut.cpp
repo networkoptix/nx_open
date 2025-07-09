@@ -196,7 +196,7 @@ TEST(SharedMemoryManager, currentInstanceIndexWhenRunSecond)
 {
     auto sharedMemory = makeMockSharedMemory();
     auto processesMap = makeMockProcessesMap();
-    auto pid = MockSharedMemoryInterface::givenAnotherRunningInstance(
+    [[maybe_unused]] auto pid = MockSharedMemoryInterface::givenAnotherRunningInstance(
         sharedMemory,
         processesMap,
         kSessionId);

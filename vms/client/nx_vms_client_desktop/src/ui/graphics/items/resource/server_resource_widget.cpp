@@ -403,7 +403,6 @@ protected:
         const qreal horizontalOffset = 52;
         const qreal offsetTop =
             m_widget->titleBar()->geometry().y() + m_widget->titleBar()->geometry().height();
-        const qreal offsetBottom = 16;
 
         static constexpr qreal kFramePenWidth = 3.0;
 

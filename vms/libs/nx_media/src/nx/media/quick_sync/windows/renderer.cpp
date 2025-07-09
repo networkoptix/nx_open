@@ -8,7 +8,6 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
 
-
 #include "renderer.h"
 
 #include <nx/utils/log/log.h>
@@ -200,7 +199,8 @@ bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
         return false;
     }
     // This registers a resource that was created as shared in DX with its shared handle
-    BOOL success = wglDXSetResourceShareHandleNV(m_sharedSurface.Get(), m_sharedSurfaceHandle);
+    [[maybe_unused]] BOOL success =
+        wglDXSetResourceShareHandleNV(m_sharedSurface.Get(), m_sharedSurfaceHandle);
 
     m_textureHandle = wglDXRegisterObjectNV(
         m_renderDeviceHandle,

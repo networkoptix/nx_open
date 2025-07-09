@@ -183,7 +183,7 @@ void JoystickButtonActionChoiceModel::setOpenLayoutChoiceVisible(bool visible)
 
 int JoystickButtonActionChoiceModel::getRow(const QVariant& actionId) const
 {
-    const auto actionIdValue = actionId.value<menu::IDType>();
+    [[maybe_unused]] const auto actionIdValue = actionId.value<menu::IDType>();
     for (int i = 0; i < d->info.size(); ++i)
     {
         const auto& actionInfo = d->info[i];

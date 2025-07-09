@@ -47,7 +47,6 @@ void visitTree(
         visitTree(children.at(i), onVisited, flags);
 }
 
-
 /** Get text property representation, only if it's the only property. */
 QString getTextProperty(QJSValue parameters)
 {
@@ -81,8 +80,8 @@ QVariantList findAllObjectsInContainer(
     auto containerObject = qvariant_cast<QObject*>(container);
 
     // Cache some values that would be checked when visiting children objects.
-    const auto itemType = properties.property("type");
-    const bool unnamed = !properties.hasOwnProperty("name");
+    [[maybe_unused]] const auto itemType = properties.property("type");
+    [[maybe_unused]] const bool unnamed = !properties.hasOwnProperty("name");
 
     const QString textProperty = getTextProperty(properties);
 
