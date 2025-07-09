@@ -195,7 +195,6 @@ TEST_F(FisheyeCalibratorTest, arbitraryShiftedClippedEllipse)
 {
     const int width = 800;
     const int height = 600;
-    const qreal aspectRatio = qreal(width) / height;
 
     const QPointF pixCenter(390, 310);
     const QPointF pixRadii(420, 320);

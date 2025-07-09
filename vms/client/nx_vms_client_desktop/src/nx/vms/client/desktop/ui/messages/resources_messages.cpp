@@ -513,7 +513,7 @@ bool Resources::moveProxiedWebPages(QWidget* parent, const QnResourceList& resou
 
     QnSessionAwareMessageBox messageBox(parent);
 
-    const bool multipleWebpagesAreMoved = webPages.count() > 1;
+    [[maybe_unused]] const bool multipleWebpagesAreMoved = webPages.count() > 1;
 
     const auto text = tr(
         "You are about to move these web pages to Server \"%1\". These web pages proxy all"

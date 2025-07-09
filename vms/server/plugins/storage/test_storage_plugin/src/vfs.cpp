@@ -75,8 +75,10 @@ bool checkJsonObjValue(
     const char* key,
     const char* originalString)
 {
-    const char* noKeyErrorStr = "[TestStorage, JSON]: no '%s' key found: json string: %s\n";
-    const char* wrongTypeErrorStr = "[TestStorage, JSON]: '%s' is not of %s type, actual type is %s: json string: %s\n";
+    [[maybe_unused]] constexpr auto noKeyErrorStr =
+        "[TestStorage, JSON]: no '%s' key found: json string: %s\n";
+    [[maybe_unused]] constexpr auto wrongTypeErrorStr =
+        "[TestStorage, JSON]: '%s' is not of %s type, actual type is %s: json string: %s\n";
 
     if (val == nullptr)
     {

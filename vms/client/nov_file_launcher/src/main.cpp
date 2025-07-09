@@ -210,7 +210,7 @@ int launchFile(const wstring& executePath)
     }
 
     srcFile.seekg(-sizeof(int64_t) * 2, std::ios::end);
-    const int64_t novPosOffset = srcFile.tellg();
+    [[maybe_unused]] const int64_t novPosOffset = srcFile.tellg();
 
     int64_t magic = 0, novPos = 0, indexTablePos = 0;
 
@@ -239,7 +239,6 @@ int launchFile(const wstring& executePath)
         vector<int64_t> filePosList;
         vector<wstring> fileNameList;
         srcFile.seekg(indexTablePos);
-        int64_t curPos = indexTablePos;
         while (srcFile.tellg() < indexEndOffset)
         {
             int64_t builtinFilePos;

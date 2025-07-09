@@ -106,7 +106,7 @@ const auto cloud =
 const auto nothing =
     [](const AuditRecord& record, QnLegacyAuditRecord& /*legacyRecord*/)
     {
-        const auto details = record.get<std::nullptr_t>();
+        [[maybe_unused]] const auto details = record.get<std::nullptr_t>();
     };
 
 } // namespace detailsToParams
