@@ -134,7 +134,7 @@ void ServerTimeWatcher::handleResourcesAdded(const QnResourceList& resources)
     {
         const auto server = resource.objectCast<ServerResource>();
         if (!server)
-            return;
+            continue;
 
         atLeastOneServerAdded = true;
         if (server->getStatus() == nx::vms::api::ResourceStatus::online)
