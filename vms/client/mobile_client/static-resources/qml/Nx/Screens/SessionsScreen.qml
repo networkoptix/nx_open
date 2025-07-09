@@ -484,7 +484,8 @@ Page
                     return {
                         imageSource: "image://skin/64x64/Outline/no_organization.svg?primary=light10",
                         text: qsTr("No Organizations"),
-                        description: qsTr("We didn't find any organizations, try contacting support")
+                        description:
+                            qsTr("Create an organization in the Cloud Portal to access it here")
                     }
                 }
                 if (sessionsScreen.state === "inPartnerOrOrg"
