@@ -372,6 +372,10 @@
       <source>Search Filters</source>
       <translation>Arama Filtreleri</translation>
     </message>
+    <message>
+      <source>Shared Only</source>
+      <translation type="unfinished">Shared Only</translation>
+    </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>

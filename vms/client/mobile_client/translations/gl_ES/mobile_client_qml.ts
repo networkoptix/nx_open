@@ -372,6 +372,10 @@
       <source>Search Filters</source>
       <translation>Filtros de busca</translation>
     </message>
+    <message>
+      <source>Shared Only</source>
+      <translation>Só compartido</translation>
+    </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
@@ -821,7 +825,7 @@
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>Non se atoparon sitios web accesibles. Inicia sesión na conta da nube ou conéctate a un servidor local</translation>
     </message>
   </context>
   <context>

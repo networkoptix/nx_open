@@ -372,6 +372,10 @@
       <source>Search Filters</source>
       <translation>Sökfilter</translation>
     </message>
+    <message>
+      <source>Shared Only</source>
+      <translation>Endast delad</translation>
+    </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
@@ -821,7 +825,7 @@
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>Inga tillgängliga webbplatser hittades. Logga in på molnkontot eller anslut till en lokal server</translation>
     </message>
   </context>
   <context>

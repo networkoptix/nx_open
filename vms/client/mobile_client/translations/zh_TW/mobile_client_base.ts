@@ -17,12 +17,9 @@
         <numerusform>%n 物件屬性</numerusform>
       </translation>
     </message>
-  </context>
-  <context>
-    <name>QnCloudSystemInformationWatcher</name>
     <message>
-      <source>Your Site</source>
-      <translation>您的站點 (Site)</translation>
+      <source>Shared Only</source>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>

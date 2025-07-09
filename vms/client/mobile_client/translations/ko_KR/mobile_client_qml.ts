@@ -371,6 +371,10 @@
       <source>Search Filters</source>
       <translation>필터 검색</translation>
     </message>
+    <message>
+      <source>Shared Only</source>
+      <translation type="unfinished">Shared Only</translation>
+    </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>

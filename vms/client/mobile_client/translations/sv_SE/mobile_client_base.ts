@@ -19,12 +19,9 @@
         <numerusform>%n Objektattribut</numerusform>
       </translation>
     </message>
-  </context>
-  <context>
-    <name>QnCloudSystemInformationWatcher</name>
     <message>
-      <source>Your Site</source>
-      <translation>Din webbplats</translation>
+      <source>Shared Only</source>
+      <translation>Endast delad</translation>
     </message>
   </context>
   <context>

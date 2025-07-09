@@ -15,11 +15,6 @@
       <source>New Site</source>
       <translation>Novo sitio web</translation>
     </message>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user/company name</comment>
-      <translation>Persoa propietaria: %1</translation>
-    </message>
   </context>
   <context>
     <name>RemoteConnectionErrorStrings</name>

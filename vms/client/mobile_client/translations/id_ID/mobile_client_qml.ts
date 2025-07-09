@@ -371,6 +371,10 @@
       <source>Search Filters</source>
       <translation>Filter Pencarian</translation>
     </message>
+    <message>
+      <source>Shared Only</source>
+      <translation>Hanya Dibagikan</translation>
+    </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
@@ -820,7 +824,7 @@
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>Tidak ditemukan site yang dapat diakses. Masuk ke akun cloud atau koneksikan ke server lokal</translation>
     </message>
   </context>
   <context>

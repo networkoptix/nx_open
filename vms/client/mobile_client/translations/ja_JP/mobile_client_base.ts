@@ -17,12 +17,9 @@
         <numerusform>%n オブジェクト属性</numerusform>
       </translation>
     </message>
-  </context>
-  <context>
-    <name>QnCloudSystemInformationWatcher</name>
     <message>
-      <source>Your Site</source>
-      <translation>自分のサイト</translation>
+      <source>Shared Only</source>
+      <translation>共有のみ</translation>
     </message>
   </context>
   <context>

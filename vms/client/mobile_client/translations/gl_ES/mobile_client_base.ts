@@ -19,12 +19,9 @@
         <numerusform>%n Atributos do obxecto</numerusform>
       </translation>
     </message>
-  </context>
-  <context>
-    <name>QnCloudSystemInformationWatcher</name>
     <message>
-      <source>Your Site</source>
-      <translation>O teu sitio</translation>
+      <source>Shared Only</source>
+      <translation>Só compartido</translation>
     </message>
   </context>
   <context>

@@ -17,12 +17,9 @@
         <numerusform>%n Atribut Objek</numerusform>
       </translation>
     </message>
-  </context>
-  <context>
-    <name>QnCloudSystemInformationWatcher</name>
     <message>
-      <source>Your Site</source>
-      <translation>Site Anda</translation>
+      <source>Shared Only</source>
+      <translation>Hanya Dibagikan</translation>
     </message>
   </context>
   <context>

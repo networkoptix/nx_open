@@ -371,6 +371,10 @@
       <source>Search Filters</source>
       <translation>Bộ lọc Tìm kiếm</translation>
     </message>
+    <message>
+      <source>Shared Only</source>
+      <translation type="unfinished">Shared Only</translation>
+    </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>

@@ -17,12 +17,9 @@
         <numerusform>%n Thuộc tính đối tượng</numerusform>
       </translation>
     </message>
-  </context>
-  <context>
-    <name>QnCloudSystemInformationWatcher</name>
     <message>
-      <source>Your Site</source>
-      <translation>Chi nhánh của bạn</translation>
+      <source>Shared Only</source>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>

@@ -19,12 +19,9 @@
         <numerusform>%n Nesne Nitelikleri</numerusform>
       </translation>
     </message>
-  </context>
-  <context>
-    <name>QnCloudSystemInformationWatcher</name>
     <message>
-      <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <source>Shared Only</source>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>
