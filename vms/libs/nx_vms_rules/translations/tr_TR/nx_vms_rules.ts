@@ -978,10 +978,6 @@
       <source>Send Mobile Notification</source>
       <translation>Mobil Bildirim Gönder</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation>Kaynak Cihaz adını Gövdeye ekleyin</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>

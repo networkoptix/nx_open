@@ -967,10 +967,6 @@
       <source>Send Mobile Notification</source>
       <translation>Gửi thông báo di động</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation>Thêm tên thiết bị nguồn trong phần nội dung</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>

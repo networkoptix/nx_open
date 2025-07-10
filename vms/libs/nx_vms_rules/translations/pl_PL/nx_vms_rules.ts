@@ -1000,10 +1000,6 @@
       <source>Send Mobile Notification</source>
       <translation>Wyślij powiadomienie mobilne</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation>Dodaj nazwę urządzenia źródłowego do treści</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>

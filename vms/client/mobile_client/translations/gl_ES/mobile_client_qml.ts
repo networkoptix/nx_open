@@ -796,10 +796,6 @@
       <translation>Sen organizacións</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation>Non atopamos ninguhna organización, por favor, proba a poñerte en contacto co servizo de asistencia</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>Iniciar sesión</translation>
     </message>
@@ -828,8 +824,8 @@
       <translation>Os sitios en estado Suspendido ou Pechado non están dispoñibles</translation>
     </message>
     <message>
-      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation>Non se atoparon sitios web accesibles. Inicia sesión na conta da nube ou conéctate a un servidor local</translation>
+      <source>Create an organization in the Cloud Portal to access it here</source>
+      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
     </message>
   </context>
   <context>

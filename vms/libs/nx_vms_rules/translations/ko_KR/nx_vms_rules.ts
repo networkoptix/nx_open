@@ -967,10 +967,6 @@
       <source>Send Mobile Notification</source>
       <translation>모바일 알림 보내기</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation>본문에 소스 장치 이름 추가</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>

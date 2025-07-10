@@ -795,10 +795,6 @@
       <translation>組織がありません</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation>組織が見つかりませんでした。サポートにお問い合わせください。</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>ログイン</translation>
     </message>
@@ -827,8 +823,8 @@
       <translation>サスペンド状態およびシャットダウン状態のサイトは利用できません。</translation>
     </message>
     <message>
-      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation>アクセス可能なサイトが見つかりません。クラウドアカウントにログインするか、ローカルサーバーに接続してください。</translation>
+      <source>Create an organization in the Cloud Portal to access it here</source>
+      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
     </message>
   </context>
   <context>

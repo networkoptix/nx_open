@@ -796,10 +796,6 @@
       <translation>Inga organisationer</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation>Vi hittade&apos;inga organisationer, försök kontakta supporten</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>Logga in</translation>
     </message>
@@ -828,8 +824,8 @@
       <translation>Webbplatser i avstängt eller avstängt tillstånd är inte tillgängliga</translation>
     </message>
     <message>
-      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation>Inga tillgängliga webbplatser hittades. Logga in på molnkontot eller anslut till en lokal server</translation>
+      <source>Create an organization in the Cloud Portal to access it here</source>
+      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
     </message>
   </context>
   <context>

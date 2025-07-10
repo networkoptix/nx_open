@@ -1022,10 +1022,6 @@
       <source>Send Mobile Notification</source>
       <translation type="unfinished">Send Mobile Notification</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation type="unfinished">Add Source Device name to Body</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>

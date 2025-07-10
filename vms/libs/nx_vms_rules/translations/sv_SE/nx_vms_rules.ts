@@ -978,10 +978,6 @@
       <source>Send Mobile Notification</source>
       <translation>Skicka mobilavisering</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation>Lägg till källenhetsnamn i Body</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>

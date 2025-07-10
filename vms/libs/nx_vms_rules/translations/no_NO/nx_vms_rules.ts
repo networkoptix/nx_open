@@ -978,10 +978,6 @@
       <source>Send Mobile Notification</source>
       <translation>Send mobilvarsel</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation>Legg til navnet på kildeenheten i brødteksten</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>

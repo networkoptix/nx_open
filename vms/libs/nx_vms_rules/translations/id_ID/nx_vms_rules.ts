@@ -967,10 +967,6 @@
       <source>Send Mobile Notification</source>
       <translation>Kirim Notifikasi Seluler</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation>Tambahkan nama Source Perangkat ke Body</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>

@@ -795,10 +795,6 @@
       <translation>Không có tổ chức</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation>Chúng tôi không tìm thấy bất kỳ tổ chức nào, hãy thử liên hệ với bộ phận hỗ trợ</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>Đăng nhập</translation>
     </message>
@@ -827,8 +823,8 @@
       <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
     </message>
     <message>
-      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <source>Create an organization in the Cloud Portal to access it here</source>
+      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
     </message>
   </context>
   <context>
