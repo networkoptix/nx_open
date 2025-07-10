@@ -503,7 +503,7 @@ Page
                     return {
                         imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
                         text: kNoSites,
-                        description: "",
+                        description: "Connect a site to the organization to access it here",
                         buttonText: isAdministrator ? qsTr("How to connect?") : "",
                         buttonIconSource: "image://skin/24x24/Outline/cloud.svg?primary=dark1",
                         clickHandler: () => { cloudConnectionHelp.open() }
@@ -523,7 +523,8 @@ Page
                     return {
                         imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
                         text: kNoSites,
-                        description: d.kNoSitesFound,
+                        description: "No accessible sites were found. " +
+                            "Log in into the cloud account or connect to a local server",
                         buttonText: qsTr("Log In"),
                         buttonIconSource: "image://skin/24x24/Outline/cloud.svg?primary=dark1",
                         clickHandler: () => { Workflow.openCloudLoginScreen() }
@@ -533,7 +534,8 @@ Page
                 return {
                     imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
                     text: kNoSites,
-                    description: d.kNoSitesFound,
+                    description: "No accessible sites were found. " +
+                        "Request access to existing sites or connect to a local server",
                 }
             }
 
@@ -679,8 +681,6 @@ Page
         id: d
         property var listPosition: new Map()
         readonly property var kRootId: NxGlobals.uuid("")
-        readonly property string kNoSitesFound: qsTr("No accessible sites were found. " +
-            "Log in into the cloud account or connect to a local server")
     }
 
     Connections
