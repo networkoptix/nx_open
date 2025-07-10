@@ -111,10 +111,11 @@ std::string prepareUserAgent()
         nx::build_info::vmsVersion()).toStdString();
 }
 
-nx::log::Tag makeLogTag(rest::ServerConnection* instance, const nx::Uuid& serverId)
+nx::log::Tag makeLogTag(
+    rest::ServerConnection* instance, const nx::Uuid& serverId, const char *subTag)
 {
-    return nx::log::Tag(
-        QStringLiteral("%1 [%2]").arg(nx::toString(instance), serverId.toSimpleString()));
+    return nx::log::Tag(NX_FMT("%1 %2 [%3]",
+        nx::toString(instance), subTag, serverId.toSimpleString()));
 }
 
 } // namespace
@@ -269,11 +270,13 @@ ServerConnection::ServerConnection(
         .httpClientPool = systemContext->httpClientPool(),
         .auditId = systemContext->auditId(),
         .serverId = serverId,
-        .logTag = makeLogTag(this, serverId)})
+        .logTag = makeLogTag(this, serverId, "C")})
 {
     // TODO: #sivanov Raw pointer is unsafe here as ServerConnection instance may be not deleted
     // after it's owning server (and context) are destroyed. Need to change
     // QnMediaServerResource::restConnection() method to return weak pointer instead.
+
+    NX_VERBOSE(d->logTag, "Create");
 }
 
 ServerConnection::ServerConnection(
@@ -291,23 +294,32 @@ ServerConnection::ServerConnection(
         .httpClientPool = httpClientPool,
         .auditId = auditId,
         .serverId = serverId,
-        .logTag = makeLogTag(this, serverId),
+        .logTag = makeLogTag(this, serverId, "D"),
         .directConnect{Private::DirectConnect{
             .certificateVerifier = certificateVerifier,
             .address = std::move(address),
             .credentials = std::move(credentials)}}})
 {
+    NX_VERBOSE(d->logTag, "Create");
+
     if (NX_ASSERT(certificateVerifier))
     {
         connect(certificateVerifier, &QObject::destroyed, this,
-            [this]() { NX_ASSERT(false, "Invalid destruction order"); });
+            [this]() {
+                NX_ASSERT(false, "%1: Premature certificate verifier destruction", d->logTag);
+            });
     }
 }
 
 ServerConnection::~ServerConnection()
 {
+    NX_VERBOSE(d->logTag, "Destroy");
+
     if (d->directConnect)
-        NX_ASSERT(d->directConnect->certificateVerifier, "Invalid destruction order");
+    {
+        NX_ASSERT(d->directConnect->certificateVerifier,
+            "%1: Certificate verifier already destroyed", d->logTag);
+    }
 }
 
 void ServerConnection::updateAddress(nx::network::SocketAddress address)
