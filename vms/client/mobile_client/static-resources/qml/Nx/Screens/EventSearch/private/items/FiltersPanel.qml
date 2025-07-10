@@ -71,6 +71,7 @@ Rectangle
         {
             analyticsSearchSetup: control.controller.analyticsSearchSetup
             searchSetup: control.controller.searchSetup
+            bookmarkSearchSetup: control.controller.bookmarkSearchSetup
         }
 
         header: Item { width: 16 }

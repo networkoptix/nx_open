@@ -21,6 +21,7 @@ Control
     property alias descriptionTextItem: descriptionTextItem
 
     property alias customArea: customAreaLoader.sourceComponent
+    property alias customAreaItem: customAreaLoader.item
 
     implicitHeight: topPadding + bottomPadding + contentItem.height
     implicitWidth: (parent && parent.width) ?? 0
