@@ -107,6 +107,11 @@ Pane
             maximumLineCount: 3
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         }
+        InformationText
+        {
+            text: videoScreenController.resourceHelper.crossSystemName
+            visible: !!text
+        }
     }
 
     Timer

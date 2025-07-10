@@ -13,8 +13,8 @@
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/cross_system/cross_system_camera_resource.h>
-#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 
 namespace nx::vms::client::core {
 
@@ -47,7 +47,7 @@ MediaResourceHelper::MediaResourceHelper(QObject* parent):
     connect(this, &ResourceHelper::resourceNameChanged,
         this, &MediaResourceHelper::qualifiedResourceNameChanged);
 
-    connect(this, &MediaResourceHelper::systemNameChanged,
+    connect(this, &MediaResourceHelper::crossSystemNameChanged,
         this, &MediaResourceHelper::qualifiedResourceNameChanged);
 }
 
@@ -153,7 +153,7 @@ bool MediaResourceHelper::needsCloudAuthorization() const
         || d->crossSystem->status() == CloudCrossSystemContext::Status::connectionFailure);
 }
 
-QString MediaResourceHelper::systemName() const
+QString MediaResourceHelper::crossSystemName() const
 {
     if (!d->crossSystem)
         return {};
@@ -164,10 +164,9 @@ QString MediaResourceHelper::systemName() const
 
 QString MediaResourceHelper::qualifiedResourceName() const
 {
-    const auto crossSystemName = systemName();
-    return crossSystemName.isEmpty()
+    return crossSystemName().isEmpty()
         ? resourceName()
-        : nx::format("%1/%2", crossSystemName, resourceName()).toQString();
+        : nx::format("../%1", resourceName()).toQString();
 }
 
 void MediaResourceHelper::cloudAuthorize() const
@@ -286,7 +285,7 @@ void MediaResourceHelper::Private::handleResourceChanged()
 
                 connect(
                     crossSystem->systemDescription().get(), &SystemDescription::systemNameChanged,
-                    q, &MediaResourceHelper::systemNameChanged);
+                    q, &MediaResourceHelper::crossSystemNameChanged);
             }
         }
     }
@@ -301,7 +300,7 @@ void MediaResourceHelper::Private::handleResourceChanged()
     emit q->audioEnabledChanged();
     emit q->livePreviewVideoQualityChanged();
     emit q->needsCloudAuthorizationChanged();
-    emit q->systemNameChanged();
+    emit q->crossSystemNameChanged();
 }
 
 } // namespace nx::vms::client::core
