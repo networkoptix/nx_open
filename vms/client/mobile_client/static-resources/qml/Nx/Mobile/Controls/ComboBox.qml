@@ -78,7 +78,7 @@ T.ComboBox
     {
         id: focusWorkaround
 
-        property var extraAction
+        property bool openPopupOnClick: false
 
         onReleased:
             (mouse) =>
@@ -86,9 +86,10 @@ T.ComboBox
                 if (!d.isMouseEventInsideControl(mouse))
                     return
 
-                control.forceActiveFocus()
-                if (extraAction)
-                    extraAction()
+                if (openPopupOnClick)
+                    control.popup.open()
+                else
+                    control.forceActiveFocus()
             }
     }
 
@@ -113,7 +114,7 @@ T.ComboBox
             : parent.width
         height: parent.height
 
-        extraAction: () => { control.popup.open() }
+        openPopupOnClick: true
     }
 
     // Prevents early focus in the left padding area.
@@ -222,20 +223,35 @@ T.ComboBox
 
     popup: Popup
     {
-        readonly property int kMaxElementsCount: 4
+        id: popup
 
-        width: control.width
+        readonly property int kMaxPopupWidth: 328
+        readonly property int kMargin: 20
+
+        parent: Overlay.overlay
+
+        y: parent.height - height - bottomMargin
+        x: (parent.width - width - windowParams.rightMargin - windowParams.leftMargin) / 2
+            + windowParams.leftMargin
+        width: Math.min(kMaxPopupWidth, parent.width - kMargin * 2)
         height:
         {
             const paddings = topPadding + bottomPadding
-            const maxHeight = kMaxElementsCount * 48
-                + (kMaxElementsCount - 1) * listView.spacing
-                + (listView.headerItem?.height ?? 0)
-                + (listView.footerItem?.height ?? 0)
-            return Math.min(contentItem.implicitHeight, maxHeight) + paddings
+            const maxAvailableHeight = parent.height - topMargin - bottomMargin
+            return Math.min(contentItem.implicitHeight + paddings, maxAvailableHeight)
         }
 
+        topMargin: windowContext.ui.measurements.deviceStatusBarHeight + kMargin
+        bottomMargin: kMargin + windowParams.bottomMargin
+
+        Overlay.modal: Q.Rectangle
+        {
+            color: ColorTheme.transparent(ColorTheme.colors.dark1, 0.5)
+        }
+
+        closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
         modal: true
+        focus: true
         padding: 0
         topPadding: 8
         bottomPadding: 8
@@ -307,6 +323,12 @@ T.ComboBox
         {
             if (!indicatorImage.visible)
                 close()
+        }
+
+        onClosed:
+        {
+            if (control.editable)
+                control.forceActiveFocus()
         }
     }
 

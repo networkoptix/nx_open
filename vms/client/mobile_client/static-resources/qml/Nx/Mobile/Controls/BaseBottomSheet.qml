@@ -43,6 +43,11 @@ Drawer
         return 20 + customPadding + d.keyboardHeight
     }
 
+    Overlay.modal: Rectangle
+    {
+        color: ColorTheme.transparent(ColorTheme.colors.dark1, 0.5)
+    }
+
     background: Item
     {
         Rectangle
