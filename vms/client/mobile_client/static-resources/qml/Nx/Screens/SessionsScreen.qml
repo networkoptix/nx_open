@@ -188,6 +188,9 @@ Page
 
         function openWith(root)
         {
+            if (root === NxGlobals.invalidModelIndex())
+                return
+
             let data = []
 
             for (let node = root; node && node.row !== -1; node = node.parent)
