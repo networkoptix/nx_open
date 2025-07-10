@@ -39,7 +39,7 @@ T.ItemDelegate
         elide: Text.ElideRight
         font: delegate.font
         color: delegate.selected
-            ? ColorTheme.colors.light1
+            ? ColorTheme.colors.dark1
             : ColorTheme.colors.light4
     }
 }
