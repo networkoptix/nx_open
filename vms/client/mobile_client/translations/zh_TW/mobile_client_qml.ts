@@ -373,7 +373,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>僅共享</translation>
     </message>
   </context>
   <context>
@@ -791,10 +791,6 @@
       <translation>沒有組織</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation>我們沒有找到任何組織，請聯絡技術支援</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>登入</translation>
     </message>
@@ -824,7 +820,11 @@
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>未找到可造訪的站點，請登入雲端帳號或連接本地伺服器</translation>
+    </message>
+    <message>
+      <source>Create an organization in the Cloud Portal to access it here</source>
+      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
     </message>
   </context>
   <context>
@@ -1242,7 +1242,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>失去連線，重新連接中…</translation>
     </message>
   </context>
 </TS>

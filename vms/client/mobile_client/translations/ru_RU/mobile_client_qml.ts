@@ -794,10 +794,6 @@
       <translation type="unfinished">No Organizations</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>Войти</translation>
     </message>
@@ -828,6 +824,10 @@
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
       <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+    </message>
+    <message>
+      <source>Create an organization in the Cloud Portal to access it here</source>
+      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
     </message>
   </context>
   <context>

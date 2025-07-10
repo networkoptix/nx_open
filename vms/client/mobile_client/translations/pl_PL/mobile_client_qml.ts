@@ -794,10 +794,6 @@
       <translation>Brak organizacji</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation>Nie znaleźliśmy żadnych organizacji. Spróbuj skontaktować się z działem wsparcia</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>Zaloguj się</translation>
     </message>
@@ -828,6 +824,10 @@
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
       <translation>Nie znaleziono dostępnych witryn. Zaloguj się do konta w chmurze lub połącz się z lokalnym serwerem</translation>
+    </message>
+    <message>
+      <source>Create an organization in the Cloud Portal to access it here</source>
+      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
     </message>
   </context>
   <context>
