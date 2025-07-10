@@ -35,7 +35,7 @@ class MediaResourceHelper: public ResourceHelper
         NOTIFY livePreviewVideoQualityChanged)
     Q_PROPERTY(bool needsCloudAuthorization READ needsCloudAuthorization
         NOTIFY needsCloudAuthorizationChanged);
-    Q_PROPERTY(QString systemName READ systemName NOTIFY systemNameChanged)
+    Q_PROPERTY(QString crossSystemName READ crossSystemName NOTIFY crossSystemNameChanged)
     Q_PROPERTY(QString qualifiedResourceName READ qualifiedResourceName
         NOTIFY qualifiedResourceNameChanged)
     using base_type = ResourceHelper;
@@ -56,7 +56,7 @@ public:
     bool isVirtualCamera() const;
     bool audioEnabled() const;
     bool needsCloudAuthorization() const;
-    QString systemName() const;
+    QString crossSystemName() const;
     QString qualifiedResourceName() const;
     MediaPlayer::VideoQuality livePreviewVideoQuality() const;
     Q_INVOKABLE MediaPlayer::VideoQuality streamQuality(
@@ -75,7 +75,7 @@ signals:
     void audioEnabledChanged();
     void livePreviewVideoQualityChanged();
     void needsCloudAuthorizationChanged();
-    void systemNameChanged();
+    void crossSystemNameChanged();
     void qualifiedResourceNameChanged();
 
 private:

@@ -21,6 +21,7 @@ Control
     id: cameraItem
 
     property alias text: label.text
+    property string resourceName
     property string thumbnail
     property int status
     property bool keepStatus: false
@@ -187,6 +188,7 @@ Control
                     return Math.min(implicitWidth, maxWidth)
                 }
 
+                text: (!!mediaResourceHelper.crossSystemName ? "../" : "") + cameraItem.resourceName
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: 12
                 elide: Text.ElideRight

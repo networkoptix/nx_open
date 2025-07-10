@@ -41,7 +41,7 @@ GridView
             anchors.fill: parent
             anchors.margins: control.spacing / 2
 
-            text: model.resourceName
+            resourceName: model.resourceName
             status: model.resourceStatus
             thumbnail: model.thumbnail
             keepStatus: control.keepStatuses
