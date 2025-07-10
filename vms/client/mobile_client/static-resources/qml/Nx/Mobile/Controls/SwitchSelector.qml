@@ -12,6 +12,8 @@ BaseOption
 
     property int checkState: Qt.Unchecked
 
+    onClicked: customAreaItem.toggle()
+
     customArea: Switch
     {
         checkState: control.checkState

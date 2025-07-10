@@ -13,7 +13,13 @@ Control
     property alias checkState: indicator.checkState
     property alias animationDuration: indicator.animationDuration
     property bool toggleOnClick: true
+
     signal clicked()
+
+    function toggle()
+    {
+        indicator.toggle()
+    }
 
     padding: 6
     leftPadding: 8

@@ -75,6 +75,7 @@ void ParametersVisualizationModel::Private::update()
                 return {};
 
             Items result;
+            addBookmarkFilterValue(result);
             addTimeFilterValue(result);
             addCameraFilterValue(result);
             addPluginFilterValue(result);
