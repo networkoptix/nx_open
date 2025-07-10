@@ -4176,7 +4176,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>設定雙重認證(2FA)</translation>
     </message>
   </context>
   <context>
