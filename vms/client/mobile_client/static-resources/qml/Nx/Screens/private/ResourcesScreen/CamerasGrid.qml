@@ -28,11 +28,15 @@ GridView
 
     delegate: Item
     {
+        property alias mediaPlayer: cameraItem.mediaPlayer
+
         width: d.cellWidth
         height: d.cellHeight
 
         CameraItem
         {
+            id: cameraItem
+
             aspectRatio: d.kAspectRatio
             anchors.fill: parent
             anchors.margins: control.spacing / 2
