@@ -314,8 +314,11 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                     return tr("Loading...");
                 default:
                 {
-                    if (storageData.totalSpace < 0)
+                    if (storageData.totalSpace < 0
+                        || storageData.storageType == "cloud")
+                    {
                         return tr("Unknown size");
+                    }
 
                     using nx::vms::text::HumanReadable;
 
