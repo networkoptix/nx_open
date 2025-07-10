@@ -297,7 +297,9 @@ void AnalyticsDialogTableModel::reloadAttributes()
         m_columnNames.clear();
     }
     endResetModel();
-    emit headerDataChanged(Qt::Horizontal, 0, m_columnNames.count() - 1);
+
+    if (!m_columnNames.isEmpty())
+        emit headerDataChanged(Qt::Horizontal, 0, m_columnNames.count() - 1);
 }
 
 } // namespace nx::vms::client::desktop
