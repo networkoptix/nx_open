@@ -967,10 +967,6 @@
       <source>Send Mobile Notification</source>
       <translation>모바일 알림 보내기</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation>본문에 소스 장치 이름 추가</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>
@@ -1142,16 +1138,16 @@
   <context>
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
-      <source>Site HTTP(S) Request</source>
-      <translation type="unfinished">Site HTTP(S) Request</translation>
-    </message>
-    <message>
       <source>Endpoint</source>
       <translation type="unfinished">Endpoint</translation>
     </message>
     <message>
       <source>Content</source>
       <translation>콘텐츠</translation>
+    </message>
+    <message>
+      <source>Internal HTTPS Request</source>
+      <translation type="unfinished">Internal HTTPS Request</translation>
     </message>
   </context>
   <context>

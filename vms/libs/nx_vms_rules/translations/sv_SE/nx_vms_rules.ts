@@ -978,10 +978,6 @@
       <source>Send Mobile Notification</source>
       <translation>Skicka mobilavisering</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation>Lägg till källenhetsnamn i Body</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>
@@ -1156,16 +1152,16 @@
   <context>
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
-      <source>Site HTTP(S) Request</source>
-      <translation>Webbplats HTTP(S)-förfrågan</translation>
-    </message>
-    <message>
       <source>Endpoint</source>
       <translation>Ändpunkt</translation>
     </message>
     <message>
       <source>Content</source>
       <translation>Innehåll</translation>
+    </message>
+    <message>
+      <source>Internal HTTPS Request</source>
+      <translation type="unfinished">Internal HTTPS Request</translation>
     </message>
   </context>
   <context>

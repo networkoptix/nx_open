@@ -967,10 +967,6 @@
       <source>Send Mobile Notification</source>
       <translation>Kirim Notifikasi Seluler</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation>Tambahkan nama Source Perangkat ke Body</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>
@@ -1142,16 +1138,16 @@
   <context>
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
-      <source>Site HTTP(S) Request</source>
-      <translation>HTTP(S) Request Site</translation>
-    </message>
-    <message>
       <source>Endpoint</source>
       <translation>Endpoint</translation>
     </message>
     <message>
       <source>Content</source>
       <translation>Konten</translation>
+    </message>
+    <message>
+      <source>Internal HTTPS Request</source>
+      <translation type="unfinished">Internal HTTPS Request</translation>
     </message>
   </context>
   <context>

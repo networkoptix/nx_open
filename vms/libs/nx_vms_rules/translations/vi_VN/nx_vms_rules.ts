@@ -967,10 +967,6 @@
       <source>Send Mobile Notification</source>
       <translation>Gửi thông báo di động</translation>
     </message>
-    <message>
-      <source>Add Source Device name to Body</source>
-      <translation>Thêm tên thiết bị nguồn trong phần nội dung</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>
@@ -1142,16 +1138,16 @@
   <context>
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
-      <source>Site HTTP(S) Request</source>
-      <translation>Yêu cầu HTTP(S) của Chi nhánh</translation>
-    </message>
-    <message>
       <source>Endpoint</source>
       <translation>Điểm cuối</translation>
     </message>
     <message>
       <source>Content</source>
       <translation>Nội Dung</translation>
+    </message>
+    <message>
+      <source>Internal HTTPS Request</source>
+      <translation type="unfinished">Internal HTTPS Request</translation>
     </message>
   </context>
   <context>
