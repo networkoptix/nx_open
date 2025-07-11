@@ -1152,16 +1152,16 @@
 <context>
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
-        <source>Site HTTP(S) Request</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Endpoint</source>
         <translation></translation>
     </message>
     <message>
         <source>Content</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Internal HTTPS Request</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
