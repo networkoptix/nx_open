@@ -63,6 +63,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->sessionTimeoutWatcher =
                 std::make_unique<RemoteSessionTimeoutWatcher>(globalSettings());
             d->trafficRelayUrlWatcher = std::make_unique<TrafficRelayUrlWatcher>(this);
+            d->featureAccessWatcher = std::make_unique<FeatureAccessWatcher>(this);
             break;
         }
 
@@ -73,6 +74,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->cameraDataManager = std::make_unique<CameraDataManager>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
+            d->featureAccessWatcher = std::make_unique<FeatureAccessWatcher>(this);
             if (ini().allowCslObjectSearch)
                 d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             break;
@@ -280,6 +282,11 @@ common::SessionTokenHelperPtr SystemContext::getSessionTokenHelper() const
 QnCameraBookmarksManager* SystemContext::cameraBookmarksManager() const
 {
     return d->cameraBookmarksManager.get();
+}
+
+FeatureAccessWatcher* SystemContext::featureAccess() const
+{
+    return d->featureAccessWatcher.get();
 }
 
 analytics::TaxonomyManager* SystemContext::taxonomyManager() const

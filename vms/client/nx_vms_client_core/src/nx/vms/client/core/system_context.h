@@ -12,6 +12,7 @@
 #include "system_context_aware.h" //< Forward declarations.
 
 Q_MOC_INCLUDE("camera/camera_bookmarks_manager.h")
+Q_MOC_INCLUDE("nx/vms/client/core/watchers/feature_access_watcher.h")
 Q_MOC_INCLUDE("nx/vms/client/core/watchers/user_watcher.h")
 Q_MOC_INCLUDE("nx/vms/client/core/watchers/watermark_watcher.h")
 
@@ -36,6 +37,7 @@ namespace nx::vms::client::core {
 class AccessController;
 class AnalyticsEventsSearchTreeBuilder;
 class CameraDataManager;
+class FeatureAccessWatcher;
 class IoPortsCompatibilityInterface;
 class ServerRuntimeEventConnector;
 class UserWatcher;
@@ -67,6 +69,10 @@ class NX_VMS_CLIENT_CORE_API SystemContext: public common::SystemContext
 
     Q_PROPERTY(QnCameraBookmarksManager* bookmarksManager
         READ cameraBookmarksManager
+        CONSTANT)
+
+    Q_PROPERTY(FeatureAccessWatcher* featureAccess
+        READ featureAccess
         CONSTANT)
 
 public:
@@ -165,6 +171,8 @@ public:
     ServerTimeWatcher* serverTimeWatcher() const;
 
     QnCameraBookmarksManager* cameraBookmarksManager() const;
+
+    FeatureAccessWatcher* featureAccess() const;
 
     CameraDataManager* cameraDataManager() const;
 
