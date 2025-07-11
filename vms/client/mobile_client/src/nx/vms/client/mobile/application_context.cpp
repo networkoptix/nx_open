@@ -9,29 +9,31 @@
 #include <core/resource/mobile_client_resource_factory.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <nx/build_info.h>
-#include <nx/utils/guarded_callback.h>
-#include <nx/utils/serialization/format.h>
-#include <nx/utils/thread/long_runnable.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/utils/serialization/format.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/media/watermark_image_provider.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/mobile/mobile_client_meta_types.h>
-#include <nx/vms/client/mobile/system_context.h>
-#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
+#include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/ui/detail/credentials_helper.h>
 #include <nx/vms/client/mobile/ui/detail/screens.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/time/formatter.h>
 #include <settings/qml_settings_adaptor.h>
 #include <ui/camera_thumbnail_provider.h>
+#include <utils/common/delayed.h>
 #include <utils/mobile_app_info.h>
 
 namespace nx::vms::client::mobile {
@@ -187,9 +189,17 @@ void ApplicationContext::Private::initializeMainSystemContext()
                     return;
 
                 manager->stopSessionByUser();
-                //                emit m_context->showMessage(
-                //                    tr("Your session has expired"),
-                //                    tr("Session duration limit can be changed by the site administrators"));
+
+                auto error = core::errorDescription(
+                    core::RemoteConnectionErrorCode::sessionExpired,
+                    /*moduleInformation*/ {}, /*engineVersion*/ {});
+
+                executeLater(
+                    [this, error]()
+                    {
+                        windowContext->uiController()->showMessage(
+                            error.shortText, error.longText);
+                    }, q);
             }));
 }
 
