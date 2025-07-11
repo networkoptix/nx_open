@@ -90,7 +90,8 @@ private:
         const QString& eventType,
         const nx::vms::api::analytics::EventTypeId& analyticsEventTypeId,
         const QString& actionType,
-        const QString& text);
+        const QString& text,
+        Qt::SortOrder order);
 
 private:
     QScopedPointer<Ui::EventLogDialog> ui;

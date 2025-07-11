@@ -192,19 +192,23 @@ EventLogDialog::EventLogDialog(QWidget* parent):
 
     setHelpTopic(this, HelpTopic::Id::MainWindow_Notifications_EventLog);
 
-    QList<EventLogModel::Column> columns{
+    constexpr auto kDefaultSort = std::make_pair(
+        EventLogModel::DateTimeColumn, Qt::DescendingOrder);
+
+    m_model = new EventLogModel(system(), this);
+    m_model->setColumns({
         EventLogModel::DateTimeColumn,
         EventLogModel::EventColumn,
         EventLogModel::EventSourceColumn,
         EventLogModel::ActionColumn,
         EventLogModel::ActionCameraColumn,
-        EventLogModel::DescriptionColumn};
+        EventLogModel::DescriptionColumn});
+    m_model->sort(kDefaultSort.first, kDefaultSort.second);
 
-    m_model = new EventLogModel(system(), this);
-    m_model->setColumns(columns);
     ui->gridEvents->setModel(m_model);
-
     ui->gridEvents->hoverTracker()->setMouseCursorRole(Qn::ItemMouseCursorRole);
+    ui->gridEvents->horizontalHeader()->setSortIndicator(
+        kDefaultSort.first, kDefaultSort.second);
 
     initEventsModel();
     initActionsModel();
@@ -585,12 +589,18 @@ void EventLogDialog::updateData()
         ? desktop::analyticsEventTypeId(ui->eventComboBox->currentModelIndex())
         : nx::vms::api::analytics::EventTypeId();
 
+    const auto order =
+        ui->gridEvents->horizontalHeader()->sortIndicatorSection() == EventLogModel::DateTimeColumn
+        ? ui->gridEvents->horizontalHeader()->sortIndicatorOrder()
+        : Qt::SortOrder{};
+
     query(
         ui->dateRangeWidget->period(),
         eventType,
         analyticsEventTypeId,
         actionType,
-        ui->textSearchLineEdit->text());
+        ui->textSearchLineEdit->text(),
+        order);
 
     m_resetFilterAction->setEnabled(isFilterExist());
 
@@ -612,7 +622,8 @@ void EventLogDialog::query(
     const QString& eventType,
     const nx::vms::api::analytics::EventTypeId& analyticsEventTypeId,
     const QString& actionType,
-    const QString& text)
+    const QString& text,
+    Qt::SortOrder order)
 {
     m_request = {};
 
@@ -626,6 +637,7 @@ void EventLogDialog::query(
     filter.actionType = typeList(actionType);
     filter.text = text;
     filter.limit = kMaxEventLogToRequest + 1;
+    filter.order = order;
 
     const auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(eventDevices());
     if (!cameras.empty())
@@ -717,7 +729,7 @@ void EventLogDialog::requestFinished(
     nx::vms::api::rules::EventLogRecordList&& records, nx::network::rest::ErrorId error)
 {
     const bool hasMoreRecords = records.size() > kMaxEventLogToRequest;
-    if (records.size() > kMaxEventLogToRequest)
+    if (hasMoreRecords)
         records.erase(records.begin() + kMaxEventLogToRequest, records.end());
 
     m_model->setEvents(std::move(records));
@@ -752,11 +764,23 @@ void EventLogDialog::requestFinished(
                 .arg(locale.toString(end, QLocale::LongFormat)));
         }
     }
-    else
+    else // Single day filter.
     {
-        ui->statusLabel->setText(
-            tr("Event log for %1 - %n events found", "Date is substituted", m_model->rowCount())
-            .arg(locale.toString(start, QLocale::LongFormat)));
+        if (hasMoreRecords)
+        {
+            ui->statusLabel->setText(
+                tr("Event log for %1 - Showing first %n events. To find specific events, please "
+                    "adjust the date range or apply additional filters",
+                    "Date is substituted",
+                    m_model->rowCount())
+                .arg(locale.toString(start, QLocale::LongFormat)));
+        }
+        else
+        {
+            ui->statusLabel->setText(
+                tr("Event log for %1 - %n events found", "Date is substituted", m_model->rowCount())
+                .arg(locale.toString(start, QLocale::LongFormat)));
+        }
     }
 
     setLoading(State::loaded);
