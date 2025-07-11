@@ -1414,6 +1414,10 @@ QnStorageConfigWidget::RollbackData QnStorageConfigWidget::applyStoragesChanges(
             storage->setSpaceLimit(storageData.reservedSpace);
 
             resourcePool()->addResource(storage);
+
+            if (storageData.archiveMode != nx::vms::api::StorageArchiveMode::undefined)
+                storage->setStorageArchiveMode(storageData.archiveMode);
+
             result.push_back(storage);
         }
     }
