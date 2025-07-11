@@ -825,7 +825,7 @@
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Skapa en organisation i molnportalen för att komma åt den här</translation>
     </message>
   </context>
   <context>

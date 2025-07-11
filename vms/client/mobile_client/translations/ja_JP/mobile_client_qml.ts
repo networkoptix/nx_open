@@ -824,7 +824,7 @@
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>ここからアクセスするには、クラウドポータルで組織を作成してください。</translation>
     </message>
   </context>
   <context>

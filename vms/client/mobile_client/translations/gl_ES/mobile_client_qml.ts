@@ -825,7 +825,7 @@
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Crea unha organización no Portal da Nube para acceder a ela aquí</translation>
     </message>
   </context>
   <context>
