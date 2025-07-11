@@ -1117,6 +1117,9 @@ void Player::setAutoJumpPolicy(AutoJumpPolicy policy)
 
 void Player::setPosition(qint64 value)
 {
+    if (d->speed >= 0 && value > QDateTime::currentMSecsSinceEpoch())
+        value = kLivePosition;
+
     NX_DEBUG(this, "setPosition(%1: %2)",
         value, QDateTime::fromMSecsSinceEpoch(value, QTimeZone::UTC));
 
