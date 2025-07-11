@@ -2,19 +2,22 @@
 
 #include "mobile_client_ui_controller.h"
 
-#include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/resource.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
-#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/session/ui_messages.h>
-#include <nx/vms/common/system_settings.h>
+#include <nx/vms/client/mobile/ui/detail/screens.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/client/mobile/utils/operation_manager.h>
+#include <nx/vms/client/mobile/window_context.h>
+#include <nx/vms/common/system_settings.h>
+#include <utils/common/delayed.h>
 
 class QnMobileClientUiControllerPrivate
 {
@@ -91,11 +94,29 @@ QnMobileClientUiController::QnMobileClientUiController(
 
             nx::vms::client::core::appContext()->coreSettings()->lastConnection = {};
 
-            using UiMessages = nx::vms::client::mobile::UiMessages;
-            const auto errorText =
-                UiMessages::getConnectionErrorText(errorCode, moduleInformation);
+            if (errorCode == RemoteConnectionErrorCode::truncatedSessionToken
+                && windowContext()->uiController()->screens()->showCloudLoginScreen(
+                    /*reauthentication*/ true))
+            {
+                connect(nx::vms::client::core::appContext()->cloudStatusWatcher(),
+                    &nx::vms::client::core::CloudStatusWatcher::credentialsChanged,
+                    this,
+                    [this, moduleInformation]()
+                    {
+                        sessionManager()->startCloudSession(
+                            moduleInformation.cloudSystemId, moduleInformation.systemName);
+                    },
+                    Qt::SingleShotConnection);
+            }
+            else
+            {
+                using UiMessages = nx::vms::client::mobile::UiMessages;
+                const auto errorText =
+                    UiMessages::getConnectionErrorText(errorCode, moduleInformation);
 
-            uiController()->showConnectionErrorMessage(moduleInformation.systemName, errorText);
+                uiController()->showConnectionErrorMessage(
+                    moduleInformation.systemName, errorText);
+            }
         };
     connect(sessionManager(), &SessionManager::sessionFinishedWithError, this, handleSessionError);
 }
