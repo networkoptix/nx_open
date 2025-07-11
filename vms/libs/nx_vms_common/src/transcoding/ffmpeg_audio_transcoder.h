@@ -89,6 +89,7 @@ private:
     const Config m_config;
     AVCodecContext* m_decoderCtx = nullptr;
     nx::media::ffmpeg::AudioEncoder m_encoder;
+    CodecParametersConstPtr m_decoderCodecParameters;
 
     bool m_isOpened = false;
     int m_channelNumber = 0;
