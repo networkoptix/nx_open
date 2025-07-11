@@ -819,12 +819,8 @@
       <translation>サスペンド状態およびシャットダウン状態のサイトは利用できません。</translation>
     </message>
     <message>
-      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation>アクセス可能なサイトが見つかりません。クラウドアカウントにログインするか、ローカルサーバーに接続してください。</translation>
-    </message>
-    <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>ここからアクセスするには、クラウドポータルで組織を作成してください。</translation>
     </message>
   </context>
   <context>

@@ -820,12 +820,8 @@
       <translation>Os sitios en estado Suspendido ou Pechado non están dispoñibles</translation>
     </message>
     <message>
-      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation>Non se atoparon sitios web accesibles. Inicia sesión na conta da nube ou conéctate a un servidor local</translation>
-    </message>
-    <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Crea unha organización no Portal da Nube para acceder a ela aquí</translation>
     </message>
   </context>
   <context>

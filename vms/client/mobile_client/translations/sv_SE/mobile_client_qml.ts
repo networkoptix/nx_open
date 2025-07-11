@@ -820,12 +820,8 @@
       <translation>Webbplatser i avstängt eller avstängt tillstånd är inte tillgängliga</translation>
     </message>
     <message>
-      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation>Inga tillgängliga webbplatser hittades. Logga in på molnkontot eller anslut till en lokal server</translation>
-    </message>
-    <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Skapa en organisation i molnportalen för att komma åt den här</translation>
     </message>
   </context>
   <context>

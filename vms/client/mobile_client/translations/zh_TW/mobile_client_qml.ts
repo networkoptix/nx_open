@@ -819,10 +819,6 @@
       <translation>處於暫停或關閉狀態的站點不會出現</translation>
     </message>
     <message>
-      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation>未找到可造訪的站點，請登入雲端帳號或連接本地伺服器</translation>
-    </message>
-    <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
       <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
     </message>

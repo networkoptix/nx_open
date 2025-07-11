@@ -822,10 +822,6 @@
       <translation>Witryny w stanie zawieszenia lub zamknięcia są niedostępne</translation>
     </message>
     <message>
-      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation>Nie znaleziono dostępnych witryn. Zaloguj się do konta w chmurze lub połącz się z lokalnym serwerem</translation>
-    </message>
-    <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
       <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
     </message>
