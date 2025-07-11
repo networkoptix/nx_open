@@ -62,7 +62,8 @@ Page
 
             SwitchSelector
             {
-                visible: controller?.bookmarkSearchSetup ?? false
+                visible: windowContext.mainSystemContext.featureAccess.canUseShareBookmark
+                    && (controller?.bookmarkSearchSetup ?? false)
 
                 text: qsTr("Shared Only")
                 checkState: (controller?.bookmarkSearchSetup?.searchSharedOnly ?? false)

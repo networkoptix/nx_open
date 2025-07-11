@@ -18,12 +18,12 @@
 #include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/watchers/feature_access_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/system_context_accessor.h>
 #include <nx/vms/client/mobile/window_context.h>
-#include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/ui/share_link_helper.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/common/api/helpers/bookmark_api_converter.h>
@@ -174,16 +174,15 @@ ShareBookmarkBackend::ShareBookmarkBackend(QObject* parent):
                     if (!NX_ASSERT(context))
                         return false;
 
-                    const auto manager = context->windowContext()->sessionManager();
+                    const auto featureAccess = context->featureAccess();
+                    if (!featureAccess)
+                        return false;
+
                     const auto currentUser = context->userWatcher()->user();
                     const bool hasManageBookmarksPermission =
                         context->resourceAccessManager()->hasAccessRights(
                             currentUser, d->resource(), api::AccessRight::manageBookmarks);
-                    return manager
-                        && manager->hasConnectedSession()
-                        && manager->isCloudSession()
-                        && manager->connectedServerVersion() >= utils::SoftwareVersion(6, 1)
-                        && context->moduleInformation().organizationId
+                    return featureAccess->canUseShareBookmark()
                         && hasManageBookmarksPermission;
                 }();
 
@@ -199,25 +198,27 @@ ShareBookmarkBackend::ShareBookmarkBackend(QObject* parent):
     connect(d.data(), &SystemContextAccessor::systemContextIsAboutToBeChanged, this,
         [this]()
         {
-            if (const auto systemContext = d->mobileSystemContext())
-            {
-                systemContext->windowContext()->sessionManager()->disconnect(this);
-                systemContext->disconnect(this);
-            }
+            const auto context = d->mobileSystemContext();
+            if (!context)
+                return;
+
+            if (const auto access = context->featureAccess())
+                access->disconnect(this);
         });
 
     connect(d.data(), &SystemContextAccessor::systemContextChanged, this,
         [this, updateAvailablity]()
         {
-            if (const auto context = d->mobileSystemContext())
+            const auto context = d->mobileSystemContext();
+            if (!context)
+                return;
+
+            if (const auto featureAccess = context->featureAccess())
             {
-                const auto manager = context->windowContext()->sessionManager();
-                connect(manager, &SessionManager::sessionHostChanged,
-                    this, updateAvailablity);
-                connect(manager, &SessionManager::hasConnectedSessionChanged,
-                    this, updateAvailablity);
-                connect(manager, &SessionManager::connectedServerVersionChanged,
-                    this, updateAvailablity);
+                connect(featureAccess,
+                    &core::FeatureAccessWatcher::canUseShareBookmarkChanged,
+                    this,
+                    updateAvailablity);
             }
 
             updateAvailablity();

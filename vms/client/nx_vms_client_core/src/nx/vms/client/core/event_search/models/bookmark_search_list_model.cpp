@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
+#include <nx/vms/client/core/watchers/feature_access_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/common/bookmark/bookmark_facade.h>
 #include <nx/vms/common/html/html.h>
@@ -381,7 +382,7 @@ QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
         case IsSharedBookmark:
             return bookmark.shareable()
                 && bookmark.bookmarkMatchesFilter(kSharedBookmarkFilters)
-                && systemContext()->moduleInformation().organizationId;
+                && systemContext()->featureAccess()->canUseShareBookmark();
         default:
             return base_type::data(index, role);
     }
