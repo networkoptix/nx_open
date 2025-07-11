@@ -820,10 +820,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Create an organization in the Cloud Portal to access it here</source>
         <translation type="unfinished"></translation>
     </message>
