@@ -978,10 +978,6 @@
         <source>Send Mobile Notification</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Add Source Device name to Body</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::rules::RepeatSoundAction</name>
@@ -1156,16 +1152,16 @@
 <context>
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
-        <source>Site HTTP(S) Request</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Endpoint</source>
         <translation></translation>
     </message>
     <message>
         <source>Content</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Internal HTTPS Request</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
