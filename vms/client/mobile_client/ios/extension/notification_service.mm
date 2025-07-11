@@ -341,7 +341,7 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
     self.cloudRefreshToken = cloudRefreshToken;
 
     const auto searchString = [NSString stringWithFormat: @"\"%s\"", self.user.c_str()];
-    const bool isInTargets = [[targets lowercasedString] containsString: searchString];
+    const bool isInTargets = [[targets lowercaseString] containsString: searchString];
     if (!isInTargets)
     {
         extension::Logger::log(kLogTag,
