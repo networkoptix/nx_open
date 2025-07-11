@@ -74,6 +74,7 @@ bool QnFfmpegAudioTranscoder::openDecoder(const CodecParametersConstPtr& context
         return false;
     }
 
+    m_decoderCodecParameters = context;
     m_isOpened = true;
     return true;
 }
@@ -91,10 +92,11 @@ bool QnFfmpegAudioTranscoder::isOpened() const
 int QnFfmpegAudioTranscoder::transcodePacket(
     const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
-    if (m_decoderCtx && media && m_decoderCtx->codec_id != media->compressionType)
+    if (m_decoderCodecParameters && media && media->context
+        && !media->context->isEqual(*m_decoderCodecParameters))
     {
-        NX_DEBUG(this, "Input audio codec changed from: %1 to %2",
-            m_decoderCtx->codec_id, media->compressionType);
+        NX_DEBUG(this, "Input audio codec parameters changed from: %1 to %2",
+            m_decoderCodecParameters->toString(), media->context->toString());
 
         if (!openDecoder(media->context))
         {

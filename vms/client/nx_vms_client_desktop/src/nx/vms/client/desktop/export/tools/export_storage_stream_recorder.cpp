@@ -377,7 +377,7 @@ void ExportStorageStreamRecorder::reportFinished()
 void ExportStorageStreamRecorder::afterClose()
 {
     m_lastVideoCodec = AV_CODEC_ID_NONE;
-    m_lastAudioCodec = AV_CODEC_ID_NONE;
+    m_audioCodecParameters.reset();
 }
 
 void ExportStorageStreamRecorder::onFlush(StorageContext& /*context*/)
@@ -444,17 +444,17 @@ bool ExportStorageStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md
     }
     else if (md->dataType == QnAbstractMediaData::AUDIO)
     {
-        if (m_lastAudioCodec != AV_CODEC_ID_NONE
-            && md->compressionType != m_lastAudioCodec
+        if (m_audioCodecParameters && md->context
+            && !m_audioCodecParameters->isEqual(*md->context)
             && !m_audioTranscoder)
         {
-            NX_DEBUG(this, "Audio compression type has changed from %1 to %2. Close file",
-                m_lastAudioCodec, md->compressionType);
+            NX_DEBUG(this, "Audio codec parameters have changed from %1 to %2. Close file",
+                m_audioCodecParameters->toString(), md->context->toString());
 
             setLastError(nx::recording::Error::Code::audioTranscodingRequired);
             return false;
         }
-        m_lastAudioCodec = md->compressionType;
+        m_audioCodecParameters = md->context;
     }
     else if (auto metadata = std::dynamic_pointer_cast<const QnCompressedMetadata>(md))
     {

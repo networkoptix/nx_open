@@ -1934,9 +1934,7 @@ bool QnCamDisplay::isAudioHoleDetected(QnCompressedVideoDataPtr vd)
 {
     if (!vd)
         return false;
-    bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
-    if (!isVideoCamera)
-        return false; // do not change behaviour for local files
+
     if (m_videoQueue->isEmpty())
         return false;
     //return m_videoQueue->last()->timestamp - m_videoQueue->first()->timestamp >= MAX_FRAME_DURATION_MS*1000ll;
