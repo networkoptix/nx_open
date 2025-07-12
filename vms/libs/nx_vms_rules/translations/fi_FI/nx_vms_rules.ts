@@ -1161,7 +1161,7 @@
     </message>
     <message>
       <source>Internal HTTPS Request</source>
-      <translation type="unfinished">Internal HTTPS Request</translation>
+      <translation>Sisäinen HTTPS-pyyntö</translation>
     </message>
   </context>
   <context>

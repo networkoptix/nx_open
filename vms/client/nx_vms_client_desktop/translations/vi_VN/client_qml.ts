@@ -765,7 +765,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>Kiểm tra sự kiện</translation>
     </message>
     <message>
       <source>Test</source>
@@ -3101,7 +3101,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>Sự kiện thử nghiệm...</translation>
     </message>
   </context>
   <context>

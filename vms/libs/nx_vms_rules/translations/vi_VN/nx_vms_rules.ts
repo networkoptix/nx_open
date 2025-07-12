@@ -471,22 +471,22 @@
     </message>
     <message>
       <source>I/O Module disconnected</source>
-      <translation type="unfinished">I/O Module disconnected</translation>
+      <translation>Mô-đun I/O bị ngắt kết nối</translation>
     </message>
     <message>
       <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device disconnected at %1</translation>
+      <translation>Thiết bị bị ngắt kết nối tại %1</translation>
     </message>
     <message>
       <source>Camera disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera disconnected at %1</translation>
+      <translation>Camera bị ngắt kết nối tại %1</translation>
     </message>
     <message>
       <source>I/O Module disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module disconnected at %1</translation>
+      <translation>Mô-đun I/O bị ngắt kết nối tại %1</translation>
     </message>
   </context>
   <context>
@@ -671,7 +671,7 @@
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>Not allowed HTTP method</source>
-      <translation type="unfinished">Not allowed HTTP method</translation>
+      <translation>Không được phép sử dụng phương thức HTTP</translation>
     </message>
   </context>
   <context>
@@ -1106,7 +1106,7 @@
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>Cơ sở dữ liệu cục bộ được phát hiện bị hỏng và không thể khôi phục. Một cơ sở dữ liệu trống mới đã được khởi tạo. Một bản sao lưu của cơ sở dữ liệu bị hỏng đã được lưu để tham khảo.</translation>
     </message>
   </context>
   <context>
@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>Internal HTTPS Request</source>
-      <translation type="unfinished">Internal HTTPS Request</translation>
+      <translation>Yêu cầu HTTPS nội bộ</translation>
     </message>
   </context>
   <context>

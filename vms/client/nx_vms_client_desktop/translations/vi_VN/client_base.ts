@@ -4176,7 +4176,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>Thiết lập 2FA</translation>
     </message>
   </context>
   <context>
@@ -6127,11 +6127,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Cần phải chuyển mã video. Đã khởi động lại phiên xuất.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>Cần phải chuyển mã âm thanh. Phiên xuất đã được khởi động lại.</translation>
     </message>
   </context>
   <context>
@@ -6880,7 +6880,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>Chỉ những khoảng thời gian ngoại tuyến của camera hoặc máy chủ xảy ra sau khi bật tùy chọn này mới được tự động nhập. Xin lưu ý: nếu bạn tắt tùy chọn này, bất kỳ khoảng thời gian ngoại tuyến nào chưa được nhập sẽ bị mất và không thể khôi phục sau này.</translation>
     </message>
   </context>
   <context>
@@ -7096,12 +7096,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>Không thể thực hiện thao tác Thay thế Camera vì máy chủ không khả dụng.</translation>
     </message>
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the site and replaced by the selected camera</translation>
+      <translation>%1 sẽ bị xóa khỏi Chi nhánh và thay thế bằng camera đã chọn</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
@@ -7109,7 +7109,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>
-      <translation type="unfinished">Some data and settings may not be supported for the new camera</translation>
+      <translation>Một số dữ liệu và cài đặt có thể không được hỗ trợ cho camera mới</translation>
     </message>
   </context>
   <context>
@@ -7936,8 +7936,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>Nhật ký sự kiện trong khoảng thời gian từ %1 đến %2 - Hiển thị %n sự kiện đầu tiên. Để tìm sự kiện cụ thể, vui lòng điều chỉnh phạm vi ngày hoặc áp dụng các bộ lọc bổ sung</numerusform>
       </translation>
     </message>
   </context>
