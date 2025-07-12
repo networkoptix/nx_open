@@ -823,7 +823,7 @@
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Utwórz organizację w Portalu Chmury, aby uzyskać do niej dostęp</translation>
     </message>
   </context>
   <context>

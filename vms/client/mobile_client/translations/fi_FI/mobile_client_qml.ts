@@ -374,7 +374,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Vain Jaettu</translation>
     </message>
   </context>
   <context>
@@ -821,7 +821,7 @@
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Luo organisaatio Pilviportaaliin päästäksesi siihen täällä</translation>
     </message>
   </context>
   <context>

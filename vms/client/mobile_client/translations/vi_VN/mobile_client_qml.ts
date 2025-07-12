@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>Thông tin cần thiết</translation>
     </message>
   </context>
   <context>
@@ -137,7 +137,7 @@
     <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation type="unfinished">Log in to the site in %1</translation>
+      <translation>Đăng nhập vào Chi nhánh trong %1</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
@@ -150,17 +150,17 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+      <translation>Nếu Chi nhánh &lt;font color=&apos;%2&apos;&gt;không được kết nối&lt;/a&gt; với %1</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>Nhấp vào &quot;Kết nối Chi nhánh với %1&quot; trong tab %1 trong Quản trị Chi nhánh</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
+      <translation>Nếu Chi nhánh được kết nối &lt;font color=&apos;%2&apos;&gt;&lt;/a&gt; với %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
+      <translation>Mở trang Cài đặt Chi nhánh và nhấp vào liên kết &quot;thay đổi&quot; bên cạnh tên chủ sở hữu</translation>
     </message>
   </context>
   <context>
@@ -373,7 +373,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Chỉ chia sẻ</translation>
     </message>
   </context>
   <context>
@@ -804,7 +804,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Làm thế nào để kết nối?</translation>
     </message>
     <message>
       <source>Folder is empty</source>
@@ -812,15 +812,15 @@
     </message>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Quyền truy cập vào tài nguyên bị từ chối</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Các Chi nhánh ở trạng thái Bị tạm dừng hoặc Tắt máy không khả dụng</translation>
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Tạo một tổ chức trong Cổng thông tin đám mây để truy cập tại đây</translation>
     </message>
   </context>
   <context>
@@ -977,7 +977,7 @@
     </message>
     <message>
       <source>Host:Port</source>
-      <translation type="unfinished">Host:Port</translation>
+      <translation>Máy chủ: Cổng</translation>
     </message>
   </context>
   <context>
@@ -1022,11 +1022,11 @@
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Quyền truy cập vào tài nguyên bị từ chối</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Các Chi nhánh ở trạng thái Bị tạm dừng hoặc Tắt máy không khả dụng</translation>
     </message>
   </context>
   <context>
@@ -1168,7 +1168,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>Thông tin cần thiết</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -1238,7 +1238,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Mất kết nối. Đang kết nối lại...</translation>
     </message>
   </context>
 </TS>
