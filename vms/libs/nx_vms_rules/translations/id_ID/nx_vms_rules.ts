@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>Internal HTTPS Request</source>
-      <translation type="unfinished">Internal HTTPS Request</translation>
+      <translation>Permintaan HTTPS Internal</translation>
     </message>
   </context>
   <context>

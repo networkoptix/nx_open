@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>Internal HTTPS Request</source>
-      <translation type="unfinished">Internal HTTPS Request</translation>
+      <translation>内部 HTTPS リクエスト</translation>
     </message>
   </context>
   <context>

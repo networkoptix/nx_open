@@ -374,7 +374,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Vain Jaettu</translation>
     </message>
   </context>
   <context>
@@ -689,11 +689,11 @@
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this layout</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this layout</translation>
+      <translation>Emme löytäneet yhtään kameraa tässä asettelussa</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
+      <translation>Emme löytäneet tältä kohteelta kameroita. Voit lisätä ne työpöytäsovellukseemme.</translation>
     </message>
   </context>
   <context>
@@ -825,7 +825,7 @@
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Luo organisaatio Pilviportaaliin päästäksesi siihen täällä</translation>
     </message>
   </context>
   <context>

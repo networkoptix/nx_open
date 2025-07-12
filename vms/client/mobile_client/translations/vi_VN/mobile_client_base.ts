@@ -19,7 +19,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Chỉ chia sẻ</translation>
     </message>
   </context>
   <context>
@@ -79,7 +79,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>Không thể chia sẻ dấu trang.</translation>
     </message>
   </context>
   <context>
