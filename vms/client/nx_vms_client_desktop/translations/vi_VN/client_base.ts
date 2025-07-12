@@ -6818,11 +6818,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Cần phải chuyển mã video. Đã khởi động lại phiên xuất.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>Cần phải chuyển mã âm thanh. Phiên xuất đã được khởi động lại.</translation>
     </message>
   </context>
   <context>
