@@ -107,7 +107,7 @@ TEST(Analytics, Deserialization)
             ASSERT_EQ(dependentAttribute.type, AttributeType::enumeration);
             ASSERT_EQ(dependentAttribute.name, "model");
             ASSERT_NE(dependentAttribute.items, std::nullopt);
-            std::vector<Item> dependentAttributeItems;
+            std::vector<QString> dependentAttributeItems;
             dependentAttributeItems.push_back("model1");
             dependentAttributeItems.push_back("model2");
             dependentAttributeItems.push_back("model3");
@@ -161,7 +161,7 @@ TEST(Analytics, Deserialization)
             ASSERT_EQ(dependentAttribute.type, AttributeType::enumeration);
             ASSERT_EQ(dependentAttribute.name, "model");
             ASSERT_NE(dependentAttribute.items, std::nullopt);
-            std::vector<Item> dependentAttributeItems;
+            std::vector<QString> dependentAttributeItems;
             dependentAttributeItems.push_back("model1");
             dependentAttributeItems.push_back("model2");
             dependentAttributeItems.push_back("model3");
@@ -218,7 +218,7 @@ TEST(Analytics, Deserialization)
             ASSERT_EQ(dependentAttribute.type, AttributeType::enumeration);
             ASSERT_EQ(dependentAttribute.name, "model");
             ASSERT_NE(dependentAttribute.items, std::nullopt);
-            std::vector<Item> dependentAttributeItems;
+            std::vector<QString> dependentAttributeItems;
             dependentAttributeItems.push_back("model1");
             dependentAttributeItems.push_back("model2");
             dependentAttributeItems.push_back("model3");
@@ -278,7 +278,7 @@ TEST(Analytics, Deserialization)
             ASSERT_EQ(dependentAttribute.type, AttributeType::enumeration);
             ASSERT_EQ(dependentAttribute.name, "model");
             ASSERT_NE(dependentAttribute.items, std::nullopt);
-            std::vector<Item> dependentAttributeItems;
+            std::vector<QString> dependentAttributeItems;
             dependentAttributeItems.push_back("model1");
             dependentAttributeItems.push_back("model2");
             dependentAttributeItems.push_back("model3");
