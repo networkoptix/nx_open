@@ -109,6 +109,7 @@ private:
     CodecParametersConstPtr m_context;
 
     int m_dstSampleRate;
+    CodecParametersConstPtr m_decoderCodecParameters;
 
     bool m_isOpened;
     int m_channelNumber = 0;

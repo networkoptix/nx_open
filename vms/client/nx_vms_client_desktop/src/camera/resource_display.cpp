@@ -185,9 +185,6 @@ void QnResourceDisplay::play() {
         return;
 
     m_archiveReader->resumeMedia();
-
-    //if (m_graphicsWidget->isSelected() || !m_playing)
-    //    m_camera->getCamDisplay()->playAudio(m_playing);
 }
 
 void QnResourceDisplay::pause() {

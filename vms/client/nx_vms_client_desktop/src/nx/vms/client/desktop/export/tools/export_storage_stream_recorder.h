@@ -60,7 +60,7 @@ private:
     Qn::StreamQuality m_transcodeQuality = Qn::StreamQuality::normal;
     int m_transcoderFixedFrameRate = 0;
     AVCodecID m_lastVideoCodec = AV_CODEC_ID_NONE;
-    AVCodecID m_lastAudioCodec = AV_CODEC_ID_NONE;
+    CodecParametersConstPtr m_audioCodecParameters;
     MediaSigner m_signer;
     bool m_stitchTimestampGaps = true;
     TimestampCorrector m_timestampStitcher;
