@@ -296,6 +296,9 @@ Item
             id: playbackControls
 
             visible: !controller.serverOffline
+                && !controller.needsCloudAuthorization
+                && !controller.systemConnecting
+
             anchors.fill: parent
 
             MotionPlaybackMaskWatcher
@@ -324,7 +327,10 @@ Item
                 bottomOverlap: 16
                 motionSearchMode: videoNavigation.motionSearchMode
                 enabled: d.hasArchive
+
                 visible: videoNavigation.canViewArchive
+                    && !controller.needsCloudAuthorization
+                    && !controller.systemConnecting
 
                 anchors.bottom: parent.bottom
 
@@ -588,6 +594,8 @@ Item
 
                     property bool shouldBeVisible:
                     {
+                        if (controller.needsCloudAuthorization || controller.systemConnecting)
+                            return false
                         var currentTime = (new Date()).getTime()
                         var futurePosition = position > currentTime
                         var canViewArchive = videoNavigation.canViewArchive
