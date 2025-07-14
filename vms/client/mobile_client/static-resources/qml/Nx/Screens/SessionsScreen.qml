@@ -505,14 +505,15 @@ Page
                         return {
                             imageSource: "image://skin/64x64/Outline/no_access.svg?primary=light10",
                             text: qsTr("Access to Resources Denied"),
-                            description: qsTr("Sites in the Suspended or Shutdown state are not available"),
+                            description: qsTr("The resources in this organization are not "
+                                + "available to your permission group"),
                         }
                     }
 
                     return {
                         imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
                         text: kNoSites,
-                        description: "Connect a site to the organization to access it here",
+                        description: qsTr("Connect a site to the organization to access it here"),
                         buttonText: isAdministrator ? qsTr("How to connect?") : "",
                         buttonIconSource: "image://skin/24x24/Outline/cloud.svg?primary=dark1",
                         clickHandler: () => { cloudConnectionHelp.open() }
@@ -532,8 +533,8 @@ Page
                     return {
                         imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
                         text: kNoSites,
-                        description: "No accessible sites were found. " +
-                            "Log in into the cloud account or connect to a local server",
+                        description: qsTr("No accessible sites were found. " +
+                            "Log in into the cloud account or connect to a local server"),
                         buttonText: qsTr("Log In"),
                         buttonIconSource: "image://skin/24x24/Outline/cloud.svg?primary=dark1",
                         clickHandler: () => { Workflow.openCloudLoginScreen() }
@@ -543,8 +544,8 @@ Page
                 return {
                     imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
                     text: kNoSites,
-                    description: "No accessible sites were found. " +
-                        "Request access to existing sites or connect to a local server",
+                    description: qsTr("No accessible sites were found. " +
+                        "Request access to existing sites or connect to a local server"),
                 }
             }
 
