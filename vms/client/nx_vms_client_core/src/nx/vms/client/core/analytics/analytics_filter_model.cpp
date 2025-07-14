@@ -332,21 +332,8 @@ QStringList AnalyticsFilterModel::getAnalyticsObjectTypeIds(ObjectType* filterOb
     if (!filterObjectType)
         return {};
 
-    auto ids = filterObjectType->fullSubtreeTypeIds();
-
-    QStringList result;
-    result.reserve(ids.size() + 1);
-
-    // Base filtered object type must present in the ids list on the first position to be able
-    // to filter both by base type and any derived type.
-    result.push_back(filterObjectType->id());
-    std::move(
-        std::make_move_iterator(ids.begin()),
-        std::make_move_iterator(ids.end()),
-        std::back_inserter(result)
-    );
-
-    return result;
+    const auto ids = filterObjectType->fullSubtreeTypeIds();
+    return QStringList{ids.begin(), ids.end()};
 }
 
 bool AnalyticsFilterModel::isActive() const
