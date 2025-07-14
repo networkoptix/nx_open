@@ -312,7 +312,10 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(mobile_client);
 
-    QQuickStyle::setStyle("Basic");
+    // Needed only in mobile_25.2 as we have Qt 6.9.1 in master which works for Basic style out of
+    // the box.
+    if (!nx::build_info::isIos())
+        QQuickStyle::setStyle("Basic");
 
     nx::utils::rlimit::setMaxFileDescriptors(1024);
 
