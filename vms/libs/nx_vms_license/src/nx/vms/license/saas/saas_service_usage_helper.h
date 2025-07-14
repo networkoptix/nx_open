@@ -72,10 +72,12 @@ public:
     /* Propose change in integration usage for some resource.
      *  @param resourceId Resource Id.
      *  @param integrations Set of used integration.
+     *  @return pair of numbers: new licensed engines added, old licensed engines removed.
      */
-    void proposeChange(const nx::Uuid& resourceId, const std::set<nx::Uuid>& integrations);
+    std::tuple<int, int> proposeChange(const nx::Uuid& resourceId,
+        const std::set<nx::Uuid>& integrations);
 
-    void proposeChange(const std::vector<Propose>& data);
+    std::tuple<int, int> proposeChange(const std::vector<Propose>& data);
 
     void invalidateCache();
 private:

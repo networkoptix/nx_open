@@ -1812,9 +1812,12 @@ struct ModifyResourceParamAccess
     {
         auto newEngines = QJson::deserialized<std::set<nx::Uuid>>(param.value.toUtf8());
         nx::vms::license::saas::IntegrationServiceUsageHelper helper(systemContext);
-        helper.proposeChange(param.resourceId, newEngines);
-        if (helper.isOverflow())
+        const auto [newLicensedEnginesAddedCount, _] =
+            helper.proposeChange(param.resourceId, newEngines);
+        if (helper.isOverflow() && (newLicensedEnginesAddedCount > 0))
         {
+            NX_DEBUG(this, "Not enough integration licenses for camera %1.",
+                param.resourceId.toStdString(QUuid::WithBraces));
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "Not enough integration licenses for camera %1."), param.resourceId));
         }

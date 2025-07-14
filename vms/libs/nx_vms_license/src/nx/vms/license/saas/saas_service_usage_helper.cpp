@@ -136,18 +136,21 @@ std::map<QString, LicenseSummaryDataEx> IntegrationServiceUsageHelper::allInfo()
     return *m_cache;
 }
 
-void IntegrationServiceUsageHelper::proposeChange(
+std::tuple<int, int> IntegrationServiceUsageHelper::proposeChange(
     const nx::Uuid& resourceId, const std::set<nx::Uuid>& integrations)
 {
     std::vector<Propose> data;
     data.push_back(Propose{resourceId, integrations});
-    proposeChange(data);
+    return proposeChange(data);
 }
 
-void IntegrationServiceUsageHelper::proposeChange(const std::vector<Propose>& data)
+std::tuple<int, int> IntegrationServiceUsageHelper::proposeChange(const std::vector<Propose>& data)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     updateCacheUnsafe();
+
+    int newLicensedEnginesAddedCount = 0;
+    int oldLicensedEnginesRemovedCount = 0;
 
     for (const auto& propose: data)
     {
@@ -163,6 +166,7 @@ void IntegrationServiceUsageHelper::proposeChange(const std::vector<Propose>& da
                 {
                     auto& value = (*m_cache)[manifest.id];
                     --value.inUse;
+                    ++oldLicensedEnginesRemovedCount;
                 }
             }
         }
@@ -175,10 +179,14 @@ void IntegrationServiceUsageHelper::proposeChange(const std::vector<Propose>& da
                 {
                     auto& value = (*m_cache)[manifest.id];
                     ++value.inUse;
+                    ++newLicensedEnginesAddedCount;
                 }
             }
         }
     }
+
+    return std::make_tuple(newLicensedEnginesAddedCount,
+        oldLicensedEnginesRemovedCount);
 }
 
 bool IntegrationServiceUsageHelper::isOverflow() const
@@ -211,10 +219,10 @@ std::map<nx::Uuid, std::set<QString>> IntegrationServiceUsageHelper::camerasBySe
         {
             if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId))
             {
-                const auto manufest = r->plugin()->manifest();
-                if (manufest.isLicenseRequired)
+                const auto manifest = r->plugin()->manifest();
+                if (manifest.isLicenseRequired)
                 {
-                    const auto& serviceId = serviceByIntegration.value(manufest.id);
+                    const auto& serviceId = serviceByIntegration.value(manifest.id);
                     result[serviceId].insert(camera->getPhysicalId());
                 }
             }
