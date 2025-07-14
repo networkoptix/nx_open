@@ -146,8 +146,14 @@ void QnCloudStatusPanel::resizeEvent(QResizeEvent* event)
 {
     base_type::resizeEvent(event);
 
-    d_ptr->loggedInMenu->setFixedWidth(event->size().width());
-    d_ptr->offlineMenu->setFixedWidth(event->size().width());
+    const auto adjustMenuWidth =
+        [eventWidth = event->size().width()](QMenu* menu)
+        {
+            menu->setFixedWidth(std::max(eventWidth, menu->sizeHint().width()));
+        };
+
+    adjustMenuWidth(d_ptr->loggedInMenu);
+    adjustMenuWidth(d_ptr->offlineMenu);
 }
 
 void QnCloudStatusPanel::paintEvent(QPaintEvent* event)
