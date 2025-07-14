@@ -110,30 +110,12 @@ constexpr auto nxReflectVisitAllEnumItems(AttributeType*, Visitor&& visitor)
         Item{AttributeType::object, "Object"});
 }
 
-struct AttributeDescription;
-
-struct ItemObject
-{
-    /**%apidoc[opt] */
-    QString value;
-    /**%apidoc[opt] */
-    std::vector<AttributeDescription> dependentAttributes;
-
-    bool operator==(const ItemObject& other) const = default;
-};
-#define ItemObject_Fields \
-    (value) \
-    (dependentAttributes)
-
-using Item = std::variant<ItemObject, QString>;
-
-struct AttributeDescription
+struct AttributeDescriptionCommon
 {
     /**%apidoc[opt] */
     QString name;
     std::optional<AttributeType> type; /**< Can be omitted for Enum and Color attributes. */
     std::optional<QString> subtype; /**< One of: empty, a Name, "integer" or "float" for Numbers. */
-    std::optional<std::vector<std::variant<ItemObject, QString>>> items; /**< Only for Enums. */
     std::optional<QString> unit; /**< Only for Number. Can be empty. */
 
     /**%apidoc:integer */
@@ -151,21 +133,96 @@ struct AttributeDescription
      */
     std::optional<QString> condition;
 
-    bool operator==(const AttributeDescription& other) const = default;
+    AttributeDescriptionCommon()
+    {
+    }
+
+    AttributeDescriptionCommon(const AttributeDescriptionCommon& other)
+        : name(other.name),
+        type(other.type),
+        subtype(other.subtype),
+        unit(other.unit),
+        minValue(other.minValue),
+        maxValue(other.maxValue),
+        attributeList(other.attributeList),
+        condition(other.condition)
+    {
+    }
+
+    bool operator==(const AttributeDescriptionCommon& other) const = default;
 };
-#define AttributeDescription_Fields \
+
+#define AttributeDescriptionCommon_Fields \
     (name)\
     (type)\
     (subtype)\
-    (items)\
     (unit)\
     (minValue)\
     (maxValue)\
     (attributeList)\
     (condition)
 
-NX_REFLECTION_INSTRUMENT(ItemObject, ItemObject_Fields);
+struct DependentAttributeDescription : AttributeDescriptionCommon
+{
+    std::optional<std::vector<QString>> items; /**< Only for Enums. */
 
+    bool operator==(const DependentAttributeDescription& other) const = default;
+};
+#define DependentAttributeDescription_Fields \
+    AttributeDescriptionCommon_Fields \
+    (items)
+
+struct ItemObject
+{
+    /**%apidoc[opt] */
+    QString value;
+    /**%apidoc[opt] */
+    std::vector<DependentAttributeDescription> dependentAttributes;
+
+    bool operator==(const ItemObject& other) const = default;
+};
+#define ItemObject_Fields \
+    (value) \
+    (dependentAttributes)
+
+using Item = std::variant<ItemObject, QString>;
+
+struct AttributeDescription : AttributeDescriptionCommon
+{
+    std::optional<std::vector<std::variant<ItemObject, QString>>> items; /**< Only for Enums. */
+
+    bool operator==(const AttributeDescription& other) const = default;
+
+    AttributeDescription()
+    {
+    }
+
+    AttributeDescription(const AttributeDescription& other)
+        : AttributeDescriptionCommon(other),
+        items(other.items)
+    {
+    }
+
+    AttributeDescription(const DependentAttributeDescription& dep)
+        : AttributeDescriptionCommon(dep)
+    {
+        if (dep.items)
+        {
+            std::vector<Item> convertedItems;
+            for (const auto& item : *dep.items)
+                convertedItems.emplace_back(QString(item));
+            items = std::move(convertedItems);
+        }
+    }
+};
+
+#define AttributeDescription_Fields \
+    AttributeDescriptionCommon_Fields \
+    (items)
+
+NX_REFLECTION_INSTRUMENT(AttributeDescriptionCommon, AttributeDescriptionCommon_Fields);
+NX_REFLECTION_INSTRUMENT(ItemObject, ItemObject_Fields);
+NX_REFLECTION_INSTRUMENT(DependentAttributeDescription, DependentAttributeDescription_Fields);
 NX_REFLECTION_INSTRUMENT(AttributeDescription, AttributeDescription_Fields);
 
 struct ExtendedType: public NamedItem
