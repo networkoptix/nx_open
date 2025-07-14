@@ -302,3 +302,17 @@ inline detail::synth3way_t<Tp> operator<=>(
 #endif // defined(_LIBCPP_COMPILER_CLANG_BASED)
 
 #endif // defined(__clang__) && (__clang_major__ < kClangMissingCpp20SupportVersion)
+
+// std::ranges::to Might not be implemented by some compilers (Linux CI fails as of this writing)
+#if defined(__GNUC__) && !defined(__clang__)
+    #if (__GNUC__ < 15)
+        #define NX_UTILS_NO_STD_RANGES_TO 1
+    #endif
+#else
+    #if __has_include(<version>)
+        #include <version>
+    #endif
+    #if !defined(__cpp_lib_ranges_to_container) || (__cpp_lib_ranges_to_container < 202202L)
+        #define NX_UTILS_NO_STD_RANGES_TO 1
+    #endif
+#endif

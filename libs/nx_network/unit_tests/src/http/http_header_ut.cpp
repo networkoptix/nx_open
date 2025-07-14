@@ -3,9 +3,14 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/http_types.h>
+#include <nx/network/utils.h>
 #include <nx/utils/random.h>
 
 namespace nx::network::http::header::test {
+
+namespace {
+
+using nx::network::http::HttpHeaders;
 
 class HttpHeaderStrictTransportSecurity:
     public ::testing::Test
@@ -175,4 +180,51 @@ TEST_F(HttpHeaderForwarded, parse_and_serialize_are_symmetric)
         "for=192.0.2.43, for=198.51.100.17");
 }
 
+using CookieNamePair = std::pair<std::string_view, std::string_view>;
+
+static const std::pair<HttpHeaders, CookieNamePair> kCases[] = {
+    {{{"Cookie", ""}}, {"", ""}},
+    {{{"Cookie", "; "}}, {"", ""}},
+    {{{"Cookie", "sid=abc"}}, {"sid", "abc"}},
+    {{{"Cookie", "a=1; b=2"}}, {"a", "1"}},
+    {{{"Cookie", "c=3"}, {"Cookie", "d=4"}, {"Other-Header", "v"}}, {"c", "3"}},
+    {{{"Cookie", "   token=value  "}}, {"token", "value"}},
+    {{{"Cookie", ";foo=bar"}}, {"foo", "bar"}},
+    {{{"Cookie", "foo=bar; "}}, {"foo", "bar"}},
+    {{{"Cookie", "key="}}, {"key", ""}},
+    {{{"Cookie", "q=\"quoted value\"; x=y"}}, {"q", "\"quoted value\""}},
+    {{{"Cookie", "   k = v "}, {"Cookie", "z=9"}}, {"k", "v"}},
+    {{/* empty */}, {"", ""}},
+
+    // This should be reported, but as of this writing are just ignored.
+    {{{"Cookie", "invalid"}}, {"", ""}},
+    {{{"Cookie", "invalid= also_invalid=;"}}, {"", ""}},
+};
+
+class CookieParseTest: public ::testing::TestWithParam<std::pair<HttpHeaders, CookieNamePair>>
+{
+};
+
+TEST_P(CookieParseTest, cookiesView)
+{
+    const auto& [headers, expected] = GetParam();
+    const std::vector parsed = headers
+        | nx::network::utils::cookiesView()
+        | nx::utils::ranges::to<std::vector>()
+        ;
+
+    if (expected.first.empty() && expected.second.empty())
+    {
+        EXPECT_TRUE(parsed.empty());
+        return;
+    }
+
+    ASSERT_FALSE(parsed.empty()) << "No cookies parsed";
+    EXPECT_EQ(parsed.front().first, expected.first);
+    EXPECT_EQ(parsed.front().second, expected.second);
+}
+
+INSTANTIATE_TEST_SUITE_P(Headers, CookieParseTest, ::testing::ValuesIn(kCases));
+
+} // namespace
 } // namespace nx::network::http::header::test

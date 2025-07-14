@@ -234,7 +234,7 @@ private:
     CustomHandshakeConnectionFactory m_customHandshakeConnectionFactory;
     bool m_acceptSuspended = false;
     std::atomic<int> m_connectionSequence = 0;
-    utils::Counter m_startedAsyncHandshakeCancellationsCounter;
+    nx::utils::Counter m_startedAsyncHandshakeCancellationsCounter;
 
     void openConnections(const nx::Locker<nx::Mutex>& /*lock*/)
     {

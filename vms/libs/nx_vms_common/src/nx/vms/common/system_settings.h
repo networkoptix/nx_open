@@ -91,6 +91,7 @@ struct NX_VMS_COMMON_API SystemSettingNames
     DECLARE_SETTING_NAME(pixelationSettings);
     DECLARE_SETTING_NAME(proxyConnectionAccessPolicy);
     DECLARE_SETTING_NAME(deviceStorageInfoUpdateIntervalS);
+    DECLARE_SETTING_NAME(secureCookieStorageKey);
 
     static const inline std::set<QString> kReadOnlyNames = {
         cloudAccountName,
@@ -133,6 +134,7 @@ struct NX_VMS_COMMON_API SystemSettingNames
 
     static const inline std::set<QString> kHiddenNames = {
         ldap,
+        secureCookieStorageKey,
     };
 
     static const std::set<QString> kPowerUsersOnlyNames;
@@ -564,6 +566,9 @@ public:
 
     bool isAllowRegisteringIntegrationsEnabled() const;
     void setAllowRegisteringIntegrationsEnabled(bool value);
+
+    QByteArray secureCookieStorageKey() const;
+    void setSecureCookieStorageKey(QByteArray);
 
 signals:
     void initialized();

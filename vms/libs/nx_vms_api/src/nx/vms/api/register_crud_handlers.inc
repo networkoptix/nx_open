@@ -3167,6 +3167,37 @@ static void registerMiscRestHandlers(
         std::make_unique<UserGroupsPermissionsHandler>(
             systemContext->resourceAccessManager(),
             systemContext->userGroupManager()));
+
+    /**%apidoc GET /rest/v{4-}/secureCookieStorage
+     * %caption Decode all secure cookies
+     * %ingroup Utilities
+     * %param[ref] _strict
+     * %permissions Authorization is not required.
+     * %return:{std::map<QString, DecodedValue>} Map of decoded secure cookie values.
+     *
+     * %apidoc GET /rest/v{4-}/secureCookieStorage/{name}
+     * %caption Decode a secure cookie
+     * %ingroup Utilities
+     * %param:string name Name of the secure cookie to decode.
+     * %param[ref] _strict
+     * %permissions Authorization is not required.
+     * %return:{DecodedValue} Decoded secure cookie value.
+     *
+     * %apidoc PUT /rest/v{4-}/secureCookieStorage/{name}
+     * %caption Encode value
+     * %ingroup Utilities
+     * %struct EncodeValue
+     * %param value Value to encode.
+     * %param expiresS Duration in seconds. 2 years if unspecified.
+     * %param:string name Name of the secure cookie to decode.
+     * %param[ref] _strict
+     * %permissions Authorization is not required.
+     * %return:{EncodeValue}
+     *     %param[unused] name
+     *     %param expiresS Expiration timestamp in seconds since epoch.
+     */
+    reg("rest/v{4-}/secureCookieStorage/:name?", GlobalPermission::none,
+        std::make_unique<SecureCookieStorageHandler>(systemContext));
 }
 
 static void registerExperimentalHandlers(

@@ -13,6 +13,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/value_cache.h>
@@ -244,6 +245,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* showMouseTimelinePreviewAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::chrono::seconds>* cloudPollingIntervalSAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* allowRegisteringIntegrationsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QByteArray>* secureCookieStorageKey = nullptr;
 
     AdaptorList allAdaptors;
     std::unordered_set<QString> settingNames;
@@ -977,6 +979,11 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
                 return tr("Enable or disable the creation of new Integration registration requests");
             });
 
+    d->secureCookieStorageKey = new QnLexicalResourcePropertyAdaptor<QByteArray>("secureCookieStorageKey",
+            /*defaultValue*/ QByteArray{},
+            this,
+            [] { return tr("Encryption key used to encode secure cookie values."); });
+
     connect(
         d->systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -1567,6 +1574,19 @@ void SystemSettings::setAllowRegisteringIntegrationsEnabled(bool value)
 {
     d->allowRegisteringIntegrationsAdaptor->setValue(value);
 }
+
+QByteArray SystemSettings::secureCookieStorageKey() const
+{
+    return d->secureCookieStorageKey->value();
+}
+
+void SystemSettings::setSecureCookieStorageKey(QByteArray v)
+{
+    d->secureCookieStorageKey->setValue(v.isEmpty()
+        ? nx::crypt::generateAesExtraKey()
+        : std::move(v));
+}
+
 
 void SystemSettings::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
 {
