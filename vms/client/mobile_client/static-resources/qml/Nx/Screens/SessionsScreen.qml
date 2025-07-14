@@ -238,11 +238,17 @@ Page
                 collapseAll()
         }
 
-        sourceRoot: localSitesVisible
-            && !sessionsScreen.searching
-            && sessionsScreen.rootIndex === NxGlobals.invalidModelIndex()
-                ? organizationsModel.sitesRoot
-                : sessionsScreen.rootIndex
+        Component.onCompleted: resetSourceRoot()
+
+        function resetSourceRoot()
+        {
+            linearizationListModel.sourceRoot = Qt.binding(
+                () => (localSitesVisible
+                    && !sessionsScreen.searching
+                    && sessionsScreen.rootIndex === NxGlobals.invalidModelIndex())
+                        ? organizationsModel.sitesRoot
+                        : sessionsScreen.rootIndex)
+        }
     }
 
     HorizontalSlide
@@ -708,6 +714,10 @@ Page
             {
                 sessionsScreen.rootType = undefined
                 sessionsScreen.rootIndex = NxGlobals.invalidModelIndex()
+
+                linearizationListModel.resetSourceRoot()
+                siteList.currentRoot = linearizationListModel.sourceRoot
+
                 d.listPosition.clear()
             }
         }
@@ -777,12 +787,7 @@ Page
 
                 sessionsScreen.rootIndex = newIndex
                 sessionsScreen.rootType = accessor.getData(newIndex, "type")
-                linearizationListModel.sourceRoot = Qt.binding(
-                    () => localSitesVisible
-                        && !sessionsScreen.searching
-                        && sessionsScreen.rootIndex === NxGlobals.invalidModelIndex()
-                            ? organizationsModel.sitesRoot
-                            : sessionsScreen.rootIndex)
+                linearizationListModel.resetSourceRoot()
                 siteList.currentRoot = linearizationListModel.sourceRoot
             }
             else
