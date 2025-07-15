@@ -34,6 +34,14 @@ T.RadioButton
         color: control.checked
             ? control.checkedBackgroundColor
             : control.backgoundColor
+
+        MaterialEffect
+        {
+            anchors.fill: parent
+            clip: true
+            rippleSize: 160
+            mouseArea: control
+        }
     }
 
     indicator: CheckIndicator

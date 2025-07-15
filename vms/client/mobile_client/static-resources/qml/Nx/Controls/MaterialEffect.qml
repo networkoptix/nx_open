@@ -30,6 +30,9 @@ Item
 
     Connections
     {
+        readonly property var mouseX: mouseArea.mouseX ?? mouseArea.pressX
+        readonly property var mouseY: mouseArea.mouseY ?? mouseArea.pressY
+
         target: mouseArea
         ignoreUnknownSignals: true
 
@@ -64,10 +67,11 @@ Item
         {
             _currentRipple = rippleComponent.createObject(materialEffect)
             _currentRipple.fadeInDuration = 400
-            if (centered || mouseArea.mouseX == undefined || mouseArea.mouseY == undefined)
+
+            if (centered || mouseX == undefined || mouseY == undefined)
                 _currentRipple.fadeIn(width / 2, height / 2)
             else
-                _currentRipple.fadeIn(mouseArea.mouseX, mouseArea.mouseY)
+                _currentRipple.fadeIn(mouseX, mouseY)
         }
 
         function releaseAt(x, y)
@@ -92,7 +96,7 @@ Item
             fadeOutAnimation.start()
         }
 
-        function onReleased() { releaseAt(mouseArea.mouseX, mouseArea.mouseY) }
+        function onReleased() { releaseAt(mouseX, mouseY) }
 
         function onTapped(eventPoint, button)
         {

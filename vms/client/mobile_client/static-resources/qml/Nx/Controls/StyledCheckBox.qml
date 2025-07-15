@@ -32,6 +32,14 @@ CheckBox
     {
         id: backgroundItem
         color: ColorTheme.colors.dark6
+
+        MaterialEffect
+        {
+            anchors.fill: parent
+            clip: true
+            rippleSize: 160
+            mouseArea: control
+        }
     }
 
     indicator: CheckIndicator
