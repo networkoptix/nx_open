@@ -1034,11 +1034,16 @@ public:
             return base_type::filterAcceptsRow(sourceRow, sourceParent);
 
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
-        return (sourceModel()->data(sourceIndex, MembersModel::IsAllowedMember).toBool()
-                || sourceModel()->data(sourceIndex, MembersModel::IsMemberRole).toBool())
-            && (sourceModel()->data(sourceIndex, MembersModel::CanEditParents).toBool()
-                || sourceModel()->data(sourceIndex, MembersModel::IsMemberRole).toBool())
-            && base_type::filterAcceptsRow(sourceRow, sourceParent);
+        const auto regExp = filterRegularExpression();
+        const auto getData =
+            [this, &sourceIndex](int role) { return sourceModel()->data(sourceIndex, role); };
+
+        return (getData(MembersModel::IsAllowedMember).toBool()
+                || getData(MembersModel::IsMemberRole).toBool())
+            && (getData(MembersModel::CanEditParents).toBool()
+                || getData(MembersModel::IsMemberRole).toBool())
+            && (getData(Qt::DisplayRole).toString().contains(regExp)
+                || getData(MembersModel::DescriptionRole).toString().contains(regExp));
     }
 };
 

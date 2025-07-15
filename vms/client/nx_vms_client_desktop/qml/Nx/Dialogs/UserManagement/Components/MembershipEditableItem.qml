@@ -77,14 +77,10 @@ Rectangle
         text:
         {
             const result = highlightMatchingText(checkableItem.text)
-            if (control.currentSearchRegExp
-                || !control.showDescription
-                || !checkableItem.description)
-            {
+            if (!control.showDescription || !checkableItem.description)
                 return result
-            }
 
-            const description = NxGlobals.toHtmlEscaped(checkableItem.description)
+            const description = highlightMatchingText(checkableItem.description)
             return `${result}<font color="${checkableItem.descriptionColor}">`
                 + ` - ${description}</font>`
         }
