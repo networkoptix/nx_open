@@ -74,22 +74,20 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
     if (newSerializedValue.isEmpty())
         newSerializedValue = defaultSerializedValue();
 
-    bool changed;
+    bool changed = false;
     QnResourcePtr oldResource;
     QString oldSerializedValue;
+
+    directDisconnectAll();
     {
-        NX_MUTEX_LOCKER locker( &m_mutex );
+        NX_MUTEX_LOCKER locker(&m_mutex);
 
-        if(m_resource == resource)
-            return;
-
-        if(m_resource) {
-            directDisconnectAll();
-            oldResource = m_resource;
+        if(m_resource != resource)
+        {
+            oldResource = std::exchange(m_resource, resource);
             oldSerializedValue = m_serializedValue;
+            changed = loadValueLocked(newSerializedValue);
         }
-
-        m_resource = resource;
 
         if(m_resource)
         {
@@ -97,8 +95,6 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
                 resource.get(), &QnResource::propertyChanged,
                 [this](auto...args){at_resource_propertyChanged(args...);});
         }
-
-        changed = loadValueLocked(newSerializedValue);
     }
 
     if(oldResource)
