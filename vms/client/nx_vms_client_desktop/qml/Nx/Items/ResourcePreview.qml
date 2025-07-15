@@ -227,9 +227,7 @@ Item
             visible: !truncated && (content.status == AbstractResourceThumbnail.Status.unavailable
                 || loadingIndicator.timedOut)
 
-            color: accessHelper.canViewLive || accessHelper.passwordRequired
-                ? preview.foregroundColor
-                : ColorTheme.colors.red_core
+            color: preview.foregroundColor
             text: accessHelper.canViewLive || accessHelper.passwordRequired
                 ? preview.noDataText
                 : preview.noAccessText

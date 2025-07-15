@@ -47,7 +47,7 @@ Rectangle
         id: textItem
 
         anchors.centerIn: overlay
-        color: ColorTheme.colors.red_d1
+        color: ColorTheme.colors.light16
         font.capitalization: Font.AllUppercase
         font.pixelSize: 24
         text: qsTr("No access")

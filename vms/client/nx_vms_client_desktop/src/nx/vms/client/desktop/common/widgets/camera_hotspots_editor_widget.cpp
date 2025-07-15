@@ -486,7 +486,6 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
         d->cameraThumbnail->resource(), Qn::ViewLivePermission))
     {
         painter.setFont(noAccessPlaceholderFont());
-        QnScopedPainterPenRollback guard(&painter, core::colorTheme()->color("red"));
         painter.drawText(rect(), tr("NO ACCESS"), {Qt::AlignCenter});
     }
     else if (d->cameraThumbnail->status() == LiveCameraThumbnail::Status::unavailable)
