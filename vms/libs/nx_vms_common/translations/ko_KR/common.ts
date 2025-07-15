@@ -1862,5 +1862,9 @@
       <source>Max scene items (0 means default)</source>
       <translation>최대 장면수(기본값 0)</translation>
     </message>
+    <message>
+      <source>Encryption key used to encode secure cookie values.</source>
+      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+    </message>
   </context>
 </TS>

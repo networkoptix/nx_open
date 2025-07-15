@@ -2072,5 +2072,9 @@
       <source>Max scene items (0 means default)</source>
       <translation>Max liczba elementów sceny (0 oznacza domyślną)</translation>
     </message>
+    <message>
+      <source>Encryption key used to encode secure cookie values.</source>
+      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+    </message>
   </context>
 </TS>
