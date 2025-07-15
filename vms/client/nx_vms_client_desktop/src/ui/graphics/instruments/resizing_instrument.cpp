@@ -189,7 +189,7 @@ bool ResizingInstrument::mousePressEvent(QWidget* viewport, QMouseEvent* event)
 
 bool ResizingInstrument::hoverEnterEvent(QWidget* viewport, QHoverEvent* event)
 {
-    updateCursor(viewport, event->pos());
+    updateCursor(viewport, event->position().toPoint());
     return false;
 }
 
@@ -205,7 +205,7 @@ bool ResizingInstrument::hoverLeaveEvent(QWidget* /*viewport*/, QHoverEvent* eve
 
 bool ResizingInstrument::hoverMoveEvent(QWidget* viewport, QHoverEvent* event)
 {
-    updateCursor(viewport, event->pos());
+    updateCursor(viewport, event->position().toPoint());
     return false;
 }
 
