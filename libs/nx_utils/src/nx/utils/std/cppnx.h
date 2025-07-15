@@ -28,4 +28,23 @@ auto make_vector(Elements&&... e)
     return result;
 }
 
+#if !defined(__cpp_lib_bind_back)
+    template<class F, class... BoundArgs>
+    constexpr auto bind_back(F&& f, BoundArgs&&... boundArgs)
+    {
+        return
+            [f = std::forward<F>(f), ... boundArgs = std::forward<BoundArgs>(boundArgs)]
+                <typename... Args>(Args&&... args) mutable -> decltype(auto)
+            {
+                return std::invoke(f,
+                    std::forward<Args>(args)...,
+                    // FIXME: #skolesnik Investigate why this breaks compilation
+                    // std::forward<BoundArgs>(boundArgs)...
+                    boundArgs...);
+            };
+    }
+#else
+    using std::bind_back;
+#endif
+
 }   //namespace nx::utils
