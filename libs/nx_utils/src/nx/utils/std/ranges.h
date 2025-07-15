@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cctype>
 #include <functional>
 #include <ranges>
@@ -118,6 +119,14 @@ constexpr Closure to_pair =
             {
                 return std::pair{(void(I), *it++)...};
             }(std::make_index_sequence<2>{});
+    };
+
+constexpr Closure sort =
+    []<std::ranges::random_access_range R, typename Pred = std::less<>>(R&& r, const Pred& p = {})
+        requires std::sortable<std::ranges::iterator_t<R>, Pred>
+    {
+        std::ranges::sort(r, p);
+        return std::forward<R>(r);
     };
 
 #ifdef NX_UTILS_NO_STD_RANGES_TO

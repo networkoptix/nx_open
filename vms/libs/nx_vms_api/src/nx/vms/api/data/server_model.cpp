@@ -211,7 +211,7 @@ typename Model::DbUpdateTypes toDbTypes(Model model)
     if constexpr (std::is_same_v<Model, ServerModelV1>)
     {
         mainData.flags = std::move(model.flags);
-        if (model.endpoints.empty())
+        if (!model.endpoints.empty())
             mainData.networkAddresses = endpointsToServerData(std::move(model.endpoints));
     }
     else
