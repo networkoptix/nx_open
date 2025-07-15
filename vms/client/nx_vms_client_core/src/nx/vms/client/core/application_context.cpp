@@ -119,12 +119,14 @@ struct ApplicationContext::Private
             new core::VisibleItemDataDecoratorModel::PreviewProvider());
 
         nx::setOnAssertHandler(
-            [](const QString&)
+            [enginePtr = QPointer<QQmlEngine>(qmlEngine.get())](const QString&)
             {
                 std::cerr << "\nQML stacktrace:\n";
 
-                const QV4::ExecutionEngine* engine = appContext()->qmlEngine()->handle();
-                if (!engine->qmlContext()) //< Avoid a crash when called without QML stack.
+                const QV4::ExecutionEngine* engine = enginePtr
+                    ? enginePtr->handle()
+                    : nullptr;
+                if (!engine || !engine->qmlContext()) //< Avoid a crash when called without QML stack.
                 {
                     std::cerr << "  <no QML context available>" << std::endl;
                     return;
