@@ -345,11 +345,11 @@ struct LayoutThumbnailLoader::Private
         {
             case core::ThumbnailStatus::NoData:
                 if (!exportAllowed)
-                    return {};
-
-                thumbnailWidget = (isOnline || msecSinceEpoch != DATETIME_NOW)
-                    ? noDataWidget.get()
-                    : offlineWidget.get();
+                    thumbnailWidget = noExportPermissionWidget.get();
+                else if (isOnline || msecSinceEpoch != DATETIME_NOW)
+                    thumbnailWidget = noDataWidget.get();
+                else
+                    thumbnailWidget = offlineWidget.get();
                 break;
 
             case core::ThumbnailStatus::Invalid:
