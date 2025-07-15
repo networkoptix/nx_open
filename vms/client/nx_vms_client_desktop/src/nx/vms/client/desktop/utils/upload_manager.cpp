@@ -44,7 +44,8 @@ QString UploadManager::addUpload(
             UploadState::Status status = upload.status;
             if (status == UploadState::Error || status == UploadState::Done)
             {
-                m_workers[upload.id]->deleteLater();
+                if (m_workers.contains(upload.id))
+                    m_workers[upload.id]->deleteLater();
                 m_workers.remove(upload.id);
             }
         }
