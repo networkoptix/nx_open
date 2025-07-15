@@ -74,7 +74,7 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     noAccessWidget->setFont(font);
     noAccessWidget->setAlignment(Qt::AlignCenter);
     setPaletteColor(
-        noAccessWidget, noAccessWidget->foregroundRole(), core::colorTheme()->color("red"));
+        noAccessWidget, noAccessWidget->foregroundRole(), core::colorTheme()->color("light16"));
 
     installEventHandler(parent, QEvent::Show, parent,
         [this]()
