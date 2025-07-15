@@ -20,7 +20,7 @@ call %SOURCE_DIR%\build_utils\msvc\call_vcvars64.bat || @goto :exit
     :: Use the Ninja generator to avoid using CMake compiler search heuristics for MSBuild. Also,
     :: specify the compiler explicitly to avoid potential clashes with gcc if ran from a
     :: Cygwin/MinGW shell.
-    GENERATOR_OPTIONS=-GNinja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe
+    set GENERATOR_OPTIONS=-GNinja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe
     cmake "%SOURCE_DIR%" %GENERATOR_OPTIONS% -B "%BUILD_DIR%" %* || @goto :exit
 :skip_generation
 
