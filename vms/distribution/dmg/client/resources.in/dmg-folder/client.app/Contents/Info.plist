@@ -25,7 +25,7 @@
     <key>CFBundleVersion</key>
     <string>@buildNumber@</string>
     <key>LSMinimumSystemVersion</key>
-    <string>10.8</string>
+    <string>@CMAKE_OSX_DEPLOYMENT_TARGET@</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.business</string>
     <key>LSUIElement</key>
