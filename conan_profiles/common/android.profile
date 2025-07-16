@@ -15,11 +15,11 @@ qt/*:qtwebengine=False
 qt/*:qtserialport=False
 ffmpeg/*:vorbis=False
 ffmpeg/*:vpx=False
-ffmpeg/*:mp3lame=False
 ffmpeg/*:openh264=False
 boost/*:header_only = True
 
 [tool_requires]
 AndroidNDK/r26d
 ffmpeg/*:AndroidStandaloneToolchain/r26d
+libmp3lame/*:AndroidStandaloneToolchain/r26d
 qt/*:AndroidSDK/34, openjdk/18.0.1
