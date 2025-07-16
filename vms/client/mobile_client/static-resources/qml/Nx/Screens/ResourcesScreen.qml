@@ -8,6 +8,7 @@ import Nx.Controls
 import Nx.Core
 import Nx.Items
 import Nx.Mobile
+import Nx.Mobile.Controls
 import Nx.Mobile.Ui.Sheets
 import Nx.Ui
 
@@ -225,6 +226,40 @@ Page
                     : qsTr("Loading...")
                 font.pixelSize: 22
                 color: ColorTheme.colors.light16
+            }
+        }
+
+        Button
+        {
+            id: stopConnectingButton
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
+            anchors.bottomMargin: 24
+
+            text: qsTr("Stop Connecting")
+            opacity: 0
+            onClicked: windowContext.sessionManager.stopSessionByUser()
+
+            SequentialAnimation
+            {
+                id: showAnimation
+
+                running: windowContext.sessionManager.hasConnectingSession
+                    || windowContext.sessionManager.hasAwaitingResourcesSession
+
+                PauseAnimation { duration: 2000 }
+
+                OpacityAnimator
+                {
+                    target: stopConnectingButton
+                    from: 0
+                    to: 1
+                    duration: 200
+                }
             }
         }
     }
