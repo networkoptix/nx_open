@@ -29,7 +29,7 @@ template<
 >
 class CrudHandler:
     public nx::network::rest::CrudHandler<Derived>,
-    public nx::network::rest::SubscriptionHandler<rapidjson::Document>
+    public nx::network::rest::SubscriptionHandler
 {
 public:
     using base_type = nx::network::rest::CrudHandler<Derived>;
@@ -395,7 +395,7 @@ private:
             if (d->isValidType(id))
             {
                 NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
-                notify(d->subscriptionId(id), NotifyType::delete_);
+                d->notify(d->subscriptionId(id), NotifyType::delete_);
             }
             return;
         }
@@ -412,7 +412,7 @@ private:
                 if (d->isValidType(id))
                 {
                     NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
-                    notify(d->subscriptionId(id), NotifyType::update);
+                    d->notify(d->subscriptionId(id), NotifyType::update);
                 }
                 return true;
             });

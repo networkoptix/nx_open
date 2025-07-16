@@ -16,14 +16,12 @@
 
 namespace nx::network::rest {
 
-template<typename Data>
 class SubscriptionHandler
 {
 public:
     using AddMonitor = nx::MoveOnlyFunc<nx::utils::Guard()>;
     using NotifyType = Handler::NotifyType;
-    using SubscriptionCallback =
-        nx::MoveOnlyFunc<void(const QString& id, NotifyType, Data* data)>;
+    using SubscriptionCallback = Handler::SubscriptionCallback;
 
     SubscriptionHandler(AddMonitor addMonitor): m_addMonitor(std::move(addMonitor)) {}
     virtual ~SubscriptionHandler()
@@ -58,7 +56,12 @@ public:
         return guard;
     }
 
-    void notify(const QString& id, NotifyType notifyType, Data data)
+    void notify(
+        const QString& id,
+        NotifyType notifyType,
+        rapidjson::Document data,
+        std::optional<nx::Uuid> user = {},
+        bool noEtag = false) const
     {
         std::set<std::shared_ptr<SubscriptionCallback>> holder1;
         std::set<std::shared_ptr<SubscriptionCallback>> holder2;
@@ -70,9 +73,9 @@ public:
                 holder2 = it->second;
         }
         for (auto callback: holder1)
-            (*callback)(id, notifyType, &data);
+            (*callback)(id, notifyType, &data, std::move(user), noEtag);
         for (auto callback: holder2)
-            (*callback)(id, notifyType, &data);
+            (*callback)(id, notifyType, &data, std::move(user), noEtag);
     }
 
     void setAddMonitor(AddMonitor addMonitor)
