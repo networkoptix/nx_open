@@ -21,6 +21,7 @@ FocusScope
     function resetState(hasSecretValue)
     {
         control.hasSecretValue = hasSecretValue
+        textInput.maskedMode = true
         textInput.text = hasSecretValue
             ? d.kMaskText
             : ""
