@@ -1864,7 +1864,7 @@
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>
-      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+      <translation>安全な Cookie 値をエンコードするために使用される暗号化キー。</translation>
     </message>
   </context>
 </TS>

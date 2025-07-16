@@ -2074,7 +2074,7 @@
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>
-      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+      <translation>Klucz szyfrujący używany do kodowania bezpiecznych wartości plików cookie.</translation>
     </message>
   </context>
 </TS>

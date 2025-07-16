@@ -8070,6 +8070,14 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>Händelselogg för perioden från %1 till %2 - Visar de första %n händelserna. För att hitta specifika händelser, justera datumintervallet eller använd ytterligare filter</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
+      <comment>Date is substituted</comment>
+      <translation type="unfinished">
+        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>

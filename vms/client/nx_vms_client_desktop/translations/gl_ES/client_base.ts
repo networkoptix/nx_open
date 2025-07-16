@@ -8070,6 +8070,14 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
         <numerusform>Rexistro de eventos para o período de %1 a %2: mostra os primeiros %n eventos. Para atopar eventos específicos, por favor, axusta o intervalo de datas ou aplica filtros adicionais</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
+      <comment>Date is substituted</comment>
+      <translation type="unfinished">
+        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>

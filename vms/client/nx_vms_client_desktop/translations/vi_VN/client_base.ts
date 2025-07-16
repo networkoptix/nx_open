@@ -7940,6 +7940,13 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
         <numerusform>Nhật ký sự kiện trong khoảng thời gian từ %1 đến %2 - Hiển thị %n sự kiện đầu tiên. Để tìm sự kiện cụ thể, vui lòng điều chỉnh phạm vi ngày hoặc áp dụng các bộ lọc bổ sung</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
+      <comment>Date is substituted</comment>
+      <translation type="unfinished">
+        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>

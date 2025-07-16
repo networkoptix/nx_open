@@ -1864,7 +1864,7 @@
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>
-      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+      <translation>Kunci enkripsi yang digunakan untuk mengenkodekan nilai cookie yang aman.</translation>
     </message>
   </context>
 </TS>
