@@ -674,7 +674,7 @@ Page
                     organizationsModel.indexFromNodeId(appGlobalState.lastOpenedNodeId)
                 appGlobalState.lastOpenedNodeId = NxGlobals.uuid("")
                 if (nodeIndex !== NxGlobals.invalidModelIndex())
-                    goInto(nodeIndex.parent)
+                    goInto(nodeIndex.parent, /*animate*/ false)
             }
         }
     }
@@ -716,7 +716,7 @@ Page
         function onRowsRemoved() { updateVisibility() }
     }
 
-    function goInto(newIndex)
+    function goInto(newIndex, animate = true)
     {
         endSearch()
 
@@ -733,13 +733,18 @@ Page
 
         newIndex = NxGlobals.toPersistent(newIndex)
 
-        siteListContainer.slideLeft(() =>
-        {
-            linearizationListModel.sourceRoot = newIndex
-            sessionsScreen.rootIndex = newIndex
-            sessionsScreen.rootType = rootType
-            siteList.currentRoot = newIndex
-        })
+        const update = () =>
+            {
+                linearizationListModel.sourceRoot = newIndex
+                sessionsScreen.rootIndex = newIndex
+                sessionsScreen.rootType = rootType
+                siteList.currentRoot = newIndex
+            }
+
+        if (animate)
+            siteListContainer.slideLeft(update)
+        else
+            update()
     }
 
     function goBack(index)
