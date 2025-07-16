@@ -820,7 +820,7 @@
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>在雲端入口網站中建立一個組織並從此處造訪</translation>
     </message>
   </context>
   <context>
