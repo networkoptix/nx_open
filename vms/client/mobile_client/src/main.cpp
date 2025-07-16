@@ -314,7 +314,10 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 
     QQuickStyle::setStyle("Basic");
 
-    nx::utils::rlimit::setMaxFileDescriptors(1024);
+    // Apparently Android IPC consumes a fair amout of file descriptors (e.g. when working with
+    // MediaCodec for HW video decoding) and garbage collection of these descriptors/objects
+    // is not very fast. So, we need to increase the limit to avoid "Too many open files" errors.
+    nx::utils::rlimit::setMaxFileDescriptors(nx::build_info::isAndroid() ? 4096 : 1024);
 
     if (nx::build_info::isMacOsX())
     {
