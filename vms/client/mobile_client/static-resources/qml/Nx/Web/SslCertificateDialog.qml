@@ -144,7 +144,7 @@ DialogBase
 
             width: parent.width
 
-            buttonsModel: [{"id": "CONNECT"}, {"id": "CANCEL", "accented": true}]
+            buttonsModel: [{"id": "CONNECT", "accented": true}, {"id": "CANCEL"}]
 
             onButtonClicked:
             {
