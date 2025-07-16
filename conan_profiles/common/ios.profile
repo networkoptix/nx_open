@@ -18,6 +18,5 @@ qt/*:qtwebengine=False
 ffmpeg:shared=False
 ffmpeg/*:vorbis=False
 ffmpeg/*:vpx=False
-ffmpeg/*:mp3lame=False
 ffmpeg/*:openh264=False
 boost/*:header_only = True

@@ -74,7 +74,7 @@ class NxOpenConan(ConanFile):
         "mobile_user_manual:format": "pdf",
     }
 
-    ffmpeg_version_and_revision = "7.0.1#7395197c94840d269665fbcea07ada79"
+    ffmpeg_version_and_revision = "7.0.1#6784ea2299c2f5a436db3bbd57b1b4a5"
 
     python_requires = (
         "os_deps_from_deb_based_distro/0.5" "#43dce86a813993ad9acb644d3941e399",
@@ -188,6 +188,7 @@ class NxOpenConan(ConanFile):
 
         self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
+        self.requires("libmp3lame/3.100" "#da13ecbaf0d06421ae586b7226d985ad")
         self.requires("openssl/1.1.1q" "#cf9c0c761f39805e5a258dc39daff2bd")
         self.requires("qt/6.9.1" "#0d31ec3aed0c4551ce2c69606a0b035b")
         self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
@@ -202,7 +203,6 @@ class NxOpenConan(ConanFile):
             # FFmpeg dependencies.
             self.requires("ogg/1.3.5" "#00fb0bd978d034d12af5efd5d6921364")
             self.requires("vorbis/1.3.7" "#0400cbb550b491521361a41c889d5c48")
-            self.requires("libmp3lame/3.100" "#da13ecbaf0d06421ae586b7226d985ad")
             self.requires("libvpx/1.14.1" "#fb51b8d71add5751343a0d06ed3bb44e")
             self.requires("openh264/2.4.1" "#e7846aa3511316c230721ca13fc9a127")
             self.requires("freetype/2.12.1" "#cd63b23b3aa630a38fa870a267e95782")
