@@ -1932,5 +1932,9 @@
         <source>Max scene items (0 means default)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Encryption key used to encode secure cookie values.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
