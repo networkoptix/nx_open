@@ -7941,6 +7941,13 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%1 から %2 までのイベントログ - 最初の %n 件のイベントを表示しています。特定のイベントを検索するには、期間を調整するか追加のフィルターを適用してください。</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
+      <comment>Date is substituted</comment>
+      <translation type="unfinished">
+        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>

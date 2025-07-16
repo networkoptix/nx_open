@@ -1862,5 +1862,9 @@
       <source>Max scene items (0 means default)</source>
       <translation>最大場景項目 (預設為0)</translation>
     </message>
+    <message>
+      <source>Encryption key used to encode secure cookie values.</source>
+      <translation>用於對安全 cookie 值進行編碼的加密金鑰。</translation>
+    </message>
   </context>
 </TS>

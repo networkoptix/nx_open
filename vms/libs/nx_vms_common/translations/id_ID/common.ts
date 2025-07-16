@@ -1862,5 +1862,9 @@
       <source>Max scene items (0 means default)</source>
       <translation>Item scene maksimal (0 berarti default)</translation>
     </message>
+    <message>
+      <source>Encryption key used to encode secure cookie values.</source>
+      <translation>Kunci enkripsi yang digunakan untuk mengenkodekan nilai cookie yang aman.</translation>
+    </message>
   </context>
 </TS>

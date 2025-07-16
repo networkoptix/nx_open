@@ -7940,6 +7940,13 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
         <numerusform>Log event untuk periode dari %1 hingga %2 - Menampilkan event %n pertama. Untuk menemukan event tertentu, harap sesuaikan rentang tanggal atau terapkan filter tambahan</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
+      <comment>Date is substituted</comment>
+      <translation type="unfinished">
+        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>

@@ -1862,5 +1862,9 @@
       <source>Max scene items (0 means default)</source>
       <translation>最大场景项目（0表示默认）</translation>
     </message>
+    <message>
+      <source>Encryption key used to encode secure cookie values.</source>
+      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+    </message>
   </context>
 </TS>

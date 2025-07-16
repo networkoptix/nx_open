@@ -1932,5 +1932,9 @@
       <source>Max scene items (0 means default)</source>
       <translation>Max scenobjekt (0 betyder standard)</translation>
     </message>
+    <message>
+      <source>Encryption key used to encode secure cookie values.</source>
+      <translation>Krypteringsnyckel som används för att koda säkra cookievärden.</translation>
+    </message>
   </context>
 </TS>

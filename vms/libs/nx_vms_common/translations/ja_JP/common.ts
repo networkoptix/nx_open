@@ -1862,5 +1862,9 @@
       <source>Max scene items (0 means default)</source>
       <translation>シーン内最大アイテム数 (0でデフォルト値を使用)</translation>
     </message>
+    <message>
+      <source>Encryption key used to encode secure cookie values.</source>
+      <translation>安全な Cookie 値をエンコードするために使用される暗号化キー。</translation>
+    </message>
   </context>
 </TS>

@@ -1932,5 +1932,9 @@
       <source>Max scene items (0 means default)</source>
       <translation>Max kohteiden määrä (0 tarkoittaa oletus)</translation>
     </message>
+    <message>
+      <source>Encryption key used to encode secure cookie values.</source>
+      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+    </message>
   </context>
 </TS>
