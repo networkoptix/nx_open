@@ -514,7 +514,6 @@ if(MACOSX)
         add_compile_options(-msse4.1)
     endif()
     add_compile_options(-Wno-unused-local-typedef)
-    add_compile_options(-mmacosx-version-min=13.4)
     list(APPEND CMAKE_INSTALL_RPATH @executable_path/../lib)
 endif()
 
