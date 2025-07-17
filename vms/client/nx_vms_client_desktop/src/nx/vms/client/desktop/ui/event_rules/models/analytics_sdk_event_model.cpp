@@ -69,10 +69,8 @@ void AnalyticsSdkEventModel::loadFromCameras(
             }
         });
 
-    beginResetModel();
     clear();
     addItemRecursive(/*parent*/ nullptr, root);
-    endResetModel();
 }
 
 bool AnalyticsSdkEventModel::isValid() const
