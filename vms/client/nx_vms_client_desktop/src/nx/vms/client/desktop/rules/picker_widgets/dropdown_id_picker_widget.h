@@ -233,7 +233,7 @@ private:
             return;
         }
 
-        if (m_engineId.isNull() || m_field->typeId().isNull())
+        if (m_field->typeId().isNull())
         {
             const auto analyticsModel = m_comboBox->model();
             const auto selectableItems = analyticsModel->match(
