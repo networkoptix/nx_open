@@ -8074,7 +8074,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
       <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Date is substituted</comment>
       <translation type="unfinished">
-        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+        <numerusform>Rexistro de eventos para %1: móstranse os primeiros eventos %n. Para atopar eventos específicos, por favor, axusta o intervalo de datas ou aplica filtros adicionais</numerusform>
         <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
       </translation>
     </message>

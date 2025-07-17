@@ -1934,7 +1934,7 @@
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>
-      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+      <translation>Clave de cifrado empregada para codificar os valores seguros das cookies.</translation>
     </message>
   </context>
 </TS>

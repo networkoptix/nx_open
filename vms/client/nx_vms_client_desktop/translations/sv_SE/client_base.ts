@@ -8073,9 +8073,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message numerus="yes">
       <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>Händelselogg för %1 - Visar de första %n händelserna. För att hitta specifika händelser, justera datumintervallet eller använd ytterligare filter</numerusform>
+        <numerusform>Händelselogg för %1 - Visar första %n händelser. För att hitta specifika händelser måste du justera datumintervallet eller tillämpa ytterligare filter</numerusform>
       </translation>
     </message>
   </context>
