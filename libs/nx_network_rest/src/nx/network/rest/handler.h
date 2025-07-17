@@ -125,16 +125,10 @@ public:
     virtual QString idParamName() const { return {}; }
     virtual QString subscriptionId(const Request&) { return {}; }
 
-    virtual bool proxySubscribe(
+    virtual nx::utils::Guard proxySubscribe(
         const Request&, nx::MoveOnlyFunc<void(nx::json_rpc::Response)> /*handler*/)
     {
-        return false;
-    }
-
-    virtual bool proxyUnsubscribe(
-        const Request&, nx::MoveOnlyFunc<void(nx::json_rpc::Response)> /*handler*/)
-    {
-        return false;
+        return {};
     }
 
     virtual void audit(const Request& request, const Response& response);
