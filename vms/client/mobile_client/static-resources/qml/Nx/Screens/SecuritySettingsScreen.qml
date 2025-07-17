@@ -56,7 +56,10 @@ BaseSettingsScreen
             width: parent.width
             text: qsTr("Security")
 
-            checkState: appContext.settings.certificateValidationLevel == Certificate.ValidationLevel.disabled
+            property int lastValidationLevel: Certificate.ValidationLevel.recommended
+
+            checkState: appContext.settings.certificateValidationLevel
+                === Certificate.ValidationLevel.disabled
                 ? Qt.Unchecked
                 : Qt.Checked
 
@@ -64,11 +67,11 @@ BaseSettingsScreen
             {
                 if (checkState == Qt.Checked)
                 {
-                    appContext.settings.certificateValidationLevel =
-                        Certificate.ValidationLevel.recommended
+                    appContext.settings.certificateValidationLevel = lastValidationLevel
                 }
                 else
                 {
+                    lastValidationLevel = appContext.settings.certificateValidationLevel
                     appContext.settings.certificateValidationLevel =
                         Certificate.ValidationLevel.disabled
                 }
@@ -93,10 +96,17 @@ BaseSettingsScreen
         {
             id: recommendedSecurityOptionRadioButton
             width: parent.width
-            checked: !strictSecurityOptionRadioButton.checked
+            checked: appContext.settings.certificateValidationLevel
+                === Certificate.ValidationLevel.recommended
             text: qsTr("Recommended")
             extraText: qsTr("Your confirmation will be requested to pin self-signed certificates")
             visible: line.visible
+
+            onClicked:
+            {
+                appContext.settings.certificateValidationLevel =
+                    Certificate.ValidationLevel.recommended
+            }
         }
 
         StyledRadioButton
@@ -105,17 +115,15 @@ BaseSettingsScreen
 
             width: parent.width
             checked: appContext.settings.certificateValidationLevel
-                == Certificate.ValidationLevel.strict
+                === Certificate.ValidationLevel.strict
             text: qsTr("Strict")
             extraText: qsTr("Connect only servers with public certificates")
 
             visible: line.visible
 
-            onCheckedChanged:
+            onClicked:
             {
-                appContext.settings.certificateValidationLevel = checked
-                    ? Certificate.ValidationLevel.strict
-                    : Certificate.ValidationLevel.recommended
+                appContext.settings.certificateValidationLevel = Certificate.ValidationLevel.strict
             }
         }
     }
