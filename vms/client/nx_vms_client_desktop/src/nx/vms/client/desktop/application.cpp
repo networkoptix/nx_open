@@ -356,6 +356,16 @@ void setGraphicsSettings()
             qputenv(kDisableNativePixmaps, "1");
     }
 
+    if (graphicsApi == GraphicsApi::metal
+        || graphicsApi == GraphicsApi::direct3d11
+        || graphicsApi == GraphicsApi::direct3d12)
+    {
+        // In Qt 6.9.1 there is an issue with our client application: the rendering thread
+        // synchronization in case of several visible QML windows and enabled VSync with these
+        // backends is causing prolonged locks of the GUI thread.
+        qputenv("QSG_RENDER_LOOP", "basic");
+    }
+
     const auto selectedApi = nameToApi.value(graphicsApi, QSGRendererInterface::OpenGL);
     QQuickWindow::setGraphicsApi(selectedApi);
     appContext()->runtimeSettings()->setGraphicsApi(graphicsApi);
