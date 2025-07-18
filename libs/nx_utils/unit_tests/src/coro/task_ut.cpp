@@ -827,6 +827,79 @@ TEST_F(TaskTest, InheritCancelCondition)
     ASSERT_EQ(kFull, m_messages);
 }
 
+TEST_F(TaskTest, InheritCancelConditionWhenAll)
+{
+    auto nested = [this]() -> Task<>
+    {
+        Scope s{"nested", this};
+
+        co_await cancelIf([&]() { m_messages.push_back("cancel check nested"); return false; });
+
+        // Wrap awaiters with Task<> so they can be used with whenAll(). Each Task<> adds it own
+        // cancellation checks.
+        auto aTask = [this]() -> Task<std::string> { co_return co_await wrapAsyncCall("a"); };
+        auto bTask = [this]() -> Task<std::string> { co_return co_await wrapAsyncCall("b"); };
+
+        auto [a, b] = co_await whenAll(aTask(), bTask());
+
+        m_messages.push_back(a);
+        m_messages.push_back(b);
+    };
+
+    const auto test =
+        [&]() -> FireAndForget
+        {
+            Scope s{"test", this};
+
+            co_await cancelIf([&]() { m_messages.push_back("cancel check"); return false; });
+
+            co_await nested();
+        };
+
+    test();
+
+    triggerAsyncCall();
+    triggerAsyncCall();
+    triggerAsyncCall();
+
+    // Note that isCancelRequested() is used by wrapAsyncCall() before resuming because it returns
+    // the custom awaiter instead of Task<>.
+    static const Messages kFull{
+        "scope begin test",
+        "cancel check", //< Resume on cancelIf.
+        "scope begin nested",
+        "cancel check nested", //< Resume on cancelIf in nested.
+        "cancel check", //< Resume aTask.
+        "cancel check nested",
+        "wrap constructed with a",
+        "suspend a",
+        "cancel check", //< Resume bTask.
+        "cancel check nested",
+        "wrap constructed with b",
+        "suspend b",
+        "callback a",
+        "cancel check", //< Resume after await a, via isCancelRequested().
+        "cancel check nested",
+        "wrap destroyed with a",
+        "cancel check", //< Resume aTask.
+        "cancel check nested",
+        "callback b",
+        "cancel check", //< Resume after await b, via isCancelRequested().
+        "cancel check nested",
+        "wrap destroyed with b",
+        "cancel check", //< Resume bTask.
+        "cancel check nested",
+        "cancel check", //< Resume after await whenAll.
+        "cancel check nested",
+        "result from a",
+        "result from b",
+        "scope end nested",
+        "cancel check", //< Resume after await nested.
+        "scope end test"
+    };
+    ASSERT_EQ(kFull, m_messages);
+}
+
 TEST_F(TaskTest, ResumeInSuspension)
 {
     // Resumes directly from await_suspend.
