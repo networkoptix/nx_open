@@ -3,6 +3,7 @@
 #include "workbench_state_manager.h"
 
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <statistics/statistics_manager.h>
 
@@ -27,8 +28,11 @@ WorkbenchStateManager::WorkbenchStateManager(WindowContext* windowContext, QObje
 
 bool WorkbenchStateManager::tryClose(bool force)
 {
-    if (!force)
+    if (!force || !system()->user().isNull())
     {
+        // Statistics must be saved when a client disconnects from the current system, either
+        // manually or by close.
+
         // State is saved by Workbench::StateDelegate.
         if (auto statisticsManager = statisticsModule()->manager())
         {
