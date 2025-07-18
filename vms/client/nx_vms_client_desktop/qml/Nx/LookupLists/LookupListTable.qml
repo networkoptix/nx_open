@@ -29,6 +29,7 @@ CheckableTableView
     }
 
     horizontalHeaderVisible: true
+    horizontalHeaderView.resizableColumns: false
     horizontalHeaderEnabled: !editing
 
     function rowContainsCorrectData(row)
