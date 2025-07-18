@@ -695,6 +695,10 @@
       <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
       <translation>Emme löytäneet tältä kohteelta kameroita. Voit lisätä ne työpöytäsovellukseemme.</translation>
     </message>
+    <message>
+      <source>Stop Connecting</source>
+      <translation type="unfinished">Stop Connecting</translation>
+    </message>
   </context>
   <context>
     <name>SearchEdit</name>
@@ -820,12 +824,24 @@
       <translation type="unfinished">Access to Resources Denied</translation>
     </message>
     <message>
-      <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
-    </message>
-    <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
       <translation>Luo organisaatio Pilviportaaliin päästäksesi siihen täällä</translation>
+    </message>
+    <message>
+      <source>The resources in this organization are not available to your permission group</source>
+      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+    </message>
+    <message>
+      <source>Connect a site to the organization to access it here</source>
+      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
     </message>
   </context>
   <context>

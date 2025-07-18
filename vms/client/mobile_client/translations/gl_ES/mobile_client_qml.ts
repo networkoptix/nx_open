@@ -695,6 +695,10 @@
       <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
       <translation>Non atopamos ningunha cámara neste sitio web. Podes engadilas na nosa aplicación de escritorio</translation>
     </message>
+    <message>
+      <source>Stop Connecting</source>
+      <translation type="unfinished">Stop Connecting</translation>
+    </message>
   </context>
   <context>
     <name>SearchEdit</name>
@@ -820,12 +824,24 @@
       <translation>Acceso aos recursos denegado</translation>
     </message>
     <message>
-      <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation>Os sitios en estado Suspendido ou Pechado non están dispoñibles</translation>
-    </message>
-    <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
       <translation>Crea unha organización no Portal da Nube para acceder a ela aquí</translation>
+    </message>
+    <message>
+      <source>The resources in this organization are not available to your permission group</source>
+      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+    </message>
+    <message>
+      <source>Connect a site to the organization to access it here</source>
+      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
     </message>
   </context>
   <context>
