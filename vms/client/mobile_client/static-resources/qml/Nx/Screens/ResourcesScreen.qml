@@ -125,6 +125,17 @@ Page
         enabled: camerasGrid.enabled
     }
 
+    MouseArea
+    {
+        anchors.fill: parent
+        propagateComposedEvents: true
+        onPressed: (event) =>
+        {
+            event.accepted = false
+            searchToolBar.focus = false
+        }
+    }
+
     function handleOpenVideoScreenRequest(resource, thumbnailUrl, camerasModel)
     {
         for (var i = 0; i !== camerasGrid.count; ++i)
