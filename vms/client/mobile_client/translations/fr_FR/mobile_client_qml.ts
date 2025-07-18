@@ -165,7 +165,7 @@
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>Se connecter à %1 par le compte du propriétaire du site</translation>
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
@@ -691,6 +691,10 @@
       <source>Nothing found</source>
       <translation>Rien trouvé</translation>
     </message>
+    <message>
+      <source>Stop Connecting</source>
+      <translation type="unfinished">Stop Connecting</translation>
+    </message>
   </context>
   <context>
     <name>SearchEdit</name>
@@ -816,12 +820,24 @@
       <translation type="unfinished">Access to Resources Denied</translation>
     </message>
     <message>
-      <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
-    </message>
-    <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
       <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+    </message>
+    <message>
+      <source>The resources in this organization are not available to your permission group</source>
+      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+    </message>
+    <message>
+      <source>Connect a site to the organization to access it here</source>
+      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
     </message>
   </context>
   <context>

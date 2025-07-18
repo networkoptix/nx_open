@@ -690,6 +690,10 @@
       <source>Nothing found</source>
       <translation>未找到任何內容</translation>
     </message>
+    <message>
+      <source>Stop Connecting</source>
+      <translation type="unfinished">Stop Connecting</translation>
+    </message>
   </context>
   <context>
     <name>SearchEdit</name>
@@ -815,12 +819,24 @@
       <translation>存取資源被拒</translation>
     </message>
     <message>
-      <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation>處於暫停或關閉狀態的站點不會出現</translation>
-    </message>
-    <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
       <translation>在雲端入口網站中建立一個組織並從此處造訪</translation>
+    </message>
+    <message>
+      <source>The resources in this organization are not available to your permission group</source>
+      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+    </message>
+    <message>
+      <source>Connect a site to the organization to access it here</source>
+      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
     </message>
   </context>
   <context>
