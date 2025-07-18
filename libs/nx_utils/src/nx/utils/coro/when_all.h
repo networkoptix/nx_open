@@ -53,6 +53,15 @@ struct AllTasksAwaiter
                         h();
                 });
 
+            using AwaitingPromise =
+                std::tuple_element<I, decltype(self->m_tasks)>::type::PromiseBase;
+            auto& promise = std::coroutine_handle<AwaitingPromise>::from_address(
+                h.address()).promise();
+
+            // Inherit cancel condition from the awaiting coroutine.
+            if (promise.m_cancelOnResume)
+                co_await cancelIf(promise.m_cancelOnResume);
+
             std::get<I>(self->m_results) = co_await std::get<I>(self->m_tasks);
         }(this, h);
     }
@@ -136,6 +145,13 @@ struct TaskListAwaiter
                 if (m_waiting.fetch_sub(1, std::memory_order::acq_rel) == 1)
                     h();
             });
+
+        auto& promise = std::coroutine_handle<typename Task<T>::PromiseBase>::from_address(
+            h.address()).promise();
+
+        // Inherit cancel condition from the awaiting coroutine.
+        if (promise.m_cancelOnResume)
+            co_await cancelIf(promise.m_cancelOnResume);
 
         m_results[i] = co_await m_tasks[i];
     }
