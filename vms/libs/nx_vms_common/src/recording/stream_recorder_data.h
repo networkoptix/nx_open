@@ -46,7 +46,7 @@ private:
  * Auxiliary data structure. Intended to be used when additional text error information is desired
  * to be passed around (to be further logged for example).
  */
-struct ErrorEx: public Error
+struct NX_VMS_COMMON_API ErrorEx: public Error
 {
     QString message;
 
