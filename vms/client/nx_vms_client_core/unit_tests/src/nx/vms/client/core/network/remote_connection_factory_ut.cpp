@@ -50,6 +50,7 @@ static const std::string kCloudUserName = "user@example.com";
 static const std::string kCloudToken = "cloud_token";
 
 using UserInfo = RemoteConnectionFactoryRequestsManager::UserInfo;
+using Purpose = nx::vms::common::ServerCompatibilityValidator::Purpose;
 
 std::vector<UserInfo> makeDefaultUsers()
 {
@@ -97,6 +98,9 @@ struct TestLogonData
 
     /** Whether connection is checked as for mobile client (json compatible with old systems). */
     nx::vms::api::PeerType peerType = nx::vms::api::PeerType::mobileClient;
+
+    /** Purpose of connection (Desktop Client may connect in compatibility mode). */
+    Purpose purpose = Purpose::connect;
 };
 
 using ConnectionOrError = RemoteConnectionFactory::ConnectionOrError;
@@ -255,6 +259,8 @@ public:
             else
                 logonData.credentials.authToken = nx::network::http::PasswordAuthToken(kPassword);
         }
+
+        logonData.purpose = data.purpose;
 
         common::ServerCompatibilityValidator::initialize(
             data.peerType, Qn::SerializationFormat::json);
@@ -427,7 +433,11 @@ TEST_F(RemoteConnectionFactoryTest, localSystem50NoVersionTest)
 TEST_F(RemoteConnectionFactoryTest, localSystem42MinimalTest)
 {
     givenSystem({.version = kVersion42});
-    givenLogonData({.hasToken = false});
+    givenLogonData({
+        .hasToken = false,
+        .peerType = api::PeerType::desktopClient,
+        .purpose = Purpose::connectInCompatibilityMode
+    });
     whenConnectToSystem();
     thenRequestsCountIs(3); //< moduleInformation, loginWithDigest, userModel
     thenConnectionSuccessful();
@@ -436,7 +446,12 @@ TEST_F(RemoteConnectionFactoryTest, localSystem42MinimalTest)
 TEST_F(RemoteConnectionFactoryTest, localSystem42NoIdMultipleServersTest)
 {
     givenSystem({.version = kVersion42, .serversCount = 2});
-    givenLogonData({.hasId = false, .hasToken = false});
+    givenLogonData({
+        .hasId = false,
+        .hasToken = false,
+        .peerType = api::PeerType::desktopClient,
+        .purpose = Purpose::connectInCompatibilityMode
+    });
     whenConnectToSystem();
     thenRequestsCountIs(3); //< moduleInformation, loginWithDigest, userModel
     thenConnectionSuccessful();
@@ -490,7 +505,12 @@ TEST_F(RemoteConnectionFactoryTest, cloudSystem50NoIdMultipleServersTest)
 TEST_F(RemoteConnectionFactoryTest, cloudSystem42Test)
 {
     givenSystem({.version = kVersion42});
-    givenLogonData({.hasToken = false, .isCloud = true});
+    givenLogonData({
+        .hasToken = false,
+        .isCloud = true,
+        .peerType = api::PeerType::desktopClient,
+        .purpose = Purpose::connectInCompatibilityMode
+    });
     whenConnectToSystem();
     thenRequestsCountIs(3); //< moduleInformation, loginWithDigest, userModel
     thenConnectionSuccessful();

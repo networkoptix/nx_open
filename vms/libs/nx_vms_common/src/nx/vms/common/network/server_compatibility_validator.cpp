@@ -33,6 +33,8 @@ static const QMap<Purpose, nx::utils::SoftwareVersion> kMinimalVersionByPurpose{
     {Purpose::connectInCrossSystemMode, {5, 0}},
 };
 
+constexpr nx::utils::SoftwareVersion kMinimalMobileVersion = {5, 0};
+
 void ensureInitialized()
 {
     NX_ASSERT(ServerCompatibilityValidator::isInitialized());
@@ -73,7 +75,11 @@ std::optional<ServerCompatibilityValidator::Reason> checkInternal(
 {
     ensureInitialized();
 
-    if (version < kMinimalVersionByPurpose[purpose])
+    const auto minVersion = s_localPeerType == Peer::mobileClient
+        ? kMinimalMobileVersion
+        : kMinimalVersionByPurpose[purpose];
+
+    if (version < minVersion)
         return ServerCompatibilityValidator::Reason::versionIsTooLow;
 
     if (!ServerCompatibilityValidator::isCompatibleCustomization(customization))
@@ -156,7 +162,9 @@ bool ServerCompatibilityValidator::isCompatible(
 
 nx::utils::SoftwareVersion ServerCompatibilityValidator::minimalVersion(Purpose purpose)
 {
-    return kMinimalVersionByPurpose[purpose];
+    return s_localPeerType == Peer::mobileClient
+        ? kMinimalMobileVersion
+        : kMinimalVersionByPurpose[purpose];
 }
 
 bool ServerCompatibilityValidator::isCompatibleCustomization(const QString& remoteCustomization)
