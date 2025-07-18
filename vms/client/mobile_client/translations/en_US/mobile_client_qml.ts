@@ -691,6 +691,10 @@
         <source>Nothing found</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Stop Connecting</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SearchEdit</name>
@@ -816,11 +820,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sites in the Suspended or Shutdown state are not available</source>
+        <source>Create an organization in the Cloud Portal to access it here</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Create an organization in the Cloud Portal to access it here</source>
+        <source>The resources in this organization are not available to your permission group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect a site to the organization to access it here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
