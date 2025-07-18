@@ -118,11 +118,10 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
 {
     using namespace nx::network::http::header;
     const auto gateway = appContext()->cloudGateway();
-    auto address = systemContext()->connection()->connectionInfo().isCloud()
-        ? server->getCloudAddress().value()
-        : server->getPrimaryAddress();
+    const auto address = server->getCloudAddress().value_or(server->getPrimaryAddress());
     RemoteAccessData remoteAccessData;
     remoteAccessData.enabledForCurrentUser = isRemoteAccessEnabledForCurrentUser();
+
     if (!remoteAccessData.enabledForCurrentUser)
     {
         gateway->forward(address,
@@ -131,7 +130,7 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
         server->setRemoteAccessData(remoteAccessData);
         return;
     }
-    auto configurations = server->portForwardingConfigurations();
+    const auto configurations = server->portForwardingConfigurations();
     std::set<uint16_t> targetPorts;
     for (auto& configuration: configurations)
     {
@@ -142,7 +141,7 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
     BearerAuthorization header(systemContext()->credentials().authToken.value);
     gateway->enforceHeadersFor(address, {{kProxyAuthorization, header.toString()}});
 
-    auto forwardedPorts = gateway->forward(address,
+    const auto forwardedPorts = gateway->forward(address,
         targetPorts,
         systemContext()->certificateVerifier()->makeAdapterFunc(
             server->getId(), server->getApiUrl()));
