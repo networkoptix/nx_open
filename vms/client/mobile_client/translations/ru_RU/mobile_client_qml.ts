@@ -699,7 +699,7 @@
     </message>
     <message>
       <source>Stop Connecting</source>
-      <translation type="unfinished">Stop Connecting</translation>
+      <translation>Остановить подключение</translation>
     </message>
   </context>
   <context>
