@@ -695,7 +695,7 @@
     </message>
     <message>
       <source>Stop Connecting</source>
-      <translation type="unfinished">Stop Connecting</translation>
+      <translation>Zatrzymaj połączenie</translation>
     </message>
   </context>
   <context>
@@ -827,19 +827,19 @@
     </message>
     <message>
       <source>The resources in this organization are not available to your permission group</source>
-      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+      <translation>Zasoby w tej organizacji nie są dostępne dla Twojej grupy uprawnień</translation>
     </message>
     <message>
       <source>Connect a site to the organization to access it here</source>
-      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+      <translation>Połącz witrynę z organizacją, aby uzyskać do niej dostęp tutaj</translation>
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>Nie znaleziono dostępnych witryn. Zaloguj się do konta w chmurze lub połącz się z lokalnym serwerem</translation>
     </message>
     <message>
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
+      <translation>Nie znaleziono dostępnych witryn. Poproś o dostęp do istniejących witryn lub połącz się z serwerem lokalnym</translation>
     </message>
   </context>
   <context>

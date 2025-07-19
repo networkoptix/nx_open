@@ -692,7 +692,7 @@
     </message>
     <message>
       <source>Stop Connecting</source>
-      <translation type="unfinished">Stop Connecting</translation>
+      <translation>接続を停止</translation>
     </message>
   </context>
   <context>
@@ -824,19 +824,19 @@
     </message>
     <message>
       <source>The resources in this organization are not available to your permission group</source>
-      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+      <translation>この組織内のリソースは、あなたの権限グループでは利用できません。</translation>
     </message>
     <message>
       <source>Connect a site to the organization to access it here</source>
-      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+      <translation>組織にサイトを接続すると、ここからアクセスできます。</translation>
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>アクセス可能なサイトが見つかりません。クラウドアカウントにログインするか、ローカルサーバーに接続してください。</translation>
     </message>
     <message>
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
+      <translation>アクセス可能なサイトが見つかりません。既存サイトへのアクセス権をリクエストするか、ローカルサーバーに接続してください。</translation>
     </message>
   </context>
   <context>
