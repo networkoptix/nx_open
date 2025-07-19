@@ -52,6 +52,14 @@ bool HttpClient::doGet(const nx::Url& url)
             &nx::network::http::AsyncClient::doGet), _1, url));
 }
 
+bool HttpClient::doHead(const nx::Url& url)
+{
+    using namespace std::placeholders;
+    return doRequest(std::bind(
+        static_cast<void(AsyncClient::*)(const nx::Url&)>(
+            &nx::network::http::AsyncClient::doHead), _1, url));
+}
+
 bool HttpClient::doUpgrade(
     const nx::Url& url,
     const std::string& protocolToUpgradeTo)

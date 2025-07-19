@@ -41,6 +41,11 @@ public:
     /**
      * @return true if response has been received.
      */
+    bool doHead(const nx::Url& url);
+
+    /**
+     * @return true if response has been received.
+     */
     bool doUpgrade(
         const nx::Url& url,
         const std::string& protocolToUpgradeTo);

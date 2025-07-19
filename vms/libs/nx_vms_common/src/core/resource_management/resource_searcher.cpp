@@ -85,7 +85,11 @@ nx::Url QnAbstractNetworkResourceSearcher::updateUrlToHttpsIfNeed(const nx::Url&
     if (!client.doGet(requestUrl) || !client.response())
         return foundUrl;
 
-    return client.contentLocationUrl();
+    const auto& contentLocationUrl = client.contentLocationUrl();
+    nx::Url result = foundUrl;
+    result.setPort(contentLocationUrl.port());
+    result.setScheme(contentLocationUrl.scheme());
+    return result;
 }
 
 QnAbstractHttpResourceSearcher::QnAbstractHttpResourceSearcher(SystemContext* systemContext):
