@@ -112,6 +112,11 @@ common::SystemContext* EventDetailsTestBase::systemContext()
     return sContext.get();
 }
 
+Engine* EventDetailsTestBase::engine()
+{
+    return sEngine.get();
+}
+
 void EventDetailsTestBase::givenEvent(EventPtr event)
 {
     m_events.push_back(std::move(event));

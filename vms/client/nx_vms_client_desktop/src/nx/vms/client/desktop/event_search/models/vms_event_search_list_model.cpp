@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/event_search/models/private/event_model_data.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/rules/helpers/help_id.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -77,15 +78,19 @@ struct Facade
     }
 };
 
-bool hasPreview(const nx::vms::rules::AggregatedEventPtr& event)
+bool hasPreview(const QVariantMap& details)
 {
-    return event->property(rules::utils::kDeviceIdFieldName).isValid()
-        || event->property(rules::utils::kDeviceIdsFieldName).isValid();
+    return nx::vms::rules::utils::EventLog::sourceResourceType(details)
+        == nx::vms::rules::ResourceType::device;
 }
 
-QString description(const QVariantMap& details)
+QnResourceList accessibleDevices(core::SystemContext* context, const UuidList& deviceIds)
 {
-    return nx::vms::rules::Strings::eventDetails(details).join(common::html::kLineBreak);
+    return context->resourcePool()->getResourcesByIds(deviceIds).filtered(
+        [accessController = context->accessController()](const QnResourcePtr& resource)
+        {
+            return accessController->hasPermissions(resource, Qn::ViewContentPermission);
+        });
 }
 
 QColor color(const QVariantMap& details)
@@ -189,7 +194,6 @@ void VmsEventSearchListModel::Private::fetchLive()
     }();
 
     requestFetch(request, {}, MultiRequestIdHolder::Mode::dynamic);
-
 }
 
 rest::Handle VmsEventSearchListModel::Private::getEvents(
@@ -424,16 +428,18 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
     if (!NX_ASSERT(systemContext()))
         return {};
 
+    using namespace nx::vms::rules::utils;
+
     const auto infoLevel = appContext()->localSettings()->resourceInfoLevel();
     const auto event = nx::vms::rules::AggregatedEventPtr::create(
         systemContext()->vmsRulesEngine(),
         d->data[index.row()]);
-    const auto details = event->details(systemContext(), infoLevel);
+    const auto& details = event->details(systemContext(), infoLevel);
 
     switch (role)
     {
         case Qt::DisplayRole:
-            return eventTitle(details);
+            return EventLog::caption(details);
 
         case core::DecorationPathRole:
             return iconPath(event, details, systemContext()->resourcePool());
@@ -442,15 +448,18 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(color(details));
 
         case core::DescriptionTextRole:
-            return description(details);
+            return EventLog::tileDescription(details);
+
+        case Qt::ToolTipRole:
+            return EventLog::descriptionTooltip(event, systemContext(), infoLevel);
 
         case core::AnalyticsAttributesRole:
-            if (const auto attrVal = event->property("attributes");
+            if (const auto attrVal = event->property(kAttributesFieldName);
                 attrVal.canConvert<nx::common::metadata::Attributes>())
             {
                 return QVariant::fromValue(
                     systemContext()->analyticsAttributeHelper()->preprocessAttributes(
-                        event->property("objectTypeId").toString(),
+                        event->property(kObjectTypeIdFieldName).toString(),
                         attrVal.value<nx::common::metadata::Attributes>()));
             }
             else
@@ -459,50 +468,46 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
             }
 
         case core::ForcePrecisePreviewRole:
-            return hasPreview(event)
+            return hasPreview(details)
                 && event->timestamp() > microseconds::zero()
                 && event->timestamp().count() != DATETIME_NOW;
 
         case core::PreviewTimeRole:
-            if (!hasPreview(event))
+            if (!hasPreview(details))
                 return QVariant();
         [[fallthrough]];
         case core::TimestampRole:
             return QVariant::fromValue(event->timestamp()); //< Microseconds.
 
         case core::ObjectTrackIdRole:
-            return event->property("objectTrackId");
+            return event->property(kObjectTrackIdFieldName);
 
         // TODO: #sivanov Replace with a corresponding function when the event search unit
         // tests are ready.
-        case core::DisplayedResourceListRole:
+        case core::DisplayedResourceListRole: //< Event tile source label.
         {
             return QVariant::fromValue<QStringList>({
                 nx::vms::rules::utils::EventLog::sourceText(systemContext(), details)});
         }
 
-        case core::ResourceListRole:
+        case core::ResourceListRole: //< Event tooltip thumbnails.
         {
-            QnResourceList resources = systemContext()->resourcePool()->getResourcesByIds(
-                nx::vms::rules::utils::getResourceIds(event));
-            return QVariant::fromValue(resources);
+            return QVariant::fromValue(accessibleDevices(
+                systemContext(), EventLog::sourceDeviceIds(details)));
         }
 
-        case core::ResourceRole: //< Resource for thumbnail preview only.
+        case core::ResourceRole: //< Resource for tile thumbnail preview only.
         {
-            if (!hasPreview(event))
-                return {};
+            auto devices = accessibleDevices(systemContext(), EventLog::sourceDeviceIds(details));
 
-            QnResourceList devices = systemContext()->resourcePool()->getResourcesByIds(
-                nx::vms::rules::utils::getDeviceIds(event));
+            if (devices.count() == 1)
+                return QVariant::fromValue(devices.front());
 
-            // FIXME: #sivanov Cover with tests, more devices can be here.
-            if (!devices.empty())
-                return QVariant::fromValue<QnResourcePtr>(devices.first());
+            return {};
         }
 
         case Qn::HelpTopicIdRole:
-            return HelpTopic::Id::Empty;
+            return eventHelpId(event->type());
 
         default:
             return base_type::data(index, role);

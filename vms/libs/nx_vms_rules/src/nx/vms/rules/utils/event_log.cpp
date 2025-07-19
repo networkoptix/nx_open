@@ -41,6 +41,11 @@ QString EventLog::sourceText(const AggregatedEventPtr& event,
     return sourceText(context, event->details(context, detailLevel));
 }
 
+ResourceType EventLog::sourceResourceType(const QVariantMap& eventDetails)
+{
+    return eventDetails.value(utils::kSourceResourcesTypeDetailName).value<ResourceType>();
+}
+
 UuidList EventLog::sourceResourceIds(const QVariantMap& eventDetails)
 {
     return eventDetails.value(kSourceResourcesIdsDetailName).value<UuidList>();
@@ -51,6 +56,23 @@ UuidList EventLog::sourceResourceIds(
 {
     // Resource info level is not important.
     return sourceResourceIds(event->details(context, Qn::RI_NameOnly));
+}
+
+UuidList EventLog::sourceDeviceIds(const QVariantMap & eventDetails)
+{
+    const auto type = eventDetails.value(kSourceResourcesTypeDetailName).value<ResourceType>();
+
+    return type == ResourceType::device ? sourceResourceIds(eventDetails) : UuidList();
+}
+
+QString EventLog::caption(const QVariantMap & eventDetails)
+{
+    return eventDetails.value(rules::utils::kCaptionDetailName).toString();
+}
+
+QString EventLog::tileDescription(const QVariantMap & eventDetails)
+{
+    return eventDetails.value(rules::utils::kDescriptionDetailName).toString();
 }
 
 QString EventLog::descriptionTooltip(const AggregatedEventPtr& event,

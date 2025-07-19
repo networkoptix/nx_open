@@ -17,6 +17,4 @@ QString eventIconPath(
     const QString& custom = {},
     const QnResourceList& devices = {});
 
-QString eventTitle(const QVariantMap& details);
-
 } // namespace nx::vms::client::desktop
