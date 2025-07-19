@@ -3,14 +3,15 @@
 #pragma once
 
 /**@file
- * Set of utilities required primarily for displaying Event Log contents.
+ * Set of utilities required primarily for displaying Event Log & Tile contents.
  */
 
 #include <QtCore/QString>
 
 #include <nx/utils/uuid.h>
 
-#include "../basic_event.h"
+#include "../aggregated_event.h"
+#include "../manifest.h"
 
 namespace nx::vms::rules::utils {
 
@@ -43,6 +44,9 @@ struct NX_VMS_RULES_API EventLog
         common::SystemContext* context,
         Qn::ResourceInfoLevel detailLevel);
 
+    /** Can be used for source icon selection. */
+    static ResourceType sourceResourceType(const QVariantMap& eventDetails);
+
     /**
      * Event source resources. By default this is the device (if present) or server where the event
      * was produced. Some events may have several source resources - e.g. Soft Trigger for the
@@ -61,6 +65,21 @@ struct NX_VMS_RULES_API EventLog
      */
     static UuidList sourceResourceIds(
         const AggregatedEventPtr& event, common::SystemContext* context);
+
+    /**
+     * Event source resource ids for the events with device source type. Useful for tile & tooltip
+     * preview display
+     */
+    static UuidList sourceDeviceIds(const QVariantMap& eventDetails);
+
+    /**
+     * Event caption to display in log table column or event tile, should match notification
+     * caption.
+     */
+    static QString caption(const QVariantMap& eventDetails);
+
+    /** Event description to display on event tile, should match notification description. */
+    static QString tileDescription(const QVariantMap& eventDetails);
 
     /**
      * Event description tooltip text. By default it contains the extended event description.

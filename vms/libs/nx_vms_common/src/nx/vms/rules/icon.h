@@ -19,7 +19,6 @@ NX_REFLECTION_ENUM_CLASS(Icon,
     generic,
     integrationDiagnostic,
     fanError,
-    cloudOffline,
     analyticsEvent,
     analyticsObjectDetected,
     softTrigger)

@@ -26,8 +26,6 @@ static const QMap<Icon, QString> kIconPaths = {
     {Icon::inputSignal, "20x20/Outline/input_signal.svg"},
     {Icon::integrationDiagnostic, "20x20/Outline/plugin.svg"},
     {Icon::fanError, "20x20/Outline/fan.svg"},
-     // TODO: VMS-47520: check how this event is called and create if required.
-    {Icon::cloudOffline, "20x20/Outline/cloud_offline.svg"},
     {Icon::analyticsEvent, "20x20/Outline/analytics.svg"},
     {Icon::generic, "20x20/Outline/generic.svg"},
 };
@@ -65,11 +63,6 @@ QString eventIconPath(
         default:
             return kIconPaths.value(icon);
     }
-}
-
-QString eventTitle(const QVariantMap& details)
-{
-    return details.value(rules::utils::kCaptionDetailName).toString();
 }
 
 } // namespace nx::vms::client::desktop

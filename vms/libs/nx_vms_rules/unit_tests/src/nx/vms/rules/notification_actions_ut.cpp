@@ -11,8 +11,11 @@
 #include <nx/vms/rules/actions/push_notification_action.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/aggregated_event.h>
+#include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/manifest.h>
+#include <nx/vms/rules/strings.h>
+#include <nx/vms/rules/utils/event_log.h>
 #include <nx/vms/rules/utils/field_names.h>
 
 #include "event_details_test_base.h"
@@ -79,6 +82,27 @@ protected:
             systemContext(),
             &kTestTooltipActionFieldDescriptor);
         m_tooltipField->setText("{event.extendedDescription}");
+
+        const auto manifest = NotificationAction::manifest();
+
+        m_sourceTextField = makeField(manifest, utils::kSourceNameFieldName);
+        m_deviceIdsField = makeField(manifest, utils::kDeviceIdsFieldName);
+    }
+
+    std::unique_ptr<ActionBuilderField> makeField(
+        const ItemDescriptor& manifest, const QString& type)
+    {
+        const auto fieldIt = std::ranges::find_if(
+            manifest.fields,
+            [&type](const auto& f) { return f.fieldName == type; });
+
+        if (fieldIt == manifest.fields.end())
+            return {};
+
+        auto field = engine()->buildActionField(&*fieldIt);
+        field->setProperties(fieldIt->properties);
+
+        return field;
     }
 
     void thenNotificationIs(
@@ -87,7 +111,9 @@ protected:
         const QString& expectedPushDescription,
         const QString& expectedTooltip)
     {
-        auto event = buildEvent();
+        using nx::vms::rules::utils::EventLog;
+
+        const auto event = buildEvent();
 
         const auto caption = m_captionField->build(event).value<QString>();
         const auto notificationDescription = m_descriptionField->build(event).value<QString>();
@@ -98,6 +124,42 @@ protected:
         EXPECT_EQ(expectedNotificationDescription.trimmed(), notificationDescription);
         EXPECT_EQ(expectedPushDescription.trimmed(), pushDescription.trimmed());
         EXPECT_EQ(expectedTooltip.trimmed(), tooltip);
+
+        // Event tile on event panel should be identical to the notification.
+        constexpr auto kInfoLevel = Qn::RI_NameOnly;
+        const auto& details = event->details(systemContext(), kInfoLevel);
+
+        EXPECT_EQ(expectedCaption, EventLog::caption(details));
+        EXPECT_EQ(expectedNotificationDescription.trimmed(), EventLog::tileDescription(details));
+        EXPECT_EQ(
+            expectedTooltip.trimmed(),
+            EventLog::descriptionTooltip(event, systemContext(), kInfoLevel));
+    }
+
+    void thenSourceIs(
+        ResourceType expectedType, const UuidList& expectedIds, QString expectedText = {})
+    {
+        using nx::vms::rules::utils::EventLog;
+
+        constexpr auto kInfoLevel = Qn::RI_WithUrl;
+        const auto event = buildEvent();
+        const auto& details = event->details(systemContext(), kInfoLevel);
+        const auto notificationDeviceIds = m_deviceIdsField->build(event).value<UuidList>();
+        const auto notificatonServerId = event->property(utils::kServerIdFieldName).value<Uuid>();
+
+        if (expectedText.isEmpty() && !expectedIds.empty())
+            expectedText = Strings::resource(systemContext(), expectedIds.front(), kInfoLevel);
+
+        EXPECT_EQ(expectedText, m_sourceTextField->build(buildEvent()).value<QString>());
+        EXPECT_EQ(expectedText, EventLog::sourceText(systemContext(), details));
+
+        EXPECT_EQ(expectedType, EventLog::sourceResourceType(details));
+        EXPECT_EQ(expectedIds, EventLog::sourceResourceIds(details));
+
+        if (expectedType == ResourceType::device)
+            EXPECT_EQ(expectedIds, notificationDeviceIds);
+        else if (expectedType == ResourceType::server)
+            EXPECT_EQ(expectedIds.front(), notificatonServerId);
     }
 
 protected:
@@ -106,6 +168,8 @@ protected:
     std::unique_ptr<TextWithFields> m_pushDescriptionField;
     std::unique_ptr<TextWithFields> m_tooltipField;
 
+    std::unique_ptr<ActionBuilderField> m_sourceTextField;
+    std::unique_ptr<ActionBuilderField> m_deviceIdsField;
 };
 
 // FIXME: #sivanov Short plan:
@@ -238,6 +302,8 @@ Analytics Event at Entrance
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 TEST_F(NotificationActionsTest, event_analytics_descriptionOnly)
@@ -271,6 +337,8 @@ Analytics Event at Entrance
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 TEST_F(NotificationActionsTest, event_analytics_captionOnly)
@@ -300,6 +368,7 @@ Analytics Event at Entrance
     ));
 
     thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -340,6 +409,7 @@ Object detected at Entrance
     ));
 
     thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -378,6 +448,8 @@ Input on Entrance
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -411,6 +483,7 @@ Camera disconnected at Server1
 
     // Device name is already displayed in the source.
     thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -460,6 +533,8 @@ Camera IP Conflict at Server1
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::server, {kServerId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -485,6 +560,7 @@ Fan failure at Server1
         kServerId));
 
     thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
+    thenSourceIs(ResourceType::server, {kServerId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -544,6 +620,8 @@ Generic Event at Server1
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera1Id, kCamera2Id}, "Source 1");
 }
 
 TEST_F(NotificationActionsTest, event_generic_captionOnly)
@@ -571,6 +649,7 @@ Generic Event at Server1
         UuidList{kCamera1Id, kCamera2Id}));
 
     thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
+    thenSourceIs(ResourceType::device, {kCamera1Id, kCamera2Id}, "Source 1");
 }
 
 TEST_F(NotificationActionsTest, event_generic_descriptionOnly)
@@ -601,6 +680,71 @@ Generic Event at Server1
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera1Id, kCamera2Id}, "Source 1");
+}
+
+TEST_F(NotificationActionsTest, event_generic_1device_nosource)
+{
+    const QString kExpectedCaption = "Caption 2";
+    const QString kExpectedDescription = "Description 1";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Camera2");
+
+    static constexpr auto kExpectedTooltip = R"(
+Generic Event at Server1
+15:46:29
+  Caption: Caption 2
+  Description: Description 1
+  Related cameras:
+  - Camera2 (10.0.0.2)
+)";
+
+    givenEvent(QSharedPointer<GenericEvent>::create(
+        makeTimestamp("15:46:29"),
+        State::instant,
+        /*caption*/ kExpectedCaption,
+        /*description*/ kExpectedDescription,
+        /*source*/ QString(),
+        kServerId,
+        UuidList{kCamera2Id}));
+
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera2Id});
+}
+
+TEST_F(NotificationActionsTest, event_generic_2device_nosource)
+{
+    const QString kExpectedCaption = "Caption 2";
+    const QString kExpectedDescription = "Description 1";
+    static const auto kExpectedPushDescription =
+        descriptionWithSourceTag(kExpectedDescription, "Entrance");
+
+    static constexpr auto kExpectedTooltip = R"(
+Generic Event at Server1
+15:46:29
+  Caption: Caption 2
+  Description: Description 1
+  Related cameras:
+  - Entrance (10.0.0.1)
+  - Camera2 (10.0.0.2)
+)";
+
+    givenEvent(QSharedPointer<GenericEvent>::create(
+        makeTimestamp("15:46:29"),
+        State::instant,
+        /*caption*/ kExpectedCaption,
+        /*description*/ kExpectedDescription,
+        /*source*/ QString(),
+        kServerId,
+        UuidList{kCamera1Id, kCamera2Id}));
+
+    thenNotificationIs(
+        kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera1Id, kCamera2Id});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -660,6 +804,8 @@ LDAP Sync Issue at Server1
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::server, {kServerId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -700,6 +846,8 @@ Not enough licenses on Server1
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::server, {kServerId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -730,6 +878,8 @@ Motion on Entrance
     ));
 
     thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -804,6 +954,8 @@ Network Issue at Server1
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -846,6 +998,8 @@ Integration Diagnostic at Entrance
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 
@@ -868,6 +1022,7 @@ Integration Diagnostic at Entrance
         nx::vms::api::EventLevel::error
     ));
     thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 TEST_F(NotificationActionsTest, event_integrationDiagnostic_deviceAgent_descriptionOnly)
@@ -893,6 +1048,8 @@ Integration Diagnostic at Entrance
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 TEST_F(NotificationActionsTest, event_integrationDiagnostic_plugin)
@@ -931,6 +1088,8 @@ Integration Diagnostic at Engine1
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::analyticsEngine, {kEngine1Id});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -977,6 +1136,8 @@ PoE over budget on Server1
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::server, {kServerId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1019,6 +1180,8 @@ Services Issue on Server1
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::server, {kServerId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1043,6 +1206,8 @@ Server1 certificate error
         kServerId));
 
     thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::server, {kServerId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1098,6 +1263,8 @@ Server1 Conflict
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::server, {kServerId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1132,6 +1299,8 @@ Server1 Failure
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::server, {kServerId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1158,6 +1327,8 @@ Server1 Started
         kServerId));
 
     thenNotificationIs(kExpectedCaption, {}, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::server, {kServerId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1205,6 +1376,8 @@ Soft Trigger Button 1
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::device, {kCamera1Id});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1241,6 +1414,8 @@ Storage Issue at Server1
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);
+
+    thenSourceIs(ResourceType::server, {kServerId});
 }
 
 } // namespace nx::vms::rules::test

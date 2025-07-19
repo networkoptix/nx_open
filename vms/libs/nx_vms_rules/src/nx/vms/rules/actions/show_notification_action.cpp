@@ -48,7 +48,7 @@ const ItemDescriptor& NotificationAction::manifest()
                 utils::kDeviceIdsFieldName,
                 Strings::eventDevices()),
             utils::makeExtractDetailFieldDescriptor(
-                "sourceName",
+                utils::kSourceNameFieldName,
                 utils::kSourceTextDetailName),
             utils::makeExtractDetailFieldDescriptor(
                 "level",

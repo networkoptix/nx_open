@@ -9,8 +9,8 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/basic_action.h>
-#include <nx/vms/rules/basic_event.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/utils/event_log.h>
 #include <nx/vms/rules/utils/type.h>
 
 namespace nx::vms::client::desktop {
@@ -80,10 +80,7 @@ const QString& EventLogModelData::compareString() const
 
 QString EventLogModelData::eventTitle(SystemContext* context) const
 {
-    if (m_eventTitle.isEmpty())
-        m_eventTitle = desktop::eventTitle(details(context));
-
-    return m_eventTitle;
+    return nx::vms::rules::utils::EventLog::caption(details(context));
 }
 
 const QVariantMap& EventLogModelData::actionDetails(SystemContext* context) const

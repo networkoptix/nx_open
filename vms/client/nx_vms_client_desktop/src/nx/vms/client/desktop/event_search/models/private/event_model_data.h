@@ -49,8 +49,6 @@ public:
     QString actionType() const;
 
 private:
-    mutable QString m_eventTitle;
-
     mutable nx::vms::rules::ActionPtr m_action;
     mutable QVariantMap m_actionDetails;
     QString m_compareString;

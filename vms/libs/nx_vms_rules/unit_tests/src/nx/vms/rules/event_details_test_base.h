@@ -46,7 +46,9 @@ protected:
 
     static void SetUpTestSuite();
     static void TearDownTestSuite();
+
     static common::SystemContext* systemContext();
+    static Engine* engine();
 
     void givenEvent(EventPtr event);
 
