@@ -36,20 +36,20 @@ void AsyncClientMock::addMapping(
     const nx::utils::Url& /*url*/, const HostAddress& internalIp,
     quint16 internalPort, quint16 externalPort,
     Protocol protocol, const QString& description, quint64 /*duration*/,
-    std::function< void(bool) > callback)
+    std::function< void(ErrorCode) > callback)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (externalPort == m_disabledPort ||
         m_mappings.find(std::make_pair(externalPort, protocol))
         != m_mappings.end())
     {
-        return m_tasks.push([callback] { callback(false); });
+        return m_tasks.push([callback] { callback(ErrorCode::unknown); });
     }
 
     m_mappings[std::make_pair(externalPort, protocol)]
         = std::make_pair(SocketAddress(internalIp, internalPort), description);
 
-    m_tasks.push([callback] { callback(true); });
+    m_tasks.push([callback] { callback(ErrorCode::ok); });
 }
 
 void AsyncClientMock::deleteMapping(
