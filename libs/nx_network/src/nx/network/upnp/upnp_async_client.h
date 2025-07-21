@@ -15,10 +15,27 @@ namespace nx::network::upnp {
 class NX_NETWORK_API AsyncClient
 {
 public:
-    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Protocol,
+    enum ErrorCode: int
+    {
+        unknown = -1,
+
+        ok = 0,
+
+        onlyPermanentLeasesSupported = 725,
+    };
+
+    enum class Protocol
+    {
         tcp,
         udp
-    )
+    };
+
+    template<typename Visitor>
+    friend constexpr auto nxReflectVisitAllEnumItems(Protocol*, Visitor&& visitor)
+    {
+        using Item = nx::reflect::enumeration::Item<Protocol>;
+        return visitor(Item{Protocol::tcp, "TCP"}, Item{Protocol::udp, "UDP"});
+    }
 
     //! Simple SOAP call
     struct NX_NETWORK_API Message
@@ -93,7 +110,7 @@ public:
     virtual void addMapping(const nx::Url& url, const HostAddress& internalIp,
             quint16 internalPort, quint16 externalPort,
             Protocol protocol, const QString& description, quint64 duration,
-            std::function<void(bool)> callback);
+            std::function<void(ErrorCode)> callback);
 
     //! Removes mapping of @param externalPort
     virtual void deleteMapping(const nx::Url& url, quint16 externalPort, Protocol protocol,

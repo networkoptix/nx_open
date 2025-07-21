@@ -28,6 +28,8 @@ static const QString kSoapRequest(
 
 static const QString kNone; //< Just an empty string.
 
+static const QString kErrorCodeParameter = "errorCode";
+
 // UPNP parameters.
 static const QString kGetExternalIPAddress("GetExternalIPAddress");
 static const QString kAddPortMapping("AddPortMapping");
@@ -44,6 +46,7 @@ static const QString kNewInternalClient("NewInternalClient");
 static const QString kNewEnabled("NewEnabled");
 static const QString kNewPortMappingDescription("NewPortMappingDescription");
 static const QString kNewLeaseDuration("NewLeaseDuration");
+static const QString kNewRemoteHost("NewRemoteHost");
 
 // TODO: Move parsers to separate file.
 class UpnpMessageHandler
@@ -305,11 +308,17 @@ void AsyncClient::externalIp(
 }
 
 void AsyncClient::addMapping(
-    const nx::Url& url, const HostAddress& internalIp, quint16 internalPort,
-    quint16 externalPort, Protocol protocol, const QString& description,
-    quint64 duration, std::function<void(bool)> callback)
+    const nx::Url& url,
+    const HostAddress& internalIp,
+    quint16 internalPort,
+    quint16 externalPort,
+    Protocol protocol,
+    const QString& description,
+    quint64 duration,
+    std::function<void(ErrorCode)> callback)
 {
     AsyncClient::Message request(kAddPortMapping, kWanIp);
+    request.params[kNewRemoteHost] = QString(); //< Empty = allow any remote host.
     request.params[kNewExternalPort] = QString::number(externalPort);
     request.params[kNewProtocol] = nx::toString(protocol);
     request.params[kNewInternalPort] = QString::number(internalPort);
@@ -323,7 +332,16 @@ void AsyncClient::addMapping(
         request,
         [callback](const Message& response)
         {
-            callback(response.isOk());
+            if (response.isOk())
+            {
+                callback(ErrorCode::ok);
+            }
+            else
+            {
+                bool ok = false;
+                const int code = response.getParam(kErrorCodeParameter).toInt(&ok);
+                callback(ok ? ErrorCode(code) : ErrorCode::unknown);
+            }
         });
 }
 

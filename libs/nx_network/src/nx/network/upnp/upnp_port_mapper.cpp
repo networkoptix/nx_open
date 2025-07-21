@@ -429,7 +429,8 @@ void PortMapper::makeMapping(
     Device* device,
     quint16 inPort,
     Protocol protocol,
-    size_t retries)
+    size_t retries,
+    std::optional<std::chrono::milliseconds> duration)
 {
     if (!device->failCounter.isOk())
         return;
@@ -439,38 +440,50 @@ void PortMapper::makeMapping(
         desiredPort = portDistribution(randomEngine);
     while (device->engagedPorts.count(PortId(desiredPort, protocol)));
 
+    const quint64 mappingDuration =
+        duration.value_or(m_checkMappingsInterval * kMappingTimeRatio).count();
+
     m_upnpClient->addMapping(
-        device->url, device->internalIp, inPort, desiredPort, protocol, m_description,
-        std::chrono::milliseconds(m_checkMappingsInterval).count() * kMappingTimeRatio,
-        [this, device, inPort, desiredPort, protocol, retries](bool success)
+        device->url,
+        device->internalIp,
+        inPort, desiredPort,
+        protocol,
+        m_description,
+        mappingDuration,
+        [this, device, inPort, desiredPort, protocol, retries](ErrorCode errorCode)
         {
             NX_MUTEX_LOCKER lk(&m_mutex);
-            if (!success)
+            if (errorCode != ErrorCode::ok)
             {
                 device->failCounter.failure();
 
-                if (retries > 0)
+                const bool isPermanentLeaseRequired =
+                    errorCode == ErrorCode::onlyPermanentLeasesSupported;
+                const int retryCounter = isPermanentLeaseRequired
+                    ? retries
+                    : (retries - 1);
+                const auto duration = isPermanentLeaseRequired
+                    ? std::make_optional(std::chrono::milliseconds::zero())
+                    : std::nullopt;
+
+                if (retryCounter > 0)
                 {
-                    makeMapping(device, inPort, protocol, retries - 1);
+                    makeMapping(device, inPort, protocol, retryCounter, duration);
                 }
                 else
                 {
-                    NX_ERROR(this, nx::format("Could not forward any port on %1")
-                        .arg(device->url.toString(QUrl::RemovePassword)));
+                    NX_ERROR(this, "Could not forward any port on %1, error %2",
+                        device->url.toString(QUrl::RemovePassword), (int)errorCode);
                 }
-
                 return;
             }
 
             device->failCounter.success();
 
-            // save successful mapping and call callback
+            // Save successful mapping and call callback.
             const auto request = m_mapRequests.find(PortId(inPort, protocol));
             if (request == m_mapRequests.end())
-            {
-                // no need to provide this mapping any longer
-                return;
-            }
+                return; //< No need to provide this mapping any longer.
 
             const auto callback = request->second;
             const auto externalIp = device->externalIp;
