@@ -33,7 +33,8 @@ public:
 
     static constexpr std::chrono::minutes kDefaultCheckMappingsInterval{1};
 
-    typedef AsyncClient::Protocol Protocol;
+    using Protocol = AsyncClient::Protocol;
+    using ErrorCode = AsyncClient::ErrorCode;
 
     /**
      * Asks to forward the @param port to some external port
@@ -117,7 +118,12 @@ private:
     void updateExternalIp(Device* device);
     void checkMapping(Device* device, quint16 inPort, quint16 exPort, Protocol protocol);
     void ensureMapping(Device* device, quint16 inPort, Protocol protocol);
-    void makeMapping(Device* device, quint16 inPort, Protocol protocol, size_t retries = 5);
+    void makeMapping(
+        Device* device,
+        quint16 inPort,
+        Protocol protocol,
+        size_t retries = 5,
+        std::optional<std::chrono::milliseconds> duration = std::nullopt);
 
 protected: // for testing only
     nx::Mutex m_mutex;

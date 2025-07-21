@@ -31,7 +31,7 @@ public:
         const nx::Url& url, const HostAddress& internalIp,
         quint16 internalPort, quint16 externalPort,
         Protocol protocol, const QString& description, quint64 duration,
-        std::function< void(bool) > callback) override;
+        std::function< void(ErrorCode) > callback) override;
 
     virtual void deleteMapping(
         const nx::Url& url, quint16 externalPort, Protocol protocol,
