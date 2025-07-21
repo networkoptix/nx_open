@@ -39,7 +39,6 @@ private:
 
 private:
     bool initSpeex(int frameSize, int sampleRate);
-    bool initAudioEncoder();
     bool initInputDevices();
     void resizeBuffers(int frameSize);
     void startInputs();

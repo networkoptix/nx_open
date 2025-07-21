@@ -202,6 +202,12 @@ bool AudioEncoder::receivePacket(QnWritableCompressedAudioDataPtr& result)
     result.reset();
     while (true)
     {
+        if (!m_encoderContext)
+        {
+            // Happens when we try to open and then close parent stream fast.
+            return false;
+        }
+
         // 1. Try to get media from encoder.
         AvPacket avPacket;
         auto packet = avPacket.get();

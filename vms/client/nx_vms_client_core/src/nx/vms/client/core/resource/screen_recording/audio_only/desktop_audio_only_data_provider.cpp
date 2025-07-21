@@ -108,7 +108,7 @@ void DesktopAudioOnlyDataProvider::run()
     int sampleRate = format.sampleRate();
     int channels = m_audioSourcesInfo.size() > 1 ? kStereoChannelCount : format.channelCount();
 
-    if (!initAudioDecoder(sampleRate, fromQtAudioFormat(format), channels))
+    if (!initAudioEncoder(sampleRate, fromQtAudioFormat(format), channels))
         return;
 
     m_frameSize = getAudioFrameSize();
