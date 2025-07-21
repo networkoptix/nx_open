@@ -75,7 +75,7 @@ ComboBox
         return data ? data : ""
     }
 
-    property string decorationPath: getDecorationPath()
+    property string decorationPath: ""
 
     onCurrentIndexChanged: decorationPath = getDecorationPath()
     onModelChanged:
@@ -87,6 +87,7 @@ ComboBox
     property var modelAccessor: ModelDataAccessor
     {
         model: control.model
+        onModelChanged: decorationPath = getDecorationPath()
         onDataChanged: decorationPath = getDecorationPath()
         onCountChanged: decorationPath = getDecorationPath()
     }

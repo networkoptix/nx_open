@@ -15,7 +15,7 @@ Column
 
     property var loggingCategory
 
-    property var selectedAttributeValues: {}
+    property var selectedAttributeValues: ({})
 
     /* Emitted with delay when a referenced attribute value is changed. */
     signal referencedAttributeValueChanged()

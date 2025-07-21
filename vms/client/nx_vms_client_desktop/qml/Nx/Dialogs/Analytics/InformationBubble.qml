@@ -50,7 +50,7 @@ Bubble
         {
             id: attributeTable
 
-            property bool relevant: items.length > 0
+            property bool relevant: items?.length > 0 ?? false
             visible: relevant
 
             width: content.width

@@ -24,7 +24,7 @@ Dialog
         property var xAxis: []
         property var yAxis: []
         property var zAxis: []
-        property var buttons: {}
+        property var buttons: ({})
     }
 
     property var steps: [

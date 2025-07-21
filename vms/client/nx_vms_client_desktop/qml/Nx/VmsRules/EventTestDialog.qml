@@ -24,9 +24,9 @@ Dialog
     property var eventLevels: []
     property var boolStates: ["false", "true"]
 
-    property var servers: {}
-    property var devices: {}
-    property var users: {}
+    property var servers: ({})
+    property var devices: ({})
+    property var users: ({})
 
     readonly property var typeToModel: {
         "state": root.availableStates,

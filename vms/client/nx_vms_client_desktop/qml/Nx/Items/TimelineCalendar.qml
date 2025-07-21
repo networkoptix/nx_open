@@ -33,14 +33,20 @@ Control
     implicitWidth: 324
     implicitHeight: contentItem.implicitHeight
 
-    property date currentDate: new Date(new Date().getTime() + displayOffset)
+    readonly property date currentDate:
+        timer.counter, new Date(new Date().getTime() + displayOffset)
 
     Timer
     {
+        id: timer
+
+        // Exclusevely for force updating the current date. The value is ignored.
+        property int counter: 0
+
         interval: 1000
         running: true
         repeat: true
-        onTriggered: currentDate = new Date(new Date().getTime() + displayOffset)
+        onTriggered: counter += 1
     }
 
     background: Rectangle

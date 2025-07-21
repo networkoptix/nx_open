@@ -105,7 +105,7 @@ Item
         anchors.fill: control
         visible: !cannotDecryptMedia
 
-        property int previewState: { return EventSearch.PreviewState.initial }
+        property int previewState: EventSearch.PreviewState.initial
 
         sourceComponent: Component
         {
