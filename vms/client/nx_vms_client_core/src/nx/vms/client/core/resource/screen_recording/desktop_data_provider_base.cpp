@@ -104,7 +104,7 @@ int DesktopDataProviderBase::getAudioFrameSize()
     return m_audioEncoder.codecParameters()->getFrameSize();
 }
 
-bool DesktopDataProviderBase::initAudioDecoder(int sampleRate, AVSampleFormat format, int channels)
+bool DesktopDataProviderBase::initAudioEncoder(int sampleRate, AVSampleFormat format, int channels)
 {
     AVChannelLayout layout;
     av_channel_layout_default(&layout, channels);

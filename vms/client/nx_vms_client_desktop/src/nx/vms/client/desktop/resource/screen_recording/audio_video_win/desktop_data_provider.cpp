@@ -569,7 +569,7 @@ bool DesktopDataProvider::initAudioCapturing()
         int sampleRate = format.sampleRate();
         int channels = d->audioInfo.size() > 1 ? /*stereo*/ 2 : format.channelCount();
 
-        if (!initAudioDecoder(sampleRate, fromQtAudioFormat(format), channels))
+        if (!initAudioEncoder(sampleRate, fromQtAudioFormat(format), channels))
         {
             m_lastErrorStr = tr("Could not initialize audio encoder.");
             return false;
