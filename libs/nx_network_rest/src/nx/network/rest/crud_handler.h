@@ -199,26 +199,31 @@ protected:
         const auto format = request.responseFormatOrThrow();
         Response response{
             responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
-        if (auto it = response.httpHeaders.find("ETag"); it != response.httpHeaders.end())
+        const bool notification = request.jsonRpcContext() && request.jsonRpcContext()->subscribed;
+        if (!notification)
         {
-            auto etag = nx::network::http::getHeaderValue(request.httpHeaders(), "If-None-Match");
-            if (!etag.empty())
+            if (auto it = response.httpHeaders.find("ETag"); it != response.httpHeaders.end())
             {
-                bool notModified = false;
-                auto d = static_cast<const Derived*>(this);
-                if constexpr (requires { d->checkEtag(/*useId*/ false, etag, it->second); })
+                auto etag =
+                    nx::network::http::getHeaderValue(request.httpHeaders(), "If-None-Match");
+                if (!etag.empty())
                 {
-                    const bool useId = idParam(request).value || m_idParamName.isEmpty();
-                    notModified = d->checkEtag(useId, etag, it->second);
-                }
-                else
-                {
-                    notModified = etag == it->second;
-                }
-                if (notModified)
-                {
-                    response.statusCode = nx::network::http::StatusCode::notModified;
-                    return response;
+                    bool notModified = false;
+                    auto d = static_cast<const Derived*>(this);
+                    if constexpr (requires { d->checkEtag(/*useId*/ false, etag, it->second); })
+                    {
+                        const bool useId = idParam(request).value || m_idParamName.isEmpty();
+                        notModified = d->checkEtag(useId, etag, it->second);
+                    }
+                    else
+                    {
+                        notModified = etag == it->second;
+                    }
+                    if (notModified)
+                    {
+                        response.statusCode = nx::network::http::StatusCode::notModified;
+                        return response;
+                    }
                 }
             }
         }
