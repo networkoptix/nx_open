@@ -650,7 +650,6 @@ Window
                         readonly property int cellHeight: 28
                         readonly property int rowsPerPage:
                             Math.floor((height - topMargin - bottomMargin) / cellHeight)
-                        property int hoveredRow: -1
 
                         clip: true
                         selectionBehavior: TableView.SelectRows
@@ -731,17 +730,6 @@ Window
                                 contentRowLayout.anchors.rightMargin,
                                 28)
                             implicitHeight: Math.max(contentRowLayout.implicitHeight, cellHeight)
-
-                            HoverHandler
-                            {
-                                onHoveredChanged:
-                                {
-                                    if (hovered)
-                                        tableView.hoveredRow = row
-                                    else if (tableView.hoveredRow === row)
-                                        tableView.hoveredRow = -1
-                                }
-                            }
 
                             RowLayout
                             {

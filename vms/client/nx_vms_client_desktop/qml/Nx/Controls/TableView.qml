@@ -31,18 +31,32 @@ TableView
     property alias deleteShortcut: deleteShortcut
     property alias enterShortcut: enterShortcut
 
-    property int hoveredRow: hoverHandler.hovered
-        ? control.rowAtPosition(hoverHandler.point.position.x, hoverHandler.point.position.y, /*includeSpacing*/ true)
-        : -1
+    readonly property int hoveredRow:
+    {
+        if (!hoverHandler.hovered)
+            return -1
+
+        return control.rowAtPosition(hoverHandler.point.position.x, hoverHandler.point.position.y,
+            /*includeSpacing*/ true)
+    }
+
+    readonly property Item hoveredItem:
+    {
+        if (!hoverHandler.hovered)
+            return null
+
+        return control.itemAtCell(control.cellAtPosition(
+            hoverHandler.point.position.x, hoverHandler.point.position.y, /*includeSpacing*/ true))
+    }
 
     // Whether column width must be equal to the appropriate header delegate width.
     property var useDelegateWidthAsColumnWidth: (column => false)
 
     function rowAtPosition(x, y, includeSpacing)
     {
-        const cellUnderMouse = cellAtPosition(x, y, includeSpacing)
-        const indexUnderCursor = modelIndex(cellUnderMouse)
-        return rowAtIndex(indexUnderCursor)
+        const cellAtPos = cellAtPosition(x, y, includeSpacing)
+        const indexAtPos = modelIndex(cellAtPos)
+        return rowAtIndex(indexAtPos)
     }
 
     flickableDirection: Flickable.VerticalFlick
