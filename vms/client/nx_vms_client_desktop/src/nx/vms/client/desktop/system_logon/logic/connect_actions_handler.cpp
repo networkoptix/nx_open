@@ -321,6 +321,17 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
                 if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::UpdatingCredentials)
                     return;
 
+                if (reason == RemoteSessionTimeoutWatcher::SessionExpirationReason::sessionExpired
+                    && connection->connectionInfo().credentials.authToken.isPassword()
+                    && connection->connectionInfo().userType == vms::api::UserType::local)
+                {
+                    // Digest credentials should be cleared right after session is expired because
+                    // server does not watch it.
+                    CredentialsManager::forgetStoredPassword(
+                        ::helpers::getLocalSystemId(system()->moduleInformation()),
+                        connection->credentials().username);
+                }
+
                 const bool isTemporaryUser = connection->connectionInfo().isTemporary();
                 executeDelayedParented(
                     [this, isTemporaryUser, reason]()
