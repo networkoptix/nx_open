@@ -63,7 +63,6 @@ private:
     bool exportMetadata(const NovMetadata& metadata);
 
     bool exportNextCamera();
-    void finishExport(bool success);
 
     bool tryInLoop(std::function<bool()> handler);
     bool writeData(const QString &fileName, const QByteArray &data);
