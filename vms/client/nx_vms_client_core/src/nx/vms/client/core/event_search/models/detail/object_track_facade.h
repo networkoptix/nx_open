@@ -12,6 +12,7 @@ struct ObjectTrackFacade
 {
     using Type = nx::analytics::db::ObjectTrackEx;
     using TimeType = std::chrono::microseconds;
+    using IdType = nx::Uuid;
 
     static TimeType startTime(const Type& track);
 

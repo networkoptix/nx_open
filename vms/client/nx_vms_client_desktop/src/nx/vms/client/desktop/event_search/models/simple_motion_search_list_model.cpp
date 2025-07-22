@@ -51,6 +51,7 @@ struct Facade
 {
     using Type = QnTimePeriod;
     using TimeType = milliseconds;
+    using IdType = qint64;
 
     static auto startTime(const Type& period)
     {

@@ -58,6 +58,7 @@ struct Facade
 {
     using Type = nx::vms::api::rules::EventLogRecord;
     using TimeType = milliseconds;
+    using IdType = nx::Uuid;
 
     static auto id(const Type& data)
     {
@@ -329,7 +330,7 @@ bool VmsEventSearchListModel::Private::requestFetch(
         // We can have here duplicated events as the server returns the list of occurred actions.
         // So the trick is to leave only unique events and as we generate unique id for each event
         // we can just remove duplicates here.
-        core::removeDuplicateItems<Facade>(data, data.begin(), data.end());
+        core::removeDuplicateItems<Facade>(data, data.begin(), data.end(), request.direction);
 
         core::mergeOldData<Facade>(data, this->data, request.direction);
         auto fetched = core::makeFetchedData<Facade>(this->data, data, request);
