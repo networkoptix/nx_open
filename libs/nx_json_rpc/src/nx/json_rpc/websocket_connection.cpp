@@ -236,7 +236,7 @@ void WebSocketConnection::addGuard(const QString& id, nx::utils::Guard guard)
         [this, id, g = std::move(guard)]() mutable
         {
             auto& guard = m_guards[id];
-            NX_VERBOSE(this, "%1 guard for %2", guard ? "Adding" : "Replacing", id);
+            NX_VERBOSE(this, "%1 guard for %2", guard ? "Replacing" : "Adding", id);
             guard = std::move(g);
         });
 }
