@@ -122,6 +122,9 @@ QVariant ServerListModel::data(const QModelIndex& index, int role) const
     const auto serverId = d->serverIds[index.row()];
     const auto server = resourcePool()->getResourceById(serverId);
 
+    if (!server)
+        return {};
+
     switch (role)
     {
         case Qt::DisplayRole:
