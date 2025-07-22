@@ -30,6 +30,7 @@ struct Accessor
 {
     using Type = Item;
     using TimeType = std::chrono::milliseconds;
+    using IdType = QString;
 
     static QString id(const Type& item);
 

@@ -55,6 +55,8 @@ struct BookmarkFacadeBase: protected BookmarkFacadeStrings
 template<typename Bookmark>
 struct BookmarkFacade: public BookmarkFacadeBase<Bookmark>
 {
+    using IdType = decltype(Bookmark::id);
+
     static auto id(const Bookmark& bookmark) { return bookmark.id; }
     static auto tags(const Bookmark& bookmark) { return bookmark.tags; }
     static auto deviceId(const Bookmark& bookmark) { return bookmark.deviceId; }
@@ -84,6 +86,8 @@ template<>
 struct NX_VMS_COMMON_API BookmarkFacade<QnCameraBookmark>:
     public BookmarkFacadeBase<QnCameraBookmark>
 {
+    using IdType = nx::Uuid;
+
     static auto id(const Type& bookmark) { return bookmark.guid; }
     static auto creationTimeMs(const Type& bookmark) { return bookmark.creationTimeStampMs; }
     static auto deviceId(const Type& bookmark) { return bookmark.cameraId; }

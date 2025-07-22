@@ -20,10 +20,11 @@ using namespace std::chrono;
 template<typename Facade, typename Container, typename ItemIterator>
 int removeDuplicateItems(Container& container,
     const ItemIterator& itBegin,
-    const ItemIterator& itEnd)
+    const ItemIterator& itEnd,
+    EventSearch::FetchDirection direction)
 {
-    std::set<nx::Uuid> foundIds;
-    const auto removeStartIt = std::remove_if(itBegin, itEnd,
+    std::set<typename Facade::IdType> foundIds;
+    const auto isDuplicate =
         [&foundIds](const auto& item)
         {
             const auto id = Facade::id(item);
@@ -32,10 +33,31 @@ int removeDuplicateItems(Container& container,
 
             foundIds.insert(id);
             return false;
-        });
+        };
 
-    container.erase(removeStartIt, itEnd);
-    return std::distance(removeStartIt, itEnd);
+    // If duplicates are encountered, we must keep events with older start time and remove events
+    // with newer start time, such as Analytics object tracks received not from their beginning.
+
+    // In case of `FetchDirection::older` the container is sorted new-to-old, therefore we must do
+    // the duplication removal in reverse order.
+
+    if (const bool reverse = direction == EventSearch::FetchDirection::older)
+    {
+        const auto revItBegin = std::make_reverse_iterator(itEnd);
+        const auto revItEnd = std::make_reverse_iterator(itBegin);
+
+        const auto removeStartRevIt = std::remove_if(revItBegin, revItEnd, isDuplicate);
+        const auto count = std::distance(removeStartRevIt, revItEnd);
+        container.erase(itBegin, removeStartRevIt.base());
+        return count;
+    }
+    else
+    {
+        const auto removeStartIt = std::remove_if(itBegin, itEnd, isDuplicate);
+        const auto count = std::distance(removeStartIt, itEnd);
+        container.erase(removeStartIt, itEnd);
+        return count;
+    }
 }
 
 /**
@@ -52,7 +74,7 @@ void mergeOldData(NewDataContainer& newData,
     NX_ASSERT(detail::isSortedCorrectly<Facade>(oldData, Qt::DescendingOrder));
     NX_ASSERT(detail::isSortedCorrectly<Facade>(newData, sortOrderFromDirection(direction)));
 
-    detail::printDebugData<Facade>(newData, "old data");
+    detail::printDebugData<Facade>(oldData, "old data");
 
     if (oldData.empty())
         return; // Nothing to merge.
@@ -83,45 +105,19 @@ void mergeOldData(NewDataContainer& newData,
     NX_ASSERT(detail::isSortedCorrectly<Facade>(result, sortOrderFromDirection(direction)));
     detail::printDebugData<Facade>(result, "after merge");
 
-    const auto removeDuplicates =
-        [&result, direction](typename Facade::TimeType start, typename Facade::TimeType end)
-        {
-            if (direction == EventSearch::FetchDirection::older)
-                std::swap(start, end);
+    // When newData and oldData overlap, in the merged result we get duplicates with the same ID
+    // and the same start time.
 
-            const auto startIt = std::lower_bound(
-                result.begin(), result.end(), start, Predicate::lowerBound(direction));
-            const auto endIt = std::upper_bound(
-                result.begin(), result.end(), end, Predicate::upperBound(direction));
-            return removeDuplicateItems<Facade>(result, startIt, endIt);
-        };
+    // Besides that, if `oldData` was (partially) received from live, and some prolonged event was
+    // received not from its beginning (it can happen with Analytics object tracks), it can have
+    // start time greater than its archived true start time. And we potentially could have received
+    // that event in `newData` with its true start time. Such events appear as duplicates with the
+    // same ID and different start time.
 
-    const auto oldDataStartTime = std::min(Facade::startTime(oldData.front()),
-        Facade::startTime(oldData.back()));
-    const auto oldDataEndTime = std::max(Facade::startTime(oldData.front()),
-        Facade::startTime(oldData.back()));
-    const auto newDataStartTime = std::min(Facade::startTime(newData.front()),
-        Facade::startTime(newData.back()));
-    const auto newDataEndTime = std::max(Facade::startTime(newData.front()),
-        Facade::startTime(newData.back()));
-
-    const auto intersectionStartTime = std::max(oldDataStartTime, newDataStartTime);
-    const auto intersectionEndTime = std::min(oldDataEndTime, newDataEndTime);
-
-    if (intersectionStartTime <= intersectionEndTime) //< Has time periods intersection.
-    {
-        removeDuplicates(intersectionStartTime, intersectionEndTime);
-        detail::printDebugData<Facade>(result, "after normal deletion");
-    }
+    removeDuplicateItems<Facade>(result, result.begin(), result.end(), direction);
+    detail::printDebugData<Facade>(result, "after removal of duplicates");
 
     NX_ASSERT(detail::isSortedCorrectly<Facade>(result, sortOrderFromDirection(direction)));
-
-    const bool hasRemovals = removeDuplicates(Facade::TimeType::zero(), Facade::TimeType::max());
-    if (hasRemovals)
-    {
-        detail::printDebugData<Facade>(result, "wrong objects");
-        NX_ASSERT(false, "Found duplicates in inappropriate stage of merging.");
-    }
     std::swap(newData, result);
 }
 
