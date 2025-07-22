@@ -28,9 +28,8 @@ Page
     property var rootIndex: NxGlobals.invalidModelIndex()
     property var rootType
 
-    titleUnderlineVisible:
-        rootType === OrganizationsModel.Organization
-        || rootType === OrganizationsModel.Folder
+    titleUnderlineVisible: rootType === OrganizationsModel.Folder
+        || (rootType === OrganizationsModel.Organization && organizationsModel.hasChannelPartners)
 
     customBackHandler: () => goBack()
 

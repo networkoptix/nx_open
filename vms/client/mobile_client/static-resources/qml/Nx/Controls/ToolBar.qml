@@ -95,6 +95,11 @@ ToolBarBase
             height: 1
 
             visible: label.visible && label.text != ""
+            onVisibleChanged:
+            {
+                if (visible)
+                    requestPaint()
+            }
 
             onPaint:
             {
