@@ -245,6 +245,12 @@ qint64 QnLayoutFileStorageResource::getTotalSpace() const
 
 bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile)
 {
+    if (!NX_ASSERT(oldName != newName,
+        "Unexpected switching file without changing name: %1", oldName))
+    {
+        return true;
+    }
+
     NX_MUTEX_LOCKER lock(&QnLayoutFileStorageResourceGlobalContext::instance().storageSync);
     for (auto storage: QnLayoutFileStorageResourceGlobalContext::instance().allStorages)
     {

@@ -114,8 +114,11 @@ struct ExportLayoutTool::Private
         emit q->statusChanged(status);
     }
 
-    void finishExport()
+    void finishExport(bool success)
     {
+        NX_VERBOSE(this, "Export finished. Success: %1. Status: %2, last error: %3",
+            success, (int)status, (int)lastError);
+
         switch (status)
         {
             case ExportProcessStatus::exporting:
@@ -129,7 +132,7 @@ struct ExportLayoutTool::Private
             default:
                 NX_ASSERT(false, "Should never get here. Status: %1, last error: %2",
                     (int)status, (int)lastError);
-                break;
+                return; //< Do nothing.
         }
         if (status != ExportProcessStatus::success)
         {
@@ -461,7 +464,7 @@ void ExportLayoutTool::stop()
     if (m_currentCamera)
         m_currentCamera->stopExport();
 
-    finishExport(false);
+    d->finishExport(false);
 }
 
 ExportLayoutSettings::Mode ExportLayoutTool::mode() const
@@ -488,31 +491,20 @@ bool ExportLayoutTool::exportNextCamera()
     {
         if (d->exportedAnyData)
         {
-            finishExport(true);
+            d->finishExport(true);
         }
         else
         {
             NX_VERBOSE(this, "Data not found");
 
             d->lastError = ExportProcessError::dataNotFound;
-            finishExport(false);
+            d->finishExport(false);
         }
         return false;
     }
 
     m_offset++;
     return exportMediaResource(d->resources.dequeue());
-}
-
-void ExportLayoutTool::finishExport(bool success)
-{
-    if (!success)
-    {
-        NX_VERBOSE(this, "Export failed. Status: %1, last error: %2",
-            (int)d->status, (int)d->lastError);
-    }
-
-    d->finishExport();
 }
 
 bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
@@ -556,6 +548,13 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
     if (d->status == ExportProcessStatus::cancelled)
         return;
 
+    if (!NX_ASSERT(
+        d->status != ExportProcessStatus::success && d->status != ExportProcessStatus::failure,
+        "ExportLayoutTool status: %1, camera export error: %2", status, (int)convertError(status)))
+    {
+        return;
+    }
+
     d->lastError = convertError(status);
     if (d->lastError == ExportProcessError::dataNotFound)
     {
@@ -572,7 +571,7 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
     {
         NX_VERBOSE(this, "An error occurred: %1", filename);
 
-        finishExport(false);
+        d->finishExport(false);
         return;
     }
 
@@ -601,7 +600,7 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
     if (error)
     {
         d->lastError = ExportProcessError::unsupportedMedia;
-        finishExport(false);
+        d->finishExport(false);
     }
     else
     {

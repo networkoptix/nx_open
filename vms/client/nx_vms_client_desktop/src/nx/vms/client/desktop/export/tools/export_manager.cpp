@@ -6,6 +6,8 @@
 
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 #include <nx/vms/client/desktop/export/tools/export_media_tool.h>
+#include <nx/utils/log/log.h>
+
 #include "export_layout_tool.h"
 
 namespace nx::vms::client::desktop {
@@ -124,11 +126,13 @@ ExportManager::~ExportManager()
 
 nx::Uuid ExportManager::startExport(const nx::Uuid& id, std::unique_ptr<AbstractExportTool>&& tool)
 {
+    NX_VERBOSE(this, "Export process id: %1", id.toSimpleString());
     return d->startExport(new ExportProcess(id, std::move(tool), this));
 }
 
 void ExportManager::stopExport(const nx::Uuid& exportProcessId)
 {
+    NX_VERBOSE(this, "Stopped export process id: %1", exportProcessId.toString());
     d->stopExport(exportProcessId);
 }
 
