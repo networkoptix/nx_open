@@ -418,6 +418,12 @@ Dialog
                 textRole: "name"
                 model: ListModel {}
 
+                onActiveFocusChanged:
+                {
+                    if (activeFocus)
+                        openPopup()
+                }
+
                 Component.onCompleted:
                 {
                     eventPropertiesTableView.editing = true
@@ -430,8 +436,6 @@ Dialog
                             "checked": selectedDevices.includes(i.value),
                             "value": i.value})
                     }
-
-                    Qt.callLater(() => openPopup()) //< Direct `openPopup()` call does not work.
                 }
 
                 Component.onDestruction:
