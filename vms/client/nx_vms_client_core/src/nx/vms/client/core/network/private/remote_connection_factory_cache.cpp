@@ -38,6 +38,8 @@ void saveCacheInfo(
     nx::vms::common::ServerCompatibilityValidator::Purpose purpose)
 {
     const auto cloudId = connection->moduleInformation().cloudSystemId;
+    if (!NX_ASSERT(!cloudId.isEmpty()))
+        return;
 
     RemoteConnectionContextData customData;
 
@@ -47,7 +49,7 @@ void saveCacheInfo(
             return server.id == connection->moduleInformation().id;
         });
 
-    if (serverIt == servers.end())
+    if (serverIt == servers.end() || serverIt->cloudSystemId.isEmpty())
         return;
 
     connection->updateModuleInformation(serverIt->getModuleInformation());
@@ -73,18 +75,16 @@ void requestCacheInfoUpdate(
 {
     connection->serverApi()->getServersInfo(
         /*onlyFreshInfo*/ false,
-        [connection, purpose=purpose](
+        [weakConnection = std::weak_ptr(connection), purpose](
             bool success,
             rest::Handle /*handle*/,
             const rest::ErrorOrData<std::vector<nx::vms::api::ServerInformationV1>>& servers)
         {
-            if (!success)
+            if (!success || !servers)
                 return;
 
-            if (!servers)
-                return;
-
-            saveCacheInfo(connection, *servers, purpose);
+            if (auto connection = weakConnection.lock())
+                saveCacheInfo(connection, *servers, purpose);
         },
         nx::vms::client::core::appContext()->thread());
 }
@@ -231,9 +231,12 @@ void RemoteConnectionFactoryCache::startWatchingConnection(
 
     using Purpose = nx::vms::common::ServerCompatibilityValidator::Purpose;
 
-    // For now we only allow caching data when Purpose::connect is used.
-    if (context->logonData.purpose != Purpose::connect)
+    // For now we only allow caching cloud system data when Purpose::connect is used.
+    if (context->logonData.purpose != Purpose::connect
+        || connection->moduleInformation().cloudSystemId.isEmpty())
+    {
         return;
+    }
 
     static constexpr auto kCacheUpdateInterval = 1min;
 
@@ -245,11 +248,8 @@ void RemoteConnectionFactoryCache::startWatchingConnection(
         [remoteConnection = std::weak_ptr<RemoteConnection>(connection),
             purpose=context->logonData.purpose]()
         {
-            auto connection = remoteConnection.lock();;
-            if (!connection)
-                return;
-
-            requestCacheInfoUpdate(connection, purpose);
+            if (auto connection = remoteConnection.lock())
+                requestCacheInfoUpdate(connection, purpose);
         };
 
     QObject::connect(updateTimer.get(), &QTimer::timeout, updateFunc);
