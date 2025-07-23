@@ -53,11 +53,11 @@
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Analyse-hændelser</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Enhver analysehændelse</translation>
     </message>
     <message>
       <source>Camera issues</source>
