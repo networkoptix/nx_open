@@ -969,6 +969,7 @@ struct NX_NETWORK_API ContentType
 
     std::string value;
     std::string charset;
+    std::string boundary;
 
     ContentType(const std::string_view& str = kPlain.toString());
     ContentType(const char* str);
