@@ -202,9 +202,7 @@ Item
         id: navigator
 
         implicitWidth: parent.width
-        implicitHeight: videoNavigation.canViewArchive
-            ? timeline.height + playbackController.height - 16
-            : 56
+        implicitHeight: timeline.height + playbackController.height - 16
 
         Behavior on y { SmoothedAnimation { duration: 200; reversingMode: SmoothedAnimation.Sync } }
 
@@ -317,6 +315,11 @@ Item
                 readonly property int kFullLengthArchiveSupportVersion: 5
                 readonly property int kMinuteOffsetMs: 60 * 1000
                 readonly property int kFiveSecondsOffsetMs: 5 * 1000
+
+                readonly property bool relevant: videoNavigation.canViewArchive
+                    && !controller.needsCloudAuthorization
+                    && !controller.systemConnecting
+
                 rightChunksOffsetMs:
                     windowContext.sessionManager.connectedServerVersion.major >= kFullLengthArchiveSupportVersion
                         ? kFiveSecondsOffsetMs
@@ -326,11 +329,8 @@ Item
 
                 bottomOverlap: 16
                 motionSearchMode: videoNavigation.motionSearchMode
+                visible: relevant
                 enabled: d.hasArchive
-
-                visible: videoNavigation.canViewArchive
-                    && !controller.needsCloudAuthorization
-                    && !controller.systemConnecting
 
                 anchors.bottom: parent.bottom
 
@@ -476,14 +476,15 @@ Item
                 readonly property real minimalWidth: width - (zoomButtonsRow.x + zoomButtonsRow.width)
                 readonly property real overallHeight: buttonsPanel.height + timeline.bottomOverlap
                 readonly property real childrenCenterOffset: -timeline.bottomOverlap / 2
+
                 width: parent.width
-                height: visible ? 56 - timeline.bottomOverlap: 0
+                height: 56 - timeline.bottomOverlap
                 anchors.top: timeline.bottom
                 anchors.topMargin: timeline.bottomOverlap
-
-                background: Item {}
                 padding: 4
                 z: 1
+
+                background: Item {}
 
                 readonly property bool showButtonsPanel: actionButtonsPanel.buttonsCount > 0
                 visible: videoNavigation.canViewArchive || showButtonsPanel
@@ -549,6 +550,7 @@ Item
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
+                    visible: timeline.relevant
 
                     IconButton
                     {
