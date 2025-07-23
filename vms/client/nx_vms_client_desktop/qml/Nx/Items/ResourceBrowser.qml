@@ -120,19 +120,22 @@ Item
         anchors.fill: resourceBrowser
         shown: resourceTree.empty
 
-        readonly property bool localFilesAbsent:
-            resourceTree.localFilesMode && !resourceTree.isFiltering
-
-        icon: localFilesAbsent
+        icon: resourceTree.localFilesMode
             ? "image://skin/64x64/Outline/openfolder.svg?primary=dark10"
             : "image://skin/64x64/Outline/notfound.svg?primary=dark10"
 
-        title: qsTr("No local files")
+        title: resourceTree.localFilesMode && !resourceTree.isFiltering
+            ? qsTr("No local files") : qsTr("Nothing found")
 
         description:
         {
-            return qsTr("Drag video files or images to the client window, or add local media"
+            if (resourceTree.localFilesMode)
+            {
+                return qsTr("Drag video files or images to the client window, or add local media"
                     + " folder through the Local Settings dialog")
+            }
+
+            return qsTr("Try searching for something else")
         }
     }
 }
