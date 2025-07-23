@@ -550,7 +550,8 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
 
     if (!NX_ASSERT(
         d->status != ExportProcessStatus::success && d->status != ExportProcessStatus::failure,
-        "ExportLayoutTool status: %1, camera export error: %2", status, (int)convertError(status)))
+        "ExportLayoutTool status: %1, camera export error: %2",
+        (int)d->status, (int)convertError(status)))
     {
         return;
     }
