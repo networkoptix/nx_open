@@ -237,6 +237,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         " * %N - client name\n"
         " * %V - client version\n");
 
+    // VMS-57873
+    NX_INI_FLAG(false, logFailedRecordingFinishedStacktrace,
+        "[Dev] Log stacktrace needed for debugging the layout export bug.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.

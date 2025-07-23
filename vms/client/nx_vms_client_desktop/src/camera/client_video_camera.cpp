@@ -13,6 +13,7 @@
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/stack_trace.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <recording/time_period.h>
 #include <utils/common/delayed.h>
@@ -151,9 +152,24 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
         m_exportRecorder = new nx::vms::client::desktop::ExportStorageStreamRecorder(
             m_resource, m_exportReader);
 
-        connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
-        connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);
-        connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::exportFinished);
+        connect(m_exportRecorder, &QnStreamRecorder::recordingProgress,
+            this, &QnClientVideoCamera::exportProgress);
+        connect(m_exportRecorder, &QnStreamRecorder::recordingFinished,
+            this, &QnClientVideoCamera::stopExport);
+        connect(m_exportRecorder, &QnStreamRecorder::recordingFinished,
+            this, &QnClientVideoCamera::exportFinished);
+        connect(m_exportRecorder, &QnStreamRecorder::recordingFinished, this,
+            [this](const std::optional<nx::recording::Error>& reason, const QString& fileName)
+            {
+                if (!nx::vms::client::desktop::ini().logFailedRecordingFinishedStacktrace
+                    || !reason.has_value())
+                {
+                    return;
+                }
+
+                NX_VERBOSE(this, "Export finished with error: %1\ntrace:\n%2",
+                    reason.value().toString(), nx::stackTrace());
+            }, Qt::DirectConnection);
     }
     QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (m_exportReader.data());
 
