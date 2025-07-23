@@ -621,7 +621,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>CopyableLabel</name>
     <message>
       <source>copied</source>
-      <translation type="unfinished">copied</translation>
+      <translation>kopieret</translation>
     </message>
   </context>
   <context>
