@@ -38,7 +38,19 @@ const std::vector words = "And his name is John Cena"sv | spaceSplit;
 template<class F>
 struct Closure: std::ranges::range_adaptor_closure<Closure<F>>
 {
+    // Microsoft's way to "support" the standard's [[no_unique_address]] attribute is
+    // "It won't create an error, but it won't have any effect":
+    // https://devblogs.microsoft.com/cppblog/msvc-cpp20-and-the-std-cpp20-switch/
+    //
+    // To ensure ABI compatibility with MSVC code, clang doesn't support that attribute either
+    // when compiling for Windows target, reporting a warning/error for the "unknown" attribute.
+    //
+    // Meanwhile, both compilers support an extension attribute with the same functionality.
+    #ifdef _MSC_VER
+    [[msvc::no_unique_address]] F f;
+    #else
     [[no_unique_address]] F f;
+    #endif
 
     constexpr Closure(F f): f(std::move(f)) {}
 
