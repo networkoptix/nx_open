@@ -217,25 +217,28 @@ void PortMapper::addNewDevice(
     const nx::Url& url,
     const QString& serial)
 {
-    const auto itBool = m_devices.emplace(serial, std::make_unique<Device>());
-    if (!itBool.second)
-        return; // known device
+    const auto [it, added] = m_devices.emplace(serial, std::make_unique<Device>());
 
-    Device* newDevice = itBool.first->second.get();
+    // Changed URL can signal that device was restarted and mappings may be invalidated.
+    Device* newDevice = it->second.get();
+    if (!added && newDevice->url == url)
+        return; //< Known device with the same URL.
+
     newDevice->internalIp = localAddress;
     newDevice->url = url;
+    newDevice->failCounter = {}; //< Reset fail counter.
 
     if (m_isEnabled)
     {
         updateExternalIp(newDevice);
-        for (const auto& map : m_mapRequests)
-            ensureMapping(newDevice, map.first.port, map.first.protocol);
+        for ([[maybe_unused]] const auto& [portId, _] : m_mapRequests)
+            ensureMapping(newDevice, portId.port, portId.protocol);
     }
 
-    NX_VERBOSE(this, nx::format("New device %1 (%2) has been found on %3").args(
-        url.toString(QUrl::RemovePassword),
+    NX_VERBOSE(this, "New device %1 (%2) has been found/updated on %3",
+        url.toString(QUrl::RemoveUserInfo),
         serial,
-        localAddress));
+        localAddress);
 }
 
 void PortMapper::removeMapping(PortId portId)
