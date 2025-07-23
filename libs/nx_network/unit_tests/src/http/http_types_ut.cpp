@@ -798,6 +798,26 @@ TEST(HttpTypesHeaderContentType, parse)
         ASSERT_EQ("", contentType.charset);
         ASSERT_EQ("text/plain", contentType.toString());
     }
+
+    {
+        header::ContentType contentType("multipart/form-data; boundary=ExampleBoundaryString");
+        EXPECT_EQ("multipart/form-data", contentType.value);
+        EXPECT_EQ("ExampleBoundaryString", contentType.boundary);
+        EXPECT_EQ("", contentType.charset);
+        EXPECT_EQ("multipart/form-data; boundary=ExampleBoundaryString", contentType.toString());
+    }
+    {
+        #define EXPECT_CT_EQ(L, R) EXPECT_EQ(header::ContentType(L), header::ContentType(R))
+        #define EXPECT_CT_NE(L, R) EXPECT_NE(header::ContentType(L), header::ContentType(R))
+
+        EXPECT_CT_EQ("text/plain; charset=utf-8", "text/plain;charset=utf-8");
+        EXPECT_CT_EQ("multipart/form-data; boundary=ExampleBoundaryString",
+            "multipart/form-data;boundary=ExampleBoundaryString");
+        EXPECT_CT_NE("text/plain; charset=utf-8", "text/plain");
+        EXPECT_CT_NE("text/plain; charset=utf-8", "text/plain; charset=utf-16");
+        EXPECT_CT_NE("text/plain; charset=utf-8", "multipart/form-data; boundary=ExampleBoundaryString");
+        EXPECT_CT_NE("text/plain", "multipart/form-data");
+    }
 }
 
 //-------------------------------------------------------------------------------------------------

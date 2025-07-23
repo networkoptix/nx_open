@@ -1960,15 +1960,21 @@ ContentType::ContentType(const std::string_view& str)
     if (recordCount == 1)
         return;
 
-    const auto charsetExpression = nx::utils::trim(records[1]);
-    const auto [charsetTokens, count] = nx::utils::split_n<2>(charsetExpression, '=');
-    if (count != 2)
-        return;
-
-    if (charsetTokens[0] == "charset")
+    for (size_t i = 1; i < recordCount; ++i)
     {
-        charset = charsetTokens[1];
-        nx::utils::toLower(&charset);
+        const auto item = nx::utils::trim(records[i]);
+        const auto [tokens, count] = nx::utils::split_n<2>(item, '=');
+        if (count != 2)
+            continue;
+
+        if (tokens[0] == "charset")
+        {
+            charset = tokens[1];
+            nx::utils::toLower(&charset);
+        }
+
+        if (tokens[0] == "boundary")
+            boundary = tokens[1];
     }
 }
 
@@ -1980,7 +1986,9 @@ ContentType::ContentType(const char* str):
 std::string ContentType::toString() const
 {
     return nx::utils::buildString(
-        value, !charset.empty() ? "; charset=" : "", charset);
+        value,
+        !charset.empty() ? "; charset=" : "", charset,
+        !boundary.empty() ? "; boundary=" : "", boundary);
 }
 
 bool ContentType::operator==(const ContentType& rhs) const
@@ -1988,10 +1996,13 @@ bool ContentType::operator==(const ContentType& rhs) const
     if (value != rhs.value)
         return false;
 
-    if (charset.empty() || rhs.charset.empty())
-        return true;
+    if (charset != rhs.charset)
+        return false;
 
-    return charset == rhs.charset;
+    if (boundary != rhs.boundary)
+        return false;
+
+    return true;
 }
 
 bool ContentType::operator==(const std::string& rhs) const
