@@ -1215,10 +1215,14 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         && status
         && status->state != api::LdapStatus::State::online;
     const bool ldapSynced = status && status->timeSinceSyncS.has_value();
+    const bool userSyncEnabled =
+        globalSettings()->ldap().continuousSync == api::LdapSyncMode::usersAndGroups;
+
     d->ldapError = user->isLdap()
         && user->externalId().syncId != d->syncId
         && !d->ldapOffline
-        && ldapSynced;
+        && ldapSynced
+        && userSyncEnabled;
 
     state.linkEditable = accessController()->hasPowerUserPermissions()
         && permissions.testFlag(Qn::SavePermission);
