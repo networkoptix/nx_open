@@ -61,7 +61,7 @@ function openSessionsScreenWithWarning(systemName, errorText)
         ? stackView.currentItem
         : stackView.replace(null, Qt.resolvedUrl("../Screens/SessionsScreen.qml"))
     if (item)
-        showConnectionErrorMessage(systemName, errorText)
+        Qt.callLater(() => windowContext.ui.showConnectionErrorMessage(systemName, errorText))
 }
 
 function openSitePlaceholderScreen(systemName)
