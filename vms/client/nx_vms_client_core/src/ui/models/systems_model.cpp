@@ -327,7 +327,8 @@ bool QnSystemsModel::setData(const QModelIndex& index, const QVariant& value, in
     return base_type::setData(index, value, role);
 }
 
-bool QnSystemsModel::lessThan(const QModelIndex& sourceLeft, const QModelIndex& sourceRight)
+bool QnSystemsModel::lessThan(const QModelIndex& sourceLeft, const QModelIndex& sourceRight,
+    bool cloudFirstSorting)
 {
     using namespace nx::vms::client::core::welcome_screen;
 
@@ -373,14 +374,31 @@ bool QnSystemsModel::lessThan(const QModelIndex& sourceLeft, const QModelIndex& 
     if (leftIsConnectableMobile != rightIsConnectableMobile)
         return leftIsConnectableMobile;
 
-    if (leftIsOnline != rightIsOnline)
-        return leftIsOnline;
+    if (cloudFirstSorting)
+    {
+        if (leftIsOnline != rightIsOnline)
+            return leftIsOnline;
+    }
 
     const bool leftIsPending = sourceLeft.data(QnSystemsModel::IsPending).toBool();
     const bool rightIsPending = sourceRight.data(QnSystemsModel::IsPending).toBool();
 
-    if (leftIsPending != rightIsPending)
-        return rightIsPending;
+    if (cloudFirstSorting)
+    {
+        if (leftIsPending != rightIsPending)
+            return rightIsPending;
+    }
+    else
+    {
+        if (leftIsPending != rightIsPending)
+            return leftIsPending;
+
+        const bool leftIsCloud = sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
+        const bool rightIsCloud = sourceRight.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
+
+        if (leftIsCloud != rightIsCloud)
+            return leftIsCloud;
+    }
 
     const bool leftIsLocalhost = isLocalHost(sourceLeft);
     const bool rightIsLocalhost = isLocalHost(sourceRight);
@@ -388,11 +406,14 @@ bool QnSystemsModel::lessThan(const QModelIndex& sourceLeft, const QModelIndex& 
     if (leftIsLocalhost != rightIsLocalhost)
         return leftIsLocalhost;
 
-    const bool leftIsCloud = sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
-    const bool rightIsCloud = sourceRight.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
+    if (cloudFirstSorting)
+    {
+        const bool leftIsCloud = sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
+        const bool rightIsCloud = sourceRight.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
 
-    if (leftIsCloud != rightIsCloud)
-        return leftIsCloud;
+        if (leftIsCloud != rightIsCloud)
+            return leftIsCloud;
+    }
 
     const int namesOrder = nx::utils::naturalStringCompare(
         sourceLeft.data(QnSystemsModel::SystemNameRoleId).toString(),
