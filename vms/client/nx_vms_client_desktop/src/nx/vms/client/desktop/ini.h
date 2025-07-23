@@ -192,6 +192,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, useFileBasedSharedMemory,
         "[Dev] Use shared memory based on the memory mapped file.");
 
+    // VMS-57873
+    NX_INI_FLAG(false, logFailedRecordingFinishedStacktrace,
+        "[Dev] Log stacktrace needed for debugging the layout export bug.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.
