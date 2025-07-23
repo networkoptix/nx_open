@@ -1456,7 +1456,7 @@ bool OrganizationsFilterModel::lessThan(const QModelIndex& left, const QModelInd
     if (leftType != rightType)
         return leftType < rightType;
 
-    return QnSystemsModel::lessThan(left, right);
+    return QnSystemsModel::lessThan(left, right, /*cloudFirstSorting*/ true);
 }
 
 void OrganizationsFilterModel::setHideOrgSystemsFromSites(bool value)

@@ -67,7 +67,10 @@ public: // overrides
 
     int getRowIndex(const QString& systemId) const;
 
-    static bool lessThan(const QModelIndex& sourceLeft, const QModelIndex& sourceRight);
+    // TODO: cloudFirstSorting would always be true when the desktop client switches to the new
+    // welcome screen with organizations.
+    static bool lessThan(const QModelIndex& sourceLeft, const QModelIndex& sourceRight,
+        bool cloudFirstSorting = false);
 
 private:
     QScopedPointer<QnSystemsModelPrivate> d_ptr;
