@@ -1092,6 +1092,32 @@ struct ModifyStorageAccess
         data.request = param;
         amendOutputDataIfNeeded(accessData, systemContext->resourceAccessManager(), &data.request);
 
+        if (!existingResource)
+        {
+            const auto existingStorages = resourcePool->getResources<QnStorageResource>(
+                [param](const auto& s)
+                {
+                    return s->getParentId() == param.parentId;
+                });
+
+            const bool hasStorageWithSameUrl = std::any_of(
+                existingStorages.cbegin(), existingStorages.cend(),
+                [&param](const auto& s)
+                {
+                    return param.url == s->getUrl();
+                });
+
+            if (hasStorageWithSameUrl)
+            {
+                NX_DEBUG(this,
+                    "Storage with the same url %1 already exists",
+                    nx::utils::url::hidePassword(param.url));
+                return Result(
+                    ErrorCode::forbidden,
+                    detail::ServerApiErrors::tr("Storage with the same url already exists"));
+            }
+        }
+
         return transaction_descriptor::canModifyStorage(systemContext, data);
     }
 };
