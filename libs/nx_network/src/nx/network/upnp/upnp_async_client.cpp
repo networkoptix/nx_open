@@ -28,6 +28,8 @@ static const QString kSoapRequest(
 
 static const QString kNone; //< Just an empty string.
 
+static const QString kAnyRemoteHost; //< Empty string = allow any remote host.
+
 static const QString kErrorCodeParameter = "errorCode";
 
 // UPNP parameters.
@@ -318,7 +320,7 @@ void AsyncClient::addMapping(
     std::function<void(ErrorCode)> callback)
 {
     AsyncClient::Message request(kAddPortMapping, kWanIp);
-    request.params[kNewRemoteHost] = QString(); //< Empty = allow any remote host.
+    request.params[kNewRemoteHost] = kAnyRemoteHost;
     request.params[kNewExternalPort] = QString::number(externalPort);
     request.params[kNewProtocol] = nx::toString(protocol);
     request.params[kNewInternalPort] = QString::number(internalPort);
@@ -399,6 +401,7 @@ void AsyncClient::getMapping(
     AsyncClient::Message request(kGetSpecificPortMappingEntry, kWanIp);
     request.params[kNewExternalPort] = QString::number(externalPort);
     request.params[kNewProtocol] = nx::toString(protocol);
+    request.params[kNewRemoteHost] = kAnyRemoteHost;
 
     return doUpnp(url, request,
         [callback, externalPort, protocol](const Message& response)
