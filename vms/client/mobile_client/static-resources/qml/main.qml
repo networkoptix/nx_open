@@ -184,7 +184,10 @@ Controls.ApplicationWindow
             // To make sure that we have the correct order of deinitialization we
             // handle window closing manually.
             close.accepted = false
-            appContext.closeWindow()
+
+            mainWindow.hide()
+
+            Qt.callLater(() => appContext.closeWindow())
         }
 
     Component.onCompleted:

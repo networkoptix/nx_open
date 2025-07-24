@@ -17,7 +17,6 @@ Page
     title: qsTr("Looking for")
 
     leftButtonIcon.source: ""
-    customBackHandler: () => {}
 
     QnCameraListModel
     {

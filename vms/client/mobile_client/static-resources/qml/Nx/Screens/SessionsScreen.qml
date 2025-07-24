@@ -31,7 +31,7 @@ Page
     titleUnderlineVisible: rootType === OrganizationsModel.Folder
         || (rootType === OrganizationsModel.Organization && organizationsModel.hasChannelPartners)
 
-    customBackHandler: () => goBack()
+    customBackHandler: (isEscKeyPressed) => goBack(undefined, isEscKeyPressed)
 
     readonly property bool searching: !!siteList.searchText
     readonly property bool localSitesVisible: state !== "inPartnerOrOrg"
@@ -757,11 +757,13 @@ Page
             update()
     }
 
-    function goBack(index)
+    function goBack(index, isEscKeyPressed)
     {
-        if (searchField.visible)
+        if (searchField.visible) // We're on top of the hierarchy or in search.
         {
-            endSearch()
+            if (!endSearch() && !isEscKeyPressed) // Close app if it was not in search mode.
+                mainWindow.close()
+
             return
         }
 
@@ -817,16 +819,17 @@ Page
     function endSearch()
     {
         if (!searchField.visible)
-            return
+            return false
 
         if (state !== "inPartnerOrOrg" && !searching)
-            return
+            return false
 
         linearizationListModel.sourceRoot = siteList.currentRoot
         searchField.visible = false
         searchField.clear()
         searchField.resetFocus()
         siteList.positionViewAtBeginning()
+        return true
     }
 
     function resetSearch()

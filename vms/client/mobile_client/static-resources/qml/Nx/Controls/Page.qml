@@ -74,35 +74,15 @@ QuickControls.Page
 
     Keys.onPressed: (event) =>
     {
-        if (CoreUtils.keyIsBack(event.key))
-        {
-            if (control.customBackHandler)
-            {
-                control.customBackHandler()
-            }
-            else if (leftButtonIcon.source === d.kBackButtonIconSource)
-            {
-                if (windowContext.sessionManager.hasConnectingSession
-                    || windowContext.sessionManager.hasAwaitingResourcesSession)
-                {
-                    windowContext.sessionManager.stopSession();
-                }
-                else if (stackView.depth > 1)
-                {
-                    Workflow.popCurrentScreen()
-                }
-                else if (event.key != Qt.Key_Escape)
-                {
-                    appContext.closeWindow()
-                }
-                else
-                {
-                    return
-                }
-            }
+        if (!CoreUtils.keyIsBack(event.key))
+            return
 
-            event.accepted = true
-        }
+        event.accepted = true
+
+        if (control.customBackHandler)
+            control.customBackHandler(event.key === Qt.Key_Escape)
+        else if (leftButtonIcon.source === d.kBackButtonIconSource && stackView.depth > 1)
+            Workflow.popCurrentScreen()
     }
 
     QtObject
