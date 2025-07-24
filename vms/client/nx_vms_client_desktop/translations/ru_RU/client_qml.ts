@@ -2333,6 +2333,14 @@ Press Alt + Click to follow object</translation>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Перетащите видеофайлы или изображения в окно клиента или добавьте локальную папку мультимедиа в диалоговом окне «Локальные настройки»</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Ничего не найдено</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>Попробуйте другие параметры поиска</translation>
+    </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>

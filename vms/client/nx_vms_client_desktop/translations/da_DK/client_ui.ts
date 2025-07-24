@@ -351,7 +351,7 @@
     </message>
     <message>
       <source>Bookmark Log</source>
-      <translation type="unfinished">Bookmark Log</translation>
+      <translation>Bogmærke Log</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -991,7 +991,7 @@
     <name>ExportSettingsDialog</name>
     <message>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>Eksporter video</translation>
     </message>
     <message>
       <source>Single Camera</source>
@@ -1931,7 +1931,7 @@
     <name>QnVideowallSettingsDialog</name>
     <message>
       <source>Video Wall Settings</source>
-      <translation type="unfinished">Video Wall Settings</translation>
+      <translation>Indstillinger For Videovæg</translation>
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
@@ -2004,7 +2004,7 @@
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Opløsning</translation>
     </message>
     <message>
       <source>Recording Quality</source>

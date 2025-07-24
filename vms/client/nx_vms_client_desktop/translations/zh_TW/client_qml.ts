@@ -2294,6 +2294,14 @@ Press Alt + Click to follow object</source>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>將串流檔案、圖像拖曳至客戶端視窗，或透過“本機設定”選項來加入本機媒體資料夾</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>未找到任何內容</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>請嘗試搜尋其他內容</translation>
+    </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>

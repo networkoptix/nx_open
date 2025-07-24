@@ -2309,6 +2309,14 @@ Press Alt + Click to follow object</translation>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Sleep videobestanden of afbeeldingen naar het clientvenster of voeg een lokale mediamap toe via het dialoogvenster Lokale instellingen</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Niets gevonden</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>Probeer naar iets anders te zoeken</translation>
+    </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>

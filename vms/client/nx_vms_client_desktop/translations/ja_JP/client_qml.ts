@@ -1793,7 +1793,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2300,6 +2300,14 @@ Alt + クリックを使用してください。</translation>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>動画ファイルまたは画像をクライアントウィンドウにドラッグするか、[ローカル設定] ダイアログからローカルメディアフォルダーを追加してください</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>見つかりません</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>違うキーワードで検索してみてください。</translation>
     </message>
   </context>
   <context>

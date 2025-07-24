@@ -2309,6 +2309,14 @@ Press Alt + Click to follow object</translation>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Ziehen Sie Videodateien oder Bilder in das Clientfenster oder fügen Sie den lokalen Medienordner über den Dialog "Lokale Einstellungen" hinzu</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Nichts gefunden</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>Versuchen Sie, nach etwas anderem zu suchen</translation>
+    </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>

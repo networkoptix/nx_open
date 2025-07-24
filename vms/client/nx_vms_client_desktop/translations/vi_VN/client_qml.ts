@@ -2297,6 +2297,14 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Kéo tệp video hoặc hình ảnh vào cửa sổ ứng dụng khách hoặc thêm thư mục đa phương tiện cục bộ thông qua hộp thoại Cài đặt cục bộ</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Không tìm thấy kết quả nào</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>Thử tìm kiếm những thứ khác</translation>
+    </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>

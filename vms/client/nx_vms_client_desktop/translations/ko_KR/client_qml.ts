@@ -2292,6 +2292,14 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>비디오 파일 또는 이미지를 클라이언트 창으로 드래그하거나 로컬 설정 대화 상자를 통해 로컬 미디어 폴더 추가</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>결과 없음</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>다른 것을 검색해 보세요</translation>
+    </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>

@@ -2297,6 +2297,14 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Geser file video atau gambar ke jendela klien, atau tambahkan folder media lokal melalui dialog Pengaturan Lokal</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Tidak ada yang ditemukan</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>Mencoba cari yang lain</translation>
+    </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>

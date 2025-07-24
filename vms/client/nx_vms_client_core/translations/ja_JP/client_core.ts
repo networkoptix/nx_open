@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>Invalid login or password</source>
-      <translation>ログインIDまたはパスワードが違います</translation>
+      <translation>ログインIDまたはパスワードが無効です。</translation>
     </message>
     <message>
       <source>Incorrect username or password.</source>
