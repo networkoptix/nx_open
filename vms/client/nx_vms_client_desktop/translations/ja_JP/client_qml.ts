@@ -1508,7 +1508,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Password</source>
