@@ -49,6 +49,7 @@ private:
     bool m_sendAttributes = true;
     std::map<std::string, nx::sdk::Uuid> m_trackIds;
     std::set<std::string> m_objectTypeIdsToGenerate;
+    std::map<std::string, std::map<std::string, std::string>> m_attributeValueCache;
 };
 
 } // namespace object_detection

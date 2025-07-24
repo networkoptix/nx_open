@@ -3,6 +3,8 @@
 #include "device_agent.h"
 
 #include <chrono>
+#include <random>
+#include <sstream>
 
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
@@ -30,6 +32,18 @@ const std::string DeviceAgent::kTimeShiftSetting = "timestampShiftMs";
 const std::string DeviceAgent::kSendAttributesSetting = "sendAttributes";
 const std::string DeviceAgent::kObjectTypeGenerationSettingPrefix = "objectTypeIdToGenerate.";
 
+static std::vector<std::string> splitString(const std::string& input, char delimiter) {
+    std::vector<std::string> tokens;
+    std::stringstream ss(input);
+    std::string token;
+
+    while (std::getline(ss, token, delimiter)) {
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
+
 static Rect generateBoundingBox(int frameIndex, int trackIndex, int trackCount)
 {
     Rect boundingBox;
@@ -41,6 +55,21 @@ static Rect generateBoundingBox(int frameIndex, int trackIndex, int trackCount)
         1.0F - boundingBox.height - (1.0F / kTrackLength) * (frameIndex % kTrackLength));
 
     return boundingBox;
+}
+
+std::string choiceValue(const std::string& values)
+{
+    static std::map<std::string, std::vector<std::string>> cache;
+    static std::mutex mutex;
+
+    const std::lock_guard<std::mutex> lock(mutex);
+    auto& parsedValues = cache[values];
+    if (parsedValues.empty())
+        parsedValues = splitString(values, '|');
+
+    std::uniform_int_distribution<> dist(0, parsedValues.size());
+    const int index = std::rand() % parsedValues.size();
+    return parsedValues[index];
 }
 
 static std::vector<Ptr<ObjectMetadata>> generateObjects(
@@ -80,7 +109,22 @@ Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket(int64_t frameTime
     std::vector<Ptr<ObjectMetadata>> objects;
     {
         const std::lock_guard<std::mutex> lock(m_mutex);
-        objects = generateObjects(kObjectAttributes, m_objectTypeIdsToGenerate, m_sendAttributes);
+
+        if (m_attributeValueCache.empty())
+        {
+            for (const auto& entry: kObjectAttributes)
+            {
+                auto& currentAttributes = m_attributeValueCache[entry.first];
+                if (currentAttributes.empty())
+                {
+                    const std::map<std::string, std::string>& attributes = entry.second;
+                    for (const auto& attribute : attributes)
+                        currentAttributes.emplace(attribute.first, choiceValue(attribute.second));
+                }
+            }
+        }
+
+        objects = generateObjects(m_attributeValueCache, m_objectTypeIdsToGenerate, m_sendAttributes);
     }
 
     for (int i = 0; i < (int) objects.size(); ++i)
@@ -112,7 +156,10 @@ bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> vid
 {
     ++m_frameIndex;
     if ((m_frameIndex % kTrackLength) == 0)
+    {
         m_trackIds.clear();
+        m_attributeValueCache.clear();
+    }
 
     Ptr<IMetadataPacket> objectMetadataPacket = generateObjectMetadataPacket(
         videoFrame->timestampUs() + m_timestampShiftMs * 1000);
