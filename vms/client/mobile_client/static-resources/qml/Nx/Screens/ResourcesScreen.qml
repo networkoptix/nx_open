@@ -32,6 +32,13 @@ Page
         id: layoutSheet
     }
 
+    customBackHandler:
+        (isEscKeyPressed) =>
+        {
+            if (!isEscKeyPressed)
+                mainWindow.close()
+        }
+
     onLeftButtonClicked: layoutSheet.open()
     property alias filterIds: camerasGrid.filterIds
 
