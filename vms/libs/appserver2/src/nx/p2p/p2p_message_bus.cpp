@@ -316,11 +316,18 @@ void MessageBus::updateOutgoingConnection(
     }
 
     QnTransaction<nx::vms::api::UpdateCredentialsData> transaction{
-        ApiCommand::updateCredentials, id};
-    transaction.params.token = remoteUrl->credentials->authToken.value;
-    QMap<P2pConnectionPtr, TransportHeader> dstByConnection;
-    dstByConnection[*connection].dstPeers.push_back(id);
-    sendUnicastTransactionImpl(transaction, dstByConnection);
+        ApiCommand::updateCredentials, localPeer().id, {remoteUrl->credentials->authToken.value}};
+    switch ((*connection)->remotePeer().dataFormat)
+    {
+        case Qn::SerializationFormat::json:
+            (*connection)->sendTransaction(transaction, MessageType::pushTransactionData,
+                m_jsonTranSerializer->serializedTransactionWithoutHeader(transaction));
+            break;
+        case Qn::SerializationFormat::ubjson:
+            (*connection)->sendTransaction(transaction, MessageType::pushTransactionData,
+                m_ubjsonTranSerializer->serializedTransactionWithoutHeader(transaction));
+            break;
+    }
 }
 
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -1302,18 +1309,6 @@ void MessageBus::gotTransaction(
         nx::Unlocker<nx::Mutex> unlock(lock);
         m_handler->triggerNotification(tran, NotificationSource::Remote);
     }
-}
-
-template<>
-void MessageBus::gotUnicastTransaction(
-    const QnTransaction<nx::vms::api::UpdateCredentialsData>& tran,
-    const P2pConnectionPtr& connection,
-    const TransportHeader& transportHeader,
-    nx::Locker<nx::Mutex>* /*lock*/)
-{
-    NX_ASSERT(transportHeader.dstPeers.size() == 1
-        && transportHeader.dstPeers.front() == localPeer().id);
-    connection->updateCredentials(nx::network::http::BearerAuthToken{tran.params.token});
 }
 
 template <class T>
