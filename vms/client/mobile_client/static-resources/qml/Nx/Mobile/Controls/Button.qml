@@ -27,6 +27,7 @@ T.AbstractButton
     implicitHeight: 44
     implicitWidth: textItem.width + control.leftPadding + control.rightPadding
 
+    focusPolicy: Qt.TabFocus
     padding: 10
     leftPadding: 16
     rightPadding: 16
