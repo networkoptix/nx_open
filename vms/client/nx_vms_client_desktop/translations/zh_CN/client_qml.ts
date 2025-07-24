@@ -2297,6 +2297,14 @@ Press Alt + Click to follow object</translation>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>将视频文件或图像拖动至客户端窗口，或通过“本地设置”对话框添加本地媒体文件夹</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>未找到内容</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>请尝试搜寻其他内容</translation>
+    </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>

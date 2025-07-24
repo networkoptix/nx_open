@@ -1438,7 +1438,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1563,7 +1563,7 @@
     </message>
     <message>
       <source>Login:</source>
-      <translation>ログイン:</translation>
+      <translation>ログイン名:</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1575,7 +1575,7 @@
     </message>
     <message>
       <source>Take system name and settings from</source>
-      <translation>次のシステム名および設定を使用</translation>
+      <translation>システム名と設定の継承元</translation>
     </message>
   </context>
   <context>
@@ -2390,7 +2390,7 @@
     </message>
     <message>
       <source>Login:</source>
-      <translation>ログイン:</translation>
+      <translation>ログイン名:</translation>
     </message>
     <message>
       <source>Password:</source>

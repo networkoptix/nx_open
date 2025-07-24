@@ -2309,6 +2309,14 @@ Trykk Alt + Klikk for å følge objektet</translation>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Dra videofiler eller bilder til klientvinduet, eller legg til lokal mediemappe via dialogboksen Lokale innstillinger</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Ingenting funnet</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>Prøv å søke etter noe annet</translation>
+    </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>

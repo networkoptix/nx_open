@@ -2675,7 +2675,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation>ログインIDまたはパスワードが違います。</translation>
+      <translation>ログインIDまたはパスワードが無効です。</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
@@ -7591,7 +7591,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>サイトを %1 に接続できませんでした</translation>
+      <translation>サイトを %1 に接続できません</translation>
     </message>
     <message>
       <source>Connect Site to %1</source>
@@ -9226,7 +9226,7 @@ Site performance is degraded.</source>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 サイトは %1 に接続されていないサイトとのみ統合できます。サイト名とパスワードは %1 サイトから取得されます。</translation>
+      <translation>%1 サイトは、%1 に接続されていないサイトとのみ統合できます。サイト名とパスワードは、%1 サイトから継承されます。</translation>
     </message>
     <message>
       <source>Both Sites are connected to %1. Merge is not allowed.</source>
@@ -10797,7 +10797,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Password</source>
@@ -11294,7 +11294,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Email</source>

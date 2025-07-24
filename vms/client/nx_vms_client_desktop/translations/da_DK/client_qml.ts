@@ -1198,7 +1198,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Importer fra enheder</translation>
     </message>
   </context>
   <context>
@@ -1616,7 +1616,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>Opslagslister</translation>
     </message>
     <message>
       <source>Add</source>
@@ -2308,6 +2308,14 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Træk videofiler eller billeder til klientvinduet, eller tilføj lokal mediemappe via dialogboksen Lokale indstillinger</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Intet fundet</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>Prøv at søge efter noget andet</translation>
     </message>
   </context>
   <context>
@@ -3021,7 +3029,7 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Copied</source>
       <comment>Copied here means that a link is copied</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Kopieret</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>

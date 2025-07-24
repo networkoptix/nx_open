@@ -2306,6 +2306,14 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Video dosyalarını veya görüntüleri istemci penceresine sürükleyin veya Yerel Ayarlar iletişim kutusundan yerel medya klasörü ekleyin</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Hiçbir şey bulunamadı</translation>
+    </message>
+    <message>
+      <source>Try searching for something else</source>
+      <translation>Başka bir şey aramayı dene</translation>
+    </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>

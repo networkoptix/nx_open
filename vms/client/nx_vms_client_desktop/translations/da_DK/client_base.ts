@@ -74,9 +74,9 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 Bruges</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -123,7 +123,7 @@
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Kopieret</translation>
     </message>
   </context>
   <context>
@@ -176,7 +176,7 @@
     </message>
     <message>
       <source>Push my screen</source>
-      <translation type="unfinished">Push my screen</translation>
+      <translation>Flyt min skærm</translation>
     </message>
     <message>
       <source>Select Time Server</source>
@@ -288,7 +288,7 @@
     </message>
     <message>
       <source>Restore Down</source>
-      <translation type="unfinished">Restore Down</translation>
+      <translation>Gendan Ned</translation>
     </message>
     <message>
       <source>Open in Browser...</source>
@@ -571,7 +571,7 @@
     </message>
     <message>
       <source>Cameras Settings...</source>
-      <translation type="unfinished">Cameras Settings...</translation>
+      <translation>Indstillinger For Kameraer...</translation>
     </message>
     <message>
       <source>I/O Module Settings...</source>
@@ -579,7 +579,7 @@
     </message>
     <message>
       <source>I/O Modules Settings...</source>
-      <translation type="unfinished">I/O Modules Settings...</translation>
+      <translation>I/O Modulindstillinger...</translation>
     </message>
     <message>
       <source>File Settings...</source>
@@ -587,27 +587,27 @@
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation type="unfinished">Layout Settings...</translation>
+      <translation>Layout Indstillinger...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
-      <translation type="unfinished">Video Wall Settings...</translation>
+      <translation>Indstillinger For Videovæg...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
-      <translation type="unfinished">Devices List by Server...</translation>
+      <translation>Enhedsliste efter server...</translation>
     </message>
     <message>
       <source>Cameras List by Server...</source>
-      <translation type="unfinished">Cameras List by Server...</translation>
+      <translation>Kameraliste efter server...</translation>
     </message>
     <message>
       <source>Server Logs...</source>
-      <translation type="unfinished">Server Logs...</translation>
+      <translation>Server log filer...</translation>
     </message>
     <message>
       <source>Server Diagnostics...</source>
-      <translation type="unfinished">Server Diagnostics...</translation>
+      <translation>Serverdiagnostik...</translation>
     </message>
     <message>
       <source>Server Web Page...</source>
@@ -615,7 +615,7 @@
     </message>
     <message>
       <source>Server Settings...</source>
-      <translation type="unfinished">Server Settings...</translation>
+      <translation>Serverindstillinger...</translation>
     </message>
     <message>
       <source>None</source>
@@ -623,7 +623,7 @@
     </message>
     <message>
       <source>Small</source>
-      <translation type="unfinished">Small</translation>
+      <translation>Lille</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -631,7 +631,7 @@
     </message>
     <message>
       <source>Large</source>
-      <translation type="unfinished">Large</translation>
+      <translation>Stor</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -643,7 +643,7 @@
     </message>
     <message>
       <source>Close All But This</source>
-      <translation type="unfinished">Close All But This</translation>
+      <translation>Luk alle undtagen dette</translation>
     </message>
     <message>
       <source>Play</source>
@@ -655,27 +655,27 @@
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Forrige billede</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Næste billede</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Til Start</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Til Slut</translation>
     </message>
     <message>
       <source>Volume Down</source>
-      <translation type="unfinished">Volume Down</translation>
+      <translation>Lydstyrke ned</translation>
     </message>
     <message>
       <source>Volume Up</source>
-      <translation type="unfinished">Volume Up</translation>
+      <translation>Lydstyrke op</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
@@ -683,63 +683,63 @@
     </message>
     <message>
       <source>Jump to Live</source>
-      <translation type="unfinished">Jump to Live</translation>
+      <translation>Spring til live</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation type="unfinished">Synchronize Streams</translation>
+      <translation>Synkroniser Streams</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
-      <translation type="unfinished">Disable Stream Synchronization</translation>
+      <translation>Deaktivér Stream Synkronisering</translation>
     </message>
     <message>
       <source>Show Bookmarks</source>
-      <translation type="unfinished">Show Bookmarks</translation>
+      <translation>Vis bogmærker</translation>
     </message>
     <message>
       <source>Hide Bookmarks</source>
-      <translation type="unfinished">Hide Bookmarks</translation>
+      <translation>Skjul bogmærker</translation>
     </message>
     <message>
       <source>Show Calendar</source>
-      <translation type="unfinished">Show Calendar</translation>
+      <translation>Vis Kalender</translation>
     </message>
     <message>
       <source>Hide Calendar</source>
-      <translation type="unfinished">Hide Calendar</translation>
+      <translation>Skjul Kalender</translation>
     </message>
     <message>
       <source>Show Title Bar</source>
-      <translation type="unfinished">Show Title Bar</translation>
+      <translation>Vis Titellinje</translation>
     </message>
     <message>
       <source>Hide Title Bar</source>
-      <translation type="unfinished">Hide Title Bar</translation>
+      <translation>Skjul Titellinje</translation>
     </message>
     <message>
       <source>Show Timeline</source>
-      <translation type="unfinished">Show Timeline</translation>
+      <translation>Vis Tidslinje</translation>
     </message>
     <message>
       <source>Hide Timeline</source>
-      <translation type="unfinished">Hide Timeline</translation>
+      <translation>Skjul Tidslinje</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>Bogmærke Log...</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>Vis reel...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
+      <translation>Fjern fra Vis reel</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>Opret Vis reel</translation>
     </message>
     <message>
       <source>Upload File...</source>
@@ -751,55 +751,55 @@
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Nogle kameraer kræver, at der oprettes adgangskoder</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>Eksporter video...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
-      <translation type="unfinished">Export Bookmark...</translation>
+      <translation>Eksporter bogmærke...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>Skærmindstillinger...</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Eksportér bogmærker...</translation>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Glemt adgangskode</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation type="unfinished">Cancel Upload...</translation>
+      <translation>Annuller Upload...</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Indstillinger for analyse...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation type="unfinished">Show Thumbnails</translation>
+      <translation>Vis miniaturebilleder</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation type="unfinished">Hide Thumbnails</translation>
+      <translation>Skjul miniaturebilleder</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Virtuelt kamera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
-      <translation type="unfinished">Show Tree</translation>
+      <translation>Vis træ</translation>
     </message>
     <message>
       <source>Hide Tree</source>
-      <translation type="unfinished">Hide Tree</translation>
+      <translation>Skjul træ</translation>
     </message>
     <message>
       <source>Show Notifications</source>
@@ -986,7 +986,7 @@
     </message>
     <message>
       <source>Device...</source>
-      <translation type="unfinished">Device...</translation>
+      <translation>Enhed...</translation>
     </message>
     <message>
       <source>Add User...</source>
@@ -994,11 +994,11 @@
     </message>
     <message>
       <source>Integration...</source>
-      <translation type="unfinished">Integration...</translation>
+      <translation>Integration...</translation>
     </message>
     <message>
       <source>New Integration...</source>
-      <translation type="unfinished">New Integration...</translation>
+      <translation>Ny Integration...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
@@ -1006,52 +1006,52 @@
     </message>
     <message>
       <source>Add Showreel...</source>
-      <translation type="unfinished">Add Showreel...</translation>
+      <translation>Tilføj Visning...</translation>
     </message>
     <message>
       <source>Add Virtual Camera...</source>
-      <translation type="unfinished">Add Virtual Camera...</translation>
+      <translation>Tilføj Virtuelt Kamera...</translation>
     </message>
     <message>
       <source>Integration Settings...</source>
-      <translation type="unfinished">Integration Settings...</translation>
+      <translation>Integrationsindstillinger...</translation>
     </message>
     <message>
       <source>Proxied Integration...</source>
-      <translation type="unfinished">Proxied Integration...</translation>
+      <translation>Proxy-integration...</translation>
     </message>
     <message>
       <source>Proxied Web Page...</source>
-      <translation type="unfinished">Proxied Web Page...</translation>
+      <translation>Proxy-webside...</translation>
     </message>
     <message>
       <source>Show Proxied Resources</source>
-      <translation type="unfinished">Show Proxied Resources</translation>
+      <translation>Vis proxy-ressourcer</translation>
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>Importer fra enheder...</translation>
     </message>
     <message>
       <source>User Manual...</source>
-      <translation type="unfinished">User Manual...</translation>
+      <translation>Brugermanual...</translation>
     </message>
     <message>
       <source>Convert to Shared Layout</source>
-      <translation type="unfinished">Convert to Shared Layout</translation>
+      <translation>Konverter til delt layout</translation>
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message>
@@ -1100,7 +1100,7 @@
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Opløsning</translation>
     </message>
     <message>
       <source>JavaScript API...</source>
@@ -1116,7 +1116,7 @@
     </message>
     <message>
       <source>Layout</source>
-      <translation type="unfinished">Layout</translation>
+      <translation>Layout</translation>
     </message>
     <message>
       <source>New Layout</source>
@@ -1128,7 +1128,7 @@
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation type="unfinished">New Welcome Screen</translation>
+      <translation>Ny velkomstskærm</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
@@ -1171,45 +1171,45 @@
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation>Licensen er i afventende deaktiveringstilstand, men er endnu ikke blevet deaktiveret.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+      <translation>Antal deaktiveringer overskredet grænsen for denne licens.</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
+      <translation>Hardware-ID'et for serveren med denne licens stemmer ikke overens med det hardware-ID, hvor licensen blev aktiveret.</translation>
     </message>
   </context>
   <context>
     <name>DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
-      <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
+      <translation>LDAP-gruppemedlemskab administreres på LDAP-serveren</translation>
     </message>
   </context>
   <context>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Indtast en gyldig adgangskode</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Adgangskoden er ikke gyldig.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Krypteret layout</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>Filen %1 er krypteret. Indtast venligst adgangskoden:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Venligst genindtast adgangskode for layout %1:</translation>
     </message>
   </context>
   <context>
@@ -1231,19 +1231,19 @@
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Lyd- og video fletning</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Del 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 Medie Fil</translation>
     </message>
     <message>
       <source>Executable %1 Media File</source>
@@ -1359,7 +1359,7 @@
     </message>
     <message>
       <source>Copied</source>
-      <translation type="unfinished">Copied</translation>
+      <translation>Kopieret</translation>
     </message>
     <message>
       <source>Hardware ID: %1
@@ -1484,26 +1484,26 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>Fil &quot;%1&quot; findes allerede. Prøv venligst et andet navn.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>File &quot;%1&quot; bruges af en anden proces.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>Fil &quot;%1&quot; kan ikke skrives. Prøv venligst et andet navn.</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Filnavn &quot;%1&quot; er reserveret af operativsystemet. Prøv venligst et andet navn.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
   </context>
@@ -1518,11 +1518,11 @@ Licensnøgle: %2</translation>
     <name>OutgoingMailSettingsWidget::Private</name>
     <message>
       <source>TLS</source>
-      <translation type="unfinished">TLS</translation>
+      <translation>TLS</translation>
     </message>
     <message>
       <source>SSL</source>
-      <translation type="unfinished">SSL</translation>
+      <translation>SSL</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1551,21 +1551,21 @@ Licensnøgle: %2</translation>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>%1 brugere modtager e-mails</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>%1 er ikke tilgængelig</translation>
     </message>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Route via %1</translation>
+      <translation>Rute via %1</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation type="unfinished">Route via SMTP server</translation>
+      <translation>Rute via SMTP-server</translation>
     </message>
     <message>
       <source>Success</source>
@@ -1573,7 +1573,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Authentication failed</source>
-      <translation type="unfinished">Authentication failed</translation>
+      <translation>Godkendelse mislykkedes</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -1582,27 +1582,27 @@ Licensnøgle: %2</translation>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <translation>%1 brugere vil begynde at modtage e-mails umiddelbart efter du har anvendt disse indstillinger</translation>
     </message>
     <message>
       <source>Cannot reach the server</source>
-      <translation type="unfinished">Cannot reach the server</translation>
+      <translation>Kan ikke finde serveren</translation>
     </message>
     <message>
       <source>Username or Password are incorrect</source>
-      <translation type="unfinished">Username or Password are incorrect</translation>
+      <translation>Brugernavn eller adgangskode er forkert</translation>
     </message>
     <message>
       <source>Insecure</source>
-      <translation type="unfinished">Insecure</translation>
+      <translation>Usikker</translation>
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>Forbindelsen mislykkedes</translation>
     </message>
     <message>
       <source>Username cannot be empty</source>
-      <translation type="unfinished">Username cannot be empty</translation>
+      <translation>Brugernavn skal udfyldes</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -1645,18 +1645,18 @@ Licensnøgle: %2</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message>
       <source>Short</source>
-      <translation type="unfinished">Short</translation>
+      <translation>Kort</translation>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Lang</translation>
     </message>
     <message>
       <source>Common</source>
@@ -1664,38 +1664,38 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Incorrect</source>
-      <translation type="unfinished">Incorrect</translation>
+      <translation>Forkert</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols</source>
-      <translation type="unfinished">Password should contain different types of symbols</translation>
+      <translation>Adgangskoden skal indeholde forskellige typer symboler</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
-        <numerusform>Password must be at least %n characters long</numerusform>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters</numerusform>
-        <numerusform>Password must be no longer than %n characters</numerusform>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>Adgangskoden må ikke indeholde %n eller flere på hinanden følgende tegn samlet</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message>
@@ -1704,73 +1704,73 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed</translation>
+      <translation>Kun latinske bogstaver, tal og tastatursymboler %1 er tilladt</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols are allowed</translation>
+      <translation>Kun latinske bogstaver, tal og tastatursymboler er tilladt</translation>
     </message>
   </context>
   <context>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+      <translation>Kan ikke hente den aktuelle position fra kamera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
-      <translation type="unfinished">Please wait for the camera to go online.</translation>
+      <translation>Vent venligst på, at kameraet går online.</translation>
     </message>
     <message>
       <source>Failed to get current position</source>
-      <translation type="unfinished">Failed to get current position</translation>
+      <translation>Kunne ikke hente nuværende position</translation>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+      <translation>Kan ikke indstille den aktuelle position for kameraet &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
-      <translation type="unfinished">Failed to set current position</translation>
+      <translation>Kunne ikke indstille den aktuelle position</translation>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation type="unfinished">Preset used by some tours. Delete it anyway?</translation>
+      <translation>Forudindstilling, der bruges af nogle ture. Slet det alligevel?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
-      <translation type="unfinished">These tours will become invalid.</translation>
+      <translation>Disse ture vil blive ugyldige.</translation>
     </message>
   </context>
   <context>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Layout er låst</translation>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>Dette kamera understøtter ikke avanceret PTZ</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Zoomer ud...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Flytter...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Zoomer ind...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Fokuserer...</translation>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>PTZ kan kun bruges i live-tilstand</translation>
     </message>
   </context>
   <context>
@@ -1785,11 +1785,11 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Fokusér Fjernt</translation>
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Fokusér Nært</translation>
     </message>
     <message>
       <source>Auto Focus</source>
@@ -1811,19 +1811,19 @@ Licensnøgle: %2</translation>
     <name>QnAboutDialog</name>
     <message>
       <source>OpenGL version</source>
-      <translation type="unfinished">OpenGL version</translation>
+      <translation>OpenGL-version</translation>
     </message>
     <message>
       <source>OpenGL renderer</source>
-      <translation type="unfinished">OpenGL renderer</translation>
+      <translation>OpenGL-renderer</translation>
     </message>
     <message>
       <source>OpenGL vendor</source>
-      <translation type="unfinished">OpenGL vendor</translation>
+      <translation>OpenGL-leverandør</translation>
     </message>
     <message>
       <source>OpenGL max texture size</source>
-      <translation type="unfinished">OpenGL max texture size</translation>
+      <translation>Opengl maks. teksturstørrelse</translation>
     </message>
     <message>
       <source>%1 version %2 (%3).</source>
@@ -3518,7 +3518,7 @@ Licensnøgle: %2</translation>
     <name>QnNewVirtualCameraDialog</name>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Virtuelt kamera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
@@ -4093,7 +4093,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>Serverindstillinger</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -4628,7 +4628,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Ikke defineret</translation>
     </message>
     <message>
       <source>removable</source>
@@ -4832,7 +4832,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Nogle kameraer kræver, at der oprettes adgangskoder</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
@@ -5228,19 +5228,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Zoomer ind...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Zoomer ud...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Flytter...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Fokuserer...</translation>
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
@@ -5732,7 +5732,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Ikke defineret</translation>
     </message>
     <message>
       <source>Lst</source>
@@ -5769,9 +5769,9 @@ If you intended to move analytics data to another storage location, please conta
     <name>Strings</name>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5826,7 +5826,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Ikke defineret</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -5866,7 +5866,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Kilde kamera</translation>
     </message>
     <message>
       <source>Is listed</source>
@@ -6672,7 +6672,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Opløsning</translation>
     </message>
     <message>
       <source>Setting was changed</source>
@@ -7300,7 +7300,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Kilde kamera</translation>
     </message>
   </context>
   <context>
@@ -7372,7 +7372,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cameras Settings</source>
-      <translation type="unfinished">Cameras Settings</translation>
+      <translation>Indstillinger For Kameraer</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
@@ -7380,7 +7380,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I/O Modules Settings</source>
-      <translation type="unfinished">I/O Modules Settings</translation>
+      <translation>I/O Modulindstillinger</translation>
     </message>
     <message>
       <source>Dewarping</source>
@@ -7599,7 +7599,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Kopieret</translation>
     </message>
     <message>
       <source>Pasted</source>
@@ -8769,7 +8769,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>Forbindelsen mislykkedes</translation>
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
@@ -10181,7 +10181,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>Ny Integration</translation>
     </message>
     <message>
       <source>Edit Integration</source>
@@ -11284,11 +11284,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Lang</translation>
     </message>
     <message>
       <source>Short</source>
-      <translation type="unfinished">Short</translation>
+      <translation>Kort</translation>
     </message>
   </context>
   <context>
@@ -11920,7 +11920,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integration</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -12281,11 +12281,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Fokusér Nært</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Fokusér Fjernt</translation>
     </message>
     <message>
       <source>Autofocus</source>
@@ -12670,13 +12670,13 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Kilde kamera</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message>
@@ -13232,7 +13232,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Forrige billede</translation>
     </message>
     <message>
       <source>Speed Up</source>
@@ -13240,7 +13240,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Næste billede</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
@@ -13248,7 +13248,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Til Start</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -13256,7 +13256,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Til Slut</translation>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
