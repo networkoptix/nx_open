@@ -1493,7 +1493,7 @@
     </message>
     <message>
       <source>Copied</source>
-      <translation type="unfinished">Copied</translation>
+      <translation>Kopieret</translation>
     </message>
     <message>
       <source>Hardware ID: %1
@@ -2587,13 +2587,13 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Kilde Kamera</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message>
@@ -2855,7 +2855,7 @@ Licensnøgle: %2</translation>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
-      <translation type="unfinished">automatic</translation>
+      <translation>automatisk</translation>
     </message>
   </context>
   <context>
@@ -2988,7 +2988,7 @@ Licensnøgle: %2</translation>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
       <source>automatic</source>
-      <translation type="unfinished">automatic</translation>
+      <translation>automatisk</translation>
     </message>
   </context>
   <context>
@@ -4178,7 +4178,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Virtuelt kamera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
@@ -4862,7 +4862,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>Serverindstillinger</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -5574,7 +5574,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Nogle kameraer kræver, at der oprettes adgangskoder</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
@@ -5855,19 +5855,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Zoomer ind...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Zoomer ud...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Flytter...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Fokuserer...</translation>
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
@@ -6609,7 +6609,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Kilde kamera</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
@@ -6656,7 +6656,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Ikke defineret</translation>
     </message>
     <message>
       <source>Lst</source>
@@ -7375,7 +7375,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Opløsning</translation>
     </message>
     <message>
       <source>Setting was changed</source>
@@ -8010,7 +8010,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cameras Settings</source>
-      <translation type="unfinished">Cameras Settings</translation>
+      <translation>Indstillinger For Kameraer</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
@@ -8018,7 +8018,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I/O Modules Settings</source>
-      <translation type="unfinished">I/O Modules Settings</translation>
+      <translation>I/O Modulindstillinger</translation>
     </message>
     <message>
       <source>Dewarping</source>
@@ -8252,7 +8252,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Kopieret</translation>
     </message>
     <message>
       <source>Pasted</source>
@@ -9409,7 +9409,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>Forbindelsen mislykkedes</translation>
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
@@ -10667,7 +10667,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>Ny Integration</translation>
     </message>
     <message>
       <source>Edit Integration</source>
@@ -11809,11 +11809,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Lang</translation>
     </message>
     <message>
       <source>Short</source>
-      <translation type="unfinished">Short</translation>
+      <translation>Kort</translation>
     </message>
   </context>
   <context>
@@ -12234,11 +12234,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Analyse-hændelser</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Enhver analysehændelse</translation>
     </message>
     <message>
       <source>No events</source>
@@ -12268,7 +12268,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integration</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -12598,11 +12598,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Fokusér Nært</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Fokusér Fjernt</translation>
     </message>
     <message>
       <source>Autofocus</source>
@@ -12846,13 +12846,13 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Kilde kamera</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
       </translation>
     </message>
     <message>
@@ -13549,7 +13549,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Forrige billede</translation>
     </message>
     <message>
       <source>Speed Up</source>
@@ -13557,7 +13557,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Næste billede</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
@@ -13565,7 +13565,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Til Start</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -13573,7 +13573,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Til Slut</translation>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>

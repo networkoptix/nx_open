@@ -3092,7 +3092,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation>ログインIDまたはパスワードが違います。</translation>
+      <translation>ログインIDまたはパスワードが無効です。</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
@@ -8243,7 +8243,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>システムは %1 に接続されました</translation>
+      <translation>システムが %1 に接続されました。</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
@@ -9730,7 +9730,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 システムは %1 に接続されていないシステムとのみ統合できます。システム名とパスワードは %1 システムから取得されます。</translation>
+      <translation>%1 システムは、%1 に接続されていないシステムとのみ統合できます。システム名とパスワードは、%1 システムから継承されます。</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -11305,7 +11305,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Password</source>
@@ -11791,7 +11791,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Email</source>

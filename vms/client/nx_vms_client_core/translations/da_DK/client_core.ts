@@ -173,7 +173,7 @@
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>Forbindelsen mislykkedes</translation>
     </message>
     <message>
       <source>Your access to this system has expired.</source>

@@ -1264,7 +1264,7 @@
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integration</translation>
     </message>
     <message>
       <source>Cloud storage</source>
@@ -2414,7 +2414,7 @@
     </message>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Kilde kamera</translation>
     </message>
     <message>
       <source>Also show on source camera</source>
