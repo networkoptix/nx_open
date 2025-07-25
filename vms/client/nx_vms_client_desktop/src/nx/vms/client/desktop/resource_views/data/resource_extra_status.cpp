@@ -29,7 +29,7 @@ ResourceExtraStatus getResourceExtraStatus(const QnResourcePtr& resource)
             resourceExtraStatus.setFlag(ResourceExtraStatusFlag::scheduled);
 
         if (camera->statusFlags().testFlag(CameraStatusFlag::CSF_HasIssuesFlag)
-            || camera->statusFlags().testFlag(CameraStatusFlag::CSF_InvalidScheduleFlag))
+            || camera->hasVideo() && camera->statusFlags().testFlag(CameraStatusFlag::CSF_InvalidScheduleFlag))
         {
             resourceExtraStatus.setFlag(ResourceExtraStatusFlag::buggy);
         }
