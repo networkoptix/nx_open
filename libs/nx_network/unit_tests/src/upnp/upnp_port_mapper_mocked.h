@@ -39,11 +39,11 @@ public:
 
     virtual void getMapping(
         const nx::Url& url, quint32 index,
-        std::function< void(MappingInfo) > callback) override;
+        MappingInfoCallback callback) override;
 
     virtual void getMapping(
         const nx::Url& url, quint16 externalPort, Protocol protocol,
-        std::function< void(MappingInfo) > callback) override;
+        MappingInfoCallback callback) override;
 
     typedef std::map<
         std::pair< quint16 /*external*/, Protocol /*protocol*/ >,

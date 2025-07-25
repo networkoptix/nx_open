@@ -6,6 +6,7 @@
 
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/utils/std/expected.h>
 
 namespace nx::network::upnp {
 
@@ -20,6 +21,9 @@ public:
         unknown = -1,
 
         ok = 0,
+
+        specifiedArrayIndexInvalid = 713,
+        noSuchEntryInArray = 714,
 
         onlyPermanentLeasesSupported = 725,
     };
@@ -61,24 +65,21 @@ public:
     struct NX_NETWORK_API MappingInfo
     {
         HostAddress internalIp;
-        quint16 internalPort;
-        quint16 externalPort;
-        Protocol protocol;
+        quint16 internalPort = 0;
+        quint16 externalPort = 0;
+        Protocol protocol = Protocol::tcp;
         QString description;
         std::chrono::milliseconds duration;
-
-        MappingInfo(const HostAddress& inIp = HostAddress(),
-            quint16 inPort = 0,
-            quint16 exPort = 0,
-            Protocol prot = Protocol::tcp,
-            const QString& desc = QString(),
-            quint64 dur = 0);
 
         bool isValid() const;
         QString toString() const;
     };
 
-    using MappingList = std::vector<MappingInfo>;
+    using MappingInfoResult = nx::utils::expected<MappingInfo, ErrorCode>;
+    using MappingInfoCallback = std::function<void(MappingInfoResult)>;
+
+    using MappingInfoList = std::vector<MappingInfo>;
+    using MappingInfoListCallback = std::function<void(MappingInfoList, bool)>;
 
 public:
     AsyncClient() = default;
@@ -108,24 +109,32 @@ public:
 
     //! Maps @param externalPort to @param internalPort on @param internalIp
     virtual void addMapping(const nx::Url& url, const HostAddress& internalIp,
-            quint16 internalPort, quint16 externalPort,
-            Protocol protocol, const QString& description, quint64 duration,
-            std::function<void(ErrorCode)> callback);
+        quint16 internalPort, quint16 externalPort,
+        Protocol protocol, const QString& description, quint64 duration,
+        std::function<void(ErrorCode)> callback);
 
     //! Removes mapping of @param externalPort
     virtual void deleteMapping(const nx::Url& url, quint16 externalPort, Protocol protocol,
-            std::function<void(bool)> callback);
+        std::function<void(bool)> callback);
 
     //! Provides mapping info by @param index
     virtual void getMapping(const nx::Url& url, quint32 index,
-            std::function<void(MappingInfo)> callback);
+        MappingInfoCallback callback);
 
     //! Provides mapping info by @param externalPort and @param protocol
     virtual void getMapping(const nx::Url& url, quint16 externalPort, Protocol protocol,
-            std::function<void(MappingInfo)> callback);
+        MappingInfoCallback callback);
 
-    void getAllMappings(const nx::Url& url,
-        std::function<void(MappingList)> callback);
+    void getAllMappings(const nx::Url& url, MappingInfoListCallback callback);
+
+private:
+    static ErrorCode getErrorCode(const Message& message);
+
+    static void processMappingResponse(
+        const Message& response,
+        MappingInfoCallback callback,
+        std::optional<Protocol> protocol = std::nullopt,
+        std::optional<quint16> externalPort = std::nullopt);
 
 private:
     nx::Mutex m_mutex;
