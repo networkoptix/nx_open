@@ -150,21 +150,25 @@ public:
 void fetchMappingsRecursive(
     AsyncClient* client,
     const nx::Url& url,
-    const std::function<void(AsyncClient::MappingList)>& callback,
-    std::shared_ptr<AsyncClient::MappingList> collected,
-    AsyncClient::MappingInfo newMap)
+    const AsyncClient::MappingInfoListCallback& callback,
+    std::shared_ptr<AsyncClient::MappingInfoList> collected,
+    AsyncClient::MappingInfoResult result)
 {
-    if (!newMap.isValid())
+    if (!result)
     {
-        callback(std::move(*collected));
+        // When mapping list is exhausted, specifiedArrayIndexInvalid is returned.
+        // This means we fetched all exisitng mappings from the device.
+        callback(
+            std::move(*collected),
+            result.error() == AsyncClient::ErrorCode::specifiedArrayIndexInvalid);
         return;
     }
 
-    collected->push_back(std::move(newMap));
+    collected->push_back(std::move(*result));
     client->getMapping(url, collected->size(),
-        [client, url, callback, collected](AsyncClient::MappingInfo nextMap)
+        [client, url, callback, collected](AsyncClient::MappingInfoResult result)
         {
-            fetchMappingsRecursive(client, url, callback, collected, std::move(nextMap));
+            fetchMappingsRecursive(client, url, callback, collected, std::move(result));
         });
 }
 
@@ -188,23 +192,6 @@ QString AsyncClient::Message::toString() const
         paramList << nx::format("%1='%2'").args(param.first, param.second);
 
     return nx::format("%1:%2(%3)").args(service, action, paramList.join(", "));
-}
-
-AsyncClient::MappingInfo::MappingInfo(
-    const HostAddress& inIp,
-    quint16 inPort,
-    quint16 exPort,
-    Protocol prot,
-    const QString& desc,
-    quint64 dur)
-    :
-    internalIp(inIp),
-    internalPort(inPort),
-    externalPort(exPort),
-    protocol(prot),
-    description(desc),
-    duration(dur)
-{
 }
 
 bool AsyncClient::MappingInfo::isValid() const
@@ -334,16 +321,7 @@ void AsyncClient::addMapping(
         request,
         [callback](const Message& response)
         {
-            if (response.isOk())
-            {
-                callback(ErrorCode::ok);
-            }
-            else
-            {
-                bool ok = false;
-                const int code = response.getParam(kErrorCodeParameter).toInt(&ok);
-                callback(ok ? ErrorCode(code) : ErrorCode::unknown);
-            }
+            callback(response.isOk() ? ErrorCode::ok : getErrorCode(response));
         });
 }
 
@@ -366,7 +344,7 @@ void AsyncClient::deleteMapping(
 
 void AsyncClient::getMapping(
     const nx::Url& url, quint32 index,
-    std::function<void(MappingInfo)> callback)
+    MappingInfoCallback callback)
 {
     AsyncClient::Message request(kGetGenericPortMappingEntry, kWanIp);
     request.params[kNewPortMappingIndex] = QString::number(index);
@@ -376,63 +354,70 @@ void AsyncClient::getMapping(
         request,
         [callback](const Message& response)
         {
-            if (response.isOk())
-            {
-                callback(MappingInfo(
-                    HostAddress::fromString(
-                        response.getParam(kNewInternalClient).toStdString()),
-                    response.getParam(kNewInternalPort).toUShort(),
-                    response.getParam(kNewExternalPort).toUShort(),
-                    nx::reflect::fromString<Protocol>(
-                        response.getParam(kNewProtocol).toStdString()),
-                    response.getParam(kNewPortMappingDescription)));
-            }
-            else
-            {
-                callback(MappingInfo());
-            }
+            processMappingResponse(response, callback);
         });
 }
 
 void AsyncClient::getMapping(
     const nx::Url& url, quint16 externalPort, Protocol protocol,
-    std::function<void(MappingInfo)> callback)
+    MappingInfoCallback callback)
 {
     AsyncClient::Message request(kGetSpecificPortMappingEntry, kWanIp);
     request.params[kNewExternalPort] = QString::number(externalPort);
     request.params[kNewProtocol] = nx::toString(protocol);
     request.params[kNewRemoteHost] = kAnyRemoteHost;
 
-    return doUpnp(url, request,
+    return doUpnp(
+        url,
+        request,
         [callback, externalPort, protocol](const Message& response)
         {
-            if (response.isOk())
-            {
-                callback(MappingInfo(
-                    HostAddress::fromString(
-                        response.getParam(kNewInternalClient).toStdString()),
-                    response.getParam(kNewInternalPort).toUShort(),
-                    externalPort,
-                    protocol,
-                    response.getParam(kNewPortMappingDescription),
-                    response.getParam(kNewLeaseDuration).toULongLong()));
-            }
-            else
-            {
-                callback(MappingInfo());
-            }
+            processMappingResponse(response, callback, protocol, externalPort);
         });
 }
 
-void AsyncClient::getAllMappings(
-    const nx::Url& url, std::function<void(MappingList)> callback)
+AsyncClient::ErrorCode AsyncClient::getErrorCode(const Message& message)
 {
-    auto mappings = std::make_shared<std::vector<MappingInfo>>();
+    bool ok = false;
+    const int code = message.getParam(kErrorCodeParameter).toInt(&ok);
+    return ok ? ErrorCode(code) : ErrorCode::unknown;
+}
+
+void AsyncClient::getAllMappings(
+    const nx::Url& url, MappingInfoListCallback callback)
+{
+    auto mappings = std::make_shared<MappingInfoList>();
     return getMapping(url, 0,
-        [this, url, callback, mappings](MappingInfo newMap)
+        [this, url, callback, mappings](MappingInfoResult result)
         {
-            fetchMappingsRecursive(this, url, callback, mappings, std::move(newMap));
+            fetchMappingsRecursive(this, url, callback, mappings, std::move(result));
         });
+}
+
+void AsyncClient::processMappingResponse(
+    const Message& response,
+    MappingInfoCallback callback,
+    std::optional<Protocol> protocol,
+    std::optional<quint16> externalPort)
+{
+    if (response.isOk())
+    {
+        callback(MappingInfo{
+            .internalIp = HostAddress::fromString(
+                response.getParam(kNewInternalClient).toStdString()),
+            .internalPort = response.getParam(kNewInternalPort).toUShort(),
+            .externalPort = externalPort.value_or(response.getParam(kNewExternalPort).toUShort()),
+            .protocol = protocol.value_or(
+                nx::reflect::fromString<Protocol>(response.getParam(kNewProtocol).toStdString())),
+            .description = response.getParam(kNewPortMappingDescription),
+            .duration = std::chrono::milliseconds(
+                response.getParam(kNewLeaseDuration).toULongLong()),
+        });
+    }
+    else
+    {
+        callback(nx::utils::unexpected(getErrorCode(response)));
+    }
 }
 
 } // namespace nx::network::upnp
