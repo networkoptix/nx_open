@@ -290,7 +290,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
             const bool isWebView = m_view->hasFocus()
                 && dynamic_cast<GraphicsWebEngineView*>(m_scene->focusItem());
 
-            for (auto actionId: {
+            // List of actions that should be disabled when a Web page is focused.
+            const static std::vector<action::IDType> kActionsToDisable = {
                 action::NotificationsTabAction, //< N
                 action::ResourcesTabAction, //< C
                 action::MotionTabAction, //< M
@@ -309,10 +310,34 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
                 action::RemoveLayoutItemAction,
                 action::RemoveLayoutItemFromSceneAction,
                 action::RemoveFromServerAction,
-                action::RemoveShowreelAction})
-            {
-                action(actionId)->setEnabled(!isWebView);
-            }
+                action::RemoveShowreelAction
+            };
+
+            const static auto keySequences =
+                [this]()
+                {
+                    // Store key sequences assigned to the above-defined actions in MenuFactory.
+                    // We could also iterate over the list returned by menu()->actions(), but this
+                    // approach may require more precise filtering, such as for F-key shortcuts.
+                    std::vector<std::pair<action::IDType, QKeySequence>> result;
+                    for (auto actionId: kActionsToDisable)
+                    {
+                        auto sequence = action(actionId)->shortcut();
+
+                        // Check that the sequence meets our expectations and should be disabled.
+                        if (!NX_ASSERT(sequence.count() == 1))
+                            continue;
+                        if (!NX_ASSERT(sequence[0].keyboardModifiers() == Qt::NoModifier))
+                            continue;
+
+                        result.push_back({actionId, sequence});
+                    }
+
+                    return result;
+                }();
+
+            for (const auto& [actionId, keySequence]: keySequences)
+                action(actionId)->setShortcut(!isWebView ? keySequence : QKeySequence());
         });
 
     /* Create curtain animator. */
