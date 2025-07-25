@@ -13,17 +13,11 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
-#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/app_info.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/vms/client/core/network/certificate_verifier.h>
-#include <nx/vms/client/core/network/cloud_status_watcher.h>
-#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
@@ -36,7 +30,6 @@
 #include <nx/vms/common/update/start_update_reply.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx/vms/update/update_check.h>
-#include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/synctime.h>
 
 #include "peer_state_tracker.h"
@@ -83,9 +76,6 @@ ServerUpdateTool::ServerUpdateTool(SystemContext* systemContext, QObject* parent
     m_uploadManager.reset(new UploadManager());
     m_stateTracker.reset(new PeerStateTracker(this));
 
-    connect(this, &ServerUpdateTool::moduleInformationReceived,
-        m_stateTracker.get(), &PeerStateTracker::setVersionInformation);
-
     m_downloader.reset(new Downloader(
         m_outputDir, systemContext, {new InternetOnlyPeerManager()}));
 
@@ -115,7 +105,6 @@ ServerUpdateTool::~ServerUpdateTool()
 
     saveInternalState();
     m_downloader->disconnect(this);
-    m_serverConnection.reset();
 
     NX_VERBOSE(this) << "~ServerUpdateTool() done";
 }
@@ -254,7 +243,7 @@ std::future<UpdateContents> ServerUpdateTool::checkMediaserverUpdateInfo()
     auto promise = std::make_shared<std::promise<UpdateContents>>();
     auto result = promise->get_future();
 
-    const auto handleResponse =
+    auto handleResponse =
         [this, promise = std::move(promise)](
             bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& result)
         {
@@ -283,7 +272,9 @@ std::future<UpdateContents> ServerUpdateTool::checkMediaserverUpdateInfo()
     // Requesting remote update info.
     system_update::requestUpdateInformation(connection,
         common::update::TargetVersionParams{},
-        nx::utils::guarded(this, handleResponse));
+        std::move(handleResponse),
+        this);
+
     return result;
 }
 
@@ -338,7 +329,6 @@ void ServerUpdateTool::readUpdateManifest(
     result.error = common::update::InformationError::noError;
 }
 
-// NOTE: We are probably not in the UI thread.
 void ServerUpdateTool::atExtractFilesFinished(nx::zip::Extractor::Error code)
 {
     NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::unpack);
@@ -873,7 +863,7 @@ bool ServerUpdateTool::requestStopAction()
     NX_INFO(this, "requestStopAction() - sending request");
     dropAllRequests("requestStopAction()");
 
-    const auto handleResponse =
+    auto handleResponse =
         [this](
             bool success,
             rest::Handle /*requestId*/,
@@ -903,8 +893,8 @@ bool ServerUpdateTool::requestStopAction()
         "/ec2/cancelUpdate",
         network::rest::Params{},
         /*body*/ {},
-        nx::utils::guarded(this, std::move(handleResponse)),
-        thread());
+        std::move(handleResponse),
+        this);
 
     for (const auto& file: m_activeDownloads)
         m_downloader->deleteFile(file.first);
@@ -920,7 +910,7 @@ bool ServerUpdateTool::requestRetryAction()
     if (!connection)
         return false;
 
-    const auto handleResponse =
+    auto handleResponse =
         [this](
             bool success,
             rest::Handle handle,
@@ -942,8 +932,8 @@ bool ServerUpdateTool::requestRetryAction()
     m_expectedStatusHandle = connection->postJsonResult("/ec2/retryUpdate",
         network::rest::Params{},
         QByteArray{},
-        nx::utils::guarded(this, handleResponse),
-        thread());
+        std::move(handleResponse),
+        this);
 
     return m_expectedStatusHandle != 0;
 }
@@ -968,7 +958,7 @@ bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
 
     NX_VERBOSE(this, "requestFinishUpdate(%1) - sending request", skipActivePeers);
 
-    const auto handleResponse =
+    auto handleResponse =
         [this, skipActivePeers](
             bool success,
             rest::Handle /*requestId*/,
@@ -1003,8 +993,8 @@ bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
     connection->postJsonResult("/ec2/finishUpdate",
         params,
         QByteArray(),
-        nx::utils::guarded(this, handleResponse),
-        thread());
+        std::move(handleResponse),
+        this);
 
     return true;
 }
@@ -1040,7 +1030,7 @@ bool ServerUpdateTool::requestStartUpdate(
 
     dropAllRequests(__func__);
 
-    const auto handleResponse =
+    auto handleResponse =
         [this](bool success, ::rest::Handle, const nx::network::rest::JsonResult& result)
         {
             if (success)
@@ -1064,7 +1054,8 @@ bool ServerUpdateTool::requestStartUpdate(
         "/ec2/startUpdate",
         network::rest::Params{},
         QJson::serialized(info),
-        nx::utils::guarded(this, std::move(handleResponse)));
+        std::move(handleResponse),
+        this);
 
     m_remoteUpdateManifest = info;
 
@@ -1108,7 +1099,7 @@ bool ServerUpdateTool::requestInstallAction(
     NX_VERBOSE(this, "requestInstallAction() for %1", servers);
     dropAllRequests("requestInstallAction()");
 
-    const auto handleResponse =
+    auto handleResponse =
         [this](
             bool success,
             rest::Handle requestId,
@@ -1141,7 +1132,8 @@ bool ServerUpdateTool::requestInstallAction(
             /*suffix*/ "",
             /*empty*/ "")}},
         QByteArray(),
-        nx::utils::guarded(this, handleResponse));
+        std::move(handleResponse),
+        this);
 
     if (handle)
         m_requestingInstall.insert(handle);
@@ -1153,40 +1145,31 @@ void ServerUpdateTool::requestModuleInformation()
 {
     NX_VERBOSE(this, "%1()", __func__);
 
-    auto callback = nx::utils::guarded(this,
+    auto callback =
         [this](
             bool success, rest::Handle /*handle*/,
             const rest::ResultWithData<QList<nx::vms::api::ModuleInformation>>& response)
         {
             if (success)
-                emit moduleInformationReceived(response.data);
-        });
+            {
+                m_stateTracker->setVersionInformation(response.data);
+            }
+            else
+            {
+                NX_WARNING(this, "Can't get all module information, code: %1, error: %2",
+                    response.error, response.errorString);
+            }
+        };
 
-    // We expect that m_serverConnection is created in requestStartUpdate
-    if (!m_serverConnection)
+    if (auto api = connectedServerApi())
     {
-        if (auto messageBusConnection = systemContext()->messageBusConnection())
-        {
-            const nx::vms::api::ModuleInformation& moduleInformation =
-                messageBusConnection->moduleInformation();
-
-            // TODO: #sivanov Looks like we can take existing rest connection here.
-            m_serverConnection.reset(new rest::ServerConnection(
-                systemContext()->httpClientPool(),
-                moduleInformation.id,
-                systemContext()->auditId(),
-                systemContext()->certificateVerifier(),
-                messageBusConnection->address(),
-                messageBusConnection->credentials()));
-        }
-        else
-        {
-            NX_WARNING(this, "requestModuleInformation() - messageBusConnection is not available. "
-                "There will be problems tracking server version during install process.");
-        }
+        api->getModuleInformationAll(std::move(callback), this);
     }
-    if (m_serverConnection)
-        m_serverConnection->getModuleInformationAll(callback);
+    else
+    {
+        NX_WARNING(this, "requestModuleInformation() - rest API is not available. "
+            "There will be problems tracking server version during install process.");
+    }
 }
 
 void ServerUpdateTool::atUpdateStatusResponse(
@@ -1236,13 +1219,11 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
     // Requesting update status for mediaservers.
     m_expectedStatusHandle = system_update::requestUpdateStatus(
         connection,
-        [this, tool = QPointer<ServerUpdateTool>(this)](
+        [this](
             bool success,
             rest::Handle handle,
             const network::rest::JsonResult& result)
         {
-            if (!tool)
-                return;
 
             if (result.errorId != network::rest::ErrorId::ok)
             {
@@ -1252,10 +1233,10 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     result.errorId, result.errorString);
             }
 
-            tool->atUpdateStatusResponse(
+            atUpdateStatusResponse(
                 success, handle, result.deserialized<common::update::StatusList>());
         },
-        thread());
+        this);
 
     // Requesting remote update info.
     const rest::Handle handle = system_update::requestUpdateInformation(
@@ -1295,7 +1276,7 @@ std::future<ServerUpdateTool::RemoteStatus> ServerUpdateTool::requestRemoteUpdat
     if (auto connection = connectedServerApi())
     {
         system_update::requestUpdateStatus(connection,
-            [this, promise, tool = QPointer<ServerUpdateTool>(this)](
+            [this, promise](
                  bool success,
                  rest::Handle handle,
                  const network::rest::JsonResult& result)
@@ -1309,15 +1290,15 @@ std::future<ServerUpdateTool::RemoteStatus> ServerUpdateTool::requestRemoteUpdat
 
                 const auto statusList = result.deserialized<common::update::StatusList>();
 
-                if (tool)
-                    tool->atUpdateStatusResponse(success, handle, statusList);
+                atUpdateStatusResponse(success, handle, statusList);
 
                 RemoteStatus remoteStatus;
                 for (const auto& status: statusList)
                     remoteStatus[status.serverId] = status;
 
                 promise->set_value(remoteStatus);
-            }, thread());
+            },
+            this);
     }
     else
     {
@@ -1507,9 +1488,9 @@ QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 std::future<UpdateContents> ServerUpdateTool::checkForUpdate(
     const common::update::UpdateInfoParams& infoParams)
 {
-    const auto connection = this->connection();
+    auto api = connectedServerApi();
 
-    if (!connection || !connection->serverApi())
+    if (!api)
     {
         NX_WARNING(this, "checkForUpdate() - There's no server connection.");
         std::promise<UpdateContents> promise;
@@ -1520,11 +1501,11 @@ std::future<UpdateContents> ServerUpdateTool::checkForUpdate(
 
     return std::async(
         [updateUrl = nx::vms::common::update::releaseListUrl(systemContext()),
-            connection,
+            api,
             infoParams]() -> UpdateContents
         {
             auto contents = system_update::getUpdateContents(
-                connection->serverApi(), updateUrl, infoParams);
+                api, updateUrl, infoParams);
             if (std::holds_alternative<update::LatestVmsVersionParams>(infoParams))
                 contents.sourceType = UpdateSourceType::internet;
             else
