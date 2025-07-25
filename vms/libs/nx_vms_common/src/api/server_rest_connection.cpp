@@ -128,6 +128,17 @@ using HandleCallback = nx::MoveOnlyFunc<void(rest::Handle)>;
 
 struct ServerConnection::Private
 {
+    ~Private()
+    {
+        decltype(pendingRequests) handles;
+        {
+            NX_MUTEX_LOCKER lock(&mutex);
+            std::swap(handles, pendingRequests);
+        }
+        for (const auto handle: handles)
+            httpClientPool->terminate(handle);
+    }
+
     auto executeRequestAwaitable(
         nx::network::http::ClientPool::Request request,
         std::optional<nx::network::http::AsyncClient::Timeouts> timeouts,
@@ -162,11 +173,20 @@ struct ServerConnection::Private
                         h();
                     });
 
+                auto connection = m_connection;
+
+                auto removePending = nx::utils::AsyncHandlerExecutor(connection).bind(
+                    [connection](Handle handle)
+                    {
+                        connection->d->removePending(handle);
+                    });
+
                 auto onSuspend = std::move(m_onSuspend);
 
                 auto context = m_connection->prepareContext(
                     m_request,
-                    [this, h = std::move(h), guard = std::move(guard)](
+                    [this, h = std::move(h), guard = std::move(guard),
+                        removePending = std::move(removePending)](
                         nx::network::http::ClientPool::ContextPtr context) mutable
                     {
                         // Executes in asio thread.
@@ -178,6 +198,8 @@ struct ServerConnection::Private
 
                         m_context = std::move(context);
                         guard.disarm();
+                        removePending(m_context->handle);
+
                         h();
                     },
                     m_timeouts);
@@ -185,7 +207,10 @@ struct ServerConnection::Private
                 auto handle = m_connection->sendRequest(context);
                 // If we resumed from sendRequest() immediately, `this` is already destroyed!
                 if (handle != 0)
+                {
+                    connection->d->addPending(handle);
                     onSuspend(handle);
+                }
             }
 
             nx::network::http::ClientPool::ContextPtr await_resume() const
@@ -229,6 +254,18 @@ struct ServerConnection::Private
         nx::vms::common::SessionTokenHelperPtr helper,
         HandleCallback onSuspend);
 
+    void addPending(rest::Handle handle)
+    {
+        NX_MUTEX_LOCKER lock(&mutex);
+        pendingRequests.insert(handle);
+    }
+
+    void removePending(rest::Handle handle)
+    {
+        NX_MUTEX_LOCKER lock(&mutex);
+        pendingRequests.erase(handle);
+    }
+
     ServerConnection* const q;
     const nx::vms::common::SystemContext* systemContext = nullptr;
     nx::network::http::ClientPool* const httpClientPool;
@@ -258,6 +295,7 @@ struct ServerConnection::Private
     std::optional<DirectConnect> directConnect;
 
     std::map<Handle, Handle> substitutions;
+    std::set<Handle> pendingRequests;
 };
 
 ServerConnection::ServerConnection(
@@ -2709,6 +2747,7 @@ ServerConnection::Private::executeRequestAsync(
         std::move(onSuspend),
         logTag);
 
+
     rest::Handle originalHandle = context->handle;
 
     // Asio thread.
@@ -2841,18 +2880,20 @@ Handle ServerConnection::Private::executeRequest(
     return handle;
 }
 
-void ServerConnection::cancelRequest(const Handle& requestId)
+void ServerConnection::cancelRequest(Handle requestId)
 {
     std::optional<Handle> actualId;
     {
         // Check if we had re-send this request with updated credentials.
         NX_MUTEX_LOCKER lock(&d->mutex);
 
-        if (auto it = d->substitutions.find(requestId);
-            it != d->substitutions.end())
+        if (auto it = d->substitutions.find(requestId); it != d->substitutions.end())
         {
             actualId = it->second;
+            d->pendingRequests.erase(*actualId);
         }
+
+        d->pendingRequests.erase(requestId);
     }
 
     if (actualId)

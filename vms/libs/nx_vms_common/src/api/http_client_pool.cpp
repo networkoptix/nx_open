@@ -540,8 +540,7 @@ struct ClientPool::Private
 //--------------------------------------------------------------------------------------------------
 // ClientPool
 
-ClientPool::ClientPool(QObject *parent):
-    QObject(parent),
+ClientPool::ClientPool():
     d(new Private)
 {
     SocketGlobals::instance().allocationAnalyzer().recordObjectCreation(this);
@@ -592,10 +591,10 @@ bool ClientPool::terminate(int handle)
     std::unique_ptr<AsyncClient> client;
     {
         NX_MUTEX_LOCKER lock(&d->mutex);
-        if (d->awaitingRequests.count(handle))
+        if (auto it = d->awaitingRequests.find(handle); it != d->awaitingRequests.end())
         {
-            context = d->awaitingRequests[handle];
-            d->awaitingRequests.erase(handle);
+            context = std::move(it->second);
+            d->awaitingRequests.erase(it);
         }
         else
         {

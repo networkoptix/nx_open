@@ -17,6 +17,8 @@ struct EmptyResponseType {};
 template<typename Data>
 using ErrorOrData = nx::utils::expected<Data, nx::network::rest::Result>;
 
+using ErrorOrEmpty = ErrorOrData<EmptyResponseType>;
+
 template <typename T>
 struct ResultWithData
 {

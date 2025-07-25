@@ -61,7 +61,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
 
     // Some tests do not use network. It is OK to not initialize the pool for them.
     if (nx::network::SocketGlobals::isInitialized())
-        d->httpClientPool = std::make_unique<network::http::ClientPool>(this);
+        d->httpClientPool = std::make_unique<network::http::ClientPool>();
 
     switch (d->mode)
     {

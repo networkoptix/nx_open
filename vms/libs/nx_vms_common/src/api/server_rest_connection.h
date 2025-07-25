@@ -89,6 +89,8 @@ public:
     using Timeouts = nx::network::http::AsyncClient::Timeouts;
     using AbstractCertificateVerifier = nx::vms::common::AbstractCertificateVerifier;
 
+    using ErrorOrEmpty = rest::ErrorOrEmpty;
+
 public:
     /**
      * Used to send REST requests to the mediaserver. It uses messageBusConnection and
@@ -140,10 +142,6 @@ public:
      * Default callback type for GET requests without result data.
      */
     using GetCallback = Callback<nx::network::rest::JsonResult>;
-
-    using ContextPtr = nx::network::http::ClientPool::ContextPtr;
-
-    using ErrorOrEmpty = ErrorOrData<EmptyResponseType>;
 
     /**
     * Load information about cross-server archive
@@ -902,7 +900,7 @@ public:
      * Note that this effectively means that YOU ARE NEVER SAFE, even if you've cancelled all your
      * requests in your destructor. Better bulletproof your callbacks with `guarded`.
      */
-    void cancelRequest(const Handle& requestId);
+    void cancelRequest(Handle requestId);
 
     enum class DebugFlag
     {
@@ -920,6 +918,8 @@ public:
     static void setDebugFlag(DebugFlag flag, bool on);
 
 private:
+    using ContextPtr = nx::network::http::ClientPool::ContextPtr;
+
     ContextPtr prepareContext(
         const nx::network::http::ClientPool::Request& request,
         nx::MoveOnlyFunc<void (ContextPtr)> callback,
@@ -1039,8 +1039,5 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerConnection::DebugFlags);
-
-using Empty = EmptyResponseType;
-using ErrorOrEmpty = ServerConnection::ErrorOrEmpty;
 
 } // namespace rest
