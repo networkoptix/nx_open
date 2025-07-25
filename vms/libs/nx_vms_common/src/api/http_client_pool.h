@@ -16,9 +16,8 @@ namespace nx::network::http {
 /**
  * A pool of http connections, effectively limiting number of simultaneous requests.
  */
-class NX_VMS_COMMON_API ClientPool: public QObject
+class NX_VMS_COMMON_API ClientPool
 {
-    Q_OBJECT
 public:
     /**
      * Wraps request data and intermediate values.
@@ -197,7 +196,7 @@ public:
     };
     using ContextPtr = QSharedPointer<Context>;
 
-    ClientPool(QObject *parent = nullptr);
+    ClientPool();
     virtual ~ClientPool();
 
 public:
