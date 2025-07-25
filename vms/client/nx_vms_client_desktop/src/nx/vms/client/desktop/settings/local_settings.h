@@ -86,6 +86,8 @@ public:
         "When 'Info' mode is enabled on cameras, full info will be displayed even without hover."};
     Property<bool> showInfoByDefault{this, "showInfoByDefault", false,
         "'Info' mode will be enabled by default on newly opened cameras."};
+    Property<bool> showRoiByDefault{this, "showRoiByDefault", true,
+        "'Regions of Interest' mode will be enabled by default on newly opened cameras."};
 
     Property<Qn::TimeMode> timeMode{this, "timeMode", Qn::ClientTimeMode};
 

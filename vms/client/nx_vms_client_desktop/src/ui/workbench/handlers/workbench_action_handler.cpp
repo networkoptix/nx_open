@@ -1065,6 +1065,8 @@ void ActionHandler::at_openInLayoutAction_triggered()
         addParams.paused = false;
         addParams.speed = 1.0;
 
+        addParams.displayRoi = appContext()->localSettings()->showRoiByDefault();
+
         const bool canViewFootage = std::any_of(resources.begin(), resources.end(),
             [](auto resource)
             {
