@@ -48,8 +48,6 @@ bool WindowsDesktopResource::isRendererSlow() const
     return captureMode == CaptureMode::fullScreen;
 }
 
-static AudioLayoutConstPtr emptyAudioLayout(new AudioLayout());
-
 AudioLayoutConstPtr WindowsDesktopResource::getAudioLayout(
     const QnAbstractStreamDataProvider* dataProvider) const
 {
@@ -57,7 +55,10 @@ AudioLayoutConstPtr WindowsDesktopResource::getAudioLayout(
     auto provider = dynamic_cast<const DesktopDataProviderWrapper*>(dataProvider);
     if (provider && provider->owner()->getAudioLayout())
         return provider->owner()->getAudioLayout();
-    return emptyAudioLayout;
+
+    static AudioLayoutConstPtr kEmptyAudioLayout = std::make_shared<AudioLayout>();
+
+    return kEmptyAudioLayout;
 }
 
 } // namespace nx::vms::client::desktop

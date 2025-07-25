@@ -93,8 +93,8 @@ AVSampleFormat DesktopDataProviderBase::fromQtAudioFormat(const QAudioFormat& fo
 
 AudioLayoutConstPtr DesktopDataProviderBase::getAudioLayout() const
 {
-    if (!m_audioLayout)
-        m_audioLayout.reset(new AudioLayout(m_audioEncoder.codecParameters()));
+    if (!m_audioLayout && m_audioEncoder.codecParameters())
+        m_audioLayout = std::make_shared<AudioLayout>(m_audioEncoder.codecParameters());
 
     return m_audioLayout;
 }

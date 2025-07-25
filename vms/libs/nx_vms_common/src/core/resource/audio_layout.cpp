@@ -2,6 +2,8 @@
 
 #include "audio_layout.h"
 
+#include <nx/utils/log/assert.h>
+
 AudioLayout::AudioLayout(const CodecParametersConstPtr& codecParams)
 {
     addTrack(codecParams);
@@ -29,7 +31,8 @@ AudioLayout::AudioLayout(const AVFormatContext* formatContext)
 
 void AudioLayout::addTrack(const CodecParametersConstPtr& codecParams, const QString& description)
 {
-    m_audioTracks.push_back({description, codecParams});
+    if (NX_ASSERT(codecParams))
+        m_audioTracks.push_back({description, codecParams});
 }
 
 const std::vector<AudioLayout::AudioTrack>& AudioLayout::tracks() const
