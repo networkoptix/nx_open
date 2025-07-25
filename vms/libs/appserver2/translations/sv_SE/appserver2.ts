@@ -339,5 +339,9 @@
       <source>It is forbidden to change Server deployment code</source>
       <translation>Det är förbjudet att ändra Server distributionskod</translation>
     </message>
+    <message>
+      <source>Storage with the same url already exists</source>
+      <translation type="unfinished">Storage with the same url already exists</translation>
+    </message>
   </context>
 </TS>
