@@ -339,5 +339,9 @@
       <source>It is forbidden to change Server deployment code</source>
       <translation>禁止更改伺服器部署程式碼</translation>
     </message>
+    <message>
+      <source>Storage with the same url already exists</source>
+      <translation type="unfinished">Storage with the same url already exists</translation>
+    </message>
   </context>
 </TS>
