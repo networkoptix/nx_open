@@ -118,6 +118,12 @@ void initApplication(const QnStartupParameters& startupParams)
     // We don't want changes in desktop color settings to clash with our custom style.
     QApplication::setDesktopSettingsAware(false);
     QApplication::setQuitOnLastWindowClosed(true);
+
+    // Changing the working directory is necessary to be able to open the client using the
+    // `nx-vms://` link from the browser. When the client is launched using the browser, the working
+    // directory becomes <SysDrive>/Windows/System32. For some reason, chromium cannot correctly
+    // determine the OS version in this working directory, and crashes.
+    QDir::setCurrent(QApplication::applicationDirPath());
 }
 
 void sendCloudPortalConfirmation(const nx::vms::utils::SystemUri& uri, QObject* owner)
