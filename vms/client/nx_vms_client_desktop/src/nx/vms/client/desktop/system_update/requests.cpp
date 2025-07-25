@@ -153,6 +153,7 @@ UpdateContents getUpdateContents(
             promise->set_value(success);
         });
 
+    proxyConnection.reset();
     proxyCheck.wait();
 
     return contents;

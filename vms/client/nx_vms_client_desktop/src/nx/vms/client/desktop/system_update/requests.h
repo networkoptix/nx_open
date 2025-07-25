@@ -23,6 +23,7 @@ rest::Handle requestUpdateStatus(
     nx::utils::AsyncHandlerExecutor executor = {});
 
 /** Get update info directly from the Internet or via the given proxy connection. */
+// TODO: #amalov Refactor to return future or take callback.
 UpdateContents getUpdateContents(
     rest::ServerConnectionPtr proxyConnection,
     const nx::Url& url,

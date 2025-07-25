@@ -131,9 +131,9 @@ public:
     Q_ENUM(OfflineUpdateState);
 
     std::future<UpdateContents> checkForUpdate(const common::update::UpdateInfoParams& infoParams);
+    std::future<UpdateContents> checkMediaserverUpdateInfo();
 
     std::future<UpdateContents> checkUpdateFromFile(const QString& file);
-    std::future<UpdateContents> checkMediaserverUpdateInfo();
     std::future<UpdateContents> takeUpdateCheckFromFile();
 
     /**
@@ -251,7 +251,6 @@ public:
 signals:
     void packageDownloaded(const nx::vms::update::Package& package);
     void packageDownloadFailed(const nx::vms::update::Package& package, const QString& error);
-    void moduleInformationReceived(const QList<nx::vms::api::ModuleInformation>& moduleInformation);
 
     /** Called when /ec2/startUpdate request is complete. */
     void startUpdateComplete(bool success, const QString& error);
@@ -271,9 +270,6 @@ private:
     void atRequestServerFreeSpaceResponse(bool success, rest::Handle handle,
         const QnUpdateFreeSpaceReply& reply);
 
-    // Wrapper to get REST connection to specified server.
-    // For testing purposes. We can switch there to a dummy http server.
-    rest::ServerConnectionPtr getServerConnection(const QnMediaServerResourcePtr& server) const;
     static void readUpdateManifest(const QString& path, UpdateContents& result);
     QnMediaServerResourceList getServersForUpload();
 
@@ -350,8 +346,6 @@ private:
     QSet<nx::vms::update::Package> m_manualPackages;
     /** Additional package properties. */
     QHash<QString, UpdateContents::PackageProperties> m_packageProperties;
-    /** Direct connection to the mediaserver. */
-    rest::ServerConnectionPtr m_serverConnection;
 
     /**
      * A set of servers that were participating in update.
