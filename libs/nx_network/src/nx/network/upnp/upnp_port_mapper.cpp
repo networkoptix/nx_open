@@ -319,17 +319,29 @@ void PortMapper::checkMapping(
         return;
 
     m_upnpClient->getMapping(
-        device->url, exPort, protocol,
-        [this, device, inPort, exPort, protocol](AsyncClient::MappingInfo info)
+        device->url,
+        exPort,
+        protocol,
+        [this, device, inPort, exPort, protocol](AsyncClient::MappingInfoResult result)
         {
+            const bool noSuchEntry =
+                !result && result.error() == AsyncClient::ErrorCode::noSuchEntryInArray;
+
             NX_MUTEX_LOCKER lk(&m_mutex);
+            if (!result && !noSuchEntry)
+            {
+                NX_VERBOSE(this, "Mapping check failed with error %1", (int)result.error());
+                device->failCounter.failure();
+                return;
+            }
+
             device->failCounter.success();
 
-            bool stillMapped = (
-                info.internalPort == inPort &&
-                info.externalPort == exPort &&
-                info.protocol == protocol &&
-                info.internalIp == device->internalIp);
+            const bool stillMapped = !noSuchEntry
+                && result->internalPort == inPort
+                && result->externalPort == exPort
+                && result->protocol == protocol
+                && result->internalIp == device->internalIp;
 
             PortId portId(inPort, protocol);
             if (!stillMapped)
@@ -361,14 +373,18 @@ void PortMapper::ensureMapping(Device* device, quint16 inPort, Protocol protocol
         return;
 
     m_upnpClient->getAllMappings(device->url,
-        [this, device, inPort, protocol](AsyncClient::MappingList list)
+        [this, device, inPort, protocol](AsyncClient::MappingInfoList mappings, bool allReceived)
         {
             NX_MUTEX_LOCKER lk(&m_mutex);
-            device->failCounter.success();
+            if (!allReceived)
+            {
+                device->failCounter.failure();
+                return;
+            }
 
             // Save existing mappings in case if router can silently remap them
             device->engagedPorts.clear();
-            for (const auto& mapping : list)
+            for (const auto& mapping : mappings)
                 device->engagedPorts.insert(PortId(mapping.externalPort, mapping.protocol));
 
             const auto deviceMap = device->mapped.find(PortId(inPort, protocol));
@@ -380,7 +396,7 @@ void PortMapper::ensureMapping(Device* device, quint16 inPort, Protocol protocol
             }
 
             const auto callback = request->second;
-            for (const auto& mapping : list)
+            for (const auto& mapping : mappings)
                 if (mapping.internalIp == device->internalIp && mapping.internalPort == inPort
                     && mapping.protocol == protocol
                     && (mapping.duration == std::chrono::milliseconds::zero()

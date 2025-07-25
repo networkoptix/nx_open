@@ -42,13 +42,13 @@ TEST(UpnpAsyncClient, DISABLED_GetIp)
         EXPECT_EQ(prom.get_future().get().toString(), EXTERNAL_IP);
     }
     {
-        nx::utils::promise< AsyncClient::MappingInfo > prom;
+        nx::utils::promise< AsyncClient::MappingInfoResult > prom;
         client.getMapping(URL, 8877, TCP,
-            [&](const AsyncClient::MappingInfo& mapping)
-        { prom.set_value(mapping); });
+            [&](AsyncClient::MappingInfoResult result)
+        { prom.set_value(result); });
 
         // no such mapping
-        EXPECT_FALSE(prom.get_future().get().isValid());
+        EXPECT_FALSE(prom.get_future().get().has_value());
     }
     {
         nx::utils::promise< bool > prom;
@@ -57,9 +57,9 @@ TEST(UpnpAsyncClient, DISABLED_GetIp)
         EXPECT_FALSE(prom.get_future().get()); // no such mapping
     }
     {
-        nx::utils::promise< AsyncClient::MappingList > prom;
+        nx::utils::promise< AsyncClient::MappingInfoList > prom;
         client.getAllMappings(URL,
-            [&](const AsyncClient::MappingList& v) { prom.set_value(v); });
+            [&](AsyncClient::MappingInfoList mappings, bool) { prom.set_value(mappings); });
         EXPECT_EQ(prom.get_future().get().size(), 2U); // mappings from Skype ;)
     }
 }
@@ -85,9 +85,8 @@ TEST(UpnpAsyncClient, DISABLED_Mapping)
     {
         nx::utils::promise< SocketAddress > prom;
         client.getMapping(URL, 8877, TCP,
-            [&](const AsyncClient::MappingInfo& m)
-        { prom.set_value(SocketAddress(m.internalIp,
-            m.internalPort)); });
+            [&](AsyncClient::MappingInfoResult result)
+            { prom.set_value(SocketAddress(result->internalIp, result->internalPort)); });
 
         EXPECT_EQ(prom.get_future().get().toString(),
             SocketAddress(INTERNAL_IP, 80).toString());

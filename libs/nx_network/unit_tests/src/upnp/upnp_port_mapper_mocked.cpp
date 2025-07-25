@@ -63,44 +63,52 @@ void AsyncClientMock::deleteMapping(
 
 void AsyncClientMock::getMapping(
     const nx::utils::Url& /*url*/, quint32 index,
-    std::function< void(MappingInfo) > callback)
+    MappingInfoCallback callback)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_mappings.size() <= index)
-        return m_tasks.push([callback] { callback(MappingInfo()); });
+    {
+        return m_tasks.push(
+            [callback] { callback(nx::utils::unexpected(ErrorCode::specifiedArrayIndexInvalid)); });
+    }
 
     const auto mapping = *std::next(m_mappings.begin(), index);
     m_tasks.push(
         [callback, mapping]
         {
-            callback(MappingInfo(
-                mapping.second.first.address,
-                mapping.second.first.port,
-                mapping.first.first,
-                mapping.first.second,
-                mapping.second.second));
+            callback(MappingInfo{
+                .internalIp = mapping.second.first.address,
+                .internalPort = mapping.second.first.port,
+                .externalPort = mapping.first.first,
+                .protocol = mapping.first.second,
+                .description = mapping.second.second,
+            });
         });
 }
 
 void AsyncClientMock::getMapping(
     const nx::utils::Url& /*url*/, quint16 externalPort, Protocol protocol,
-    std::function< void(MappingInfo) > callback)
+    MappingInfoCallback callback)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     const auto it = m_mappings.find(std::make_pair(externalPort, protocol));
     if (it == m_mappings.end())
-        return m_tasks.push([callback] { callback(MappingInfo()); });
+    {
+        return m_tasks.push(
+            [callback] { callback(nx::utils::unexpected(ErrorCode::unknown)); });
+    }
 
     const auto mapping = *it;
     m_tasks.push(
         [callback, mapping]
         {
-            callback(MappingInfo(
-                mapping.second.first.address,
-                mapping.second.first.port,
-                mapping.first.first,
-                mapping.first.second,
-                mapping.second.second));
+            callback(MappingInfo{
+                .internalIp = mapping.second.first.address,
+                .internalPort = mapping.second.first.port,
+                .externalPort = mapping.first.first,
+                .protocol = mapping.first.second,
+                .description = mapping.second.second,
+            });
         });
 }
 
