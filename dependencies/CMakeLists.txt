@@ -33,3 +33,8 @@ endif()
 if(withMediaServer OR withSdk)
     add_subdirectory(ftplibpp)
 endif()
+
+if (withClouds)
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../artifacts/sourcegraph_jsonrpc2
+        ${CMAKE_BINARY_DIR}/open/artifacts/sourcegraph_jsonrpc2)
+endif()
