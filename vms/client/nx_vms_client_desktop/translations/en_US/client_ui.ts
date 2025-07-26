@@ -1394,10 +1394,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Connect to the previous system on startup</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Automatically restore saved windows configuration</source>
         <translation></translation>
     </message>
