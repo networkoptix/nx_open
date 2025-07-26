@@ -341,7 +341,7 @@
     </message>
     <message>
       <source>Storage with the same url already exists</source>
-      <translation type="unfinished">Storage with the same url already exists</translation>
+      <translation>同じ URL のストレージがすでに存在します。</translation>
     </message>
   </context>
 </TS>

@@ -7943,8 +7943,8 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message numerus="yes">
       <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>Log event untuk %1 - Menampilkan %n event pertama. Untuk menemukan event tertentu, silakan sesuaikan rentang tanggal atau terapkan filter tambahan</numerusform>
       </translation>
     </message>
   </context>
