@@ -1394,10 +1394,6 @@
       <translation>시작</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>시작 시 이전 시스템에 연결</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>저장된 Windows 구성을 자동으로 복원</translation>
     </message>

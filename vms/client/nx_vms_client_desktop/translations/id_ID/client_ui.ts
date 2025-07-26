@@ -1394,10 +1394,6 @@
       <translation>Permulaan</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Koneksikan ke sistem sebelumnya saat startup</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Secara otomatis mengembalikan konfigurasi windows yang disimpan</translation>
     </message>

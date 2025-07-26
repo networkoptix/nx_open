@@ -1394,10 +1394,6 @@
       <translation>Başlangıç</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Başlangıçta önceki sisteme bağlan</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Kaydedilen pencere yapılandırmasını otomatik olarak geri yükle</translation>
     </message>

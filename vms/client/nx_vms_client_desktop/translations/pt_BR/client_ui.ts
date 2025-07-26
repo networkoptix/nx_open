@@ -1394,10 +1394,6 @@
       <translation>Inicialização</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Conectar ao sistema anterior ao iniciar</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Restaurar automaticamente as configurações das janelas salvas</translation>
     </message>

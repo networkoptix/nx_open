@@ -1394,10 +1394,6 @@
       <translation>Arrincar ao inicio</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Conectar co sistema anterior ao iniciar</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Restaurar automaticamente a configuración gardada de Windows</translation>
     </message>

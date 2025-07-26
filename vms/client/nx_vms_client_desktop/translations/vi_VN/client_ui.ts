@@ -1394,10 +1394,6 @@
       <translation>Khởi động</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Kết nối với hệ thống trước đó khi khởi động</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Tự động khôi phục cấu hình cửa sổ đã lưu</translation>
     </message>

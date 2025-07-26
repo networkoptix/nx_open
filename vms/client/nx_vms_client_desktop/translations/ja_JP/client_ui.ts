@@ -1394,10 +1394,6 @@
       <translation>スタートアップ</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>起動後、直前に使用したシステムに接続する</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>保存されたウィンドウ構成を自動的に復元する</translation>
     </message>

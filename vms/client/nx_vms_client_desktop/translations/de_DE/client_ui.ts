@@ -1394,10 +1394,6 @@
       <translation>Grundeinstellungen</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Beim Start mit dem vorherigen System verbinden</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Gespeicherte Windowskonfiguration automatisch wiederherstellen</translation>
     </message>

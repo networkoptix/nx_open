@@ -1394,10 +1394,6 @@
       <translation>Opstart</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Opret forbindelse til det tidligere system ved opstart</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Gendan automatisk gemt Windows-konfiguration</translation>
     </message>

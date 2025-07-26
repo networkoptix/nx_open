@@ -1394,10 +1394,6 @@
       <translation>啟動</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>啟動後自動連線至先前登入的系統</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>自動還原已儲存的視窗設定</translation>
     </message>

@@ -1394,10 +1394,6 @@
       <translation>Uruchomienie</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Połącz się z poprzednim systemem podczas uruchamiania</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Automatycznie przywracaj zapisaną konfigurację okien</translation>
     </message>

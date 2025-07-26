@@ -1394,10 +1394,6 @@
       <translation>Uppstart</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Anslut till det tidigare systemet vid uppstart</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Återställ automatiskt sparad fönsterkonfiguration</translation>
     </message>
