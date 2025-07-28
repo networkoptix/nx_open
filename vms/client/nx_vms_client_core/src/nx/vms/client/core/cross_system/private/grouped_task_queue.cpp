@@ -129,7 +129,7 @@ void GroupedTaskQueue::Private::start(TaskPtr task)
         [this, id = task->id()](QFuture<void> = {})
         {
             NX_VERBOSE(this, "Task %1 finished", id);
-            executeInThread(q->thread(), [this]() { scheduleNext(); });
+            executeInThread(q->thread(), nx::utils::guarded(q, [this]() { scheduleNext(); }));
         });
 
     auto promise = std::make_shared<Promise>();
