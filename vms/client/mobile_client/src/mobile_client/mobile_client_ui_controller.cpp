@@ -93,10 +93,12 @@ QnMobileClientUiController::QnMobileClientUiController(
                 return;
 
             nx::vms::client::core::appContext()->coreSettings()->lastConnection = {};
+            const QString user =
+                nx::vms::client::core::appContext()->cloudStatusWatcher()->cloudLogin();
 
             if (errorCode == RemoteConnectionErrorCode::truncatedSessionToken
                 && windowContext()->uiController()->screens()->showCloudLoginScreen(
-                    /*reauthentication*/ true))
+                    /*reauthentication*/ true, user))
             {
                 connect(nx::vms::client::core::appContext()->cloudStatusWatcher(),
                     &nx::vms::client::core::CloudStatusWatcher::credentialsChanged,

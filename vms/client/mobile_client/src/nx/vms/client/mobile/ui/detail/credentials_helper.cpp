@@ -81,11 +81,11 @@ core::OauthClient* CredentialsHelper::createOauthClient(
     const auto result = new core::OauthClient(type, core::OauthViewType::mobile, /*cloudSystem*/ {},
         kRefreshTokenLifetime);
 
-    if (!token.isEmpty())
-    {
-        result->setCredentials(nx::network::http::Credentials(
-            user.toStdString(), nx::network::http::BearerAuthToken(token.toStdString())));
-    }
+    result->setCredentials(nx::network::http::Credentials(
+        user.toStdString(),
+        token.isEmpty()
+            ? nx::network::http::AuthToken{}
+            : nx::network::http::BearerAuthToken(token.toStdString())));
 
     connect(result, &core::OauthClient::authDataReady, this,
         [result, forced]()

@@ -26,10 +26,11 @@ bool Screens::show2faValidationScreen(const network::http::Credentials& credenti
     return QmlWrapperHelper::showScreen(windowContext(), kLoginScreenUrl, properties) == "success";
 }
 
-bool Screens::showCloudLoginScreen(bool reauthentication) const
+bool Screens::showCloudLoginScreen(bool reauthentication, const QString& user) const
 {
     QVariantMap properties;
     properties["forced"] = reauthentication;
+    properties["user"] = user;
     return QmlWrapperHelper::showScreen(windowContext(), kLoginScreenUrl, properties) == "success";
 }
 
