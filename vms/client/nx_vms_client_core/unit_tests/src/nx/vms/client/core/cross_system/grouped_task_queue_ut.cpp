@@ -37,7 +37,7 @@ public:
 
 void GroupQueueTest::SetUp()
 {
-    QTimer::singleShot(kTimeout,
+    QTimer::singleShot(kTimeout, &m_eventLoop,
         [this]()
         {
             m_eventLoop.quit();
