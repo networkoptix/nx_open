@@ -26,6 +26,8 @@ struct TwoWayAudioController::Private
     Private(TwoWayAudioController* q);
     void setStarted(bool value);
     bool setActive(bool active, OperationCallback&& callback = OperationCallback());
+    bool setActive_6_0(bool active, OperationCallback&& callback = OperationCallback());
+    bool setActiveActual(bool active, OperationCallback&& callback = OperationCallback());
 
     TwoWayAudioController* const q;
     OrderedRequestsHelper orderedRequestsHelper;
@@ -64,6 +66,15 @@ bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& 
     if (!available)
         return false;
 
+    const auto serverVersion = q->connection()->moduleInformation().version;
+    if (serverVersion < nx::utils::SoftwareVersion(6, 1))
+        return setActive_6_0(active, std::move(callback)); // To support servers 6.0 and before.
+    else
+        return setActiveActual(active, std::move(callback));
+}
+
+bool TwoWayAudioController::Private::setActiveActual(bool active, OperationCallback&& callback)
+{
     const auto targetResource = availabilityWatcher->audioOutputDevice();
     if (!NX_ASSERT(targetResource))
         return false;
@@ -94,6 +105,31 @@ bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& 
             callback(true);
     }
     return true;
+}
+
+bool TwoWayAudioController::Private::setActive_6_0(bool active, OperationCallback&& callback)
+{
+    const auto targetResource = availabilityWatcher->audioOutputDevice();
+    if (!NX_ASSERT(targetResource))
+        return false;
+
+    nx::network::rest::Params params;
+    params.insert("clientId", sourceId);
+    params.insert("resourceId", targetResource->getId().toSimpleString());
+    params.insert("action", active ? "start" : "stop");
+
+    const auto requestCallback = nx::utils::guarded(q,
+        [this, active, callback](
+            bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& result)
+        {
+            const bool ok = success && result.errorId == nx::network::rest::ErrorId::ok;
+            setStarted(active && ok);
+            if (callback)
+                callback(ok);
+        });
+
+    return orderedRequestsHelper.postJsonResult(q->connectedServerApi(),
+        "/api/transmitAudio", params, requestCallback, QThread::currentThread());
 }
 
 //--------------------------------------------------------------------------------------------------
