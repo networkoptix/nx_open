@@ -13,12 +13,21 @@ namespace test {
 
 TEST(Upnp, Urn)
 {
-    const auto id = lit("SomeUpnpId");
-    const auto urn = toUpnpUrn(id, lit("xxx"));
-    EXPECT_EQ(urn, lit("urn:schemas-upnp-org:xxx:SomeUpnpId:1"));
-
-    EXPECT_EQ(id, fromUpnpUrn(urn, lit("xxx")));
-    EXPECT_NE(id, fromUpnpUrn(urn, lit("yyy")));
+    const QString id = "SomeUpnpId";
+    const std::optional<int> versions[] = {std::nullopt, 1, 2};
+    for (const auto& version: versions)
+    {
+        const QString urn = version
+            ? toUpnpUrn(id, "xxx", *version)
+            : toUpnpUrn(id, "xxx");
+        const QString expected = NX_FMT("urn:schemas-upnp-org:xxx:SomeUpnpId:%1",
+            version.value_or(1));
+        EXPECT_EQ(urn, expected);
+        EXPECT_EQ(id, fromUpnpUrn(urn, u"xxx"));
+        EXPECT_EQ(id, fromUpnpUrn(urn, u"xxx", version.value_or(1)));
+        EXPECT_NE(id, fromUpnpUrn(urn, u"xxx", version.value_or(1) + 1));
+        EXPECT_NE(id, fromUpnpUrn(urn, u"yyy"));
+    }
 }
 
 class TestSearchHandler:

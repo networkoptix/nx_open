@@ -44,13 +44,18 @@ public:
     //! Simple SOAP call
     struct NX_NETWORK_API Message
     {
+        using ParamsMap = std::map<QString, QString>;
+
         Message() = default;
-        Message(QString action, QString service):
-            action(std::move(action)), service(std::move(service)) {}
+        Message(QString action, QString service, ParamsMap params = {}):
+            action(std::move(action)),
+            service(std::move(service)),
+            params(std::move(params))
+        {}
 
         QString action;
         QString service;
-        std::map<QString, QString> params;
+        ParamsMap params;
 
         //! @returns whether message represents normal request/response or error
         //! NOTE: in case of error @var action and @var service are empty
@@ -126,6 +131,10 @@ public:
         MappingInfoCallback callback);
 
     void getAllMappings(const nx::Url& url, MappingInfoListCallback callback);
+
+    static std::optional<Message> parseResponse(
+        nx::network::http::StatusCode::Value statusCode,
+        const QByteArray& responseBody);
 
 private:
     static ErrorCode getErrorCode(const Message& message);
