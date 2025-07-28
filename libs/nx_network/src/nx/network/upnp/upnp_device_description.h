@@ -11,7 +11,10 @@ static const QString kBasicDeviceType = "Basic";
 
 //Helper formatters "urn:schemas-upnp-org:service:ID:VERSION"
 QString NX_NETWORK_API toUpnpUrn(const QString& id, const QString& suffix, int version = 1);
-QString NX_NETWORK_API fromUpnpUrn(const QString& urn, const QString& suffix, int version = 1);
+QString NX_NETWORK_API fromUpnpUrn(
+    QStringView urn,
+    QStringView suffix,
+    std::optional<int> version = std::nullopt);
 
 //!Contains some info about discovered UPnP device
 struct NX_NETWORK_API DeviceInfo
