@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
+#include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
@@ -27,6 +28,14 @@ ServerAudioConnectionWatcher::ServerAudioConnectionWatcher(
     m_sessionManager(sessionManager)
 {
     const auto userWatcher = systemContext->userWatcher();
+
+    auto serverVersion = systemContext->moduleInformation().version;
+    if (serverVersion < nx::utils::SoftwareVersion(6, 1))
+    {
+        // To support servers 6.0 and before.
+        m_desktop.reset(new vms::client::core::DesktopAudioOnlyResource());
+        m_desktop->addToSystemContext(systemContext);
+    }
 
     connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, &ServerAudioConnectionWatcher::handleResourceAdded);
@@ -70,8 +79,11 @@ void ServerAudioConnectionWatcher::handleResourceAdded(const QnResourcePtr& reso
     {
         if (serverResource->getId() == m_remoteServerId)
         {
-            m_server = serverResource;
-            tryAddCurrentServerConnection();
+            if (m_server != serverResource)
+            {
+                m_server = serverResource;
+                tryAddCurrentServerConnection();
+            }
         }
     }
 }
