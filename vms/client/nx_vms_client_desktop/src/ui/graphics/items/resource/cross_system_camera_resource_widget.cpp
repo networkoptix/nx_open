@@ -67,6 +67,9 @@ QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
 {
     NX_ASSERT(d->crossSystemCamera);
     const auto systemId = d->crossSystemCamera->systemId();
+    appContext()->cloudCrossSystemManager()->setPriority(
+        systemId, core::CloudCrossSystemManager::Priority::high);
+
     d->context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
     connect(
         statusOverlayController(),
