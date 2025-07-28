@@ -15,16 +15,17 @@ QString toUpnpUrn(const QString& id, const QString& suffix, int version)
     return kUrnTemplate.arg(suffix, id, QString::number(version));
 }
 
-QString fromUpnpUrn(const QString& urn, const QString& suffix, int version)
+QString fromUpnpUrn(QStringView urn, QStringView suffix, std::optional<int> version)
 {
-    const auto split = urn.split(":");
+    const auto split = urn.split(':');
     if (split.size() == 5
-        && split[0] == "urn"
-        && split[1] == "schemas-upnp-org"
+        && split[0] == u"urn"
+        && split[1] == u"schemas-upnp-org"
         && split[2] == suffix
-        && split[4] == QString::number(version))
-        return split[3];
-
+        && (!version || split[4] == QString::number(*version)))
+    {
+        return split[3].toString();
+    }
     return QString();
 }
 
@@ -106,7 +107,7 @@ bool DeviceDescriptionHandler::charactersInDevice(const QString& ch)
     auto& lastDev = *m_deviceStack.back();
 
     if (m_paramElement == "deviceType")
-        lastDev.deviceType = fromUpnpUrn(ch, "device");
+        lastDev.deviceType = fromUpnpUrn(ch, u"device");
     else if (m_paramElement == "friendlyName")
         lastDev.friendlyName = ch;
     else if (m_paramElement == "manufacturer")
@@ -130,7 +131,7 @@ bool DeviceDescriptionHandler::charactersInDevice(const QString& ch)
 bool DeviceDescriptionHandler::charactersInService(const QString& ch)
 {
     if (m_paramElement == QLatin1String("serviceType"))
-        m_lastService->serviceType = fromUpnpUrn(ch, "service");
+        m_lastService->serviceType = fromUpnpUrn(ch, u"service");
     else if (m_paramElement == QLatin1String("serviceId"))
         m_lastService->serviceId = ch;
     else if (m_paramElement == QLatin1String("controlURL"))

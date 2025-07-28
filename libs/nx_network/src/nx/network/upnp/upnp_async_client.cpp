@@ -50,6 +50,24 @@ static const QString kNewPortMappingDescription("NewPortMappingDescription");
 static const QString kNewLeaseDuration("NewLeaseDuration");
 static const QString kNewRemoteHost("NewRemoteHost");
 
+// There are evidences that some routers send XMLs with broken namespaces, for example:
+// `<u:DeletePortMappingResponse xmlns:u0="urn:schemas-upnp-org:service:WANIPConnection:1">`.
+// This makes XML invalid, but we can workaround the known cases.
+const QXmlStreamNamespaceDeclarations& knownBrokenNamespaces()
+{
+    static const QXmlStreamNamespaceDeclarations namespaces =
+        []()
+        {
+            const QString urn = toUpnpUrn(AsyncClient::kWanIp, "service");
+            QXmlStreamNamespaceDeclarations namespaces;
+            // Add namespace prefixes here.
+            for (QString prefix: {"u"})
+                namespaces.emplaceBack(prefix, urn);
+            return namespaces;
+        }();
+    return namespaces;
+};
+
 // TODO: Move parsers to separate file.
 class UpnpMessageHandler
 {
@@ -70,8 +88,8 @@ public:
         const QStringView& localName,
         const QXmlStreamAttributes& /*attrs*/)
     {
-        if (localName == QLatin1String("xml") || localName == QLatin1String("Envelope"))
-            return true; // TODO: check attrs
+        if (isIgnoredElement(localName))
+            return true;
 
         m_awaitedValue = &m_message.params[localName.toString()];
         return true;
@@ -81,7 +99,7 @@ public:
         const QStringView& /*namespaceUri*/,
         const QStringView& /*localName*/)
     {
-        m_awaitedValue = 0;
+        m_awaitedValue = nullptr;
         return true;
     }
 
@@ -94,6 +112,17 @@ public:
     }
 
     const AsyncClient::Message& message() const { return m_message; }
+
+protected:
+    virtual QStringList ignoredElements() const
+    {
+        return {"xml", "Envelope", "Body"};
+    }
+
+    bool isIgnoredElement(QStringView name) const
+    {
+        return ignoredElements().contains(name, Qt::CaseInsensitive);
+    }
 
 protected:
     AsyncClient::Message m_message;
@@ -111,13 +140,11 @@ public:
         const QStringView& localName,
         const QXmlStreamAttributes& attrs) override
     {
-        if (localName == QLatin1String("Body"))
-            return true;
-
-        if (namespaceUri == QLatin1String("u") || namespaceUri.startsWith(QLatin1String("u:")))
+        static constexpr QStringView kResponseSuffix = u"Response";
+        if (localName.endsWith(kResponseSuffix))
         {
-            m_message.action = localName.toString();
-            m_message.service = fromUpnpUrn(namespaceUri.toString(), "service");
+            m_message.action = localName.chopped(kResponseSuffix.size()).toString();
+            m_message.service = fromUpnpUrn(namespaceUri.toString(), u"service");
             return true;
         }
 
@@ -130,20 +157,10 @@ class UpnpFailureHandler:
 {
     using base_type = UpnpMessageHandler;
 
-public:
-    virtual bool startElement(
-        const QStringView& namespaceUri,
-        const QStringView& localName,
-        const QXmlStreamAttributes& attrs) override
+protected:
+    virtual QStringList ignoredElements() const override
     {
-        if (localName == QLatin1String("Fault")
-            || localName == QLatin1String("UPnpError")
-            || localName == QLatin1String("detail"))
-        {
-            return true;
-        }
-
-        return base_type::startElement(namespaceUri, localName, attrs);
+        return base_type::ignoredElements() + QStringList{"Fault", "UPnPError", "detail"};
     }
 };
 
@@ -242,29 +259,18 @@ void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
             m_httpClients.erase(ptr);
         }
 
+        std::optional<Message> result;
         if (auto resp = ptr->response())
         {
-            const auto status = resp->statusLine.statusCode;
-            const bool success = (status >= 200 && status < 300);
-
-            std::unique_ptr<UpnpMessageHandler> xmlHandler;
-            if (success)
-                xmlHandler.reset(new UpnpSuccessHandler);
-            else
-                xmlHandler.reset(new UpnpFailureHandler);
-
-            QXmlStreamReader reader(toByteArray(ptr->fetchMessageBodyBuffer()));
-            if (nx::utils::parseXml(reader, *xmlHandler))
-            {
-                callback(xmlHandler->message());
-                return;
-            }
+            result = parseResponse(
+                resp->statusLine.statusCode,
+                ptr->fetchMessageBodyBuffer().toByteArray());
         }
 
-        NX_ERROR(this, nx::format("Could not parse message from %1").arg(
-            url.toString(QUrl::RemovePassword)));
+        if (!result)
+            NX_ERROR(this, "Could not parse message from %1", url.toString(QUrl::RemovePassword));
 
-        callback(Message());
+        callback(result.value_or(Message()));
     };
 
     NX_MUTEX_LOCKER lk(&m_mutex);
@@ -418,6 +424,22 @@ void AsyncClient::processMappingResponse(
     {
         callback(nx::utils::unexpected(getErrorCode(response)));
     }
+}
+
+std::optional<AsyncClient::Message> AsyncClient::parseResponse(
+    nx::network::http::StatusCode::Value statusCode, const QByteArray& responseBody)
+{
+    std::unique_ptr<UpnpMessageHandler> xmlHandler;
+    if (nx::network::http::StatusCode::isSuccessCode(statusCode))
+        xmlHandler = std::make_unique<UpnpSuccessHandler>();
+    else
+        xmlHandler = std::make_unique<UpnpFailureHandler>();
+
+    QXmlStreamReader reader(responseBody);
+    reader.addExtraNamespaceDeclarations(knownBrokenNamespaces());
+    if (nx::utils::parseXml(reader, *xmlHandler))
+        return xmlHandler->message();
+    return std::nullopt;
 }
 
 } // namespace nx::network::upnp
