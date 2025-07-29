@@ -23,6 +23,7 @@ public:
     virtual void clear() override;
 
 private:
+    void updateCodecParameters(const uint8_t* data, int size, bool extraData);
 
 private:
     CodecParametersConstPtr m_codecParameters;
