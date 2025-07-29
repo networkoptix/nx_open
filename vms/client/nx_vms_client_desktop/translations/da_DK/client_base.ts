@@ -2548,7 +2548,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>N/A</source>
-      <translation type="unfinished">N/A</translation>
+      <translation>Ikke tilgængelig</translation>
     </message>
     <message>
       <source>Every %1</source>
@@ -4653,7 +4653,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>N/A</source>
-      <translation type="unfinished">N/A</translation>
+      <translation>Ikke tilgængelig</translation>
     </message>
   </context>
   <context>
@@ -7085,7 +7085,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Redigere indstillinger</translation>
     </message>
     <message>
       <source>View Live</source>
@@ -7113,7 +7113,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit Settings.</source>
-      <translation type="unfinished">Edit Settings.</translation>
+      <translation>Redigere indstillinger.</translation>
     </message>
   </context>
   <context>
