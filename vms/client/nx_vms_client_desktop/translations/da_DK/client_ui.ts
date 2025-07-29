@@ -1790,7 +1790,7 @@
     </message>
     <message>
       <source>Language</source>
-      <translation type="unfinished">Language</translation>
+      <translation>Sprog</translation>
     </message>
     <message>
       <source>Time Mode</source>
