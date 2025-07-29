@@ -105,6 +105,7 @@ public:
         RequestContext requestContext,
         CompletionFuncRefType completionFunc) const
     {
+        using namespace std::chrono;
         applyModRewrite(&requestContext.request.requestLine.url);
 
         auto handlerContext = getHandler(
@@ -128,10 +129,13 @@ public:
         m_runningRequestCounter->increment();
 
         const auto handlerPtr = handlerContext->handler.get();
-        auto requestProcessStartTime = std::chrono::steady_clock::now();
+        auto requestProcessStartTime = steady_clock::now();
 
         const int seq = ++m_requestSeq;
-        m_activeRequests.emplace(seq, requestContext.request.requestLine.toString());
+        m_activeRequests.emplace(seq,
+            ActiveRequest{requestContext.request.requestLine.toString(),
+                requestContext.traceContext ? requestContext.traceContext->traceId : "",
+                requestProcessStartTime});
 
         handlerPtr->serve(
             std::move(requestContext),
@@ -140,7 +144,7 @@ public:
                 requestProcessStartTime, statisticsKey = std::move(statisticsKey)](
                     RequestResult result) mutable
             {
-                using namespace std::chrono;
+
                 recordStatistics(
                     result,
                     statisticsKey,
@@ -187,6 +191,13 @@ protected:
         std::string pathTemplate;
     };
 
+    struct ActiveRequest
+    {
+        std::string requestLine;
+        std::string traceId;
+        std::chrono::steady_clock::time_point startTime;
+    };
+
 protected:
     virtual void applyModRewrite(nx::Url* url) const = 0;
 
@@ -203,6 +214,7 @@ private:
         const RequestResult& result,
         const std::string& requestPathTemplate,
         std::chrono::microseconds processingTime) const;
+    void printActiveRequests() const;
 
 private:
     /**
@@ -218,7 +230,8 @@ private:
         std::string, server::RequestStatisticsCalculator
     > m_requestPathStatsCalculators;
 
-    mutable nx::utils::PartitionedConcurrentHashMap<int /*sequence*/, std::string> m_activeRequests;
+    mutable nx::utils::PartitionedConcurrentHashMap<int /*sequence*/, ActiveRequest>
+        m_activeRequests;
     mutable std::atomic<int> m_requestSeq{0};
     std::optional<std::chrono::milliseconds> m_linger = kDefaultLinger;
 };

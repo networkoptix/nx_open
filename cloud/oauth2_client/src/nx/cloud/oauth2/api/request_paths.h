@@ -18,6 +18,7 @@ static constexpr char kOauthSessionPath[] = "/oauth2/v1/session/{sessionId}";
 static constexpr char kAccountChangedEventHandler[] = "/oauth2/v1/accountUpdate";
 
 static constexpr char kHealthPath[] = "/maintenance/health";
+static constexpr char kMetricsPath[] = "/oauth2/statistics/metrics/";
 
 static constexpr char kApiPrefix[] = "/oauth2";
 static constexpr char kClientIdParam[] = "clientId";

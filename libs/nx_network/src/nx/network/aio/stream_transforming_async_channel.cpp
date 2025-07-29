@@ -4,6 +4,7 @@
 
 #include <sstream>
 
+#include <cpptrace/from_current.hpp>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
@@ -100,15 +101,18 @@ void StreamTransformingAsyncChannel::tryToCompleteUserTasks(
     {
         nx::utils::InterruptionFlag::Watcher watcher(&m_aioInterruptionFlag);
 
-        try
+        CPPTRACE_TRY
         {
             processTask(task.get());
         }
-        catch (const std::exception& e)
+        CPPTRACE_CATCH(const std::exception& e)
         {
             // NOTE: this may be already deleted here: it is tested by watcher.interrupted() below.
-            NX_DEBUG(typeid(StreamTransformingAsyncChannel), "%1. Exception caught while reporting "
-                "SSL I/O completion. %2", (void*) this, e.what());
+            NX_DEBUG(typeid(StreamTransformingAsyncChannel),
+                "%1. Exception caught while reporting "
+                "SSL I/O completion. %2",
+                e.what(),
+                cpptrace::from_current_exception().to_string(false));
         }
 
         if (watcher.interrupted())

@@ -2,6 +2,8 @@
 
 #include "http_message_dispatcher.h"
 
+#include <chrono>
+
 #include <nx/utils/string.h>
 
 namespace nx::network::http {
@@ -13,13 +15,7 @@ AbstractMessageDispatcher::AbstractMessageDispatcher():
 
 AbstractMessageDispatcher::~AbstractMessageDispatcher()
 {
-    auto activeRequests = m_activeRequests.takeAll();
-
-    if (!activeRequests.empty())
-    {
-        NX_INFO(this, "Some requests are still running: %1",
-            nx::utils::join(activeRequests, "; ", [](const auto& val) { return val.second; }));
-    }
+    printActiveRequests();
 
     if (m_linger)
         NX_ASSERT(waitUntilAllRequestsCompleted(*m_linger));
@@ -120,6 +116,29 @@ void AbstractMessageDispatcher::recordStatistics(
 
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_statusCodesPerMinute[result.statusCode].add(1);
+}
+
+void AbstractMessageDispatcher::printActiveRequests() const
+{
+    using namespace std::chrono;
+    auto activeRequests = m_activeRequests.takeAll();
+
+    if (!activeRequests.empty())
+    {
+        NX_INFO(this,
+            "Some requests are still running: %1",
+            nx::utils::join(activeRequests,
+                "; ",
+                [](const auto& val)
+                {
+                    return nx::format("%1 - %2 [%3ms]")
+                        .args(val.second.traceId,
+                            val.second.requestLine,
+                            duration_cast<milliseconds>(steady_clock::now() - val.second.startTime)
+                                .count())
+                        .toStdString();
+                }));
+    }
 }
 
 } // namespace nx::network::http
