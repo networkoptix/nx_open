@@ -4,6 +4,7 @@
 
 #include <QTimer>
 
+#include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
 #include <nx/vms/client/desktop/common/widgets/table_view.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
@@ -47,6 +48,7 @@ private:
     QScopedPointer<Ui::LogsManagementWidget> ui;
     QPointer<LogsManagementWatcher> m_watcher;
     bool needUpdateBeforeClosing = false;
+    LoadingIndicatorPtr m_loadingIndicator;
 
     QTimer m_delayUpdateTimer;
 };

@@ -49,4 +49,6 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
+using LoadingIndicatorPtr = std::shared_ptr<LoadingIndicator>;
+
 } // namespace nx::vms::client::desktop

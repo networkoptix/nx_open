@@ -77,7 +77,8 @@ LogsManagementWidget::LogsManagementWidget(
     base_type(parent),
     SystemContextAware(context),
     ui(new Ui::LogsManagementWidget),
-    m_watcher(context->logsManagementWatcher())
+    m_watcher(context->logsManagementWatcher()),
+    m_loadingIndicator(new LoadingIndicator())
 {
     setupUi();
 
@@ -139,54 +140,50 @@ void LogsManagementWidget::setupUi()
 
     setWarningStyle(ui->errorLabel);
 
-    auto updateLoadingAnimation =
-        [this]()
-        {
-            auto model = ui->unitsTable->model();
-            for (int i = 0; i < model->rowCount(); ++i)
-            {
-                auto index = ui->unitsTable->model()->index(i, LogsManagementModel::StatusColumn);
-                ui->unitsTable->openPersistentEditor(index);
-            }
-        };
-
-    auto closeEditors =
-        [this]()
-        {
-            auto model = ui->unitsTable->model();
-            for (int i = 0; i < model->rowCount(); ++i)
-            {
-                auto index = ui->unitsTable->model()->index(i, LogsManagementModel::StatusColumn);
-                ui->unitsTable->closePersistentEditor(index);
-            }
-        };
-
     connect(
         m_watcher, &LogsManagementWatcher::stateChanged,
         this, &LogsManagementWidget::updateWidgets);
 
-    connect(
-        m_watcher, &LogsManagementWatcher::stateChanged,
-        this, updateLoadingAnimation);
+    auto updateStatusColumn =
+        [this]
+        {
+            const auto model = ui->unitsTable->model();
+            for (int row = 0; row < model->rowCount(); ++row)
+                ui->unitsTable->update(model->index(row, LogsManagementModel::StatusColumn));
+        };
+
+    connect(m_watcher, &LogsManagementWatcher::stateChanged, this,
+        [this, updateStatusColumn](nx::vms::client::desktop::LogsManagementWatcher::State state)
+        {
+            if (state == nx::vms::client::desktop::LogsManagementWatcher::State::loading)
+            {
+                connect(m_loadingIndicator.get(), &LoadingIndicator::frameChanged,
+                    this, updateStatusColumn);
+            }
+            else
+            {
+                disconnect(m_loadingIndicator.get(), nullptr, this, nullptr);
+                updateStatusColumn();
+            }
+        });
 
     connect(
         m_watcher, &LogsManagementWatcher::progressChanged, this,
-        [this, updateLoadingAnimation](double progress)
+        [this](double progress)
         {
             ui->progressBar->setValue(100 * progress); //< The range is [0..100].
             ui->downloadingPercentageLabel->setText(QString("%1%").arg((int)(100 * progress)));
-
-            updateLoadingAnimation();
         });
 
     ui->unitsTable->setModel(new LogsManagementModel(this, m_watcher));
-    ui->unitsTable->setItemDelegate(new LogsManagementTableDelegate(this));
+    ui->unitsTable->setItemDelegate(new LogsManagementTableDelegate(m_loadingIndicator, this));
 
     auto scrollBar = new SnappedScrollBar(this);
     ui->unitsTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    auto header = new CheckableHeaderView(LogsManagementModel::Columns::CheckBoxColumn,
-        this);
+    auto header = new CheckableHeaderView(LogsManagementModel::Columns::CheckBoxColumn, this);
+    header->setSectionResizeMode(QHeaderView::ResizeMode::Fixed);
+
     ui->unitsTable->setHorizontalHeader(header);
     header->setSectionResizeMode(
         LogsManagementModel::Columns::NameColumn, QHeaderView::Stretch);
@@ -254,10 +251,9 @@ void LogsManagementWidget::setupUi()
         });
 
     connect(ui->unitsTable->model(), &QAbstractTableModel::dataChanged,
-        [this, closeEditors](const QModelIndex& topLeft, const QModelIndex& bottomRight,
+        [this](const QModelIndex& topLeft, const QModelIndex& bottomRight,
             const QList<int>& )
         {
-            closeEditors();
             addTableWidgets(topLeft, bottomRight);
             update();
         });

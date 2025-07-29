@@ -173,7 +173,6 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
                     return unit->server()
                         ? QnResourceDisplayInfo(unit->server()).name()
                         : tr("Client");
-
             }
             break;
 
