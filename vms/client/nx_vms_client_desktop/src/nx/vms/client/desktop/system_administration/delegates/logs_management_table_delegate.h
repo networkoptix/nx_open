@@ -5,19 +5,22 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QStyledItemDelegate>
 
+#include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
 #include <nx/vms/client/desktop/system_administration/widgets/logs_management_widget.h>
 #include <ui/common/text_pixmap_cache.h>
 
 class QSvgRenderer;
+
 namespace nx::vms::client::desktop {
-class LoadingIndicator;
 
 class LogsManagementTableDelegate: public QStyledItemDelegate
 {
     using base_type = QStyledItemDelegate;
 
 public:
-    explicit LogsManagementTableDelegate(LogsManagementWidget* parent = nullptr);
+    explicit LogsManagementTableDelegate(
+        const LoadingIndicatorPtr& loadingIndicator,
+        LogsManagementWidget* parent = nullptr);
 
     virtual void paint(
         QPainter* painter,
@@ -40,7 +43,10 @@ private:
         const QStyleOptionViewItem& styleOption,
         const QModelIndex& index) const;
 
-    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    void paintStatusColumn(
+        QPainter* painter,
+        const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const;
 
     void drawText(const QModelIndex& index, QRect textRect, QStyle* style, QStyleOptionViewItem option, QPainter* painter, bool extra) const;
 
@@ -50,7 +56,7 @@ protected:
 private:
     mutable QnTextPixmapCache m_textPixmapCache;
     LogsManagementWidget* parentWidget = nullptr;
-    QScopedPointer<LoadingIndicator> m_loadingIndicator;
+    LoadingIndicatorPtr m_loadingIndicator;
 };
 
 } // namespace nx::vms::client::desktop
