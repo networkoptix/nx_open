@@ -821,7 +821,7 @@
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Opprett en organisasjon i Cloud Portal for å få tilgang til den her</translation>
     </message>
     <message>
       <source>The resources in this organization are not available to your permission group</source>
@@ -837,7 +837,7 @@
     </message>
     <message>
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
+      <translation>Ingen tilgjengelige systemer ble funnet. Be om tilgang til eksisterende systemer eller koble til en lokal server</translation>
     </message>
   </context>
   <context>
