@@ -62,7 +62,7 @@ Result checkTierLimit(
     const auto saasManager = systemContext->saasServiceManager();
     std::optional<int> limit = saasManager->tierLimit(SaasTierLimitName::maxArchiveDays);
     if (limit.has_value() && (param.maxArchivePeriodS.count() < 0
-            || param.maxArchivePeriodS > std::chrono::days(*limit)))
+            || std::chrono::seconds(param.maxArchivePeriodS) > std::chrono::days(*limit)))
     {
         return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
             "Maximum number of archive seconds must be provided in range up to %1."),
