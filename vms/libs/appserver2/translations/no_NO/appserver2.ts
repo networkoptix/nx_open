@@ -341,7 +341,7 @@
     </message>
     <message>
       <source>Storage with the same url already exists</source>
-      <translation type="unfinished">Storage with the same url already exists</translation>
+      <translation>Lagring med samme Url finnes allerede</translation>
     </message>
   </context>
 </TS>
