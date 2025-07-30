@@ -345,6 +345,10 @@ void Player::Private::doPeriodicTasks()
         if (dataConsumer)
         {
             auto audio = dataConsumer->audioOutput();
+
+            if (q->isAudioOnlyMode() && audio && dataConsumer->isAudioEnabled())
+                setPosition(usecToMsec(audio->playbackPositionUsec()));
+
             if (audio && audio->currentBufferSizeUsec() > 0)
             {
                 gotDataTimer.restart();
