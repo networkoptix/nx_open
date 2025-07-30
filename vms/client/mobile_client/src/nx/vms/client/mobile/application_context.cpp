@@ -270,6 +270,9 @@ ApplicationContext::ApplicationContext(
 
 ApplicationContext::~ApplicationContext()
 {
+    if (d->mainSystemContext)
+        d->mainSystemContext->sessionManager()->resetSession();
+
     removeSystemContext(d->mainSystemContext.release());
 
     qmlEngine()->removeImageProvider("thumbnail");

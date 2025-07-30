@@ -22,7 +22,7 @@ void WaitingForQThreadToEmptyEventQueue::join()
     if (thread() == QThread::currentThread())
     {
         while (m_waitsDone < m_howManyTimesToWait)
-            qApp->processEvents();
+            qApp->sendPostedEvents();
     }
     else
     {

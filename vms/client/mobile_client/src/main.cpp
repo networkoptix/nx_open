@@ -395,7 +395,9 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
         testkitServer = std::make_unique<nx::vms::client::core::testkit::HttpServer>(port);
     }
 
-    int result = runApplication(&application);
+    const int result = runApplication(&application);
+
+    const auto deinitializationStartTime = steady_clock::now();
 
     // A workaround to ensure no cross-system connections are made after subsequent stopAll call.
     if (auto csw = applicationContext->cloudStatusWatcher())
@@ -409,6 +411,9 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     // Wait while deleteLater objects will be freed
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
     waitingForObjectsToBeFreed.join();
+
+    NX_ASSERT(duration_cast<seconds>(steady_clock::now() - deinitializationStartTime) < seconds(4),
+        "Application deinitialization takes too long which is inacceptable in iOS");
 
     return result;
 }
