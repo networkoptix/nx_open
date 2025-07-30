@@ -19,9 +19,7 @@ namespace ResourcePropertyKey {
 
 namespace Onvif {
 
-NX_VMS_COMMON_API extern const QString kMediaUrl;
 NX_VMS_COMMON_API extern const QString kDeviceUrl;
-NX_VMS_COMMON_API extern const QString kDeviceID;
 } // namespace Onvif
 
 namespace Server {

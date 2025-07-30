@@ -5,9 +5,7 @@
 namespace ResourcePropertyKey {
 namespace Onvif {
 
-const QString kMediaUrl("MediaUrl");
 const QString kDeviceUrl("DeviceUrl");
-const QString kDeviceID("DeviceID");
 
 } // namespace ResourcePropertyKey::Onvif
 
