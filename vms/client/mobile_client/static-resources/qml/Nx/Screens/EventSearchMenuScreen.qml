@@ -52,7 +52,7 @@ Page
             },
             {
                 "objectName": "analyticsSearchMenuButton",
-                "iconSource": "image://skin/20x20/Solid/airtransport_solid.svg",
+                "iconSource": "image://skin/20x20/Solid/object.svg",
                 "text": qsTr("Objects"),
                 "visible": windowContext.mainSystemContext?.hasSearchObjectsPermission,
                 "color": ColorTheme.colors.light4,
