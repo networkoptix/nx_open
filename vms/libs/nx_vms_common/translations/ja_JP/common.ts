@@ -1432,7 +1432,7 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation>データ同期のためのクラウドポーリングHTTPリクエストの間隔。</translation>
+      <translation>データ同期のためのクラウドポーリングHTTPリクエストの間隔</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
@@ -1552,7 +1552,7 @@
     </message>
     <message>
       <source>Disable Device vendors.</source>
-      <translation>デバイスベンダーを無効にする。</translation>
+      <translation>無効にするデバイスベンダー</translation>
     </message>
     <message>
       <source>Optimize Camera settings.</source>
