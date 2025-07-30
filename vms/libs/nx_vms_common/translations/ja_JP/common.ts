@@ -1421,7 +1421,7 @@
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation>デバイスベンダーを無効にする</translation>
+      <translation>無効にするデバイスベンダー</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
@@ -1677,7 +1677,7 @@
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation>VMSに保存されているデバイスパスワードを管理者に公開 (Webページ用)</translation>
+      <translation>VMSに保存されているデバイスパスワードを管理者に公開する (Webページ用)</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
@@ -1738,7 +1738,7 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation>データ同期のためのクラウドポーリングHTTPリクエストの間隔。</translation>
+      <translation>データ同期のためのクラウドポーリングHTTPリクエストの間隔</translation>
     </message>
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
