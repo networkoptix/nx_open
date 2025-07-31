@@ -341,7 +341,7 @@
     </message>
     <message>
       <source>Storage with the same url already exists</source>
-      <translation type="unfinished">Storage with the same url already exists</translation>
+      <translation>具有相同URL的儲存裝置已存在</translation>
     </message>
   </context>
 </TS>
