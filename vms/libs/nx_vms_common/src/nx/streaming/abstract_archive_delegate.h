@@ -65,7 +65,7 @@ public:
     Q_DECLARE_FLAGS(Flags, Flag)
 
     QnAbstractArchiveDelegate() = default;
-    virtual ~QnAbstractArchiveDelegate() override = default;
+    virtual ~QnAbstractArchiveDelegate() = default;
 
     virtual bool open(
         const QnResourcePtr& resource,

@@ -215,6 +215,7 @@ public:
         {
             NX_ASSERT(typeid(*existing) == typeid(*serializer),
                 "%1 Overriding %2 with %3", this, existing, serializer);
+            delete serializer;
             return;
         }
 

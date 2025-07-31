@@ -7,20 +7,18 @@
 #include "syncplay_wrapper.h"
 
 QnSyncPlayArchiveDelegate::QnSyncPlayArchiveDelegate(QnAbstractArchiveStreamReader* reader, QnArchiveSyncPlayWrapper* syncWrapper,
-                                                     QnAbstractArchiveDelegate* ownerDelegate):
+                                                     std::unique_ptr<QnAbstractArchiveDelegate> ownerDelegate):
     m_reader(reader),
     m_syncWrapper(syncWrapper),
-    m_ownerDelegate(ownerDelegate)
-    //m_usePrebuffer(false)
+    m_ownerDelegate(std::move(ownerDelegate))
 {
-    m_flags = ownerDelegate->getFlags();
+    m_flags = m_ownerDelegate->getFlags();
 }
 
 QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
 {
     if (m_syncWrapper)
         m_syncWrapper->erase(this);
-    delete m_ownerDelegate;
 }
 
 bool QnSyncPlayArchiveDelegate::open(const QnResourcePtr &resource,
@@ -73,22 +71,8 @@ void QnSyncPlayArchiveDelegate::setSpeed(qint64 displayTime, double value)
     m_ownerDelegate->setSpeed(displayTime, value);
 }
 
-/*
-void QnSyncPlayArchiveDelegate::jumpToPreviousFrame (qint64 time)
-{
-    m_reader->jumpToPreviousFrame(time);
-}
-
-void QnSyncPlayArchiveDelegate::jumpTo (qint64 time)
-{
-    m_reader->jumpTo(time);
-}
-*/
-
 qint64 QnSyncPlayArchiveDelegate::seek (qint64 time, bool findIFrame)
 {
-    //NX_MUTEX_LOCKER lock( &m_mutex );
-    //m_nextData.clear();
     return m_ownerDelegate->seek(time, findIFrame);
 }
 

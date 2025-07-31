@@ -134,17 +134,17 @@ QnAbstractStreamDataProvider* CameraResource::createDataProvider(Qn::ConnectionR
 
     const auto camera = toSharedPointer(this);
     const auto result = new QnArchiveStreamReader(camera);
-    const auto delegate = new QnRtspClientArchiveDelegate(result, "ClientCamera");
+    auto delegate = std::make_unique<QnRtspClientArchiveDelegate>(result, "ClientCamera");
 
     delegate->setCamera(camera);
-    result->setArchiveDelegate(delegate);
 
-    connect(delegate, &QnRtspClientArchiveDelegate::dataDropped,
+    connect(delegate.get(), &QnRtspClientArchiveDelegate::dataDropped,
         this, &CameraResource::dataDropped);
 
-    connect(delegate, &QnRtspClientArchiveDelegate::needUpdateTimeLine,
+    connect(delegate.get(), &QnRtspClientArchiveDelegate::needUpdateTimeLine,
         this, &CameraResource::footageAdded);
 
+    result->setArchiveDelegate(std::move(delegate));
     result->setRole(role);
     return result;
 }

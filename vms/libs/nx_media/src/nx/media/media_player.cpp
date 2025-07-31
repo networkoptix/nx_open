@@ -848,10 +848,10 @@ bool Player::Private::createArchiveReader()
 
     auto reader = std::make_unique<QnArchiveStreamReader>(resource);
 
-    QnAbstractArchiveDelegate* archiveDelegate;
+    std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate;
     if (isLocalFile)
     {
-        archiveDelegate = new QnAviArchiveDelegate();
+        archiveDelegate = std::make_unique<QnAviArchiveDelegate>();
     }
     else
     {
@@ -867,13 +867,13 @@ bool Player::Private::createArchiveReader()
         if (!NX_ASSERT(systemContext))
             return false;
 
-        auto rtspArchiveDelegate = new QnRtspClientArchiveDelegate(reader.get(), tag);
+        auto rtspArchiveDelegate = std::make_unique<QnRtspClientArchiveDelegate>(reader.get(), tag);
         rtspArchiveDelegate->setCamera(camera);
-        archiveDelegate = rtspArchiveDelegate;
+        archiveDelegate = std::move(rtspArchiveDelegate);
     }
 
     archiveReader = std::move(reader);
-    archiveReader->setArchiveDelegate(archiveDelegate);
+    archiveReader->setArchiveDelegate(std::move(archiveDelegate));
     if (!periods.isEmpty())
         archiveReader->setPlaybackMask(periods);
 

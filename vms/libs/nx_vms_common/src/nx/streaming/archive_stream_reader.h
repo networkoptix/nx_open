@@ -46,7 +46,10 @@ public:
      */
     QnArchiveStreamReader(const QnResourcePtr& dev);
 
-    virtual ~QnArchiveStreamReader() override;
+    virtual ~QnArchiveStreamReader();
+
+    // Manual open. Open will be called automatically on first data access
+    virtual bool open(AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
 
     virtual bool isSkippingFrames() const override;
 
@@ -144,7 +147,9 @@ public:
     void lock();
     void unlock();
 
-    virtual void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate) override;
+    virtual void setArchiveDelegate(std::unique_ptr<QnAbstractArchiveDelegate> delegate) override;
+    QnAbstractArchiveDelegate* getArchiveDelegate() const override;
+    std::unique_ptr<QnAbstractArchiveDelegate> releaseArchiveDelegate() override;
 
     virtual void startPaused(qint64 startTime) override;
 
@@ -225,6 +230,8 @@ private:
     int m_dataMarker;
     int m_newDataMarker;
     qint64 m_currentTimeHint;
+    std::unique_ptr<QnAbstractArchiveDelegate> m_delegate;
+    AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;
 
 private:
     bool m_bofReached;

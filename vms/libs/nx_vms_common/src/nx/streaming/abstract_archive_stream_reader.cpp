@@ -22,7 +22,6 @@ QnAbstractArchiveStreamReader::QnAbstractArchiveStreamReader(const QnResourcePtr
 QnAbstractArchiveStreamReader::~QnAbstractArchiveStreamReader()
 {
     stop();
-    delete m_delegate;
 }
 
 QnAbstractNavigator *QnAbstractArchiveStreamReader::navDelegate() const
@@ -58,20 +57,9 @@ void QnAbstractArchiveStreamReader::setNavDelegate(QnAbstractNavigator* navDeleg
     m_navDelegate = navDelegate;
 }
 
-QnAbstractArchiveDelegate* QnAbstractArchiveStreamReader::getArchiveDelegate() const
-{
-    return m_delegate;
-}
-
 void QnAbstractArchiveStreamReader::setCycleMode(bool value)
 {
     m_cycleMode = value;
-}
-
-bool QnAbstractArchiveStreamReader::open(AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
-{
-    m_archiveIntegrityWatcher = archiveIntegrityWatcher;
-    return m_delegate && m_delegate->open(resource(), archiveIntegrityWatcher);
 }
 
 void QnAbstractArchiveStreamReader::jumpToPreviousFrame(qint64 usec)
@@ -80,14 +68,6 @@ void QnAbstractArchiveStreamReader::jumpToPreviousFrame(qint64 usec)
         jumpTo(qMax(0ll, usec - 200 * 1000), usec-1);
     else
         jumpTo(usec, 0);
-}
-
-quint64 QnAbstractArchiveStreamReader::lengthUsec() const
-{
-    if (m_delegate)
-        return m_delegate->endTime() - m_delegate->startTime();
-    else
-        return AV_NOPTS_VALUE;
 }
 
 void QnAbstractArchiveStreamReader::addMediaFilter(const std::shared_ptr<AbstractMediaDataFilter>& filter)
