@@ -341,7 +341,7 @@
     </message>
     <message>
       <source>Storage with the same url already exists</source>
-      <translation type="unfinished">Storage with the same url already exists</translation>
+      <translation>Przestrzeń o tym samym adresie URL już istnieje</translation>
     </message>
   </context>
 </TS>

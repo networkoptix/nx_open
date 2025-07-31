@@ -7943,8 +7943,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>%1 的事件日誌 - 顯示前 %n 個事件。如需尋找特定事件，請調整日期範圍或套用其他篩選條件</numerusform>
       </translation>
     </message>
   </context>
