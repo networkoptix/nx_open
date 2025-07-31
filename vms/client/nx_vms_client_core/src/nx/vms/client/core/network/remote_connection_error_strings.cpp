@@ -252,6 +252,13 @@ public:
             }
 
             case RemoteConnectionErrorCode::forbiddenRequest:
+            {
+                return {
+                    tr("Failed to access site."),
+                    connectionError()
+                };
+            }
+
             case RemoteConnectionErrorCode::genericNetworkError:
             case RemoteConnectionErrorCode::internalError:
             case RemoteConnectionErrorCode::networkContentError:
