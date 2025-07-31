@@ -762,11 +762,8 @@ QString normalizeSpaces(const QString& input)
     return lastWasSpace ? result.left(result.length() - 1) : result;
 }
 
-QString quoteDelimitedTokens(const QString& input, const QStringList& delimiters)
+QStringList quoteDelimitedTokenList(const QString& input, const QStringList& delimiters)
 {
-    if (input.isEmpty())
-        return input;
-
     const auto processToken = [](const QString& token, int quoteCount)
     {
         if (token.isEmpty())
@@ -825,7 +822,14 @@ QString quoteDelimitedTokens(const QString& input, const QStringList& delimiters
     if (!currentToken.isEmpty())
         result << processToken(currentToken, quoteCount);
 
-    return result.join(" ");
+    return result;
+}
+
+QString quoteDelimitedTokens(const QString& input, const QStringList& delimiters)
+{
+    if (input.isEmpty())
+        return input;
+    return quoteDelimitedTokenList(input, delimiters).join(" ");
 }
 
 } // namespace nx::utils
