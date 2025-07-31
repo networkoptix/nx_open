@@ -135,6 +135,12 @@ struct NX_VMS_API BookmarkFilterBase
      * In case of several words are provided bookmark should contains all of them. If you need to
      * find bookmark by any of them it is needed to use OR (case sensitive) word as a delimiter.
      * For example: text="tag1 OR tag2".
+     * To search bookmarks by exact tag values add prefix "^" and suffix "$". In that mode tags
+     * have to be enclosed in double quotes and divided by AND or OR (case sensitive). Mixing
+     * AND and OR words is an error. Quotes can be omited for one word tags.
+     * Example: text=`^"first tag" AND "second tag"$` filters bookmarks that have both tags.
+     * Example: text=`^"first tag" OR "second tag"$` filters bookmarks that have any of tags.
+     * Example: text=`^tag123$` filters bookmarks that have tag "tag123".
     */
     QString text;
 
@@ -407,5 +413,20 @@ NX_REFLECTION_INSTRUMENT(BookmarkDescriptionRequest, BookmarkDescriptionRequest_
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkDescriptionRequest, (json), NX_VMS_API)
 
 using BookmarkTagCounts = std::map<QString /*tag*/, int /*count*/>;
+
+struct NX_VMS_API ExactTagSearchParser
+{
+    enum class Mode
+    {
+        allTags,
+        anyTag
+    };
+    Mode mode{Mode::anyTag};
+    std::vector<QString> tags;
+
+    static bool isExactTagFilter(const QString& text);
+
+    bool parse(const QString& textFilter);
+};
 
 } // namespace nx::vms::api

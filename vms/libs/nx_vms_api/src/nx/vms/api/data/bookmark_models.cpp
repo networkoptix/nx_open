@@ -105,4 +105,67 @@ QString BookmarkProtection::getDigest(
     return hasher.result().toHex();
 }
 
+bool ExactTagSearchParser::isExactTagFilter(const QString& text)
+{
+    return !text.isEmpty() && text.front() == '^' && text.back() == '$';
+}
+
+bool ExactTagSearchParser::parse(const QString& textFilter)
+{
+    if (!isExactTagFilter(textFilter))
+        return false;
+    auto text = textFilter.mid(1, textFilter.size() - 2);
+
+    const auto unquotedTag =
+        [](QString tag)
+        {
+            if (tag.size() >= 2 && tag.front() == '"' && tag.back() == '"')
+            {
+                return tag.mid(1, tag.size() - 2);
+            }
+            return tag;
+        };
+    const QStringList ops{"AND", "OR"};
+    bool expectValue = true;
+    std::optional<Mode> lastOp;
+    for (auto&& token: nx::utils::quoteDelimitedTokenList(text, ops))
+    {
+        if (ops.contains(token))
+        {
+            if (expectValue)
+                return false;
+            Mode curOp = (token == "AND") ? Mode::allTags : Mode::anyTag;
+            if (!lastOp)
+            {
+                lastOp = curOp;
+            }
+            else if (lastOp != curOp)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (!expectValue)
+                return false;
+            tags.emplace_back(unquotedTag(std::move(token)));
+        }
+
+        expectValue = !expectValue;
+    }
+    if (tags.empty())
+        return false;
+    // last AND or OR without value.
+    if (expectValue)
+        return false;
+    if (!lastOp)
+    {
+        if (tags.size() != 1u)
+            return false;
+        lastOp = Mode::anyTag;
+    }
+    mode = *lastOp;
+    return true;
+}
+
 } // namespace nx::vms::api

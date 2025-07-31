@@ -305,5 +305,7 @@ NX_UTILS_API std::string half(const std::string& str);
  * @return Formatted string with quoted tokens where needed
  */
 NX_UTILS_API QString quoteDelimitedTokens( const QString& input, const QStringList& delimiters);
+NX_UTILS_API QStringList quoteDelimitedTokenList(
+    const QString& input, const QStringList& delimiters);
 
 } // namespace nx::utils
