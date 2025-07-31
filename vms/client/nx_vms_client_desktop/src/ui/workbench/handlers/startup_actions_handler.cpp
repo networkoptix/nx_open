@@ -42,6 +42,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
+#include <nx/vms/client/desktop/system_logon/ui/oauth_login_dialog.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
@@ -120,36 +121,53 @@ struct StartupActionsHandler::Private
         if (!delayedLogonParameters)
             return;
 
-        if (!systems.empty() && qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)
-        {
-            // Patch logon data for autoconnect scenario.
-            if (delayedLogonParameters->connectScenario == ConnectScenario::autoConnect
-                && delayedLogonParameters->userType == nx::vms::api::UserType::cloud)
+        bool hidePreloader = true;
+        const auto resetLogonGuard = nx::utils::makeScopeGuard(
+            [this, &hidePreloader]
             {
-                if (const auto logonData = nx::vms::client::core::cloudLogonData(
-                    QString::fromStdString(delayedLogonParameters->address.address.toString())))
-                {
-                    delayedLogonParameters->address = logonData->address;
-                    delayedLogonParameters->expectedServerId = logonData->expectedServerId;
-                    delayedLogonParameters->expectedServerVersion =
-                        logonData->expectedServerVersion;
-                    delayedLogonParameters->expectedCloudSystemId =
-                        logonData->expectedCloudSystemId;
-                }
-            }
+                //FIXME: #amalov Add error message in case of invalid status.
+                resetDelayedLogon(hidePreloader);
+            });
 
-            q->menu()->trigger(
-                ConnectAction,
-                Parameters().withArgument(Qn::LogonDataRole, *delayedLogonParameters));
+        if (systems.empty() || qnCloudStatusWatcher->status() != core::CloudStatusWatcher::Online)
+            return;
 
-            // Preloader will be hidden by connect action.
-            resetDelayedLogon(/*hidePreloader*/ false);
-        }
-        else
+        if (delayedLogonParameters->connectScenario == ConnectScenario::connectUsingCommand
+            && delayedLogonParameters->userType == nx::vms::api::UserType::cloud
+            && delayedLogonParameters->credentials == nx::network::http::Credentials{})
         {
-            //FIXME: #amalov Add error message in case of invalid status.
-            resetDelayedLogon(/*hidePreloader*/ true);
+            CloudSystemConnectData connectData = {
+                .systemId = QString::fromStdString(delayedLogonParameters->address.address.toString()),
+                .connectScenario = ConnectScenario::connectUsingCommand};
+            q->menu()->trigger(
+                menu::ConnectToCloudSystemAction, {Qn::CloudSystemConnectDataRole, connectData});
+
+            hidePreloader = false;
+            return;
         }
+
+        // Patch logon data for autoconnect scenario.
+        if (delayedLogonParameters->connectScenario == ConnectScenario::autoConnect
+            && delayedLogonParameters->userType == nx::vms::api::UserType::cloud)
+        {
+            if (const auto logonData = nx::vms::client::core::cloudLogonData(
+                QString::fromStdString(delayedLogonParameters->address.address.toString())))
+            {
+                delayedLogonParameters->address = logonData->address;
+                delayedLogonParameters->expectedServerId = logonData->expectedServerId;
+                delayedLogonParameters->expectedServerVersion =
+                    logonData->expectedServerVersion;
+                delayedLogonParameters->expectedCloudSystemId =
+                    logonData->expectedCloudSystemId;
+            }
+        }
+
+        q->menu()->trigger(
+            ConnectAction,
+            Parameters().withArgument(Qn::LogonDataRole, *delayedLogonParameters));
+
+        // Preloader will be hidden by connect action.
+        hidePreloader = false;
     }
 
     void setDelayedLogon(std::unique_ptr<LogonData> logonParameters)
@@ -483,7 +501,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
 {
     using namespace nx::vms::utils;
 
-    if (!uri.isValid())
+    if (!uri.isValid(/*requireAuthForCloudSystemConnection*/ false))
         return false;
 
     if (uri.clientCommand != SystemUri::ClientCommand::Client)
@@ -502,8 +520,11 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     logonData.secondaryInstance = true;
     logonData.connectScenario = ConnectScenario::connectUsingCommand;
 
-    if (uri.userAuthType == nx::vms::utils::SystemUri::UserAuthType::cloud)
+    if (uri.userAuthType == nx::vms::utils::SystemUri::UserAuthType::cloud
+        || uri.hasCloudSystemAddress())
+    {
         logonData.userType = nx::vms::api::UserType::cloud;
+    }
 
     if (logonData.userType == nx::vms::api::UserType::cloud
         && logonData.credentials.authToken.empty())
@@ -642,6 +663,15 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
         authData = appContext()->coreSettings()->cloudAuthData();
         NX_DEBUG(
             this, "Loaded auth data, refresh token length: %1", authData.refreshToken.length());
+    }
+
+    if (authData.empty() && uri.hasCloudSystemAddress())
+    {
+        // Cloud system id is provided without auth data.
+        authData = OauthLoginDialog::login(
+            mainWindowWidget(),
+            tr("Login to %1", "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()),
+            OauthLoginDialog::LoginParams{.clientType = core::OauthClientType::loginCloud});
     }
 
     if (authData.empty())
