@@ -83,11 +83,6 @@ public:
     QnConstResourceVideoLayoutPtr videoLayout() const;
 
     /**
-     * \returns                         Length of this display, in microseconds. If the length is not defined, returns -1.
-     */
-    qint64 lengthUSec() const;
-
-    /**
      * \returns                         Current time of this display, in microseconds. If the time is not defined, returns -1.
      */
     qint64 currentTimeUSec() const;

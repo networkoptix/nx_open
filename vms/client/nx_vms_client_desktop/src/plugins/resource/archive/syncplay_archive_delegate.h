@@ -19,7 +19,7 @@ public:
     QnSyncPlayArchiveDelegate(
         QnAbstractArchiveStreamReader* reader,
         QnArchiveSyncPlayWrapper* syncWrapper,
-        QnAbstractArchiveDelegate* ownerDelegate);
+        std::unique_ptr<QnAbstractArchiveDelegate> ownerDelegate);
     virtual ~QnSyncPlayArchiveDelegate() override;
 
     virtual bool open(
@@ -64,5 +64,5 @@ private:
     //QnAbstractMediaDataPtr m_nextData;
     QnAbstractArchiveStreamReader* m_reader;
     QPointer<QnArchiveSyncPlayWrapper> m_syncWrapper;
-    QnAbstractArchiveDelegate* m_ownerDelegate;
+    std::unique_ptr<QnAbstractArchiveDelegate> m_ownerDelegate;
 };

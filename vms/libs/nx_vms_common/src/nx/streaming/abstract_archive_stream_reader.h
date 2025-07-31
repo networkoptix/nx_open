@@ -22,24 +22,20 @@ class NX_VMS_COMMON_API QnAbstractArchiveStreamReader:
 
 public:
     QnAbstractArchiveStreamReader(const QnResourcePtr& resource);
-    virtual ~QnAbstractArchiveStreamReader() override;
+    virtual ~QnAbstractArchiveStreamReader();
 
     QnAbstractNavigator *navDelegate() const;
     void setNavDelegate(QnAbstractNavigator* navDelegate);
 
-    QnAbstractArchiveDelegate* getArchiveDelegate() const;
+    virtual QnAbstractArchiveDelegate* getArchiveDelegate() const = 0;
+    virtual std::unique_ptr<QnAbstractArchiveDelegate> releaseArchiveDelegate() = 0;
 
     virtual bool isSingleShotMode() const = 0;
 
     // Manual open. Open will be called automatically on first data access
-    bool open(AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher);
+    virtual bool open(AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) = 0;
 
     virtual bool isSkippingFrames() const = 0;
-
-    /**
-     * \returns                         Length of archive, in microseconds.
-     */
-    quint64 lengthUsec() const;
 
     void jumpToPreviousFrame(qint64 usec);
 
@@ -88,7 +84,7 @@ public:
     virtual MediaQuality getQuality() const = 0;
     virtual AVCodecID getTranscodingCodec() const = 0;
 
-    virtual void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate) = 0;
+    virtual void setArchiveDelegate(std::unique_ptr<QnAbstractArchiveDelegate> delegate) = 0;
 
     virtual void run() override;
 
@@ -131,11 +127,10 @@ signals:
     void prevFrameOccurred();
     void skipFramesTo(qint64 usec);
     void waitForDataCanBeAccepted();
+
 protected:
-    AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;
     bool m_cycleMode = false;
     qint64 m_needToSleep = 0;
-    QnAbstractArchiveDelegate* m_delegate = nullptr;
     QnAbstractNavigator* m_navDelegate = nullptr;
     nx::MoveOnlyFunc<void()> m_noDataHandler;
 

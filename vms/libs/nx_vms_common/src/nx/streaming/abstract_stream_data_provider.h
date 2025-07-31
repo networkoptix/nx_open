@@ -23,7 +23,7 @@ class NX_VMS_COMMON_API QnAbstractStreamDataProvider:
     Q_OBJECT
 public:
     QnAbstractStreamDataProvider();
-    virtual ~QnAbstractStreamDataProvider() override;
+    virtual ~QnAbstractStreamDataProvider();
 
     virtual bool dataCanBeAccepted() const;
 

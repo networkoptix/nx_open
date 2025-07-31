@@ -137,10 +137,6 @@ QnConstResourceVideoLayoutPtr QnResourceDisplay::videoLayout() const {
     return m_mediaResource->getVideoLayout(m_mediaProvider);
 }
 
-qint64 QnResourceDisplay::lengthUSec() const {
-    return m_archiveReader == nullptr ? -1 : m_archiveReader->lengthUsec();
-}
-
 qint64 QnResourceDisplay::currentTimeUSec() const
 {
     if (!m_camDisplay)

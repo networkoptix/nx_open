@@ -87,7 +87,7 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProvider(Qn::ConnectionRo
         return new QnSingleShotFileStreamreader(toSharedPointer());
 
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
-    result->setArchiveDelegate(createArchiveDelegate());
+    result->setArchiveDelegate(std::unique_ptr<QnAbstractArchiveDelegate>(createArchiveDelegate()));
     return result;
 }
 

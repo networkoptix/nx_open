@@ -112,6 +112,12 @@ QnArchiveStreamReader::~QnArchiveStreamReader()
     m_frameTypeExtractor = 0;
 }
 
+bool QnArchiveStreamReader::open(AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
+{
+    m_archiveIntegrityWatcher = archiveIntegrityWatcher;
+    return m_delegate && m_delegate->open(resource(), archiveIntegrityWatcher);
+}
+
 void QnArchiveStreamReader::nextFrame()
 {
     if (m_navDelegate) {
@@ -1384,14 +1390,24 @@ void QnArchiveStreamReader::unlock()
     m_jumpMtx.unlock();
 }
 
-void QnArchiveStreamReader::setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate)
+void QnArchiveStreamReader::setArchiveDelegate(std::unique_ptr<QnAbstractArchiveDelegate> delegate)
 {
-    m_delegate = contextDelegate;
+    m_delegate = std::move(delegate);
     if (m_endOfPlaybackHandler)
         m_delegate->setEndOfPlaybackHandler(m_endOfPlaybackHandler);
 
     if (m_errorHandler)
         m_delegate->setErrorHandler(m_errorHandler);
+}
+
+QnAbstractArchiveDelegate* QnArchiveStreamReader::getArchiveDelegate() const
+{
+    return m_delegate.get();
+}
+
+std::unique_ptr<QnAbstractArchiveDelegate> QnArchiveStreamReader::releaseArchiveDelegate()
+{
+    return std::move(m_delegate);
 }
 
 void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)

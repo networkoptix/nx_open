@@ -282,7 +282,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* r
     d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
     //reader->setEnabled(d->enabled);
 
-    reader->setArchiveDelegate(new QnSyncPlayArchiveDelegate(reader, this, reader->getArchiveDelegate()));
+    reader->setArchiveDelegate(std::make_unique<QnSyncPlayArchiveDelegate>(reader, this, reader->releaseArchiveDelegate()));
     reader->setCycleMode(false);
 
     connect(reader, &QnAbstractArchiveStreamReader::beforeJump, this,
