@@ -891,14 +891,14 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
                 }
             }
 
-            if (const auto v = request->apiVersion(); !NX_ASSERT(v) || *v < 3)
-                return;
-
-            const bool isStrict = request->params().value("_strict", "false") != "false";
-            if (isStrict)
+            if (const auto v = request->apiVersion(); NX_ASSERT(v) && *v > 2)
             {
-                throw Exception::badRequest(nx::format(
-                    "Parameter '%1' is not allowed by the Schema.", unescapeName(unused[0])));
+                const bool isStrict = request->params().value("_strict", "false") != "false";
+                if (isStrict)
+                {
+                    throw Exception::badRequest(nx::format(
+                        "Parameter '%1' is not allowed by the Schema.", unescapeName(unused[0])));
+                }
             }
 
             if (params)
