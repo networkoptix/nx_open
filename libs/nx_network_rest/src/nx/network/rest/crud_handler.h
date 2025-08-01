@@ -157,7 +157,6 @@ protected:
     METHOD_CHECKER(getSubscriptionId);
     METHOD_CHECKER(flexibleIdToId);
     METHOD_CHECKER(fillMissingParams);
-    METHOD_CHECKER(fillMissingParamsForResponse);
     #undef METHOD_CHECKER
 
     virtual Response executeGet(const Request& request) override;
@@ -251,8 +250,6 @@ protected:
     Response responseById(Id id, const Request& request, ResponseAttributes responseAttributes = {})
     {
         auto resource = readById(id, request, &responseAttributes, ErrorId::internalServerError);
-        if constexpr (DoesMethodExist_fillMissingParamsForResponse<Derived>::value)
-            static_cast<Derived*>(this)->fillMissingParamsForResponse(&resource, request);
         return response(std::move(resource), request, std::move(responseAttributes));
     }
 
@@ -463,12 +460,6 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
             processGetRequest<detail::FunctionArgumentType<&Derived::read, 0>>(request);
         ResponseAttributes responseAttributes;
         auto list = call(&Derived::read, std::move(filter), request, &responseAttributes);
-        if constexpr (DoesMethodExist_fillMissingParamsForResponse<Derived>::value)
-        {
-            auto* d = static_cast<Derived*>(this);
-            for (auto& model: list)
-                d->fillMissingParamsForResponse(&model, request);
-        }
 
         // As of this writing `std::array<X, 1>` return type for `CrudHandler::read` implementation
         // is an ad hoc to allow returning a single element or to not unwrap an array that might
