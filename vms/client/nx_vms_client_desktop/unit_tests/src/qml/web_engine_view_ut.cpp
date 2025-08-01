@@ -10,6 +10,7 @@
 #include <QtCore/QObject>
 #include <QtQml/QQmlComponent>
 
+#include <client/client_module.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 
 #include "qml_test_environment.h"
@@ -17,7 +18,16 @@
 namespace nx::vms::client::desktop {
 namespace test {
 
-TEST(WebEngineViewTest, clipboardIsUnavailableWithoutUserAction)
+class WebEngineViewTest: public testing::Test
+{
+protected:
+    static void SetUpTestCase()
+    {
+        QnClientModule::initWebEngine();
+    }
+};
+
+TEST_F(WebEngineViewTest, clipboardIsUnavailableWithoutUserAction)
 {
     QmlTestEnvironment env;
     QQmlComponent webViewComponent(

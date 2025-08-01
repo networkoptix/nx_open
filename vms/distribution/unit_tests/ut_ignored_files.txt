@@ -22,6 +22,7 @@
 /bin/QtWebView/*
 !/bin/*plugin.so
 !/bin/*plugin.dll
+!/bin/*plugin.dylib
 
 /translations/*
 
