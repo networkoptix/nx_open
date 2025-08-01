@@ -1108,7 +1108,6 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{2-}/layouts/{layoutId}/items
      * Retrieves all Layout Items for the specified Layout record stored in the Site.
-     * %jsonrpc subscribe
      * %caption Get Layout Items
      * %ingroup Layouts
      * %param:string layoutId Layout unique id or logical id.
@@ -1118,7 +1117,6 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{2-}/layouts/{layoutId}/items/{id}
      * Retrieves the specified Layout Item for the specified Layout record stored in the Site.
-     * %jsonrpc subscribe
      * %caption Get Layout Item
      * %ingroup Layouts
      * %struct LayoutItemFilter

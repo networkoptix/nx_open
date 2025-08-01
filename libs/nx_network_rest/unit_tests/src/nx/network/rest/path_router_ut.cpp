@@ -177,13 +177,12 @@ TEST_F(PathRouterTest, Route)
                 }
                 std::unique_ptr<Request> request;
                 nx::network::http::Request httpRequest;
-                nx::json_rpc::Request jsonRpcRequest;
                 if (type == jsonRpc)
                 {
-                    jsonRpcRequest = nx::json_rpc::Request::create(
-                        /*id*/ {}, data.testPath[type].toStdString(), data.params.toJson());
                     request = std::make_unique<Request>(
-                        json_rpc::Context{jsonRpcRequest}, kSystemSession);
+                        json_rpc::Context{nx::json_rpc::Request::create(
+                            /*id*/ {}, data.testPath[type].toStdString(), data.params.toJson())},
+                        kSystemSession);
                 }
                 else
                 {

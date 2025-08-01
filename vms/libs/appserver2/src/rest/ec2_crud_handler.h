@@ -276,8 +276,12 @@ protected:
             auto etags = lock->getValue(request.userSession.access.userId);
             if (etags)
             {
-                nx::network::http::insertOrReplaceHeader(&responseAttributes->httpHeaders,
-                    {"ETag", nx::utils::toHex(etags->get().calculate(std::move(item)))});
+                const auto [etag, changed] = etags->get().calculate(std::move(item));
+                if (!changed && request.jsonRpcContext() && request.jsonRpcContext()->subscribed)
+                    return {};
+
+                nx::network::http::insertOrReplaceHeader(
+                    &responseAttributes->httpHeaders, {"ETag", nx::utils::toHex(etag)});
             }
             else
             {
@@ -362,9 +366,30 @@ protected:
     static QString subscriptionId(QString id) { return id; }
     static QString subscriptionId(const nx::Uuid& id) { return id.toSimpleString(); }
 
-    void notify(const QString& id, NotifyType notifyType)
+    void notify(
+        const QString& id,
+        NotifyType notifyType,
+        std::optional<nx::Uuid> user = {},
+        bool noEtag = false)
     {
-        SubscriptionHandler::notify(id, notifyType, /*data*/ {});
+        switch (notifyType)
+        {
+            case NotifyType::update:
+                using List = typename nx::utils::FunctionTraits<&Derived::read>::ReturnType;
+                using Data = typename List::value_type;
+                SubscriptionHandler::notifyWithPayload<Data>(id, notifyType, std::move(user),
+                    [this, id, noEtag](const auto& user)
+                    {
+                        return payloadForUpdate<Data>(id, user, noEtag);
+                    },
+                    [this](const auto& request) { return makePostProcessContext(request); },
+                    this->m_schemas.get());
+                break;
+            case NotifyType::delete_:
+                SubscriptionHandler::notifyWithPayload<DeleteInput>(id, notifyType, std::move(user),
+                    [this, id, noEtag](const auto& u) { return payloadForDelete(id, u, noEtag); });
+                break;
+        }
     }
 
 protected:
@@ -379,6 +404,81 @@ private:
             throw nx::network::rest::Exception::notFound(
                 NX_FMT("Object type %1 is not found", nx::reflect::json::serialize(id)));
         }
+    }
+
+    template<typename T>
+    nx::network::rest::json_rpc::Payload<T> payloadForUpdate(
+        const QString& id, const nx::Uuid& user, bool noEtag)
+    {
+        using namespace nx::network::rest;
+        json_rpc::Payload<T> result;
+        try
+        {
+            ResponseAttributes responseAttributes;
+            auto list = static_cast<Derived*>(this)->read(
+                {id}, payloadRequest(id, user), &responseAttributes);
+            if (!list.empty())
+            {
+                result.data = std::move(list.front());
+                if (!noEtag)
+                {
+                    if (auto it = responseAttributes.httpHeaders.find("ETag");
+                        it != responseAttributes.httpHeaders.end())
+                    {
+                        result.extensions.emplace().etag = it->second;
+                    }
+                }
+            }
+        }
+        catch (const Exception& e)
+        {
+            NX_VERBOSE(this, "Failed read() for notification %1: %2", id, e);
+        }
+        return result;
+    }
+
+    nx::network::rest::json_rpc::Payload<DeleteInput> payloadForDelete(
+        const QString& id, const nx::Uuid& user, bool noEtag)
+    {
+        using namespace nx::network::rest;
+        json_rpc::Payload<DeleteInput> result{DeleteInput{id}};
+        if (noEtag)
+            return result;
+
+        try
+        {
+            ResponseAttributes responseAttributes;
+            static_cast<Derived*>(this)->delete_(
+                {id}, payloadRequest(id, user), &responseAttributes);
+            if (auto it = responseAttributes.httpHeaders.find("ETag");
+                it != responseAttributes.httpHeaders.end())
+            {
+                result.extensions.emplace().etag = it->second;
+            }
+        }
+        catch (const Exception& e)
+        {
+            NX_VERBOSE(this, "Failed delete_() for notification %1: %2", id, e);
+        }
+        return result;
+    }
+
+    PostProcessContext makePostProcessContext(const nx::network::rest::Request& request) const
+    {
+        PostProcessContext result{request.params(), request.method(), request.decodedPath()};
+        if (!result.path.endsWith('}'))
+            result.path += "/{" + this->m_idParamName + '}';
+        for (const auto f: nx::reflect::listFieldNames<std::decay_t<Filter>>())
+            result.filters.remove(QString::fromStdString(std::string{f}));
+        if constexpr (requires { Filter::getDeprecatedFieldNames(); })
+        {
+            auto names = Filter::getDeprecatedFieldNames();
+            for (auto it = names->begin(); it != names->end(); ++it)
+                result.filters.remove(it.value());
+        }
+        result.defaultValueAction =
+            this->extractDefaultValueAction(&result.filters, request.apiVersion());
+        return result;
     }
 
     void notify(const QnAbstractTransaction& transaction)

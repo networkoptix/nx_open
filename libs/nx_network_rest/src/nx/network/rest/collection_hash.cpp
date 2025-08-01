@@ -29,14 +29,14 @@ static Hash combineHashes(const std::map<CollectionHash::ItemId, Hash>& hashes)
 
 } // namespace
 
-CollectionHash::Value CollectionHash::calculate(Item item)
+std::pair<CollectionHash::Value, bool /*changed*/> CollectionHash::calculate(Item item)
 {
     auto hash = calculateHash(std::move(item.raw));
     auto it = m_hashes.find(item.id);
     if (it != m_hashes.end())
     {
         if (it->second == hash)
-            return m_combinedHash + std::move(hash);
+            return {m_combinedHash + std::move(hash), /*changed*/ false};
 
         it->second = std::move(hash);
     }
@@ -44,7 +44,7 @@ CollectionHash::Value CollectionHash::calculate(Item item)
     {
         it = m_hashes.emplace(std::move(item.id), std::move(hash)).first;
     }
-    return (m_combinedHash = combineHashes(m_hashes)) + it->second;
+    return {(m_combinedHash = combineHashes(m_hashes)) + it->second, /*changed*/ true};
 }
 
 CollectionHash::Value CollectionHash::calculate(std::vector<Item> list)

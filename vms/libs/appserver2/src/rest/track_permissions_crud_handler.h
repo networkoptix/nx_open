@@ -10,7 +10,11 @@ public:
     TrackPermission(
         nx::vms::common::SystemContext* systemContext,
         nx::Uuid allAccessibleGroupId,
-        nx::network::rest::SubscriptionHandler* handler);
+        nx::MoveOnlyFunc<void(const QString& id,
+            nx::network::rest::Handler::NotifyType notifyType,
+            std::optional<nx::Uuid> user,
+            bool noEtag)> notify);
+
     virtual ~TrackPermission();
     nx::utils::Guard trackPermissions(const nx::Uuid& user);
     void addAccessible(const QString& id);
@@ -48,19 +52,23 @@ public:
         QueryProcessor* queryProcessor,
         Args&&... args)
         :
-        TrackPermission(queryProcessor->systemContext(), allAccessibleGroupId, this),
+        TrackPermission(queryProcessor->systemContext(), allAccessibleGroupId,
+            [this](auto&&... args)
+            {
+                TrackPermissionCrudHandler::CrudHandler::notify(std::forward<decltype(args)>(args)...);
+            }),
         TrackPermissionCrudHandler::CrudHandler(queryProcessor, std::forward<Args>(args)...)
     {
     }
 
-    nx::utils::Guard addSubscription(const nx::network::rest::Request& request,
+    nx::utils::Guard addSubscription(nx::network::rest::Request request,
         nx::network::rest::Handler::SubscriptionCallback callback)
     {
+        const auto userId = request.userSession.access.userId;
         std::vector<nx::utils::Guard> guards;
-        guards.push_back(
-            TrackPermissionCrudHandler::CrudHandler::SubscriptionHandler::addSubscription(
-                request, std::move(callback)));
-        guards.push_back(trackPermissions(request.userSession.access.userId));
+        guards.push_back(TrackPermissionCrudHandler::CrudHandler::addSubscription(
+            std::move(request), std::move(callback)));
+        guards.push_back(trackPermissions(userId));
         return {[guards = std::move(guards)]() mutable { guards.clear(); }};
     }
 
@@ -75,7 +83,6 @@ public:
                 removeAccessible(id);
                 break;
         }
-        TrackPermissionCrudHandler::CrudHandler::SubscriptionHandler::notify(
-            id, notifyType, /*data*/ {});
+        TrackPermissionCrudHandler::CrudHandler::notify(id, notifyType);
     }
 };
