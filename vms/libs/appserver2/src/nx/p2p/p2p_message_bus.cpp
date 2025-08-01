@@ -86,15 +86,6 @@ struct GotUnicastTransactionFuction
     }
 };
 
-static bool canSendJsonTransactionWithHeader(const PeerDataEx& remotePeer)
-{
-    if (remotePeer.isClient())
-        return true;
-
-    auto string = std::to_string(remotePeer.protoVersion);
-    return string.size() > 2 && string[0] >= '6' && string[1] >= '1';
-}
-
 // ---------------------- P2pMessageBus --------------
 
 MessageBus::MessageBus(
@@ -1105,7 +1096,6 @@ void MessageBus::sendTransactionImpl(
         }
         else
         {
-            NX_ASSERT(canSendJsonTransactionWithHeader(connection->remotePeer()));
             TransportHeader header(transportHeader);
             header.via.insert(localPeer().id);
             connection->sendTransaction(tran, MessageType::pushImpersistentBroadcastTransaction,
@@ -1804,7 +1794,6 @@ bool MessageBus::sendUnicastTransactionImpl(
             switch (connection->remotePeer().dataFormat)
             {
                 case Qn::SerializationFormat::json:
-                    NX_ASSERT(canSendJsonTransactionWithHeader(connection->remotePeer()));
                     connection->sendTransaction(
                         tran, MessageType::pushImpersistentUnicastTransaction,
                         m_jsonTranSerializer->serializedTransactionWithHeader(

@@ -458,9 +458,15 @@ void ConnectionBase::setState(State state, const QString& reason)
 
 static constexpr std::string_view kJsonMessagePattern = "[00]";
 
+static bool isMessageTypeSupportedInJson(int protoVersion)
+{
+    auto string = std::to_string(protoVersion);
+    return string.size() > 2 && string[0] >= '6' && string[1] >= '1';
+}
+
 void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data)
 {
-    if (remotePeer().isClient())
+    if (localPeer().isClient() || remotePeer().isClient())
     {
         NX_ASSERT(messageType == MessageType::pushTransactionData);
         return sendMessage(data);
@@ -481,6 +487,7 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
     }
     else
     {
+        NX_ASSERT(isMessageTypeSupportedInJson(m_remotePeer.protoVersion));
         buffer.reserve((data.empty() ? 0 : data.size() + 1) + kJsonMessagePattern.size());
         buffer.append(kJsonMessagePattern.front());
         buffer.append('0' + (int) messageType / 10);
@@ -503,7 +510,7 @@ void ConnectionBase::sendMessage(MessageType messageType, const QByteArray& data
 MessageType ConnectionBase::getMessageType(
     const nx::Buffer& buffer, const nx::vms::api::PeerData& peer) const
 {
-    if (peer.isClient())
+    if (m_localPeer.isClient() || m_remotePeer.isClient())
         return MessageType::pushTransactionData;
 
     auto messageType = (qint8) MessageType::unknown;
@@ -685,7 +692,7 @@ void ConnectionBase::handleMessage(const nx::Buffer& message)
 #endif
 
     const auto messageType = getMessageType(message, localPeer());
-    if (messageType == MessageType::unknown || localPeer().isClient())
+    if (messageType == MessageType::unknown || m_localPeer.isClient() || m_remotePeer.isClient())
     {
         emit gotMessage(weakPointer(), messageType, message);
         return;
