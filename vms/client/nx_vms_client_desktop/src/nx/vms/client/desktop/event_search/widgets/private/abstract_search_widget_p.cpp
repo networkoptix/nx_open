@@ -202,7 +202,7 @@ AbstractSearchWidgetPrivate::AbstractSearchWidgetPrivate(
             [this]()
             {
                 auto newText = m_commonSetup->textFilter()->text();
-                if (m_textFilterEdit->text() != newText)
+                if (m_textFilterEdit->text().trimmed() != newText)
                     m_textFilterEdit->setText(newText);
             });
     }

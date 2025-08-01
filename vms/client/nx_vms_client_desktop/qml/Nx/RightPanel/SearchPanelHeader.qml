@@ -106,7 +106,8 @@ Column
 
             function onTextChanged()
             {
-                searchField.text = d.textFilter.text
+                if (searchField.text.trim() != d.textFilter.text)
+                    searchField.text = d.textFilter.text
             }
         }
 
