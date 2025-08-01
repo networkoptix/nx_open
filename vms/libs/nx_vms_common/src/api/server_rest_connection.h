@@ -589,7 +589,7 @@ public:
         const std::string& integrationUserSessionToken,
         const QString& path,
         const QByteArray& messageBody,
-        PostCallback&& callback,
+        Callback<ErrorOrEmpty>&& callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle getPluginInformation(

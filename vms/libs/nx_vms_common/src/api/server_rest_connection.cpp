@@ -1430,7 +1430,7 @@ Handle ServerConnection::postMetadata(
     const std::string& integrationUserSessionToken,
     const QString& path,
     const QByteArray& messageBody,
-    PostCallback&& callback,
+    Callback<ErrorOrEmpty>&& callback,
     nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRestRequest(
@@ -1440,7 +1440,7 @@ Handle ServerConnection::postMetadata(
 
     request.credentials = nx::network::http::BearerAuthToken(integrationUserSessionToken);
 
-    using Context = ResultContext<EmptyResponseType>;
+    using Context = ResultContext<ErrorOrEmpty>;
 
     return d->executeRequest(
         /*helper*/ nullptr,
