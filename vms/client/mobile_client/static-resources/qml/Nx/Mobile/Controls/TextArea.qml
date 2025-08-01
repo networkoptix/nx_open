@@ -7,7 +7,9 @@ import Nx.Core
 
 import nx.vms.client.mobile
 
-Flickable
+import "private"
+
+Item
 {
     id: control
 
@@ -15,64 +17,147 @@ Flickable
     property alias labelText: fieldBackground.labelText
     property alias text: textArea.text
     property alias readOnly: textArea.readOnly
+    property bool customSelection: Qt.platform.os == "android"
 
     implicitWidth: 268
     implicitHeight: Math.min(150, textArea.implicitHeight)
 
-    boundsBehavior: Flickable.StopAtBounds
-    flickableDirection: Flickable.VerticalFlick
-
-    TextArea.flickable: TextArea
+    Flickable
     {
-        id: textArea
+        id: flickable
 
-        wrapMode: TextArea.Wrap
+        anchors.fill: parent
 
-        topPadding: 30
-        leftPadding: 12
-        rightPadding: 12
+        boundsBehavior: Flickable.StopAtBounds
+        flickableDirection: Flickable.VerticalFlick
 
-        font.pixelSize: 16
-        font.weight: 500
-        color: enabled
-            ? ColorTheme.colors.light4
-            : ColorTheme.transparent(ColorTheme.colors.light4, 0.3)
-
-        background: FieldBackground
+        TextArea.flickable: TextArea
         {
-            id: fieldBackground
+            id: textArea
 
-            owner: textArea
+            wrapMode: TextArea.Wrap
+            persistentSelection: customSelection
+            selectByMouse: !customSelection
+            selectByKeyboard: !customSelection
+
+            topPadding: 30
+            leftPadding: 12
+            rightPadding: 12
+
+            font.pixelSize: 16
+            font.weight: 500
+            color: enabled
+                ? ColorTheme.colors.light4
+                : ColorTheme.transparent(ColorTheme.colors.light4, 0.3)
+
+            background: FieldBackground
+            {
+                id: fieldBackground
+
+                owner: textArea
+            }
+
+            focus: false
+
+            // Workaround for QTBUG-74055 - track cursor position correctly when we have
+            // top/bottom paddings set.
+            onCursorRectangleChanged:
+            {
+                // Maps position of root item in coordinates of flickable's contentItem.
+                const textAreaPos = textArea.mapToItem(flickable.contentItem, 0, 0)
+
+                var minY = textAreaPos.y
+                    + cursorRectangle.y
+                    + cursorRectangle.height
+                    + textArea.bottomPadding
+                    - flickable.height
+                var maxY = textAreaPos.y
+                    + cursorRectangle.y
+                    - textArea.topPadding
+
+                if (flickable.contentY >= maxY) //< Cursor is above top position.
+                    flickable.contentY = maxY
+                else if (flickable.contentY <= minY) // Cursor is below bottom position.
+                    flickable.contentY = minY
+            }
+
+            Component.onCompleted: TextInputWorkaround.setup(textArea)
         }
 
-        focus: false
-
-        // Workaround for QTBUG-74055 - track cursor position correctly when we have
-        // top/bottom paddings set.
-        onCursorRectangleChanged:
+        SmoothedAnimation on contentY
         {
-            // Maps position of root item in coordinates of flickable's contentItem.
-            const textAreaPos = textArea.mapToItem(control.contentItem, 0, 0)
-
-            var minY = textAreaPos.y
-                + cursorRectangle.y
-                + cursorRectangle.height
-                + textArea.bottomPadding
-                - control.height
-            var maxY = textAreaPos.y
-                + cursorRectangle.y
-                - textArea.topPadding
-
-            if (control.contentY >= maxY) //< Cursor is above top position.
-                control.contentY = maxY
-            else if (control.contentY <= minY) // Cursor is below bottom position.
-                control.contentY = minY
+            id: scrollingAnimation
         }
 
-        Component.onCompleted: TextInputWorkaround.setup(textArea)
+        function scrollTo(contentY)
+        {
+            scrollingAnimation.to = contentY
+            scrollingAnimation.restart()
+        }
+
+        function scrollToTextPosition(position)
+        {
+            const rect = textArea.positionToRectangle(position)
+
+            if (rect.top - textArea.topPadding < flickable.contentY)
+                flickable.scrollTo(rect.top - textArea.topPadding)
+            else if (rect.bottom - flickable.height + textArea.bottomPadding > flickable.contentY)
+                flickable.scrollTo(rect.bottom - flickable.height + textArea.bottomPadding)
+        }
+
+        // Update bounds to avoid QTBUG-60296 when initial position of text is wrong and shifted
+        // for the TextArea paddings twice.
+        Component.onCompleted: returnToBounds()
     }
 
-    // Update bounds to avoid QTBUG-60296 when initial position of text is wrong and shifted
-    // for the TextArea paddings twice.
-    Component.onCompleted: returnToBounds()
+    function selectText(start, end)
+    {
+        let focusPosition = null
+        if (textArea.selectionStart != start)
+            focusPosition = start
+        if (textArea.selectionEnd != end)
+            focusPosition = end
+
+        // Keep the current scroll position during selection, since scrolling is implemented using
+        // animation.
+        const currentY = flickable.contentY
+        textArea.select(start, end)
+        flickable.contentY = currentY
+
+        if (focusPosition)
+            flickable.scrollToTextPosition(focusPosition)
+    }
+
+    function selectWord(position)
+    {
+        // Keep the current scroll position during selection, since scrolling is implemented using
+        // animation.
+        const currentY = flickable.contentY
+        textArea.cursorPosition = position
+        textArea.selectWord()
+        flickable.contentY = currentY
+
+        flickable.scrollToTextPosition(position)
+    }
+
+    Loader
+    {
+        id: textSelectionArea
+
+        active: customSelection && textArea.activeFocus
+
+        anchors.fill: parent
+        anchors.topMargin: textArea.topPadding
+
+        sourceComponent: Component
+        {
+            TextSelectionArea
+            {
+                target: textArea
+                selectText: control.selectText
+                selectWord: control.selectWord
+                menuEnabled: !flickable.movingVertically
+            }
+        }
+    }
 }
