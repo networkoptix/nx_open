@@ -22,7 +22,7 @@ public:
         std::string raw;
     };
 
-    Value calculate(Item item);
+    std::pair<Value, bool /*changed*/> calculate(Item item);
     Value calculate(std::vector<Item> list);
     Value remove(const ItemId& id);
 

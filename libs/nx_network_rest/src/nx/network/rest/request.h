@@ -43,7 +43,7 @@ NX_REFLECTION_ENUM_CLASS(Subs,
 
 struct Context
 {
-    nx::json_rpc::Request& request;
+    nx::json_rpc::Request request;
     std::weak_ptr<nx::json_rpc::WebSocketConnection> connection;
     bool subscribed = false;
 
@@ -87,6 +87,30 @@ public:
         int serverPort = 0);
 
     Request(const nx::network::http::Request* httpRequest, std::optional<Content> content);
+
+    Request(Request&& r):
+        mutableUserSession(std::move(r.mutableUserSession)),
+        userSession(mutableUserSession),
+        foreignAddress(r.foreignAddress),
+        serverPort(r.serverPort),
+        isConnectionSecure(r.isConnectionSecure),
+        m_httpRequest(r.m_httpRequest),
+        m_jsonRpcContext(std::move(r.m_jsonRpcContext)),
+        m_urlParams(r.m_urlParams),
+        m_pathParams(r.m_pathParams),
+        m_method(std::move(r.m_method)),
+        m_content(std::move(r.m_content)),
+        m_httpHeaders(std::move(r.m_httpHeaders)),
+        m_url(std::move(r.m_url)),
+        m_decodedPath(std::move(r.m_decodedPath)),
+        m_paramsCache(std::move(r.m_paramsCache)),
+        m_responseFormat(r.m_responseFormat),
+        m_isConcreteIdProvided(r.m_isConcreteIdProvided),
+        m_apiVersion(std::move(r.m_apiVersion))
+    {
+    }
+
+    Request& operator=(Request&&) = delete;
 
     /**
      * Method from request, may be overwritten by:

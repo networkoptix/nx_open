@@ -578,10 +578,8 @@ TEST_P(OpenApiSchemaTest, TestUnusedWithEscape)
     const auto rpcMethod = NX_FMT("rest.%1.test_unused.create", GetParam()).toStdString();
     QJsonObject data;
     ASSERT_TRUE(QJson::deserialize(QByteArray{kTestJsonForUnused}, &data));
-    nx::json_rpc::Request jsonRpcRequest = nx::json_rpc::Request::create(
-        /*id*/ {}, rpcMethod, data);
-    auto requestWithRpc =
-        std::make_unique<Request>(json_rpc::Context{jsonRpcRequest}, kSystemSession);
+    auto requestWithRpc = std::make_unique<Request>(
+        json_rpc::Context{nx::json_rpc::Request::create(/*id*/ {}, rpcMethod, data)}, kSystemSession);
     requestWithRpc->setDecodedPathOrThrow(decodedPath);
     headers.clear();
     actualPaths.clear();

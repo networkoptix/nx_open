@@ -113,11 +113,10 @@ public:
     using SubscriptionCallback = nx::MoveOnlyFunc<void(
         const QString& id,
         NotifyType,
-        rapidjson::Document* payload,
-        std::optional<nx::Uuid> user,
-        bool noEtag)>;
+        rapidjson::Document* data,
+        rapidjson::Document* extensions)>;
 
-    virtual nx::utils::Guard subscribe(const Request&, SubscriptionCallback)
+    virtual nx::utils::Guard subscribe(Request, SubscriptionCallback)
     {
         return {};
     }

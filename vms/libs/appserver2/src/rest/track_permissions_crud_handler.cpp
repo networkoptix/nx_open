@@ -38,19 +38,26 @@ struct TrackPermission::Private
     TrackPermission* q;
     nx::vms::common::SystemContext* systemContext;
     nx::Uuid allAccessibleGroupId;
-    nx::network::rest::SubscriptionHandler* handler;
+    nx::MoveOnlyFunc<void(const QString& id,
+        nx::network::rest::Handler::NotifyType notifyType,
+        std::optional<nx::Uuid> user,
+        bool noEtag)>
+        notifyFunc;
     nx::Lockable<std::map<nx::Uuid, Subscription>> userSubscriptions;
 
     Private(
         TrackPermission* q,
         nx::vms::common::SystemContext* systemContext,
         nx::Uuid allAccessibleGroupId,
-        nx::network::rest::SubscriptionHandler* handler)
+        nx::MoveOnlyFunc<void(const QString& id,
+            nx::network::rest::Handler::NotifyType notifyType,
+            std::optional<nx::Uuid> user,
+            bool noEtag)> notify)
         :
         q(q),
         systemContext(systemContext),
         allAccessibleGroupId(std::move(allAccessibleGroupId)),
-        handler(handler)
+        notifyFunc(std::move(notify))
     {
     }
 
@@ -135,9 +142,9 @@ struct TrackPermission::Private
     Notification makeNotification(nx::Uuid user, QString id, NotifyType type) const
     {
         return
-            [this, user = std::move(user), id = std::move(id), type](bool noEtag)
+            [this, user = std::move(user), id = std::move(id), type](bool noEtag) mutable
             {
-                handler->notify(id, type, /*data*/ {}, user, noEtag);
+                notifyFunc(id, type, std::move(user), noEtag);
             };
     }
 
@@ -232,9 +239,13 @@ struct TrackPermission::Private
 TrackPermission::TrackPermission(
     nx::vms::common::SystemContext* systemContext,
     nx::Uuid allAccessibleGroupId,
-    nx::network::rest::SubscriptionHandler* handler)
+    nx::MoveOnlyFunc<void(const QString& id,
+        nx::network::rest::Handler::NotifyType notifyType,
+        std::optional<nx::Uuid> user,
+        bool noEtag)> notify)
     :
-    d(std::make_unique<Private>(this, systemContext, std::move(allAccessibleGroupId), handler))
+    d(std::make_unique<Private>(
+        this, systemContext, std::move(allAccessibleGroupId), std::move(notify)))
 {
 }
 
