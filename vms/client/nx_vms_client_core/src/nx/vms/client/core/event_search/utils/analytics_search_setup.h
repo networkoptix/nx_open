@@ -23,6 +23,14 @@ class NX_VMS_CLIENT_CORE_API AnalyticsSearchSetup: public QObject
     Q_PROPERTY(QStringList attributeFilters READ attributeFilters WRITE setAttributeFilters
         NOTIFY attributeFiltersChanged)
 
+    Q_PROPERTY(bool vectorizationSearchEnabled READ vectorizationSearchEnabled)
+
+    Q_PROPERTY(analytics::db::TextScope textSearchScope READ textSearchScope WRITE setTextSearchScope
+        NOTIFY textSearchScopeChanged)
+
+    Q_PROPERTY(nx::Uuid referenceTrackId READ referenceTrackId WRITE setReferenceTrackId
+        NOTIFY referenceTrackIdChanged)
+
     Q_PROPERTY(QRectF area READ area WRITE setArea NOTIFY areaChanged)
     Q_PROPERTY(bool isAreaSelected READ isAreaSelected NOTIFY areaChanged)
     Q_PROPERTY(bool areaEnabled READ areaEnabled NOTIFY areaEnabledChanged)
@@ -48,6 +56,14 @@ public:
     void setAttributeFilters(const QStringList& value);
     QString combinedTextFilter() const;
 
+    bool vectorizationSearchEnabled() const;
+
+    nx::analytics::db::TextScope textSearchScope() const;
+    void setTextSearchScope(nx::analytics::db::TextScope value);
+
+    nx::Uuid referenceTrackId() const;
+    void setReferenceTrackId(const nx::Uuid& value);
+
     QRectF area() const;
     void setArea(const QRectF& value);
     bool isAreaSelected() const;
@@ -69,6 +85,8 @@ public:
 signals:
     void objectTypesChanged();
     void combinedTextFilterChanged();
+    void textSearchScopeChanged();
+    void referenceTrackIdChanged();
     void areaChanged();
     void areaEnabledChanged();
     void areaSelectionActiveChanged();

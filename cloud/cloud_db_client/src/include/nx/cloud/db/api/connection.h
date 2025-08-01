@@ -12,6 +12,7 @@
 #include <nx/network/socket_factory.h>
 
 #include "account_manager.h"
+#include "analytics_db_manager.h"
 #include "auth_provider.h"
 #include "batch_user_processing_manager.h"
 #include "maintenance_manager.h"
@@ -78,6 +79,8 @@ public:
     virtual api::SystemManager* systemManager() = 0;
     virtual api::OrganizationManager* organizationManager() = 0;
     virtual api::AuthProvider* authProvider() = 0;
+
+    virtual api::AnalyticsDbManager* analyticsDbManager() = 0;
 
     /**
      * Maintenance manager is for accessing cloud internal data for maintenance/debug purposes.

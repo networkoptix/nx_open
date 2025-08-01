@@ -18,6 +18,8 @@ Rectangle
 {
     id: previewPanel
 
+    property bool showDevControls: false
+
     property var selectedItem: null
     property alias slideAnimationEnabled: panelAnimation.enabled
 
@@ -28,6 +30,7 @@ Rectangle
 
     signal prevClicked()
     signal nextClicked()
+    signal findSimilarClicked(string trackId)
     signal showOnLayoutClicked()
     signal close()
 
@@ -504,6 +507,22 @@ Rectangle
         color: ColorTheme.colors.dark8
         width: parent.width
         height: 52
+
+        Button
+        {
+            visible: previewPanel.showDevControls && previewPanel.selectedItem.hasTitleImage
+
+            anchors.left: parent.left
+            anchors.leftMargin: 12
+            anchors.verticalCenter: parent.verticalCenter
+
+            enabled: !!previewPanel.selectedItem
+
+            text: qsTr("Find similar")
+
+            onClicked:
+                previewPanel.findSimilarClicked(previewPanel.selectedItem.trackId)
+        }
 
         Button
         {

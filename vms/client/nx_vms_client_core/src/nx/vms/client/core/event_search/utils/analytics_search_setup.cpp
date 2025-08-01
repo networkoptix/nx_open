@@ -6,7 +6,10 @@
 #include <QtQml/QtQml>
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
+
+#include "analytics/db/analytics_db_types.h"
 
 namespace nx::vms::client::core {
 
@@ -45,6 +48,12 @@ AnalyticsSearchSetup::AnalyticsSearchSetup(AnalyticsSearchListModel* model, QObj
     connect(model, &AnalyticsSearchListModel::combinedTextFilterChanged,
         this, &AnalyticsSearchSetup::combinedTextFilterChanged);
 
+    connect(model, &AnalyticsSearchListModel::textSearchScopeChanged,
+        this, &AnalyticsSearchSetup::textSearchScopeChanged);
+
+    connect(model, &AnalyticsSearchListModel::referenceTrackIdChanged,
+        this, &AnalyticsSearchSetup::referenceTrackIdChanged);
+
     connect(model, &AnalyticsSearchListModel::selectedEngineChanged,
         this, &AnalyticsSearchSetup::engineChanged);
 
@@ -67,6 +76,10 @@ AnalyticsSearchSetup::AnalyticsSearchSetup(AnalyticsSearchListModel* model, QObj
     connect(this, &AnalyticsSearchSetup::objectTypesChanged,
         this, &AnalyticsSearchSetup::parametersChanged);
     connect(this, &AnalyticsSearchSetup::combinedTextFilterChanged,
+        this, &AnalyticsSearchSetup::parametersChanged);
+    connect(this, &AnalyticsSearchSetup::textSearchScopeChanged,
+        this, &AnalyticsSearchSetup::parametersChanged);
+    connect(this, &AnalyticsSearchSetup::referenceTrackIdChanged,
         this, &AnalyticsSearchSetup::parametersChanged);
     connect(this, &AnalyticsSearchSetup::areaChanged,
         this, &AnalyticsSearchSetup::parametersChanged);
@@ -123,6 +136,33 @@ void AnalyticsSearchSetup::setAttributeFilters(const QStringList& value)
 QString AnalyticsSearchSetup::combinedTextFilter() const
 {
     return d->model ? d->model->combinedTextFilter() : QString();
+}
+
+bool AnalyticsSearchSetup::vectorizationSearchEnabled() const
+{
+    return ini().vectorizationSearchEnabled;
+}
+
+nx::analytics::db::TextScope AnalyticsSearchSetup::textSearchScope() const
+{
+    return d->model ? d->model->textSearchScope() : analytics::db::TextScope::attributes;
+}
+
+void AnalyticsSearchSetup::setTextSearchScope(nx::analytics::db::TextScope value)
+{
+    if (NX_ASSERT(d->model))
+        d->model->setTextSearchScope(value);
+}
+
+nx::Uuid AnalyticsSearchSetup::referenceTrackId() const
+{
+    return d->model ? d->model->referenceTrackId() : nx::Uuid{};
+}
+
+void AnalyticsSearchSetup::setReferenceTrackId(const nx::Uuid& value)
+{
+    if (NX_ASSERT(d->model))
+        d->model->setReferenceTrackId(value);
 }
 
 QRectF AnalyticsSearchSetup::area() const

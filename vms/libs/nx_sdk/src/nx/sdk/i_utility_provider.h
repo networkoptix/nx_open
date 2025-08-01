@@ -140,13 +140,28 @@ public:
     }
 };
 
-class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider4>
+class IUtilityProvider5: public Interface<IUtilityProvider5, IUtilityProvider4>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider5"); }
 
     virtual IString* cloudSystemId() const = 0;
 };
-using IUtilityProvider5 = IUtilityProvider;
+
+class IUtilityProvider : public Interface<IUtilityProvider, IUtilityProvider5>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider6"); }
+
+    /**
+     * Comma-separated list of supported image/text vectorization model names.
+     * Example: "openai/clip-vit-large-patch14-336".
+     * The plugin can specify a vectorization model from this list in the EngineManifest,
+     * and use it to generate and attach a vector to the track's best shot data.
+     */
+    virtual IString* supportedVectorizationModels() const = 0;
+};
+
+using IUtilityProvider6 = IUtilityProvider;
 
 } // namespace nx::sdk

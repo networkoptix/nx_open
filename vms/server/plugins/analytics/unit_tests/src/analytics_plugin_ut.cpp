@@ -293,7 +293,8 @@ public:
     virtual int64_t vmsSystemTimeSinceEpochMs() const override { return 0; }
     virtual const nx::sdk::IString* getHomeDir() const override { return new nx::sdk::String(); }
     virtual const char* serverId() const override { return ""; }
-    virtual IString* cloudSystemId() const { return new nx::sdk::String(); }
+    virtual IString* cloudSystemId() const override { return new nx::sdk::String(); }
+    virtual IString* supportedVectorizationModels() const override { return new nx::sdk::String(); }
     virtual const char* cloudToken() const override { return ""; }
     virtual void subscribeForCloudTokenUpdate(ICloudTokenSubscriber* /*subscriber*/) override {}
 

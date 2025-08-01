@@ -27,6 +27,9 @@ Window
     property bool showPreview: false
     property alias tileView: tileViewButton.checked
 
+    property bool showDevControls: eventModel.analyticsSetup
+        && eventModel.analyticsSetup.vectorizationSearchEnabled
+
     modality: Qt.NonModal
 
     width: Metrics.kDefaultDialogWidth
@@ -157,6 +160,8 @@ Window
                 {
                     id: header
 
+                    showDevControls: dialog.showDevControls
+
                     model: eventModel
                     searchDelay: LocalSettings.iniConfigValue("analyticsSearchRequestDelayMs")
                     limitToCurrentCamera: model.crossSiteMode
@@ -167,7 +172,31 @@ Window
 
                     SelectableTextButton
                     {
+                        id: referenceTrackIdButton
+
+                        visible: showDevControls
+                            && !eventModel.analyticsSetup.referenceTrackId.isNull()
+
+                        parent: header.filtersColumn
+                        Layout.maximumWidth: header.filtersColumn.width
+
+                        selectable: false
+                        deactivatable: false
+                        accented: true
+
+                        icon.source: "image://skin/20x20/Outline/image.svg"
+                        text: "Similar to: " + eventModel.analyticsSetup.referenceTrackId.toString()
+
+                        onClicked:
+                            eventModel.analyticsSetup.referenceTrackId = NxGlobals.uuid("")
+                    }
+
+                    SelectableTextButton
+                    {
                         id: areaSelectionButton
+
+                        visible: eventModel.analyticsSetup
+                            && eventModel.analyticsSetup.referenceTrackId.isNull()
 
                         parent: header.filtersColumn
                         Layout.maximumWidth: header.filtersColumn.width
@@ -209,6 +238,9 @@ Window
                     AnalyticsFilters
                     {
                         id: analyticsFilters
+
+                        visible: eventModel.analyticsSetup
+                            && eventModel.analyticsSetup.referenceTrackId.isNull()
 
                         width: parent.width
                         bottomPadding: 16
@@ -895,6 +927,8 @@ Window
         {
             id: previewPanel
 
+            showDevControls: dialog.showDevControls
+
             height: content.height
             width: 460
             x: showPreview ? content.width - width : content.width
@@ -909,6 +943,9 @@ Window
 
             onNextClicked:
                 selection.index = eventModel.index(selection.index.row + 1, 0)
+
+            onFindSimilarClicked: (trackId) =>
+                eventModel.analyticsSetup.referenceTrackId = NxGlobals.uuid(trackId)
 
             onShowOnLayoutClicked:
                 d.showSelectionOnLayout()

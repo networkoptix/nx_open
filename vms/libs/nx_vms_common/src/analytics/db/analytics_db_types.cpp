@@ -111,6 +111,7 @@ ObjectTrackEx::ObjectTrackEx(const ObjectTrack& data)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Image, (json)(ubjson), Image_analytics_storage_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Title, (json)(ubjson), Title_analytics_storage_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BaseTrackImage, (json)(ubjson), BaseTrackImage_analytics_storage_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BestShot, (json)(ubjson), BestShot_analytics_storage_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TrackImage, (json)(ubjson), TrackImage_analytics_storage_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectTrack, (json)(ubjson), ObjectTrack_analytics_storage_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
@@ -317,6 +318,14 @@ void serializeToParams(const Filter& filter, nx::network::rest::Params* params)
             lit("freeText"), QString::fromUtf8(QUrl::toPercentEncoding(filter.freeText)));
     }
 
+    if (filter.textScope != TextScope::attributes)
+    {
+        params->insert("textScope", nx::reflect::toString(filter.textScope));
+    }
+
+    if (!filter.referenceBestShotId.isNull())
+        params->insert("referenceBestShotId", filter.referenceBestShotId.toSimpleString());
+
     if (!filter.analyticsEngineId.isNull())
         params->insert("analyticsEngineId", filter.analyticsEngineId.toSimpleString());
 
@@ -439,6 +448,16 @@ bool deserializeFromParams(
     if (params.contains(lit("freeText")))
     {
         filter->freeText = QUrl::fromPercentEncoding(params.value(lit("freeText")).toUtf8());
+    }
+
+    if (params.contains("textScope"))
+    {
+        filter->textScope = nx::reflect::fromString<TextScope>(params.value("textScope").toStdString());
+    }
+
+    if (params.contains("referenceBestShotId"))
+    {
+        filter->referenceBestShotId = nx::Uuid::fromStringSafe(params.value("referenceBestShotId"));
     }
 
     if (params.contains("analyticsEngineId"))

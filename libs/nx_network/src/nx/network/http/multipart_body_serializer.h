@@ -48,7 +48,7 @@ public:
     void writeBodyPart(
         const std::string& contentType,
         const nx::network::http::HttpHeaders& headers,
-        nx::Buffer data);
+        std::string_view data);
 
     /** Signal end of multipart body. */
     void writeEpilogue();
@@ -68,7 +68,7 @@ private:
     void startBodyPartInternal(
         const std::string& contentType,
         const nx::network::http::HttpHeaders& headers,
-        nx::Buffer data,
+        std::string_view data,
         std::optional<std::uint64_t> contentLength);
 };
 

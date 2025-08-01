@@ -16,6 +16,7 @@ const std::string kImageBestShotGenerationPolicy = "imageBestShotGenerationPolic
 
 const std::string kBestShotObjectCountSetting = "bestShotObjectCount";
 const std::string kFrameNumberToGenerateBestShotSetting = "frameNumberToGenerateBestShot";
+const std::string kGenerateVectorSetting = "generateVector";
 
 const std::string kBestShotTopLeftXSetting = "bestShotTopLeftX";
 const std::string kBestShotTopLeftYSetting = "bestShotTopLeftY";

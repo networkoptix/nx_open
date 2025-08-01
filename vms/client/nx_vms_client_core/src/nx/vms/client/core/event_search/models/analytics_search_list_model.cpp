@@ -90,6 +90,9 @@ public:
         cameraStatusListener;
 
     const std::unique_ptr<TextFilterSetup> textFilter;
+    TextScope textSearchScope;
+
+    nx::Uuid referenceTrackId;
 
     rest::Handle currentHttpRequestId = 0;
 
@@ -440,6 +443,8 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(
 
     filter.maxObjectTracksToSelect = limit;
     filter.freeText = q->combinedTextFilter();
+    filter.textScope = textSearchScope;
+    filter.referenceBestShotId = referenceTrackId;
     filter.analyticsEngineId = selectedEngine;
     filter.sortOrder = EventSearch::sortOrderFromDirection(request.direction);
     filter.timePeriod = request.period(q->interestTimePeriod());
@@ -1285,6 +1290,38 @@ QString AnalyticsSearchListModel::combinedTextFilter() const
         attributesText,
         systemContext()->analyticsAttributeHelper(),
         selectedObjectTypes());
+}
+
+TextScope AnalyticsSearchListModel::textSearchScope() const
+{
+    return d->textSearchScope;
+}
+
+void AnalyticsSearchListModel::setTextSearchScope(TextScope value)
+{
+    if (d->textSearchScope == value)
+        return;
+
+    clear();
+    d->textSearchScope = value;
+    NX_VERBOSE(this, "Set text search scope to \"%1\"", nx::reflect::toString(value));
+    emit textSearchScopeChanged();
+}
+
+nx::Uuid AnalyticsSearchListModel::referenceTrackId() const
+{
+    return d->referenceTrackId;
+}
+
+void AnalyticsSearchListModel::setReferenceTrackId(const nx::Uuid& value)
+{
+    if (d->referenceTrackId == value)
+        return;
+
+    clear();
+    d->referenceTrackId = value;
+    NX_VERBOSE(this, "Set reference track id to \"%1\"", value);
+    emit referenceTrackIdChanged();
 }
 
 bool AnalyticsSearchListModel::isConstrained() const

@@ -343,6 +343,11 @@ public:
     nx::Buffer fetchMessageBodyBuffer();
 
     /**
+     * Move current message body buffer to the response.
+     */
+    void moveMessageBodyToResponse();
+
+    /**
      * Can be invoked after receiving response only.
      */
     std::unique_ptr<AbstractMsgBodySource> takeResponseBodySource();

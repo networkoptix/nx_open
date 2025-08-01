@@ -117,6 +117,9 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(true, validateCloudLayouts,
         "[Dev] Additional cloud layouts validation.");
+
+    NX_INI_FLAG(false, vectorizationSearchEnabled,
+        "[Dev] Enable analytics search using vectorization.");
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();

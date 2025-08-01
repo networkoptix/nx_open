@@ -29,6 +29,9 @@ public:
     virtual int attributeCount() const override;
     virtual Flags flags() const override;
 
+    virtual const char* vectorData() const override;
+    virtual int vectorSize() const override;
+
     /** See IObjectTrackBestShotPacket0::trackId(). */
     void setTrackId(const Uuid& trackId);
 
@@ -59,6 +62,8 @@ public:
     /** See IObjectTrackBestShotPacket::flags(). */
     void setFlags(Flags flags);
 
+    void setVectorData(std::vector<char> data);
+
 private:
     Uuid m_trackId;
     Flags m_flags = Flags::none;
@@ -70,6 +75,7 @@ private:
     std::string m_imageDataFormat;
 
     std::vector<Ptr<Attribute>> m_attributes;
+    std::vector<char> m_vectorData;
 };
 
 } // namespace nx::sdk::analytics

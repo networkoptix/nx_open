@@ -17,6 +17,7 @@ extern const std::string kImageBestShotGenerationPolicy;
 
 extern const std::string kBestShotObjectCountSetting;
 extern const std::string kFrameNumberToGenerateBestShotSetting;
+extern const std::string kGenerateVectorSetting;
 
 extern const std::string kBestShotTopLeftXSetting;
 extern const std::string kBestShotTopLeftYSetting;

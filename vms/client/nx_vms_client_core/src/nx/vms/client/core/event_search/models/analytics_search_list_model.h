@@ -9,7 +9,12 @@
 
 #include <nx/vms/client/core/event_search/models/abstract_async_search_list_model.h>
 
-namespace nx::analytics::db { struct ObjectTrack; }
+namespace nx::analytics::db {
+
+struct ObjectTrack;
+enum class TextScope;
+
+} // namespace nx::analytics::db
 
 namespace nx::vms::client::core {
 
@@ -46,6 +51,12 @@ public:
     void setAttributeFilters(const QStringList& value);
 
     QString combinedTextFilter() const; // Free text filter combined with attribute filters.
+
+    nx::analytics::db::TextScope textSearchScope() const;
+    void setTextSearchScope(nx::analytics::db::TextScope value);
+
+    nx::Uuid referenceTrackId() const;
+    void setReferenceTrackId(const nx::Uuid& value);
 
     // Metadata newer than timestamp returned by this callback will be deferred.
     using LiveTimestampGetter = std::function<
@@ -103,6 +114,8 @@ signals:
     void availableNewTracksChanged();
     void attributeFiltersChanged();
     void combinedTextFilterChanged();
+    void textSearchScopeChanged();
+    void referenceTrackIdChanged();
 
 protected:
     virtual bool isFilterDegenerate() const override;

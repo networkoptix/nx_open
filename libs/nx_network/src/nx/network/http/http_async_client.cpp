@@ -720,6 +720,11 @@ nx::Buffer AsyncClient::fetchMessageBodyBuffer()
     return std::exchange(m_responseMessageBody, {});
 }
 
+void AsyncClient::moveMessageBodyToResponse()
+{
+    m_response.setBody(std::move(m_responseMessageBody));
+}
+
 std::unique_ptr<AbstractMsgBodySource> AsyncClient::takeResponseBodySource()
 {
     NX_VERBOSE(this, "Connection to %1 is taken as response body source",

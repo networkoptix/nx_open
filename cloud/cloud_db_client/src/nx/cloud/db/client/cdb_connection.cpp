@@ -17,6 +17,7 @@ Connection::Connection(
     m_accountManager(&m_requestExecutor),
     m_systemManager(&m_requestExecutor),
     m_organizationManager(&m_requestExecutor),
+    m_analyticsDbManager(&m_requestExecutor),
     m_authProvider(&m_requestExecutor),
     m_maintenanceManager(&m_requestExecutor),
     m_oauthManager(&m_requestExecutor),
@@ -41,6 +42,11 @@ api::SystemManager* Connection::systemManager()
 api::OrganizationManager* Connection::organizationManager()
 {
     return &m_organizationManager;
+}
+
+api::AnalyticsDbManager* Connection::analyticsDbManager()
+{
+    return &m_analyticsDbManager;
 }
 
 api::AuthProvider* Connection::authProvider()

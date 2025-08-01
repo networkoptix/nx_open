@@ -2,6 +2,12 @@
 
 #include "device_agent.h"
 
+#include <cmath>
+#include <filesystem>
+#include <numeric>
+#include <random>
+
+#include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 
@@ -9,11 +15,25 @@
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/analytics/helpers/object_track_title_packet.h>
-
 #include <nx/vms_server_plugins/analytics/stub/utils.h>
 
 #include "settings.h"
 #include "stub_analytics_plugin_best_shots_ini.h"
+
+static const int kVectorSize = 768;
+
+namespace fs = std::filesystem;
+
+namespace {
+
+bool isLittleEndian()
+{
+    uint16_t num = 0x1;
+    char* ptr = reinterpret_cast<char*>(&num);
+    return ptr[0] == char(0x1);
+}
+
+} //namespace
 
 namespace nx {
 namespace vms_server_plugins {
@@ -149,8 +169,8 @@ void DeviceAgent::maybeGenerateBestShotAndTitle()
     {
         generateBestShotObject();
 
-        std::vector<Ptr<IObjectTrackBestShotPacket>> bestShotPackets = generateBestShots();
-        for (Ptr<IObjectTrackBestShotPacket>& bestShotPacket: bestShotPackets)
+        auto bestShotPackets = generateBestShots();
+        for (auto& bestShotPacket: bestShotPackets)
             pushMetadataPacket(bestShotPacket);
     }
 
@@ -171,6 +191,42 @@ bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> vid
     return true;
 }
 
+std::vector<DeviceAgent::ImageData> DeviceAgent::loadImages(const std::string& path)
+{
+    std::vector<DeviceAgent::ImageData> result;
+
+    if (!fs::exists(path))
+    {
+        NX_OUTPUT << __func__ << "Path does not exist: " << path;
+        return result;
+    }
+
+    if (fs::is_regular_file(path))
+    {
+        // Load a single image file.
+        DeviceAgent::ImageData imageData;
+        imageData.data = loadFile(path);
+        imageData.format = imageFormatFromPath(path);
+        result.push_back(imageData);
+    }
+    else if (fs::is_directory(path))
+    {
+        // Load all image files from the directory.
+        for (const auto& entry : fs::directory_iterator(path))
+        {
+            if (fs::is_regular_file(entry))
+            {
+                std::string filePath = entry.path().string();
+                DeviceAgent::ImageData imageData;
+                imageData.data = loadFile(filePath);
+                imageData.format = imageFormatFromPath(filePath);
+                result.push_back(imageData);
+            }
+        }
+    }
+    return result;
+}
+
 void DeviceAgent::configureBestShots(std::map<std::string, std::string>& settings)
 {
     nx::kit::utils::fromString(settings[kEnableBestShotGeneration], &m_generateBestShot);
@@ -183,8 +239,7 @@ void DeviceAgent::configureBestShots(std::map<std::string, std::string>& setting
     const std::string bestShotImagePath = settings[kBestShotImagePathSetting];
     if (!bestShotImagePath.empty())
     {
-        m_bestShotGenerationContext.imageData = loadFile(bestShotImagePath);
-        m_bestShotGenerationContext.imageDataFormat = imageFormatFromPath(bestShotImagePath);
+        m_bestShotGenerationContext.images = loadImages(bestShotImagePath);
     }
 
     m_bestShotGenerationContext.url = settings[kBestShotUrlSetting];
@@ -208,6 +263,10 @@ void DeviceAgent::configureBestShots(std::map<std::string, std::string>& setting
     nx::kit::utils::fromString(
         settings[kFrameNumberToGenerateBestShotSetting],
         &m_bestShotGenerationContext.frameNumberToGenerateBestShot);
+
+    nx::kit::utils::fromString(
+        settings[kGenerateVectorSetting],
+        &m_bestShotGenerationContext.generateVector);
 
     int bestShotObjectCount = 0;
     nx::kit::utils::fromString(settings[kBestShotObjectCountSetting], &bestShotObjectCount);
@@ -245,8 +304,7 @@ void DeviceAgent::configureTitles(std::map<std::string, std::string>& settings)
     const std::string titleImagePath = settings[kTitleImagePathSetting];
     if (!titleImagePath.empty())
     {
-        m_titleGenerationContext.imageData = loadFile(titleImagePath);
-        m_titleGenerationContext.imageDataFormat = imageFormatFromPath(titleImagePath);
+        m_titleGenerationContext.images = loadImages(titleImagePath);
     }
 
     m_titleGenerationContext.url = settings[kTitleUrlSetting];
@@ -310,6 +368,56 @@ nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived
     return nullptr;
 }
 
+std::vector<char> generateRandomVector()
+{
+    std::vector<float> data(kVectorSize);
+
+    // Fill with random values (example: uniform distribution)
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+
+    for (float& v: data)
+        v = dist(gen);
+
+    // Normalize to unit vector length (L2 norm = 1)
+    float norm = std::sqrt(std::accumulate(data.begin(), data.end(), 0.0f,
+        [](float sum, float val) { return sum + val * val; }));
+
+    if (norm > 0.0f)
+    {
+        for (float& v: data)
+            v /= norm;
+    }
+
+    // Write to QByteArray via QDataStream in Little Endian
+    std::vector<char> output;
+    output.reserve(kVectorSize * sizeof(float));
+    if (!isLittleEndian())
+    {
+        for (float v: data)
+        {
+            uint32_t asInt;
+            std::memcpy(&asInt, &v, sizeof(float));
+
+            // Convert to little endian manually (portable)
+            char bytes[4];
+            bytes[0] = asInt & 0xFF;
+            bytes[1] = (asInt >> 8) & 0xFF;
+            bytes[2] = (asInt >> 16) & 0xFF;
+            bytes[3] = (asInt >> 24) & 0xFF;
+            output.insert(output.end(), bytes, bytes + 4);
+        }
+    }
+    else
+    {
+        const char* raw = reinterpret_cast<const char*>(data.data());
+        output.insert(output.end(), raw, raw + kVectorSize * sizeof(float));
+    }
+
+    return output;
+}
+
 DeviceAgent::BestShotList DeviceAgent::generateBestShots()
 {
     BestShotList result;
@@ -322,12 +430,20 @@ DeviceAgent::BestShotList DeviceAgent::generateBestShots()
 
         if (counter == 0)
         {
+            Ptr<ObjectTrackBestShotPacket> bestShot;
             if (m_bestShotGenerationContext.policy == BestShotGenerationPolicy::fixed)
-                result.push_back(generateFixedBestShot(trackId));
+                bestShot = generateFixedBestShot(trackId);
             else if (m_bestShotGenerationContext.policy == BestShotGenerationPolicy::url)
-                result.push_back(generateUrlBestShot(trackId));
+                bestShot = generateUrlBestShot(trackId);
             else if (m_bestShotGenerationContext.policy == BestShotGenerationPolicy::image)
-                result.push_back(generateImageBestShot(trackId));
+                bestShot = generateImageBestShot(trackId);
+
+            if (bestShot)
+            {
+                if (m_bestShotGenerationContext.generateVector)
+                    bestShot->setVectorData(generateRandomVector());
+                result.push_back(std::move(bestShot));
+            }
 
             it = m_bestShotGenerationCounterByTrackId.erase(it);
         }
@@ -372,7 +488,7 @@ DeviceAgent::TitleList DeviceAgent::generateTitles()
     return result;
 }
 
-Ptr<IObjectTrackBestShotPacket> DeviceAgent::generateFixedBestShot(Uuid trackId)
+Ptr<ObjectTrackBestShotPacket> DeviceAgent::generateFixedBestShot(Uuid trackId)
 {
     return makePtr<ObjectTrackBestShotPacket>(
         trackId,
@@ -380,7 +496,7 @@ Ptr<IObjectTrackBestShotPacket> DeviceAgent::generateFixedBestShot(Uuid trackId)
         m_bestShotGenerationContext.fixedBestShotBoundingBox);
 }
 
-Ptr<IObjectTrackBestShotPacket> DeviceAgent::generateUrlBestShot(Uuid trackId)
+Ptr<ObjectTrackBestShotPacket> DeviceAgent::generateUrlBestShot(Uuid trackId)
 {
     auto bestShotPacket = makePtr<ObjectTrackBestShotPacket>(
         trackId,
@@ -391,14 +507,18 @@ Ptr<IObjectTrackBestShotPacket> DeviceAgent::generateUrlBestShot(Uuid trackId)
     return bestShotPacket;
 }
 
-Ptr<IObjectTrackBestShotPacket> DeviceAgent::generateImageBestShot(Uuid trackId)
+Ptr<ObjectTrackBestShotPacket> DeviceAgent::generateImageBestShot(Uuid trackId)
 {
     auto bestShotPacket = makePtr<ObjectTrackBestShotPacket>(
         trackId,
         m_lastFrameTimestampUs);
 
-    bestShotPacket->setImageDataFormat(m_bestShotGenerationContext.imageDataFormat);
-    bestShotPacket->setImageData(m_bestShotGenerationContext.imageData);
+    if (!m_bestShotGenerationContext.images.empty())
+    {
+        int index = rand() % m_bestShotGenerationContext.images.size();
+        bestShotPacket->setImageDataFormat(m_bestShotGenerationContext.images[index].format);
+        bestShotPacket->setImageData(m_bestShotGenerationContext.images[index].data);
+    }
 
     return bestShotPacket;
 }
@@ -433,8 +553,12 @@ Ptr<IObjectTrackTitlePacket> DeviceAgent::generateImageTitle(Uuid trackId)
 
     titlePacket->setText(m_titleGenerationContext.text);
 
-    titlePacket->setImageDataFormat(m_titleGenerationContext.imageDataFormat);
-    titlePacket->setImageData(m_titleGenerationContext.imageData);
+    if (!m_titleGenerationContext.images.empty())
+    {
+        int index = rand() % m_titleGenerationContext.images.size();
+        titlePacket->setImageDataFormat(m_titleGenerationContext.images[index].format);
+        titlePacket->setImageData(m_titleGenerationContext.images[index].data);
+    }
 
     return titlePacket;
 }

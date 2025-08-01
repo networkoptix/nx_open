@@ -499,10 +499,14 @@ public:
 private:
     virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
-        this->deserializeFusionRequestResult(
-            client->lastSysErrorCode(),
-            client->response(),
-            client->fetchMessageBodyBuffer());
+        if (client->response())
+        {
+            client->moveMessageBodyToResponse();
+            this->deserializeFusionRequestResult(
+                client->lastSysErrorCode(),
+                client->response(),
+                client->response()->messageBody);
+        }
 
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);

@@ -36,6 +36,7 @@ R"json(
 {
     "streamTypeFilter": "compressedVideo",
     "capabilities": "noAutoBestShots",
+    "vectorizationModel": "openai/clip-vit-large-patch14-336",
     "deviceAgentSettingsModel":
     {
         "type": "Settings",
@@ -57,6 +58,12 @@ R"json(
                         "name": ")json" + kEnableObjectTitleGeneration + R"json(",
                         "caption": "Enable Object Title generation",
                         "defaultValue": true
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kGenerateVectorSetting + R"json(",
+                        "caption": "Generate random vector for bestShot. Vector format is 768 little-endian serialized floats.",
+                        "defaultValue": false
                     }
                 ]
             },

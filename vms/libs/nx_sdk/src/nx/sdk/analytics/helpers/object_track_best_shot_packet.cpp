@@ -29,6 +29,21 @@ ObjectTrackBestShotPacket::Flags ObjectTrackBestShotPacket::flags() const
     return m_flags;
 }
 
+void ObjectTrackBestShotPacket::setVectorData(std::vector<char> data)
+{
+    m_vectorData = std::move(data);
+}
+
+const char* ObjectTrackBestShotPacket::vectorData() const
+{
+    return m_vectorData.data();
+}
+
+int ObjectTrackBestShotPacket::vectorSize() const
+{
+    return m_vectorData.size();
+}
+
 int64_t ObjectTrackBestShotPacket::timestampUs() const
 {
     return m_timestampUs;

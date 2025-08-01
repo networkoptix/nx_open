@@ -76,6 +76,13 @@ struct NX_VMS_API EngineManifest
     /**%apidoc[opt] */
     TypeLibrary typeLibrary;
 
+    /**%apidoc[opt]
+     * Plugin could provide vector attached to a best shot.
+     * At this case plugin should provide vectorization model name.
+     * List of supported vectorization models can be read via UtilityProvider.
+     */
+    QString vectorizationModel;
+
     bool operator==(const EngineManifest& other) const = default;
 };
 #define EngineManifest_Fields \
@@ -87,7 +94,8 @@ struct NX_VMS_API EngineManifest
     (objectActions) \
     (deviceAgentSettingsModel) \
     (groups) \
-    (typeLibrary)
+    (typeLibrary) \
+    (vectorizationModel)
 
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json), NX_VMS_API)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EngineCapabilities)

@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <include/nx/cloud/db/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 
 #include "account_manager.h"
+#include "analytics_db_manager.h"
 #include "async_http_requests_executor.h"
 #include "auth_provider.h"
 #include "batch_user_processing_manager.h"
@@ -27,6 +28,7 @@ public:
     virtual api::AccountManager* accountManager() override;
     virtual api::SystemManager* systemManager() override;
     virtual api::OrganizationManager* organizationManager() override;
+    virtual api::AnalyticsDbManager* analyticsDbManager() override;
     virtual api::AuthProvider* authProvider() override;
     virtual api::MaintenanceManager* maintenanceManager() override;
     virtual api::OauthManager* oauthManager() override;
@@ -66,6 +68,7 @@ private:
     AccountManager m_accountManager;
     SystemManager m_systemManager;
     OrganizationManager m_organizationManager;
+    AnalyticsDbManager m_analyticsDbManager;
     AuthProvider m_authProvider;
     MaintenanceManager m_maintenanceManager;
     OauthManager m_oauthManager;

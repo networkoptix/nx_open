@@ -85,14 +85,29 @@ public:
     virtual int attributeCount() const = 0;
 };
 
-class IObjectTrackBestShotPacket:
-    public Interface<IObjectTrackBestShotPacket, IObjectTrackBestShotPacket1>
+class IObjectTrackBestShotPacket2:
+    public Interface<IObjectTrackBestShotPacket2, IObjectTrackBestShotPacket1>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket2"); }
 
     virtual Flags flags() const = 0;
 };
-using IObjectTrackBestShotPacket2 = IObjectTrackBestShotPacket;
+
+class IObjectTrackBestShotPacket:
+    public Interface<IObjectTrackBestShotPacket, IObjectTrackBestShotPacket2>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket3"); }
+
+    /**
+     * @return Image vector used for similarity search.
+     * The vector is a float32 array serialized in Little Endian format.
+     */
+    virtual const char* vectorData() const = 0;
+
+    virtual int vectorSize() const = 0;
+};
+using IObjectTrackBestShotPacket3 = IObjectTrackBestShotPacket;
 
 } // namespace nx::sdk::analytics

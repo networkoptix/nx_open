@@ -16,6 +16,8 @@ Column
 {
     id: header
 
+    property bool showDevControls: false
+
     property RightPanelModel model: null
     property alias limitToCurrentCamera: cameraSelector.limitToCurrentCamera
 
@@ -42,6 +44,39 @@ Column
 
         darkMode: true
         visible: !!d.textFilter
+    }
+
+    ComboBox
+    {
+        id: textScope
+
+        visible: header.showDevControls
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: 8
+        anchors.rightMargin: 8
+
+        displayText: "Scope: " + currentText
+
+        textRole: "text"
+        valueRole: "value"
+        model: [
+            { value: 0, text: "attributes" },
+            { value: 1, text: "vector" },
+            { value: 2, text: "both" }
+        ]
+
+        property AnalyticsSearchSetup setup:
+            (header.model && header.model.analyticsSetup) || null
+
+        onActivated: (index) =>
+        {
+            if (!setup)
+                return
+
+            setup.textSearchScope = valueAt(index)
+        }
     }
 
     // Do not remove this Control wrapper.

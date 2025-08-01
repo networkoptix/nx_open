@@ -10,6 +10,8 @@
 #include <nx/sdk/analytics/i_object_track_title_packet.h>
 #include <nx/sdk/analytics/rect.h>
 
+namespace nx::sdk::analytics { class ObjectTrackBestShotPacket; }
+
 namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
@@ -51,6 +53,12 @@ private:
         image,
     };
 
+    struct ImageData
+    {
+        std::string format;
+        std::vector<char> data;
+    };
+
     struct BestShotGenerationContext
     {
         BestShotGenerationPolicy policy;
@@ -58,10 +66,10 @@ private:
 
         std::string url;
 
-        std::string imageDataFormat;
-        std::vector<char> imageData;
+        std::vector<ImageData> images;
 
         nx::sdk::analytics::Rect fixedBestShotBoundingBox;
+        bool generateVector = false;
     };
 
     struct TitleGenerationConext
@@ -71,8 +79,7 @@ private:
 
         std::string url;
 
-        std::string imageDataFormat;
-        std::vector<char> imageData;
+        std::vector<DeviceAgent::ImageData> images;
 
         std::string text;
 
@@ -80,19 +87,19 @@ private:
     };
 
 private:
-    using BestShotList = std::vector<nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket>>;
+    using BestShotList = std::vector<nx::sdk::Ptr<nx::sdk::analytics::ObjectTrackBestShotPacket>>;
     BestShotList generateBestShots();
 
     using TitleList = std::vector<nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackTitlePacket>>;
     TitleList generateTitles();
 
-    nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket> generateFixedBestShot(
+    nx::sdk::Ptr<nx::sdk::analytics::ObjectTrackBestShotPacket> generateFixedBestShot(
         nx::sdk::Uuid trackId);
 
-    nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket> generateUrlBestShot(
+    nx::sdk::Ptr<nx::sdk::analytics::ObjectTrackBestShotPacket> generateUrlBestShot(
         nx::sdk::Uuid trackId);
 
-    nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket> generateImageBestShot(
+    nx::sdk::Ptr<nx::sdk::analytics::ObjectTrackBestShotPacket> generateImageBestShot(
         nx::sdk::Uuid trackId);
 
     nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackTitlePacket> generateFixedTitle(
@@ -107,6 +114,7 @@ private:
     void maybeGenerateBestShotAndTitle();
     void generateBestShotObject();
     void generateTitleObject();
+    std::vector<DeviceAgent::ImageData> loadImages(const std::string& path);
 
     void configureBestShots(std::map<std::string, std::string>& settings);
     void configureTitles(std::map<std::string, std::string>& settings);

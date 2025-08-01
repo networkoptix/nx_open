@@ -42,13 +42,13 @@ void MultipartBodySerializer::writeData(nx::Buffer data)
 void MultipartBodySerializer::writeBodyPart(
     const std::string& contentType,
     const nx::network::http::HttpHeaders& headers,
-    nx::Buffer data)
+    std::string_view data)
 {
     auto contentLength = data.size();
     startBodyPartInternal(
         contentType,
         headers,
-        std::move(data),
+        data,
         contentLength);
     m_bodyPartStarted = false;
 }
@@ -68,7 +68,7 @@ bool MultipartBodySerializer::eof() const
 void MultipartBodySerializer::startBodyPartInternal(
     const std::string& contentType,
     const nx::network::http::HttpHeaders& headers,
-    nx::Buffer data,
+    std::string_view data,
     std::optional<std::uint64_t> contentLength)
 {
     m_bodyPartStarted = true;
@@ -83,7 +83,7 @@ void MultipartBodySerializer::startBodyPartInternal(
             &serializedData,
             "Content-Length: ", std::to_string(*contentLength), "\r\n");
     }
-    nx::utils::buildString(&serializedData, "\r\n", (std::string_view) data);
+    nx::utils::buildString(&serializedData, "\r\n", data);
 
     m_outputStream->processData(std::move(serializedData));
 }

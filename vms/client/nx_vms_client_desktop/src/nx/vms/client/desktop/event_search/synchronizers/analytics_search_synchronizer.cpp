@@ -181,6 +181,12 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::combinedTextFilterChanged,
         this, &AnalyticsSearchSynchronizer::updateWorkbench);
 
+    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::textSearchScopeChanged,
+        this, &AnalyticsSearchSynchronizer::updateWorkbench);
+
+    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::referenceTrackIdChanged,
+        this, &AnalyticsSearchSynchronizer::updateWorkbench);
+
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::engineChanged,
         this, &AnalyticsSearchSynchronizer::updateWorkbench);
 
@@ -336,6 +342,9 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
 
     m_filter.analyticsEngineId = m_analyticsSetup->engine();
     m_filter.freeText = m_analyticsSetup->combinedTextFilter();
+    m_filter.textScope = m_analyticsSetup->textSearchScope();
+
+    m_filter.referenceBestShotId = m_analyticsSetup->referenceTrackId();
 
     const auto objectTypes = m_analyticsSetup->objectTypes();
     m_filter.objectTypeId = {objectTypes.cbegin(), objectTypes.cend()};

@@ -107,7 +107,12 @@ struct BestShot: public BaseTrackImage
     BestShot(const BaseTrackImage& image): BaseTrackImage(image) { timestampUs = 0; }
 
     bool initialized() const { return timestampUs > 0; }
+
+    std::optional<QByteArray> vectorData;
 };
+#define BestShot_analytics_storage_Fields BaseTrackImage_analytics_storage_Fields(vectorData)
+QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson), NX_VMS_COMMON_API);
+NX_REFLECTION_INSTRUMENT(BestShot, BestShot_analytics_storage_Fields)
 
 struct TrackImage: public BaseTrackImage
 {
@@ -198,6 +203,12 @@ NX_REFLECTION_INSTRUMENT(ObjectTrackEx, ObjectTrackEx_analytics_storage_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
+NX_REFLECTION_ENUM_CLASS(TextScope,
+    attributes,
+    vector,
+    both
+);
+
 struct NX_VMS_COMMON_API Filter
 {
     enum Option
@@ -233,6 +244,12 @@ struct NX_VMS_COMMON_API Filter
      * values, using wildcards.
      */
     QString freeText;
+
+    /** Method to search tracks: by attributes, text vector or both of them. */
+    TextScope textScope{TextScope::attributes};
+
+    /** Used together with textScope::image. Used for cloud analytics data only */
+    nx::Uuid referenceBestShotId;
 
     // TODO: #akolesnikov Move result options to a separate struct.
 
@@ -303,7 +320,7 @@ private:
         const AbstractObjectTypeDictionary& objectTypeDictionary) const;
 };
 #define Filter_analytics_storage_Fields \
-    (deviceIds)(objectTypeId)(objectTrackId)(timePeriod)(boundingBox)(freeText) \
+    (deviceIds)(objectTypeId)(objectTrackId)(timePeriod)(boundingBox)(freeText)(textScope)(referenceBestShotId) \
     (maxObjectTracksToSelect)(needFullTrack)(sortOrder)(analyticsEngineId)(storageId)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json), NX_VMS_COMMON_API);
 NX_REFLECTION_INSTRUMENT(Filter, Filter_analytics_storage_Fields)

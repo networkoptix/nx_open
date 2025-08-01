@@ -31,8 +31,8 @@ enum class Error
 };
 
 NX_VMS_COMMON_API bool useMultiThreadEncode(AVCodecID codec, QSize resolution);
-QRect roundRect(const QRect& srcRect);
-QSize roundSize(const QSize& size);
+NX_VMS_COMMON_API QRect roundRect(const QRect& srcRect);
+NX_VMS_COMMON_API QSize roundSize(const QSize& size);
 
 NX_VMS_COMMON_API AVCodecID findEncoderCodecId(const QString& codecName);
 
