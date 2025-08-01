@@ -2,12 +2,14 @@
 
 #include "saas_service_usage_helper.h"
 
+#include <QtCore/QSet>
 #include <QtCore/QTimer>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <licensing/license.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
@@ -157,29 +159,53 @@ std::tuple<int, int> IntegrationServiceUsageHelper::proposeChange(const std::vec
         const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(propose.resourceId);
         if (!camera)
             continue;
+
+        QSet<nx::Uuid> alreadyEnabledEngines;
         for (const auto& id: camera->userEnabledAnalyticsEngines())
         {
-            if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
+            if (auto engineResource = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
+                alreadyEnabledEngines.insert(engineResource->getId());
+        }
+
+        QSet<nx::Uuid> proposedEngines;
+        for (const auto& id: propose.integrations)
+        {
+            if (auto engineResource = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
+                proposedEngines.insert(engineResource->getId());
+        }
+
+        for (const auto& id: camera->userEnabledAnalyticsEngines())
+        {
+            if (auto alreadyEnabledEngineResource =
+                    resourcePool()->getResourceById<AnalyticsEngineResource>(id))
             {
-                const auto manifest = r->plugin()->manifest();
+                const auto manifest = alreadyEnabledEngineResource->plugin()->manifest();
                 if (manifest.isLicenseRequired)
                 {
                     auto& value = (*m_cache)[manifest.id];
-                    --value.inUse;
-                    ++oldLicensedEnginesRemovedCount;
+
+                    if (!proposedEngines.contains(alreadyEnabledEngineResource->getId()))
+                    {
+                        --value.inUse;
+                        ++oldLicensedEnginesRemovedCount;
+                    }
                 }
             }
         }
+
         for (const auto& id: propose.integrations)
         {
-            if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
+            if (auto proposedEngineResource = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
             {
-                const auto manifest = r->plugin()->manifest();
+                const auto manifest = proposedEngineResource->plugin()->manifest();
                 if (manifest.isLicenseRequired)
                 {
                     auto& value = (*m_cache)[manifest.id];
-                    ++value.inUse;
-                    ++newLicensedEnginesAddedCount;
+                    if (!alreadyEnabledEngines.contains(proposedEngineResource->getId()))
+                    {
+                        ++value.inUse;
+                        ++newLicensedEnginesAddedCount;
+                    }
                 }
             }
         }
