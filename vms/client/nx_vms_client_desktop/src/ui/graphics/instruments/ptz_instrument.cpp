@@ -55,6 +55,9 @@ using namespace nx::vms::common::ptz;
 
 namespace {
 
+const QString kAutoTrackingPortName = QString::fromStdString(
+    nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::autoTracking));
+
 static const QVector3D kKeyboardPtzSensitivity(/*pan*/ 0.5, /*tilt*/ 0.5, /*zoom*/ 1.0);
 
 static const qreal kWheelFisheyeZoomSensitivity = 4.0;
@@ -166,6 +169,16 @@ QVector3D applyRotation(const QVector3D& speed, qreal rotation)
     }
 
     return transformedSpeed;
+}
+
+bool cameraSupportsAutoTracking(nx::vms::client::core::CameraResourcePtr camera)
+{
+    const QnIOPortDataList ports = camera->ioPortDescriptions();
+    return std::any_of(ports.cbegin(), ports.cend(),
+        [](const auto& port)
+        {
+            return port.outputName == kAutoTrackingPortName;
+        });
 }
 
 } // namespace
@@ -480,12 +493,18 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
 
 void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
 {
-    if (showOnceSettings()->newPtzMechanicPromo() && showOnceSettings()->autoTrackingPromo())
-        return;
-
     PtzData& data = m_dataByWidget[widget];
     if (data.isFisheye())
         return;
+
+    const bool supportAutoTracking = cameraSupportsAutoTracking(
+        widget->resource().dynamicCast<nx::vms::client::core::CameraResource>());
+
+    if (showOnceSettings()->newPtzMechanicPromo()
+        && (showOnceSettings()->autoTrackingPromo() || !supportAutoTracking))
+    {
+        return;
+    }
 
     if (!data.promoOverlay)
     {
@@ -495,10 +514,10 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
         data.promoOverlay = new PtzPromoOverlay();
 
         connect(data.promoOverlay.data(), &PtzPromoOverlay::closeRequested, this,
-            [this, widget, overlay = data.promoOverlay.data()]()
+            [this, widget, overlay = data.promoOverlay.data(), supportAutoTracking]()
             {
                 showOnceSettings()->newPtzMechanicPromo = true;
-                showOnceSettings()->autoTrackingPromo = true;
+                showOnceSettings()->autoTrackingPromo = supportAutoTracking;
                 widget->removeOverlayWidget(overlay);
                 overlay->setVisible(false);
                 overlay->deleteLater();
@@ -512,7 +531,7 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
 
     data.promoOverlay->setPagesVisibility(
         !showOnceSettings()->newPtzMechanicPromo(),
-        false); //< VMS-54580: was decided to temporarily disable Target Lock page in 6.0.
+        !showOnceSettings()->autoTrackingPromo() && supportAutoTracking);
 
     const bool showPromo = widget->options().testFlag(QnResourceWidget::ControlPtz)
         && !appContext()->localSettings()->ptzAimOverlayEnabled()
