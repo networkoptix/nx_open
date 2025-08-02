@@ -2065,6 +2065,10 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
       <source>Filter by</source>
       <translation>Filtrera på</translation>
     </message>
+    <message>
+      <source>Find similar</source>
+      <translation type="unfinished">Find similar</translation>
+    </message>
   </context>
   <context>
     <name>PreviewTableView</name>

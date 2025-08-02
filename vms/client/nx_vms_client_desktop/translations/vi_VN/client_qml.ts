@@ -2053,6 +2053,10 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
       <source>Filter by</source>
       <translation>Lọc theo</translation>
     </message>
+    <message>
+      <source>Find similar</source>
+      <translation type="unfinished">Find similar</translation>
+    </message>
   </context>
   <context>
     <name>PreviewTableView</name>

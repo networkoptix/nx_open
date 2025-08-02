@@ -2053,6 +2053,10 @@ Select an Integration to begin configuring its parameters.</source>
       <source>Filter by</source>
       <translation>篩選條件</translation>
     </message>
+    <message>
+      <source>Find similar</source>
+      <translation type="unfinished">Find similar</translation>
+    </message>
   </context>
   <context>
     <name>PreviewTableView</name>

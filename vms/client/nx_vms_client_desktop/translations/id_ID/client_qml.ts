@@ -2053,6 +2053,10 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
       <source>Filter by</source>
       <translation>Filter berdasarkan</translation>
     </message>
+    <message>
+      <source>Find similar</source>
+      <translation type="unfinished">Find similar</translation>
+    </message>
   </context>
   <context>
     <name>PreviewTableView</name>

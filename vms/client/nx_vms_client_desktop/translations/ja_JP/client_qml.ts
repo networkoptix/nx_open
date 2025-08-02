@@ -2055,6 +2055,10 @@ Select an Integration to begin configuring its parameters.</source>
       <source>Filter by</source>
       <translation>フィルター</translation>
     </message>
+    <message>
+      <source>Find similar</source>
+      <translation type="unfinished">Find similar</translation>
+    </message>
   </context>
   <context>
     <name>PreviewTableView</name>

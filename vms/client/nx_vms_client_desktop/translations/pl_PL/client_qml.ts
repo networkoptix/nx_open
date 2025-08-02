@@ -2089,6 +2089,10 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
       <source>Filter by</source>
       <translation>Filtruj według</translation>
     </message>
+    <message>
+      <source>Find similar</source>
+      <translation type="unfinished">Find similar</translation>
+    </message>
   </context>
   <context>
     <name>PreviewTableView</name>

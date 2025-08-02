@@ -2065,6 +2065,10 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
       <source>Filter by</source>
       <translation>Filtrar por</translation>
     </message>
+    <message>
+      <source>Find similar</source>
+      <translation type="unfinished">Find similar</translation>
+    </message>
   </context>
   <context>
     <name>PreviewTableView</name>

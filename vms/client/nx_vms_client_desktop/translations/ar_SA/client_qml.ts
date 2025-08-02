@@ -2113,6 +2113,10 @@ Select an Integration to begin configuring its parameters.</translation>
       <source>Filter by</source>
       <translation type="unfinished">Filter by</translation>
     </message>
+    <message>
+      <source>Find similar</source>
+      <translation type="unfinished">Find similar</translation>
+    </message>
   </context>
   <context>
     <name>PreviewTableView</name>
