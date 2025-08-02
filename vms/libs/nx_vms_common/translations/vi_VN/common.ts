@@ -1864,7 +1864,7 @@
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>
-      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+      <translation>Khóa mã hóa được sử dụng để mã hóa các giá trị cookie an toàn.</translation>
     </message>
   </context>
 </TS>
