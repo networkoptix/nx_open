@@ -55,8 +55,8 @@ BottomSheet
             }
         }
 
-        lifetimeComboBox.model = expiresInModel
-        lifetimeComboBox.currentIndex = currentIndex
+        expirationComboBox.model = expiresInModel
+        expirationComboBox.currentIndex = currentIndex
 
         bookmarkDescriptionTextArea.text = backend.bookmarkDescription
         shareLinkOptionsText.text = qsTr("Shared link options")
@@ -176,15 +176,15 @@ BottomSheet
 
     ComboBox
     {
-        id: lifetimeComboBox
+        id: expirationComboBox
 
         backgroundMode: FieldBackground.Mode.Light
         width: parent.width
 
         enabled: d.enabled
 
-        popupTitle: qsTr("Select Lifetime")
-        labelText: qsTr("Lifetime")
+        popupTitle: qsTr("Select Expiration")
+        labelText: qsTr("Expiration")
 
         textRole: "text"
 
@@ -243,7 +243,7 @@ BottomSheet
                 if (id == "share")
                 {
                     if (backend.isExpired)
-                        lifetimeComboBox.currentIndex = 1
+                        expirationComboBox.currentIndex = 1
                     d.share(/*showNativeShareSheet*/true)
                 }
 
@@ -271,7 +271,7 @@ BottomSheet
                 : sharePasswordInput.text
 
             return backend.share(
-                lifetimeComboBox.model[lifetimeComboBox.currentIndex].expires,
+                expirationComboBox.model[expirationComboBox.currentIndex].expires,
                 bookmarkPassword.trim(),
                 showNativeShareSheet)
         }
