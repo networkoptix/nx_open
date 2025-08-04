@@ -2057,7 +2057,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Find similar</source>
-      <translation type="unfinished">Find similar</translation>
+      <translation>類似検索</translation>
     </message>
   </context>
   <context>
