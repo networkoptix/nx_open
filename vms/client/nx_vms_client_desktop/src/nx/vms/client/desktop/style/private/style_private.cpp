@@ -203,6 +203,8 @@ void StylePrivate::drawSwitch(QPainter* painter, const QStyleOption* option) con
         ? ((pressed || focused || hovered) ? QIcon::Active : QIcon::Normal)
         : QIcon::Disabled;
 
+    painter->save();
+    painter->setRenderHint(QPainter::SmoothPixmapTransform);
     if (option->state.testFlag(QStyle::State_On))
     {
         painter->drawPixmap(
@@ -218,6 +220,7 @@ void StylePrivate::drawSwitch(QPainter* painter, const QStyleOption* option) con
         painter->drawPixmap(
             rect, qnSkin->icon(kSwitchOff).pixmap(Metrics::kButtonSwitchSize, iconMode));
     }
+    painter->restore();
 }
 
 void StylePrivate::drawCheckBox(
