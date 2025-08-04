@@ -63,16 +63,17 @@ ToolBarBase
     }
 
     Keys.onPressed:
-    {
-        if (CoreUtils.keyIsBack(event.key))
+        (event) =>
         {
-            close()
-            event.accepted = true
+            if (CoreUtils.keyIsBack(event.key))
+            {
+                close()
+                event.accepted = true
+            }
+            else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return)
+            {
+                toolBar.accepted()
+                event.accepted = true;
+            }
         }
-        else if (event.key == Qt.Key_Enter || event.key == Qt.Key_Return)
-        {
-            toolBar.accepted()
-            event.accepted = true;
-        }
-    }
 }

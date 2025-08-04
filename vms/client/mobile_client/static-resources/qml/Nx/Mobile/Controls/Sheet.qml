@@ -27,6 +27,7 @@ Popup
         color: ColorTheme.colors.dark7
     }
 
+    focus: true
     topPadding: windowParams.topMargin
     leftPadding: 0
     rightPadding: 0
