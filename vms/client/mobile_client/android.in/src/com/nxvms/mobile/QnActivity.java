@@ -28,7 +28,6 @@ import java.lang.reflect.Field;
 import org.qtproject.qt.android.bindings.QtActivity;
 import com.nxvms.mobile.utils.Logger;
 import com.nxvms.mobile.utils.QnWindowUtils;
-import com.nxvms.mobile.utils.Android10BackGestureWorkaround;
 import com.nxvms.mobile.push.PushMessageManager;
 
 public class QnActivity extends QtActivity
@@ -220,20 +219,5 @@ public class QnActivity extends QtActivity
         super.onConfigurationChanged(newConfig);
 
         QnWindowUtils.handleOrientationChanged();
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event)
-    {
-
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P
-            && event.getActionMasked() == MotionEvent.ACTION_CANCEL)
-        {
-            // We run workaround on any motion cancel event.
-            // TODO: #ynikitenkov Check if the newest version of Qt fixes it.
-            Android10BackGestureWorkaround.workaround();
-        }
-
-        return super.dispatchTouchEvent(event);
     }
 }

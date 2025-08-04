@@ -174,11 +174,6 @@ Controls.ApplicationWindow
         property var lastOpenedNodeId: NxGlobals.uuid("")
     }
 
-    Android10BackGestureWorkaround
-    {
-        workaroundParentItem: contentItem
-    }
-
     onClosing:
         (close) =>
         {
