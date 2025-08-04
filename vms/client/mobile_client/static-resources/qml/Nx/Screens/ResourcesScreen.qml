@@ -35,7 +35,11 @@ Page
     customBackHandler:
         (isEscKeyPressed) =>
         {
-            if (!isEscKeyPressed)
+            if (searchToolBar.visible)
+                searchToolBar.close()
+            else if (loadingDummy.visible)
+                windowContext.sessionManager.stopSessionByUser()
+            else if (!isEscKeyPressed)
                 mainWindow.close()
         }
 
