@@ -265,11 +265,17 @@ struct NX_VMS_API ApiBestShotMetadataPacket
     /**%apidoc[opt] */
     std::vector<ApiObjectMetadataAttribute> attributes;
 
+    /**%apidoc[opt]
+     * Image vector used for similarity search.
+     * The vector is a float32 array serialized in Little Endian format.
+     */
+    std::vector<char> vectorData;
+
     bool operator==(const ApiBestShotMetadataPacket& other) const = default;
 };
 #define nx_vms_api_analytics_ApiBestShotMetadataPacket_Fields \
     (id)(deviceId)(trackId)(flags)(timestampMs)(boundingBox) \
-    (imageUrl)(imageData)(imageDataFormat)(attributes)
+    (imageUrl)(imageData)(imageDataFormat)(attributes)(vectorData)
 QN_FUSION_DECLARE_FUNCTIONS(ApiBestShotMetadataPacket, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ApiBestShotMetadataPacket,
     nx_vms_api_analytics_ApiBestShotMetadataPacket_Fields)

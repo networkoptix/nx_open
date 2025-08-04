@@ -3,7 +3,7 @@
 "use strict"
 
 const constants = require("./constants");
-const { mergeMaps, boundingBoxToString } = require("./utils.js");
+const { mergeMaps, boundingBoxToString, generateRandomVector } = require("./utils.js");
 const { randomUUID } = require("node:crypto");
 
 const makeObjectMetadataPackets = (mouseMovableObjectMetadata, objectActionMetadata, timestampMs) => {
@@ -69,7 +69,8 @@ const makeBestShotMetadataPacket = (trackId, timestampMs) => {
             y: 0,
             width: 0,
             height: 0
-        })
+        }),
+        vectorData: generateRandomVector()
     };
 };
 

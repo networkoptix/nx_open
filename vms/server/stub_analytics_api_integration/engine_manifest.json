@@ -1,4 +1,5 @@
 {
+    "vectorizationModel": "openai/clip-vit-large-patch14-336",
     "typeLibrary":
     {
         "objectTypes":
