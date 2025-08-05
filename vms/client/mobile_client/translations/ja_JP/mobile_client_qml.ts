@@ -905,10 +905,6 @@
       <translation>説明</translation>
     </message>
     <message>
-      <source>Lifetime</source>
-      <translation>有効期間</translation>
-    </message>
-    <message>
       <source>Protect with Password (optional)</source>
       <translation>パスワードで保護 (オプション)</translation>
     </message>
@@ -949,12 +945,16 @@
       <translation>共有中</translation>
     </message>
     <message>
-      <source>Select Lifetime</source>
-      <translation>有効期限を選択してください</translation>
-    </message>
-    <message>
       <source>Share Link</source>
       <translation>リンクを共有</translation>
+    </message>
+    <message>
+      <source>Select Expiration</source>
+      <translation type="unfinished">Select Expiration</translation>
+    </message>
+    <message>
+      <source>Expiration</source>
+      <translation type="unfinished">Expiration</translation>
     </message>
   </context>
   <context>

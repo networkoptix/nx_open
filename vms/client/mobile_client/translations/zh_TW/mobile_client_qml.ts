@@ -905,10 +905,6 @@
       <translation>&amp;敘述</translation>
     </message>
     <message>
-      <source>Lifetime</source>
-      <translation>生命週期</translation>
-    </message>
-    <message>
       <source>Protect with Password (optional)</source>
       <translation>使用密碼保護 (非必要)</translation>
     </message>
@@ -949,12 +945,16 @@
       <translation>分享中</translation>
     </message>
     <message>
-      <source>Select Lifetime</source>
-      <translation>選擇效期</translation>
-    </message>
-    <message>
       <source>Share Link</source>
       <translation>分享連結</translation>
+    </message>
+    <message>
+      <source>Select Expiration</source>
+      <translation type="unfinished">Select Expiration</translation>
+    </message>
+    <message>
+      <source>Expiration</source>
+      <translation type="unfinished">Expiration</translation>
     </message>
   </context>
   <context>

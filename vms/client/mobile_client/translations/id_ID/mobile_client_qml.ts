@@ -905,10 +905,6 @@
       <translation>Deskripsi</translation>
     </message>
     <message>
-      <source>Lifetime</source>
-      <translation>Selamanya</translation>
-    </message>
-    <message>
       <source>Protect with Password (optional)</source>
       <translation>Proteksi dengan Kata Sandi (opsional)</translation>
     </message>
@@ -949,12 +945,16 @@
       <translation>Berbagi</translation>
     </message>
     <message>
-      <source>Select Lifetime</source>
-      <translation>Pilih Seumur Hidup</translation>
-    </message>
-    <message>
       <source>Share Link</source>
       <translation>Bagi Link</translation>
+    </message>
+    <message>
+      <source>Select Expiration</source>
+      <translation type="unfinished">Select Expiration</translation>
+    </message>
+    <message>
+      <source>Expiration</source>
+      <translation type="unfinished">Expiration</translation>
     </message>
   </context>
   <context>

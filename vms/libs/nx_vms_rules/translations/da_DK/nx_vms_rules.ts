@@ -202,7 +202,7 @@
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Til</translation>
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>

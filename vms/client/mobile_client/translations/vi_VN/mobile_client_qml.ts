@@ -905,10 +905,6 @@
       <translation>Mô tả</translation>
     </message>
     <message>
-      <source>Lifetime</source>
-      <translation>Vĩnh viễn</translation>
-    </message>
-    <message>
       <source>Protect with Password (optional)</source>
       <translation>Bảo vệ bằng mật khẩu (tùy chọn)</translation>
     </message>
@@ -949,12 +945,16 @@
       <translation>Chia sẻ</translation>
     </message>
     <message>
-      <source>Select Lifetime</source>
-      <translation>Chọn trọn đời</translation>
-    </message>
-    <message>
       <source>Share Link</source>
       <translation>Chia sẻ Liên kết</translation>
+    </message>
+    <message>
+      <source>Select Expiration</source>
+      <translation type="unfinished">Select Expiration</translation>
+    </message>
+    <message>
+      <source>Expiration</source>
+      <translation type="unfinished">Expiration</translation>
     </message>
   </context>
   <context>

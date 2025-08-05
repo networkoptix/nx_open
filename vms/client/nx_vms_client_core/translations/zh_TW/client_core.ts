@@ -179,6 +179,10 @@
       <source>Failed to access site</source>
       <translation>未能連接站點</translation>
     </message>
+    <message>
+      <source>Failed to access site.</source>
+      <translation type="unfinished">Failed to access site.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>

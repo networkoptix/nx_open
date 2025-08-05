@@ -2091,7 +2091,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Find similar</source>
-      <translation type="unfinished">Find similar</translation>
+      <translation>Znajdz podobne</translation>
     </message>
   </context>
   <context>

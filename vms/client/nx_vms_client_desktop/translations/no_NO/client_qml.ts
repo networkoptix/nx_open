@@ -2067,7 +2067,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Find similar</source>
-      <translation type="unfinished">Find similar</translation>
+      <translation>Finn lignende</translation>
     </message>
   </context>
   <context>
