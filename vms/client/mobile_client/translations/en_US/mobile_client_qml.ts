@@ -906,10 +906,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Lifetime</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Protect with Password (optional)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -950,11 +946,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Select Lifetime</source>
+        <source>Share Link</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Share Link</source>
+        <source>Select Expiration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expiration</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
