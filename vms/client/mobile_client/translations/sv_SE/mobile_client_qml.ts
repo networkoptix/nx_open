@@ -902,10 +902,6 @@
       <translation>Beskrivning</translation>
     </message>
     <message>
-      <source>Lifetime</source>
-      <translation>Livslängd</translation>
-    </message>
-    <message>
       <source>Protect with Password (optional)</source>
       <translation>Skydda med lösenord (valfritt)</translation>
     </message>
@@ -946,12 +942,16 @@
       <translation>Delning</translation>
     </message>
     <message>
-      <source>Select Lifetime</source>
-      <translation>Välj livstid</translation>
-    </message>
-    <message>
       <source>Share Link</source>
       <translation>Dela länk</translation>
+    </message>
+    <message>
+      <source>Select Expiration</source>
+      <translation type="unfinished">Select Expiration</translation>
+    </message>
+    <message>
+      <source>Expiration</source>
+      <translation type="unfinished">Expiration</translation>
     </message>
   </context>
   <context>

@@ -40,7 +40,7 @@
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>ingen data til prognose</translation>
     </message>
     <message>
       <source>empty</source>
@@ -155,15 +155,15 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administratorer</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Superbrugere</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>Avancerede seere</translation>
     </message>
     <message>
       <source>Viewers</source>
@@ -175,15 +175,15 @@
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>Medlemmer af denne gruppe kan se livevideoer, I/O-moduler og websider.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>Medlemmer af denne gruppe kan, ud over de tilladelser, der er givet af gruppen Seere, se og aktivere PTZ-positioner og PTZ-runder, bruge 2-vejs lyd, betjene I/O-modulknapper, oprette og redigere bogmærker og se hændelsesloggen.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>Medlemmer af denne gruppe kan, udover de tilladelser, der er givet af Live Viewers-gruppen, se og eksportere arkiv og bogmærker.</translation>
     </message>
     <message>
       <source>Site Health Viewers</source>
@@ -314,11 +314,11 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>Modtaget forkert svar fra Server %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation type="unfinished">Check if Server is up and has the proper version.</translation>
+      <translation>Kontroller, om serveren er oppe og har den rigtige version.</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
@@ -326,7 +326,7 @@
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation type="unfinished">Finally, try to update firmware. If the problem persists, please contact support.</translation>
+      <translation>Prøv endelig at opdatere firmware. Hvis problemet fortsætter, kontakt venligst support.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
@@ -338,7 +338,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>Der er opstået en input/output-fejl. OS-meddelelse: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -350,23 +350,23 @@
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the camera, then restore factory defaults on the web-page.</translation>
+      <translation>Prøv venligst at genstarte kameraet, og gendan derefter fabriksstandard på web-siden.</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation type="unfinished">Make sure the device is plugged into the network. Try to reboot the device.</translation>
+      <translation>Sørg for, at enheden er tilsluttet netværket. Prøv at genstarte enheden.</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation type="unfinished">Make sure the camera is plugged into the network. Try to reboot the camera.</translation>
+      <translation>Sørg for, at kameraet er tilsluttet netværket. Prøv at genstarte kameraet.</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Enhedsanmodning &quot;%1&quot; fejlede med fejl &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Kameraanmodning &quot;%1&quot; mislykkedes med fejl &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -402,15 +402,15 @@
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open I/O module issues dialog for more details.</translation>
+      <translation>For mange mediefejl. Åbn dialogboksen Problemer med I/O-modulet for at få flere oplysninger.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation type="unfinished">Device initialization process is in progress.</translation>
+      <translation>Enhedens initialiseringsproces er i gang.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation type="unfinished">Camera initialization process is in progress.</translation>
+      <translation>Kamerainitialiseringsprocessen er i gang.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
@@ -418,59 +418,59 @@
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation type="unfinished">Make sure port %1 is accessible (e.g. forwarded).</translation>
+      <translation>Sørg for, at port %1 er tilgængelig (f.eks. videresendt).</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the device web-page.</translation>
+      <translation>Hvis det ikke hjælper, gendan fabrikken standardindstillinger på enhedens web-side.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the camera web-page.</translation>
+      <translation>Hvis det ikke hjælper, skal du gendanne fabriksindstillingerne på kameraets webside.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the I/O module web-page.</translation>
+      <translation>Hvis det ikke hjælper, skal du gendanne fabriksindstillingerne på I/O-modulets webside.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Failed to connect to media port %2.</translation>
+      <translation>Kan ikke åbne medie URL %1. Kunne ikke forbinde til medie port %2.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation type="unfinished">Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</translation>
+      <translation>Kan ikke åbne medie URL %1. Forbindelsen til port %2 blev lukket uventet.</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse device response. URL %1, request name %2.</translation>
+      <translation>Kunne ikke analysere enhedssvaret. URL %1, anmodningsnavn %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse camera response. URL %1, request name %2.</translation>
+      <translation>Kamerasvaret kunne ikke analyseres. URL %1, anmodningsnavn %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse I/O module response. URL %1, request name %2.</translation>
+      <translation>Kunne ikke parse I/O-modulets svar. URL %1, anmodningsnavn %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation type="unfinished">No supported media tracks at URL %1.</translation>
+      <translation>Ingen understøttede mediespor på URL %1.</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation type="unfinished">Not authorized. URL %1.</translation>
+      <translation>Ikke autoriseret. URL %1.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Unsupported media protocol %2.</translation>
+      <translation>Kan ikke åbne medie-URL'en %1. Medieprotokol der ikke understøttes %2.</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>Kameraet blev gendannet fra arkivet. Slet kameraet, og tilføj det igen for at se livevideo.</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>Opdater venligst firmwaren. Den minimalt understøttede version er %1. Den nuværende version er %2</translation>
     </message>
     <message>
       <source>Plugin error. %1</source>
@@ -498,15 +498,15 @@
     </message>
     <message>
       <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+      <translation>Der blev modtaget ugyldige data fra enheden. Detaljer: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+      <translation>Der blev modtaget ugyldige data fra kameraet. Detaljer: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>Der blev modtaget ugyldige data fra I/O-modulet. Detaljer: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -798,9 +798,9 @@
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Analoge licenser</numerusform>
+        <numerusform>%n/%1 Analoge licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -908,7 +908,7 @@
     </message>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>Lokal optagelse</translation>
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
@@ -1341,7 +1341,7 @@
     <name>ServiceTypeDisplayStringHelper</name>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>Lokal optagelse</translation>
     </message>
     <message>
       <source>Integration</source>
@@ -1349,7 +1349,7 @@
     </message>
     <message>
       <source>Cloud storage</source>
-      <translation type="unfinished">Cloud storage</translation>
+      <translation>Cloud-lagring</translation>
     </message>
     <message>
       <source>Live view</source>
@@ -1360,7 +1360,7 @@
     <name>StringsHelper</name>
     <message>
       <source>Check internet connection between VMS and license server.</source>
-      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
+      <translation>Kontroller internetforbindelsen mellem VMS og licensserver.</translation>
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
@@ -1378,35 +1378,35 @@
     <name>TimeFormat</name>
     <message>
       <source>just now</source>
-      <translation type="unfinished">just now</translation>
+      <translation>lige nu</translation>
     </message>
     <message>
       <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
+      <translation>i går</translation>
     </message>
     <message>
       <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
+      <translation>for en uge siden</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
+      <translation>
+        <numerusform>for %n minutter siden</numerusform>
+        <numerusform>for %n minutter siden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
-        <numerusform>%n hours ago</numerusform>
+      <translation>
+        <numerusform>for %n timer siden</numerusform>
+        <numerusform>for %n timer siden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days ago</source>
-      <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
-        <numerusform>%n days ago</numerusform>
+      <translation>
+        <numerusform>for %n dage siden</numerusform>
+        <numerusform>for %n dage siden</numerusform>
       </translation>
     </message>
   </context>
@@ -1418,19 +1418,19 @@
     </message>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
+      <translation>Den tilsvarende container i FFMPEG-biblioteket blev ikke fundet.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation type="unfinished">Could not create output file for video recording.</translation>
+      <translation>Kunne ikke oprette outputfil til videooptagelse.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+      <translation>Kunne ikke allokere outputstream til optagelse.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation type="unfinished">Could not allocate output audio stream.</translation>
+      <translation>Kunne ikke allokere outputlydstream.</translation>
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
@@ -1438,27 +1438,27 @@
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation type="unfinished">Invalid audio codec information.</translation>
+      <translation>Ugyldige lyd-codec-oplysninger.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
+      <translation>Video- eller lydcodec'en er inkompatibel med det valgte format.</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Video omkodning påkrævet.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
+      <translation>Ugyldig ressourcetype for dataeksport.</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Ingen data eksporteret.</translation>
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Lås denne del af arkivet op for at eksportere indholdet.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
@@ -1466,7 +1466,7 @@
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Fejl ved filskrivning.</translation>
     </message>
     <message>
       <source>Audio transcoding required.</source>
@@ -1514,31 +1514,31 @@
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
-      <translation type="unfinished">Anonymous statistics report allowed.</translation>
+      <translation>Anonym statistikrapport tilladt.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time.</source>
-      <translation type="unfinished">Anonymous statistics report last time.</translation>
+      <translation>Anonym statistikrapport sidste gang.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version.</source>
-      <translation type="unfinished">Anonymous statistics report last version.</translation>
+      <translation>Anonym statistikrapport seneste version.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number.</source>
-      <translation type="unfinished">Anonymous statistics report last number.</translation>
+      <translation>Anonym statistik rapporterer sidste nummer.</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle.</source>
-      <translation type="unfinished">Anonymous statistics time cycle.</translation>
+      <translation>Anonym statistik tidscyklus.</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update.</source>
-      <translation type="unfinished">Anonymous statistics report delay after update.</translation>
+      <translation>Anonym statistik rapport forsinkelse efter opdatering.</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL.</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL.</translation>
+      <translation>Anonym Statistik Rapport Server URL.</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL.</source>
@@ -1546,7 +1546,7 @@
     </message>
     <message>
       <source>Anonymous statistics report Client settings.</source>
-      <translation type="unfinished">Anonymous statistics report Client settings.</translation>
+      <translation>Anonym statistik rapport Klient indstillinger.</translation>
     </message>
     <message>
       <source>Device storage information update interval.</source>
@@ -1570,11 +1570,11 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID.</source>
-      <translation type="unfinished">Primary time synchronization Server ID.</translation>
+      <translation>Primær tidssynkroniseringsserver-ID.</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds).</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds).</translation>
+      <translation>Maksimal forskel mellem lokal tid og kildetid (millisekunder).</translation>
     </message>
     <message>
       <source>OS time change check period.</source>
@@ -1602,7 +1602,7 @@
     </message>
     <message>
       <source>Cloud authorization key.</source>
-      <translation type="unfinished">Cloud authorization key.</translation>
+      <translation>Cloud-godkendelsesnøgle.</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site.</source>
@@ -1622,15 +1622,15 @@
     </message>
     <message>
       <source>Disable Device vendors.</source>
-      <translation type="unfinished">Disable Device vendors.</translation>
+      <translation>Deaktivér Enhedssælgere.</translation>
     </message>
     <message>
       <source>Optimize Camera settings.</source>
-      <translation type="unfinished">Optimize Camera settings.</translation>
+      <translation>Optimer kameraindstillinger.</translation>
     </message>
     <message>
       <source>Thumbnails auto-update.</source>
-      <translation type="unfinished">Thumbnails auto-update.</translation>
+      <translation>Miniaturer auto-opdatering.</translation>
     </message>
     <message>
       <source>Send plain-text emails.</source>
@@ -1646,7 +1646,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730).</source>
-      <translation type="unfinished">Audit trail period (days, 14-730).</translation>
+      <translation>Revisionssporperiode (dage, 14-730).</translation>
     </message>
     <message>
       <source>Event log period (days).</source>
@@ -1658,11 +1658,11 @@
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption).</translation>
+      <translation>Gennemtving HTTPS (datatrafik kryptering).</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption).</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption).</translation>
+      <translation>Gennemtving RTSPS (video trafik kryptering).</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
@@ -1670,27 +1670,27 @@
     </message>
     <message>
       <source>Enable auto-discovery.</source>
-      <translation type="unfinished">Enable auto-discovery.</translation>
+      <translation>Aktivér automatisk opdagelse.</translation>
     </message>
     <message>
       <source>Enable auto-update notifications.</source>
-      <translation type="unfinished">Enable auto-update notifications.</translation>
+      <translation>Aktivér notifikationer om automatiske opdateringer.</translation>
     </message>
     <message>
       <source>Enable update notifications.</source>
-      <translation type="unfinished">Enable update notifications.</translation>
+      <translation>Aktivér opdateringsnotifikationer.</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping.</source>
-      <translation type="unfinished">Enable UPNP port-mapping.</translation>
+      <translation>Aktivér UPNP-porttilknytning.</translation>
     </message>
     <message>
       <source>Backup settings.</source>
-      <translation type="unfinished">Backup settings.</translation>
+      <translation>Backupindstillinger.</translation>
     </message>
     <message>
       <source>Cloud host override.</source>
-      <translation type="unfinished">Cloud host override.</translation>
+      <translation>Tilsidesættelse af cloud-vært.</translation>
     </message>
     <message>
       <source>Enable cross-domain policy.</source>
@@ -1698,7 +1698,7 @@
     </message>
     <message>
       <source>Enable RTSP for Arecont.</source>
-      <translation type="unfinished">Enable RTSP for Arecont.</translation>
+      <translation>Aktivér RTSP for Arecont.</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher.</source>

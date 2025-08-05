@@ -12,14 +12,14 @@
     <name>AnalyticSelectors</name>
     <message>
       <source>ADVANCED SEARCH</source>
-      <translation type="unfinished">ADVANCED SEARCH</translation>
+      <translation>AVANCERET SØGNING</translation>
     </message>
   </context>
   <context>
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>App Info</translation>
     </message>
   </context>
   <context>
@@ -37,11 +37,11 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Beta Funktioner</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation type="unfinished">Video Download</translation>
+      <translation>Videodownload</translation>
     </message>
     <message>
       <source>Ability to download video</source>
@@ -809,7 +809,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Hvordan forbindes der?</translation>
     </message>
     <message>
       <source>Folder is empty</source>
@@ -868,7 +868,7 @@
     </message>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Beta Funktioner</translation>
     </message>
     <message>
       <source>Early access to new features</source>
@@ -900,10 +900,6 @@
     <message>
       <source>Description</source>
       <translation>Beskrivelse</translation>
-    </message>
-    <message>
-      <source>Lifetime</source>
-      <translation type="unfinished">Lifetime</translation>
     </message>
     <message>
       <source>Protect with Password (optional)</source>
@@ -946,12 +942,16 @@
       <translation type="unfinished">Sharing</translation>
     </message>
     <message>
-      <source>Select Lifetime</source>
-      <translation type="unfinished">Select Lifetime</translation>
-    </message>
-    <message>
       <source>Share Link</source>
       <translation type="unfinished">Share Link</translation>
+    </message>
+    <message>
+      <source>Select Expiration</source>
+      <translation type="unfinished">Select Expiration</translation>
+    </message>
+    <message>
+      <source>Expiration</source>
+      <translation type="unfinished">Expiration</translation>
     </message>
   </context>
   <context>

@@ -902,10 +902,6 @@
       <translation>Description</translation>
     </message>
     <message>
-      <source>Lifetime</source>
-      <translation>Durée de vie</translation>
-    </message>
-    <message>
       <source>Protect with Password (optional)</source>
       <translation>Protéger avec un mot de passe (facultatif)</translation>
     </message>
@@ -946,12 +942,16 @@
       <translation>Partage en cours</translation>
     </message>
     <message>
-      <source>Select Lifetime</source>
-      <translation type="unfinished">Select Lifetime</translation>
-    </message>
-    <message>
       <source>Share Link</source>
       <translation type="unfinished">Share Link</translation>
+    </message>
+    <message>
+      <source>Select Expiration</source>
+      <translation type="unfinished">Select Expiration</translation>
+    </message>
+    <message>
+      <source>Expiration</source>
+      <translation type="unfinished">Expiration</translation>
     </message>
   </context>
   <context>
