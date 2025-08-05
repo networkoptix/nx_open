@@ -128,6 +128,12 @@ struct NX_VMS_API MediaSettings
      */
     bool panoramic = true;
 
+    /**%apidoc
+     * Forces specific video codec. Causes error response if specified codec is not found or not
+     * supported for selected particular container (see `format`).
+     */
+    std::optional<QString> videoCodec;
+
     ValidationResult validateMediaSettings() const;
 
     bool isValid() const;
@@ -136,7 +142,7 @@ struct NX_VMS_API MediaSettings
 };
 #define MediaSettings_Fields (stream)(positionMs)(resolution)(resolutionWhenTranscoding)\
     (rotation)(aspectRatio)(dewarping)(dewarpingXangle)(dewarpingYangle)(dewarpingFov)\
-    (dewarpingPanofactor)(zoom)
+    (dewarpingPanofactor)(zoom)(videoCodec)
 QN_FUSION_DECLARE_FUNCTIONS(MediaSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MediaSettings, MediaSettings_Fields)
 

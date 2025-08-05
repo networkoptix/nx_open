@@ -64,6 +64,8 @@ LegacyTranscodingSettings::LegacyTranscodingSettings(
         if (layout && layout->channelCount() > 1)
             panoramic = true;
     }
+
+    videoCodec = settings->videoCodec;
 }
 
 bool LegacyTranscodingSettings::isEmpty() const
@@ -97,6 +99,9 @@ bool LegacyTranscodingSettings::isEmpty() const
         return false;
 
     if (panoramic)
+        return false;
+
+    if (videoCodec)
         return false;
 
     return true;
