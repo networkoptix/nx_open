@@ -285,6 +285,7 @@ CameraDiagnostics::Result RtspRestreamer::openStream()
             m_reader.setCredentials(nx::network::http::BearerAuthToken(token));
         }
 
+        m_reader.rtspClient().setFormat(QnRtspClient::Format::Auto);
         auto result = m_reader.openStream();
         if (result.errorCode == CameraDiagnostics::ErrorCode::noError)
             return result;

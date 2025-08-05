@@ -8,6 +8,7 @@
 
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_connection_processor.h>
+#include <nx/branding.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/nettools.h>
@@ -366,6 +367,19 @@ QnRtspClient::~QnRtspClient()
 {
     stop();
     delete [] m_responseBuffer;
+}
+
+void QnRtspClient::setFormat(const Format format)
+{
+    if (m_format == format)
+        return;
+
+    if (format == Format::NxProprietary)
+        setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1");
+    else
+        removeAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT);
+
+    m_format = format;
 }
 
 bool QnRtspClient::parseSDP(const QByteArray& response)
@@ -774,6 +788,15 @@ CameraDiagnostics::Result QnRtspClient::sendOptions()
     {
         NX_DEBUG(this, "GET_PARAMETER method not allowed, disable keep alive, public methods: %1",
             allowedMethods);
+    }
+
+    if (m_format == Format::Auto)
+    {
+        QString server = extractRtspParam(QLatin1String(response), QLatin1String("Server:"));
+        if (server.contains(nx::branding::vmsName()))
+            setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1");
+        else
+            removeAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT);
     }
 
     return result;

@@ -1114,7 +1114,7 @@ bool QnRtspClientArchiveDelegate::setupRtspSession(
     session->setCredentials(credentials, nx::network::http::header::AuthScheme::digest);
     session->setAdditionAttribute(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME, auditId.toSimpleByteArray());
-    session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1");
+    session->setFormat(QnRtspClient::Format::NxProprietary);
     session->setAdditionAttribute(
         Qn::CUSTOM_USERNAME_HEADER_NAME, QString::fromStdString(credentials.username).toUtf8());
 
