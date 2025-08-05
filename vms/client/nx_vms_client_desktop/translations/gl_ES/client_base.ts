@@ -1402,7 +1402,7 @@
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
-      <translation>Gallego</translation>
+      <translation>Galego</translation>
     </message>
   </context>
   <context>
