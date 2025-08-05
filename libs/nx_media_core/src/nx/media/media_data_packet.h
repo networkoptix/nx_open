@@ -138,6 +138,8 @@ public:
     bool isLQ() const;
     bool isLive() const;
 
+    const CodecParametersConstPtr& getContext() const;
+
     QString idForToStringFromPtr() const;
 
 public:

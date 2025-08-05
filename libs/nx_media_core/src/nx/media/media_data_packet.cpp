@@ -56,6 +56,11 @@ bool QnAbstractMediaData::isLive() const
     return flags & MediaFlags_LIVE;
 }
 
+const CodecParametersConstPtr& QnAbstractMediaData::getContext() const
+{
+    return context;
+}
+
 AVMediaType toAvMediaType(QnAbstractMediaData::DataType dataType)
 {
     switch (dataType)

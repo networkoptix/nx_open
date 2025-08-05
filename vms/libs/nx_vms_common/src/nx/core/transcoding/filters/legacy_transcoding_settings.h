@@ -37,6 +37,7 @@ struct NX_VMS_COMMON_API LegacyTranscodingSettings
     nx::core::transcoding::FilterParams cameraNameParams;
     Watermark watermark;
     bool panoramic = false;
+    std::optional<QString> videoCodec;
 
     bool isEmpty() const;
 };
