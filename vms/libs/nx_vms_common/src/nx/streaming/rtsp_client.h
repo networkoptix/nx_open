@@ -113,6 +113,13 @@ inline bool operator<(
 class NX_VMS_COMMON_API QnRtspClient
 {
 public:
+    enum class Format
+    {
+        RTP,
+        NxProprietary,
+        Auto, //< If the server is NX, then NxProprietary will be used, otherwise use RTP.
+    };
+
     struct Config
     {
         bool shouldGuessAuthDigest = false;
@@ -163,6 +170,11 @@ public:
      * Update RTSP Client config.
      */
     void setConfig(const Config& config) { m_config = config; }
+
+    /**
+     * Set RTP streaming format.
+     */
+    void setFormat(const Format format);
 
     /**
      * Shutdown TCP socket and terminate current IO operation. Can be called from the other thread.
@@ -426,6 +438,7 @@ private:
     nx::network::NatTraversalSupport m_natTraversal{nx::network::NatTraversalSupport::enabled};
     bool m_keepAliveSupported = true;
     std::chrono::milliseconds m_tcpConnectionTimeout{};
+    Format m_format = Format::RTP;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read
