@@ -185,21 +185,23 @@ void ClientLogCollector::run()
         return;
     }
 
+    auto baseLogDirectory = QFileInfo(baseFileName.value()).absolutePath();
+
     auto calculationSize =
         [&]()
         {
             int size = 0;
 
-            for (int rotation = 0; !m_cancelled && rotation <= kMaxLogRotation; rotation++)
-            {
-                for (const auto extension: {File::Extension::log, File::Extension::zip})
-                {
-                    const auto path = File::makeFileName(*baseFileName, rotation, extension);
-                    if (!QFile::exists(path))
-                        continue;
+            QDir logFolder(baseLogDirectory);
+            logFolder.setNameFilters(QStringList() << "*.log" << "*.log.zip");
+            QStringList fileList = logFolder.entryList();
 
-                    size += QFileInfo(path).size();
-                }
+            for (int i = 0; !m_cancelled && i < fileList.size(); i++)
+            {
+                if (!QFile::exists(baseLogDirectory + QDir::separator() + fileList[i]))
+                    continue;
+
+                size += QFileInfo(baseLogDirectory + QDir::separator() + fileList[i]).size();
             }
 
             const auto directory = QFileInfo(*baseFileName).absoluteDir();
@@ -362,35 +364,31 @@ void ClientLogCollector::run()
             return true;
         };
 
-    for (int rotation = 0; !m_cancelled && rotation <= kMaxLogRotation; rotation++)
+    QDir logFolder(baseLogDirectory);
+    logFolder.setNameFilters(QStringList() << "*.log" << "*.log.zip");
+    QStringList fileList = logFolder.entryList();
+
+    for (int i = 0; !m_cancelled && i < fileList.size(); i++)
     {
-        NX_VERBOSE(this,
-            "Archiving %1 for %2",
-            (rotation == 0) ? "current log file" : NX_FMT("rotated log file %1", rotation),
-            name);
+        NX_VERBOSE(this, "Archiving log file %1 for %2", fileList.at(i), name);
 
-        for (const auto extension: {File::Extension::log, File::Extension::zip})
+        const auto path = baseLogDirectory + QDir::separator() + fileList.at(i);
+        if (!QFile::exists(path))
         {
-            const auto path = File::makeFileName(*baseFileName, rotation, extension);
-            if (!QFile::exists(path))
-            {
-                NX_VERBOSE(this,
-                    "Log file for %1 does not exist at the path %2, skipping it",
-                    name,
-                    path);
-                continue;
-            }
+            NX_VERBOSE(
+                this, "Log file for %1 does not exist at the path %2, skipping it", name, path);
+            continue;
+        }
 
-            if (rotation && extension == File::Extension::zip)
-            {
-                if (!addFileToArchiveWithRotation(path, extension))
-                    return;
-            }
-            else
-            {
-                if (!addLogFileToArchive(path))
-                    return;
-            }
+        if (path.endsWith(".log.zip"))
+        {
+            if (!addFileToArchiveWithRotation(path, File::zip))
+                return;
+        }
+        else
+        {
+            if (!addLogFileToArchive(path))
+                return;
         }
     }
 
