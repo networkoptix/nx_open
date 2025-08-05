@@ -886,7 +886,7 @@
     </message>
     <message>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Tilføj enheder</translation>
     </message>
     <message>
       <source>Default</source>
@@ -1644,7 +1644,7 @@
     <name>NewDeviceAdditionDialog</name>
     <message>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Tilføj enheder</translation>
     </message>
     <message>
       <source>to</source>

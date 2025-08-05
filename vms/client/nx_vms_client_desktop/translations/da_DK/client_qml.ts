@@ -988,7 +988,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Afslut</translation>
     </message>
   </context>
   <context>
