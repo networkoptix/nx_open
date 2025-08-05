@@ -1597,7 +1597,7 @@
     </message>
     <message>
       <source>Persistent Servers where updates are stored</source>
-      <translation>更新が保存される永続サーバー</translation>
+      <translation>更新情報を保存する永続サーバー</translation>
     </message>
     <message>
       <source>VMS Server version specific features</source>
@@ -1609,7 +1609,7 @@
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation>障害が発生した場合に、分析DBストレージのマウントポイントの権限取得を強制する</translation>
+      <translation>分析DBストレージのマウントポイントの権限取得失敗時、強制的に取得する</translation>
     </message>
     <message>
       <source>Storage encryption enabled</source>
@@ -1689,7 +1689,7 @@
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation>プライマリストリーム用にフレームをキャッシュするかどうか。値: &apos;yes&apos; - 常に有効 (RAMを多く消費する可能性あり)、 &apos;no&apos; - 再生時に要求される場合 (HLS等) を除いて常に無効、&apos;auto&apos; - &apos;no&apos;と似ていますが、ユーザーエクスペリエンスを向上させる場合にオンになります (分析プラグインがカメラで動作しているとき等)。</translation>
+      <translation>プライマリストリームのフレームのキャッシュ設定。値: &apos;yes&apos; - 常に有効 (RAMを多く消費する可能性あり)、 &apos;no&apos; - 再生時に要求される場合 (HLS等) を除いて常に無効、&apos;auto&apos; - &apos;no&apos; の条件に加え、ユーザーエクスペリエンスを向上させる場合にもオン (カメラに対して分析プラグインが動作しているとき等)。</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
@@ -1758,7 +1758,7 @@
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only</source>
-      <translation>SMTP設定。これらの設定はパワーユーザーにのみ表示されます。</translation>
+      <translation>SMTP設定。パワーユーザー以上にのみ表示。</translation>
     </message>
   </context>
   <context>
