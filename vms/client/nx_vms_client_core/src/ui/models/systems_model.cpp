@@ -332,6 +332,15 @@ bool QnSystemsModel::lessThan(const QModelIndex& sourceLeft, const QModelIndex& 
 {
     using namespace nx::vms::client::core::welcome_screen;
 
+    if (cloudFirstSorting)
+    {
+        const bool leftIsCloud = sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
+        const bool rightIsCloud = sourceRight.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
+
+        if (leftIsCloud != rightIsCloud)
+            return leftIsCloud;
+    }
+
     const auto leftIsFactorySystem =
         sourceLeft.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
     const auto rightIsFactorySystem =

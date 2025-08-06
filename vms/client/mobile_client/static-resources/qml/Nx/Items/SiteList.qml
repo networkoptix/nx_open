@@ -80,7 +80,9 @@ ListView
         return NxGlobals.toHtmlEscaped(text)
     }
 
-    section.property: currentSearchRegExp ? "section" : ""
+    section.property: currentSearchRegExp || siteList.currentTab == OrganizationsModel.SitesTab
+        ? "section"
+        : ""
     section.criteria: ViewSection.FullString
     section.delegate: ColumnLayout
     {
@@ -173,7 +175,7 @@ ListView
                 saasSuspended: modelData.isSaasSuspended ?? false
                 saasShutDown: modelData.isSaasShutDown ?? false
                 isFromSites: modelData.isFromSites ?? false
-                ownerDescription: cloudSystem ? modelData.ownerDescription : ""
+                ownerDescription: cloudSystem ? (modelData.ownerDescription ?? "") : ""
                 running: modelData.isOnline || false
                 reachable: modelData.isReachable || false
                 compatible: (modelData.isCompatibleToMobileClient || modelData.isFactorySystem) || false
