@@ -568,6 +568,7 @@ namespace header {
 /** Common header name constants. */
 static constexpr char kAccept[] = "Accept";
 static constexpr char kAcceptLanguage[] = "Accept-Language";
+static constexpr char kContentDisposition[] = "Content-Disposition";
 static constexpr char kContentType[] = "Content-Type";
 static constexpr char kContentLength[] = "Content-Length";
 static constexpr char kUserAgent[] = "User-Agent";

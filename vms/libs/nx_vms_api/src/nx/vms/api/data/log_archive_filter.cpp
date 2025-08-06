@@ -3,8 +3,13 @@
 #include "log_archive_filter.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/std/ranges.h>
 
 namespace nx::vms::api {
+
+const std::vector<api::LogName> LogArchiveFilter::kAllNames =
+    nx::reflect::enumeration::visitAllItems<api::LogName>(
+        [](auto&&... items) { return std::vector{items.value...} | nx::utils::ranges::sort(); });
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LogArchiveFilter, (json), LogArchiveFilter_Fields)
 

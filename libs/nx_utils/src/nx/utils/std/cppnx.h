@@ -2,10 +2,14 @@
 
 #pragma once
 
+#include <functional>
+#include <utility>
+#include <vector>
+
 /**@file
-  * This file is for c++ utilities that are absent in modern c++ standards but can be easily
-  * implemented using c++14. Some of them are in std::experimental, some present on selected
-  * compilers, some are waiting in c++20 and further standards.
+ * This file is for c++ utilities that are absent in modern c++ standards but can be easily
+ * implemented using c++14. Some of them are in std::experimental, some present on selected
+ * compilers, some are waiting in c++20 and further standards.
  */
 
 namespace nx::utils {
@@ -29,20 +33,21 @@ auto make_vector(Elements&&... e)
 }
 
 #if !defined(__cpp_lib_bind_back)
-    template<class F, class... BoundArgs>
-    constexpr auto bind_back(F&& f, BoundArgs&&... boundArgs)
+
+    template<typename F, typename... Bound>
+    constexpr auto bind_back(F&& f, Bound&&... bound)
     {
         return
-            [f = std::forward<F>(f), ... boundArgs = std::forward<BoundArgs>(boundArgs)]
-                <typename... Args>(Args&&... args) mutable -> decltype(auto)
+            [f = std::forward<F>(f), ... bound = std::forward<Bound>(bound)]<typename... Args>
+                requires std::invocable<F&&, Args&&..., Bound&&...>
+                (Args&&... args) mutable -> decltype(auto)
             {
-                return std::invoke(f,
+                return std::invoke(std::forward<decltype(f)>(f),
                     std::forward<Args>(args)...,
-                    // FIXME: #skolesnik Investigate why this breaks compilation
-                    // std::forward<BoundArgs>(boundArgs)...
-                    boundArgs...);
+                    std::forward<decltype(bound)>(bound)...);
             };
     }
+
 #else
     using std::bind_back;
 #endif

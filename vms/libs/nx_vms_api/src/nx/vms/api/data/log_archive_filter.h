@@ -22,11 +22,14 @@ NX_REFLECTION_ENUM_CLASS(LogName,
 
 struct NX_VMS_API LogArchiveFilter
 {
+    static const std::vector<nx::vms::api::LogName> kAllNames;
+
     nx::Uuid id;
 
-    /**%apidoc Indicates if the archive includes (and how many) rotated files. */
-    std::optional<int> rotated;
+    /**%apidoc[opt] N most recent rotated log files. */
+    int lastN = log::kMaxLogRotation;
 
+    // FIXME: #skolesnik #ekarpov /rest/v4 will not parse query parameters into a simple std::vector
     /**%apidoc:stringArray
      * Logs included in the archive.
      *     %value main
@@ -35,9 +38,18 @@ struct NX_VMS_API LogArchiveFilter
      *     %value update
      * %// NOTE: need to specify values explicitly since apidoc doesn't parse ValueOrArray
      */
-    std::optional<json::ValueOrArray<LogName>> names;
+    std::optional<json::ValueOrArray<api::LogName>> names;
+
+    static DeprecatedFieldNames const* getDeprecatedFieldNames()
+    {
+        const static DeprecatedFieldNames kDeprecatedFieldNames{
+            {lit("lastN"), lit("rotated")}, //< Starting from v4
+        };
+
+        return std::addressof(kDeprecatedFieldNames);
+    }
 };
-#define LogArchiveFilter_Fields (id)(rotated)(names)
+#define LogArchiveFilter_Fields (id)(lastN)(names)
 QN_FUSION_DECLARE_FUNCTIONS(LogArchiveFilter, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(LogArchiveFilter, LogArchiveFilter_Fields)
 
