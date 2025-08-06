@@ -12,14 +12,14 @@
     <name>AnalyticSelectors</name>
     <message>
       <source>ADVANCED SEARCH</source>
-      <translation type="unfinished">ADVANCED SEARCH</translation>
+      <translation>AVANCERET SØGNING</translation>
     </message>
   </context>
   <context>
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>App Info</translation>
     </message>
   </context>
   <context>
@@ -41,7 +41,7 @@
     </message>
     <message>
       <source>Video Download</source>
-      <translation type="unfinished">Video Download</translation>
+      <translation>Videodownload</translation>
     </message>
     <message>
       <source>Ability to download video</source>
@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation type="unfinished">Follow the steps of wizard</translation>
+      <translation>Følg guidens trin</translation>
     </message>
     <message>
       <source>OK</source>
@@ -651,7 +651,7 @@
     <name>RangeSelector</name>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>Fra</translation>
     </message>
     <message>
       <source>To</source>
@@ -685,7 +685,7 @@
     </message>
     <message>
       <source>No Cameras</source>
-      <translation type="unfinished">No Cameras</translation>
+      <translation>Ingen Kameraer</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this layout</source>
@@ -813,7 +813,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Hvordan forbindes der?</translation>
     </message>
     <message>
       <source>Folder is empty</source>
@@ -888,7 +888,7 @@
     </message>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>App Info</translation>
     </message>
   </context>
   <context>
@@ -951,11 +951,11 @@
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Vælg udløbsdato</translation>
     </message>
     <message>
       <source>Expiration</source>
-      <translation type="unfinished">Expiration</translation>
+      <translation>Udløber</translation>
     </message>
   </context>
   <context>

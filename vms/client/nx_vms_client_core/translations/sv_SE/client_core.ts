@@ -181,7 +181,7 @@
     </message>
     <message>
       <source>Failed to access site.</source>
-      <translation type="unfinished">Failed to access site.</translation>
+      <translation>Misslyckades med att komma åt webbplatsen.</translation>
     </message>
   </context>
   <context>

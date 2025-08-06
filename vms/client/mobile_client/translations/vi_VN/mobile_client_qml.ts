@@ -954,7 +954,7 @@
     </message>
     <message>
       <source>Expiration</source>
-      <translation type="unfinished">Expiration</translation>
+      <translation>Hết hạn</translation>
     </message>
   </context>
   <context>

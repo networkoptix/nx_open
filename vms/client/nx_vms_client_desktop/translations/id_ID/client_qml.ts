@@ -2055,7 +2055,7 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
     <message>
       <source>Find similar</source>
-      <translation type="unfinished">Find similar</translation>
+      <translation>Cari yang serupa</translation>
     </message>
   </context>
   <context>
