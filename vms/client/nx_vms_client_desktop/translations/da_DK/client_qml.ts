@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
     <message>
       <source>Membership</source>
@@ -865,7 +865,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -915,7 +915,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -946,7 +946,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
     <message>
       <source>Members</source>
@@ -985,7 +985,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
     <message>
       <source>No members</source>
@@ -1249,7 +1249,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
     <message>
       <source>Last Sync</source>
@@ -1434,7 +1434,7 @@
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Eksporter</translation>
     </message>
     <message>
       <source>Create New...</source>
@@ -1580,7 +1580,7 @@
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>Seneste version</translation>
     </message>
     <message>
       <source>Built-in</source>
@@ -1609,7 +1609,7 @@
     </message>
     <message>
       <source>New password</source>
-      <translation type="unfinished">New password</translation>
+      <translation>Ny adgangskode</translation>
     </message>
     <message>
       <source>Confirm password</source>
@@ -2423,7 +2423,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2450,7 +2450,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>Lokal</translation>
     </message>
     <message>
       <source>Cloud</source>
@@ -2462,7 +2462,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Fulde Navn</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2521,7 +2521,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2564,7 +2564,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Fulde Navn</translation>
     </message>
     <message>
       <source>Account Settings</source>
@@ -2672,7 +2672,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Dupliker</translation>
     </message>
     <message>
       <source>Delete</source>
