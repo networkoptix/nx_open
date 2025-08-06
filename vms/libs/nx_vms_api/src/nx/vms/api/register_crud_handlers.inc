@@ -854,7 +854,21 @@ static void registerServerRestHandlers(
     reg("rest/v{2-}/servers/:id/logSettings", GlobalPermission::powerUser, GlobalPermission::powerUserWithFreshSession,
         std::make_unique<LogSettingsHandler>(serverModule, serverConnector));
 
-    /**%apidoc GET /rest/v{2-}/servers/{id}/logArchive
+    /**%apidoc GET /rest/v{2-3}/servers/{id}/logArchive
+     * %jsonrpc[unused]
+     * %caption Get log archive
+     * %ingroup Servers
+     * %struct LogArchiveFilter
+     * %param:string id Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`,
+     *     or be `this` to refer to the current Server.
+     *     %example this
+     * %param[opt]:integer rotated Include from 001 to this value rotated files.
+     *     %deprecated Use `lastN` starting from `v4`.
+     * %param[ref] _language,_local,_strict,_ticket
+     * %permissions Power User.
+     * %return Archive with the log files.
+     *
+     * %apidoc GET /rest/v{4-}/servers/{id}/logArchive
      * %jsonrpc[unused]
      * %caption Get log archive
      * %ingroup Servers
@@ -867,7 +881,7 @@ static void registerServerRestHandlers(
      * %return Archive with the log files.
      */
     reg("rest/v{2-}/servers/:id/logArchive", GlobalPermission::powerUser,
-        std::make_unique<LogArchiveHandler>(serverModule, serverConnector));
+        std::make_unique<LogArchiveHandler>(serverModule));
 
     /**%apidoc GET /rest/v{2-}/servers/{id}/staticWebContent
      * %caption Get static web content info

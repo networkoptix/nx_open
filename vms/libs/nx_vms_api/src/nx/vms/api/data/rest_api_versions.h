@@ -5,7 +5,7 @@
 #include <array>
 #include <string_view>
 
-constexpr std::array<std::string_view, 4> kRestApiVersions{"v1", "v2", "v3", "v4"};
+constexpr std::array kRestApiVersions = std::to_array<std::string_view>({"v1", "v2", "v3", "v4"});
 
 constexpr auto kRestApiV1 = kRestApiVersions.cbegin();
 constexpr auto kRestApiV2 = std::next(kRestApiV1);
