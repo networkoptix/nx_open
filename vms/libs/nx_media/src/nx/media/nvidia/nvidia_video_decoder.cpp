@@ -97,9 +97,9 @@ bool NvidiaVideoDecoder::isAvailable()
 }
 
 bool NvidiaVideoDecoder::isCompatible(
-    const QnConstCompressedVideoDataPtr& frame, AVCodecID codec, int /*width*/, int /*height*/)
+    const QnConstCompressedVideoDataPtr& frame, AVCodecID /*codec*/, int /*width*/, int /*height*/)
 {
-    if (freeGpuMemory() < ini().nvidiaFreeMemoryLimit)
+    if ((int)freeGpuMemory() < ini().nvidiaFreeMemoryLimit)
         return false;
 
     NvidiaVideoDecoder decoder(/*checkMode*/ true);

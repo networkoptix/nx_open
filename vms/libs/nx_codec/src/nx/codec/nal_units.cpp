@@ -278,7 +278,7 @@ int NALUnit::deserialize(quint8* buffer, quint8* end)
 
     //NX_ASSERT((*buffer & 0x80) == 0);
     if ((*buffer & 0x80) != 0) {
-        qWarning() << "Invalid forbidden_zero_bit for nal unit " << decodeType(*buffer);
+        NX_DEBUG(this, "Invalid forbidden_zero_bit for nal unit: %1", decodeType(*buffer));
     }
 
     nal_ref_idc   = (*buffer >> 5) & 0x3;
