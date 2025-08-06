@@ -107,6 +107,11 @@ public:
         const db::api::AccountChangedEvent& /*event*/,
         nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
 
+    virtual void issueServiceToken(
+        const api::IssueServiceTokenRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
+            completionHandler) override;
+
      void setCredentials(network::http::Credentials credentials) override;
 
 protected:

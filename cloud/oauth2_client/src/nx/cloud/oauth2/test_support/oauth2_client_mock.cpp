@@ -156,6 +156,19 @@ void Oauth2ClientMock::notifyAccountUpdated(
     return completionHandler(db::api::ResultCode::ok);
 }
 
+void Oauth2ClientMock::issueServiceToken(
+    const api::IssueServiceTokenRequest& request,
+    nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)> completionHandler)
+{
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, api::IssueServiceTokenResponse{});
+
+    Oauth2ClientMockManager::RequestPath path = {
+        api::kOauthServiceToken, nx::network::http::Method::post};
+    processRequest<api::IssueServiceTokenRequest, api::IssueServiceTokenResponse>(
+        path, request, std::move(completionHandler));
+}
+
 void Oauth2ClientMock::setCredentials(network::http::Credentials)
 {
 }

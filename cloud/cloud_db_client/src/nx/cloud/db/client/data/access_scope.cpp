@@ -105,11 +105,9 @@ bool AccessScope::isSuitableForSystem(const std::optional<std::string>& clientId
     if (!m_attributes.count(kCloudSystemId))
         return false;
 
-    if (!clientId)
-        return false;
-
     bool notContainUrls = m_urls.empty()
-        || (m_urls.size() == 1
+        || (clientId
+            && m_urls.size() == 1
             && m_urls[0].ends_with(nx::network::http::rest::substituteParameters(
                 kOauthTokensDeletePath, {*clientId})));
 

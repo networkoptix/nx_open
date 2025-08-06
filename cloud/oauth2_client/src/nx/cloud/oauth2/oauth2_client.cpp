@@ -143,6 +143,18 @@ void Oauth2Client::notifyAccountUpdated(
         std::move(completionHandler));
 }
 
+void Oauth2Client::issueServiceToken(
+    const api::IssueServiceTokenRequest& request,
+    nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)> completionHandler)
+{
+    base_type::template makeAsyncCall<api::IssueServiceTokenResponse>(
+        nx::network::http::Method::post,
+        api::kOauthServiceToken,
+        {}, // query
+        std::move(request),
+        std::move(completionHandler));
+}
+
 void Oauth2Client::setCredentials(network::http::Credentials credentials)
 {
     httpClientOptions().setCredentials(credentials);

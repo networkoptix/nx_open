@@ -23,4 +23,6 @@ static constexpr char kClientIdParam[] = "clientId";
 
 static constexpr char kApiDocPrefix[] = "/oauth2/docs/api";
 
+static constexpr char kOauthServiceToken[] = "/oauth2/v1/internal/serviceToken";
+
 } // namespace nx::cloud::oauth2::api

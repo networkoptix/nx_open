@@ -76,7 +76,11 @@ public:
         const db::api::AccountChangedEvent& event,
         nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) = 0;
 
-     virtual void setCredentials(network::http::Credentials credentials) = 0;
+    virtual void issueServiceToken(const api::IssueServiceTokenRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
+            completionHandler) = 0;
+
+    virtual void setCredentials(network::http::Credentials credentials) = 0;
 };
 
 class NX_OAUTH2_CLIENT_API Oauth2Client:
@@ -137,6 +141,11 @@ public:
     void notifyAccountUpdated(
         const db::api::AccountChangedEvent& event,
         nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
+
+    virtual void issueServiceToken(
+        const api::IssueServiceTokenRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
+            completionHandler) override;
 
     void setCredentials(network::http::Credentials credentials) override;
 };
