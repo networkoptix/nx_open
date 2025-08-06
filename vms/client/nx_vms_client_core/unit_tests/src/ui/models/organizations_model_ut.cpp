@@ -4,6 +4,7 @@
 
 #include <nx/vms/client/core/common/models/linearization_list_model.h>
 #include <nx/vms/client/core/network/cloud_api.h>
+#include <nx/vms/client/core/system_finder/private/cloud_system_description.h>
 #include <nx/vms/client/core/system_finder/private/local_system_description.h>
 #include <ui/models/organizations_model.h>
 #include <ui/models/systems_model.h>
@@ -414,11 +415,21 @@ TEST_F(TestOrganizationsModel, searchGrouping)
         /*cloudSystemId*/ QString(),
         "Local system 1"));
 
-    controller->emitSystemDiscovered(LocalSystemDescription::create(
-        /*id*/ nx::Uuid::createUuid().toSimpleString(),
-        /*localSystemId*/ nx::Uuid::createUuid(),
-        /*cloudSystemId*/ nx::Uuid::createUuid().toSimpleString(),
-        "Cloud system a 1"));
+    controller->emitSystemDiscovered(QnCloudSystemDescription::create(
+        QnCloudSystem{
+            .cloudId = nx::Uuid::createUuid().toSimpleString(),
+            .localId = nx::Uuid::createUuid(),
+            .name = "Cloud system a 1",
+            .ownerAccountEmail = "",
+            .ownerFullName = "",
+            .authKey = "",
+            .weight = 0.0,
+            .lastLoginTimeUtcMs = 0,
+            .online = true,
+            .system2faEnabled = false,
+            .version = "1.0.0",
+            .organizationId = {},
+        }));
 
     OrganizationsFilterModel filterModel;
     LinearizationListModel linearizationModel;
@@ -438,8 +449,8 @@ TEST_F(TestOrganizationsModel, searchGrouping)
             "Organization 1.1: Partner 1",
             "Organization 1.2: Partner 1",
             "Organization 2.1: Partner 2",
-            "Cloud system a 1: Other results<br>Sites",
-            "Local system 1: Other results<br>Sites",
+            "Cloud system a 1: Other results<br>Cloud",
+            "Local system 1: Local",
         }),
         dumpTree(filterModel));
 
@@ -450,8 +461,8 @@ TEST_F(TestOrganizationsModel, searchGrouping)
 
     ASSERT_EQ(
         QStringList({
-            "Cloud system a 1: Sites",
-            "Local system 1: Sites",
+            "Cloud system a 1: Cloud",
+            "Local system 1: Local",
             "Partner 1: Other results<br>Partners",
             "Partner 2: Other results<br>Partners",
             "Organization 1.1: Partner 1",
@@ -471,11 +482,21 @@ TEST_F(TestOrganizationsModel, sitesSearch)
         /*cloudSystemId*/ QString(),
         "Local system 1"));
 
-    controller->emitSystemDiscovered(LocalSystemDescription::create(
-        /*id*/ nx::Uuid::createUuid().toSimpleString(),
-        /*localSystemId*/ nx::Uuid::createUuid(),
-        /*cloudSystemId*/ nx::Uuid::createUuid().toSimpleString(),
-        "Cloud system 1"));
+    controller->emitSystemDiscovered(QnCloudSystemDescription::create(
+        QnCloudSystem{
+            .cloudId = nx::Uuid::createUuid().toSimpleString(),
+            .localId = nx::Uuid::createUuid(),
+            .name = "Cloud system 1",
+            .ownerAccountEmail = "",
+            .ownerFullName = "",
+            .authKey = "",
+            .weight = 0.0,
+            .lastLoginTimeUtcMs = 0,
+            .online = true,
+            .system2faEnabled = false,
+            .version = "1.0.0",
+            .organizationId = {},
+        }));
 
     OrganizationsFilterModel filterModel;
     LinearizationListModel linearizationModel;
@@ -490,8 +511,8 @@ TEST_F(TestOrganizationsModel, sitesSearch)
 
     ASSERT_EQ(
         QStringList({
-            "Cloud system 1: Sites",
-            "Local system 1: Sites",
+            "Cloud system 1: Cloud",
+            "Local system 1: Local",
             "Group1: Other results<br>ChannelPartner1 / Org1",
             "SubGroup1: ChannelPartner1 / Org1 / Group1",
             "SubGroup2: ChannelPartner1 / Org1 / Group1",

@@ -727,9 +727,6 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
         if (!d->sitesModel)
             return {};
 
-        if (role == SectionRole)
-            return (d->hasChannelPartners || d->hasOrganizations) ? kSites : "";
-
         if (index.parent() != d->sitesRoot())
             return {};
 
@@ -744,8 +741,12 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
                 return true;
             case TabSectionRole:
                 return OrganizationsModel::SitesTab;
+            case SectionRole:
             case PathFromRootRole:
-                return (d->hasChannelPartners || d->hasOrganizations) ? kSites : "";
+                return d->sitesModel->data(
+                    d->mapToProxyModel(index), QnSystemsModel::IsCloudSystemRoleId).toBool()
+                        ? tr("Cloud")
+                        : tr("Local");
             case QnSystemsModel::IsSaasUninitialized:
             {
                 auto id = d->sitesModel->data(
