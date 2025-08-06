@@ -404,7 +404,7 @@
     </message>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Bevægelsesdetektion</translation>
     </message>
     <message>
       <source>Media Streaming</source>
@@ -550,7 +550,7 @@
     <name>CameraInfoWidget</name>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Model</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -558,7 +558,7 @@
     </message>
     <message>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>IP-adresse</translation>
     </message>
     <message>
       <source>Ping</source>
@@ -582,7 +582,7 @@
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Sekundær Stream</translation>
     </message>
     <message>
       <source>MAC Address</source>
@@ -627,7 +627,7 @@
     <name>CameraMotionSettingsWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Bevægelsesdetektion</translation>
     </message>
     <message>
       <source>Sensitivity</source>
@@ -756,7 +756,7 @@
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
-      <translation type="unfinished">No connection</translation>
+      <translation>Ingen forbindelse</translation>
     </message>
     <message>
       <source>This site is connected to</source>
@@ -1166,7 +1166,7 @@
     <name>ImageOverlaySettingsWidget</name>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Billede</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1281,7 +1281,7 @@
     <name>LayoutGeneralSettingsWidget</name>
     <message>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>Låst</translation>
     </message>
     <message>
       <source>Width</source>
@@ -1335,7 +1335,7 @@
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Funktioner</translation>
     </message>
   </context>
   <context>
@@ -1512,7 +1512,7 @@
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Billede</translation>
     </message>
     <message>
       <source>Mode</source>
@@ -2226,7 +2226,7 @@
     </message>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administratorer</translation>
     </message>
     <message>
       <source>Available to</source>
@@ -2234,7 +2234,7 @@
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Superbrugere</translation>
     </message>
   </context>
   <context>
@@ -2291,7 +2291,7 @@
     </message>
     <message>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>IP-adresse</translation>
     </message>
     <message>
       <source>Port</source>
@@ -2413,7 +2413,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
   </context>
   <context>
@@ -2529,7 +2529,7 @@
     <name>VirtualCameraMotionWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Bevægelsesdetektion</translation>
     </message>
     <message>
       <source>Detect motion</source>
@@ -2613,11 +2613,11 @@
     </message>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Off</source>
-      <translation type="unfinished">Off</translation>
+      <translation>Slået fra</translation>
     </message>
     <message>
       <source>Schedule</source>

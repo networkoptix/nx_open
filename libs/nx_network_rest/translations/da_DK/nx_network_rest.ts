@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your Site administrator.</translation>
+      <translation>Adgangskoden er udløbet. Kontakt venligst din Site administrator.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a Site administrator.</translation>
+      <translation>Denne bruger er blevet deaktiveret af en Site administrator.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your Site administrator.</translation>
+      <translation>Denne godkendelsesmetode er forbudt. Kontakt venligst din Site administrator.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
@@ -64,15 +64,15 @@
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your Site administrator.</translation>
+      <translation>Intern serverfejl (%1). Kontakt venligst din Site administrator.</translation>
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
-      <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+      <translation>Anmodningen er uautoriseret på grund af en ukendt fejl.</translation>
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>Sessionsnøglen er for gammel til dette Site.</translation>
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
@@ -83,31 +83,31 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>Manglende påkrævet parameter: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>Anmodningen kunne ikke behandles.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Forbudt.</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Konflikt.</translation>
     </message>
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Ugyldig forespørgsel.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Ikke implementeret.</translation>
     </message>
     <message>
       <source>Not found.</source>
@@ -120,11 +120,11 @@
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>Ikke-understøttet medietype.</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>Tjenesten er ikke tilgængelig.</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
@@ -132,19 +132,19 @@
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>Session udløbet.</translation>
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Sessionsautorisation kræves.</translation>
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
-      <translation type="unfinished">Session is too old according to the Site config.</translation>
+      <translation>Session er for gammel i henhold til Site config.</translation>
     </message>
     <message>
       <source>Resource no longer present on server.</source>
-      <translation type="unfinished">Resource no longer present on server.</translation>
+      <translation>Ressource er ikke længere til stede på serveren.</translation>
     </message>
     <message>
       <source>Not allowed.</source>
@@ -154,11 +154,11 @@
     <message>
       <source>Invalid parameter `%1`: %2</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2</translation>
+      <translation>Ugyldig parameter `%1`: %2</translation>
     </message>
     <message>
       <source>Service unauthorized.</source>
-      <translation type="unfinished">Service unauthorized.</translation>
+      <translation>Tjenesten er ikke godkendt.</translation>
     </message>
   </context>
 </TS>
