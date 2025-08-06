@@ -541,7 +541,7 @@
     </message>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Bevægelsesdetektion</translation>
     </message>
     <message>
       <source>Media Streaming</source>
@@ -687,7 +687,7 @@
     <name>CameraInfoWidget</name>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Model</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -695,7 +695,7 @@
     </message>
     <message>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>IP-adresse</translation>
     </message>
     <message>
       <source>Ping</source>
@@ -719,7 +719,7 @@
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Sekundær Stream</translation>
     </message>
     <message>
       <source>MAC Address</source>
@@ -767,7 +767,7 @@
     <name>CameraMotionSettingsWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Bevægelsesdetektion</translation>
     </message>
     <message>
       <source>Sensitivity</source>
@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>No connection</source>
-      <translation type="unfinished">No connection</translation>
+      <translation>Ingen forbindelse</translation>
     </message>
   </context>
   <context>
@@ -1418,7 +1418,7 @@
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
-      <translation type="unfinished">System Settings</translation>
+      <translation>Systemindstillinger</translation>
     </message>
   </context>
   <context>
@@ -1440,7 +1440,7 @@
     <name>ImageOverlaySettingsWidget</name>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Billede</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1555,7 +1555,7 @@
     <name>LayoutGeneralSettingsWidget</name>
     <message>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>Låst</translation>
     </message>
     <message>
       <source>Width</source>
@@ -1609,7 +1609,7 @@
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Funktioner</translation>
     </message>
   </context>
   <context>
@@ -1798,7 +1798,7 @@
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Billede</translation>
     </message>
     <message>
       <source>Mode</source>
@@ -2044,7 +2044,7 @@
     </message>
     <message>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>Niveau:</translation>
     </message>
     <message>
       <source>ERROR</source>
@@ -2163,7 +2163,7 @@
     </message>
     <message>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Database-fil-hoved</translation>
     </message>
     <message>
       <source>Default notification title will be used if left empty</source>
@@ -2664,7 +2664,7 @@
     </message>
     <message>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>IP-adresse</translation>
     </message>
     <message>
       <source>Port</source>
@@ -2683,7 +2683,7 @@
     <name>ShowOnAlarmLayoutActionWidget</name>
     <message>
       <source>for</source>
-      <translation type="unfinished">for</translation>
+      <translation>til</translation>
     </message>
     <message>
       <source>Force Alarm Layout opening</source>
@@ -2827,7 +2827,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
   </context>
   <context>
@@ -2947,7 +2947,7 @@
     <name>VirtualCameraMotionWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Bevægelsesdetektion</translation>
     </message>
     <message>
       <source>Detect motion</source>
@@ -3023,11 +3023,11 @@
     </message>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Off</source>
-      <translation type="unfinished">Off</translation>
+      <translation>Slået fra</translation>
     </message>
     <message>
       <source>Schedule</source>

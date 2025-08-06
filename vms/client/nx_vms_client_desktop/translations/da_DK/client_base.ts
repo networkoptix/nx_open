@@ -2717,7 +2717,7 @@ Licensnøgle: %2</translation>
     <name>QnBusinessRulesViewModel</name>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Event</source>
@@ -2950,7 +2950,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Model</translation>
     </message>
     <message>
       <source>Firmware</source>
@@ -3841,7 +3841,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Funktioner</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
@@ -3884,7 +3884,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Udløbet</translation>
     </message>
     <message>
       <source>OK</source>
@@ -4072,7 +4072,7 @@ Licensnøgle: %2</translation>
     <name>QnMediaResourceWidget</name>
     <message>
       <source>Screenshot</source>
-      <translation type="unfinished">Screenshot</translation>
+      <translation>Skærmbillede</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -4569,7 +4569,7 @@ Licensnøgle: %2</translation>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
-      <translation type="unfinished">Health Monitor</translation>
+      <translation>Sundhedsovervågning</translation>
     </message>
   </context>
   <context>
@@ -4584,7 +4584,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Rotate</source>
-      <translation type="unfinished">Rotate</translation>
+      <translation>Rotér</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
@@ -4850,7 +4850,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
-      <translation type="unfinished">Storage Analytics</translation>
+      <translation>Lagringsanalyse</translation>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
@@ -5304,7 +5304,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>lokal</translation>
     </message>
     <message>
       <source>ram</source>
@@ -5398,7 +5398,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Invalid storage path</source>
-      <translation type="unfinished">Invalid storage path</translation>
+      <translation>Ugyldig lagringssti</translation>
     </message>
     <message>
       <source>Add this storage anyway?</source>
@@ -5429,7 +5429,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Licenses</source>
-      <translation type="unfinished">Licenses</translation>
+      <translation>Licenser</translation>
     </message>
     <message>
       <source>Email</source>
@@ -5997,7 +5997,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Kunne ikke anvende ændringer</translation>
     </message>
     <message>
       <source>Stop Video Wall?</source>
@@ -7808,7 +7808,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Sekundær Stream</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7847,7 +7847,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Afslut</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -8124,7 +8124,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Sekundær Stream</translation>
     </message>
     <message>
       <source>No secondary stream</source>
@@ -8898,11 +8898,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Fejl ved filskrivning.</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Ingen data eksporteret.</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -8910,7 +8910,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Video omkodning påkrævet.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
@@ -8918,14 +8918,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Lås denne del af arkivet op for at eksportere indholdet.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog</name>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Eksporter</translation>
     </message>
     <message>
       <source>Rapid Review</source>
@@ -8957,7 +8957,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Billede</translation>
     </message>
     <message>
       <source>Add Text</source>
@@ -9113,7 +9113,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Model</translation>
     </message>
     <message>
       <source>Address</source>
@@ -9199,7 +9199,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Kunne ikke anvende ændringer</translation>
     </message>
     <message>
       <source>Delete groups</source>
@@ -9445,11 +9445,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Kunne ikke anvende ændringer</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>Seneste version</translation>
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
@@ -9471,7 +9471,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Eksporter</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -9772,7 +9772,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Merging Systems...</source>
-      <translation type="unfinished">Merging Systems...</translation>
+      <translation>Sammensmeltende systemer...</translation>
     </message>
     <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
@@ -10882,7 +10882,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Health Monitor</source>
-      <translation type="unfinished">Health Monitor</translation>
+      <translation>Sundhedsovervågning</translation>
     </message>
   </context>
   <context>
@@ -11206,7 +11206,7 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
-      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+      <translation>Kryptering af videotrafik kan øge CPU-forbruget betydeligt</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
@@ -11453,7 +11453,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Message</source>
-      <translation type="unfinished">Message</translation>
+      <translation>Besked</translation>
     </message>
     <message>
       <source>Store Update Files</source>
@@ -11887,7 +11887,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11978,7 +11978,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11998,7 +11998,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Fulde Navn</translation>
     </message>
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
@@ -12013,11 +12013,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupper</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>Seneste version</translation>
     </message>
   </context>
   <context>
@@ -12045,7 +12045,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Kunne ikke anvende ændringer</translation>
     </message>
     <message>
       <source>Apply changes?</source>
@@ -12777,7 +12777,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>Fra</translation>
     </message>
   </context>
   <context>
@@ -12788,7 +12788,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Value</source>
@@ -12953,7 +12953,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>Fra</translation>
     </message>
   </context>
   <context>

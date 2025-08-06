@@ -301,7 +301,7 @@
     </message>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Fixed Duration</source>
@@ -726,7 +726,7 @@
     </message>
     <message>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Database-fil-hoved</translation>
     </message>
     <message>
       <source>Body</source>
