@@ -39,6 +39,7 @@ struct ResourceSelectionModelAdapter::Private
     IsIndexAccepted externalFilter;
     TopLevelNodesPolicy topLevelNodesPolicy = TopLevelNodesPolicy::hideEmpty;
     bool webPagesAndIntegrationsCombined = false;
+    bool isExtraInfoRequired = appContext()->localSettings()->resourceInfoLevel() > Qn::RI_NameOnly;
 
     Private(ResourceSelectionModelAdapter* q):
         q(q),
@@ -108,7 +109,16 @@ struct ResourceSelectionModelAdapter::Private
             return false;
 
         const auto text = sourceModel->data(sourceIndex, Qt::DisplayRole).toString();
-        return text.contains(filterText, Qt::CaseInsensitive);
+        if (text.contains(filterText, Qt::CaseInsensitive))
+            return true;
+
+        if (isExtraInfoRequired)
+        {
+            const auto extraInfo = sourceModel->data(sourceIndex, Qn::ExtraInfoRole).toString();
+            return extraInfo.contains(filterText, Qt::CaseInsensitive);
+        }
+
+        return false;
     }
 };
 
@@ -119,7 +129,12 @@ ResourceSelectionModelAdapter::ResourceSelectionModelAdapter(QObject* parent):
     connect(&appContext()->localSettings()->resourceInfoLevel,
         &nx::utils::property_storage::BaseProperty::changed,
         this,
-        &ResourceSelectionModelAdapter::extraInfoRequiredChanged);
+        [this]
+        {
+            d->isExtraInfoRequired =
+                appContext()->localSettings()->resourceInfoLevel() > Qn::RI_NameOnly;
+            emit extraInfoRequiredChanged();
+        });
 
     connect(d->selectionDecoratorModel.get(),
         &ResourceSelectionDecoratorModel::selectedResourcesChanged,
@@ -263,7 +278,7 @@ void ResourceSelectionModelAdapter::setWebPagesAndIntegrationsCombined(bool valu
 
 bool ResourceSelectionModelAdapter::isExtraInfoRequired() const
 {
-    return appContext()->localSettings()->resourceInfoLevel() > Qn::RI_NameOnly;
+    return d->isExtraInfoRequired;
 }
 
 bool ResourceSelectionModelAdapter::isExtraInfoForced(QnResource* resource) const

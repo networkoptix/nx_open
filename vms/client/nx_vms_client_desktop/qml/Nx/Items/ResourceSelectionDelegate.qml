@@ -132,8 +132,11 @@ Item
         {
             id: extraInfo
 
-            text: (delegateItem.showExtraInfo && model && model.extraInfo) || ""
-            textFormat: Text.PlainText
+            text: (delegateItem.showExtraInfo
+                && model
+                && model.extraInfo
+                && highlightMatchingText(model.extraInfo)) || ""
+            textFormat: Text.StyledText
             font.weight: Font.Normal
             height: parent.height
             elide: Text.ElideRight
