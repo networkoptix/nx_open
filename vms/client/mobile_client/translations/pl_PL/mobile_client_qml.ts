@@ -953,7 +953,7 @@
     </message>
     <message>
       <source>Expiration</source>
-      <translation type="unfinished">Expiration</translation>
+      <translation>Wygaśnięcie</translation>
     </message>
   </context>
   <context>

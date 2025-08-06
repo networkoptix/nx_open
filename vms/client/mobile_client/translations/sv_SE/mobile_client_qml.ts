@@ -947,11 +947,11 @@
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Välj utgångsdatum</translation>
     </message>
     <message>
       <source>Expiration</source>
-      <translation type="unfinished">Expiration</translation>
+      <translation>Förfaller</translation>
     </message>
   </context>
   <context>

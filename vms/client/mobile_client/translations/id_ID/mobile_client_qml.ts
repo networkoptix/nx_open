@@ -946,11 +946,11 @@
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Pilih Habis Masa Berlaku</translation>
     </message>
     <message>
       <source>Expiration</source>
-      <translation type="unfinished">Expiration</translation>
+      <translation>Masa Berlaku</translation>
     </message>
   </context>
   <context>

@@ -951,7 +951,7 @@
     </message>
     <message>
       <source>Expiration</source>
-      <translation type="unfinished">Expiration</translation>
+      <translation>Utløper</translation>
     </message>
   </context>
   <context>

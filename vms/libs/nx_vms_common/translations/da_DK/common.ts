@@ -171,7 +171,7 @@
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>Live Viewer</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
@@ -806,57 +806,57 @@
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Professionelle Licenser</numerusform>
+        <numerusform>%n/%1 Professionelle Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Edge-licenser</numerusform>
+        <numerusform>%n/%1 Edge-licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Vmax-licenser</numerusform>
+        <numerusform>%n/%1 Vmax-licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Analog Encoder Licenser</numerusform>
+        <numerusform>%n/%1 Analog Encoder Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Videovæglicenser</numerusform>
+        <numerusform>%n/%1 Videovæglicenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 I/O Modul Licenser</numerusform>
+        <numerusform>%n/%1 I/O Modul Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Startlicenser</numerusform>
+        <numerusform>%n/%1 Startlicenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -870,17 +870,17 @@
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Bridge Licenser</numerusform>
+        <numerusform>%n/%1 Bridge Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Ugyldige licenser</numerusform>
+        <numerusform>%n/%1 Ugyldige licenser</numerusform>
       </translation>
     </message>
     <message>
@@ -893,17 +893,17 @@
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n NVR Licenses</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n NVR-licenser</numerusform>
+        <numerusform>%n NVR-licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 NVR-licenser</numerusform>
+        <numerusform>%n/%1 NVR-licenser</numerusform>
       </translation>
     </message>
     <message>
@@ -1139,19 +1139,19 @@
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation type="unfinished">mos</translation>
+      <translation>mos</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation type="unfinished">yrs</translation>
+      <translation>år</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
+      <translation>
+        <numerusform>millisekunder</numerusform>
+        <numerusform>millisekunder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1213,7 +1213,7 @@
     <message>
       <source>Msec</source>
       <comment>Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>Msek</translation>
     </message>
     <message>
       <source>Sec</source>
@@ -1228,90 +1228,90 @@
     <message>
       <source>Hrs</source>
       <comment>Capitalized long suffix for displaying hours</comment>
-      <translation type="unfinished">Hrs</translation>
+      <translation>Timer</translation>
     </message>
     <message>
       <source>Days</source>
       <comment>Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Dage</translation>
     </message>
     <message>
       <source>Wks</source>
       <comment>Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>Uger</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>Mos</translation>
     </message>
     <message>
       <source>Yrs</source>
       <comment>Capitalized long suffix for displaying years</comment>
-      <translation type="unfinished">Yrs</translation>
+      <translation>År</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
+      <translation>
+        <numerusform>Millisekunder</numerusform>
+        <numerusform>Millisekunder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
+      <translation>
+        <numerusform>Sekunder</numerusform>
+        <numerusform>Sekunder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>Minutes</numerusform>
-        <numerusform>Minutes</numerusform>
+      <translation>
+        <numerusform>Minutter</numerusform>
+        <numerusform>Minutter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Hours</source>
       <comment>Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
+      <translation>
+        <numerusform>Timer</numerusform>
+        <numerusform>Timer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Days</source>
       <comment>Capitalized fapitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>Dage</numerusform>
+        <numerusform>Dage</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Capitalized full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
-        <numerusform>Weeks</numerusform>
+      <translation>
+        <numerusform>Uger</numerusform>
+        <numerusform>Uger</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Months</source>
       <comment>Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
+      <translation>
+        <numerusform>Måneder</numerusform>
+        <numerusform>Måneder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
+      <translation>
+        <numerusform>År</numerusform>
+        <numerusform>År</numerusform>
       </translation>
     </message>
   </context>
@@ -1323,7 +1323,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>Flere grupper</translation>
     </message>
   </context>
   <context>
@@ -1489,7 +1489,7 @@
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-      <translation type="unfinished">Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</translation>
+      <translation>Semikolonsepareret liste over servere, der er udpeget til at oprette forbindelse til skyen. Servere øverst på listen har højere prioritet. Hvis listen er tom, vælges der automatisk en server til skyforbindelsen.</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1498,11 +1498,11 @@
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+      <translation>Aktiver forældede API funktioner, der i øjeblikket bruges af %1 software (usikker)</translation>
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>Interval mellem Cloud polling HTTP-anmodninger for at synkronisere data.</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
@@ -1542,7 +1542,7 @@
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL.</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL.</translation>
+      <translation>Anonym crashrapportserver API-URL.</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings.</source>
@@ -1550,7 +1550,7 @@
     </message>
     <message>
       <source>Device storage information update interval.</source>
-      <translation type="unfinished">Device storage information update interval.</translation>
+      <translation>Opdateringsinterval for enhedslagringsoplysninger.</translation>
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h).</source>
@@ -1702,7 +1702,7 @@
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher.</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher.</translation>
+      <translation>Aktivér sekventiel Flir ONVIF-søger.</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB).</source>
@@ -1754,7 +1754,7 @@
     </message>
     <message>
       <source>Update releases.json file URL.</source>
-      <translation type="unfinished">Update releases.json file URL.</translation>
+      <translation>Opdater URL-adressen for releases.json-filen.</translation>
     </message>
     <message>
       <source>Target update information.</source>
@@ -1786,7 +1786,7 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds).</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds).</translation>
+      <translation>Godkendelse Session token levetid (sekunder).</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens.</source>
@@ -1870,7 +1870,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds).</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds).</translation>
+      <translation>Kontrollér tilladelser for videostreaming på VMS-serverperiode (millisekunder).</translation>
     </message>
     <message>
       <source>Storage encryption enabled.</source>
@@ -1886,7 +1886,7 @@
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</translation>
+      <translation>HTTP header: Server, understøttede variabler: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
       <source>HTTP header: Origin.</source>
@@ -1902,11 +1902,11 @@
     </message>
     <message>
       <source>Allow Power User editing Security Settings.</source>
-      <translation type="unfinished">Allow Power User editing Security Settings.</translation>
+      <translation>Tillad superbruger at redigere sikkerhedsindstillinger.</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure).</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure).</translation>
+      <translation>Aktiver forældede API-funktioner (usikker).</translation>
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
@@ -1922,11 +1922,11 @@
     </message>
     <message>
       <source>LDAP settings.</source>
-      <translation type="unfinished">LDAP settings.</translation>
+      <translation>LDAP- indstillinger.</translation>
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+      <translation>SMTP-indstillinger. Disse indstillinger er kun synlige for superbrugere.</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>

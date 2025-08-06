@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation type="unfinished">Follow the steps of wizard</translation>
+      <translation>Følg guidens trin</translation>
     </message>
     <message>
       <source>OK</source>
@@ -651,7 +651,7 @@
     <name>RangeSelector</name>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>Fra</translation>
     </message>
     <message>
       <source>To</source>
@@ -884,7 +884,7 @@
     </message>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>App Info</translation>
     </message>
   </context>
   <context>
@@ -947,11 +947,11 @@
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Vælg udløbsdato</translation>
     </message>
     <message>
       <source>Expiration</source>
-      <translation type="unfinished">Expiration</translation>
+      <translation>Udløber</translation>
     </message>
   </context>
   <context>
