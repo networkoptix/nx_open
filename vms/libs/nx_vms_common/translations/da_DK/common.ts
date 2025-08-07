@@ -16,7 +16,7 @@
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
-      <translation>ingen data til prognose</translation>
+      <translation>Ingen data til prognose</translation>
     </message>
     <message>
       <source>empty</source>
@@ -198,19 +198,19 @@
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation>Avancerede seere</translation>
+      <translation>Avancerede visnings brugere</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>Visninger</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation>Live Viewer</translation>
+      <translation>Live Visninger</translation>
     </message>
     <message>
       <source>System Health Viewers</source>
-      <translation>Systemtilstandsvisninger</translation>
+      <translation>System tilstands visninger</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
@@ -230,7 +230,7 @@
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation>Medlemmer af denne gruppe kan se oplysninger om systemtilstandsovervågning og serverprocessorbelastning i realtid (serverovervågning).</translation>
+      <translation>Medlemmer af denne gruppe kan se oplysninger om system tilstandsovervågning og server processor belastning i realtid (serverovervågning).</translation>
     </message>
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</source>
@@ -282,7 +282,7 @@
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation>Prøv endelig at opdatere firmware. Hvis problemet fortsætter, kontakt venligst support.</translation>
+      <translation>Prøv først at opdatere firmware. Hvis problemet fortsætter, kontakt venligst support.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
@@ -318,7 +318,7 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>Enhedsanmodning &quot;%1&quot; fejlede med fejl &quot;%2&quot;.</translation>
+      <translation>Enhedsanmodning &quot;%1&quot; mislykkedes med fejl &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -362,11 +362,11 @@
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation>Enhedens initialiseringsproces er i gang.</translation>
+      <translation>Enhedens initialiserings proces er i gang.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation>Kamerainitialiseringsprocessen er i gang.</translation>
+      <translation>Kamera initialiserings processen er i gang.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
@@ -398,15 +398,15 @@
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation>Kunne ikke analysere enhedssvaret. URL %1, anmodningsnavn %2.</translation>
+      <translation>Kunne ikke analysere enhedssvaret. URL %1, anmodnings navn %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation>Kamerasvaret kunne ikke analyseres. URL %1, anmodningsnavn %2.</translation>
+      <translation>Kamerasvaret kunne ikke analyseres. URL %1, anmodnings navn %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation>Kunne ikke parse I/O-modulets svar. URL %1, anmodningsnavn %2.</translation>
+      <translation>Kunne ikke parse I/O-modulets svar. URL %1, anmodnings navn %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
@@ -706,8 +706,8 @@
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Videovæglicenser</numerusform>
-        <numerusform>%n/%1 Videovæglicenser</numerusform>
+        <numerusform>%n/%1 Video væg licenser</numerusform>
+        <numerusform>%n/%1 Video væg licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -722,16 +722,16 @@
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Startlicenser</numerusform>
-        <numerusform>%n/%1 Startlicenser</numerusform>
+        <numerusform>%n/%1 Start licenser</numerusform>
+        <numerusform>%n/%1 Start licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Gratis Licenser</numerusform>
+        <numerusform>%n/%1 Gratis Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -761,39 +761,39 @@
     <message numerus="yes">
       <source>%n NVR Licenses</source>
       <translation>
-        <numerusform>%n NVR-licenser</numerusform>
-        <numerusform>%n NVR-licenser</numerusform>
+        <numerusform>%n NVR licenser</numerusform>
+        <numerusform>%n NVR licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 NVR-licenser</numerusform>
-        <numerusform>%n/%1 NVR-licenser</numerusform>
+        <numerusform>%n/%1 NVR licenser</numerusform>
+        <numerusform>%n/%1 NVR licenser</numerusform>
       </translation>
     </message>
     <message>
       <source>Local Recording</source>
-      <translation type="unfinished">Local Recording</translation>
+      <translation>Lokal Optagelse</translation>
     </message>
     <message>
       <source>Local Recording service</source>
-      <translation>Lokal optagelsestjeneste</translation>
+      <translation>Lokal Optagelses tjeneste</translation>
     </message>
     <message numerus="yes">
       <source>%n Local Recording Services</source>
       <translation>
-        <numerusform>%n Lokale Optagelsestjenester</numerusform>
-        <numerusform>%n Lokale Optagelsestjenester</numerusform>
+        <numerusform>%n Lokale Optagelses tjenester</numerusform>
+        <numerusform>%n Lokale Optagelses tjenester</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local Recording Services</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Lokale Optagelsestjenester</numerusform>
-        <numerusform>%n/%1 Lokale Optagelsestjenester</numerusform>
+        <numerusform>%n/%1 Lokale Optagelses tjenester</numerusform>
+        <numerusform>%n/%1 Lokale Optagelses tjenester</numerusform>
       </translation>
     </message>
   </context>
@@ -1067,7 +1067,7 @@
     <message>
       <source>Sec</source>
       <comment>Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>Sek</translation>
     </message>
     <message>
       <source>Min</source>
@@ -1172,7 +1172,7 @@
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation>Ukendt transkodningsmetode</translation>
+      <translation>Ukendt trans kodnings metode</translation>
     </message>
   </context>
   <context>
@@ -1209,7 +1209,7 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Ugyldig forespørgsel.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -1248,7 +1248,7 @@
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation>Sessionsautorisation kræves.</translation>
+      <translation>Sessions autorisation kræves.</translation>
     </message>
     <message>
       <source>Not allowed.</source>
@@ -1337,15 +1337,15 @@
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation>Kunne ikke oprette outputfil til videooptagelse.</translation>
+      <translation>Kunne ikke oprette output fil til videooptagelse.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kunne ikke allokere outputstream til optagelse.</translation>
+      <translation>Kunne ikke allokere output stream til optagelse.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation>Kunne ikke allokere outputlydstream.</translation>
+      <translation>Kunne ikke allokere output lyd stream.</translation>
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
@@ -1424,7 +1424,7 @@
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation>System opdateringsinterval (sekunder, 1 s-1 t)</translation>
+      <translation>System opdateringsinterval (sekunder, 1s-1 t)</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
@@ -1436,7 +1436,7 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation>Primær tidssynkroniseringsserver-ID</translation>
+      <translation>Primær tids synkroniserings server-ID</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
@@ -1480,7 +1480,7 @@
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation>Deaktivér Enhedssælgere</translation>
+      <translation>Deaktivér Enheds mærker</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
@@ -1508,7 +1508,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation>Revisionssporperiode (dage, 14-730)</translation>
+      <translation>Revisions sporperiode (dage, 14-730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
@@ -1764,7 +1764,7 @@
     </message>
     <message>
       <source>LDAP settings</source>
-      <translation>LDAP- indstillinger</translation>
+      <translation>LDAP indstillinger</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
@@ -1772,7 +1772,7 @@
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-      <translation>Semikolonsepareret liste over servere, der er udpeget til at oprette forbindelse til skyen. Servere øverst på listen har højere prioritet. Hvis listen er tom, vælges der automatisk en server til skyforbindelsen.</translation>
+      <translation>Semikolon separeret liste over servere, der er udpeget til at oprette forbindelse til skyen. Servere øverst på listen har højere prioritet. Hvis listen er tom, vælges der automatisk en server til skyforbindelsen.</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
@@ -1780,7 +1780,7 @@
     </message>
     <message>
       <source>Enable deprecated API functions (insecure)</source>
-      <translation>Aktiver forældede API-funktioner (usikker)</translation>
+      <translation>Aktiver forældede API funktioner (usikker)</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1793,15 +1793,15 @@
     </message>
     <message>
       <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
+      <translation>Organisations Id</translation>
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation>Interval mellem Cloud polling HTTP-anmodninger for at synkronisere data.</translation>
+      <translation>Interval mellem Cloud polling HTTP anmodninger for at synkronisere data.</translation>
     </message>
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
-      <translation>Lokalt system-ID, null betyder, at systemet endnu ikke er konfigureret.</translation>
+      <translation>Lokalt system ID, null betyder, at systemet endnu ikke er konfigureret.</translation>
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
@@ -1809,19 +1809,19 @@
     </message>
     <message>
       <source>Device storage information update interval</source>
-      <translation>Opdateringsinterval for enhedslagringsoplysninger</translation>
+      <translation>Opdateringsinterval for enheds lagrings oplysninger</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
-      <translation>Anonym crashrapportserver API-URL</translation>
+      <translation>Anonym Crash Rapport Server API URL</translation>
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation>Kontrollér tilladelser for videostreaming på VMS-serverperiode (millisekunder)</translation>
+      <translation>Kontroller tilladelser for videostreaming på VMS server periode (millisekunder)</translation>
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only</source>
-      <translation>SMTP-indstillinger. Disse indstillinger er kun synlige for superbrugere</translation>
+      <translation>SMTP indstillinger. Disse indstillinger er kun synlige for superbrugere</translation>
     </message>
   </context>
   <context>
@@ -1948,20 +1948,20 @@
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation>
-        <numerusform>Enheder IP-konflikt</numerusform>
-        <numerusform>Enheder IP-konflikt</numerusform>
+        <numerusform>Enheder IP konflikt</numerusform>
+        <numerusform>Enheder IP konflikt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Kameraernes IP-konflikt</numerusform>
-        <numerusform>Cameras IP Conflict</numerusform>
+      <translation>
+        <numerusform>Kameraer IP konflikt</numerusform>
+        <numerusform>Kameraer IP konflikt</numerusform>
       </translation>
     </message>
     <message>
       <source>Any Device Issue</source>
-      <translation>Ethvert enhedsproblem</translation>
+      <translation>Ethvert Enheds Problem</translation>
     </message>
     <message>
       <source>Any Camera Issue</source>
@@ -1993,7 +1993,7 @@
     </message>
     <message>
       <source>Network Issue at %1</source>
-      <translation>Netværksproblem ved %1</translation>
+      <translation>Netværks problem på %1</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
@@ -2023,11 +2023,11 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>Server &quot;%1&quot; har afsluttet en arkivbackup</translation>
+      <translation>Server &quot;%1&quot; har afsluttet en arkiv backup</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation>Generisk begivenhed på %1</translation>
+      <translation>Generisk Hændelse på %1</translation>
     </message>
     <message>
       <source>An unknown event has occurred</source>
@@ -2035,7 +2035,7 @@
     </message>
     <message>
       <source>Event: %1</source>
-      <translation>Begivenhed: %1</translation>
+      <translation>Hændelse: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
@@ -2065,7 +2065,7 @@
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Konflikter Server #%1: %2</translation>
+      <translation>Konflikt Server #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
