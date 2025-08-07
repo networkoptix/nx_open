@@ -1847,7 +1847,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>E-mails</translation>
     </message>
     <message>
       <source>RHI backend</source>
@@ -3870,7 +3870,7 @@ Licensnøgle: %2</translation>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation type="unfinished">Enter URL</translation>
+      <translation>Indtast URL</translation>
     </message>
     <message>
       <source>URL</source>
@@ -4448,7 +4448,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Eksklusiv</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -4620,7 +4620,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Eksklusiv</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -6874,7 +6874,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Kilde: %1</translation>
     </message>
   </context>
   <context>

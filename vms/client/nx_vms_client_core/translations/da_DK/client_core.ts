@@ -177,11 +177,11 @@
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation type="unfinished">Failed to access site</translation>
+      <translation>Kunne ikke få adgang til webstedet</translation>
     </message>
     <message>
       <source>Failed to access site.</source>
-      <translation>Kunne ikke få adgang til webstedet.</translation>
+      <translation>Kunne ikke få adgang til site.</translation>
     </message>
   </context>
   <context>

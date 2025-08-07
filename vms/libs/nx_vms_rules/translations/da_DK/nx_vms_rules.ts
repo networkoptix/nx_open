@@ -431,11 +431,11 @@
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation type="unfinished">Input Port: %1</translation>
+      <translation>Indgangsport: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation type="unfinished">Input on %1</translation>
+      <translation>Input på %1</translation>
     </message>
     <message>
       <source>Input Signal on Device</source>
@@ -500,17 +500,17 @@
     <name>nx::vms::rules::DeviceIpConflictEvent</name>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation type="unfinished">Conflicting Address: %1</translation>
+      <translation>Konflikt Adresse: %1</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Device IP Conflict at %1</translation>
+      <translation>Enheds IP Konflikt på %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Camera IP Conflict at %1</translation>
+      <translation>Kamera IP Konflikt på %1</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -610,7 +610,7 @@
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation type="unfinished">Generic Event at %1</translation>
+      <translation>Generisk begivenhed på %1</translation>
     </message>
     <message>
       <source>Related devices:</source>
@@ -780,7 +780,7 @@
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
-      <translation type="unfinished">Motion on %1</translation>
+      <translation>Bevægelse på %1</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
@@ -832,7 +832,7 @@
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
@@ -857,7 +857,7 @@
     <message>
       <source>Network Issue at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Network Issue at %1</translation>
+      <translation>Netværksproblem ved %1</translation>
     </message>
   </context>
   <context>
