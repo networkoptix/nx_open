@@ -57,8 +57,8 @@ void MultilineElidedLabel::paintEvent(QPaintEvent* event)
         line.setLineWidth(widgetWidth);
         int nextLineY = y + lineSpacing;
 
-        // Check whether the given line is the last one.
-        if (height() >= nextLineY + lineSpacing)
+        const bool isFirstLine = textLayout.lineCount() == 1;
+        if (isFirstLine || height() >= nextLineY + lineSpacing)
         {
             if (!isMultiline)
             {
