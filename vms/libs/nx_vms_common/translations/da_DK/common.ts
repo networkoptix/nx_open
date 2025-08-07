@@ -40,7 +40,7 @@
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
-      <translation>ingen data til prognose</translation>
+      <translation>Ingen data til prognose</translation>
     </message>
     <message>
       <source>empty</source>
@@ -163,15 +163,15 @@
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation>Avancerede seere</translation>
+      <translation>Avancerede visnings brugere</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>Visninger</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation>Live Viewer</translation>
+      <translation>Live Visninger</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
@@ -326,7 +326,7 @@
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation>Prøv endelig at opdatere firmware. Hvis problemet fortsætter, kontakt venligst support.</translation>
+      <translation>Prøv først at opdatere firmware. Hvis problemet fortsætter, kontakt venligst support.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
@@ -362,7 +362,7 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>Enhedsanmodning &quot;%1&quot; fejlede med fejl &quot;%2&quot;.</translation>
+      <translation>Enhedsanmodning &quot;%1&quot; mislykkedes med fejl &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -406,11 +406,11 @@
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation>Enhedens initialiseringsproces er i gang.</translation>
+      <translation>Enhedens initialiserings proces er i gang.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation>Kamerainitialiseringsprocessen er i gang.</translation>
+      <translation>Kamera initialiserings processen er i gang.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
@@ -442,15 +442,15 @@
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation>Kunne ikke analysere enhedssvaret. URL %1, anmodningsnavn %2.</translation>
+      <translation>Kunne ikke analysere enhedssvaret. URL %1, anmodnings navn %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation>Kamerasvaret kunne ikke analyseres. URL %1, anmodningsnavn %2.</translation>
+      <translation>Kamerasvaret kunne ikke analyseres. URL %1, anmodnings navn %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation>Kunne ikke parse I/O-modulets svar. URL %1, anmodningsnavn %2.</translation>
+      <translation>Kunne ikke parse I/O-modulets svar. URL %1, anmodnings navn %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
@@ -839,8 +839,8 @@
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Videovæglicenser</numerusform>
-        <numerusform>%n/%1 Videovæglicenser</numerusform>
+        <numerusform>%n/%1 Video væg licenser</numerusform>
+        <numerusform>%n/%1 Video væg licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -855,16 +855,16 @@
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Startlicenser</numerusform>
-        <numerusform>%n/%1 Startlicenser</numerusform>
+        <numerusform>%n/%1 Start licenser</numerusform>
+        <numerusform>%n/%1 Start licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Gratis Licenser</numerusform>
+        <numerusform>%n/%1 Gratis Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -894,16 +894,16 @@
     <message numerus="yes">
       <source>%n NVR Licenses</source>
       <translation>
-        <numerusform>%n NVR-licenser</numerusform>
-        <numerusform>%n NVR-licenser</numerusform>
+        <numerusform>%n NVR licenser</numerusform>
+        <numerusform>%n NVR licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 NVR-licenser</numerusform>
-        <numerusform>%n/%1 NVR-licenser</numerusform>
+        <numerusform>%n/%1 NVR licenser</numerusform>
+        <numerusform>%n/%1 NVR licenser</numerusform>
       </translation>
     </message>
     <message>
@@ -1218,7 +1218,7 @@
     <message>
       <source>Sec</source>
       <comment>Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>Sek</translation>
     </message>
     <message>
       <source>Min</source>
@@ -1422,15 +1422,15 @@
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation>Kunne ikke oprette outputfil til videooptagelse.</translation>
+      <translation>Kunne ikke oprette output fil til videooptagelse.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kunne ikke allokere outputstream til optagelse.</translation>
+      <translation>Kunne ikke allokere output stream til optagelse.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation>Kunne ikke allokere outputlydstream.</translation>
+      <translation>Kunne ikke allokere output lyd stream.</translation>
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
@@ -1489,7 +1489,7 @@
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-      <translation>Semikolonsepareret liste over servere, der er udpeget til at oprette forbindelse til skyen. Servere øverst på listen har højere prioritet. Hvis listen er tom, vælges der automatisk en server til skyforbindelsen.</translation>
+      <translation>Semikolon separeret liste over servere, der er udpeget til at oprette forbindelse til skyen. Servere øverst på listen har højere prioritet. Hvis listen er tom, vælges der automatisk en server til skyforbindelsen.</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1502,7 +1502,7 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation>Interval mellem Cloud polling HTTP-anmodninger for at synkronisere data.</translation>
+      <translation>Interval mellem Cloud polling HTTP anmodninger for at synkronisere data.</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
@@ -1594,7 +1594,7 @@
     </message>
     <message>
       <source>Organization Id.</source>
-      <translation type="unfinished">Organization Id.</translation>
+      <translation>Organisations Id.</translation>
     </message>
     <message>
       <source>Cloud Site ID.</source>

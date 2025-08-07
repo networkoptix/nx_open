@@ -1847,7 +1847,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>E-mails</translation>
     </message>
     <message>
       <source>RHI backend</source>
@@ -3870,7 +3870,7 @@ Licensnøgle: %2</translation>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation type="unfinished">Enter URL</translation>
+      <translation>Indtast URL</translation>
     </message>
     <message>
       <source>URL</source>
@@ -4212,7 +4212,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Indstil</translation>
     </message>
     <message>
       <source>Log In</source>

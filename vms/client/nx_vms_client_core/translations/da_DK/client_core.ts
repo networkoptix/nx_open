@@ -389,11 +389,11 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Sites</translation>
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Partnere</translation>
     </message>
   </context>
   <context>

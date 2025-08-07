@@ -1056,7 +1056,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Tilladelsesgrupper</translation>
     </message>
   </context>
   <context>
@@ -1114,7 +1114,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Tilladelsesgrupper</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
@@ -2890,7 +2890,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Tilladelsesgrupper</translation>
     </message>
     <message>
       <source>Access</source>
@@ -3000,7 +3000,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Tilladelsesgrupper</translation>
     </message>
     <message>
       <source>Access expires</source>
@@ -3073,7 +3073,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Alle Sites</translation>
     </message>
   </context>
   <context>
