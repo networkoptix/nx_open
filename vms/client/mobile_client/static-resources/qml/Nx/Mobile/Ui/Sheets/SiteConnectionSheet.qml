@@ -176,6 +176,13 @@ BottomSheet
             passwordInput.errorText = ""
         }
 
+        function resetFocus()
+        {
+            addressField.focus = false
+            userComboBox.focus = false
+            passwordInput.focus = false
+        }
+
         function ensureDataEntered()
         {
             d.resetErrors()
@@ -210,6 +217,7 @@ BottomSheet
             if (!ensureDataEntered())
                 return
 
+            d.resetFocus()
             d.connectingNow = true
 
             // Using callLater to avoid problems with animations and event queue
