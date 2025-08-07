@@ -949,7 +949,7 @@
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Wybierz termin wygaśnięcia</translation>
     </message>
     <message>
       <source>Expiration</source>

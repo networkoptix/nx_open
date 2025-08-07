@@ -181,7 +181,7 @@
     </message>
     <message>
       <source>Failed to access site.</source>
-      <translation>Kunne ikke få adgang til webstedet.</translation>
+      <translation>Kunne ikke få adgang til site.</translation>
     </message>
   </context>
   <context>
@@ -373,7 +373,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Prøv at ændre søgeparametrene</translation>
     </message>
   </context>
   <context>
@@ -388,11 +388,11 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Sites</translation>
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Partnere</translation>
     </message>
   </context>
   <context>

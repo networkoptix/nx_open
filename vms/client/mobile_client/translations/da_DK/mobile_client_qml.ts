@@ -41,31 +41,31 @@
     </message>
     <message>
       <source>Video Download</source>
-      <translation>Videodownload</translation>
+      <translation>Video download</translation>
     </message>
     <message>
       <source>Ability to download video</source>
-      <translation type="unfinished">Ability to download video</translation>
+      <translation>Mulighed for at downloade video</translation>
     </message>
     <message>
       <source>Speedup connections</source>
-      <translation type="unfinished">Speedup connections</translation>
+      <translation>Hurtigere forbindelser</translation>
     </message>
     <message>
       <source>Improve network performance</source>
-      <translation type="unfinished">Improve network performance</translation>
+      <translation>Forbedre netværkets ydeevne</translation>
     </message>
     <message>
       <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <translation>Maksimalt antal dekodere</translation>
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <translation>Forbedr video afkodnings ydelsen ved hjælp af maksimalt antal hardwaredekodere</translation>
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>
-      <translation type="unfinished">Please restart the app to apply the changes.</translation>
+      <translation>Genstart venligst appen for at anvende ændringerne.</translation>
     </message>
   </context>
   <context>
@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>Krævede oplysninger</translation>
     </message>
   </context>
   <context>
@@ -137,11 +137,11 @@
     <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation type="unfinished">Log in to the site in %1</translation>
+      <translation>Log ind på webstedet i %1</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation>Følg guidens trin</translation>
+      <translation>Følg trinnene i guiden</translation>
     </message>
     <message>
       <source>OK</source>
@@ -150,26 +150,26 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+      <translation>Hvis webstedet &lt;font color=&apos;%2&apos;&gt;ikke er forbundet&lt;/a&gt; til %1</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>Klik på &quot;Forbind websted til %1&quot; i fanen %1 i Webstedsadministration</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
+      <translation>Hvis webstedet er &lt;font color=&apos;%2&apos;&gt;forbundet&lt;/a&gt; til %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>Opret forbindelse til %1 via webstedsejerens konto</translation>
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
+      <translation>Åbn siden Indstillinger for websted, og klik på linket &quot;skift&quot; ud for ejerens navn&apos;</translation>
     </message>
   </context>
   <context>
@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Deling åbner den nye bogmærke dialogboks for at generere et afspilningslink efter indstilling af delingsindstillingerne</translation>
     </message>
   </context>
   <context>
@@ -242,7 +242,7 @@
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation type="unfinished">Copy log ID</translation>
+      <translation>Kopiér log-ID</translation>
     </message>
   </context>
   <context>
@@ -292,14 +292,14 @@
     <message>
       <source>Enter your %1 account password to connect to the Site</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
+      <translation>Indtast din %1 kontoadgangskode for at oprette forbindelse til webstedet</translation>
     </message>
   </context>
   <context>
     <name>DownloadMediaButton</name>
     <message>
       <source>Download next</source>
-      <translation type="unfinished">Download next</translation>
+      <translation>Download næste</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
@@ -314,14 +314,14 @@
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
-      <translation type="unfinished">SHARED</translation>
+      <translation>DELT</translation>
     </message>
   </context>
   <context>
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation type="unfinished">Looking for</translation>
+      <translation>Leder efter</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -370,11 +370,11 @@
     <name>FiltersScreen</name>
     <message>
       <source>Search Filters</source>
-      <translation type="unfinished">Search Filters</translation>
+      <translation>Søgefiltre</translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Kun delt</translation>
     </message>
   </context>
   <context>
@@ -400,7 +400,7 @@
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Vis ikke dette vindue igen</translation>
     </message>
   </context>
   <context>
@@ -481,7 +481,7 @@
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation type="unfinished">App Settings</translation>
+      <translation>App-indstillinger</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -490,7 +490,7 @@
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Logget ind som %1</translation>
     </message>
   </context>
   <context>
@@ -533,7 +533,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Ydeevne</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -545,18 +545,18 @@
     </message>
     <message>
       <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <translation>Aktiver software dekoder fallback</translation>
     </message>
     <message>
       <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <translation>Afkod nogle sjældne videoformater ved hjælp af softwaredekoder</translation>
     </message>
   </context>
   <context>
     <name>PluginSelector</name>
     <message>
       <source>Plugin</source>
-      <translation type="unfinished">Plugin</translation>
+      <translation>Plugin</translation>
     </message>
   </context>
   <context>
@@ -601,19 +601,19 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Sites</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Alle Sites</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation type="unfinished">Selected Sites</translation>
+      <translation>Valgte Sites</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation type="unfinished">At least one site has to be selected</translation>
+      <translation>Mindst ét site skal vælges</translation>
     </message>
   </context>
   <context>
@@ -640,11 +640,11 @@
     </message>
     <message>
       <source>Transcoding is disabled by the Server.</source>
-      <translation type="unfinished">Transcoding is disabled by the Server.</translation>
+      <translation>Transkodning er deaktiveret af serveren.</translation>
     </message>
     <message>
       <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
-      <translation type="unfinished">Transcoding is not supported for Servers with version lower than 3.0.</translation>
+      <translation>Transkodning understøttes ikke for servere med en version ældre end 3.0.</translation>
     </message>
   </context>
   <context>
@@ -655,7 +655,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Til</translation>
     </message>
   </context>
   <context>
@@ -693,7 +693,7 @@
     </message>
     <message>
       <source>Stop Connecting</source>
-      <translation type="unfinished">Stop Connecting</translation>
+      <translation>Stop Forbindelse</translation>
     </message>
   </context>
   <context>
@@ -766,7 +766,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>Vært: Port</translation>
     </message>
   </context>
   <context>
@@ -785,15 +785,15 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Sites</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Prøv at ændre søgeparametrene</translation>
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>Ingen organisationer</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -801,11 +801,11 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Partnere</translation>
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Ingen Sites</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -919,15 +919,15 @@
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Udløber om en time</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Udløber om en dag</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Udløber om en måned</translation>
     </message>
     <message>
       <source>Never expires</source>
