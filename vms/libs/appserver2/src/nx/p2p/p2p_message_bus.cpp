@@ -31,6 +31,7 @@ namespace p2p {
 
 const QString MessageBus::kCloudPathPrefix("/cdb");
 std::chrono::milliseconds kDefaultTimerInterval(500);
+static const int kMinServerVersionForClientTransactionSubmit = 6100;
 
 using namespace ec2;
 using namespace vms::api;
@@ -312,6 +313,12 @@ void MessageBus::updateOutgoingConnection(
     if (connection == m_connections.end())
     {
         NX_DEBUG(this, "Can not find connection '%1'", id);
+        return;
+    }
+
+    if ((*connection)->remotePeer().protoVersion < kMinServerVersionForClientTransactionSubmit)
+    {
+        NX_DEBUG(this, "Remote peer version is too low to update credentials for '%1'", id);
         return;
     }
 
