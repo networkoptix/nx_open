@@ -10,6 +10,7 @@ static constexpr char kOauthClientLogoutPath[] = "/oauth2/v1/user/self/client/{c
 static constexpr char kOauthTokenPath[] = "/oauth2/v1/token";
 
 static constexpr char kOauthJwksPath[] = "/oauth2/v1/jwks";
+static constexpr char kOauthJwksRfc7517Path[] = "/oauth2/v1/.well-known/jwks.json";
 static constexpr char kOauthJwkByIdPath[] = "/oauth2/v1/jwks/{kid}";
 
 static constexpr char kOauthPasswordResetCodePath[] = "/oauth2/v1/internal/passwordResetCode";

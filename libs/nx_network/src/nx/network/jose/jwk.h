@@ -55,6 +55,17 @@ public:
     void setKid(const std::string& value);
 };
 
+/**
+ * JSON Web Key Set as defined by https://datatracker.ietf.org/doc/html/rfc7517.
+ * See https://datatracker.ietf.org/doc/html/rfc7517#section-5 for fields descriptions.
+ */
+struct JwkSet
+{
+    std::vector<Key> keys;
+};
+
+NX_REFLECTION_INSTRUMENT(JwkSet, (keys))
+
 struct KeyPair
 {
     Key pub;
