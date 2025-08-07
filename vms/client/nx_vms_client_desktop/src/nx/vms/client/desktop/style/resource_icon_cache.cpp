@@ -114,13 +114,13 @@ NX_DECLARE_COLORIZED_ICON(kAlertYellowIcon, "20x20/Solid/alert2.svg", kYellowThe
 NX_DECLARE_COLORIZED_ICON(kClientIcon, "20x20/Solid/client.svg",\
     kTreeThemeSubstitutions)
 
-NX_DECLARE_COLORIZED_ICON(kSystemCloudUnauthIcon, "20x20/Solid/system_cloud_unauthorized.svg",\
+NX_DECLARE_COLORIZED_ICON(kSystemCloudUnauthIcon, "20x20/Solid/site_cloud_unauthorized.svg",\
     kTreeThemeOfflineSubstitutions)
-NX_DECLARE_COLORIZED_ICON(kSystemCloudOfflineIcon, "20x20/Solid/system_cloud_offline.svg",\
+NX_DECLARE_COLORIZED_ICON(kSystemCloudOfflineIcon, "20x20/Solid/site_cloud_offline.svg",\
     kTreeThemeOfflineSubstitutions)
-NX_DECLARE_COLORIZED_ICON(kSystemCloudWarningIcon, "20x20/Solid/system_cloud_warning.svg",\
+NX_DECLARE_COLORIZED_ICON(kSystemCloudWarningIcon, "20x20/Solid/site_cloud_warning.svg",\
     kWarningTheme)
-NX_DECLARE_COLORIZED_ICON(kSystemCloudIcon, "20x20/Solid/system_cloud.svg",\
+NX_DECLARE_COLORIZED_ICON(kSystemCloudIcon, "20x20/Solid/site_cloud.svg",\
     kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kEncoderIcon, "20x20/Solid/encoder.svg",\
@@ -196,9 +196,9 @@ NX_DECLARE_COLORIZED_ICON(kScreenControlledIcon, "20x20/Solid/screen_controlled.
 NX_DECLARE_COLORIZED_ICON(kScreenOfflineIcon, "20x20/Solid/screen_offline.svg",\
     kTreeThemeOfflineSubstitutions)
 
-NX_DECLARE_COLORIZED_ICON(kSystemLocalIcon, "20x20/Solid/system_local.svg",\
+NX_DECLARE_COLORIZED_ICON(kSystemLocalIcon, "20x20/Solid/site_local.svg",\
     kTreeThemeSubstitutions)
-NX_DECLARE_COLORIZED_ICON(kOtherSystemsIcon, "20x20/Solid/other_systems.svg",\
+NX_DECLARE_COLORIZED_ICON(kOtherSystemsIcon, "20x20/Solid/sites.svg",\
     kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kServersIcon, "20x20/Solid/servers.svg",\

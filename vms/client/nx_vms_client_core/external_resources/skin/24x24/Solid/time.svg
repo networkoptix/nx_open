@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <g class="24x24/Solid/time">
-    <path fill="#ffffff" fill-rule="evenodd" d="M20 12c0 4.417-3.583 8-8 8s-8-3.583-8-8 3.583-8 8-8 8 3.583 8 8Zm-4.626 2.293a1 1 0 0 1-1.414 1.414l-2.667-2.667a1 1 0 0 1-.293-.707v-4a1 1 0 1 1 2 0v3.586l2.374 2.374Z" class="Primary" clip-rule="evenodd"/>
+    <path fill="#B0B9C4" d="M12 4c4.417 0 8 3.583 8 8s-3.583 8-8 8-8-3.583-8-8 3.583-8 8-8Zm0 3.333a1 1 0 0 0-1 1v4a1 1 0 0 0 .293.707l2.667 2.667a1 1 0 0 0 1.414-1.414L13 11.919V8.333a1 1 0 0 0-1-1Z" class="Primary"/>
   </g>
 </svg>

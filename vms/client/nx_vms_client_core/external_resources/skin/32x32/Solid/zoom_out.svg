@@ -4,7 +4,7 @@
     <path fill="#ffffff" d="M10 17v-2h12v2z" class="Primary"/>
   </g>
   <defs>
-    <clipPath id="a" class="a">
+    <clipPath id="a">
       <path fill="#ffffff" d="M0 0h32v32H0z"/>
     </clipPath>
   </defs>

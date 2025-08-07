@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <g class="24x24/Outline/timeline">
+    <path fill="#B0B9C4" d="M20 3a1 1 0 0 1 1 1v16a1 1 0 1 1-2 0v-2h-5a1 1 0 1 1 0-2h5v-3h-8v1l-.005.102a1 1 0 0 1-.893.893L10 15H5l-.103-.005a1 1 0 0 1-.892-.893L4 14v-4a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1h8V8h-5a1 1 0 1 1 0-2h5V4a1 1 0 0 1 1-1ZM6 13h3v-2H6v2Z" class="Primary"/>
+  </g>
+</svg>

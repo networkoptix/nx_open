@@ -62,7 +62,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
     {QnIcon::Pressed, {.primary = "light14"}},
 };
 
-NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Outline/system.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Outline/site.svg", kIconSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kNotificationIcon, "20x20/Outline/event_rules.svg", kIconSubstitutions)
 
 nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {

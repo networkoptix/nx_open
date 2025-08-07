@@ -31,7 +31,7 @@ Page
 
         model: [
             {
-                "iconSource": "image://skin/24x24/Outline/disconnect.svg",
+                "iconSource": "image://skin/24x24/Outline/logout.svg",
                 "text": windowContext.sessionManager.systemName,
                 "initialize": (item) => item.customAreaComponent = disconnectButtonCustomArea,
                 "action": () => windowContext.sessionManager.stopSessionByUser()

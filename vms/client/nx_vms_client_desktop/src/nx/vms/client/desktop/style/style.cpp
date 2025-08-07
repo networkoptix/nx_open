@@ -159,7 +159,7 @@ NX_DECLARE_COLORIZED_ICON(kArrowBackwardIcon, "24x24/Outline/arrow_back.svg", kL
 NX_DECLARE_COLORIZED_ICON(kArrowForwardIcon, "24x24/Outline/arrow_forward.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kArrowUp2pxIcon, "24x24/Outline/arrow_up_2px.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kCloseIcon, "16x16/Outline/close.svg", kLight1Theme)
-NX_DECLARE_COLORIZED_ICON(kHamburger2pxIcon, "24x24/Outline/hamburger_menu_2px.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kHamburger2pxIcon, "24x24/Outline/menu.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kFileDialogIcon, "24x24/Outline/grid_view.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kErrorIcon, "64x64/Outline/error.svg", kRedTheme)
 NX_DECLARE_COLORIZED_ICON(kInfoIcon, "64x64/Outline/info.svg", kLight10Theme)

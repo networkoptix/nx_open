@@ -19,7 +19,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSystemSu
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kAddSubstitutions =
     {{QnIcon::Normal, {.primary = "dark14"}}};
 
-NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Solid/system_local.svg", kSystemSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Solid/site_local.svg", kSystemSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kAddSubstitutions)
 
 } // namespace
