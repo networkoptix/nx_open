@@ -35,8 +35,10 @@ PlainPickerWidget::PlainPickerWidget(
     m_hintButton = new HintButton;
     m_hintButton->setVisible(false);
     labelWithHintLayout->addWidget(m_hintButton);
+    labelWithHintLayout->setAlignment(m_hintButton, Qt::AlignCenter);
 
     mainLayout->addLayout(labelWithHintLayout);
+    mainLayout->setAlignment(labelWithHintLayout, Qt::AlignTop);
 
     auto contentLayout = new QVBoxLayout;
     m_contentWidget = new QWidget;
