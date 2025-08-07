@@ -140,11 +140,11 @@
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation type="unfinished">Input Port: %1</translation>
+      <translation>Indgangsport: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation type="unfinished">Input on %1</translation>
+      <translation>Input på %1</translation>
     </message>
     <message>
       <source>State</source>
@@ -194,15 +194,15 @@
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation type="unfinished">Device %1 was disconnected</translation>
+      <translation>Enhed %1 blev afbrudt</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation type="unfinished">Camera %1 was disconnected</translation>
+      <translation>Kamera %1 blev afbrudt</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation type="unfinished">I/O Module %1 was disconnected</translation>
+      <translation>I/O Modul %1 blev afbrudt</translation>
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
@@ -227,21 +227,21 @@
     <name>nx::vms::rules::DeviceIpConflictEvent</name>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation type="unfinished">Conflicting Address: %1</translation>
+      <translation>Konflikt Adresse: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
-      <translation type="unfinished">MAC #%1: %2</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Device IP Conflict at %1</translation>
+      <translation>Enheds IP Konflikt på %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Camera IP Conflict at %1</translation>
+      <translation>Kamera IP Konflikt på %1</translation>
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
@@ -373,7 +373,7 @@
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation type="unfinished">Generic Event at %1</translation>
+      <translation>Generisk begivenhed på %1</translation>
     </message>
     <message>
       <source>State</source>
@@ -446,7 +446,7 @@
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>Server &quot;%1&quot; har et licensproblem</translation>
     </message>
     <message>
       <source>License Issue</source>
@@ -469,7 +469,7 @@
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
-      <translation type="unfinished">Motion on %1</translation>
+      <translation>Bevægelse på %1</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
@@ -488,7 +488,7 @@
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
       <source>Network Issue at %1</source>
-      <translation type="unfinished">Network Issue at %1</translation>
+      <translation>Netværksproblem ved %1</translation>
     </message>
     <message>
       <source>Network Issue</source>
@@ -533,7 +533,7 @@
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
@@ -850,21 +850,21 @@
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation type="unfinished">Conflicting Server: %1</translation>
+      <translation>Konflikt Server: %1</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation type="unfinished">Conflicting Server #%1: %2</translation>
+      <translation>Konflikter Server #%1: %2</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation type="unfinished">MAC #%1: %2</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>Server &quot;%1&quot; Konflikt</translation>
     </message>
     <message>
       <source>Server Conflict</source>
@@ -875,7 +875,7 @@
     <name>nx::vms::rules::ServerFailureEvent</name>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>Server &quot;%1&quot; Fejl</translation>
     </message>
     <message>
       <source>Server Failure</source>
@@ -894,7 +894,7 @@
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>Server &quot;%1&quot; Startet</translation>
     </message>
     <message>
       <source>Server Started</source>
@@ -932,7 +932,7 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Udløser: %1</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
@@ -1064,11 +1064,11 @@
     <name>nx::vms::rules::TextWithFields</name>
     <message>
       <source>Event: %1</source>
-      <translation type="unfinished">Event: %1</translation>
+      <translation>Begivenhed: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Kilde: %1</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
@@ -1076,11 +1076,11 @@
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>Billedtekst: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>Årsag: %1</translation>
     </message>
   </context>
   <context>

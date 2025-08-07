@@ -900,7 +900,7 @@
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Tilladelsesgrupper</translation>
     </message>
   </context>
   <context>
@@ -958,7 +958,7 @@
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Tilladelsesgrupper</translation>
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
@@ -2486,7 +2486,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Tilladelsesgrupper</translation>
     </message>
     <message>
       <source>Access</source>
@@ -2592,7 +2592,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Tilladelsesgrupper</translation>
     </message>
     <message>
       <source>Access expires</source>

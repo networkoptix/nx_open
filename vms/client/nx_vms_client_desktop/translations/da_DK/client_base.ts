@@ -1981,7 +1981,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>E-mails</translation>
     </message>
     <message>
       <source>RHI backend</source>
@@ -4603,7 +4603,7 @@ Licensnøgle: %2</translation>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation type="unfinished">Enter URL</translation>
+      <translation>Indtast URL</translation>
     </message>
     <message>
       <source>URL</source>
@@ -8531,7 +8531,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit camera settings</source>
-      <translation type="unfinished">Edit camera settings</translation>
+      <translation>Rediger kameraindstillinger</translation>
     </message>
     <message>
       <source>View event log</source>
