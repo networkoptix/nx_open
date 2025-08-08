@@ -10,6 +10,7 @@
 #include <nx/branding.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -291,6 +292,8 @@ void QnCloudManagementWidget::disconnectFromCloud()
 
 void QnCloudManagementWidget::onDisconnectSuccess()
 {
+    core::appContext()->cloudStatusWatcher()->updateSystems();
+
     const auto user = context()->user();
     const bool isCloudUser = user ? user->isCloud() : false;
 
