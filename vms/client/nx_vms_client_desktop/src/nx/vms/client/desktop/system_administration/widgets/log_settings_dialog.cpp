@@ -188,6 +188,13 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
         .level = BarDescription::BarLevel::Warning,
         .isEnabledProperty = &messageBarSettings()->performanceLoggingWarning});
 
+    ui->settingsSavingError->init({
+        .text = tr(
+             "Split File by Size must be greater then 10 MB and less than or equal to "
+             "the half of a value set for Limit Max Volume"),
+        .level = BarDescription::BarLevel::Error});
+    ui->settingsSavingError->hide();
+
     auto resetButton = ui->buttonBox->button(QDialogButtonBox::Reset);
     resetButton->setIcon(qnSkin->icon(kResetIcon));
     resetButton->setFlat(true);
@@ -201,8 +208,29 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
 
     auto cancelButton = ui->buttonBox->button(QDialogButtonBox::Cancel);
 
+    auto onOkClicked =
+        [this]()
+        {
+            if ((maxVolumeSize().value_or(0) / 2) >= maxFileSize().value_or(0)
+                && maxFileSize().value_or(0) >= 10 * kMegabyte)
+            {
+                accept();
+            }
+            else
+            {
+                ui->settingsSavingError->show();
+                setErrorStyle(ui->splitBySizeValue);
+            }
+        };
+
+    connect(ui->splitBySizeValue, &QSpinBox::valueChanged,
+        [this]()
+        {
+            resetErrorStyle(ui->splitBySizeValue);
+        });
+
     connect(resetButton, &QPushButton::clicked, this, &LogSettingsDialog::resetToDefault);
-    connect(okButton, &QPushButton::clicked, this, &QDialog::accept);
+    connect(okButton, &QPushButton::clicked, onOkClicked);
     connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
     connect(
