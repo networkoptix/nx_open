@@ -527,7 +527,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Suspenderet</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -3077,7 +3077,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Alle Sites</translation>
     </message>
   </context>
   <context>

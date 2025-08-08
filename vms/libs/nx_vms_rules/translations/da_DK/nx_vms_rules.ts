@@ -125,7 +125,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Occurs At</source>
