@@ -15,7 +15,7 @@
   <String Id="ClientAndServer">Klient og Server</String>
   <String Id="ClientOnly">Kun klient</String>
   <String Id="ClientOnlyDesc">The Client application is used to view video and manage the System</String>
-  <String Id="ServerOnly">Server only</String>
+  <String Id="ServerOnly">Kun server</String>
   <String Id="ServerOnlyDesc">The Server application is used to store System information and archives</String>
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpCloseButton">Luk</String>

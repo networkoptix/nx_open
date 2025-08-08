@@ -3218,7 +3218,7 @@ Licensnøgle: %2</translation>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Logget ind som %1</translation>
     </message>
   </context>
   <context>
@@ -3896,7 +3896,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation type="unfinished">Server not found</translation>
+      <translation>Serveren blev ikke fundet</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -10746,7 +10746,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Ydeevne</translation>
     </message>
     <message>
       <source>Native</source>
@@ -10970,7 +10970,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Suspenderet</translation>
     </message>
     <message>
       <source>Shut down</source>
