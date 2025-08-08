@@ -11,6 +11,7 @@
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <core/resource/camera_resource.h>
+#include <nx/reflect/json/deserializer.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/analytics/analytics_filter_model.h>
@@ -450,6 +451,18 @@ void AnalyticsSearchSynchronizer::updateAttributeFiltersFromSettings()
         system()->userSettings()->objectSearchAttributeFilters());
 }
 
+void AnalyticsSearchSynchronizer::updateTextSearchScopeFromSettings()
+{
+    m_analyticsSetup->setTextSearchScope(
+        nx::reflect::fromString<nx::analytics::db::TextScope>(
+        system()->userSettings()->textSearchScope().toStdString()));
+}
+
+void AnalyticsSearchSynchronizer::updateReferenceTrackIdFromSettings()
+{
+    m_analyticsSetup->setReferenceTrackId(system()->userSettings()->referenceTrackId());
+}
+
 void AnalyticsSearchSynchronizer::updateCameraSelectionFromSettings()
 {
     const core::EventSearch::CameraSelection cameraSelection =
@@ -508,6 +521,8 @@ void AnalyticsSearchSynchronizer::updateFiltersFromSettings()
     updateTimeSelectionFromSettings();
     updateAreaFromSettings();
     updateAttributeFiltersFromSettings();
+    updateTextSearchScopeFromSettings();
+    updateReferenceTrackIdFromSettings();
 }
 
 void AnalyticsSearchSynchronizer::handleWidgetAnalyticsFilterRectChanged()
@@ -599,6 +614,22 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
             const auto objectTypes = m_analyticsSetup->objectTypes();
             for (auto instance: instancesToNotify())
                 instance->m_analyticsSetup->setObjectTypes(objectTypes);
+        });
+
+    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::textSearchScopeChanged, this,
+        [this]()
+        {
+            const auto scope = m_analyticsSetup->textSearchScope();
+            for (auto instance: instancesToNotify())
+                instance->m_analyticsSetup->setTextSearchScope(scope);
+        });
+
+    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::referenceTrackIdChanged, this,
+        [this]()
+        {
+            const auto value = m_analyticsSetup->referenceTrackId();
+            for (auto instance: instancesToNotify())
+                instance->m_analyticsSetup->setReferenceTrackId(value);
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::attributeFiltersChanged, this,
@@ -731,6 +762,22 @@ void AnalyticsSearchSynchronizer::setupSettingsStorage()
         [this]()
         {
             system()->userSettings()->objectSearchArea = m_analyticsSetup->area();
+        });
+
+    m_settingsSyncConnections << connect(
+        m_analyticsSetup, &core::AnalyticsSearchSetup::textSearchScopeChanged, this,
+        [this]()
+        {
+            system()->userSettings()->textSearchScope = QString::fromStdString(
+                nx::reflect::json::serialize(m_analyticsSetup->textSearchScope()));
+        });
+
+    m_settingsSyncConnections << connect(
+        m_analyticsSetup, &core::AnalyticsSearchSetup::referenceTrackIdChanged, this,
+        [this]()
+        {
+            system()->userSettings()->referenceTrackId =
+                m_analyticsSetup->referenceTrackId();
         });
 }
 

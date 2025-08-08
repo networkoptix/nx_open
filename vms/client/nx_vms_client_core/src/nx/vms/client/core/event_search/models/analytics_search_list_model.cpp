@@ -90,7 +90,7 @@ public:
         cameraStatusListener;
 
     const std::unique_ptr<TextFilterSetup> textFilter;
-    TextScope textSearchScope;
+    TextScope textSearchScope{TextScope::attributes};
 
     nx::Uuid referenceTrackId;
 

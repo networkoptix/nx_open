@@ -8,8 +8,12 @@
 #include "cdb_request_path.h"
 
 static constexpr char kTracksPath[] = "/analyticsDb/v1/tracks";
+static constexpr char kCompressedTrackPeriodsPath[] = "/analyticsDb/v1/periods/flat";
 static constexpr char kBestShotImagePath[] = "/analyticsDb/v1/tracks/{id}/image/bestShot";
 static constexpr char kTitleImagePath[] = "/analyticsDb/v1/tracks{id}/image/title";
+
+static const int kAgregationIntervalSec = 5;
+static const int kAgregationIntervalMs = kAgregationIntervalSec * 1000;
 
 namespace nx::cloud::db::client {
 
@@ -58,6 +62,37 @@ void AnalyticsDbManager::getTracks(
         kTracksPath,
         filter.toUrlQuery(),
         std::move(completionHandler));
+}
+
+api::TimePeriodList uncompressTimePeriods(const std::vector<int64_t>& compressed)
+{
+    api::TimePeriodList result(compressed.size() / 2);
+    int64_t current = 0;
+    for (size_t i = 0; i < compressed.size() / 2; ++i)
+    {
+        current += compressed[i * 2];
+        result[i].startTimeMs = current * kAgregationIntervalMs;
+        result[i].durationMs = compressed[i * 2 + 1] * kAgregationIntervalMs;
+        current += compressed[i * 2 + 1];
+    }
+    return result;
+}
+
+void AnalyticsDbManager::getTrackPeriods(
+    const api::GetTracksParamsData& filter,
+    nx::MoveOnlyFunc<void(api::ResultCode, const api::TimePeriodList& data)> completionHandler)
+{
+    auto query = filter.toUrlQuery();
+    query.addQueryItem("interval", kAgregationIntervalSec); //< Aggregation interval. So far use same value as VMS.
+    query.addQueryItem("resultInIntervals", "true");
+    m_requestsExecutor->makeAsyncCall<std::vector<int64_t>>(
+        Method::get,
+        kCompressedTrackPeriodsPath,
+        query,
+        [handler = std::move(completionHandler)](api::ResultCode code, std::vector<int64_t> compressed)
+        {
+            handler(code, uncompressTimePeriods(compressed));
+        });
 }
 
 struct ResponseFetcher

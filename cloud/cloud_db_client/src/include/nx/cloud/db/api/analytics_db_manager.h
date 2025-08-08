@@ -28,6 +28,10 @@ public:
         const GetTracksParamsData& filter,
         nx::MoveOnlyFunc<void(ResultCode, const ReadTracksData& data)> completionHandler) = 0;
 
+    virtual void getTrackPeriods(
+        const api::GetTracksParamsData& filter,
+        nx::MoveOnlyFunc<void(api::ResultCode, const api::TimePeriodList& data)> completionHandler) = 0;
+
     virtual void getBestShotImage(
         const nx::Uuid& trackId,
         nx::MoveOnlyFunc<void(ResultCode, const TrackImageData& image)> completionHandler) = 0;

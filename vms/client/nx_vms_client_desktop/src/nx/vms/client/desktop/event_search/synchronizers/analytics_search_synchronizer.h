@@ -51,6 +51,8 @@ private:
     void updateTimeSelectionFromSettings();
     void updateAreaFromSettings();
     void updateAttributeFiltersFromSettings();
+    void updateTextSearchScopeFromSettings();
+    void updateReferenceTrackIdFromSettings();
     void updateCameraSelectionFromSettings();
     void updateEngineIdFromSettings();
     void updateFiltersFromSettings();

@@ -44,6 +44,8 @@ public:
     Property<QStringList> objectSearchObjectTypeIds{this, "objectSearchObjectTypeIds"};
     Property<QRectF> objectSearchArea{this, "objectSearchArea"};
     Property<QStringList> objectSearchAttributeFilters{this, "objectSearchAttributeFilters"};
+    Property<QString> textSearchScope{ this, "textSearchScope" };
+    Property<nx::Uuid> referenceTrackId{ this, "referenceTrackId" };
     Property<nx::Uuid> objectSearchEngineId{this, "objectSearchEngineId"};
 
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(ObjectSearchDisplayMode, tiles, table)

@@ -22,6 +22,10 @@ public:
         const api::GetTracksParamsData& filter,
         nx::MoveOnlyFunc<void(api::ResultCode, const api::ReadTracksData& data)> completionHandler) override;
 
+    virtual void getTrackPeriods(
+        const api::GetTracksParamsData& filter,
+        nx::MoveOnlyFunc<void(api::ResultCode, const api::TimePeriodList& data)> completionHandler) override;
+
     virtual void getBestShotImage(
         const nx::Uuid& trackId,
         nx::MoveOnlyFunc<void(api::ResultCode, const api::TrackImageData& image)> completionHandler) override;

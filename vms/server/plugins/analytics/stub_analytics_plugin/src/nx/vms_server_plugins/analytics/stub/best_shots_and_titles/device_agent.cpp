@@ -26,6 +26,13 @@ namespace fs = std::filesystem;
 
 namespace {
 
+bool ends_with(const std::string& value, const std::string_view& ending)
+{
+    if (ending.size() > value.size())
+        return false;
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
 bool isLittleEndian()
 {
     uint16_t num = 0x1;
@@ -217,6 +224,11 @@ std::vector<DeviceAgent::ImageData> DeviceAgent::loadImages(const std::string& p
             if (fs::is_regular_file(entry))
             {
                 std::string filePath = entry.path().string();
+                const bool isImage = ends_with(filePath, ".jpeg") || ends_with(filePath, ".jpg")
+                    || ends_with(filePath, ".png") || ends_with(filePath, ".bmp");
+                if (!isImage)
+                    continue;
+
                 DeviceAgent::ImageData imageData;
                 imageData.data = loadFile(filePath);
                 imageData.format = imageFormatFromPath(filePath);

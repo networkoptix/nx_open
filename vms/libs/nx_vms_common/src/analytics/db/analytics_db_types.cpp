@@ -280,7 +280,9 @@ bool Filter::operator==(const Filter& right) const
         && freeText == right.freeText
         && sortOrder == right.sortOrder
         && deviceIds == right.deviceIds
-        && storageId == right.storageId;
+        && storageId == right.storageId
+        && textScope == right.textScope
+        && referenceBestShotId == right.referenceBestShotId;
 }
 
 bool Filter::operator!=(const Filter& right) const
