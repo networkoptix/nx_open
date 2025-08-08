@@ -101,6 +101,57 @@ TEST(HttpAuthDigest, calcDigestResponse)
     }
 }
 
+TEST(HttpAuthDigest, calcDigestResponseWithDifferentQopOptions)
+{
+    auto calculateDigest =
+        [](const std::optional<std::string>& qop, header::DigestAuthorization* digestHeader)
+        {
+            header::WWWAuthenticate authHeader(header::AuthScheme::digest);
+            authHeader.params.emplace("realm", "test@example.com");
+            if (qop.has_value())
+                authHeader.params.emplace("qop", *qop);
+            authHeader.params.emplace("nonce", "dcd98b7102dd2f0e8b11d0f600bfb0c093");
+            authHeader.params.emplace("algorithm", "MD5");
+
+            return calcDigestResponse(Method::get,
+                "user",
+                "password",
+                std::nullopt,
+                "/some/uri",
+                authHeader,
+                digestHeader);
+        };
+
+    // No qop options
+    {
+        header::DigestAuthorization digestHeader;
+        ASSERT_TRUE(calculateDigest(std::nullopt, &digestHeader));
+        const auto qop = digestHeader.digest->params.find("qop");
+        ASSERT_TRUE(qop == digestHeader.digest->params.end());
+    }
+    // qop="auth-int"
+    {
+        header::DigestAuthorization digestHeader;
+        ASSERT_FALSE(calculateDigest("auth-int", &digestHeader)); //< qop=auth-int is not supported.
+    }
+    // qop="auth,auth-int"
+    {
+        header::DigestAuthorization digestHeader;
+        ASSERT_TRUE(calculateDigest("auth,auth-int", &digestHeader));
+        const auto qop = digestHeader.digest->params.find("qop");
+        ASSERT_TRUE(qop != digestHeader.digest->params.end());
+        ASSERT_EQ(qop->second, "auth"); //< One of the alternatives.
+    }
+    // qop="auth"
+    {
+        header::DigestAuthorization digestHeader;
+        ASSERT_TRUE(calculateDigest("auth", &digestHeader));
+        const auto qop = digestHeader.digest->params.find("qop");
+        ASSERT_TRUE(qop != digestHeader.digest->params.end());
+        ASSERT_EQ(qop->second, "auth");
+    }
+}
+
 TEST(HttpAuthDigest, cnonce_is_supported_properly)
 {
     static constexpr char kUsername[] = "username";

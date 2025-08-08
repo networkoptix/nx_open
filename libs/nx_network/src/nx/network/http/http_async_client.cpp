@@ -1654,7 +1654,7 @@ bool AsyncClient::resendRequestWithAuthorization(
         if (!addDigestAuthorizationToRequest(
                 serverEndpoint,
                 serverRole,
-            credentialsToUse,
+                credentialsToUse,
                 *wwwAuthenticateHeader,
                 authorizationHeaderName))
         {
