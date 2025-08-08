@@ -880,7 +880,7 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Ydeevne</translation>
     </message>
     <message>
       <source>App Info</source>
@@ -1005,7 +1005,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Prøv at ændre søgeparametrene</translation>
     </message>
   </context>
   <context>
@@ -1185,7 +1185,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>Krævede oplysninger</translation>
     </message>
     <message>
       <source>Log In</source>
