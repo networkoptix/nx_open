@@ -41,7 +41,7 @@ namespace nx::vms::client::core {
 
 namespace {
 
-static constexpr auto kSystemUpdateInterval = 10s;
+static constexpr auto kSystemUpdateInterval = 100s;
 static constexpr auto kReconnectInterval = 5s;
 static constexpr int kUpdateSystemsTriesCount = 6;
 
