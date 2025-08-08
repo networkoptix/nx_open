@@ -201,6 +201,9 @@
     <widget class="nx::vms::client::desktop::CommonMessageBar" name="detailsWarning" native="true"/>
    </item>
    <item>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="settingsSavingError" native="true"/>
+   </item>
+   <item>
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
