@@ -306,6 +306,9 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
 
         case TotalSpaceColumn:
         {
+            if (storageData.storageType == "cloud")
+                return tr("Adaptive");
+
             switch (storageData.totalSpace)
             {
                 case QnStorageResource::kUnknownSize:
@@ -314,11 +317,8 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                     return tr("Loading...");
                 default:
                 {
-                    if (storageData.totalSpace < 0
-                        || storageData.storageType == "cloud")
-                    {
+                    if (storageData.totalSpace < 0)
                         return tr("Unknown size");
-                    }
 
                     using nx::vms::text::HumanReadable;
 
