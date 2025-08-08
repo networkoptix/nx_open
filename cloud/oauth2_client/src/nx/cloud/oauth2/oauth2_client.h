@@ -75,28 +75,11 @@ public:
         const db::api::AccountChangedEvent& event,
         nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) = 0;
 
-    // TODO: #anekrasov Do we need this?
-    virtual void internalClientLogout(
-        const std::string& email,
-        const std::string& clienId,
-        nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) = 0;
+    virtual void issueServiceToken(const api::IssueServiceTokenRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
+            completionHandler) = 0;
 
-    // TODO: #anekrasov Do we need this?
-    virtual void internalLogout(
-        const std::string& email, nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) = 0;
-
-    // TODO: #anekrasov Do we need this?
-    virtual void internalIssueToken(
-        const std::optional<std::string>& hostName,
-        const network::SocketAddress& clientEndpoint,
-        const nx::cloud::db::api::IssueTokenRequest& request,
-        nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)> handler) = 0;
-
-    // TODO: #anekrasov Do we need this?
-    virtual void internalGetSession(
-        const std::string& sessionId,
-        nx::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>
-            handler) = 0;
+    virtual void setCredentials(network::http::Credentials credentials) = 0;
 };
 
 class NX_OAUTH2_CLIENT_API Oauth2Client:
@@ -150,25 +133,6 @@ public:
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::GetSessionResponse)>
             completionHandler) override;
 
-    void internalClientLogout(
-        const std::string& email,
-        const std::string& clienId,
-        nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
-
-    void internalLogout(
-        const std::string& email, nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
-
-    void internalIssueToken(
-        const std::optional<std::string>& hostName,
-        const network::SocketAddress& clientEndpoint,
-        const nx::cloud::db::api::IssueTokenRequest& request,
-        nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)> handler) override;
-
-    void internalGetSession(
-        const std::string& sessionId,
-        nx::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>
-            handler) override;
-
     void markSessionMfaVerified(
         const std::string& sessionId,
         nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
@@ -176,6 +140,13 @@ public:
     void notifyAccountUpdated(
         const db::api::AccountChangedEvent& event,
         nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
+
+    virtual void issueServiceToken(
+        const api::IssueServiceTokenRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
+            completionHandler) override;
+
+    void setCredentials(network::http::Credentials credentials) override;
 };
 
 using Oauth2ClientFactoryFunc = std::unique_ptr<AbstractOauth2Client>(

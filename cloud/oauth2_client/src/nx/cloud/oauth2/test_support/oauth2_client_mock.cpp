@@ -126,30 +126,17 @@ void Oauth2ClientMock::notifyAccountUpdated(
     return completionHandler(db::api::ResultCode::ok);
 }
 
-
-void Oauth2ClientMock::internalLogout(
-    const std::string&, nx::MoveOnlyFunc<void(db::api::ResultCode)>)
+void Oauth2ClientMock::issueServiceToken(
+    const api::IssueServiceTokenRequest& request,
+    nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)> completionHandler)
 {
-    throw std::logic_error("not implemented");
+    Oauth2ClientMockManager::RequestPath path = {
+        api::kOauthServiceToken, nx::network::http::Method::post};
+    processRequest<api::IssueServiceTokenRequest, api::IssueServiceTokenResponse>(
+        path, request, std::move(completionHandler));
 }
 
-void Oauth2ClientMock::internalIssueToken(
-    const std::optional<std::string>&,
-    const network::SocketAddress&,
-    const nx::cloud::db::api::IssueTokenRequest&,
-    nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)>)
-{
-    throw std::logic_error("not implemented");
-}
-
-void Oauth2ClientMock::internalClientLogout(
-    const std::string&, const std::string&, nx::MoveOnlyFunc<void(db::api::ResultCode)>)
-{
-    throw std::logic_error("not implemented");
-}
-
-void Oauth2ClientMock::internalGetSession(const std::string&,
-    nx::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>)
+void Oauth2ClientMock::setCredentials(network::http::Credentials)
 {
     throw std::logic_error("not implemented");
 }

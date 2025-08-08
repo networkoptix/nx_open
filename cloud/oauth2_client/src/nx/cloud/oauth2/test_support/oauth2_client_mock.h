@@ -97,25 +97,6 @@ public:
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::GetSessionResponse)>
             completionHandler) override;
 
-    void internalClientLogout(
-        const std::string& email,
-        const std::string& clienId,
-        nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
-
-    void internalLogout(
-        const std::string& email, nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
-
-    void internalIssueToken(
-        const std::optional<std::string>& hostName,
-        const network::SocketAddress& clientEndpoint,
-        const nx::cloud::db::api::IssueTokenRequest& request,
-        nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)> handler) override;
-
-    void internalGetSession(
-        const std::string& sessionId,
-        nx::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>
-            handler) override;
-
     void markSessionMfaVerified(
         const std::string& sessionId,
         nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
@@ -123,6 +104,13 @@ public:
     void notifyAccountUpdated(
         const db::api::AccountChangedEvent& /*event*/,
         nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
+
+    virtual void issueServiceToken(
+        const api::IssueServiceTokenRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
+            completionHandler) override;
+
+     void setCredentials(network::http::Credentials credentials) override;
 
 protected:
     template <class Request, class Response, class CompletionHandler>

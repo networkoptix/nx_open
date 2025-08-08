@@ -143,30 +143,19 @@ void Oauth2Client::notifyAccountUpdated(
         std::move(completionHandler));
 }
 
-void Oauth2Client::internalLogout(
-    const std::string&, nx::MoveOnlyFunc<void(db::api::ResultCode)>)
+void Oauth2Client::issueServiceToken(
+    const api::IssueServiceTokenRequest& request,
+    nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)> completionHandler)
 {
-    throw std::logic_error("not implemented");
+    base_type::template makeAsyncCall<api::IssueServiceTokenResponse>(
+        nx::network::http::Method::post,
+        api::kOauthServiceToken,
+        {}, // query
+        std::move(request),
+        std::move(completionHandler));
 }
 
-void Oauth2Client::internalIssueToken(
-    const std::optional<std::string>&,
-    const network::SocketAddress&,
-    const nx::cloud::db::api::IssueTokenRequest&,
-    nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)>)
-{
-    throw std::logic_error("not implemented");
-}
-
-void Oauth2Client::internalClientLogout(
-    const std::string&, const std::string&, nx::MoveOnlyFunc<void(db::api::ResultCode)>)
-{
-    throw std::logic_error("not implemented");
-}
-
-void Oauth2Client::internalGetSession(
-    const std::string&,
-    nx::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>)
+void Oauth2Client::setCredentials(network::http::Credentials)
 {
     throw std::logic_error("not implemented");
 }
