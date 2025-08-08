@@ -935,7 +935,7 @@
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Vis ikke dette vindue igen</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
@@ -2147,7 +2147,7 @@
     <name>PushNotificationBusinessActionWidget</name>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Language Settings</source>

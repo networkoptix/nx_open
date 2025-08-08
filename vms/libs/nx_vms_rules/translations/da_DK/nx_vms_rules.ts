@@ -347,7 +347,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Til</translation>
     </message>
   </context>
   <context>
@@ -560,7 +560,7 @@
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
@@ -595,7 +595,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Rewind</source>
@@ -722,7 +722,7 @@
     <name>nx::vms::rules::PushNotificationAction</name>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Header</source>
@@ -765,7 +765,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Til</translation>
     </message>
   </context>
   <context>
@@ -824,7 +824,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Additional Recipients</source>
@@ -913,7 +913,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <source>Rewind</source>
