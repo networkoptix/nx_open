@@ -309,17 +309,22 @@ static std::string fieldOrDefault(
     return iter != inputParams.end() ? iter->second : defaultValue;
 }
 
-static bool isQopTypeSupported(const std::string_view& qopAttributeValue)
+static std::optional<std::string> chooseQop(const std::string& qopAttributeValue)
 {
     if (qopAttributeValue.empty())
-        return true;
+        return qopAttributeValue;
 
-    bool found = false;
+    std::optional<std::string> found;
     nx::utils::split(
         qopAttributeValue, ',',
         [&found](const auto& qopOption)
         {
-            found = found || nx::utils::stricmp(nx::utils::trim(qopOption), "auth") == 0;
+            if (!found)
+            {
+                std::string_view trimmed = nx::utils::trim(qopOption);
+                if (nx::utils::stricmp(trimmed, "auth") == 0)
+                    found = std::string{trimmed};
+            }
         });
     return found;
 }
@@ -339,9 +344,9 @@ bool calcDigestResponse(
 
     const auto nonce = fieldOrDefault(inputParams, "nonce");
     const auto realm = fieldOrDefault(inputParams, "realm");
-    const auto qop = fieldOrDefault(inputParams, "qop");
+    const auto qop = chooseQop(fieldOrDefault(inputParams, "qop"));
 
-    if (!isQopTypeSupported(qop))
+    if (!qop.has_value())
         return false;
 
     const std::string ha1 = predefinedHa1
@@ -365,7 +370,7 @@ bool calcDigestResponse(
     outputParams->emplace("uri", uri);
 
     std::string digestResponse;
-    if (qop.empty())
+    if (qop->empty())
     {
         digestResponse = calcResponse(ha1, nonce, ha2, algorithm);
     }
@@ -376,9 +381,9 @@ bool calcDigestResponse(
             inputParams, "cnonce", nx::utils::random::generateName(16));
 
         digestResponse = calcResponseAuthInt(
-            ha1, nonce, nonceCount, clientNonce, qop, ha2, algorithm);
+            ha1, nonce, nonceCount, clientNonce, *qop, ha2, algorithm);
 
-        outputParams->emplace("qop", qop);
+        outputParams->emplace("qop", *qop);
         outputParams->emplace("nc", std::move(nonceCount));
         outputParams->emplace("cnonce", clientNonce);
     }
