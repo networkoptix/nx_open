@@ -44,6 +44,7 @@ qt_libraries = [
     'WebChannelQuick',
     'WebEngineCore',
     'WebEngineQuick',
+    'WebEngineQuickDelegatesQml',
     'WebEngineWidgets',
     'Widgets',
     'Xml',
@@ -114,6 +115,7 @@ def create_client_update_file(config, output_file):
     launcher_version_name = config['launcher_version_file']
     minilauncher_binary_name = config['minilauncher_binary_name']
     client_update_files_directory = config['client_update_files_directory']
+    help_directory = os.path.join(config['help_directory'], 'help')
     locale_resources_directory = os.path.join(qt_directory, 'resources')
     webengine_locales_directory = os.path.join(qt_directory, 'translations', 'qtwebengine_locales')
     mobile_help_source_file_path = config['mobile_help_source_file_path']
@@ -148,7 +150,11 @@ def create_client_update_file(config, output_file):
         qt_plugins_dir = os.path.join(qt_directory, 'plugins')
         tools.zip_files_to(zip, tools.qt_plugins_files(qt_plugins_dir, qt_plugins), qt_plugins_dir)
 
-        tools.zip_all_files(zip, config['help_directory'])
+        tools.zip_files_to(
+            zip=zip,
+            files=tools.find_all_files(help_directory),
+            rel_path=help_directory,
+            target_path='help')
         tools.zip_all_files(zip, os.path.join(config['ucrt_directory'], 'bin'))
         tools.zip_all_files(zip, os.path.join(config['vcrt_directory'], 'bin'))
         tools.zip_files_to(zip, tools.find_all_files(config['fonts_directory']), binaries_dir)
