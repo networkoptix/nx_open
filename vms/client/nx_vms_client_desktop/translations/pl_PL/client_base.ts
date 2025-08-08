@@ -11386,6 +11386,14 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::StartupActionsHandler</name>
+    <message>
+      <source>Login to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Zaloguj się do %1</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>

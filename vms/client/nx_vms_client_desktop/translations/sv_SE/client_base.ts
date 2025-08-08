@@ -11061,6 +11061,14 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::StartupActionsHandler</name>
+    <message>
+      <source>Login to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Logga in på %1</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>

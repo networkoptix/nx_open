@@ -10899,6 +10899,14 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::StartupActionsHandler</name>
+    <message>
+      <source>Login to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Masuk ke %1</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>

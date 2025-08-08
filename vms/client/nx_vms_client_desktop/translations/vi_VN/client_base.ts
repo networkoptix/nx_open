@@ -10899,6 +10899,14 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::StartupActionsHandler</name>
+    <message>
+      <source>Login to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Đăng nhập vào %1</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>

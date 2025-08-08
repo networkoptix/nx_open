@@ -2790,7 +2790,7 @@ Licensnøgle: %2</translation>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Logget ind som %1</translation>
     </message>
   </context>
   <context>
@@ -3253,7 +3253,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation type="unfinished">Server not found</translation>
+      <translation>Serveren blev ikke fundet</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -10249,7 +10249,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Ydeevne</translation>
     </message>
     <message>
       <source>Native</source>
@@ -10389,7 +10389,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Suspenderet</translation>
     </message>
     <message>
       <source>Shut down</source>
@@ -11058,6 +11058,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Try changing the filters or enable motion recording</source>
       <translation>Prøv at ændre filtre, eller aktivér bevægelsesoptagelse</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::StartupActionsHandler</name>
+    <message>
+      <source>Login to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Log ind på %1</translation>
     </message>
   </context>
   <context>
