@@ -3,16 +3,13 @@
 #include "cloud_layouts_manager.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QUrlQuery>
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/cloud/db/client/async_http_requests_executor.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
-#include <nx/network/http/buffer_source.h>
-#include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/socket_global.h>
-#include <nx/network/url/url_builder.h>
-#include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/serialization/format.h>
@@ -22,8 +19,8 @@
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
-#include <nx/vms/client/core/network/network_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cross_system_layout_data.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
@@ -42,7 +39,8 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-constexpr auto kRequestInterval = 30s;
+constexpr auto kRequestInterval = 100s;
+constexpr auto kDefaultRequestTimeout = 30s;
 constexpr auto kLayoutsPath = "/docdb/v1/docs/layouts";
 const auto kParticularLayoutPathTemplate = kLayoutsPath + QString("/%1.json");
 
@@ -64,9 +62,6 @@ nx::utils::Url actualLayoutsEndpoint()
 
 } // namespace
 
-using Request = std::unique_ptr<AsyncClient>;
-using core::NetworkManager;
-
 struct CloudLayoutsManager::Private
 {
     using CloudStatus = core::CloudStatusWatcher::Status;
@@ -77,15 +72,19 @@ struct CloudLayoutsManager::Private
     std::unique_ptr<SystemContext> systemContext = std::make_unique<SystemContext>(
         SystemContext::Mode::cloudLayouts,
         appContext()->peerId());
-    const nx::utils::Url endpoint = actualLayoutsEndpoint();
-    std::unique_ptr<NetworkManager> networkManager = std::make_unique<NetworkManager>();
+    nx::cloud::db::client::ApiRequestsExecutor apiRequestExecutor;
     std::unique_ptr<QTimer> timer = std::make_unique<QTimer>();
     QnUserResourcePtr user;
 
     Private(CloudLayoutsManager* owner):
-        q(owner)
+        q(owner),
+        apiRequestExecutor(actualLayoutsEndpoint(), nx::network::ssl::kDefaultCertificateCheck)
     {
         appContext()->addSystemContext(systemContext.get());
+
+        apiRequestExecutor.setCacheEnabled(true);
+        apiRequestExecutor.setRequestTimeout(kDefaultRequestTimeout);
+
         timer->setInterval(kRequestInterval);
         timer->callOnTimeout([this](){ updateLayouts(); });
     }
@@ -95,19 +94,7 @@ struct CloudLayoutsManager::Private
         appContext()->removeSystemContext(systemContext.release());
     }
 
-    Request makeRequest()
-    {
-        Request request = std::make_unique<AsyncClient>(
-            nx::network::ssl::kDefaultCertificateCheck);
-        NetworkManager::setDefaultTimeouts(request.get());
-
-        if (NX_ASSERT(cloudStatusWatcher))
-            request->setCredentials(cloudStatusWatcher->credentials());
-
-        return request;
-    }
-
-    void addLayoutsToResourcePool(std::vector<CrossSystemLayoutData> layouts)
+    void addLayoutsToResourcePool(const std::vector<CrossSystemLayoutData>& layouts)
     {
         auto resourcePool = systemContext->resourcePool();
         const auto layoutsList = resourcePool->getResources().filtered<CrossSystemLayoutResource>(
@@ -173,32 +160,27 @@ struct CloudLayoutsManager::Private
 
     void updateLayouts()
     {
-        Request request = makeRequest();
-        auto url = endpoint;
-        url.setPath(kLayoutsPath);
-        url.setQuery("matchPrefix&responseType=dataOnly");
-        networkManager->doGet(
-            std::move(request),
-            std::move(url),
-            q,
-            nx::utils::guarded(q,
-                [this](NetworkManager::Response response)
-                {
-                    if (status != CloudStatus::Online)
-                        return;
+        QUrlQuery query;
+        query.addQueryItem("matchPrefix", "");
+        query.addQueryItem("responseType", "dataOnly");
 
-                    if (!StatusCode::isSuccessCode(response.statusLine.statusCode))
+        apiRequestExecutor.makeAsyncCall<std::vector<CrossSystemLayoutData>>(
+            network::http::Method::get,
+            kLayoutsPath,
+            nx::utils::UrlQuery(query),
+            nx::utils::guarded(
+                q,
+                [this](
+                    cloud::db::api::ResultCode resultCode,
+                    std::vector<CrossSystemLayoutData> layoutsData)
+                {
+                    if (resultCode != nx::cloud::db::api::ResultCode::ok)
                     {
-                        NX_WARNING(this, "Layouts request failed with code %1",
-                            response.statusLine.statusCode);
+                        NX_WARNING(this, "Layouts request failed with code %1", resultCode);
                         return;
                     }
 
-                    std::vector<CrossSystemLayoutData> updatedLayouts;
-                    const bool parsed = nx::reflect::json::deserialize(response.messageBody,
-                        &updatedLayouts);
-                    if (NX_ASSERT(parsed, "Actual response is:\n%1", response.messageBody))
-                        addLayoutsToResourcePool(std::move(updatedLayouts));
+                    addLayoutsToResourcePool(layoutsData);
                 }));
     }
 
@@ -222,31 +204,18 @@ struct CloudLayoutsManager::Private
             return;
         }
 
-        nx::network::http::Method method = isNewLayout
-            ? nx::network::http::Method::post
-            : nx::network::http::Method::put;
-
-        Request request = makeRequest();
-        auto url = endpoint;
-        url.setPath(nx::format(kParticularLayoutPathTemplate, layout.id.toSimpleString()));
-        auto messageBody = std::make_unique<BufferSource>(
-            Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
-            nx::reflect::json::serialize(layout));
-        request->setRequestBody(std::move(messageBody));
-        networkManager->doRequest(
-            method,
-            std::move(request),
-            std::move(url),
-            q,
+        apiRequestExecutor.makeAsyncCall<void>(
+            isNewLayout ? network::http::Method::post : network::http::Method::put,
+            nx::format(kParticularLayoutPathTemplate, layout.id.toSimpleString()).toStdString(),
+            /*urlQuery*/ {},
+            layout,
             nx::utils::guarded(q,
-                [this, callback](NetworkManager::Response response)
+                [this, callback = std::move(callback)](cloud::db::api::ResultCode resultCode)
                 {
-                    const bool success = StatusCode::isSuccessCode(response.statusLine.statusCode);
+                    const bool success = resultCode == cloud::db::api::ResultCode::ok;
                     if (!success)
-                    {
-                        NX_WARNING(this, "Save request failed with code %1",
-                            response.statusLine.statusCode);
-                    }
+                        NX_WARNING(this, "Save request failed with code %1", resultCode);
+
                     if (callback)
                         callback(success);
                 }));
@@ -254,22 +223,15 @@ struct CloudLayoutsManager::Private
 
     void sendDeleteLayoutRequest(const nx::Uuid& id)
     {
-        Request request = makeRequest();
-        auto url = endpoint;
-        url.setPath(nx::format(kParticularLayoutPathTemplate, id.toSimpleString()));
-        networkManager->doDelete(
-            std::move(request),
-            std::move(url),
-            q,
+        apiRequestExecutor.makeAsyncCall<void>(
+            network::http::Method::delete_,
+            nx::format(kParticularLayoutPathTemplate, id.toSimpleString()).toStdString(),
+            /*urlQuery*/ {},
             nx::utils::guarded(q,
-                [this](NetworkManager::Response response)
+                [this](cloud::db::api::ResultCode resultCode)
                 {
-                    const bool success = StatusCode::isSuccessCode(response.statusLine.statusCode);
-                    if (!success)
-                    {
-                        NX_WARNING(this, "Delete request failed with code %1",
-                            response.statusLine.statusCode);
-                    }
+                    if (resultCode != cloud::db::api::ResultCode::ok)
+                        NX_WARNING(this, "Delete request failed with code %1", resultCode);
                 }));
     }
 
@@ -324,7 +286,7 @@ struct CloudLayoutsManager::Private
             return;
 
         auto internalCallback =
-            [this, layout, callback](bool success)
+            [layout, callback = std::move(callback)](bool success)
             {
                 if (success)
                 {
@@ -363,6 +325,9 @@ struct CloudLayoutsManager::Private
 
         if (status == CloudStatus::Online)
         {
+            apiRequestExecutor.httpClientOptions().setCredentials(
+                cloudStatusWatcher->credentials());
+
             timer->start();
             ensureUser();
             updateLayouts();
@@ -399,7 +364,7 @@ CloudLayoutsManager::CloudLayoutsManager(QObject* parent):
 
 CloudLayoutsManager::~CloudLayoutsManager()
 {
-    d->networkManager->pleaseStopSync();
+    d->apiRequestExecutor.pleaseStopSync();
 }
 
 LayoutResourcePtr CloudLayoutsManager::convertLocalLayout(const LayoutResourcePtr& layout)
@@ -411,7 +376,7 @@ void CloudLayoutsManager::saveLayout(
     const CrossSystemLayoutResourcePtr& layout,
     SaveCallback callback)
 {
-    d->saveLayout(layout, callback);
+    d->saveLayout(layout, std::move(callback));
 }
 
 void CloudLayoutsManager::deleteLayout(const QnLayoutResourcePtr& layout)
