@@ -4650,6 +4650,10 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <source>Read-Write Policy</source>
       <translation type="unfinished">Read-Write Policy</translation>
     </message>
+    <message>
+      <source>Adaptive</source>
+      <translation type="unfinished">Adaptive</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -8927,6 +8931,10 @@ The Logging Level &quot;%1&quot; will provide you with more granular information
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
       <translation type="unfinished">The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+    </message>
+    <message>
+      <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
+      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
     </message>
   </context>
   <context>
