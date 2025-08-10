@@ -4605,6 +4605,10 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>Read-Write Policy</source>
       <translation>Kebijakan Read-Write</translation>
     </message>
+    <message>
+      <source>Adaptive</source>
+      <translation>Adaptif</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -8786,6 +8790,10 @@ Level Logging &quot;%1&quot; akan memberi Anda informasi yang lebih terperinci.<
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
       <translation>Level Logging yang dipilih dapat menurunkan performa.
 Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda mengumpulkan cukup log.</translation>
+    </message>
+    <message>
+      <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
+      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
     </message>
   </context>
   <context>

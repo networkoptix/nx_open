@@ -4650,6 +4650,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Read-Write Policy</source>
       <translation>Läs-skriv-policy</translation>
     </message>
+    <message>
+      <source>Adaptive</source>
+      <translation>Adaptiv</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -8927,6 +8931,10 @@ Loggningsnivån &quot;%1&quot; ger dig mer detaljerad information.</translation>
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
       <translation>Den valda loggnivån kan försämra prestandan.
 Kom ihåg att returnera loggnivån till dess standardinställning när du har samlat ihop tillräckligt med loggar.</translation>
+    </message>
+    <message>
+      <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
+      <translation>Dela fil efter storlek måste vara större än 10 MB och mindre än eller lika med hälften av ett värde som angetts för Limit Max Volume</translation>
     </message>
   </context>
   <context>

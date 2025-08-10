@@ -4739,6 +4739,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Read-Write Policy</source>
       <translation>Polityka odczytu i zapisu</translation>
     </message>
+    <message>
+      <source>Adaptive</source>
+      <translation>Adaptacyjny</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -9208,6 +9212,10 @@ Poziom rejestrowania &quot;%1&quot; zapewni bardziej szczegółowych informacji.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
       <translation>Wybrany poziom rejestrowania może pogorszyć wydajność.
 Pamiętaj, aby przywrócić poziom rejestrowania do ustawienia domyślnego po zebraniu wystarczającej liczby logów.</translation>
+    </message>
+    <message>
+      <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
+      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
     </message>
   </context>
   <context>
