@@ -4607,7 +4607,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Adaptive</source>
-      <translation type="unfinished">Adaptive</translation>
+      <translation>適應模式</translation>
     </message>
   </context>
   <context>
