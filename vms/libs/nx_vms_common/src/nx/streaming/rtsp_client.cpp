@@ -528,7 +528,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::Url& url, qint64 startTim
 CameraDiagnostics::Result QnRtspClient::sendDescribe()
 {
     QByteArray response;
-    auto result = sendRequestAndReceiveResponse(createDescribeRequest(), response);
+    const auto result = sendRequestAndReceiveResponse(createDescribeRequest(), response);
     if (!result)
     {
         stop();

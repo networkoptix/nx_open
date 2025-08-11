@@ -1142,9 +1142,7 @@ CameraDiagnostics::Result RtspResourceStreamProvider::openStream()
 {
     setUrl(m_resource->getUrl());
 
-    // Set credentials from resource only if not already forced.
-    if (!m_credentials)
-        setCredentials(nx::network::http::Credentials(m_resource->getAuth()));
+    setCredentials(nx::network::http::Credentials(m_resource->getAuth()));
 
     m_RtpSession.setMediaTypeEnabled(
         nx::rtp::Sdp::MediaType::Audio,
