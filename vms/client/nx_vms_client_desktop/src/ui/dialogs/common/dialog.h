@@ -29,6 +29,8 @@ public:
     /// @brief Shows dialog and cancels drag action to prevent hang on
     void show();
 
+    virtual void open() override;
+
     [[deprecated]] int exec() override;
 
     Qt::Orientations resizeToContentsMode() const;

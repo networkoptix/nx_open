@@ -8,6 +8,7 @@
 #include <QtQuick/QQuickWindow>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QDialog>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QWidget>
@@ -32,13 +33,22 @@ int topic(int id)
 }
 } // namespace
 
-int HelpTopicAccessor::helpTopic(const QWidget* object)
+int HelpTopicAccessor::helpTopic(const QObject* object)
 {
     if (!NX_ASSERT(object))
         return HelpTopic::Id::Empty;
 
+    return qAbs(
+        qvariant_cast<int>(object->property(qn_helpTopicPropertyName), HelpTopic::Id::Empty));
+}
+
+int HelpTopicAccessor::helpTopic(const QWidget* widget)
+{
+    if (!NX_ASSERT(widget))
+        return HelpTopic::Id::Empty;
+
     // Iterating through all the hierarchy to get a proper help topic
-    for (auto widget = object; widget; widget = widget->parentWidget())
+    for (; widget; widget = widget->parentWidget())
     {
         const auto property = widget->property(qn_helpTopicPropertyName);
         const auto topicId = qAbs(qvariant_cast<int>(property, HelpTopic::Id::Empty));
@@ -51,13 +61,28 @@ int HelpTopicAccessor::helpTopic(const QWidget* object)
     return HelpTopic::Id::Empty;
 }
 
-int HelpTopicAccessor::helpTopic(QObject* object)
+bool HelpTopicAccessor::hasAnyHelpTopic(const QDialog* dialog)
 {
-    if (!NX_ASSERT(object))
-        return HelpTopic::Id::Empty;
+    if (!NX_ASSERT(dialog))
+        return false;
 
-    return qAbs(
-        qvariant_cast<int>(object->property(qn_helpTopicPropertyName), HelpTopic::Id::Empty));
+    const auto dialogHelpTopic = helpTopic(static_cast<const QObject*>(dialog));
+    if (dialogHelpTopic == HelpTopic::Id::Forced_Empty)
+        return false;
+    else if (dialogHelpTopic != HelpTopic::Id::Empty)
+        return true;
+
+    for (const auto childWidget: dialog->findChildren<QWidget*>())
+    {
+        const auto property = childWidget->property(qn_helpTopicPropertyName);
+        const auto topicId = qAbs(qvariant_cast<int>(property, HelpTopic::Id::Empty));
+        if (topicId == HelpTopic::Id::Forced_Empty)
+            break;
+        if (topicId != HelpTopic::Id::Empty)
+            return true;
+    }
+
+    return false;
 }
 
 void HelpTopicAccessor::setHelpTopic(QObject* object, int helpTopic, bool enforceForChildren)

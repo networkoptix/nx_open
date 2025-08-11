@@ -4,6 +4,7 @@
 
 #include <QtCore/QPoint>
 
+class QDialog;
 class QObject;
 class QWidget;
 class QGraphicsItem;
@@ -27,8 +28,9 @@ public:
     static int helpTopicAt(QGraphicsItem* item, const QPointF& pos, bool bubbleUp = false);
     static int helpTopicAt(QQuickItem* item, const QPointF& pos); //< Always from parent down.
     static int helpTopicAt(QQuickWindow* window, const QPointF& pos); //< Always from parent down.
-    static int helpTopic(QObject* object);
-    static int helpTopic(const QWidget* object);
+    static int helpTopic(const QObject* object);
+    static int helpTopic(const QWidget* widget);
+    static bool hasAnyHelpTopic(const QDialog* dialog);
 };
 
 inline int helpTopic(QObject* object)
@@ -39,6 +41,11 @@ inline int helpTopic(QObject* object)
 inline int helpTopic(const QWidget* object)
 {
     return HelpTopicAccessor::helpTopic(object);
+}
+
+inline bool hasAnyHelpTopic(const QDialog* dialog)
+{
+    return HelpTopicAccessor::hasAnyHelpTopic(dialog);
 }
 
 inline void setHelpTopic(QObject* object, int helpTopic, bool enforceForChildren = false)
