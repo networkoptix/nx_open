@@ -1170,6 +1170,19 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
         co_await loadOrgListAsync(std::move(*orgList));
 
         emit q->fullTreeLoaded();
+        if (sitesModelRowCount > 0)
+        {
+            // Roles IsSaasUninitialized and IsAccessibleThroughOrgRole depend on the organization
+            // structure (they search if the site can be reached through org tree).
+            // Update them after the model is fully loaded so they do not use partially loaded data.
+            emit q->dataChanged(
+                q->index(0, 0, sitesRoot()),
+                q->index(sitesModelRowCount - 1, 0, sitesRoot()),
+                {
+                    QnSystemsModel::IsSaasUninitialized,
+                    OrganizationsModel::IsAccessibleThroughOrgRole
+                });
+        }
 
         // Delay before next update.
         co_await coro::qtTimer(kUpdateDelay);
