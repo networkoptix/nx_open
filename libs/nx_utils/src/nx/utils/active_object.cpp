@@ -31,8 +31,16 @@ void SimpleActiveObject::activateObject()
 
         if (m_state == (int)ActiveState::notActive)
         {
-            activateObjectHook();
             m_state = (int)ActiveState::active;
+            try
+            {
+                activateObjectHook();
+            }
+            catch (...)
+            {
+                m_state = (int)ActiveState::notActive;
+                throw;
+            }
             return;
         }
     }
