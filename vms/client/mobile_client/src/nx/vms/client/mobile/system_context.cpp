@@ -9,6 +9,7 @@
 #include <camera/camera_thumbnail_cache.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <nx/branding.h>
@@ -245,6 +246,25 @@ SystemContext::SystemContext(WindowContext* context,
                 NX_DEBUG(this, "User name changed to empty, stopping session");
                 if (sessionManager()->hasSession())
                     sessionManager()->stopSessionByUser();
+            }
+        });
+
+    // Workaround for supporting audio-only devices when connecting to server versions earlier than
+    // 6.1, which do not send resource type information for mobile client.
+    connect(resourcePool(), &QnResourcePool::resourcesAdded, this,
+        [this](const QnResourceList& resources)
+        {
+            if (moduleInformation().version >= utils::SoftwareVersion{6, 1}
+                || !qnResTypePool->isEmpty())
+            {
+                return;
+            }
+
+            for (const auto& resource: resources)
+            {
+                auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+                if (camera && !camera->isAudioEnabled())
+                    camera->setAudioEnabled(true);
             }
         });
 
