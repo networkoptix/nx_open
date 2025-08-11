@@ -432,6 +432,7 @@ Page
         y: systemTabs.height
 
         visible: !organizationsModel.topLevelLoading
+            || appContext.cloudStatusWatcher.status === CloudStatusWatcher.Offline
 
         SiteList
         {
@@ -615,7 +616,8 @@ Page
 
         property bool currentRootLoading: false
 
-        visible: organizationsModel.topLevelLoading || currentRootLoading
+        visible: (organizationsModel.topLevelLoading || currentRootLoading)
+            && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
 
         component MaskItem: Rectangle
         {

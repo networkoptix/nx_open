@@ -4,8 +4,12 @@ import QtQuick
 import QtQuick.Layouts
 
 import Nx.Core
+import Nx.Controls
 import Nx.Models
 import Nx.Items
+import Nx.Ui
+
+import nx.vms.client.core
 
 ListView
 {
@@ -46,8 +50,126 @@ ListView
 
     header: Item
     {
+        id: headerItem
+
+        onHeightChanged:
+        {
+            // Workaround for ListView not properly updating on header size change - if we are
+            // roughly near the start of the list and header size changes - just force the header
+            // to be fully visible.
+            if (siteList.contentY < 200) //< ~ Tile height+section height+some spacing
+                siteList.positionViewAtBeginning()
+        }
+
         width: parent.width
-        height: 16
+        height: 8
+
+        states:
+        [
+            State
+            {
+                name: "showButton"
+                when: appContext.cloudStatusWatcher.status === CloudStatusWatcher.LoggedOut
+                    && siteList.count != 0
+                    && siteList.currentTab === OrganizationsModel.SitesTab
+                    && !siteList.searchText
+
+                PropertyChanges
+                {
+                    cloudColumn.visible: true
+                    headerItem.height: 8 + cloudColumn.height
+                }
+            },
+            State
+            {
+                name: "hidden"
+                when: siteList.currentTab !== OrganizationsModel.SitesTab
+                    || !!siteList.searchText
+                    || (siteList.count != 0 && siteList.itemAtIndex(0)?.isCloudSystem)
+
+                PropertyChanges
+                {
+                    cloudColumn.visible: false
+                    headerItem.height: 8
+                }
+            },
+            State
+            {
+                name: "loading"
+                when: appContext.cloudStatusWatcher.status === CloudStatusWatcher.Offline
+                    && siteList.currentTab === OrganizationsModel.SitesTab
+                    && (siteList.count != 0 && !siteList.itemAtIndex(0)?.isCloudSystem)
+                    && !siteList.searchText
+
+                PropertyChanges
+                {
+                    cloudColumn.visible: true
+                    headerItem.height: 8 + cloudColumn.height
+                }
+            }
+        ]
+
+        ColumnLayout
+        {
+            id: cloudColumn
+            spacing: 12
+            visible: false
+            width: parent.width
+            y: 12
+
+            Text
+            {
+                id: cloudText
+
+                Layout.fillWidth: true
+
+                color: ColorTheme.colors.light16
+                text: qsTr("Cloud")
+                font.pixelSize: 14
+                horizontalAlignment: Text.AlignLeft
+                elide: Text.ElideMiddle
+            }
+
+            Button
+            {
+                id: cloudButton
+
+                visible: headerItem.state == "showButton"
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 44
+                color: ColorTheme.colors.brand_core
+                textColor: ColorTheme.colors.dark1
+                leftPadding: 0
+                rightPadding: 0
+                padding: 0
+
+                text: qsTr("Log In")
+
+                onClicked: Workflow.openCloudLoginScreen()
+            }
+
+            Skeleton
+            {
+                visible: headerItem.state == "loading"
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 116
+
+                component MaskItem: Rectangle
+                {
+                    radius: 8
+                    color: "white"
+                    antialiasing: false
+                }
+
+                MaskItem
+                {
+                    width: parent.width
+                    height: 116
+                }
+            }
+        }
     }
 
     footer: Item
@@ -150,6 +272,9 @@ ListView
     {
         spacing: siteList.horizontalSpacing
         property var rowData: model.data
+
+        readonly property bool isCloudSystem: rowData.length > 0
+            && (rowData[0].isCloudSystem ?? false)
 
         Repeater
         {
