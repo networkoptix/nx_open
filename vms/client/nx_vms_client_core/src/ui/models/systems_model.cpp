@@ -392,23 +392,17 @@ bool QnSystemsModel::lessThan(const QModelIndex& sourceLeft, const QModelIndex& 
     const bool leftIsPending = sourceLeft.data(QnSystemsModel::IsPending).toBool();
     const bool rightIsPending = sourceRight.data(QnSystemsModel::IsPending).toBool();
 
-    if (cloudFirstSorting)
-    {
-        if (leftIsPending != rightIsPending)
-            return rightIsPending;
-    }
-    else
-    {
-        if (leftIsPending != rightIsPending)
-            return leftIsPending;
+    if (leftIsPending != rightIsPending)
+        return leftIsPending;
 
+    if (!cloudFirstSorting)
+    {
         const bool leftIsCloud = sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
         const bool rightIsCloud = sourceRight.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
 
         if (leftIsCloud != rightIsCloud)
             return leftIsCloud;
     }
-
     const bool leftIsLocalhost = isLocalHost(sourceLeft);
     const bool rightIsLocalhost = isLocalHost(sourceRight);
 
