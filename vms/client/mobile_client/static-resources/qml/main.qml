@@ -63,6 +63,7 @@ Controls.ApplicationWindow
         y: topLevelWarning.height
         width: windowParams.availableWidth
         height: windowParams.availableHeight - screenNavigationBar.heightOffset
+        focus: true
 
         function restoreActiveFocus()
         {
