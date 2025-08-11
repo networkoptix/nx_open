@@ -116,7 +116,7 @@ Dialog
                     ? "<a href=%2>%1</a>".arg(version).arg(releaseNotesUrl)
                     : version
 
-                if (clientUpdateManager.isPlannedUpdateDatePassed() && clientUpdateManager.isTodaySuitableForUpdate())
+                if (clientUpdateManager.isPlannedUpdateDatePassed())
                 {
                     if (!updateState.installationNeeded)
                         return noNewVersionState

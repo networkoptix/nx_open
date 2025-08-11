@@ -271,15 +271,15 @@ void ClientUpdateManager::Private::checkUpdateTime()
 
     const auto now = qnSyncTime->currentDateTime();
 
-    if (!isSuitableDay(now.date()))
+    const auto updateDateTime = q->plannedUpdateDate();
+
+    if (!isSuitableDay(now.date()) && now <= updateDateTime)
     {
         NX_VERBOSE(this,
             "Updates are prohibited on Thursdays, Fridays and Saturdays. "
                 "Skipping the update time check. Current date: %1", now);
         return;
     }
-
-    const auto updateDateTime = q->plannedUpdateDate();
 
     NX_VERBOSE(this,
         "Checking update time. Update date: %1, now: %2, shift: %3 min. "
@@ -786,11 +786,6 @@ bool ClientUpdateManager::isPlannedUpdateDatePassed() const
 {
     return d->updateContents.info.isValid()
         && qnSyncTime->currentDateTime() >= plannedUpdateDate();
-}
-
-bool ClientUpdateManager::isTodaySuitableForUpdate() const
-{
-    return isSuitableDay(qnSyncTime->currentDateTime().date());
 }
 
 QUrl ClientUpdateManager::releaseNotesUrl() const
