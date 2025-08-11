@@ -302,6 +302,7 @@ ListView
                 isFromSites: modelData.isFromSites ?? false
                 ownerDescription: cloudSystem ? (modelData.ownerDescription ?? "") : ""
                 running: modelData.isOnline || false
+                pending: modelData.isPending || false
                 reachable: modelData.isReachable || false
                 compatible: (modelData.isCompatibleToMobileClient || modelData.isFactorySystem) || false
                 wrongCustomization: modelData.wrongCustomization ? modelData.wrongCustomization : false

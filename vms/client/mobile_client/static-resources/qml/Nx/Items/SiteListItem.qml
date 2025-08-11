@@ -23,6 +23,7 @@ Item
     property bool saasShutDown: false
     property bool needDigestCloudPassword: false
     property bool running: false
+    property bool pending: false
     property string ownerDescription
     property bool reachable: false
     property bool compatible: true
@@ -254,7 +255,7 @@ Item
                             return wrongCustomization ?  qsTr("INCOMPATIBLE") : invalidVersion
 
                         if (!running)
-                            return qsTr("OFFLINE")
+                            return pending ? qsTr("PENDING") : qsTr("OFFLINE")
 
                         if (!reachable)
                             return qsTr("UNREACHABLE")
