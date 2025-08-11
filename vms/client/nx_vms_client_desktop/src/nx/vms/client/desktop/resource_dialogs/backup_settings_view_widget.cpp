@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/license/saas/saas_service_usage_helper.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
@@ -278,6 +279,11 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(
         &BackupSettingsDecoratorModel::globalBackupSettingsChanged,
         this, &BackupSettingsViewWidget::globalBackupSettingsChanged);
 
+    connect(m_backupSettingsDecoratorModel.get(),
+        &BackupSettingsDecoratorModel::globalBackupSettingsChanged,
+        this,
+        &BackupSettingsViewWidget::updateChangedGlobalSettingsWarning);
+
     connect(resourceViewWidget(), &FilteredResourceViewWidget::itemClicked, this,
         [this](const QModelIndex& index)
         {
@@ -378,6 +384,7 @@ void BackupSettingsViewWidget::loadDataToUi()
 void BackupSettingsViewWidget::applyChanges()
 {
     m_backupSettingsDecoratorModel->applyChanges();
+    updateChangedGlobalSettingsWarning();
 }
 
 void BackupSettingsViewWidget::discardChanges()
@@ -509,6 +516,16 @@ void BackupSettingsViewWidget::dropdownItemClicked(const QModelIndex& index)
     connect(menu.get(), &QMenu::aboutToHide, menu.get(), &QMenu::deleteLater);
 
     menu.release()->popup(menuPoint);
+}
+
+void BackupSettingsViewWidget::updateChangedGlobalSettingsWarning()
+{
+    auto modelBackupNewCameras =
+        m_backupSettingsDecoratorModel->globalBackupSettings().backupNewCameras;
+    auto savedBackupNewCameras = systemSettings()->backupSettings().backupNewCameras;
+    resourceViewWidget()->setInfoMessage(savedBackupNewCameras && !modelBackupNewCameras
+        ? tr("Backup will be turned off for newly added cameras on all servers at the site")
+        : QString());
 }
 
 } // namespace nx::vms::client::desktop
