@@ -49,6 +49,7 @@ private:
     void loadState(const ServerSettingsDialogState& state);
     void switchItemClicked(const QModelIndex& index);
     void dropdownItemClicked(const QModelIndex& index);
+    void updateChangedGlobalSettingsWarning();
 
 private:
     bool m_isCloudBackupStorage = false;
