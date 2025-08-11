@@ -44,6 +44,12 @@ void QnDialog::show()
     cancelDrag(this);
 }
 
+void QnDialog::open()
+{
+    fixWindowFlags();
+    QDialog::open();
+}
+
 int QnDialog::exec()
 {
     fixWindowFlags();
@@ -118,7 +124,7 @@ void QnDialog::afterLayout()
 void QnDialog::fixWindowFlags()
 {
     auto flags = windowFlags();
-    if (helpTopic(this) != HelpTopic::Id::Empty)
+    if (hasAnyHelpTopic(this))
         flags |= Qt::WindowContextHelpButtonHint;
     else
         flags &= ~Qt::WindowContextHelpButtonHint;
