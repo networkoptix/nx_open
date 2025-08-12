@@ -28,7 +28,7 @@ WizardStep
             id: joystickImage
 
             Layout.alignment: Qt.AlignHCenter
-            source: "image://skin/64x64/Outline/pan.svg"
+            source: "image://skin/64x64/Outline/pan.svg?primary=light16&secondary=light10"
             sourceSize: Qt.size(120, 120)
         }
     }
@@ -42,10 +42,27 @@ WizardStep
 
         function onStateChanged(newState)
         {
-            joystickInvestigationDialog.collectedData.xAxis = [
-                ...joystickInvestigationDialog.collectedData.xAxis,
-                newState
-            ]
+            if (Qt.platform.os === "windows")
+            {
+                joystickInvestigationDialog.collectedData.xAxis = [
+                    ...joystickInvestigationDialog.collectedData.xAxis,
+                    [
+                        joystickInvestigationDialog.currentDevice.xAxisPosition(),
+                        joystickInvestigationDialog.currentDevice.xAxisDescription()
+                    ]
+                ]
+            }
+            else if (Qt.platform.os === "osx")
+            {
+                joystickInvestigationDialog.collectedData.xAxis = [
+                    ...joystickInvestigationDialog.collectedData.xAxis,
+                    newState
+                ]
+            }
+            else
+            {
+                console.log("%1 is not supported".arg(Qt.platform.os));
+            }
         }
     }
 }

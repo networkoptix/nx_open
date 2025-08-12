@@ -26,7 +26,7 @@ WizardStep
         Image
         {
             Layout.alignment: Qt.AlignHCenter
-            source: "image://skin/64x64/Outline/rotate.svg"
+            source: "image://skin/64x64/Outline/rotate.svg?primary=light16&secondary=light10"
             sourceSize: Qt.size(120, 120)
         }
     }
@@ -40,10 +40,27 @@ WizardStep
 
         function onStateChanged(newState)
         {
-            joystickInvestigationDialog.collectedData.zAxis = [
-                ...joystickInvestigationDialog.collectedData.zAxis,
-                newState
-            ]
+            if (Qt.platform.os === "windows")
+            {
+                joystickInvestigationDialog.collectedData.zAxis = [
+                    ...joystickInvestigationDialog.collectedData.zAxis,
+                    [
+                        joystickInvestigationDialog.currentDevice.zAxisPosition(),
+                        joystickInvestigationDialog.currentDevice.zAxisDescription()
+                    ]
+                ]
+            }
+            else if (Qt.platform.os === "osx")
+            {
+                joystickInvestigationDialog.collectedData.zAxis = [
+                    ...joystickInvestigationDialog.collectedData.zAxis,
+                    newState
+                ]
+            }
+            else
+            {
+                console.log("%1 is not supported".arg(Qt.platform.os));
+            }
         }
     }
 }

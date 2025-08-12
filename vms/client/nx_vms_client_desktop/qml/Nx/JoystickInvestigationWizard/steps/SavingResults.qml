@@ -2,11 +2,10 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Dialogs
 import QtQuick.Layouts
-import Qt.labs.platform
 
 import Nx.Controls
-import Nx.Dialogs
 import Nx.JoystickInvestigationWizard
 
 WizardStep
@@ -43,7 +42,14 @@ WizardStep
             nameFilters: [qsTr("JSON files (*.json)")]
             fileMode: FileDialog.SaveFile
 
-            onAccepted: filePath = selectedFile
+            onAccepted:
+            {
+                let tempFilePath = selectedFile.toString()
+                const prefix = "file:///"
+                filePath = tempFilePath.startsWith(prefix)
+                    ? tempFilePath.substring(prefix.length)
+                    : tempFilePath
+            }
         }
 
         Label
@@ -68,7 +74,6 @@ WizardStep
 
             Button
             {
-                implicitWidth: 30
                 text: "..."
 
                 onClicked: saveFileDialog.open()

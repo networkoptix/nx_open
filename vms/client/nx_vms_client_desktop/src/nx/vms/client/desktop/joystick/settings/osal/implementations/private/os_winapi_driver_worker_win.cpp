@@ -217,7 +217,13 @@ bool OsWinApiDriver::Worker::enumerationCallback(
     worker->foundDevices.append(
         {
             .inputDevice = inputDevice,
-            .info = { .id = guid, .modelName = modelName },
+            .info =
+            {
+                .id = guid,
+                // There is no path on Windows, but the code may use it as a unique identifier.
+                .path = guid,
+                .modelName = modelName
+            },
         });
 
     return DIENUM_CONTINUE;
