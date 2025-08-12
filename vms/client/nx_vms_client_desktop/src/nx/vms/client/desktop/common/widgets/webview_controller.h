@@ -49,8 +49,6 @@ public:
     using CertificateValidationFunc =
         std::function<bool(const QString& certificateChain, const QUrl& url)>;
 
-    using ClientApiAuthCondition = std::function<bool(const QUrl& url)>;
-
 public:
     WebViewController(QObject* parent);
     virtual ~WebViewController() override;
@@ -169,22 +167,17 @@ public:
      * Initializes Client API.
      * @param context Workbench context.
      * @param item Workbench item.
-     * @param authCondition Condition which is checked during the authentication using Client API.
-     *     May be used with another controller.
      * @param isDedicatedWindow Whether the web page is opened in a dedicated window.
      */
     void initClientApiSupport(
         WindowContext* context,
-        ClientApiAuthCondition authCondition,
         bool isDedicatedWindow = true);
 
     /**
      * Initializes Client API.
      * @param item Workbench item.
-     * @param authCondition Condition which is checked during the authentication using Client API.
-     *     May be used with another controller.
      */
-    void initClientApiSupport(QnWorkbenchItem* item, ClientApiAuthCondition authCondition);
+    void initClientApiSupport(QnWorkbenchItem* item);
 
     /** Register the save state metatype for suspend()/resume() methods. */
     static void registerMetaType();

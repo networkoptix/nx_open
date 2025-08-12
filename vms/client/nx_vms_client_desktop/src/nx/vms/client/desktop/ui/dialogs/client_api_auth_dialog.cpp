@@ -4,56 +4,72 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/common/html/html.h>
 #include <ui/widgets/views/resource_list_view.h>
 
 namespace nx::vms::client::desktop {
 
-ClientApiAuthDialog::ClientApiAuthDialog(const QnResourcePtr& resource, QWidget* parent):
+namespace {
+
+QString currentUserKey()
+{
+    if (auto context = appContext()->currentSystemContext())
+    {
+        if (auto user = context->user())
+        {
+            if (user->isCloud())
+                return user->getName();
+
+            if (user->isTemporary())
+                return QString(); // Do not save temporary users allowance.
+
+            return context->moduleInformation().localSystemId.toString(QUuid::WithBraces)
+                + user->getName();
+        }
+    }
+    return QString();
+}
+
+} // namespace
+
+ClientApiAuthDialog::ClientApiAuthDialog(const QString& origin, QWidget* parent):
     QnMessageBox(
         QnMessageBox::Icon::Warning,
         tr("This web page is requesting access to your account for authorization"),
-        tr("Your confirmation is required to provide a token to",
-            "... a web page (below there is a web page name with an icon)"),
+        tr("Your confirmation is required to provide a token to %1",
+            "%1 is a url hostname").arg(common::html::bold(origin)),
         QDialogButtonBox::Cancel,
         QDialogButtonBox::NoButton,
         parent)
-
 {
-    addCustomWidget(new QnResourceListView({resource}));
-    setCheckBoxEnabled(true); //< "Do not show this message again" checkbox.
     m_allowButton = addButton(tr("Allow"), QDialogButtonBox::YesRole);
 }
 
-bool ClientApiAuthDialog::isApproved(const QnResourcePtr& resource, const QUrl& url)
+bool ClientApiAuthDialog::isApproved(const QUrl& url)
 {
-    const auto systemContext = dynamic_cast<core::SystemContext*>(resource->systemContext());
-    if (!NX_ASSERT(systemContext))
-        return false;
+    const auto key = currentUserKey();
+    const bool canSaveAllowance = !key.isEmpty();
 
-    const auto connection = systemContext->connection();
-    if (!connection)
-        return false;
-
-    const auto key = AuthAllowedUrls::key(
-        systemContext->moduleInformation().localSystemId,
-        QString::fromStdString(connection->credentials().username));
+    const AuthAllowedUrls::Origin origin = AuthAllowedUrls::origin(url);
 
     auto allowedUrls = appContext()->localSettings()->authAllowedUrls();
-    if (allowedUrls.items[key].contains(url.toString()))
+    if (canSaveAllowance && allowedUrls.items[key].contains(origin))
         return true;
 
-    ClientApiAuthDialog dialog(resource);
+    ClientApiAuthDialog dialog(origin);
+    dialog.setCheckBoxEnabled(canSaveAllowance); //< "Do not show this message again" checkbox.
     dialog.exec();
+
     const bool isApproved = dialog.clickedButton() == dialog.m_allowButton;
 
-    if (isApproved && dialog.isChecked())
+    if (isApproved && canSaveAllowance && dialog.isChecked())
     {
-        allowedUrls.items[key].insert(url.toString());
+        allowedUrls.items[key].insert(origin);
         appContext()->localSettings()->authAllowedUrls = allowedUrls;
     }
 
