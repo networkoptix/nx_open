@@ -44,6 +44,7 @@ public:
     nx::Uuid selectedEngine() const;
     void setSelectedEngine(const nx::Uuid& value);
 
+    std::set<QString> filteredObjectTypes() const;
     QStringList selectedObjectTypes() const;
     void setSelectedObjectTypes(const QStringList& value);
 
