@@ -248,6 +248,14 @@ static void registerSystemRestHandlers(
      * %param[ref] _local
      * %permissions Any User.
      * %return:{MergeStatusReply}
+     *
+     **%apidoc DELETE /rest/v3/system/merge
+     * Finish Site merge forcefully. Use with care: data sync will continue but some unmerged data
+     * may be lost.
+     * %caption Finish merge forcefully
+     * %ingroup Site
+     * %param[ref] _strict,_ticket
+     * %permissions Administrator with a fresh session.
      */
     reg("rest/v{1-3}/system/merge", GlobalPermission::none, GlobalPermission::administrator,
         std::make_unique<SiteMergeHandler>(serverModule, serverConnector));
@@ -269,6 +277,14 @@ static void registerSystemRestHandlers(
      * %param[ref] _local
      * %permissions Any User.
      * %return:{MergeStatusReply}
+     *
+     **%apidoc DELETE /rest/v{4-}/site/merge
+     * Finish Site merge forcefully. Use with care: data sync will continue but some unmerged data
+     * may be lost.
+     * %caption Finish merge forcefully
+     * %ingroup Site
+     * %param[ref] _strict,_ticket
+     * %permissions Administrator with a fresh session.
      */
     reg("rest/v{4-}/site/merge", GlobalPermission::none, GlobalPermission::administrator,
         std::make_unique<SiteMergeHandler>(serverModule, serverConnector));

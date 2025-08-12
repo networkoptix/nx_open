@@ -303,6 +303,8 @@ public:
     nx::Uuid lastMergeSlaveId() const;
     void setLastMergeSlaveId(const nx::Uuid& value);
 
+    bool forceMergeFinished();
+
     nx::Url clientStatisticsSettingsUrl() const;
 
     std::chrono::seconds deviceStorageInfoUpdateInterval() const;
