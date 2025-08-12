@@ -2055,7 +2055,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>Find similar</source>
-      <translation type="unfinished">Find similar</translation>
+      <translation>Tìm tương tự</translation>
     </message>
   </context>
   <context>

@@ -8793,7 +8793,7 @@ Hãy nhớ khôi phục Mức ghi nhật ký về cài đặt mặc định sau 
     </message>
     <message>
       <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
-      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
+      <translation>Chia tệp theo kích thước phải lớn hơn 10 MB và nhỏ hơn hoặc bằng một nửa giá trị được đặt cho Giới hạn dung lượng tối đa</translation>
     </message>
   </context>
   <context>

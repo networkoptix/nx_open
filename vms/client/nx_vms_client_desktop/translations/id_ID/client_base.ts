@@ -8793,7 +8793,7 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     </message>
     <message>
       <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
-      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
+      <translation>Membagi File berdasarkan Ukuran harus lebih besar dari 10 MB dan kurang dari atau sama dengan setengah nilai yang ditetapkan untuk Batas Volume Maksimum</translation>
     </message>
   </context>
   <context>

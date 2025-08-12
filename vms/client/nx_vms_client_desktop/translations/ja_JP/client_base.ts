@@ -8794,7 +8794,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
-      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
+      <translation>「ファイルをサイズで分割」の設定値は、10 MB 以上かつ「合計容量制限」の設定値の半分以下である必要があります。</translation>
     </message>
   </context>
   <context>
