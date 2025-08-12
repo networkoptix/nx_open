@@ -946,7 +946,7 @@
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Chọn ngày hết hạn</translation>
     </message>
     <message>
       <source>Expiration</source>
