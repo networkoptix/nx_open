@@ -1649,6 +1649,29 @@ void SystemSettings::setLastMergeSlaveId(const nx::Uuid& value)
     d->lastMergeSlaveIdAdaptor->setValue(value.toString());
 }
 
+bool SystemSettings::forceMergeFinished()
+{
+    const nx::Uuid master(d->lastMergeMasterIdAdaptor->value());
+    const nx::Uuid slave(d->lastMergeSlaveIdAdaptor->value());
+    if (master == slave)
+        return false;
+
+    if (master.isNull())
+    {
+        NX_INFO(this, "Force slave merge id %1", slave);
+        d->lastMergeMasterIdAdaptor->setValue(slave.toString());
+    }
+    else
+    {
+        if (slave.isNull())
+            NX_INFO(this, "Force master merge id %1", master);
+        else
+            NX_INFO(this, "Force master merge id %1 over slave %2", master, slave);
+        d->lastMergeSlaveIdAdaptor->setValue(master.toString());
+    }
+    return true;
+}
+
 nx::utils::Url SystemSettings::clientStatisticsSettingsUrl() const
 {
     return nx::utils::Url::fromUserInput(d->clientStatisticsSettingsUrlAdaptor->value().trimmed());
