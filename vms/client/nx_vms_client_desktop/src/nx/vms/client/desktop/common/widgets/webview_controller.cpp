@@ -41,6 +41,7 @@
 #include <nx/vms/client/desktop/jsapi/tab.h>
 #include <nx/vms/client/desktop/jsapi/tabs.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
+#include <nx/vms/client/desktop/ui/dialogs/client_api_auth_dialog.h>
 #include <nx/vms/client/desktop/webpage/web_page_data_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -990,7 +991,6 @@ void WebViewController::setCertificateValidator(CertificateValidationFunc valida
 
 void WebViewController::initClientApiSupport(
     WindowContext* context,
-    ClientApiAuthCondition authCondition,
     bool isDedicatedWindow)
 {
     if (!NX_ASSERT(context))
@@ -1047,12 +1047,13 @@ void WebViewController::initClientApiSupport(
             // Objects may be used with another controller, so use webView to get current url.
             return new jsapi::Auth(
                 context->system(),
-                [authCondition, webView = QPointer(d->rootObject())]
+                [webView = QPointer(d->rootObject())]
                 {
                     if (!NX_ASSERT(webView))
                         return false;
 
-                    return authCondition(webView->property("url").toUrl());
+                    return ClientApiAuthDialog::isApproved(
+                        webView->property("url").toUrl().host());
                 },
                 parent);
         });
@@ -1064,9 +1065,7 @@ void WebViewController::initClientApiSupport(
         });
 }
 
-void WebViewController::initClientApiSupport(
-    QnWorkbenchItem* item,
-    ClientApiAuthCondition authCondition)
+void WebViewController::initClientApiSupport(QnWorkbenchItem* item)
 {
     if (!NX_ASSERT(item && item->layout()))
         return;
@@ -1092,7 +1091,7 @@ void WebViewController::initClientApiSupport(
                 layout->windowContext(), layout, /*isSupportedCondition*/ {}, parent);
         });
 
-    initClientApiSupport(layout->windowContext(), authCondition, /*isDedicatedWindow*/ false);
+    initClientApiSupport(layout->windowContext(), /*isDedicatedWindow*/ false);
 }
 
 void WebViewController::registerMetaType()

@@ -82,12 +82,7 @@ void WebViewDialog::init(
     m_webWidget->controller()->load(resource, url);
 
     if (enableClientApi && context)
-    {
-        auto authCondition = [](const QUrl&) { return true; };
-        m_webWidget->controller()->initClientApiSupport(context, authCondition);
-    }
-
-    return;
+        m_webWidget->controller()->initClientApiSupport(context);
 }
 
 } // namespace nx::vms::client::desktop

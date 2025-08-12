@@ -4,7 +4,6 @@
 
 #include <QtCore/QUrl>
 
-#include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/message_box.h>
 
 namespace nx::vms::client::desktop {
@@ -13,8 +12,8 @@ class ClientApiAuthDialog: public QnMessageBox
 {
     Q_OBJECT
 public:
-    ClientApiAuthDialog(const QnResourcePtr& resource, QWidget* parent = nullptr);
-    static bool isApproved(const QnResourcePtr& resource, const QUrl& url);
+    ClientApiAuthDialog(const QString& origin, QWidget* parent = nullptr);
+    static bool isApproved(const QUrl& url);
 
 private:
     QPushButton* m_allowButton = nullptr;

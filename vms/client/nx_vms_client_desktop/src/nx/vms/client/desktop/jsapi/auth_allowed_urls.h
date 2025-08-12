@@ -3,32 +3,33 @@
 #pragma once
 
 #include <map>
-#include <set>
 
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
 #include <nx/reflect/instrument.h>
-#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
 
 /**
- * A set of approved urls that have access to a session token using jsapi for each system and user
- * separately.
+ * A set of approved hostnames that have access to a session token using jsapi for each system and
+ * user separately. For cloud users only username is a key.
  */
 struct AuthAllowedUrls
 {
-    using Key = QString;
-    using Urls = std::set<QString>;
+    using Origin = QString;
 
-    std::map<Key, Urls> items;
+    std::map<QString, std::set<Origin>> items;
 
     bool operator==(const AuthAllowedUrls&) const = default;
 
-    static Key key(const nx::Uuid& systemId, const QString& username)
+    static Origin origin(const QUrl& url)
     {
-        return systemId.toString(QUuid::WithBraces) + username;
+        return url.toString(
+            QUrl::RemoveUserInfo
+            | QUrl::RemovePath
+            | QUrl::RemoveQuery
+            | QUrl::RemoveFragment);
     }
 };
 

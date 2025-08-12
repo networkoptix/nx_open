@@ -17,7 +17,6 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/ui/dialogs/client_api_auth_dialog.h>
 #include <nx/vms/client/desktop/ui/dialogs/web_page_certificate_dialog.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
@@ -127,15 +126,7 @@ QnWebResourceWidget::QnWebResourceWidget(
     updateButtonsVisibility();
 
     const auto controller = m_webEngineView->controller();
-
-    // May be used with another QnWebResourceWidget.
-    auto authCondition =
-        [resource = resource()](const QUrl& url)
-        {
-            return ClientApiAuthDialog::isApproved(resource, url);
-        };
-
-    controller->initClientApiSupport(this->item(), authCondition);
+    controller->initClientApiSupport(this->item());
     controller->setLoadIcon(true);
 
     const auto webPage = resource().dynamicCast<QnWebPageResource>();
