@@ -99,6 +99,7 @@ public:
     QRectF filterRect;
     QStringList attributeFilters;
     QStringList selectedObjectTypeList;
+    std::set<QString> filteredObjectTypes;
     std::set<QString> selectedObjectTypes;
     mutable QHash<QString, bool> objectTypeAcceptanceCache;
 
@@ -443,25 +444,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(
     filter.analyticsEngineId = selectedEngine;
     filter.sortOrder = EventSearch::sortOrderFromDirection(request.direction);
     filter.timePeriod = request.period(q->interestTimePeriod());
-    filter.objectTypeId = selectedObjectTypes;
-
-    if (!selectedObjectTypes.empty())
-    {
-        const auto& state = q->systemContext()->analyticsTaxonomyStateWatcher()->state();
-        auto currentObjectType = state->objectTypeById(selectedObjectTypeList.first());
-        auto prevObjectType = currentObjectType;
-        while (currentObjectType && selectedObjectTypeList.contains(currentObjectType->id()))
-        {
-            prevObjectType = currentObjectType;
-            currentObjectType = currentObjectType->base();
-        }
-
-        if (prevObjectType)
-        {
-            filter.objectTypeId.clear();
-            filter.objectTypeId.insert(prevObjectType->id());
-        }
-    }
+    filter.objectTypeId = q->filteredObjectTypes();
 
     if (q->cameraSet().type() == ManagedCameraSet::Type::single && filterRect.isValid())
         filter.boundingBox = filterRect;
@@ -1223,6 +1206,11 @@ void AnalyticsSearchListModel::setSelectedEngine(const nx::Uuid& value)
     emit selectedEngineChanged();
 }
 
+std::set<QString> AnalyticsSearchListModel::filteredObjectTypes() const
+{
+    return d->filteredObjectTypes;
+}
+
 QStringList AnalyticsSearchListModel::selectedObjectTypes() const
 {
     return d->selectedObjectTypeList;
@@ -1237,7 +1225,24 @@ void AnalyticsSearchListModel::setSelectedObjectTypes(const QStringList& value)
     clear();
     d->selectedObjectTypes = std::move(newObjectTypes);
     d->selectedObjectTypeList = {d->selectedObjectTypes.cbegin(), d->selectedObjectTypes.cend()};
+    d->filteredObjectTypes = d->selectedObjectTypes;
     NX_VERBOSE(this, "Set selected object type to \"%1\"", d->selectedObjectTypeList);
+
+    // Filter out excessive object types.
+    if (!d->filteredObjectTypes.empty())
+    {
+        auto currentObjectType = d->objectTypeById(d->selectedObjectTypeList.first());
+        auto prevObjectType = currentObjectType;
+        while (currentObjectType && d->selectedObjectTypeList.contains(currentObjectType->id()))
+        {
+            prevObjectType = currentObjectType;
+            currentObjectType = currentObjectType->base();
+        }
+
+        if (prevObjectType)
+            d->filteredObjectTypes = std::set<QString>{prevObjectType->id()};
+    }
+
     emit selectedObjectTypesChanged();
 }
 

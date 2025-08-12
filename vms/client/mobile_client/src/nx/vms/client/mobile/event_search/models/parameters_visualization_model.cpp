@@ -163,7 +163,11 @@ void ParametersVisualizationModel::Private::addObjectTypeFilterValue(Items& resu
             if (!analyticsSetup)
                 return {};
 
-            const auto& types = analyticsSetup->objectTypes();
+            const auto filterModel = analyticsSetup->model();
+            if (!filterModel)
+                return {};
+
+            const auto& types = filterModel->filteredObjectTypes();
             switch (types.size())
             {
                 case 0:
@@ -175,7 +179,7 @@ void ParametersVisualizationModel::Private::addObjectTypeFilterValue(Items& resu
                         return {};
 
                     const auto taxonomy = currentContext->taxonomyManager()->currentTaxonomy();
-                    const auto objectType = taxonomy->objectTypeById(types.first());
+                    const auto objectType = taxonomy->objectTypeById(*types.begin());
                     return objectType
                         ? Item{objectType->name(), objectType->icon()}
                         : Item{};
