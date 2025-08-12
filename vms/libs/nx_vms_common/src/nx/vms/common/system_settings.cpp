@@ -1807,6 +1807,46 @@ void SystemSettings::setLastMergeSlaveId(const nx::Uuid& value)
     d->lastMergeSlaveIdAdaptor->setValue(value.toSimpleString());
 }
 
+bool SystemSettings::forceMergeFinished()
+{
+    const nx::Uuid master(d->lastMergeMasterIdAdaptor->value());
+    const nx::Uuid slave(d->lastMergeSlaveIdAdaptor->value());
+    if (master == slave)
+        return false;
+
+    if (master.isNull())
+    {
+        NX_INFO(this, "Force slave merge id %1", slave);
+        d->lastMergeMasterIdAdaptor->setValue(slave.toSimpleString());
+    }
+    else
+    {
+        if (slave.isNull())
+        {
+            NX_INFO(this, "Force master merge id %1", master);
+            d->lastMergeSlaveIdAdaptor->setValue(master.toSimpleString());
+        }
+        else
+        {
+            const auto masterTime = master.timeSinceEpoch();
+            const auto slaveTime = slave.timeSinceEpoch();
+            NX_ASSERT(!(masterTime.has_value() ^ slaveTime.has_value()),
+                "master is%1 v7 slave is%2 v7", masterTime ? "" : " not", slaveTime ? "" : " not");
+            if (masterTime && slaveTime && (*masterTime < *slaveTime))
+            {
+                NX_INFO(this, "Force slave merge id %1 over master %2", slave, master);
+                d->lastMergeMasterIdAdaptor->setValue(slave.toSimpleString());
+            }
+            else
+            {
+                NX_INFO(this, "Force master merge id %1 over slave %2", master, slave);
+                d->lastMergeSlaveIdAdaptor->setValue(master.toSimpleString());
+            }
+        }
+    }
+    return true;
+}
+
 nx::Url SystemSettings::clientStatisticsSettingsUrl() const
 {
     return nx::Url::fromUserInput(d->clientStatisticsSettingsUrlAdaptor->value().trimmed());
