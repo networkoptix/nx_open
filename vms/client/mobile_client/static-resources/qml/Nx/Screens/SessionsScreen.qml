@@ -615,8 +615,10 @@ Page
         anchors.fill: parent
 
         property bool currentRootLoading: false
+        property bool waitingForLastOpened: appGlobalState.lastOpenedNodeId !== NxGlobals.uuid("")
+            && appGlobalState.lastOpenedNodeId !== undefined
 
-        visible: (organizationsModel.topLevelLoading || currentRootLoading)
+        visible: (organizationsModel.topLevelLoading || currentRootLoading || waitingForLastOpened)
             && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
 
         component MaskItem: Rectangle
