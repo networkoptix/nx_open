@@ -144,7 +144,9 @@ DebugActionsHandler::DebugActionsHandler(WindowContext* windowContext, QObject *
 #ifdef Q_OS_MAC
     if (ini().virtualJoystick)
         VirtualJoystickDialog::registerAction();
+#endif
 
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
     if (ini().joystickInvestigationWizard)
         JoystickInvestigationWizardDialog::registerAction();
 #endif

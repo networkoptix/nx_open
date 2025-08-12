@@ -21,6 +21,8 @@ Dialog
     property string outputFilePath: ""
     property bool isSavingPermitted: false
     property QtObject collectedData: QtObject {
+        property string manufacturer: ""
+        property string deviceName: ""
         property var xAxis: []
         property var yAxis: []
         property var zAxis: []
@@ -37,6 +39,8 @@ Dialog
     ]
 
     signal resultReady(string filePath, string data)
+
+    title: qsTr("Joystick Investigation")
 
     width: minimumWidth
     height: minimumHeight

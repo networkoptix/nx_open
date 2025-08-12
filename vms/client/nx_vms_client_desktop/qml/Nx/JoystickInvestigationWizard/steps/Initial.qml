@@ -13,14 +13,17 @@ WizardStep
 {
     id: initialStep
 
-    property var devicesList: [/*{ path: , name: }*/]
+    property var devicesList: [/*{ path: , manufacturer: , name: , id: }*/]
     property int selectedDeviceIndex
 
     function onDeviceListChanged()
     {
         const devices = joystickInvestigationDialog.joystickManager.devices()
 
-        devicesList = Object.keys(devices).map(path => ({ path, name: devices[path] }))
+        devicesList = Object.keys(devices).map(path => ({ path,
+            manufacturer: devices[path][0],
+            name: devices[path][1],
+            id: devices[path][2]}))
 
         if (devicesList.length === 0)
             nextEnabled = false
@@ -40,6 +43,9 @@ WizardStep
     {
         nextEnabled = true
         selectedDeviceIndex = index
+        joystickInvestigationDialog.collectedData.manufacturer =
+            devicesList[index].manufacturer
+        joystickInvestigationDialog.collectedData.deviceName = devicesList[index].name
     }
 
     function onBeforeNext()
@@ -57,6 +63,8 @@ WizardStep
 
         joystickInvestigationDialog.currentDevice = null
 
+        joystickInvestigationDialog.collectedData.manufacturer = ""
+        joystickInvestigationDialog.collectedData.deviceName = ""
         joystickInvestigationDialog.collectedData.xAxis = []
         joystickInvestigationDialog.collectedData.yAxis = []
         joystickInvestigationDialog.collectedData.zAxis = []
@@ -98,7 +106,10 @@ WizardStep
 
             delegate: RadioButton
             {
-                text: devicesList[index].name
+                text: "%1 - %2 (%3)"
+                    .arg(devicesList[index].manufacturer)
+                    .arg(devicesList[index].name)
+                    .arg(devicesList[index].id)
                 onClicked: onJoystickSelected(index)
                 ButtonGroup.group: joystickRadioButtonsGroup
             }

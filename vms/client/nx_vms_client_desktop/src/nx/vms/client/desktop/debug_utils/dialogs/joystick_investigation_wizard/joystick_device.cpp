@@ -28,6 +28,29 @@ void JoystickDevice::onStateChanged(const OsalDevice::State& newState)
 {
     QList<bool> state;
 
+    m_xAxisPosition = newState.x;
+    m_yAxisPosition = newState.y;
+    m_zAxisPosition = newState.z;
+
+    if (!m_xAxisDescription.isInitialized && newState.isAxisXInitialized)
+    {
+        m_xAxisDescription.isInitialized = true;
+        m_xAxisDescription.min = newState.minX;
+        m_xAxisDescription.max = newState.maxX;
+    }
+    if (!m_yAxisDescription.isInitialized && newState.isAxisYInitialized)
+    {
+        m_yAxisDescription.isInitialized = true;
+        m_yAxisDescription.min = newState.minY;
+        m_yAxisDescription.max = newState.maxY;
+    }
+    if (!m_zAxisDescription.isInitialized && newState.isAxisZInitialized)
+    {
+        m_zAxisDescription.isInitialized = true;
+        m_zAxisDescription.min = newState.minZ;
+        m_zAxisDescription.max = newState.maxZ;
+    }
+
     if (!NX_ASSERT(newState.rawData.canConvert<QBitArray>()))
         return;
 

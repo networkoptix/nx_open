@@ -22,15 +22,18 @@ struct OsWinApiDeviceWin::Private
 {
     Device device;
 
-    QTimer* pollingTimer;
+    QTimer* pollingTimer = nullptr;
 
     bool isAxisXInitialized = false;
     bool isAxisYInitialized = false;
     bool isAxisZInitialized = false;
 
-    int minX, maxX;
-    int minY, maxY;
-    int minZ, maxZ;
+    int minX = 0;
+    int maxX = 0;
+    int minY = 0;
+    int maxY = 0;
+    int minZ = 0;
+    int maxZ = 0;
 
     int buttonsNumber = 0;
     int errorsCounter = 0;
@@ -98,6 +101,7 @@ void OsWinApiDeviceWin::poll()
         .minZ = d->minZ,
         .maxZ = d->maxZ,
         .buttons = QBitArray(d->buttonsNumber),
+        .rawData = QBitArray{}, // TODO: @alevenkov Fill it with meaningfull data if needed.
     };
 
     if (status != DI_OK)

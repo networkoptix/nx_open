@@ -100,8 +100,10 @@ QVariantMap JoystickManager::devices() const
 
     for (auto it = d->joysticks.begin(); it != d->joysticks.end(); ++it)
     {
-        result[it.key()] = QString("%1 - %2 (%3)")
-            .arg(it.value().info.manufacturerName, it.value().info.modelName, it.value().info.id);
+        result[it.key()] = QStringList()
+            << it.value().info.manufacturerName
+            << it.value().info.modelName
+            << it.value().info.id;
     }
 
     return result;
