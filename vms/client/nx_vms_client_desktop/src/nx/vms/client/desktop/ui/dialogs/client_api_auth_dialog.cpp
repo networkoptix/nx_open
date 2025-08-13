@@ -5,11 +5,11 @@
 #include <QtWidgets/QPushButton>
 
 #include <core/resource/user_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/common/html/html.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/widgets/views/resource_list_view.h>
 
 namespace nx::vms::client::desktop {
@@ -41,12 +41,20 @@ ClientApiAuthDialog::ClientApiAuthDialog(const QString& origin, QWidget* parent)
     QnMessageBox(
         QnMessageBox::Icon::Warning,
         tr("This web page is requesting access to your account for authorization"),
-        tr("Your confirmation is required to provide a token to %1",
-            "%1 is a url hostname").arg(common::html::bold(origin)),
+        tr("Your confirmation is required to provide a token to",
+            "... a web page (below there is a web page name with an icon)"),
         QDialogButtonBox::Cancel,
         QDialogButtonBox::NoButton,
         parent)
 {
+    QnWebPageResourcePtr url(new QnWebPageResource());
+    url->setForceUsingLocalProperties(); //< For the subtype.
+    url->setUrl(origin);
+    url->setName(origin);
+    url->setSubtype(nx::vms::api::WebPageSubtype::clientApi);
+
+    addCustomWidget(new QnResourceListView({url}));
+
     m_allowButton = addButton(tr("Allow"), QDialogButtonBox::YesRole);
 }
 
