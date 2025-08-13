@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
+#include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
 #if defined(Q_OS_MACOS)
@@ -53,6 +54,9 @@ AdvancedSearchDialog::AdvancedSearchDialog(QObject* parent):
 {
     rootObjectHolder()->object()->setProperty(
         "windowContext", QVariant::fromValue(windowContext()));
+
+    executeDelayedParented(
+        [this] { rootObjectHolder()->object()->setProperty("ready", true); }, this);
 
     connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit,
         this, &QObject::deleteLater);
