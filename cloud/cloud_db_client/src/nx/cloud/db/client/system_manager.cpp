@@ -191,6 +191,9 @@ void SystemManager::update(
     const api::SystemAttributesUpdate& updatedData,
     std::function<void(api::ResultCode)> completionHandler)
 {
+    if (updatedData.name && updatedData.name->empty())
+        NX_WARNING(this, "Attempting to set empty name for systemId(%1)", systemId);
+
     m_requestsExecutor->makeAsyncCall</*Output*/ void>(
         nx::network::http::Method::put,
         nx::network::http::rest::substituteParameters(kSystemPath, {systemId}),
