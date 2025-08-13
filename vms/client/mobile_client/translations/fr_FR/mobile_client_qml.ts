@@ -1007,6 +1007,14 @@
       <source>Try changing the search parameters</source>
       <translation>Essayez de modifier les paramètres de recherche</translation>
     </message>
+    <message>
+      <source>Cloud</source>
+      <translation type="unfinished">Cloud</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
+    </message>
   </context>
   <context>
     <name>SiteListItem</name>
@@ -1033,6 +1041,10 @@
     <message>
       <source>SHUTDOWN</source>
       <translation>ARRETER</translation>
+    </message>
+    <message>
+      <source>PENDING</source>
+      <translation type="unfinished">PENDING</translation>
     </message>
   </context>
   <context>

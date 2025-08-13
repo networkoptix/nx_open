@@ -946,7 +946,7 @@
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>選擇到期日</translation>
     </message>
     <message>
       <source>Expiration</source>
@@ -1006,6 +1006,14 @@
       <source>Try changing the search parameters</source>
       <translation>嘗試更改搜尋參數</translation>
     </message>
+    <message>
+      <source>Cloud</source>
+      <translation type="unfinished">Cloud</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
+    </message>
   </context>
   <context>
     <name>SiteListItem</name>
@@ -1032,6 +1040,10 @@
     <message>
       <source>SHUTDOWN</source>
       <translation>關閉</translation>
+    </message>
+    <message>
+      <source>PENDING</source>
+      <translation type="unfinished">PENDING</translation>
     </message>
   </context>
   <context>
