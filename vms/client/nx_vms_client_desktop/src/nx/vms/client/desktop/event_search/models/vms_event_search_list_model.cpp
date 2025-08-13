@@ -483,6 +483,9 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
         case core::ObjectTrackIdRole:
             return event->property(kObjectTrackIdFieldName);
 
+        case core::ItemZoomRectRole:
+            return event->property(kBoundingBoxFieldName);
+
         // TODO: #sivanov Replace with a corresponding function when the event search unit
         // tests are ready.
         case core::DisplayedResourceListRole: //< Event tile source label.
