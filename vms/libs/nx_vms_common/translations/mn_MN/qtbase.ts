@@ -307,7 +307,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation type="unfinished">Open the combo box selection popup</translation>
+      <translation>Комбо хайрцаг сонгох цонхыг нээнэ үү</translation>
     </message>
   </context>
   <context>
@@ -372,7 +372,7 @@ Press ESC to cancel</source>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation type="unfinished">Destination file is the same file.</translation>
+      <translation>Очих файл нь ижил файл юм.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
@@ -380,7 +380,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Destination file exists</source>
-      <translation type="unfinished">Destination file exists</translation>
+      <translation>Очих файл байна</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
@@ -392,7 +392,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Will not rename sequential file using block copy</source>
-      <translation type="unfinished">Will not rename sequential file using block copy</translation>
+      <translation>Блок хуулбарыг ашиглан дараалсан файлын нэрийг өөрчлөхгүй</translation>
     </message>
     <message>
       <source>Cannot remove source file</source>
@@ -408,7 +408,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation type="unfinished">Failure to write block</translation>
+      <translation>Блок бичиж чадаагүй</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
@@ -439,11 +439,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Parent Directory</source>
-      <translation type="unfinished">Parent Directory</translation>
+      <translation>Эцэг эхийн лавлах</translation>
     </message>
     <message>
       <source>Go to the parent directory</source>
-      <translation type="unfinished">Go to the parent directory</translation>
+      <translation>Үндсэн лавлах руу очно уу</translation>
     </message>
     <message>
       <source>Create New Folder</source>
@@ -475,7 +475,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Find Directory</source>
-      <translation type="unfinished">Find Directory</translation>
+      <translation>Лавлах хай</translation>
     </message>
     <message>
       <source>Open</source>
