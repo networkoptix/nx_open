@@ -84,8 +84,9 @@ NX_REFLECTION_TAG_TYPE(SaveTrackData, jsonSerializeChronoDurationAsNumber)
 struct ReadTrackData: public TrackData
 {
     std::optional<TitleWithFlagData> title;
+    std::optional<float> similarity;
 };
-NX_REFLECTION_INSTRUMENT(ReadTrackData, TrackData_Fields(title))
+NX_REFLECTION_INSTRUMENT(ReadTrackData, TrackData_Fields(title)(similarity))
 NX_REFLECTION_TAG_TYPE(ReadTrackData, jsonSerializeChronoDurationAsNumber)
 
 using SaveTracksData = std::vector<SaveTrackData>;

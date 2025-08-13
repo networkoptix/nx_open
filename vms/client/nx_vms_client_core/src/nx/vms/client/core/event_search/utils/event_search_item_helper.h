@@ -71,9 +71,6 @@ void mergeOldData(NewDataContainer& newData,
     const OldDataContainer& oldData,
     EventSearch::FetchDirection direction)
 {
-    NX_ASSERT(detail::isSortedCorrectly<Facade>(oldData, Qt::DescendingOrder));
-    NX_ASSERT(detail::isSortedCorrectly<Facade>(newData, sortOrderFromDirection(direction)));
-
     detail::printDebugData<Facade>(oldData, "old data");
 
     if (oldData.empty())
@@ -87,6 +84,12 @@ void mergeOldData(NewDataContainer& newData,
         std::swap(newData, data);
         return;
     }
+
+    // TODO: in case of vector search data is sorted by another condition: similarity, startTime
+    // So far I assume we never merged data that found by vector search. So, moving asserts below should help.
+    // As a better fix it is needed to update sorting predicates.
+    NX_ASSERT(detail::isSortedCorrectly<Facade>(oldData, Qt::DescendingOrder));
+    NX_ASSERT(detail::isSortedCorrectly<Facade>(newData, sortOrderFromDirection(direction)));
 
     detail::printDebugData<Facade>(newData, "new data");
 

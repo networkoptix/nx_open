@@ -180,10 +180,12 @@ struct ObjectTrack
      * unique value of the storageId.
      */
     std::string storageId;
+
+    std::optional<float> similarity;
 };
 #define ObjectTrack_analytics_storage_Fields \
     (id)(deviceId)(objectTypeId)(attributes)(firstAppearanceTimeUs)(lastAppearanceTimeUs) \
-    (objectPosition)(bestShot)(title)(analyticsEngineId)(storageId)
+    (objectPosition)(bestShot)(title)(analyticsEngineId)(storageId)(similarity)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectTrack, (json)(ubjson), NX_VMS_COMMON_API);
 NX_REFLECTION_INSTRUMENT(ObjectTrack, ObjectTrack_analytics_storage_Fields)
 
