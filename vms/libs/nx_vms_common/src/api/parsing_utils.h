@@ -284,10 +284,7 @@ public:
         return request;
     }
 
-    virtual bool isSessionExpired() const
-    {
-        return false;
-    }
+    virtual bool isSessionExpired() const = 0;
 
     virtual bool isSuccess() const = 0;
 
@@ -481,6 +478,13 @@ public:
                 const auto context = static_cast<RawResultContext*>(resultContext.get());
                 callback(context->success, handle, context->result, context->headers);
             };
+    }
+
+    virtual bool isSessionExpired() const override
+    {
+        // RawResultContext is not intended to be used with requests, which potentially could
+        // require a fresh session.
+        return false;
     }
 
     virtual bool isSuccess() const override

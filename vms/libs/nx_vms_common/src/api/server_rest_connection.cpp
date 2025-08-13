@@ -582,32 +582,17 @@ Handle ServerConnection::dumpDatabase(
         prepareUrl("/rest/v2/system/database", /*params*/ {}),
         nx::network::http::header::ContentType::kBinary.value);
 
-    auto internalCallback =
-        [callback = std::move(callback)](
-            bool success,
-            Handle requestId,
-            QByteArray body,
-            const network::http::HttpHeaders&)
-        {
-            if (success)
-            {
-                callback(success, requestId, body);
-                return;
-            }
-            nx::network::rest::Result result;
-            QJson::deserialize(body, &result);
-            callback(success, requestId, nx::utils::unexpected(result));
-        };
-
     auto timeouts = nx::network::http::AsyncClient::Timeouts::defaults();
     timeouts.responseReadTimeout = std::chrono::minutes(5);
     timeouts.messageBodyReadTimeout = std::chrono::minutes(5);
 
+    using Context = ResultContext<ErrorOrData<QByteArray>>;
+
     return d->executeRequest(
         tokenHelper,
         request,
-        std::make_unique<RawResultContext>(),
-        RawResultContext::wrapCallback(std::move(internalCallback)),
+        std::make_unique<Context>(),
+        Context::wrapCallback(std::move(callback)),
         executor,
         timeouts);
 }
@@ -2759,6 +2744,9 @@ ServerConnection::Private::executeRequestAsync(
         context->getStatusLine(),
         context->response.headers);
 
+    // RawResultContext is not intended to be used with requests, which potentially could require
+    // a fresh session. We could add an assert here, validating the context type if a helper is
+    // provided.
     if (requestContext->isSessionExpired() && helper)
     {
         co_await nx::utils::AsyncHandlerExecutor(qApp);
