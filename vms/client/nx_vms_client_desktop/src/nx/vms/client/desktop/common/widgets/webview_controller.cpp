@@ -1052,7 +1052,8 @@ void WebViewController::initClientApiSupport(
                     if (!NX_ASSERT(webView))
                         return false;
 
-                    return ClientApiAuthDialog::isApproved(webView->property("url").toUrl());
+                    return ClientApiAuthDialog::isApproved(
+                        webView->property("url").toUrl().host());
                 },
                 parent);
         });
