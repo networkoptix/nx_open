@@ -25,6 +25,7 @@ Window
 
     property WindowContext windowContext: null
     property bool showPreview: false
+    property bool ready: false
     property alias tileView: tileViewButton.checked
 
     modality: Qt.NonModal
@@ -130,6 +131,7 @@ Window
     Item
     {
         id: content
+        visible: dialog.ready
 
         anchors.left: parent.left
         anchors.right: parent.right
