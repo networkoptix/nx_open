@@ -1358,6 +1358,10 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
       <source>Next</source>
       <translation>Tiếp tục</translation>
     </message>
+    <message>
+      <source>Joystick Investigation</source>
+      <translation type="unfinished">Joystick Investigation</translation>
+    </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>
