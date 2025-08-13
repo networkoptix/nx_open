@@ -143,8 +143,10 @@ void QnDatabaseManagementWidget::onBackupFileSelected(QString fileName)
             rest::ErrorOrData<QByteArray> data)
         {
             NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
-            success = false;
-            if (data)
+            if (!data)
+                success = false;
+
+            if (success)
             {
                 QFile file(fileName);
                 success = file.open(QIODevice::WriteOnly) && file.write(*data) == data->size();
@@ -158,8 +160,8 @@ void QnDatabaseManagementWidget::onBackupFileSelected(QString fileName)
             {
                 if (!data)
                 {
-                    NX_ERROR(
-                        this, "Failed to dump Server database: %1", QJson::serialized(data.error()));
+                    NX_ERROR(this,
+                        "Failed to dump Server database: %1", QJson::serialized(data.error()));
                 }
                 setWarningStyle(ui->labelMessage);
                 ui->labelMessage->setText(tr("Failed to back up database"));
