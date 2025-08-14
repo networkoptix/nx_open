@@ -66,7 +66,16 @@ struct ExportMediaTool::Private
             ? settings.period.endTimeMs() * 1000ll
             : DATETIME_NOW;
 
-        if (!initDataProvider(startTimeUs, endTimeUs, timelapseFrameStepUs))
+        nx::core::transcoding::Settings transcodingSettings = settings.transcodingSettings;
+        if (settings.forceVideoTranscoding)
+            transcodingSettings.forceTranscoding = true;
+
+        nx::core::transcoding::FilterChain filters(
+            transcodingSettings,
+            mediaResource->getDewarpingParams(),
+            mediaResource->getVideoLayout());
+
+        if (!initDataProvider(startTimeUs, endTimeUs, timelapseFrameStepUs, filters.isTranscodingRequired()))
         {
             setStatus(ExportProcessStatus::failure);
             return false;
@@ -93,16 +102,8 @@ struct ExportMediaTool::Private
                 dataProvider->pleaseStop();
             });
 
-        nx::core::transcoding::Settings transcodingSettings = settings.transcodingSettings;
-        if (settings.forceVideoTranscoding)
-            transcodingSettings.forceTranscoding = true;
         if (settings.forceAudioTranscoding)
             exportRecorder->forceAudioTranscoding();
-
-        nx::core::transcoding::FilterChain filters(
-            transcodingSettings,
-            mediaResource->getDewarpingParams(),
-            mediaResource->getVideoLayout());
 
         exportRecorder->setTranscodeFilters(filters);
         exportRecorder->setPreciseStartPosition(startTimeUs);
@@ -167,7 +168,7 @@ private:
         emit q->statusChanged(status);
     }
 
-    bool initDataProvider(qint64 startTimeUs, qint64 endTimeUs, qint64 timelapseFrameStepUs)
+    bool initDataProvider(qint64 startTimeUs, qint64 endTimeUs, qint64 timelapseFrameStepUs, bool hasTranscoding)
     {
         NX_ASSERT(!dataProvider);
         const bool isRapidReview = timelapseFrameStepUs > 0;
@@ -207,7 +208,9 @@ private:
             NX_ASSERT(camera);
             rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false);
-            rtspClient->setMediaRole(PlaybackMode::export_);
+            rtspClient->setMediaRole(hasTranscoding
+                ? PlaybackMode::exportWithTranscoding
+                : PlaybackMode::export_);
             rtspClient->setRange(startTimeUs, endTimeUs, timelapseFrameStepUs);
         }
 
