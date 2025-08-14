@@ -79,11 +79,8 @@ void ServerAudioConnectionWatcher::handleResourceAdded(const QnResourcePtr& reso
     {
         if (serverResource->getId() == m_remoteServerId)
         {
-            if (m_server != serverResource)
-            {
-                m_server = serverResource;
-                tryAddCurrentServerConnection();
-            }
+            m_server = serverResource;
+            tryAddCurrentServerConnection();
         }
     }
 }
