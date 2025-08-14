@@ -49,6 +49,16 @@ MediaResourceHelper::MediaResourceHelper(QObject* parent):
 
     connect(this, &MediaResourceHelper::crossSystemNameChanged,
         this, &MediaResourceHelper::qualifiedResourceNameChanged);
+
+    connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemAboutToBeLost,
+        this, [this](const QString& systemId)
+        {
+            if (d->crossSystem && d->crossSystem->systemId() == systemId)
+            {
+                setResource({});
+                emit resourceRemoved();
+            }
+        });
 }
 
 MediaResourceHelper::~MediaResourceHelper()
