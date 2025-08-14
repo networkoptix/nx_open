@@ -18,7 +18,14 @@
     <widget class="nx::vms::client::desktop::Panel" name="filterPanel" native="true">
      <layout class="QHBoxLayout" name="panelLayout" stretch="0,0,0,0,1,0,0">
       <item>
-       <widget class="QnDateRangeWidget" name="dateRangeWidget" native="true"/>
+       <widget class="QnDateRangeWidget" name="dateRangeWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QnTreeComboBox" name="eventComboBox">
