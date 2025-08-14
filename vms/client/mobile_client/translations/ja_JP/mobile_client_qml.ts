@@ -1008,11 +1008,11 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>クラウド</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>ログイン</translation>
     </message>
   </context>
   <context>
@@ -1043,7 +1043,7 @@
     </message>
     <message>
       <source>PENDING</source>
-      <translation type="unfinished">PENDING</translation>
+      <translation>未設定</translation>
     </message>
   </context>
   <context>

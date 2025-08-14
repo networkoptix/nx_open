@@ -400,11 +400,11 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Chmura</translation>
     </message>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>Lokalny</translation>
     </message>
   </context>
   <context>

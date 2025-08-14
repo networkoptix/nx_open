@@ -1009,11 +1009,11 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Moln</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Logga in</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1044,7 @@
     </message>
     <message>
       <source>PENDING</source>
-      <translation type="unfinished">PENDING</translation>
+      <translation>VÄNTANDE</translation>
     </message>
   </context>
   <context>
