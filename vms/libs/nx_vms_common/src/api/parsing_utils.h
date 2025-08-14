@@ -132,13 +132,17 @@ rest::ErrorOrData<T> parseMessageBody(
     const nx::network::http::StatusLine& statusLine,
     bool* success)
 {
-    if (format != Qn::SerializationFormat::json)
+    // Unsupported format is OK for raw requests, no need to write it to the log.
+    if constexpr (!std::is_same_v<T, QByteArray>)
     {
-        NX_DEBUG(NX_SCOPE_TAG,
-            "Unsupported format '%1', status code: %2, message body: %3 ...",
-            nx::reflect::enumeration::toString(format),
-            statusLine,
-            messageBody.left(kMessageBodyLogSize));
+        if (format != Qn::SerializationFormat::json)
+        {
+            NX_DEBUG(NX_SCOPE_TAG,
+                "Unsupported format '%1', status code: %2, message body: %3 ...",
+                nx::reflect::enumeration::toString(format),
+                statusLine,
+                messageBody.left(kMessageBodyLogSize));
+        }
     }
 
     if (statusLine.statusCode == nx::network::http::StatusCode::ok)
@@ -320,16 +324,21 @@ public:
         if (messageBody.isEmpty() && format == Qn::SerializationFormat::unsupported)
             format = Qn::SerializationFormat::json;
 
-        const bool goodFormat = format == Qn::SerializationFormat::json
-            || format == Qn::SerializationFormat::ubjson;
-
         result = parseMessageBody<T>(format, messageBody, statusLine, &success);
 
-        if (!goodFormat
-            || systemError != SystemError::noError
+        if (systemError != SystemError::noError
             || statusLine.statusCode != nx::network::http::StatusCode::ok)
         {
             success = false;
+        }
+
+        // Check format for the non-raw requests.
+        if constexpr (!std::is_same_v<T, rest::ErrorOrData<QByteArray>>)
+        {
+            const bool goodFormat = format == Qn::SerializationFormat::json
+                || format == Qn::SerializationFormat::ubjson;
+            if (!goodFormat)
+                success = false;
         }
     }
 

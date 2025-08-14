@@ -6,7 +6,6 @@
 #include <QtGui/QDesktopServices>
 
 #include <api/server_rest_connection.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -136,7 +135,7 @@ void QnDatabaseManagementWidget::onBackupFileSelected(QString fileName)
     resetStyle(ui->labelMessage);
     ui->labelMessage->setText(tr("Database backup is being downloaded from the server. Please wait."));
 
-    auto dumpDatabaseHandler = nx::utils::guarded(this,
+    auto dumpDatabaseHandler =
         [this, fileName](
             bool success,
             rest::Handle requestId,
@@ -169,7 +168,7 @@ void QnDatabaseManagementWidget::onBackupFileSelected(QString fileName)
 
             m_currentRequest = 0;
             updateState(State::backupFinished, success);
-        });
+        };
 
     updateState(State::backupStarted);
 
@@ -181,7 +180,7 @@ void QnDatabaseManagementWidget::onBackupFileSelected(QString fileName)
         FreshSessionTokenHelper::ActionType::backup);
 
     m_currentRequest = connection->dumpDatabase(
-        sessionTokenHelper, std::move(dumpDatabaseHandler), thread());
+        sessionTokenHelper, std::move(dumpDatabaseHandler), this);
 
     ui->openFolderButton->disconnect(this);
     connect(
@@ -242,7 +241,7 @@ void QnDatabaseManagementWidget::restoreDb()
     resetStyle(ui->labelMessage);
     ui->labelMessage->setText(tr("Database backup is being uploaded to the server. Please wait."));
 
-    auto restoreDatabaseHandler = nx::utils::guarded(this,
+    auto restoreDatabaseHandler =
         [this, fileName](bool success, rest::Handle requestId, rest::ErrorOrEmpty reply)
         {
             NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
@@ -262,7 +261,7 @@ void QnDatabaseManagementWidget::restoreDb()
                 reply.error().errorString);
             setWarningStyle(ui->labelMessage);
             ui->labelMessage->setText(tr("Failed to restore database"));
-        });
+        };
 
     updateState(State::restoreStarted);
 
@@ -274,7 +273,7 @@ void QnDatabaseManagementWidget::restoreDb()
         FreshSessionTokenHelper::ActionType::restore);
 
     m_currentRequest = connection->restoreDatabase(
-        sessionTokenHelper, data, std::move(restoreDatabaseHandler), thread());
+        sessionTokenHelper, data, std::move(restoreDatabaseHandler), this);
 }
 
 void QnDatabaseManagementWidget::updateState(State state, bool operationSuccess)
