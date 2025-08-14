@@ -1011,6 +1011,14 @@
       <source>Try changing the search parameters</source>
       <translation>Försök att ändra sökparametrar</translation>
     </message>
+    <message>
+      <source>Cloud</source>
+      <translation>Moln</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>Logga in</translation>
+    </message>
   </context>
   <context>
     <name>SiteListItem</name>
@@ -1037,6 +1045,10 @@
     <message>
       <source>SHUTDOWN</source>
       <translation>AVSTÄNGNING</translation>
+    </message>
+    <message>
+      <source>PENDING</source>
+      <translation>VÄNTANDE</translation>
     </message>
   </context>
   <context>

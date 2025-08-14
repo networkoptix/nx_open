@@ -1359,6 +1359,10 @@ Select an Integration to begin configuring its parameters.</source>
       <source>Next</source>
       <translation>次へ</translation>
     </message>
+    <message>
+      <source>Joystick Investigation</source>
+      <translation>ジョイスティックの調査</translation>
+    </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>

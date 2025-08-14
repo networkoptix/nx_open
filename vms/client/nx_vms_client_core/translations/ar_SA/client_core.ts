@@ -402,6 +402,14 @@
       <source>Partners</source>
       <translation type="unfinished">Partners</translation>
     </message>
+    <message>
+      <source>Cloud</source>
+      <translation type="unfinished">Cloud</translation>
+    </message>
+    <message>
+      <source>Local</source>
+      <translation type="unfinished">Local</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::RecordingStatusHelper</name>

@@ -1010,6 +1010,14 @@
       <source>Try changing the search parameters</source>
       <translation>異なる検索条件でお試しください。</translation>
     </message>
+    <message>
+      <source>Cloud</source>
+      <translation>クラウド</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>ログイン</translation>
+    </message>
   </context>
   <context>
     <name>SiteListItem</name>
@@ -1036,6 +1044,10 @@
     <message>
       <source>SHUTDOWN</source>
       <translation>シャットダウン</translation>
+    </message>
+    <message>
+      <source>PENDING</source>
+      <translation>未設定</translation>
     </message>
   </context>
   <context>

@@ -1358,6 +1358,10 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
       <source>Next</source>
       <translation>Next</translation>
     </message>
+    <message>
+      <source>Joystick Investigation</source>
+      <translation>Investigasi Joystick</translation>
+    </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>

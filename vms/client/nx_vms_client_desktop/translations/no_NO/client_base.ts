@@ -8934,7 +8934,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
-      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
+      <translation>Del fil etter størrelse må være større enn 10 MB og mindre enn eller lik halvparten av en verdi angitt for Maksimalt volum</translation>
     </message>
   </context>
   <context>

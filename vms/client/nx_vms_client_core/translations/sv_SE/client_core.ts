@@ -394,6 +394,14 @@
       <source>Partners</source>
       <translation>Partners</translation>
     </message>
+    <message>
+      <source>Cloud</source>
+      <translation>Moln</translation>
+    </message>
+    <message>
+      <source>Local</source>
+      <translation>Lokal</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::RecordingStatusHelper</name>

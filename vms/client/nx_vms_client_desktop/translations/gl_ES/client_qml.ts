@@ -1364,6 +1364,10 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
       <source>Next</source>
       <translation>Seguinte</translation>
     </message>
+    <message>
+      <source>Joystick Investigation</source>
+      <translation type="unfinished">Joystick Investigation</translation>
+    </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>

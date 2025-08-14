@@ -1358,6 +1358,10 @@ Select an Integration to begin configuring its parameters.</source>
       <source>Next</source>
       <translation>繼續</translation>
     </message>
+    <message>
+      <source>Joystick Investigation</source>
+      <translation type="unfinished">Joystick Investigation</translation>
+    </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>
@@ -2055,7 +2059,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Find similar</source>
-      <translation type="unfinished">Find similar</translation>
+      <translation>尋找相似</translation>
     </message>
   </context>
   <context>

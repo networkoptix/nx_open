@@ -1376,6 +1376,10 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
       <source>Next</source>
       <translation>Dalej</translation>
     </message>
+    <message>
+      <source>Joystick Investigation</source>
+      <translation type="unfinished">Joystick Investigation</translation>
+    </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>

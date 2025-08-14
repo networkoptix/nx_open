@@ -1376,6 +1376,10 @@ Select an Integration to begin configuring its parameters.</translation>
       <source>Next</source>
       <translation>Další</translation>
     </message>
+    <message>
+      <source>Joystick Investigation</source>
+      <translation type="unfinished">Joystick Investigation</translation>
+    </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>

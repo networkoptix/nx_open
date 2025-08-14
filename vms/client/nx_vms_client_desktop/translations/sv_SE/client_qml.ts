@@ -1364,6 +1364,10 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
       <source>Next</source>
       <translation>Nästa</translation>
     </message>
+    <message>
+      <source>Joystick Investigation</source>
+      <translation>Joystick undersökning</translation>
+    </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>
