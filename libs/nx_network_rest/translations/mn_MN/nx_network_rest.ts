@@ -16,7 +16,7 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Энэ хэрэглэгч байхгүй эсвэл нэвтрэх боломжгүй байна.</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -52,15 +52,15 @@
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>Тасалбарын түлхүүр хүчингүй эсвэл хугацаа нь дууссан.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Ижил нэвтрэх эрхтэй нэгээс олон хэрэглэгчийг танилцуулж байна.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>LDAP серверийн SSL/TLS сертификатыг баталгаажуулах боломжгүй байна.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>

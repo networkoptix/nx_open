@@ -1361,7 +1361,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>ジョイスティックの調査</translation>
     </message>
   </context>
   <context>

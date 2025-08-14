@@ -1366,7 +1366,7 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>Joystick undersökning</translation>
     </message>
   </context>
   <context>

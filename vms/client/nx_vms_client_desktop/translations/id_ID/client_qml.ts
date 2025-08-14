@@ -1360,7 +1360,7 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>Investigasi Joystick</translation>
     </message>
   </context>
   <context>
