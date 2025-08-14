@@ -523,7 +523,7 @@ bool QnRtspClientArchiveDelegate::reopen()
     if (m_camera)
     {
         if (m_position != DATETIME_NOW && m_position != DATETIME_INVALID
-            && m_mode == PlaybackMode::export_)
+            && (m_mode == PlaybackMode::export_ || m_mode == PlaybackMode::exportWithTranscoding))
         {
             m_reopenPosition = m_position;
         }

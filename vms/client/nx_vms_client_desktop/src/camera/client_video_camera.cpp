@@ -143,6 +143,9 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
         ? timePeriod.endTimeMs() * 1000ll
         : DATETIME_NOW;
 
+    nx::core::transcoding::FilterChain filters(
+        transcodingSettings, nx::vms::api::dewarping::MediaData(), nullptr);
+
     NX_MUTEX_LOCKER lock( &m_exportMutex );
     if (!m_exportRecorder)
     {
@@ -171,7 +174,9 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
             QnVirtualCameraResourcePtr camera = m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
             rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false);
-            rtspClient->setMediaRole(PlaybackMode::export_);
+            rtspClient->setMediaRole(filters.isTranscodingRequired()
+                ? PlaybackMode::exportWithTranscoding
+                : PlaybackMode::export_);
             rtspClient->setRange(startTimeUs, endTimeUs, 0);
         }
 
@@ -228,8 +233,6 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
     m_exportRecorder->setServerTimeZone(timeZone);
     m_exportRecorder->setContainer(format);
 
-    nx::core::transcoding::FilterChain filters(
-        transcodingSettings, nx::vms::api::dewarping::MediaData(), nullptr);
     m_exportRecorder->setTranscodeFilters(filters);
 
     m_exportReader->addDataProcessor(m_exportRecorder);
