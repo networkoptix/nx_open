@@ -32,7 +32,8 @@ NX_REFLECTION_ENUM_CLASS(PlaybackMode,
     thumbNails,
     export_,
     edge,
-    preview
+    preview,
+    exportWithTranscoding
 )
 
 class NX_VMS_COMMON_API QnAbstractArchiveDelegate: public QObject
