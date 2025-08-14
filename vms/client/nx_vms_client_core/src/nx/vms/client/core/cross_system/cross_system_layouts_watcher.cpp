@@ -71,11 +71,10 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
     // On contrary, if another system goes offline or unauthorized, it's not considered lost,
     // and cloudCrossSystemManager keeps its system context intact.
     connect(appContext()->cloudCrossSystemManager(),
-        &CloudCrossSystemManager::systemLost,
+        &CloudCrossSystemManager::systemAboutToBeLost,
         this,
-        [this, processLayouts](const QString& systemId)
+        [processLayouts](const QString& systemId)
         {
-            NX_ASSERT(!appContext()->cloudCrossSystemManager()->systemContext(systemId));
             processLayouts(nullptr, systemId);
         });
 
