@@ -119,6 +119,11 @@ void AioThread::stopMonitoring(
 
 void AioThread::post(Pollable* const sock, nx::MoveOnlyFunc<void()> functor)
 {
+    unsigned int dummy;
+    NX_ASSERT_HEAVY_CONDITION(
+        !sock || sock->getRecvTimeout(&dummy),
+        "socket probably closed or corrupted!");
+
     m_taskQueue->addTask(
         detail::PostAsyncCallTask(sock, std::move(functor)));
 
