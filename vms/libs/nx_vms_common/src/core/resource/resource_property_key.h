@@ -17,11 +17,6 @@
  */
 namespace ResourcePropertyKey {
 
-namespace Onvif {
-
-NX_VMS_COMMON_API extern const QString kDeviceUrl;
-} // namespace Onvif
-
 namespace Server {
 
 using namespace nx::vms::api::server_properties;

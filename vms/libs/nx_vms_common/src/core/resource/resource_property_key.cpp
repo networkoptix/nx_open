@@ -3,11 +3,6 @@
 #include "resource_property_key.h"
 
 namespace ResourcePropertyKey {
-namespace Onvif {
-
-const QString kDeviceUrl("DeviceUrl");
-
-} // namespace ResourcePropertyKey::Onvif
 
 namespace WebPage {
 
