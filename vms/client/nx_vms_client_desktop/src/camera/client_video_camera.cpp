@@ -194,14 +194,11 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
         connect(m_exportRecorder, &QnStreamRecorder::recordingFinished, this,
             [this](const std::optional<nx::recording::Error>& reason, const QString& fileName)
             {
-                if (!nx::vms::client::desktop::ini().logFailedRecordingFinishedStacktrace
-                    || !reason.has_value())
-                {
-                    return;
-                }
+                if (reason.has_value())
+                    NX_VERBOSE(this, "Export finished with error: %1", reason.value().toString());
+                else
+                    NX_VERBOSE(this, "Export finished successfully");
 
-                NX_VERBOSE(this, "Export finished with error: %1\ntrace:\n%2",
-                    reason.value().toString(), nx::stackTrace());
             }, Qt::DirectConnection);
     }
     QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (m_exportReader.data());
