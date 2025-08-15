@@ -401,6 +401,11 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 
     const int result = runApplication(&application);
 
+    // TODO: Move all the code above in mobile application context destructor with correct
+    // deinitialization order.
+    applicationContext->qmlEngine()->removeImageProvider("thumbnail");
+    applicationContext->resetEngine();
+
     const auto deinitializationStartTime = steady_clock::now();
 
     // A workaround to ensure no cross-system connections are made after subsequent stopAll call.

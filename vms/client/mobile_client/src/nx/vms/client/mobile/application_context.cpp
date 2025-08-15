@@ -275,9 +275,6 @@ ApplicationContext::~ApplicationContext()
 
     removeSystemContext(d->mainSystemContext.release());
 
-    qmlEngine()->removeImageProvider("thumbnail");
-    resetEngine(); // Frees all systems contexts of the QML objects.
-
     // Currently, throughout the derived client code (desktop, mobile) it's assumed everywhere
     // that all system contexts are of that most derived level. I.e. desktop client code expects
     // desktop::SystemContext, mobile client code expects mobile::SystemContext everywhere.

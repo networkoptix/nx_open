@@ -207,6 +207,8 @@ public:
 
     NetworkModule* networkModule() const;
 
+    void resetEngine();
+
 signals:
     void systemContextAdded(SystemContext* systemContext);
     void systemContextRemoved(SystemContext* systemContext);
@@ -214,8 +216,6 @@ signals:
 protected:
 
     void storeFontConfig(FontConfig* config);
-
-    void resetEngine();
 
     /**
      *  Initializes translation-related stuff. Should be called on the inheritor side since
