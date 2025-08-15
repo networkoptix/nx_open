@@ -23,7 +23,7 @@ class NX_VMS_CLIENT_CORE_API AnalyticsSearchSetup: public QObject
     Q_PROPERTY(QStringList attributeFilters READ attributeFilters WRITE setAttributeFilters
         NOTIFY attributeFiltersChanged)
 
-    Q_PROPERTY(bool vectorizationSearchEnabled READ vectorizationSearchEnabled)
+    Q_PROPERTY(bool vectorizationSearchEnabled READ vectorizationSearchEnabled CONSTANT)
 
     Q_PROPERTY(analytics::db::TextScope textSearchScope READ textSearchScope WRITE setTextSearchScope
         NOTIFY textSearchScopeChanged)
