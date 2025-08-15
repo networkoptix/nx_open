@@ -9215,7 +9215,7 @@ Pamiętaj, aby przywrócić poziom rejestrowania do ustawienia domyślnego po ze
     </message>
     <message>
       <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
-      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
+      <translation>Podziel plik według rozmiaru. Rozmiar musi być większy niż 10 MB i mniejszy lub równy połowie wartości ustawionej dla opcji Limit maksymalnej wielkości</translation>
     </message>
   </context>
   <context>

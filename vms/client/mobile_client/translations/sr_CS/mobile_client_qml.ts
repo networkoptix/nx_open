@@ -1119,6 +1119,25 @@
     </message>
   </context>
   <context>
+    <name>TextSelectionArea</name>
+    <message>
+      <source>Cut</source>
+      <translation type="unfinished">Cut</translation>
+    </message>
+    <message>
+      <source>Copy</source>
+      <translation type="unfinished">Copy</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation type="unfinished">Paste</translation>
+    </message>
+    <message>
+      <source>Select All</source>
+      <translation type="unfinished">Select All</translation>
+    </message>
+  </context>
+  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

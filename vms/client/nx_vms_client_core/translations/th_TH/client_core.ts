@@ -394,11 +394,11 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>คลาวด์</translation>
     </message>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>ท้องถิ่น</translation>
     </message>
   </context>
   <context>
