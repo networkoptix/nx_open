@@ -68,14 +68,8 @@ Item
     {
         target: controller.mediaPlayer
 
-        function onPlaybackStateChanged()
-        {
-            var state = controller.mediaPlayer.playbackState
-            if (state == MediaPlayer.Previewing)
-                return //< In case of previewing we do not change paused state.
-
-            videoNavigation.paused = state != MediaPlayer.Playing
-        }
+        function onPlaybackStateChanged() { d.updateNavigation() }
+        function onMediaStatusChanged() { d.updateNavigation() }
     }
 
     NxObject
@@ -115,6 +109,16 @@ Item
             interval: 10
             repeat: false
             onTriggered: d.updateWarningText()
+        }
+
+        function updateNavigation()
+        {
+            const state = controller.mediaPlayer.playbackState
+            if (state == MediaPlayer.Previewing) //< Do not change the paused state during preview.
+                return
+
+            const hasMedia = controller.mediaPlayer.mediaStatus != MediaPlayer.NoMedia
+            videoNavigation.paused = hasMedia && state != MediaPlayer.Playing
         }
 
         function updateWarningText()
