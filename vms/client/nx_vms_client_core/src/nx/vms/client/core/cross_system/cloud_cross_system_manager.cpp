@@ -143,13 +143,31 @@ void CloudCrossSystemManager::Private::setCloudSystems(
         emit q->systemFound(systemId);
     }
 
+    // Gather all connections to be removed.
+    std::vector<std::future<void>> remainingConnections;
+
     for (const auto& systemId: removedCloudIds)
     {
         NX_VERBOSE(this, "Cloud system %1 is lost", cloudSystems[systemId].get());
         emit q->systemAboutToBeLost(systemId);
-        cloudSystems.erase(systemId);
+        if (auto it = cloudSystems.find(systemId); it != cloudSystems.end())
+        {
+            if (it->second)
+            {
+                auto future = it->second->takeConnectionFuture();
+                if (future.valid())
+                    remainingConnections.push_back(std::move(future));
+            }
+            cloudSystems.erase(it); //< This should actually trigger future cancellation.
+        }
         emit q->systemLost(systemId);
     }
+
+    if (remainingConnections.empty())
+        return;
+
+    // Avoid blocking current thread (may be main thread) by waiting for futures we no longer need.
+    std::thread([c = std::move(remainingConnections)] {}).detach();
 }
 
 void CloudCrossSystemManager::Private::requestCloudAuthorization()

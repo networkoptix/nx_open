@@ -755,6 +755,14 @@ struct CloudCrossSystemContext::Private
     }
 };
 
+std::future<void> CloudCrossSystemContext::takeConnectionFuture()
+{
+    if (!d->connectionProcess)
+        return {};
+
+    return std::move(d->connectionProcess->future);
+}
+
 CloudCrossSystemContext::CloudCrossSystemContext(
     SystemDescriptionPtr systemDescription,
     QObject* parent)
