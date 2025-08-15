@@ -1008,11 +1008,11 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Đám mây</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -1043,7 +1043,7 @@
     </message>
     <message>
       <source>PENDING</source>
-      <translation type="unfinished">PENDING</translation>
+      <translation>ĐANG CHỜ</translation>
     </message>
   </context>
   <context>
@@ -1110,6 +1110,25 @@
     <message>
       <source>Select All</source>
       <translation>Chọn tất cả</translation>
+    </message>
+  </context>
+  <context>
+    <name>TextSelectionArea</name>
+    <message>
+      <source>Cut</source>
+      <translation type="unfinished">Cut</translation>
+    </message>
+    <message>
+      <source>Copy</source>
+      <translation type="unfinished">Copy</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation type="unfinished">Paste</translation>
+    </message>
+    <message>
+      <source>Select All</source>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

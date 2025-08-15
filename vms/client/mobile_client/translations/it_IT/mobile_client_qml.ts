@@ -1009,11 +1009,11 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Cloud</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Accedi</translation>
     </message>
   </context>
   <context>
@@ -1111,6 +1111,25 @@
     <message>
       <source>Select All</source>
       <translation>Seleziona tutto</translation>
+    </message>
+  </context>
+  <context>
+    <name>TextSelectionArea</name>
+    <message>
+      <source>Cut</source>
+      <translation type="unfinished">Cut</translation>
+    </message>
+    <message>
+      <source>Copy</source>
+      <translation type="unfinished">Copy</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation type="unfinished">Paste</translation>
+    </message>
+    <message>
+      <source>Select All</source>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>
