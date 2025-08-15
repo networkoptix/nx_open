@@ -1378,7 +1378,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>Badanie joysticka</translation>
     </message>
   </context>
   <context>
