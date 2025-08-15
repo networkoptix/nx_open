@@ -82,6 +82,8 @@ public:
 
     nx::Uuid organizationId() const;
 
+    std::future<void> takeConnectionFuture();
+
 signals:
     void needsCloudAuthorizationChanged();
     void statusChanged(Status oldStatus);
