@@ -68,7 +68,9 @@ void mapObjectTypes(
 
     for (taxonomy::ObjectType* objectType: objectTypes)
     {
-        outObjectTypesById.insert(objectType->id(), objectType);
+        for (const auto& id: objectType->typeIds())
+            outObjectTypesById.insert(id, objectType);
+
         mapObjectTypes(objectType->derivedObjectTypes(), outObjectTypesById);
     }
 }
