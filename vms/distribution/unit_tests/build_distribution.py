@@ -276,7 +276,7 @@ def main():
                 a,
                 target_dir=os.path.join(lib_dir, "libcuda_stub"),
                 source_dir=os.path.join(conf.BUILD_DIR, lib_dir, "libcuda_stub"),
-                file_list=["libnvidia-ml.so.1"])
+                file_list=["libnvidia-ml.so.1", "libcuda.so.1"])
 
         # Archive translations
         archiveByGlob(a, "translations", translations_dir,
