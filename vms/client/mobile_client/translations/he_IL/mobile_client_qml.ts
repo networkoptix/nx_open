@@ -1119,19 +1119,19 @@
     <name>TextSelectionArea</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>גזור</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>העתק</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>הדבק</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>בחר הכל</translation>
     </message>
   </context>
   <context>
