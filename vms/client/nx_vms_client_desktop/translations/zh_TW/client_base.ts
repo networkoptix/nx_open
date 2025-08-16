@@ -6625,6 +6625,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
       <translation>需要再%1個適當的雲端儲存服務才能將它們啟用備份</translation>
     </message>
+    <message>
+      <source>Backup will be turned off for newly added cameras on all servers at the site</source>
+      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
