@@ -1353,7 +1353,7 @@
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
-      <translation>匿名統計レポートの更新後の遅延</translation>
+      <translation>更新後の匿名統計レポートの遅延</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL</source>
@@ -1373,7 +1373,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation>時刻同期有効</translation>
+      <translation>時刻同期を有効にする</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1557,7 +1557,7 @@
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation>単一サーバー上のセッショントークン数上限</translation>
+      <translation>単一サーバー上の最大セッショントークン数</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
@@ -1617,7 +1617,7 @@
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation>ストレージ暗号化有効</translation>
+      <translation>ストレージの暗号化を有効にする</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
@@ -1657,7 +1657,7 @@
     </message>
     <message>
       <source>Use only HTTPS for cameras</source>
-      <translation>カメラへの接続にHTTPSのみを使用</translation>
+      <translation>カメラへの接続にHTTPSのみを使用する</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
@@ -1673,7 +1673,7 @@
     </message>
     <message>
       <source>Enable 2FA for the System</source>
-      <translation>システムの二要素認証を有効化</translation>
+      <translation>システムの二要素認証を有効にする</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
@@ -1725,7 +1725,7 @@
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-      <translation>サーバーが RTSP セッションに再接続するまでの連続 RTP エラーの最大数。</translation>
+      <translation>サーバーが RTSP セッションに再接続するまでの連続 RTP エラーの最大数</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
