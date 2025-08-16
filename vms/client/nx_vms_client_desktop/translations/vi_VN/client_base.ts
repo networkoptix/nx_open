@@ -6625,6 +6625,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
       <translation>%1 cần có dịch vụ lưu trữ đám mây phù hợp để kích hoạt tính năng sao lưu.</translation>
     </message>
+    <message>
+      <source>Backup will be turned off for newly added cameras on all servers at the site</source>
+      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>

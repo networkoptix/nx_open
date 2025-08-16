@@ -6736,6 +6736,10 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
       <translation>%1 requírense servizos de almacenamento na nube axeitados para activar a copia de seguridade para eles.</translation>
     </message>
+    <message>
+      <source>Backup will be turned off for newly added cameras on all servers at the site</source>
+      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>

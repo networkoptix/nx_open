@@ -1423,7 +1423,7 @@
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-      <translation>サーバーが RTSP セッションに再接続するまでの連続 RTP エラーの最大数。</translation>
+      <translation>サーバーが RTSP セッションに再接続するまでの連続 RTP エラーの最大数</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
@@ -1464,7 +1464,7 @@
     </message>
     <message>
       <source>Anonymous statistics report delay after update.</source>
-      <translation>匿名統計レポートの更新後の遅延。</translation>
+      <translation>更新後の匿名統計レポートの遅延。</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL.</source>
@@ -1804,7 +1804,7 @@
     </message>
     <message>
       <source>Storage encryption enabled.</source>
-      <translation>ストレージ暗号化を有効にする。</translation>
+      <translation>ストレージの暗号化を有効にする。</translation>
     </message>
     <message>
       <source>Current storage encryption key.</source>

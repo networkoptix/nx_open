@@ -6736,6 +6736,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
       <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
     </message>
+    <message>
+      <source>Backup will be turned off for newly added cameras on all servers at the site</source>
+      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
