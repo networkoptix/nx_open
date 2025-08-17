@@ -2,11 +2,12 @@
 
 #include "cloud_result_messages.h"
 
-#include <nx/network/app_info.h>
-
-#include <nx/utils/log/format.h>
-
 #include <nx/branding.h>
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/common/html/html.h>
 
 QString QnCloudResultMessages::accountNotFound()
 {
@@ -16,10 +17,12 @@ QString QnCloudResultMessages::accountNotFound()
 QString QnCloudResultMessages::accountNotActivated()
 {
     using nx::network::AppInfo;
+    using namespace nx::vms::client::desktop;
 
-    const auto cloudLink = nx::format("<a href=\"%2\">%1</a>").args(
+    const auto cloudLink = nx::vms::common::html::customLink(
         nx::branding::cloudName(),
-        AppInfo::defaultCloudPortalUrl(nx::branding::cloudHost().toStdString()));
+        QString::fromStdString(
+            AppInfo::defaultCloudPortalUrl(nx::network::SocketGlobals::cloud().cloudHost())));
 
     return tr("Account is not activated.")
         + ' '

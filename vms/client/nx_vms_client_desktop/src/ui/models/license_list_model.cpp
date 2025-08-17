@@ -8,11 +8,13 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/branding.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/license/validator.h>
@@ -148,7 +150,7 @@ QVariant QnLicenseListModel::textData(const QModelIndex& index, bool fullText) c
         case ServerColumn:
         {
             if (license->type() == Qn::LC_SaasLocalRecording)
-                return nx::branding::cloudHost();
+                return QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
             auto server = serverByLicense(license);
             if (!server)
                 return tr("Server not found");

@@ -12,8 +12,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("desktop_client.ini") { reload(); }
 
-    bool isAutoCloudHostDeductionMode() const;
-
     // ---------------------------------------------------------------------------------------------
     // Developers' section
     // Flags here can be removed by developers' decision.
@@ -33,10 +31,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(false, profilerMode,
         "[Dev] Enables client profiling mode. Includes only statistics panel display as of now.");
-
-    NX_INI_STRING("", cloudHost,
-        "[Dev] Overrides the current Client's Cloud Host. Allows to connect to the Server that \n"
-        "uses the specified Cloud Host. Use 'auto' to allow client switch cloud host on the fly.");
 
     NX_INI_FLAG(true, limitFrameRate,
         "[Dev] Limits client frame rate to the maximum of 60 fps. Forces VSync on the video \n"
