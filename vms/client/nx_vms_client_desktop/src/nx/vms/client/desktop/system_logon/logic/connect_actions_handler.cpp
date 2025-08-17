@@ -44,6 +44,7 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
@@ -675,7 +676,7 @@ void ConnectActionsHandler::switchCloudHostIfNeeded(const QString& remoteCloudHo
     if (remoteCloudHost.isEmpty())
         return;
 
-    if (!ini().isAutoCloudHostDeductionMode())
+    if (!core::ini().isAutoCloudHostDeductionMode())
         return;
 
     const auto activeCloudHost = nx::network::SocketGlobals::cloud().cloudHost();

@@ -10,6 +10,8 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_vms_client_core.ini") { reload(); }
 
+    bool isAutoCloudHostDeductionMode() const;
+
     // VMS-30347.
     NX_INI_INT(8, maxLastConnectedTilesStored,
         "[Support] Maximum last connected systems tiles stored on the Welcome Screen");
@@ -120,6 +122,11 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(false, vectorizationSearchEnabled,
         "[Dev] Enable analytics search using vectorization.");
+
+    NX_INI_STRING("", cloudHost,
+        "[Dev] Overrides the current Client's Cloud Host. Allows to connect to the Server that \n"
+        "uses the specified Cloud Host. Use 'auto' to allow client switch cloud host on the fly.");
+
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();

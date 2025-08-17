@@ -46,6 +46,7 @@
 #include <nx/vms/client/core/analytics/object_display_settings.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
@@ -163,13 +164,6 @@ nx::vms::api::PeerType peerType(const QnStartupParameters& startupParams)
     return startupParams.videoWallGuid.isNull()
         ? nx::vms::api::PeerType::desktopClient
         : nx::vms::api::PeerType::videowallClient;
-}
-
-QString actualCloudHost()
-{
-    return ini().isAutoCloudHostDeductionMode()
-        ? QString()
-        : ini().cloudHost;
 }
 
 Qn::SerializationFormat appSerializationFormat(const QnStartupParameters& startupParameters)
@@ -537,7 +531,7 @@ struct ApplicationContext::Private
         if (ini().developerMode || ini().demoMode)
             developerFlags.setFlag(DeveloperFlag::ignoreCustomization);
 
-        if (ini().isAutoCloudHostDeductionMode())
+        if (core::ini().isAutoCloudHostDeductionMode())
             developerFlags.setFlag(DeveloperFlag::ignoreCloudHost);
 
         if (ini().developerMode || startupParameters.isVideoWallLauncherMode())
@@ -721,7 +715,7 @@ ApplicationContext::ApplicationContext(
         appSerializationFormat(startupParameters),
         peerType(startupParameters),
         features.core,
-        actualCloudHost(),
+        /*customCloudHost*/ QString(),
         /*customExternalResourceFile*/ "client_external.dat",
         parent),
     d(new Private{

@@ -11,21 +11,22 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <mobile_client/mobile_client_settings.h>
-#include <nx/branding.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/api/data/bookmark_models.h>
-#include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/watchers/feature_access_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/system_context_accessor.h>
-#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/ui/share_link_helper.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/common/api/helpers/bookmark_api_converter.h>
 #include <nx/vms/text/human_readable.h>
 #include <utils/common/delayed.h>
@@ -66,14 +67,9 @@ void ShareBookmarkBackend::Private::shareBookmarkLink(const QString& bookmarkFul
         return;
 
     const auto systemId = context->cloudSystemId();
-    const auto customCloudHost = qnSettings->customCloudHost();
-    const auto cloudHost = customCloudHost.isEmpty()
-        ? nx::branding::cloudHost()
-        : customCloudHost;
-
     const auto result = network::url::Builder()
         .setScheme(network::http::kSecureUrlSchemeName)
-        .setHost(cloudHost)
+        .setHost(nx::network::SocketGlobals::cloud().cloudHost())
         .setPath(QString("share/%1/%2").arg(systemId, bookmarkFullId))
         .toUrl().toQUrl();
 

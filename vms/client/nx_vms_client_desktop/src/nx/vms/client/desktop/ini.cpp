@@ -12,12 +12,4 @@ Ini& ini()
     return ini;
 }
 
-bool Ini::isAutoCloudHostDeductionMode() const
-{
-    // Allow to connect to any cloud host in demo mode if cloud host is not passed explicitly.
-    QString cloudHost(this->cloudHost);
-    return cloudHost == "auto"
-        || (cloudHost.isEmpty() && demoMode);
-}
-
 } // namespace nx::vms::client::desktop

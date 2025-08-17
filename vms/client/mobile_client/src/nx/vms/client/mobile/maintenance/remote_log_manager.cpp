@@ -6,8 +6,8 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QtQml>
 
-#include <nx/branding.h>
 #include <mobile_client/mobile_client_settings.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/maintenance/log/collector_api_paths.h>
 #include <nx/network/maintenance/log/uploader.h>
@@ -60,7 +60,7 @@ RemoteLogManager::RemoteLogManager(QObject* parent):
 
             const auto url = nx::network::url::Builder()
                 .setScheme(nx::network::http::kUrlSchemeName)
-                .setHost(nx::branding::cloudHost())
+                .setHost(nx::network::SocketGlobals::cloud().cloudHost())
                 .setPath(nx::network::maintenance::log::kLogCollectorPathPrefix);
             return std::make_unique<UploaderManager>(url, logUploadFilter);
 

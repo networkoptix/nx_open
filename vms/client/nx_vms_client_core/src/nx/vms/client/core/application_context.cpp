@@ -23,6 +23,7 @@
 #include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/core/cross_system/cross_system_layouts_watcher.h>
 #include <nx/vms/client/core/event_search/models/visible_item_data_decorator_model.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
@@ -76,6 +77,17 @@ static void initializeResources()
 }
 
 namespace nx::vms::client::core {
+
+namespace {
+
+QString actualCloudHost(const QString& customCloudHost)
+{
+    return ini().isAutoCloudHostDeductionMode()
+        ? customCloudHost
+        : ini().cloudHost;
+}
+
+} // namespace
 
 using CommonFeatureFlag = common::ApplicationContext::FeatureFlag;
 
@@ -217,7 +229,7 @@ ApplicationContext::ApplicationContext(
     common::ApplicationContext(
         peerType,
         features.base,
-        customCloudHost,
+        actualCloudHost(customCloudHost),
         parent),
     d(new Private{
         .q = this,
