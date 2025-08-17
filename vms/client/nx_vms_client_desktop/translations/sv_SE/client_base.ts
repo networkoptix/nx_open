@@ -6738,7 +6738,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>Säkerhetskopiering kommer att inaktiveras för nyligen tillagda kameror på alla servrar på platsen</translation>
     </message>
   </context>
   <context>
