@@ -16,6 +16,14 @@
 namespace nx {
 namespace utils {
 
+template<typename T>
+std::future<std::remove_cvref_t<T>> makeReadyFuture(T&& value)
+{
+    std::promise<std::remove_cvref_t<T>> p;
+    p.set_value(std::forward<T>(value));
+    return p.get_future();
+}
+
 //enum class future_status
 //{
 //    ready,
