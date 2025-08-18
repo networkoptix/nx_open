@@ -303,7 +303,7 @@ EventPanel::Private::Private(EventPanel* q):
             }
         });
 
-    action(menu::ResetCurrenTabFiltersAndSelectNotificationsTabAction)->trigger();
+    menu()->trigger(menu::ResetCurrenTabFiltersAndSelectNotificationsTabAction);
 
     connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
         this, &Private::updateUnreadCounter);

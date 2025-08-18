@@ -7,6 +7,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -181,7 +182,7 @@ void VmsRulesDialog::resetToDefaults()
 
 void VmsRulesDialog::openEventLogDialog()
 {
-    action(menu::OpenEventLogAction)->trigger();
+    menu()->trigger(menu::OpenEventLogAction);
 }
 
 void VmsRulesDialog::openTestEventDialog()

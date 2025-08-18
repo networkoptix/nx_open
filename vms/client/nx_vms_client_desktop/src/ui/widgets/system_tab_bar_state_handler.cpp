@@ -131,7 +131,7 @@ void SystemTabBarStateHandler::handleStateChanged(const State& state)
         if (session)
             session->autoTerminateIfNeeded();
 
-        action(menu::DisconnectAction)->trigger();
+        menu()->trigger(menu::DisconnectAction);
     }
 }
 

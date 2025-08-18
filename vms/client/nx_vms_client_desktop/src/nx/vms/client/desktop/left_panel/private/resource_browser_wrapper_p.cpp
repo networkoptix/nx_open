@@ -154,7 +154,7 @@ ResourceBrowserWrapper::ResourceBrowserWrapper(
         {
             if (m_focusScope)
                 m_focusScope->setFocus(Qt::ShortcutFocusReason);
-            action(menu::ResourcesTabAction)->trigger();
+            menu()->trigger(menu::ResourcesTabAction);
             invokeQmlMethod<void>(this->resourceBrowser, "focusSearchField");
         });
 
@@ -163,7 +163,7 @@ ResourceBrowserWrapper::ResourceBrowserWrapper(
         {
             if (m_focusScope)
                 m_focusScope->setFocus(Qt::ShortcutFocusReason);
-            action(menu::ResourcesTabAction)->trigger();
+            menu()->trigger(menu::ResourcesTabAction);
             tree.startEditing();
         });
 
@@ -174,7 +174,7 @@ ResourceBrowserWrapper::ResourceBrowserWrapper(
                 return;
 
             QScopedValueRollback<bool> guard(m_inSelection, true);
-            action(menu::SelectionChangeAction)->trigger();
+            menu()->trigger(menu::SelectionChangeAction);
         });
 
     connect(action(menu::SelectionChangeAction), &QAction::triggered,
@@ -267,7 +267,7 @@ void ResourceBrowserWrapper::handleNewResourceItemAction()
         1,
         Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
 
-    action(menu::ResourcesTabAction)->trigger();
+    menu()->trigger(menu::ResourcesTabAction);
     tree.setSelection(indexes);
 }
 
