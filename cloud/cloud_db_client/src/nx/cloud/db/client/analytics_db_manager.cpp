@@ -19,15 +19,13 @@ namespace nx::cloud::db::client {
 
 using namespace nx::network::http;
 
-AnalyticsDbManager::AnalyticsDbManager(ApiRequestsExecutor* requestsExecutor):
+AnalyticsDbManager::AnalyticsDbManager(
+    ApiRequestsExecutor* requestsExecutor)
+    :
     m_requestsExecutor(requestsExecutor)
 {
     const QString customUrl(nx::cloud::db::api::ini().customizedAnalyticsDbUrl);
-    if (customUrl.isEmpty())
-    {
-        m_requestsExecutor = requestsExecutor;
-    }
-    else
+    if (!customUrl.isEmpty())
     {
         m_customRequestExecutor = std::make_unique<ApiRequestsExecutor>(
             nx::Url::fromUserInput(customUrl),
@@ -35,17 +33,27 @@ AnalyticsDbManager::AnalyticsDbManager(ApiRequestsExecutor* requestsExecutor):
         m_customRequestExecutor->setRequestTimeout(std::chrono::seconds(60));
 
         m_customRequestExecutor->bindToAioThread(m_requestsExecutor->getAioThread());
-        m_customRequestExecutor->httpClientOptions().setCredentials(m_requestsExecutor->httpClientOptions().credentials());
         m_customRequestExecutor->httpClientOptions().setAdditionalHeaders(m_requestsExecutor->httpClientOptions().additionalHeaders());
-        m_requestsExecutor = m_customRequestExecutor.get();
     }
+}
+
+ApiRequestsExecutor* AnalyticsDbManager::requestExecutor()
+{
+    if (m_customRequestExecutor)
+    {
+        auto credentials = m_requestsExecutor->getHttpCredentials();
+        if (credentials)
+            m_customRequestExecutor->httpClientOptions().setCredentials(*credentials);
+        return m_customRequestExecutor.get();
+    }
+    return m_requestsExecutor;
 }
 
 void AnalyticsDbManager::saveTracks(
     const api::SaveTracksData& data,
     nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
-    m_requestsExecutor->makeAsyncCall<void>(
+    requestExecutor()->makeAsyncCall<void>(
         Method::post,
         kTracksPath,
         /*urlQuery*/{ "vectorize=true" },
@@ -57,7 +65,7 @@ void AnalyticsDbManager::getTracks(
     const api::GetTracksParamsData& filter,
     nx::MoveOnlyFunc<void(api::ResultCode, const api::ReadTracksData& data)> completionHandler)
 {
-    m_requestsExecutor->makeAsyncCall<api::ReadTracksData>(
+    requestExecutor()->makeAsyncCall<api::ReadTracksData>(
         Method::get,
         kTracksPath,
         filter.toUrlQuery(),
@@ -85,7 +93,7 @@ void AnalyticsDbManager::getTrackPeriods(
     auto query = filter.toUrlQuery();
     query.addQueryItem("interval", kAgregationIntervalSec); //< Aggregation interval. So far use same value as VMS.
     query.addQueryItem("resultInIntervals", "true");
-    m_requestsExecutor->makeAsyncCall<std::vector<int64_t>>(
+    requestExecutor()->makeAsyncCall<std::vector<int64_t>>(
         Method::get,
         kCompressedTrackPeriodsPath,
         query,
@@ -116,7 +124,7 @@ void AnalyticsDbManager::getBestShotImage(
     const nx::Uuid& trackId,
     nx::MoveOnlyFunc<void(api::ResultCode, const api::TrackImageData& image)> completionHandler)
 {
-    m_requestsExecutor->makeAsyncCall<void, ResponseFetcher>(
+    requestExecutor()->makeAsyncCall<void, ResponseFetcher>(
         Method::get,
         nx::network::http::rest::substituteParameters(kBestShotImagePath, { trackId.toSimpleStdString() }),
         /*urlQuery*/{},
@@ -127,7 +135,7 @@ void AnalyticsDbManager::getTitleImage(
     const nx::Uuid& trackId,
     nx::MoveOnlyFunc<void(api::ResultCode, const api::TrackImageData& image)> completionHandler)
 {
-    m_requestsExecutor->makeAsyncCall<void, ResponseFetcher>(
+    requestExecutor()->makeAsyncCall<void, ResponseFetcher>(
         Method::get,
         nx::network::http::rest::substituteParameters(kTitleImagePath, { trackId.toSimpleStdString()}),
         /*urlQuery*/{},

@@ -12,7 +12,9 @@ class AnalyticsDbManager:
     public api::AnalyticsDbManager
 {
 public:
-    AnalyticsDbManager(ApiRequestsExecutor* requestsExecutor);
+
+    AnalyticsDbManager(
+        ApiRequestsExecutor* requestsExecutor);
 
     virtual void saveTracks(
         const api::SaveTracksData& data,
@@ -34,6 +36,8 @@ public:
         const nx::Uuid& trackId,
         nx::MoveOnlyFunc<void(api::ResultCode, const api::TrackImageData& image)> completionHandler) override;
 
+private:
+    ApiRequestsExecutor* requestExecutor();
 private:
     std::unique_ptr<ApiRequestsExecutor> m_customRequestExecutor;
     ApiRequestsExecutor* m_requestsExecutor = nullptr;

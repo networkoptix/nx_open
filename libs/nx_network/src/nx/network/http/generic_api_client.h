@@ -106,6 +106,8 @@ public:
         return std::exchange(this->m_lastResponseHeaders, {});
     }
 
+    const nx::Url& baseApiUrl() const;
+
 protected:
     /**
      * @param ResponseFetchers 0 or more fetchers applied to the HTTP response object.
@@ -146,8 +148,6 @@ protected:
 
 protected:
     virtual void stopWhileInAioThread() override;
-
-    const nx::Url& baseApiUrl() const;
 
 private:
     struct Context
@@ -313,7 +313,7 @@ void GenericApiClient<ResultCode, Base>::setHttpCredentials(Credentials credenti
 template<HasResultCodeT ResultCode, typename Base>
 std::optional<Credentials> GenericApiClient<ResultCode, Base>::getHttpCredentials() const
 {
-    return !m_clientOptions.credentials().username.empty()
+    return !m_clientOptions.credentials().authToken.empty()
         ? std::make_optional(m_clientOptions.credentials()) : std::nullopt;
 }
 
