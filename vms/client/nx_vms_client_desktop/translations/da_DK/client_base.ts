@@ -6738,7 +6738,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>Backup vil blive slået fra for nyligt tilføjede kameraer på alle servere på webstedet</translation>
     </message>
   </context>
   <context>
@@ -8938,7 +8938,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
-      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
+      <translation>Opdel fil efter størrelse skal være større end 10 MB og mindre end eller lig med halvdelen af en værdi, der er angivet for Begræns maks. volumen</translation>
     </message>
   </context>
   <context>
