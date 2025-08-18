@@ -35,14 +35,6 @@
 namespace nx {
 namespace audio {
 
-namespace {
-
-#if defined(Q_OS_WINDOWS)
-    static LPALCREOPENDEVICESOFT alcReopenDeviceSOFT = nullptr;
-#endif
-
-} // unnamed namespace
-
 #if defined(Q_OS_ANDROID)
     int AudioDevice::internalBufferInSamples(ALCdevice* device)
     {
@@ -69,13 +61,6 @@ AudioDevice *AudioDevice::instance()
 AudioDevice::AudioDevice(QObject* parent):
     QObject(parent)
 {
-    #if defined(__SANITIZE_ADDRESS__) && defined(Q_OS_WINDOWS)
-        // According to the following thread, this issue most probably won't be fixed.
-        // https://developercommunity.visualstudio.com/t/ASAN-x64-causes-unhandled-exception-at-0/1365655
-        NX_INFO(this, "Audio output is disabled due to conflict with ASan on Windows");
-        return;
-    #endif
-
     #if defined(OPENAL_STATIC)
         alc_init();
         NX_DEBUG(this, "OpenAL init");
@@ -95,7 +80,7 @@ AudioDevice::AudioDevice(QObject* parent):
     }
 
     #if defined(Q_OS_WINDOWS)
-        setupReopenCallback();
+        setupReopenCallback(true);
     #endif
 
     m_context = alcCreateContext(m_device, nullptr);
@@ -126,6 +111,10 @@ void AudioDevice::deinitialize()
 {
     if (m_device)
     {
+        #if defined(Q_OS_WINDOWS)
+            setupReopenCallback(false);
+        #endif
+
         // Disable context
         if (m_context)
         {
@@ -215,27 +204,28 @@ Sound* AudioDevice::createSound(const nx::media::audio::Format& format) const
 }
 
 #if defined(Q_OS_WINDOWS)
-    void AudioDevice::setupReopenCallback()
+    void AudioDevice::setupReopenCallback(bool on)
     {
-        LPALCEVENTCONTROLSOFT alcEventControlSOFT;
-        LPALCEVENTCALLBACKSOFT alcEventCallbackSOFT;
-
-        alcReopenDeviceSOFT = reinterpret_cast<LPALCREOPENDEVICESOFT>(
+        static auto alcReopenDeviceSOFT = reinterpret_cast<LPALCREOPENDEVICESOFT>(
             alcGetProcAddress(m_device, "alcReopenDeviceSOFT"));
-        alcEventControlSOFT = reinterpret_cast<LPALCEVENTCONTROLSOFT>(
+        static auto alcEventControlSOFT = reinterpret_cast<LPALCEVENTCONTROLSOFT>(
             alGetProcAddress("alcEventControlSOFT"));
-        alcEventCallbackSOFT = reinterpret_cast<LPALCEVENTCALLBACKSOFT>(
+        static auto alcEventCallbackSOFT = reinterpret_cast<LPALCEVENTCALLBACKSOFT>(
             alGetProcAddress("alcEventCallbackSOFT"));
 
         if (alcReopenDeviceSOFT && alcEventControlSOFT && alcEventCallbackSOFT)
         {
             const std::array<ALenum,1> evt_types{{ALC_EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT}};
-            alcEventControlSOFT(static_cast<ALsizei>(evt_types.size()), evt_types.data(), AL_TRUE);
+            alcEventControlSOFT(
+                static_cast<ALsizei>(evt_types.size()), evt_types.data(), on ? AL_TRUE : AL_FALSE);
+
+            if (!on)
+                return;
 
             alcEventCallbackSOFT(
                 [](
                     ALCenum eventType,
-                    ALCenum,
+                    ALCenum deviceType,
                     ALCdevice*,
                     ALCsizei,
                     const ALCchar*,
@@ -243,6 +233,9 @@ Sound* AudioDevice::createSound(const nx::media::audio::Format& format) const
                 ) noexcept -> void
                 {
                     if (eventType != ALC_EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT)
+                        return;
+
+                    if (deviceType != ALC_PLAYBACK_DEVICE_SOFT)
                         return;
 
                     auto audioDevice = reinterpret_cast<AudioDevice*>(userParam);

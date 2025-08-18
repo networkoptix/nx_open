@@ -26,9 +26,6 @@ class AudioDevice: public QObject
 public:
     static AudioDevice* instance();
 
-    AudioDevice(QObject* parent = nullptr);
-    ~AudioDevice();
-
     void deinitialize();
 
     Sound* createSound(const nx::media::audio::Format& format) const;
@@ -56,6 +53,12 @@ public:
     QString versionString() const;
     static QString company();
 
+protected:
+    // Make sure the object is available only as a singleton, otherwise global callbacks may not
+    // work properly.
+    AudioDevice(QObject* parent = nullptr);
+    virtual ~AudioDevice() override;
+
 private:
     friend class Sound;
 
@@ -66,7 +69,7 @@ private:
 
 private:
     #if defined(Q_OS_WINDOWS)
-        void setupReopenCallback();
+        void setupReopenCallback(bool on);
     #endif
 
 signals:
