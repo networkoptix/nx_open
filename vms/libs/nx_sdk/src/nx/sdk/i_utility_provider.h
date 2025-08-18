@@ -132,7 +132,7 @@ public:
     virtual void updated(const char* token) const = 0;
 };
 
-class IUtilityProvider: public Interface<IUtilityProvider5, IUtilityProvider4>
+class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider4>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider5"); }
