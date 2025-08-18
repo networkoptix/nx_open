@@ -1092,6 +1092,10 @@ struct ModifyStorageAccess
         data.request = param;
         amendOutputDataIfNeeded(accessData, systemContext->resourceAccessManager(), &data.request);
 
+        NX_DEBUG(this,
+            "Checking that the storage with url %1 doesn't already exist on the current server",
+            nx::utils::url::hidePassword(param.url));
+
         if (!existingResource)
         {
             const auto existingStorages = resourcePool->getResources<QnStorageResource>(
@@ -1099,6 +1103,17 @@ struct ModifyStorageAccess
                 {
                     return s->getParentId() == param.parentId;
                 });
+
+            if (nx::log::isToBeLogged(nx::log::Level::verbose))
+            {
+                std::vector<QString> existingUrls;
+                std::transform(
+                    existingStorages.cbegin(), existingStorages.cend(),
+                    std::back_inserter(existingUrls),
+                    [](const auto& s) {return nx::utils::url::hidePassword(s->getUrl()); });
+
+                NX_DEBUG(this, "Existing storage urls: %1", existingUrls);
+            }
 
             const bool hasStorageWithSameUrl = std::any_of(
                 existingStorages.cbegin(), existingStorages.cend(),
@@ -1116,6 +1131,8 @@ struct ModifyStorageAccess
                     ErrorCode::forbidden,
                     detail::ServerApiErrors::tr("Storage with the same url already exists"));
             }
+
+            NX_DEBUG(this, "No storage with the same url found");
         }
 
         return transaction_descriptor::canModifyStorage(systemContext, data);
