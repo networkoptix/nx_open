@@ -1167,7 +1167,7 @@ void QnMediaResourceWidget::createButtons()
                 if (on)
                     selectThisWidget(true);
                 else
-                    action(menu::ResetCurrenTabFiltersAndSelectNotificationsTabAction)->trigger();
+                    menu()->trigger(menu::ResetCurrenTabFiltersAndSelectNotificationsTabAction);
             }
 
             action(menu::ObjectSearchModeAction)->setChecked(on);

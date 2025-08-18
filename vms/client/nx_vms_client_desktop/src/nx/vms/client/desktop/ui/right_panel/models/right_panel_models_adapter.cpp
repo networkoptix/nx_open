@@ -552,7 +552,7 @@ void RightPanelModelsAdapter::showOnLayout(int row)
     if (!NX_ASSERT(row >= 0))
         return;
 
-    d->context()->menu()->action(menu::ObjectsTabAction)->trigger();
+    d->context()->menu()->trigger(menu::ObjectsTabAction);
 
     // Bring main window to front, event from minimized state.
     const auto mainWindow = d->context()->mainWindowWidget();
