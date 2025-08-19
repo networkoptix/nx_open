@@ -60,13 +60,13 @@ OrderedRequestsHelper::~OrderedRequestsHelper()
 }
 
 bool OrderedRequestsHelper::postJsonResult(
-    const rest::ServerConnectionPtr& connection,
+    const rest::ServerConnectionWeakPtr& connection,
     const QString& action,
     const nx::network::rest::Params& params,
     rest::JsonResultCallback&& callback,
     QThread* thread)
 {
-    if (!connection)
+    if (connection.expired())
         return false;
 
     auto internalCallback = nx::utils::guarded(this,
@@ -92,9 +92,9 @@ bool OrderedRequestsHelper::postJsonResult(
         [connection, action, params, internalCallback = std::move(internalCallback),
             thread]() mutable -> rest::Handle
         {
-            if (connection)
+            if (auto api = connection.lock())
             {
-                return connection->postJsonResult(
+                return api->postJsonResult(
                     action, params, {}, std::move(internalCallback), thread);
             }
 
@@ -115,13 +115,13 @@ bool OrderedRequestsHelper::postJsonResult(
 }
 
 bool OrderedRequestsHelper::getJsonResult(
-    const rest::ServerConnectionPtr& connection,
+    const rest::ServerConnectionWeakPtr& connection,
     const QString& action,
     const nx::network::rest::Params& params,
     rest::JsonResultCallback&& callback,
     QThread* thread)
 {
-    if (!connection)
+    if (connection.expired())
         return false;
 
     auto internalCallback = nx::utils::guarded(this,
@@ -147,9 +147,9 @@ bool OrderedRequestsHelper::getJsonResult(
         [connection, action, params, internalCallback = std::move(internalCallback),
             thread]() mutable -> rest::Handle
         {
-            if (connection)
+            if (auto api = connection.lock())
             {
-                return connection->getJsonResult(
+                return api->getJsonResult(
                     action, params, std::move(internalCallback), thread);
             }
 
