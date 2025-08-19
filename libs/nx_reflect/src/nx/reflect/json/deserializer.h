@@ -80,15 +80,28 @@ DeserializationResult deserialize(
     std::enable_if_t<std::is_floating_point_v<T>>* = nullptr)
 {
     if (ctx.value.IsDouble())
+    {
         *data = (T) ctx.value.GetDouble();
+    }
     else if (ctx.value.IsInt64())
-        *data = (T) ctx.value.GetInt64();
+    {
+        auto origin = ctx.value.GetInt64();
+        auto converted = static_cast<T>(origin);
+        if (static_cast<int64_t>(converted) != origin)
+            return {false, "Too big integer", getStringRepresentation(ctx.value)};
+
+        *data = converted;
+    }
     else if (ctx.value.IsString())
+    {
         *data = (T) std::stod(std::string(ctx.value.GetString(), ctx.value.GetStringLength()));
+    }
     else
+    {
         // Null value should raise failure here to make sure existing field value is not
         // overwritten with the default-initialized one.
         return DeserializationResult(false);
+    }
 
     return DeserializationResult(true);
 }
@@ -370,8 +383,30 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
         *data = T();
         if (ctx.value.IsNumber())
         {
-            *data = static_cast<T>(ctx.value.GetInt64());
-            return DeserializationResult(true);
+            const auto setIfFit =
+                [data, &ctx]<typename U>(U origin, const char* error) -> DeserializationResult
+                {
+                    auto converted = static_cast<T>(origin);
+                    if constexpr (std::is_signed_v<T> && std::is_unsigned_v<U>)
+                    {
+                        if (converted < T(0))
+                            return {false, error, getStringRepresentation(ctx.value)};
+                    }
+                    if (static_cast<U>(converted) != origin)
+                        return {false, error, getStringRepresentation(ctx.value)};
+                    *data = converted;
+                    return {};
+                };
+            return
+                ctx.value.IsInt64()
+                    ? setIfFit(ctx.value.GetInt64(), "Too big integral")
+                    : ctx.value.IsUint64()
+                        ? setIfFit(ctx.value.GetUint64(), "Too big integral")
+                        : ctx.value.IsInt()
+                            ? setIfFit(ctx.value.GetInt(), "Too big integral")
+                            : ctx.value.IsUint()
+                                ? setIfFit(ctx.value.GetUint(), "Too big integral")
+                                : setIfFit(ctx.value.GetDouble(), "Must be integral");
         }
         if (ctx.value.IsString())
         {
