@@ -31,6 +31,8 @@ public:
 
     void setPreventDefaultContextMenu(bool value);
 
+    virtual void moveToDedicatedWindow() override;
+
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;
 

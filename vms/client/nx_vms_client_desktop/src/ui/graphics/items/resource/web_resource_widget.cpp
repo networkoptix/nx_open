@@ -377,6 +377,15 @@ void QnWebResourceWidget::setPreventDefaultContextMenu(bool value)
     m_webEngineView->controller()->setWebPageContextMenuEnabled(value);
 }
 
+void QnWebResourceWidget::moveToDedicatedWindow()
+{
+    menu::Parameters parameters{resource()};
+    parameters.setArgument(nx::vms::client::core::ActivateLinkRole, m_webEngineView->url());
+
+    if (NX_ASSERT(menu()->triggerIfPossible(menu::OpenInDedicatedWindowAction, parameters)))
+        close();
+}
+
 bool QnWebResourceWidget::verifyCertificate(const QString& pemString, const QUrl& url)
 {
     // Certificate have not passed validation if this method is called.

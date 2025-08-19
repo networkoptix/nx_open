@@ -23,5 +23,5 @@ public:
 private:
     void addNewWebPage(nx::vms::api::WebPageSubtype subtype);
     void editWebPage();
-    void openInDedicatedWindow(const QnWebPageResourcePtr& webPage);
+    void openInDedicatedWindow(const QnWebPageResourcePtr& webPage, const QString& url = {});
 };

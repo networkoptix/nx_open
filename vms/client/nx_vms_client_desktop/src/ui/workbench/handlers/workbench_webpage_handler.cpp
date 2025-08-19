@@ -92,7 +92,10 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                 if (!webPage)
                     continue;
 
-                openInDedicatedWindow(webPage);
+                const auto url = parameters.argument(
+                    nx::vms::client::core::ActivateLinkRole, webPage->getUrl());
+
+                openInDedicatedWindow(webPage, url);
             }
         });
 
@@ -245,7 +248,9 @@ void QnWorkbenchWebPageHandler::editWebPage()
     dialog->show();
 }
 
-void QnWorkbenchWebPageHandler::openInDedicatedWindow(const QnWebPageResourcePtr& webPage)
+void QnWorkbenchWebPageHandler::openInDedicatedWindow(
+    const QnWebPageResourcePtr& webPage,
+    const QString& url)
 {
     const auto proxyResource =
         webPage->getOptions().testFlag(QnWebPageResource::Proxied)
@@ -265,7 +270,7 @@ void QnWorkbenchWebPageHandler::openInDedicatedWindow(const QnWebPageResourcePtr
         | Qt::WindowCloseButtonHint);
 
     webDialog->init(
-        webPage->getUrl(),
+        url.isEmpty() ? webPage->getUrl() : url,
         /*enableClientApi*/ webPage->getOptions().testFlag(QnWebPageResource::Integration),
         windowContext(),
         proxyResource,
