@@ -5,6 +5,7 @@
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/engine.h>
@@ -132,7 +133,7 @@ void VmsRulesDialog::resetToDefaults()
 
 void VmsRulesDialog::openEventLogDialog()
 {
-    action(ui::action::OpenEventLogAction)->trigger();
+    menu()->trigger(ui::action::OpenEventLogAction);
 }
 
 void VmsRulesDialog::deleteRuleImpl(nx::Uuid id)
