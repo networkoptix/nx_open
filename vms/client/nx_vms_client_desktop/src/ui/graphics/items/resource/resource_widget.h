@@ -316,7 +316,7 @@ public:
     /** Debug string representation. */
     QString toString() const;
 
-    void moveToDedicatedWindow();
+    virtual void moveToDedicatedWindow();
 
     void deinitialize();
 
