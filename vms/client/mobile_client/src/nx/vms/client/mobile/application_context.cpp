@@ -266,6 +266,8 @@ ApplicationContext::ApplicationContext(
             d->windowContext->uiController()->screens()->showCloudLoginScreen(
                 /*reauthentication*/ true);
         });
+
+    connect(qApp, &QGuiApplication::aboutToQuit, this, &ApplicationContext::closeWindow);
 }
 
 ApplicationContext::~ApplicationContext()
@@ -316,10 +318,12 @@ void ApplicationContext::closeWindow()
     if (!NX_ASSERT(d->windowContext))
         return;
 
-    // Make sure all QML instances are destroyed before window contexts is disappeared.
-    const auto window = d->windowContext->mainWindow();
-    window->deleteLater();
-    QObject::connect(window, &QObject::destroyed, qApp, &QGuiApplication::quit);
+    if (const auto window = d->windowContext->mainWindow())
+    {
+        // Make sure all QML instances are destroyed before window contexts is disappeared.
+        window->deleteLater();
+        QObject::connect(window, &QObject::destroyed, qApp, &QGuiApplication::quit);
+    }
 }
 
 QnMobileAppInfo* ApplicationContext::appInfo() const
