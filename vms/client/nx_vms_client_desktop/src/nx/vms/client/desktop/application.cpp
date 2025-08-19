@@ -328,8 +328,9 @@ void setGraphicsSettings()
         }
     }
 
-    const auto gpuInfo = gpu::selectDevice(graphicsApi, ini().gpuName);
+    static const char* kChromiumFlags = "QTWEBENGINE_CHROMIUM_FLAGS";
 
+    const auto gpuInfo = gpu::selectDevice(graphicsApi, ini().gpuName);
     if (gpuInfo.name.toLower().contains("nvidia") && graphicsApi == GraphicsApi::vulkan)
     {
         // Nvidia drivers cannot create more than 5 VK devices, so enable device sharing.
@@ -340,19 +341,18 @@ void setGraphicsSettings()
 
         // Chromium blocks WebGL on mobile tegra when using ANGLE vulkan backend.
         if (nx::build_info::isArm())
-        {
-            static const char* kChromiumFlags = "QTWEBENGINE_CHROMIUM_FLAGS";
-            auto value = qgetenv(kChromiumFlags);
-            qputenv(kChromiumFlags, value + " --ignore-gpu-blocklist");
-        }
+            qputenv(kChromiumFlags, qgetenv(kChromiumFlags) + " --ignore-gpu-blocklist");
     }
 
-    if (nx::build_info::isLinux()
-        && gpuInfo.name.toLower().contains("intel")
-        && appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::autoselect)
+    if (nx::build_info::isLinux() && gpuInfo.name.toLower().contains("intel"))
     {
         // Never autoselect Intel+Vulkan on Linux - vulkan video support is not reliable.
-        graphicsApi = GraphicsApi::opengl;
+        if (appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::autoselect)
+            graphicsApi = GraphicsApi::opengl;
+
+        // Workaround for a crash within Chromium rendering due to graphic driver issue.
+        if (graphicsApi == GraphicsApi::opengl)
+            qputenv(kChromiumFlags, qgetenv(kChromiumFlags) + " --disable-gpu-compositing");
     }
 
     if (graphicsApi == GraphicsApi::vulkan && nx::build_info::isLinux())
