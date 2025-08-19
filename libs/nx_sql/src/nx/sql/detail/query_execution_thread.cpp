@@ -182,11 +182,11 @@ bool QueryExecutionThread::isDbErrorRecoverable(DBResultCode code)
         case DBResultCode::retryLater:
         case DBResultCode::uniqueConstraintViolation:
         case DBResultCode::logicError:
+        case DBResultCode::externalServiceError:
             return true;
 
         case DBResultCode::ioError:
         case DBResultCode::connectionError:
-        case DBResultCode::externalServiceError:
             return false;
 
         default:
