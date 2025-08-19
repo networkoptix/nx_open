@@ -257,75 +257,75 @@
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</translation>
+      <translation>L'utilisateur &apos;%1(%2)&apos; n'est pas autorisé à modifier les paramètres du serveur.</translation>
     </message>
     <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
-      <translation type="unfinished">Creation of a non-local (%1) User Group is forbidden for VMS.</translation>
+      <translation>La création d’un groupe d’utilisateurs non local (%1) est interdite pour le VMS.</translation>
     </message>
     <message>
       <source>Cannot modify the built-in User Group %1(%2).</source>
-      <translation type="unfinished">Cannot modify the built-in User Group %1(%2).</translation>
+      <translation>Impossible de modifier le groupe d'utilisateurs intégré %1(%2).</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</translation>
+      <translation>L'utilisateur &apos;%1(%2)&apos; n'est pas autorisé à modifier le groupe d'utilisateurs &apos;%3(%4)&apos; avec &apos;%5&apos; droits.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to delete User Groups.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to delete User Groups.</translation>
+      <translation>L'utilisateur &apos;%1(%2)&apos; n'est pas autorisé à supprimer des groupes d'utilisateurs.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to delete the User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to delete the User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</translation>
+      <translation>L'utilisateur &apos;%1(%2)&apos; n'est pas autorisé à supprimer le groupe d'utilisateurs &apos;%3(%4)&apos; avec &apos;%5&apos; droits.</translation>
     </message>
     <message>
       <source>Removing User Group is forbidden because it is still used by &apos;%1&apos;.</source>
-      <translation type="unfinished">Removing User Group is forbidden because it is still used by &apos;%1&apos;.</translation>
+      <translation>La suppression du groupe d'utilisateurs est interdite car elle est toujours utilisée par &apos;%1&apos;.</translation>
     </message>
     <message>
       <source>Removing User Group is forbidden because it is still inherited by &apos;%1&apos;.</source>
-      <translation type="unfinished">Removing User Group is forbidden because it is still inherited by &apos;%1&apos;.</translation>
+      <translation>La suppression du groupe d'utilisateurs est interdite car elle est toujours héritée par &apos;%1&apos;.</translation>
     </message>
     <message>
       <source>Cannot delete the built-in User Group %1(%2).</source>
-      <translation type="unfinished">Cannot delete the built-in User Group %1(%2).</translation>
+      <translation>Impossible de supprimer le groupe d'utilisateurs intégré %1(%2).</translation>
     </message>
     <message>
       <source>User %1 is not allowed to modify the Showreel with parentId %2.</source>
-      <translation type="unfinished">User %1 is not allowed to modify the Showreel with parentId %2.</translation>
+      <translation>L'utilisateur %1 n'est pas autorisé à modifier le Showreel avec le parent ID %2.</translation>
     </message>
     <message>
       <source>Modifying of %1 entries out of %2 is not allowed for %3.</source>
       <comment>%3 is a C++ type name</comment>
-      <translation type="unfinished">Modifying of %1 entries out of %2 is not allowed for %3.</translation>
+      <translation>La modification des entrées %1 sur %2 n'est pas autorisée pour %3.</translation>
     </message>
     <message>
       <source>%1 storage can be only in the backup storage pool.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 storage can be only in the backup storage pool.</translation>
+      <translation>Le stockage %1 ne peut être que dans le groupe de sauvegarde.</translation>
     </message>
     <message>
       <source>%1 storage cannot be enabled due to insufficient services.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 storage cannot be enabled due to insufficient services.</translation>
+      <translation>Le stockage %1 ne peut pas être activé en raison de services insuffisants.</translation>
     </message>
     <message>
       <source>Can&apos;t enable writing for local storage because there is an active %1 storage</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Can&apos;t enable writing for local storage because there is an active %1 storage</translation>
+      <translation>Impossible d'activer l'écriture pour le stockage local car il y a un stockage %1 actif</translation>
     </message>
     <message>
       <source>Changing storage URL is prohibited.</source>
-      <translation type="unfinished">Changing storage URL is prohibited.</translation>
+      <translation>La modification de l'URL de stockage est interdite.</translation>
     </message>
     <message>
       <source>Invalid `storageArchiveMode` value.</source>
-      <translation type="unfinished">Invalid `storageArchiveMode` value.</translation>
+      <translation>Valeur `storageArchiveMode` invalide.</translation>
     </message>
     <message>
       <source>Changing `storageArchiveMode` to undefined is prohibited for existing storage.</source>
-      <translation type="unfinished">Changing `storageArchiveMode` to undefined is prohibited for existing storage.</translation>
+      <translation>La modification de `storageArchiveMode` à non défini est interdite pour le stockage existant.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`</source>
@@ -333,7 +333,7 @@
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create new User Groups.</translation>
+      <translation>L'utilisateur &apos;%1(%2)&apos; n'est pas autorisé à créer de nouveaux groupes d'utilisateurs.</translation>
     </message>
     <message>
       <source>It is forbidden to change Server deployment code</source>
@@ -341,7 +341,7 @@
     </message>
     <message>
       <source>Storage with the same url already exists</source>
-      <translation type="unfinished">Storage with the same url already exists</translation>
+      <translation>Un stockage avec la même url existe déjà</translation>
     </message>
   </context>
 </TS>
