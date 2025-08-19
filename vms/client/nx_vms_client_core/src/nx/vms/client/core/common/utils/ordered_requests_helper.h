@@ -6,7 +6,6 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <nx/network/rest/params.h>
-#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::core {
 
@@ -19,18 +18,18 @@ public:
     ~OrderedRequestsHelper();
 
     bool getJsonResult(
-        const rest::ServerConnectionPtr& connection,
+        const rest::ServerConnectionWeakPtr& connection,
         const QString& action,
         const nx::network::rest::Params& params,
         rest::JsonResultCallback&& callback,
-        QThread* thread = nullptr);
+        QThread* thread);
 
     bool postJsonResult(
-        const rest::ServerConnectionPtr& connection,
+        const rest::ServerConnectionWeakPtr& connection,
         const QString& action,
         const nx::network::rest::Params& params,
         rest::JsonResultCallback&& callback,
-        QThread* thread = nullptr);
+        QThread* thread);
 
 private:
     struct Private;

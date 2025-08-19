@@ -183,7 +183,7 @@ struct ServerConnection::Private
 
                 auto onSuspend = std::move(m_onSuspend);
 
-                auto context = m_connection->prepareContext(
+                auto context = connection->prepareContext(
                     m_request,
                     [this, h = std::move(h), guard = std::move(guard),
                         removePending = std::move(removePending)](
@@ -192,9 +192,9 @@ struct ServerConnection::Private
                         // Executes in asio thread.
                         const auto osErrorCode = context->systemError;
 
-                        NX_VERBOSE(m_logTag,
-                            "<%1> Got serialized reply. OS error: %2, HTTP status: %3",
-                            context->handle, osErrorCode, context->getStatusLine().statusCode);
+                        NX_VERBOSE(m_logTag, "<%1> Reply %2 %3 Error: %4, Status: %5",
+                            context->handle, context->request.method, context->request.url,
+                            osErrorCode, context->getStatusLine().statusCode);
 
                         m_context = std::move(context);
                         guard.disarm();
@@ -204,7 +204,7 @@ struct ServerConnection::Private
                     },
                     m_timeouts);
 
-                auto handle = m_connection->sendRequest(context);
+                auto handle = connection->sendRequest(context);
                 // If we resumed from sendRequest() immediately, `this` is already destroyed!
                 if (handle != 0)
                 {
@@ -344,7 +344,8 @@ ServerConnection::ServerConnection(
     {
         connect(certificateVerifier, &QObject::destroyed, this,
             [this]() {
-                NX_ASSERT(false, "%1: Premature certificate verifier destruction", d->logTag);
+                // Skip assertion here to assert when the connection is destroyed.
+                NX_WARNING(this, "Premature certificate verifier destruction");
             });
     }
 }
@@ -2684,12 +2685,8 @@ Handle ServerConnection::executePatch(
 {
     auto request = prepareRequest(
         nx::network::http::Method::patch, prepareUrl(path, params), contentType, messageBody);
-    auto handle = request.isValid()
-        ? d->executeRequest(request, std::move(callback), executor)
-        : Handle();
 
-    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
-    return handle;
+    return d->executeRequest(request, std::move(callback), std::move(executor));
 }
 
 template <typename ResultType>
@@ -2731,7 +2728,6 @@ ServerConnection::Private::executeRequestAsync(
         timeouts,
         std::move(onSuspend),
         logTag);
-
 
     rest::Handle originalHandle = context->handle;
 
@@ -2816,13 +2812,13 @@ Handle ServerConnection::Private::executeRequest(
     nx::utils::AsyncHandlerExecutor executor,
     std::optional<Timeouts> timeouts)
 {
+    rest::Handle handle = {};
+
     if (!request.isValid())
     {
-        NX_VERBOSE(logTag, "<%1> %2", 0, request.url);
+        NX_VERBOSE(logTag, "<%1> %2 %3", handle, request.method, request.url);
         return {};
     }
-
-    rest::Handle handle = 0;
 
     [this](
         const nx::network::http::ClientPool::Request& request,
@@ -2834,8 +2830,7 @@ Handle ServerConnection::Private::executeRequest(
     {
         co_await guard(q);
 
-        nx::log::Tag tag(QString("%1 [%2]").arg(
-            nx::toString(typeid(rest::ServerConnection)), serverId.toSimpleString()));
+        const auto tag = this->logTag; //< Store this data on coroutine frame.
 
         QElapsedTimer timer;
         timer.start();
@@ -2864,7 +2859,7 @@ Handle ServerConnection::Private::executeRequest(
         helper,
         [&handle](rest::Handle h) { handle = h; });
 
-    NX_VERBOSE(logTag, "<%1> %2", 0, request.url);
+    NX_VERBOSE(logTag, "<%1> %2 %3", handle, request.method, request.url);
     return handle;
 }
 
@@ -3106,10 +3101,10 @@ Handle ServerConnection::sendRequest(const ContextPtr& context)
         return 0;
 
     auto metrics = nx::vms::common::appContext()->metrics();
-    metrics->totalServerRequests()++;
-    NX_VERBOSE(
-        d->logTag, "%1: %2", metrics->totalServerRequests.name(), metrics->totalServerRequests());
+    const auto total = ++metrics->totalServerRequests();
+
     Handle requestId = d->httpClientPool->sendRequest(context);
+    NX_VERBOSE(d->logTag, "<%1> %2: %3", requestId, metrics->totalServerRequests.name(), total);
 
     // Request can be complete just inside `sendRequest`, so requestId is already invalid.
     if (!requestId || context->isFinished())

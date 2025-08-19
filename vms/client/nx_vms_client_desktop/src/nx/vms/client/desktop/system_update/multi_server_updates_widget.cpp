@@ -23,7 +23,6 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
@@ -42,8 +41,8 @@
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
-#include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -411,20 +410,18 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             }
         });
 
-    connect(system()->userWatcher(), &nx::vms::client::core::UserWatcher::userChanged, this,
-        [this](const QnUserResourcePtr &user)
+    connect(windowContext(), &WindowContext::beforeSystemChanged, this,
+        [this]()
         {
             // This prevents widget from recalculating update report for each server removed from
             // the resource pool during disconnect.
-            if (!user)
-            {
-                NX_DEBUG(this, "Disconnected from the system. Cleaning up current update context");
-                // We will be here when we disconnect from the server.
-                // So we can clear our state as well.
-                clearUpdateInfo();
-                setTargetState(WidgetUpdateState::initial, {});
-                setUpdateSourceMode(UpdateSourceType::internet);
-            }
+            NX_DEBUG(this, "Disconnected from the system. Cleaning up current update context");
+            // We will be here when we disconnect from the server.
+            // So we can clear our state as well.
+
+            clearUpdateInfo();
+            setTargetState(WidgetUpdateState::initial, {});
+            setUpdateSourceMode(UpdateSourceType::internet);
         });
 
     setWarningStyle(ui->longUpdateWarning);
