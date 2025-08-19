@@ -345,7 +345,7 @@ void UserGroupRequestChain::Private::runRequests(
 
                         const auto replyIdRollback = nx::utils::makeScopedRollback(replyId);
 
-                        if (const int* idPtr = std::get_if<int>(&response.id))
+                        if (const auto* idPtr = std::get_if<nx::json_rpc::NumericId>(&response.id))
                         {
                             if (*idPtr >= 0 && (size_t) *idPtr < q->size())
                                 replyId = *idPtr;

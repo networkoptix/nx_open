@@ -4,24 +4,13 @@
 
 #include <nx/reflect/json.h>
 
-namespace std {
-
-static QString toString(const nx::json_rpc::detail::OutgoingProcessor::Id& value)
-{
-    return std::holds_alternative<int>(value)
-        ? nx::toString(std::get<int>(value))
-        : '"' + std::get<QString>(value) + '"';
-}
-
-} // std
-
 namespace nx::json_rpc::detail {
 
 static OutgoingProcessor::Id toId(const ResponseId& id)
 {
-    if (std::holds_alternative<int>(id))
-        return std::get<int>(id);
-    return std::get<QString>(id);
+    if (std::holds_alternative<NumericId>(id))
+        return std::get<NumericId>(id);
+    return std::get<StringId>(id);
 }
 
 void OutgoingProcessor::clear(SystemError::ErrorCode error)
@@ -30,9 +19,9 @@ void OutgoingProcessor::clear(SystemError::ErrorCode error)
         [error](const auto& id)
         {
             return Response::makeError(
-                std::holds_alternative<int>(id)
-                    ? ResponseId{std::get<int>(id)}
-                    : ResponseId{std::get<QString>(std::move(id))},
+                std::holds_alternative<NumericId>(id)
+                    ? ResponseId{std::get<NumericId>(id)}
+                    : ResponseId{std::get<StringId>(std::move(id))},
                 Error::transportError,
                     NX_FMT("Connection closed with error %1: %2", error, SystemError::toString(error))
                         .toStdString());

@@ -1577,9 +1577,9 @@ extractJsonRpcExpired(rest::ErrorOrData<JsonRpcResultType>& result)
     {
         if (isSessionExpiredError(response))
         {
-            if (const auto intId = std::get_if<int>(&response.id))
+            if (const auto intId = std::get_if<nx::json_rpc::NumericId>(&response.id))
                 ids.insert(*intId);
-            else if (const auto strId = std::get_if<QString>(&response.id))
+            else if (const auto strId = std::get_if<nx::json_rpc::StringId>(&response.id))
                 ids.insert(*strId);
         }
     }

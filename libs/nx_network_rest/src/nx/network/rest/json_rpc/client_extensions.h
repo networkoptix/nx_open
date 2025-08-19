@@ -22,8 +22,7 @@ struct Payload
 NX_REFLECTION_INSTRUMENT_TEMPLATE(Payload, (data)(extensions))
 
 template<typename T>
-inline nx::json_rpc::Request to(
-    std::optional<std::variant<QString, int>> id, std::string method, Payload<T> payload)
+inline nx::json_rpc::Request to(nx::json_rpc::RequestId id, std::string method, Payload<T> payload)
 {
     auto result = nx::json_rpc::Request::create(std::move(id), std::move(method));
     if (payload.data || payload.extensions)

@@ -19,7 +19,7 @@ namespace nx::json_rpc::detail {
 class OutgoingProcessor
 {
 public:
-    using Id = std::variant<QString, int>;
+    using Id = std::variant<StringId, NumericId>;
     using SendFunc = nx::MoveOnlyFunc<void(std::string)>;
     OutgoingProcessor(SendFunc sendFunc): m_sendFunc(std::move(sendFunc)) {}
     ~OutgoingProcessor() { clear(SystemError::interrupted); }
