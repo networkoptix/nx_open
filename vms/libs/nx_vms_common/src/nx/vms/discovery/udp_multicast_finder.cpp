@@ -216,7 +216,14 @@ void UdpMulticastFinder::receiveModuleInformation()
                 moduleInformation.remoteAddresses.insert(
                     QString::fromStdString(endpoint.address.toString()));
                 if (m_moduleHandler)
+                {
                     m_moduleHandler(moduleInformation, endpoint);
+                }
+                else
+                {
+                    NX_VERBOSE(this, nx::format("No handler for module information from %1: %2")
+                        .args(endpoint, QJson::serialized(moduleInformation)));
+                }
             }
 
             receiveModuleInformation();

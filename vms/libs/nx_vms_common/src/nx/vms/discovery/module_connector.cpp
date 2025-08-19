@@ -68,6 +68,9 @@ void ModuleConnector::forgetModule(const nx::Uuid& id)
 
 void ModuleConnector::newEndpoints(std::set<nx::network::SocketAddress> endpoints, const nx::Uuid& id)
 {
+    NX_VERBOSE(this, "New endpoints call: %1 for module %2",
+        containerString(endpoints), id.toSimpleString());
+
     NX_ASSERT(endpoints.size());
     validateEndpoints(&endpoints);
     if (endpoints.empty())

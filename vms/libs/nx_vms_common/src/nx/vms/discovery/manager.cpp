@@ -146,6 +146,8 @@ struct Manager::Private
 
     void initializeMulticastFinders()
     {
+        NX_VERBOSE(this, "Multicast finders initialization");
+
         multicastFinder = std::make_unique<UdpMulticastFinder>(moduleConnector->getAioThread());
         multicastFinder->listen(
             [this](nx::vms::api::ModuleInformationWithAddresses module,
@@ -153,6 +155,8 @@ struct Manager::Private
             {
                 const auto endpoints = ec2::moduleInformationEndpoints(module);
                 const bool isOwnServer = serverModeInfo && (module.id == serverModeInfo->peerId);
+
+                NX_VERBOSE(this, "Received multicast module info: %1", QJson::serialized(module));
 
                 if (!isOwnServer && endpoints.size() != 0
                     && !nx::vms::common::appContext()->isCertificateValidationLevelStrict())
