@@ -6627,7 +6627,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>Backup akan dimatikan untuk kamera baru yang ditambahkan di semua server di site</translation>
     </message>
   </context>
   <context>

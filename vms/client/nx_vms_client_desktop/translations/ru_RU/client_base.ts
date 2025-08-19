@@ -4742,7 +4742,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Adaptive</source>
-      <translation type="unfinished">Adaptive</translation>
+      <translation>Адаптивный</translation>
     </message>
   </context>
   <context>
@@ -6960,7 +6960,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>Резервное копирование будет отключено для новых добавленных камер на всех серверах сайта</translation>
     </message>
   </context>
   <context>
@@ -9220,7 +9220,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
-      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
+      <translation>Размер файла должен быть больше 10 МБ и меньше или равен половине значения, установленного для параметра «Ограничение максимального объема»</translation>
     </message>
   </context>
   <context>

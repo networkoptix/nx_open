@@ -1283,7 +1283,7 @@
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>For at rapportere problemet, kontakt venligst %1.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>

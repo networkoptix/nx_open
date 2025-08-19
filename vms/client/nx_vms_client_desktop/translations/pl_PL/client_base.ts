@@ -6959,7 +6959,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>Kopia zapasowa zostanie wyłączona dla nowo dodanych kamer na wszystkich serwerach w systemie</translation>
     </message>
   </context>
   <context>
