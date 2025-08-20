@@ -17,6 +17,7 @@
 #include <QtCore/QCollator>
 #include <QtCore/QElapsedTimer>
 
+#include <nx/build_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/win32_syscall_resolver.h>
 #include <nx/utils/system_error.h>
@@ -214,6 +215,12 @@ bool Socket<SocketInterfaceToImplement>::close()
 #ifdef _WIN32
     return ::closesocket(fd) == 0;
 #else
+    if (nx::build_info::isMacOsX() || nx::build_info::isIos())
+    {
+        // On macOS, closing a socket is not instantaneous (e.g. multicast UDP).
+        std::thread([fd]() { ::close(fd); }).detach();
+        return true;
+    }
     return ::close(fd) == 0;
 #endif
 }
