@@ -38,10 +38,12 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget* parent):
         ui->autoStartCheckBox->hide();
 
     setHelpTopic(ui->mediaFoldersGroupBox, HelpTopic::Id::MediaFolders);
-    setHelpTopic(ui->pauseOnInactivityCheckBox,
-        HelpTopic::Id::SystemSettings_General_AutoPause);
-    setHelpTopic(ui->idleTimeoutSpinBox, ui->idleTimeoutWidget,
-        HelpTopic::Id::SystemSettings_General_AutoPause);
+    setHelpTopic(ui->audioGroupBox, HelpTopic::Id::SystemSettings_ScreenRecording);
+    setHelpTopic(ui->startupSettingsGroup, HelpTopic::Id::LaunchingAndClosing);
+
+    setHelpTopic(ui->pauseOnInactivityLayout, HelpTopic::Id::SystemSettings_General_AutoPause);
+    setHelpTopic(ui->playAudioForAllCamerasCheckbox, HelpTopic::Id::Audio_General);
+    setHelpTopic(ui->restoreSessionCheckBox, HelpTopic::Id::LaunchingAndClosing);
 
     ui->idleTimeoutWidget->setEnabled(false);
 

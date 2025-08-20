@@ -34,6 +34,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "configuring_time_synchronizati.html";
         case Id::Administration_Update:
             return "upgrading_vms.html";
+        case Id::Audio_General:
+            return "using_audio.html";
         case Id::AuditTrail:
             return "viewing_users_actions_log_audi.html";
         case Id::Bookmarks_Editing:
@@ -186,6 +188,12 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "adding_users_from_ldap_server.html";
         case Id::Licenses:
             return "obtaining_and_activating_vms_licenses.html";
+        case Id::LocalSettings_Advanced_Blur:
+            return "disabling_blurv_for_intel_hd_g.html";
+        case Id::LocalSettings_Advanced_HardwareDecode:
+            return "hardware_video_decoding.html";
+        case Id::LocalSettings_Advanced_LiveBuffer:
+            return "configuring_live_buffer_size.html";
         case Id::Login:
             return "connecting_to_enterprise_contr.html";
         case Id::MainWindow_Calendar:

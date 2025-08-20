@@ -5,11 +5,12 @@
 #include <QtCore/QPoint>
 
 class QDialog;
-class QObject;
-class QWidget;
 class QGraphicsItem;
+class QLayout;
+class QObject;
 class QQuickItem;
 class QQuickWindow;
+class QWidget;
 
 namespace nx::vms::client::desktop {
 
@@ -57,5 +58,8 @@ inline void setHelpTopic(QObject* object0, QObject* object1, int helpTopic)
 {
     HelpTopicAccessor::setHelpTopic(object0, object1, helpTopic);
 }
+
+void setHelpTopic(QLayout* layout, int helpTopic);
+void setHelpTopic(std::initializer_list<QLayout*> layouts, int helpTopic);
 
 } // namespace nx::vms::client::desktop
