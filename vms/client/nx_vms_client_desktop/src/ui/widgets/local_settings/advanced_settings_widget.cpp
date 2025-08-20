@@ -99,7 +99,20 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
 
     ui->maximumLiveBufferLengthSpinBox->setSuffix(' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds));
 
-    setHelpTopic(ui->doubleBufferCheckbox, HelpTopic::Id::SystemSettings_General_DoubleBuffering);
+    setHelpTopic(ui->downmixAudioCheckBox, HelpTopic::Id::MainWindow_MediaItem_Local);
+    setHelpTopic(ui->disableBlurCheckbox, HelpTopic::Id::LocalSettings_Advanced_Blur);
+    setHelpTopic(ui->doubleBufferingWidget, HelpTopic::Id::SystemSettings_General_DoubleBuffering);
+    setHelpTopic(ui->useHardwareDecodingLayout, HelpTopic::Id::LocalSettings_Advanced_HardwareDecode);
+
+    setHelpTopic(
+        {ui->maximumLiveBufferLengthLabelLayout, ui->liveBufferEditLayout},
+        HelpTopic::Id::LocalSettings_Advanced_LiveBuffer);
+
+    setHelpTopic(ui->certificateLayout, HelpTopic::Id::CertificateValidation);
+
+    setHelpTopic(ui->clearCacheButton, HelpTopic::Id::MainWindow_WebPageItem);
+
+    setHelpTopic(ui->logsManagementBox, HelpTopic::Id::SystemSettings_General_Logs);
 
     ui->doubleBufferCheckboxHint->setHintText(
         tr("Helps avoid problems with OpenGL drawing which result in 100% CPU load."));

@@ -11,6 +11,7 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QLayout>
 #include <QtWidgets/QWidget>
 
 #include <client/client_globals.h>
@@ -254,6 +255,25 @@ int HelpTopicAccessor::helpTopicAt(QQuickWindow* window, const QPointF& pos)
     return topicId != HelpTopic::Id::Empty
         ? topicId
         : HelpTopicAccessor::helpTopic(static_cast<QObject*>(window));
+}
+
+void setHelpTopic(QLayout* layout, int helpTopic)
+{
+    for (int i = 0; i < layout->count(); ++i)
+    {
+        auto item = layout->itemAt(i);
+
+        if (auto widget = item->widget())
+            setHelpTopic(widget, helpTopic);
+        else if (auto itemLayout = item->layout())
+            setHelpTopic(itemLayout, helpTopic);
+    }
+}
+
+void setHelpTopic(std::initializer_list<QLayout*> layouts, int helpTopic)
+{
+    for (auto layout : layouts)
+        setHelpTopic(layout, helpTopic);
 }
 
 } // namespace nx::vms::client::desktop
