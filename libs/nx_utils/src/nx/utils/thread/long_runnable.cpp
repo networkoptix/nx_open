@@ -2,6 +2,7 @@
 
 #include "long_runnable.h"
 
+#include <nx/build_info.h>
 #include <nx/utils/log/log.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -16,6 +17,8 @@ public:
     void stopAll()
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
+        if (!m_created.isEmpty())
+            NX_DEBUG(this, "Stopping all long runnables: %1", nx::containerString(m_created));
         for (QnLongRunnable *runnable : m_created)
             runnable->pleaseStop();
         waitAllLocked();
@@ -77,7 +80,10 @@ private:
     void waitAllLocked()
     {
         using namespace std::chrono;
-        static const seconds kStopTimeout(60);
+        static const milliseconds kStopTimeout(
+            (nx::build_info::isMacOsX() || nx::build_info::isIos())
+                ? 500
+                : 60 * 1000);
         const auto start = system_clock::now();
 
         while (!m_running.isEmpty())
