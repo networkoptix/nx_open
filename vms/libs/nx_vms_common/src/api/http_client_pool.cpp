@@ -248,8 +248,8 @@ struct AsyncClientStopper
             client->pleaseStop(
                 [this]()
                 {
-                    promise->set_value();
                     stopped = true;
+                    promise->set_value();
                 });
         }
     }
