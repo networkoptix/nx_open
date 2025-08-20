@@ -659,7 +659,7 @@ void ConnectActionsHandler::switchCloudHostIfNeeded(const QString& remoteCloudHo
     if (remoteCloudHost.isEmpty())
         return;
 
-    if (!core::ini().isAutoCloudHostDeductionMode())
+    if (!core::ini().isAutoCloudHostDeductionMode() && !ini().demoMode)
         return;
 
     const auto activeCloudHost = nx::network::SocketGlobals::cloud().cloudHost();

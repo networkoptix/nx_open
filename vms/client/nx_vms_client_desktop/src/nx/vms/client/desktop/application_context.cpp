@@ -531,7 +531,7 @@ struct ApplicationContext::Private
         if (ini().developerMode || ini().demoMode)
             developerFlags.setFlag(DeveloperFlag::ignoreCustomization);
 
-        if (core::ini().isAutoCloudHostDeductionMode())
+        if (core::ini().isAutoCloudHostDeductionMode() || ini().demoMode)
             developerFlags.setFlag(DeveloperFlag::ignoreCloudHost);
 
         if (ini().developerMode || startupParameters.isVideoWallLauncherMode())
