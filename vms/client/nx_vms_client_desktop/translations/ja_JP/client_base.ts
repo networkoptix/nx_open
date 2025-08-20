@@ -6873,7 +6873,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
-      <translation>録画スケジュール内の映像品質およびフレームレート (FPS) の項目は、カメラに設定されなくなります</translation>
+      <translation>録画スケジュール内の映像品質およびフレームレート (FPS) の項目は、カメラに設定されなくなります。</translation>
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
@@ -10282,13 +10282,13 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
-      <translation>選択したカメラの一部は、映像品質とFPSの設定が無効になっています。</translation>
+      <translation>選択したカメラの一部で、映像品質と FPS の設定が無効になっています。</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
 You can still change quality and FPS directly on the camera.</source>
-      <translation>&quot;エキスパート&quot; タブの &quot;カメラのストリームおよびプロファイル設定を保持する&quot; オプションが原因で、映像品質とFPSの設定が無効になっています。
-映像品質とFPSはカメラで直接変更できます。</translation>
+      <translation>&quot;エキスパート&quot; タブの &quot;カメラのストリームおよびプロファイル設定を保持する&quot; オプションが原因で、映像品質と FPS の設定が無効になっています。
+映像品質と FPS はカメラで直接変更できます。</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -10403,8 +10403,8 @@ You can still change quality and FPS directly on the camera.</source>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation>&quot;サイト管理&quot; ダイアログの &quot;カメラ設定の変更を許可する&quot; オプションが原因で、映像品質とFPSの設定が無効になっています。
-映像品質とFPSはカメラ側で直接変更できます。</translation>
+      <translation>&quot;サイト管理&quot; ダイアログの &quot;カメラ設定の変更を許可する&quot; オプションが原因で、映像品質と FPS の設定が無効になっています。
+映像品質と FPS はカメラ側で直接変更できます。</translation>
     </message>
     <message>
       <source>Mbps</source>
