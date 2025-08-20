@@ -67,6 +67,11 @@ void UdpMulticastFinder::listen(ModuleHandler handler)
 void UdpMulticastFinder::stopWhileInAioThread()
 {
     m_updateTimer.pleaseStopSync();
+    if (m_receiver)
+    {
+        for (const auto& [ip, sock]: m_senders)
+            m_receiver->leaveGroup(m_multicastEndpoint.address, ip);
+    }
     m_senders.clear();
     m_receiver.reset();
 }
