@@ -8,6 +8,9 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/reflect/json/serializer.h>
+#include <nx/utils/json/qt_core_types.h>
+#include <nx/utils/json/qt_geometry_reflect.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/optional.h>
@@ -179,7 +182,7 @@ void trace(const State& state, QString message)
     if (tracingEnabled)
     {
         NX_DEBUG(kLogTag, message);
-        NX_DEBUG(kLogTag, state);
+        NX_DEBUG(kLogTag, nx::reflect::json::serialize(state));
     }
 }
 

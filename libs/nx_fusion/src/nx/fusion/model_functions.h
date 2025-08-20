@@ -4,7 +4,6 @@
 
 #include <nx/fusion/fusion/fusion_adaptor.h>
 #include <nx/fusion/serialization/csv_functions.h>
-#include <nx/fusion/serialization/debug_macros.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 #include <nx/fusion/serialization/sql_functions.h>

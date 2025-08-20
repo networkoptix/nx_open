@@ -8,7 +8,9 @@
 #include <QtCore/QString>
 #include <QtGui/QImage>
 
-#include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/flux/abstract_flux_state.h>
 
 namespace nx::vms::client::desktop {
@@ -187,24 +189,15 @@ struct LayoutSettingsDialogState: AbstractFluxState
 };
 
 #define LayoutSettingsDialogState_Range_Fields (min)(max)(value)
-
-QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::Range,
-    (debug),
-    NX_VMS_CLIENT_DESKTOP_API)
+NX_REFLECTION_INSTRUMENT(LayoutSettingsDialogState::Range, LayoutSettingsDialogState_Range_Fields)
 
 #define LayoutSettingsDialogState_Background_Fields (supported)(status)(errorText)(width)(height)\
-    (keepImageAspectRatio)(opacityPercent)(cropToMonitorAspectRatio)(filename)(imageSourcePath)\
-    (preview)(croppedPreview)
-
-QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::Background,
-    (debug),
-    NX_VMS_CLIENT_DESKTOP_API)
+    (keepImageAspectRatio)(opacityPercent)(cropToMonitorAspectRatio)(filename)(imageSourcePath)
+NX_REFLECTION_INSTRUMENT(LayoutSettingsDialogState::Background,
+    LayoutSettingsDialogState_Background_Fields)
 
 #define LayoutSettingsDialogState_Fields (locked)(cellAspectRatio)(logicalId)\
     (fixedSizeEnabled)(fixedSize)(background)
-
-QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState,
-    (debug),
-    NX_VMS_CLIENT_DESKTOP_API)
+NX_REFLECTION_INSTRUMENT(LayoutSettingsDialogState, LayoutSettingsDialogState_Fields)
 
 } // namespace nx::vms::client::desktop
