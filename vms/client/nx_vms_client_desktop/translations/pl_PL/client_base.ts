@@ -9690,11 +9690,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LdapSettingsWidget</name>
     <message>
       <source>Disconnect LDAP server?</source>
-      <translation type="unfinished">Disconnect LDAP server?</translation>
+      <translation>Odłączyć serwer LDAP?</translation>
     </message>
     <message>
       <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>Wszyscy użytkownicy i grupy LDAP zostaną usunięci.&lt;br&gt;&lt;br&gt; Ustawienia LDAP również zostaną usunięte.</translation>
     </message>
     <message>
       <source>Disconnect</source>

@@ -1120,9 +1120,9 @@
       <comment>Full suffix for displaying days</comment>
       <translation>
         <numerusform>dzień</numerusform>
-        <numerusform>dzień</numerusform>
-        <numerusform>dzień</numerusform>
-        <numerusform>dzień</numerusform>
+        <numerusform>dni</numerusform>
+        <numerusform>dni</numerusform>
+        <numerusform>dni</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1130,9 +1130,9 @@
       <comment>Full suffix for displaying weeks</comment>
       <translation>
         <numerusform>tydzień</numerusform>
-        <numerusform>tydzień</numerusform>
-        <numerusform>tydzień</numerusform>
-        <numerusform>tydzień</numerusform>
+        <numerusform>tygodni</numerusform>
+        <numerusform>tygodni</numerusform>
+        <numerusform>tygodnie</numerusform>
       </translation>
     </message>
     <message numerus="yes">
