@@ -1115,11 +1115,18 @@ struct ModifyStorageAccess
                 NX_DEBUG(this, "Existing storage urls: %1", existingUrls);
             }
 
+            auto toNoCredUrl =
+                [](const QString& s)
+                {
+                    auto url = QUrl(s);
+                    return url.isValid() ? url.toDisplayString(QUrl::RemoveUserInfo) : s;
+                };
+
             const bool hasStorageWithSameUrl = std::any_of(
                 existingStorages.cbegin(), existingStorages.cend(),
-                [&param](const auto& s)
+                [&param, &toNoCredUrl](const auto& s)
                 {
-                    return param.url == s->getUrl();
+                    return toNoCredUrl(param.url) == toNoCredUrl(s->getUrl());
                 });
 
             if (hasStorageWithSameUrl)
