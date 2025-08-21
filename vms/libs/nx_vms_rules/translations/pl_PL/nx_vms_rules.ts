@@ -643,7 +643,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>Dla użytkowników</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -786,7 +786,7 @@
     </message>
     <message>
       <source>Recording services disabled</source>
-      <translation type="unfinished">Recording services disabled</translation>
+      <translation>Usługi nagrywania wyłączone</translation>
     </message>
     <message>
       <source>Cloud storage services disabled</source>
@@ -798,7 +798,7 @@
     </message>
     <message>
       <source>Services issue</source>
-      <translation type="unfinished">Services issue</translation>
+      <translation>Problem z usługami</translation>
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
@@ -836,7 +836,7 @@
     </message>
     <message>
       <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
+      <translation>Wyślij e-mail</translation>
     </message>
     <message>
       <source>To</source>

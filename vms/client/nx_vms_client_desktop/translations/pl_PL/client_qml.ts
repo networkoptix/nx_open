@@ -2426,7 +2426,7 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>Czas jest niedostępny z powodu zmian DST</translation>
     </message>
   </context>
   <context>
@@ -2668,7 +2668,7 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Gdy ciągła synchronizacja z serwerem LDAP jest wyłączona, członkostwo użytkowników w grupach nie jest synchronizowane automatycznie. Aby zaktualizować te informacje, należy zainicjować synchronizację ręczną.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>

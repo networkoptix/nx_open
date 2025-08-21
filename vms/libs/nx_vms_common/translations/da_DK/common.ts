@@ -102,7 +102,7 @@
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>din regionale / licens support</translation>
     </message>
   </context>
   <context>
@@ -2110,7 +2110,7 @@
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>RTP pakketab detekteret.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
@@ -2366,23 +2366,23 @@
     </message>
     <message>
       <source>Failed to backup file %1</source>
-      <translation type="unfinished">Failed to backup file %1</translation>
+      <translation>Kunne ikke sikkerhedskopiere filen %1</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>Udfør HTTP(S)-anmodning</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Forbindelsen til kameraet (primær stream) blev uventet lukket.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Forbindelsen til kameraet (sekundær strøm) blev uventet lukket.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Forbindelsen til enheden blev uventet lukket.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
@@ -2394,7 +2394,7 @@
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Kan ikke initialisere AES-kryptering, mens optagelse er aktiveret i mediearkivet. Data er skrevet ukrypteret.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
@@ -2486,7 +2486,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation type="unfinished">Server &quot;%1&quot; has license migration issue</translation>
+      <translation>Server &quot;%1&quot; har problemer med overførsel af licens</translation>
     </message>
     <message>
       <source>Service overuse</source>

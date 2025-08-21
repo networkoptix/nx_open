@@ -102,7 +102,7 @@
     </message>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>Opret Bogmærke</translation>
     </message>
     <message>
       <source>At</source>
@@ -477,7 +477,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Begynd Når</translation>
     </message>
     <message>
       <source>Occurs at</source>
@@ -784,7 +784,7 @@
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Betalt integrationstjenester deaktiveret</translation>
     </message>
     <message>
       <source>Services issue</source>
@@ -808,7 +808,7 @@
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Brug af betalt integrationstjeneste på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
       </translation>
     </message>
   </context>
