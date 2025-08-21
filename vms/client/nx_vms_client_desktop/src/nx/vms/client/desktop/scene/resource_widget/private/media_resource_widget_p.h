@@ -38,7 +38,7 @@ public:
     const QnResourcePtr resource;
     const QnMediaResourcePtr mediaResource;
     const core::CameraResourcePtr camera;
-    const bool hasVideo;
+    bool hasVideo;
     bool isIoModule;
     bool isExportedLayout = false;
     bool isPreviewSearchLayout = false;
@@ -107,6 +107,7 @@ signals:
     void licenseStatusChanged();
     void analyticsSupportChanged();
     void isIoModuleChanged();
+    void hasVideoChanged();
 
 private:
     void updateIsPlayingLive();

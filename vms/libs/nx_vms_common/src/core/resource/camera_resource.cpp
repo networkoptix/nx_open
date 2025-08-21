@@ -2833,6 +2833,7 @@ void QnVirtualCameraResource::emitPropertyChanged(
         m_cachedHasVideo.reset();
         m_cachedSupportedMotionTypes.reset();
         m_motionType.reset();
+        emit hasVideoChanged(::toSharedPointer(this));
         emit motionTypeChanged(::toSharedPointer(this));
     }
     else if (key == nx::vms::api::device_properties::kPtzCapabilities)

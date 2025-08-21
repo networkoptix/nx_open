@@ -890,6 +890,7 @@ signals:
     void compatibleAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
     void deviceAgentManifestsChanged(const QnVirtualCameraResourcePtr& camera);
     void isIOModuleChanged(const QnVirtualCameraResourcePtr& camera);
+    void hasVideoChanged(const QnVirtualCameraResourcePtr& camera);
 
     // TODO: Get rid of this "maybe" logic.
     void compatibleEventTypesMaybeChanged(const QnVirtualCameraResourcePtr& camera);

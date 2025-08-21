@@ -390,6 +390,7 @@ private slots:
 
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
+    void updateAnalyticsAndHud();
 
 private:
     void handleItemDataChanged(const nx::Uuid& id, int role, const QVariant& data);
@@ -476,6 +477,10 @@ private:
 
     void updateSelectedArea();
     void handleSelectedAreaChanged();
+
+    void updateVideoSpecificComponents();
+    void updateAudioSpecificComponents();
+    void updateIoModuleComponents();
 
 private:
     nx::utils::ImplPtr<nx::vms::client::desktop::MediaResourceWidgetPrivate> d;

@@ -6,9 +6,8 @@
 #include <QtWidgets/QGraphicsScale>
 
 #include <nx/utils/math/fuzzy.h>
-
-#include <ui/graphics/instruments/transform_listener_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/instruments/transform_listener_instrument.h>
 #include <ui/utils/viewport_scale_watcher.h>
 
 QnViewportBoundWidget::QnViewportBoundWidget(QGraphicsItem* parent):
@@ -106,7 +105,7 @@ QVariant QnViewportBoundWidget::itemChange(GraphicsItemChange change, const QVar
 {
     if (change == ItemSceneHasChanged)
     {
-        if (scene())
+        if (scene() && !m_scaleWatcher->initialized())
             m_scaleWatcher->initialize(scene());
     }
 
