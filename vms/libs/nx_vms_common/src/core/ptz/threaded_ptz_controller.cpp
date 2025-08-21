@@ -228,11 +228,11 @@ bool QnThreadedPtzController::getPosition(
 }
 
 bool QnThreadedPtzController::getLimits(
-    QnPtzLimits* /*limits*/,
+    nx::vms::api::PtzPositionLimits* /*limits*/,
     CoordinateSpace space,
     const Options& options) const
 {
-    return requestData<QnPtzLimits>(
+    return requestData<nx::vms::api::PtzPositionLimits>(
         spaceCommand(Command::getDeviceLimits, space),
         &QnAbstractPtzController::getLimits,
         options,

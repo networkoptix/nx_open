@@ -52,7 +52,7 @@ public:
         const Options& options = {Type::operational}) const override;
 
     virtual bool getLimits(
-        QnPtzLimits* limits,
+        nx::vms::api::PtzPositionLimits* limits,
         CoordinateSpace space,
         const Options& options = {Type::operational}) const override;
 

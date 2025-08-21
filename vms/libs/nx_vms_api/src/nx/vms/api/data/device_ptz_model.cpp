@@ -36,4 +36,40 @@ QString PtzPresetFilter::toString() const
     return QJson::serialized(*this);
 }
 
+qreal MinMaxLimit::range() const noexcept
+{
+    return max - min;
+}
+
+bool MinMaxLimit::between(qreal val) const noexcept
+{
+    return !(val < min) && !(max < val);
+}
+
+qreal MinMaxLimit::clamp(qreal val) const noexcept
+{
+    return std::clamp(val, min, max);
+}
+
+bool MinMaxLimit::operator==(const MinMaxLimit& other) const noexcept
+{
+    return qFuzzyCompare(min, other.min) && qFuzzyCompare(max, other.max);
+}
+
+PtzPositionLimits PtzPositionLimits::defaults() noexcept
+{
+    return PtzPositionLimits{
+        .pan = MinMaxLimit{0.0, 360},
+        .tilt = MinMaxLimit{-90, 90},
+        .fov = MinMaxLimit{0.0, 360},
+        .rotation = MinMaxLimit{0.0, 360},
+        .focus = MinMaxLimit{0.0, 1.0},
+        .panSpeed = MinMaxLimit{-1.0, 1.0},
+        .tiltSpeed = MinMaxLimit{-1.0, 1.0},
+        .zoomSpeed = MinMaxLimit{-1.0, 1.0},
+        .rotationSpeed = MinMaxLimit{-1.0, 1.0},
+        .focusSpeed = MinMaxLimit{-1.0, 1.0},
+    };
+}
+
 } // namespace nx::vms::api

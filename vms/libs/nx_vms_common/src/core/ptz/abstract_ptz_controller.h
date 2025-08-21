@@ -7,7 +7,6 @@
 #include <core/ptz/ptz_auxiliary_trait.h>
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/ptz_fwd.h>
-#include <core/ptz/ptz_limits.h>
 #include <core/ptz/ptz_math.h>
 #include <core/ptz/ptz_object.h>
 #include <core/ptz/ptz_preset.h>
@@ -224,7 +223,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * @returns Whether the operation was successful.
      */
     virtual bool getLimits(
-        QnPtzLimits* limits,
+        nx::vms::api::PtzPositionLimits* limits,
         CoordinateSpace space,
         const Options& options = {Type::operational}) const = 0;
 

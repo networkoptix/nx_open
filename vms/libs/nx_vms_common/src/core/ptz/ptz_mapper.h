@@ -7,7 +7,6 @@
 #include <utils/math/space_mapper.h>
 
 #include "ptz_fwd.h"
-#include "ptz_limits.h"
 
 class QnPtzMapperPrivate;
 
@@ -36,7 +35,7 @@ public:
         return m_outputMapper->sourceToTarget(position);
     }
 
-    const QnPtzLimits& logicalLimits() const
+    const nx::vms::api::PtzPositionLimits& logicalLimits() const
     {
         return m_logicalLimits;
     }
@@ -44,7 +43,7 @@ public:
 private:
     QnSpaceMapperPtr<Vector> m_inputMapper;
     QnSpaceMapperPtr<Vector> m_outputMapper;
-    QnPtzLimits m_logicalLimits;
+    nx::vms::api::PtzPositionLimits m_logicalLimits;
 };
 
 #endif // QN_PTZ_MAPPER_H

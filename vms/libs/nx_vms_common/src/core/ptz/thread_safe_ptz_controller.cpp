@@ -73,7 +73,7 @@ bool ThreadSafePtzController::getPosition(
 }
 
 bool ThreadSafePtzController::getLimits(
-    QnPtzLimits* limits,
+    nx::vms::api::PtzPositionLimits* limits,
     CoordinateSpace space,
     const Options& options) const
 {

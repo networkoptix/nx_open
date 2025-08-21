@@ -176,7 +176,7 @@ void initializeMetatypesInternal()
     qRegisterMetaType<QnPtzTour>();
     qRegisterMetaType<QnPtzTourList>();
     qRegisterMetaType<QnPtzData>();
-    qRegisterMetaType<QnPtzLimits>();
+    qRegisterMetaType<nx::vms::api::PtzPositionLimits>();
     qRegisterMetaType<QnPtzMapperPtr>();
     qRegisterMetaType<nx::vms::common::ptz::Command>();
     qRegisterMetaType<nx::vms::common::ptz::DataFields>();

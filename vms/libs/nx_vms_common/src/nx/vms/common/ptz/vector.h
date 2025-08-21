@@ -5,10 +5,10 @@
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 
-#include <core/ptz/ptz_limits.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/api/data/device_ptz_model.h>
 
 #include "component.h"
 #include "limits_type.h"
@@ -89,12 +89,12 @@ public:
 
     bool isValid() const;
 
-    Vector restricted(const QnPtzLimits& limits, LimitsType restrictionType) const;
+    Vector restricted(const nx::vms::api::PtzPositionLimits& limits, LimitsType restrictionType) const;
 
-    static Vector rangeVector(const QnPtzLimits& limits, LimitsType limitsType);
+    static Vector rangeVector(const nx::vms::api::PtzPositionLimits& limits, LimitsType limitsType);
 
     QString toString() const;
-    Vector scaleSpeed(const QnPtzLimits& limits) const;
+    Vector scaleSpeed(const nx::vms::api::PtzPositionLimits& limits) const;
 };
 
 NX_VMS_COMMON_API Vector operator*(const Vector& ptzVector, double scalar);
@@ -151,54 +151,8 @@ inline nx::vms::common::ptz::Vector qSNaN<nx::vms::common::ptz::Vector>()
     return nx::vms::common::ptz::Vector(kNan, kNan, kNan, kNan);
 }
 
-inline nx::vms::common::ptz::Vector qBound(
-    const nx::vms::common::ptz::Vector& position,
-    const QnPtzLimits& limits)
-{
-    bool unlimitedPan = false;
-    const qreal panRange = (limits.maxPan - limits.minPan);
-    if (qFuzzyCompare(panRange, 360) || panRange > 360)
-        unlimitedPan = true;
-
-    qreal pan = position.pan;
-    if (!unlimitedPan && !qBetween(limits.minPan, pan, limits.maxPan))
-    {
-        /* Round it to the nearest boundary. */
-        qreal panBase = limits.minPan - qMod(limits.minPan, 360.0);
-        qreal panShift = qMod(pan, 360.0);
-
-        qreal bestPan = pan;
-        qreal bestDist = std::numeric_limits<qreal>::max();
-
-        pan = panBase - 360.0 + panShift;
-        for (int i = 0; i < 3; i++)
-        {
-            qreal dist;
-            if (pan < limits.minPan)
-                dist = limits.minPan - pan;
-            else if (pan > limits.maxPan)
-                dist = pan - limits.maxPan;
-            else
-                dist = 0.0;
-
-            if (dist < bestDist)
-            {
-                bestDist = dist;
-                bestPan = pan;
-            }
-
-            pan += 360.0;
-        }
-
-        pan = bestPan;
-    }
-
-    return nx::vms::common::ptz::Vector(
-        pan,
-        qBound((float) limits.minTilt, (float) position.tilt, (float) limits.maxTilt),
-        qBound((float) limits.minRotation, (float) position.rotation, (float) limits.maxRotation),
-        qBound((float) limits.minFov, (float) position.zoom, (float) limits.maxFov));
-}
+NX_VMS_COMMON_API nx::vms::common::ptz::Vector qBound(
+    const nx::vms::common::ptz::Vector& position, const nx::vms::api::PtzPositionLimits& limits);
 
 NX_VMS_COMMON_API nx::vms::common::ptz::Vector linearCombine(
     qreal a,

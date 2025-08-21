@@ -5,6 +5,7 @@
 #include <array>
 
 #include <nx/utils/json/flags.h>
+#include <nx/vms/api/data/device_ptz_model.h>
 
 namespace nx::vms::common {
 namespace ptz {
@@ -30,6 +31,27 @@ static const ComponentVector<5> kAllComponents = {
     Component::zoom,
     Component::focus
 };
+
+inline std::optional<::nx::vms::api::MinMaxLimit> findComponent(
+    const nx::vms::api::PtzPositionLimits& limits, Component c) noexcept
+{
+    using enum Component;
+    switch (c)
+    {
+        case pan:
+            return limits.pan;
+        case tilt:
+            return limits.tilt;
+        case rotation:
+            return limits.rotation;
+        case zoom:
+            return limits.fov;
+        case focus:
+            return limits.focus;
+        default:
+            return std::nullopt;
+    }
+}
 
 } // namespace ptz
 } // namespace nx::vms::common

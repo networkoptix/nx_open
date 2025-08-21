@@ -134,7 +134,7 @@ bool QnProxyPtzController::getPosition(
 }
 
 bool QnProxyPtzController::getLimits(
-    QnPtzLimits* limits,
+    nx::vms::api::PtzPositionLimits* limits,
     CoordinateSpace space,
     const Options& options) const
 {

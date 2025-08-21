@@ -43,7 +43,7 @@ public:
         const Options& options) const override;
 
     virtual bool getLimits(
-        QnPtzLimits* limits,
+        nx::vms::api::PtzPositionLimits* limits,
         CoordinateSpace space,
         const Options& options) const override;
 
@@ -88,7 +88,7 @@ private:
     Ptz::Capabilities m_capabilities;
     Vector m_unitSpeed;
 
-    QnPtzLimits m_limits;
+    nx::vms::api::PtzPositionLimits m_limits;
     bool m_unlimitedPan;
 
     qreal m_aspectRatio;

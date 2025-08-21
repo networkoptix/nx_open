@@ -84,16 +84,13 @@ nx::vms::api::dewarping::ViewData QnFisheyePtzController::itemDewarpingParams() 
 
 void QnFisheyePtzController::updateLimits()
 {
-    m_limits.minFov = 20.0;
-    m_limits.maxFov = 90.0 * m_itemDewarpingParams.panoFactor;
+    m_limits.fov = nx::vms::api::MinMaxLimit{20.0, 90.0 * m_itemDewarpingParams.panoFactor};
 
     if (m_mediaDewarpingParams.is360VR())
     {
         m_unlimitedPan = true;
-        m_limits.minPan = 0.0;
-        m_limits.maxPan = 360.0;
-        m_limits.minTilt = -90.0;
-        m_limits.maxTilt = 90.0;
+        m_limits.pan = nx::vms::api::MinMaxLimit{0.0, 360.0};
+        m_limits.tilt = nx::vms::api::MinMaxLimit{-90.0, 90.0};
     }
     else
     {
@@ -108,25 +105,18 @@ void QnFisheyePtzController::updateLimits()
         if (m_mediaDewarpingParams.viewMode == dewarping::FisheyeCameraMount::wall)
         {
             m_unlimitedPan = false;
-            m_limits.minPan = -90.0;
-            m_limits.maxPan = 90.0;
-
-            m_limits.minTilt = -90.0;
-            m_limits.maxTilt = 90.0;
-
+            m_limits.pan = nx::vms::api::MinMaxLimit{-90.0, 90.0};
             // If circle edge is out of picture, reduce maximum angle
-            if (maxY > 1.0)
-                m_limits.minTilt += (maxY - 1.0) * 180.0;
-            if (minY < 0.0)
-                m_limits.maxTilt += minY * 180.0;
+            m_limits.tilt = nx::vms::api::MinMaxLimit{
+                maxY > 1.0 ? -90.0 + (maxY - 1.0) * 180.0 : -90.0,
+                minY < 0.0 ? 90.0 + minY * 180.0 : 90.0
+            };
         }
         else
         {
             m_unlimitedPan = true;
-            m_limits.minPan = 0.0;
-            m_limits.maxPan = 360.0;
-            m_limits.minTilt = 0.0;
-            m_limits.maxTilt = 90.0;
+            m_limits.pan = nx::vms::api::MinMaxLimit{0.0, 360.0};
+            m_limits.tilt = nx::vms::api::MinMaxLimit{0.0, 90.0};
         }
     }
 
@@ -194,23 +184,25 @@ Vector QnFisheyePtzController::boundedPosition(const Vector& position)
 
     const auto hFov = result.zoom;
     const auto vFov = result.zoom / m_aspectRatio;
+    NX_ASSERT(m_limits.pan && m_limits.tilt);
 
     if (!m_unlimitedPan)
     {
-        result.pan = qBound<double>(
-            m_limits.minPan + hFov / 2.0, result.pan, m_limits.maxPan - hFov / 2.0);
+        const auto pan = *m_limits.pan;
+        result.pan =
+            qBound<double>(pan.min + hFov / 2.0, result.pan, pan.max - hFov / 2.0);
     }
 
-    if (!m_unlimitedPan || !qFuzzyEquals(m_limits.minTilt, -90)
+    if (!m_unlimitedPan || !qFuzzyEquals(m_limits.tilt->min, -90)
         || m_itemDewarpingParams.panoFactor > 1)
     {
-        result.tilt = qMax(m_limits.minTilt + vFov / 2.0, result.tilt);
+        result.tilt = qMax(m_limits.tilt->min + vFov / 2.0, result.tilt);
     }
 
-    if (!m_unlimitedPan || !qFuzzyEquals(m_limits.maxTilt, 90)
+    if (!m_unlimitedPan || !qFuzzyEquals(m_limits.tilt->max, 90)
         || m_itemDewarpingParams.panoFactor > 1)
     {
-        result.tilt = qMin(m_limits.maxTilt - vFov  / 2.0, result.tilt);
+        result.tilt = qMin(m_limits.tilt->max - vFov / 2.0, result.tilt);
     }
 
     return result;
@@ -270,7 +262,7 @@ Ptz::Capabilities QnFisheyePtzController::getCapabilities(
 }
 
 bool QnFisheyePtzController::getLimits(
-    QnPtzLimits* limits,
+    nx::vms::api::PtzPositionLimits* limits,
     CoordinateSpace space,
     const Options& options) const
 {

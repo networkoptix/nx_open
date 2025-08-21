@@ -59,7 +59,7 @@ public:
         const Options& options) const override;
 
     virtual bool getLimits(
-        QnPtzLimits* limits,
+        nx::vms::api::PtzPositionLimits* limits,
         CoordinateSpace space,
         const Options& options) const override;
 

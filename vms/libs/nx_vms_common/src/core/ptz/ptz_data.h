@@ -11,7 +11,6 @@
 
 #include "ptz_auxiliary_trait.h"
 #include "ptz_fwd.h"
-#include "ptz_limits.h"
 #include "ptz_object.h"
 #include "ptz_preset.h"
 #include "ptz_tour.h"
@@ -31,8 +30,8 @@ struct QnPtzData
     Ptz::Capabilities capabilities;
     Vector logicalPosition;
     Vector devicePosition;
-    QnPtzLimits logicalLimits;
-    QnPtzLimits deviceLimits;
+    nx::vms::api::PtzPositionLimits logicalLimits;
+    nx::vms::api::PtzPositionLimits deviceLimits;
     Qt::Orientations flip;
     QnPtzPresetList presets;
     QnPtzTourList tours;

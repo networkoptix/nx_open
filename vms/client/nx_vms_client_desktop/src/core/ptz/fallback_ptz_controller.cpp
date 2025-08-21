@@ -132,7 +132,7 @@ bool QnFallbackPtzController::getPosition(
 }
 
 bool QnFallbackPtzController::getLimits(
-    QnPtzLimits* limits,
+    nx::vms::api::PtzPositionLimits* limits,
     CoordinateSpace space,
     const Options& options) const
 {

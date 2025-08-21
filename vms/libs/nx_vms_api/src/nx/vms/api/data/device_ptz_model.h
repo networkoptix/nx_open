@@ -90,7 +90,14 @@ struct NX_VMS_API MinMaxLimit
 
     /**%apidoc Maximum value. */
     qreal max = 0.0;
+
+    qreal range() const noexcept;
+    bool between(qreal val) const noexcept;
+    qreal clamp(qreal val) const noexcept;
+
+    bool operator==(const MinMaxLimit& other) const noexcept;
 };
+
 #define MinMaxLimit_Fields (min)(max)
 QN_FUSION_DECLARE_FUNCTIONS(MinMaxLimit, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MinMaxLimit, MinMaxLimit_Fields)
@@ -98,34 +105,38 @@ NX_REFLECTION_INSTRUMENT(MinMaxLimit, MinMaxLimit_Fields)
 struct NX_VMS_API PtzPositionLimits
 {
     /**%apidoc Pan limits. */
-    MinMaxLimit pan;
+    std::optional<MinMaxLimit> pan;
 
     /**%apidoc Tilt limits. */
-    MinMaxLimit tilt;
+    std::optional<MinMaxLimit> tilt;
 
     /**%apidoc Field of View (Zoom) limits. */
-    MinMaxLimit fov;
+    std::optional<MinMaxLimit> fov;
 
     /**%apidoc Rotation limits. */
-    MinMaxLimit rotation;
+    std::optional<MinMaxLimit> rotation;
 
     /**%apidoc Focus limits. */
-    MinMaxLimit focus;
+    std::optional<MinMaxLimit> focus;
 
     /**%apidoc Pan speed limits. */
-    MinMaxLimit panSpeed;
+    std::optional<MinMaxLimit> panSpeed;
 
     /**%apidoc Tilt speed limits. */
-    MinMaxLimit tiltSpeed;
+    std::optional<MinMaxLimit> tiltSpeed;
 
     /**%apidoc Zoom speed limits. */
-    MinMaxLimit zoomSpeed;
+    std::optional<MinMaxLimit> zoomSpeed;
 
     /**%apidoc Rotation speed limits. */
-    MinMaxLimit rotationSpeed;
+    std::optional<MinMaxLimit> rotationSpeed;
 
     /**%apidoc Focus speed limits. */
-    MinMaxLimit focusSpeed;
+    std::optional<MinMaxLimit> focusSpeed;
+
+    bool operator==(const PtzPositionLimits& other) const noexcept = default;
+
+    static PtzPositionLimits defaults() noexcept;
 };
 #define PtzPositionLimits_Fields (pan)(tilt)(fov)(rotation)(focus)\
     (panSpeed)(tiltSpeed)(zoomSpeed)(rotationSpeed)(focusSpeed)

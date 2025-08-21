@@ -42,7 +42,7 @@ Ptz::Capabilities CachingPtzController::getCapabilities(
 }
 
 bool CachingPtzController::getLimits(
-    QnPtzLimits* limits,
+    nx::vms::api::PtzPositionLimits* limits,
     CoordinateSpace space,
     const Options& options) const
 {

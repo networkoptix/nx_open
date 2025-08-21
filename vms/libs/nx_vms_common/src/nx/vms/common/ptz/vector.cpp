@@ -250,44 +250,57 @@ bool Vector::isValid() const
     return qIsNaN(*this);
 }
 
-Vector Vector::restricted(const QnPtzLimits& limits, LimitsType restrictionType) const
+Vector Vector::restricted(
+    const nx::vms::api::PtzPositionLimits& limits, LimitsType restrictionType) const
 {
+    const auto clamp =
+        [](const std::optional<nx::vms::api::MinMaxLimit>& o, const double v)
+        {
+            return o.transform([=](const nx::vms::api::MinMaxLimit& r) { return r.clamp(v); })
+                .value_or(0.0);
+        };
+
     if (restrictionType == LimitsType::position)
     {
-        return Vector(
-            std::clamp(pan, limits.minPan, limits.maxPan),
-            std::clamp(tilt, limits.minTilt, limits.maxTilt),
-            std::clamp(rotation, limits.minRotation, limits.maxRotation),
-            std::clamp(zoom, limits.minFov, limits.maxFov),
-            std::clamp(focus, limits.minFocus, limits.maxFocus));
+        return Vector{
+            clamp(limits.pan, pan),
+            clamp(limits.tilt, tilt),
+            clamp(limits.rotation, rotation),
+            clamp(limits.fov, zoom),
+            clamp(limits.focus, focus)};
     }
-
-    return Vector(
-            std::clamp(pan, limits.minPanSpeed, limits.maxPanSpeed),
-            std::clamp(tilt, limits.minTiltSpeed, limits.maxTiltSpeed),
-            std::clamp(rotation, limits.minRotationSpeed, limits.maxRotationSpeed),
-            std::clamp(zoom, limits.minZoomSpeed, limits.maxZoomSpeed),
-            std::clamp(focus, limits.minFocusSpeed, limits.maxFocusSpeed));
+    return Vector{
+        clamp(limits.panSpeed, pan),
+        clamp(limits.tiltSpeed, tilt),
+        clamp(limits.rotationSpeed, rotation),
+        clamp(limits.zoomSpeed, zoom),
+        clamp(limits.focusSpeed, focus)};
 }
 
-/*static*/ Vector Vector::rangeVector(const QnPtzLimits& limits, LimitsType limitsType)
+/*static*/ Vector Vector::rangeVector(const nx::vms::api::PtzPositionLimits& limits, LimitsType limitsType)
 {
+    const auto diff =
+        [](const std::optional<nx::vms::api::MinMaxLimit>& o)
+        {
+            return o.transform(&nx::vms::api::MinMaxLimit::range).value_or(0.0);
+        };
+
     if (limitsType == LimitsType::position)
     {
-        return Vector(
-            limits.maxPan - limits.minPan,
-            limits.maxTilt - limits.minTilt,
-            limits.maxRotation - limits.minRotation,
-            limits.maxFov - limits.minFov,
-            limits.maxFocus - limits.minFocus);
+        return Vector{
+            diff(limits.pan),
+            diff(limits.tilt),
+            diff(limits.rotation),
+            diff(limits.fov),
+            diff(limits.focus)};
     }
 
-    return Vector(
-        limits.maxPanSpeed - limits.minPanSpeed,
-        limits.maxTiltSpeed - limits.minTiltSpeed,
-        limits.maxRotationSpeed - limits.minRotationSpeed,
-        limits.maxZoomSpeed - limits.minZoomSpeed,
-        limits.maxFocusSpeed - limits.minFocusSpeed);
+    return Vector{
+        diff(limits.panSpeed),
+        diff(limits.tiltSpeed),
+        diff(limits.rotationSpeed),
+        diff(limits.zoomSpeed),
+        diff(limits.focusSpeed)};
 }
 
 QString Vector::toString() const
@@ -296,20 +309,22 @@ QString Vector::toString() const
 }
 
 // Scale from [-1, 1] to [min, max] range.
-double scaleSpeedComponent(double value, qreal min, qreal max)
+double scaleSpeedComponent(double value, const std::optional<nx::vms::api::MinMaxLimit>& r)
 {
+    if(!r.has_value())
+        return 0.0;
     const auto absolute = (value + 1) / 2;
-    return absolute * (max - min) + min;
+    return absolute * r->range() + r->min;
 }
 
-Vector Vector::scaleSpeed(const QnPtzLimits& limits) const
+Vector Vector::scaleSpeed(const nx::vms::api::PtzPositionLimits& limits) const
 {
     Vector result;
-    result.pan = scaleSpeedComponent(pan, limits.minPanSpeed, limits.maxPanSpeed);
-    result.tilt = scaleSpeedComponent(tilt, limits.minTiltSpeed, limits.maxTiltSpeed);
-    result.rotation = scaleSpeedComponent(rotation, limits.minRotationSpeed, limits.maxRotationSpeed);
-    result.zoom = scaleSpeedComponent(zoom, limits.minZoomSpeed, limits.maxZoomSpeed);
-    result.focus = scaleSpeedComponent(focus, limits.minFocusSpeed, limits.maxFocusSpeed);
+    result.pan = scaleSpeedComponent(pan, limits.panSpeed);
+    result.tilt = scaleSpeedComponent(tilt, limits.tiltSpeed);
+    result.rotation = scaleSpeedComponent(rotation, limits.rotationSpeed);
+    result.zoom = scaleSpeedComponent(zoom, limits.zoomSpeed);
+    result.focus = scaleSpeedComponent(focus, limits.focusSpeed);
     return result;
 }
 
@@ -344,6 +359,67 @@ QDebug operator<<(QDebug dbg, const nx::vms::common::ptz::Vector& ptzVector)
             ptzVector.focus);
 
     return dbg.maybeSpace();
+}
+
+qreal calcBestPan(qreal initialPan, nx::vms::api::MinMaxLimit range) noexcept
+{
+    bool unlimitedPan = false;
+    const qreal panRange = range.range();
+    if (qFuzzyCompare(panRange, 360) || panRange > 360)
+        unlimitedPan = true;
+
+    qreal pan = initialPan;
+    if (!unlimitedPan && !range.between(pan))
+    {
+        /* Round it to the nearest boundary. */
+        const qreal panBase = range.min - qMod(range.min, 360.0);
+        const qreal panShift = qMod(pan, 360.0);
+
+        qreal bestPan = pan;
+        qreal bestDist = std::numeric_limits<qreal>::max();
+
+        pan = panBase - 360.0 + panShift;
+        for (int i = 0; i < 3; i++)
+        {
+            qreal dist{};
+            if (pan < range.min)
+                dist = range.min - pan;
+            else if (pan > range.max)
+                dist = pan - range.max;
+            else
+                dist = 0.0;
+
+            if (dist < bestDist)
+            {
+                bestDist = dist;
+                bestPan = pan;
+            }
+
+            pan += 360.0;
+        }
+
+        pan = bestPan;
+    }
+    return pan;
+}
+
+nx::vms::common::ptz::Vector qBound(
+    const nx::vms::common::ptz::Vector& position, const nx::vms::api::PtzPositionLimits& limits)
+{
+    const auto clamp =
+        [](const std::optional<nx::vms::api::MinMaxLimit>& o, const double v)
+        {
+            return o.transform([=](const nx::vms::api::MinMaxLimit r) { return r.clamp(v); })
+                .value_or(0.0);
+        };
+    const auto bestPan = limits.pan
+        .transform([=](nx::vms::api::MinMaxLimit r) { return calcBestPan(position.pan, r); })
+        .value_or(0.0);
+    return nx::vms::common::ptz::Vector(
+        bestPan,
+        clamp(limits.tilt, position.tilt),
+        clamp(limits.rotation, position.rotation),
+        clamp(limits.fov, position.zoom));
 }
 
 nx::vms::common::ptz::Vector linearCombine(

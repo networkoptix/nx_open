@@ -29,13 +29,16 @@ typedef QList<QnPtzTour> QnPtzTourList;
 class QnPtzAuxiliaryTrait;
 typedef QList<QnPtzAuxiliaryTrait> QnPtzAuxiliaryTraitList;
 
-struct QnPtzLimits;
+namespace nx::vms::api {
+
+struct PtzPositionLimits;
+
+}
 
 struct QnPtzData;
 
 struct QnPtzObject;
 
-QN_FUSION_DECLARE_FUNCTIONS(QnPtzLimits, (json), NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(QnPtzTourSpot, (json), NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(QnPtzTour, (json), NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(QnPtzData, (json), NX_VMS_COMMON_API)

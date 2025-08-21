@@ -68,7 +68,7 @@ bool QnBasicPtzController::getPosition(
 }
 
 bool QnBasicPtzController::getLimits(
-    QnPtzLimits* /*limits*/,
+    nx::vms::api::PtzPositionLimits* /*limits*/,
     CoordinateSpace /*space*/,
     const Options& /*options*/) const
 {

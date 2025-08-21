@@ -56,13 +56,11 @@ QnPtzMapper::QnPtzMapper(
     if(qFuzzyCompare(maxPan - minPan, 720.0))
     {
         /* There are no limits for pan. */
-        m_logicalLimits.minPan = 0.0;
-        m_logicalLimits.maxPan = 360.0;
+        m_logicalLimits.pan = {0.0, 360.0};
     }
     else
     {
-        m_logicalLimits.minPan = minPan;
-        m_logicalLimits.maxPan = maxPan;
+        m_logicalLimits.pan = {minPan, maxPan};
     }
 
     auto lo = m_inputMapper->sourceToTarget(
@@ -71,10 +69,8 @@ QnPtzMapper::QnPtzMapper(
     auto hi = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(
         Vector(0, 90, 0, 360)));
 
-    m_logicalLimits.minTilt = lo.tilt;
-    m_logicalLimits.maxTilt = hi.tilt;
-    m_logicalLimits.minFov = lo.zoom;
-    m_logicalLimits.maxFov = hi.zoom;
+    m_logicalLimits.tilt = {lo.tilt, hi.tilt};
+    m_logicalLimits.fov = {lo.zoom, hi.zoom};
 }
 
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {

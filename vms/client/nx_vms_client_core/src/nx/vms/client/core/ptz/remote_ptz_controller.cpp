@@ -276,7 +276,7 @@ bool RemotePtzController::getPosition(
 }
 
 bool RemotePtzController::getLimits(
-    QnPtzLimits* /*limits*/,
+    nx::vms::api::PtzPositionLimits* /*limits*/,
     CoordinateSpace,
     const Options& /*options*/) const
 {

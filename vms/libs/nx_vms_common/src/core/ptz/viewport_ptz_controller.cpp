@@ -55,12 +55,15 @@ bool QnViewportPtzController::viewportMove(
 
     /* Note that we don't care about getLimits result as default-constructed
      * limits is actually 'no limits'. */
-    QnPtzLimits limits;
+    nx::vms::api::PtzPositionLimits limits;
     getLimits(&limits, CoordinateSpace::logical, options);
 
     // In theory projection should be a part of controller's interface.
     Projection projection = Projection::Rectilinear;
-    if(limits.maxFov > 180.0 || qFuzzyCompare(limits.maxFov, 180.0))
+    const auto maxFov = limits.fov
+        .transform([](const nx::vms::api::MinMaxLimit& r) { return r.max; })
+        .value_or(360.0); //< "No limits" value.
+    if (maxFov > 180.0 || qFuzzyCompare(maxFov, 180.0))
         projection = Projection::Equirectangular;
 
     /* Same here, we don't care about getFlip result. */
