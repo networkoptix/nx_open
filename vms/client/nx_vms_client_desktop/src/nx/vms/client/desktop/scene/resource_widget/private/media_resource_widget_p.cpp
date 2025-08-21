@@ -193,6 +193,16 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
                 emit isIoModuleChanged();
             });
 
+        connect(camera.get(), &core::CameraResource::hasVideoChanged, this,
+            [this]
+            {
+                if (this->hasVideo == camera->hasVideo())
+                    return;
+
+                this->hasVideo = camera->hasVideo();
+                emit hasVideoChanged();
+            });
+
         updateAccess();
         updateIsAnalyticsSupported();
 

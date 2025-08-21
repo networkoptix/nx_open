@@ -57,8 +57,8 @@
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
-#include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h> //< TODO: #sivanov Remove this dependency.
 #include <nx/vms/client/core/resource/camera_resource.h>
+#include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h> //< TODO: #sivanov Remove this dependency.
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
@@ -423,11 +423,26 @@ QnMediaResourceWidget::QnMediaResourceWidget(
             updateButtonsVisibility();
         };
 
-    connect(d.get(), &MediaResourceWidgetPrivate::stateChanged,
-        this, updateVisualComponents);
+    connect(d.get(), &MediaResourceWidgetPrivate::stateChanged, this, updateVisualComponents);
+    connect(d.get(), &MediaResourceWidgetPrivate::isIoModuleChanged, this,
+        [this, updateVisualComponents]
+        {
+            updateIoModuleComponents();
+            updateAudioSpecificComponents();
+            updateVisualComponents();
 
-    connect(d.get(), &MediaResourceWidgetPrivate::isIoModuleChanged,
-        this, updateVisualComponents);
+            updateAudioPlaybackState();
+        });
+
+    connect(d.get(), &MediaResourceWidgetPrivate::hasVideoChanged, this,
+        [this]
+        {
+            updateVideoSpecificComponents();
+            updateAudioSpecificComponents();
+            updateButtonsVisibility();
+
+            updateAudioPlaybackState();
+        });
 
     connect(d.get(), &MediaResourceWidgetPrivate::analyticsSupportChanged, this,
         &QnMediaResourceWidget::updateButtonsVisibility);
@@ -495,7 +510,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     /* Set up buttons. */
     createButtons();
     initStatusOverlayController();
-
 
     // TODO: #sivanov Get rid of resourceChanged.
     connect(base_type::resource().get(), &QnResource::resourceChanged, this,
@@ -698,7 +712,7 @@ void QnMediaResourceWidget::initBlurMask()
 
 void QnMediaResourceWidget::initIoModuleOverlay()
 {
-    if (d->isIoModule)
+    if (d->isIoModule && !m_ioModuleOverlayWidget)
     {
         // TODO: #vkutin Make a style metric that holds this value.
         const auto topMargin = titleBar()
@@ -727,7 +741,7 @@ void QnMediaResourceWidget::initIoModuleOverlay()
 
 void QnMediaResourceWidget::initAreaSelectOverlay()
 {
-    if (!hasVideo())
+    if (!hasVideo() || m_areaSelectOverlayWidget)
         return;
 
     m_areaSelectOverlayWidget = new AreaSelectOverlayWidget(m_compositeOverlay, this);
@@ -745,22 +759,24 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
 
 void QnMediaResourceWidget::initAnalyticsOverlays()
 {
-    if (!hasVideo())
+    if (!hasVideo() || (m_roiFiguresOverlayWidget && m_analyticsOverlayWidget))
         return;
 
-    m_roiFiguresOverlayWidget = new RoiFiguresOverlayWidget(d->camera, m_compositeOverlay);
-    addOverlayWidget(m_roiFiguresOverlayWidget, {Visible, OverlayFlag::bindToViewport});
+    if (!m_roiFiguresOverlayWidget)
+    {
+        m_roiFiguresOverlayWidget = new RoiFiguresOverlayWidget(d->camera, m_compositeOverlay);
+        addOverlayWidget(m_roiFiguresOverlayWidget, {Visible, OverlayFlag::bindToViewport});
+    }
 
-    m_analyticsOverlayWidget = new AnalyticsOverlayWidget(m_compositeOverlay);
-    addOverlayWidget(m_analyticsOverlayWidget,
-        {Visible, OverlayFlag::autoRotate | OverlayFlag::bindToViewport});
+    if (!m_analyticsOverlayWidget)
+    {
+        m_analyticsOverlayWidget = new AnalyticsOverlayWidget(m_compositeOverlay);
+        addOverlayWidget(m_analyticsOverlayWidget,
+            {Visible, OverlayFlag::autoRotate | OverlayFlag::bindToViewport});
+    }
 
     connect(m_statusOverlay, &QnStatusOverlayWidget::opacityChanged, this,
-        [this]()
-        {
-            updateAnalyticsVisibility();
-            updateHud(false);
-        });
+        &QnMediaResourceWidget::updateAnalyticsAndHud, Qt::UniqueConnection);
 }
 
 void QnMediaResourceWidget::initStatusOverlayController()
@@ -830,7 +846,7 @@ void QnMediaResourceWidget::initStatusOverlayController()
 
 void QnMediaResourceWidget::initCameraHotspotsOverlay()
 {
-    if (!canDisplayHotspots())
+    if (!canDisplayHotspots() || m_cameraHotspotsOverlayWidget)
         return;
 
     connect(d->camera.get(), &nx::vms::client::core::CameraResource::cameraHotspotsEnabledChanged,
@@ -845,7 +861,7 @@ void QnMediaResourceWidget::initCameraHotspotsOverlay()
 
 void QnMediaResourceWidget::initAudioSpectrumOverlay()
 {
-    if (!mightShowAudioSpectrum())
+    if (!mightShowAudioSpectrum() || m_audioSpectrumOverlayWidget)
         return;
 
     m_audioSpectrumOverlayWidget = new AudioSpectrumOverlayWidget(display(), m_compositeOverlay);
@@ -863,6 +879,73 @@ bool QnMediaResourceWidget::shouldShowAudioSpectrum() const
 {
     return mightShowAudioSpectrum() && hasAudio();
 }
+
+void QnMediaResourceWidget::updateVideoSpecificComponents()
+{
+    if (hasVideo())
+    {
+        initAnalyticsOverlays();
+        initAreaSelectOverlay();
+    }
+    else
+    {
+        if (m_analyticsOverlayWidget)
+        {
+            removeOverlayWidget(m_analyticsOverlayWidget);
+            m_analyticsOverlayWidget->deleteLater();
+            m_analyticsOverlayWidget = nullptr;
+        }
+
+        if (m_roiFiguresOverlayWidget)
+        {
+            removeOverlayWidget(m_roiFiguresOverlayWidget);
+            m_roiFiguresOverlayWidget->deleteLater();
+            m_roiFiguresOverlayWidget = nullptr;
+        }
+
+        if (m_areaSelectOverlayWidget)
+        {
+            removeOverlayWidget(m_areaSelectOverlayWidget);
+            m_areaSelectOverlayWidget->deleteLater();
+            m_areaSelectOverlayWidget = nullptr;
+        }
+    }
+
+    if (d->analyticsController)
+        d->analyticsController->setAnalyticsOverlayWidget(m_analyticsOverlayWidget);
+}
+
+void QnMediaResourceWidget::updateAudioSpecificComponents()
+{
+    if (mightShowAudioSpectrum())
+    {
+        initAudioSpectrumOverlay();
+    }
+    else if (m_audioSpectrumOverlayWidget)
+    {
+        removeOverlayWidget(m_audioSpectrumOverlayWidget);
+        m_audioSpectrumOverlayWidget->deleteLater();
+        m_audioSpectrumOverlayWidget = nullptr;
+    }
+}
+
+void QnMediaResourceWidget::updateIoModuleComponents()
+{
+    if (d->isIoModule)
+    {
+        initIoModuleOverlay();
+        const bool animate = animationAllowed();
+        updateIoModuleVisibility(animate);
+    }
+    else if (m_ioModuleOverlayWidget)
+    {
+        removeOverlayWidget(m_ioModuleOverlayWidget);
+        m_ioModuleOverlayWidget->deleteLater();
+        m_ioModuleOverlayWidget = nullptr;
+    }
+}
+
+
 
 QnMediaResourceWidget::AreaType QnMediaResourceWidget::areaSelectionType() const
 {
@@ -2962,6 +3045,12 @@ void QnMediaResourceWidget::at_imageEnhancementButton_toggled(bool checked)
     setImageEnhancement(params);
 }
 
+void QnMediaResourceWidget::updateAnalyticsAndHud()
+{
+    updateAnalyticsVisibility();
+    updateHud(false);
+}
+
 void QnMediaResourceWidget::at_ioModuleButton_toggled(bool /*checked*/)
 {
     if (m_ioModuleOverlayWidget)
@@ -3067,6 +3156,9 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
 {
     if (!d->isIoModule)
         return;
+
+    if (!m_ioModuleOverlayWidget)
+        initIoModuleOverlay();
 
     const QnImageButtonWidget* const button = titleBar()->rightButtonsBar()->button(Qn::IoModuleButton);
     const bool ioBtnChecked = (button && button->isChecked());
