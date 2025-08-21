@@ -6,17 +6,17 @@
     <message numerus="yes">
       <source>%n Object Types</source>
       <comment>%n is number of types</comment>
-      <translation type="unfinished">
-        <numerusform>%n Object Types</numerusform>
-        <numerusform>%n Object Types</numerusform>
+      <translation>
+        <numerusform>%n Objekttyper</numerusform>
+        <numerusform>%n Objekttyper</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Object Attributes</source>
       <comment>%n is number of attributes</comment>
-      <translation type="unfinished">
-        <numerusform>%n Object Attributes</numerusform>
-        <numerusform>%n Object Attributes</numerusform>
+      <translation>
+        <numerusform>%n Objekt Attributter</numerusform>
+        <numerusform>%n Objekt Attributter</numerusform>
       </translation>
     </message>
     <message>
@@ -35,18 +35,18 @@
     <name>nx::vms::client::mobile::MediaDownloadBackend</name>
     <message>
       <source>Can&apos;t download video</source>
-      <translation type="unfinished">Can&apos;t download video</translation>
+      <translation>Kan&apos;t downloade video</translation>
     </message>
     <message>
       <source>Please check a network connection.</source>
-      <translation type="unfinished">Please check a network connection.</translation>
+      <translation>Tjek venligst en netværksforbindelse.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::PtzCameraButtonController</name>
     <message>
       <source>Control PTZ</source>
-      <translation type="unfinished">Control PTZ</translation>
+      <translation>Kontrol PTZ</translation>
     </message>
   </context>
   <context>
@@ -73,7 +73,7 @@
     <message>
       <source>Expires in %1</source>
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>Udløber om %1</translation>
     </message>
     <message>
       <source>Error</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>Kan ikke dele bogmærke.</translation>
     </message>
   </context>
   <context>
@@ -93,7 +93,7 @@
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>Kan ikke oprette forbindelse til webstedet &quot;%1&quot;</translation>
     </message>
   </context>
 </TS>

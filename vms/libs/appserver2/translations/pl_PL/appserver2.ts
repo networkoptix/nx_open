@@ -337,7 +337,7 @@
     </message>
     <message>
       <source>It is forbidden to change Server deployment code</source>
-      <translation type="unfinished">It is forbidden to change Server deployment code</translation>
+      <translation>Zabrania się zmiany kodu wdrożenia serwera</translation>
     </message>
     <message>
       <source>Storage with the same url already exists</source>

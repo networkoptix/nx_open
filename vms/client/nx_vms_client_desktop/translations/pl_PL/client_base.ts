@@ -2018,7 +2018,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+      <translation>Uwaga: Funkcja ulepszania obrazu nie jest dostępna, gdy włączone jest sprzętowe dekodowanie wideo.</translation>
     </message>
   </context>
   <context>
@@ -7008,15 +7008,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>Aby wykonać kopię zapasową w chmurze, witryna musi być aktywna. %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>Tworzenie kopii zapasowych w chmurze jest kontynuowane, ale witryna jest obecnie zawieszona. Musi być aktywna, aby zmodyfikować ustawienia &quot;Co kopiować&quot; i &quot;Jakość kopii&quot; dla urządzenia lub włączyć kopię zapasową w chmurze. Możesz ją również wyłączyć. %1</translation>
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>Liczba urządzeń wybranych do kopii zapasowej przekracza dostępne usługi. Dodaj dodatkowe usługi lub zmniejsz liczbę urządzeń skonfigurowanych do kopii zapasowej. Na %1 witryna automatycznie ograniczy liczbę urządzeń zapasowych do liczby dostępnych usług</translation>
     </message>
   </context>
   <context>
@@ -9026,7 +9026,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LdapSettingsWidget</name>
     <message>
       <source>Disconnect LDAP server?</source>
-      <translation type="unfinished">Disconnect LDAP server?</translation>
+      <translation>Odłączyć serwer LDAP?</translation>
     </message>
     <message>
       <source>Disconnect</source>
