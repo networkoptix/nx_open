@@ -225,9 +225,15 @@ void ServerCertificateViewer::setCertificateData(
 {
     NX_ASSERT(!certificates.empty());
     m_certificates = nx::network::ssl::completeCertificateChain(certificates);
+    std::string errorMessage;
     m_rootCertificateIsTrusted = !m_certificates.empty()
         && nx::network::ssl::verifyBySystemCertificates(
-            nx::network::ssl::CertificateChainView{m_certificates.front().x509()}, {});
+            nx::network::ssl::CertificateChainView{m_certificates.front().x509()},
+            /*hostname*/ {},
+            &errorMessage);
+
+    if (!m_rootCertificateIsTrusted && !m_certificates.empty())
+        NX_DEBUG(this, "System CA verification result: %1", errorMessage);
 
     setWindowTitle(calculateDialogTitle(mode));
 
