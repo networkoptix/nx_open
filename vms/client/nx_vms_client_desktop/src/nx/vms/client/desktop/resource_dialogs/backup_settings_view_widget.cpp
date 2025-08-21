@@ -377,10 +377,6 @@ bool BackupSettingsViewWidget::hasChanges() const
     return m_backupSettingsDecoratorModel->hasChanges();
 }
 
-void BackupSettingsViewWidget::loadDataToUi()
-{
-}
-
 void BackupSettingsViewWidget::applyChanges()
 {
     m_backupSettingsDecoratorModel->applyChanges();
@@ -392,6 +388,8 @@ void BackupSettingsViewWidget::discardChanges()
     m_backupSettingsDecoratorModel->discardChanges();
     resourceViewWidget()->clearSelection();
     resourceViewWidget()->clearFilter();
+    updateChangedGlobalSettingsWarning();
+
     NX_ASSERT(!isNetworkRequestRunning());
 }
 

@@ -29,7 +29,6 @@ public:
     virtual ~BackupSettingsViewWidget() override;
 
     bool hasChanges() const;
-    void loadDataToUi();
     void applyChanges();
     void discardChanges();
     bool isNetworkRequestRunning() const;
