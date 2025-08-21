@@ -43,6 +43,11 @@ QnLicenseErrorCode Validator::validate(const QnLicensePtr& license, ValidationMo
     if (!license->isValidSignature() && mode != VM_CanActivate)
         return QnLicenseErrorCode::InvalidSignature;
 
+    // Maintain backward compatibility: if no license is found during activation,
+    // use that code as a fallback.
+    if (license->key().isEmpty() && mode == VM_CanActivate)
+        return QnLicenseErrorCode::InvalidHardwareID;
+
     nx::Uuid currentServerId;
     auto connection = messageBusConnection();
     if (connection)
@@ -50,6 +55,16 @@ QnLicenseErrorCode Validator::validate(const QnLicensePtr& license, ValidationMo
 
     const auto& manager = m_context->runtimeInfoManager();
     QnPeerRuntimeInfo info;
+
+    // TODO: #rvasilenko make NEVER an INT64_MAX
+    if (license->expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > license->expirationTime())
+        return QnLicenseErrorCode::Expired;
+
+    if (license->isUniqueLicenseType())
+        return isValidUniqueLicense(license, mode);
+
+    if (license->type() == Qn::LC_Invalid)
+        return QnLicenseErrorCode::FutureLicense;
 
     if (license->type() == Qn::LC_SaasLocalRecording)
     {
@@ -72,15 +87,6 @@ QnLicenseErrorCode Validator::validate(const QnLicensePtr& license, ValidationMo
     if (!license->brand().isEmpty() && license->brand() != info.data.brand)
         return QnLicenseErrorCode::InvalidBrand;
 
-    // TODO: #rvasilenko make NEVER an INT64_MAX
-    if (license->expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > license->expirationTime())
-        return QnLicenseErrorCode::Expired;
-
-    if (license->isUniqueLicenseType())
-        return isValidUniqueLicense(license, mode);
-
-    if (license->type() == Qn::LC_Invalid)
-        return QnLicenseErrorCode::FutureLicense;
 
     return QnLicenseErrorCode::NoError;
 }
