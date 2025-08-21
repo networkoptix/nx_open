@@ -5,31 +5,31 @@
     <name>AccessRightHelper</name>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>Se live</translation>
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Afspil lyd</translation>
     </message>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Se arkiv</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Eksportér arkiv</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>Vis bogmærker</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Administrer bogmærker</translation>
     </message>
     <message>
       <source>User Input</source>
-      <translation type="unfinished">User Input</translation>
+      <translation>Bruger Input</translation>
     </message>
     <message>
       <source>Edit Settings</source>
@@ -60,14 +60,14 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>Site Hændelse</translation>
     </message>
   </context>
   <context>
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>din regionale / licens support</translation>
     </message>
   </context>
   <context>
@@ -187,20 +187,20 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>Site Sundhed Fremvisere</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>Medlemmer af denne gruppe har ubegrænsede webstedsrettigheder. Administratorer kan oprette og ændre superbrugere, flette websteder og forbinde eller afbryde webstedet til %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Medlemmer af denne gruppe kan, ud over de tilladelser, der er givet af gruppen Avancerede læsere, kontrollere det meste af webstedskonfigurationen, men har ikke tilladelse til at ændre administratorrelaterede indstillinger, f. eks. slette eller ændre deres egne grupper og tilladelser, og kan ikke oprette eller redigere andre superbrugere.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Medlemmer af denne gruppe kan se oplysninger om overvågning af webstedets tilstand og server processor belastning i realtid (serverovervågning).</translation>
     </message>
   </context>
   <context>
@@ -215,31 +215,31 @@
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Vælg mindst én enhed</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Vælg mindst ét kamera</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 devices</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 devices</numerusform>
-        <numerusform>%n of %1 devices</numerusform>
+      <translation>
+        <numerusform>%n af %1 enheder</numerusform>
+        <numerusform>%n af %1 enheder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 cameras</numerusform>
-        <numerusform>%n of %1 cameras</numerusform>
+      <translation>
+        <numerusform>%n af %1 kameraer</numerusform>
+        <numerusform>%n af %1 kameraer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 I/O modules</numerusform>
-        <numerusform>%n of %1 I/O modules</numerusform>
+      <translation>
+        <numerusform>%n af %1 I/O-moduler</numerusform>
+        <numerusform>%n af %1 I/O-moduler</numerusform>
       </translation>
     </message>
   </context>
@@ -247,38 +247,38 @@
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>Servere der understøtter buzzer</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsEventsPolicy</name>
     <message>
       <source>Analytics events are not available for %1</source>
-      <translation type="unfinished">Analytics events are not available for %1</translation>
+      <translation>Analysehændelser er ikke tilgængelige for %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsObjectsPolicy</name>
     <message>
       <source>Analytics objects are not available for %1</source>
-      <translation type="unfinished">Analytics objects are not available for %1</translation>
+      <translation>Analyseobjekter er ikke tilgængelige for %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
-      <translation type="unfinished">Select device</translation>
+      <translation>Vælg enhed</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Vælg kamera</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
+      <translation>
+        <numerusform>%1 understøtter ikke to-vejs lyd</numerusform>
+        <numerusform>%1 understøtter ikke to-vejs lyd</numerusform>
       </translation>
     </message>
   </context>
@@ -513,9 +513,9 @@
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
+      <translation>
+        <numerusform>%1 har ingen input-porte</numerusform>
+        <numerusform>%1 har ingen input-porte</numerusform>
       </translation>
     </message>
   </context>
@@ -523,7 +523,7 @@
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Optagelse eller bevægelsesdetektering er deaktiveret for %1</translation>
     </message>
   </context>
   <context>
@@ -537,9 +537,9 @@
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
+      <translation>
+        <numerusform>%1 har ingen output relæer</numerusform>
+        <numerusform>%1 har ingen output relæer</numerusform>
       </translation>
     </message>
   </context>
@@ -547,7 +547,7 @@
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>Optagelse er deaktiveret for %1</translation>
     </message>
   </context>
   <context>
@@ -555,9 +555,9 @@
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>%n af %1 valgte brugere er ikke %2 brugere og vil ikke få mobile notifikationer.</numerusform>
+        <numerusform>%n af %1 valgte brugere er ikke %2 brugere og vil ikke få mobile notifikationer.</numerusform>
       </translation>
     </message>
   </context>
@@ -565,44 +565,44 @@
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Vælg præcis ét kamera</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
-      <translation type="unfinished">%1 has no PTZ presets</translation>
+      <translation>%1 har ingen PTZ forudindstillinger</translation>
     </message>
   </context>
   <context>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>Servere, der understøtter fan diagnostik</translation>
     </message>
   </context>
   <context>
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Vælg præcis ét kamera</translation>
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>Dette kamera er i øjeblikket ikke på det valgte layout</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>Dette kamera er i øjeblikket ikke på nogle af de valgte layouts</translation>
     </message>
   </context>
   <context>
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>Brugere har ikke adgang til det valgte layout</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Nogle brugere har ikke adgang til det valgte layout</translation>
     </message>
   </context>
   <context>
@@ -912,77 +912,77 @@
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
+      <translation>
+        <numerusform>%n Lokale optagelsestjenester</numerusform>
+        <numerusform>%n Lokale optagelsestjenester</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
-        <numerusform>%n/%1 Local recording services</numerusform>
+      <translation>
+        <numerusform>%n/%1 Lokale optagelsestjenester</numerusform>
+        <numerusform>%n/%1 Lokale optagelsestjenester</numerusform>
       </translation>
     </message>
     <message>
       <source>Local recording services</source>
-      <translation type="unfinished">Local recording services</translation>
+      <translation>Lokale optagelsestjenester</translation>
     </message>
   </context>
   <context>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>Servere, der understøtter PoE overvågning</translation>
     </message>
   </context>
   <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message numerus="yes">
       <source>%n groups</source>
-      <translation type="unfinished">
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
+      <translation>
+        <numerusform>%n grupper</numerusform>
+        <numerusform>%n grupper</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
+      <translation>
+        <numerusform>%n brugere</numerusform>
+        <numerusform>%n brugere</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
       <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+      <translation>%1 og %2 har ikke %3 tilladelse til nogle af de valgte kameraer</translation>
     </message>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>%n grupper har ikke %1 tilladelse til nogle af de valgte kameraer</numerusform>
+        <numerusform>%n grupper har ikke %1 tilladelse til nogle af de valgte kameraer</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>%1 gruppe har ikke %2 tilladelse til nogle af de valgte kameraer</translation>
     </message>
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>%n brugere har ikke %1 tilladelse til nogle af de valgte kameraer</numerusform>
+        <numerusform>%n brugere har ikke %1 tilladelse til nogle af de valgte kameraer</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">%1 user does not have %2 permission for some of selected cameras</translation>
+      <translation>%1 bruger har ikke %2 tilladelse til nogle af de valgte kameraer</translation>
     </message>
   </context>
   <context>
@@ -1057,7 +1057,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>Ingen af de valgte brugerroller indeholder brugere</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1371,7 +1371,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nyt Site</translation>
     </message>
   </context>
   <context>
@@ -1934,7 +1934,7 @@
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>
-      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+      <translation>Krypteringsnøgle, der bruges til at kode sikre cookieværdier.</translation>
     </message>
   </context>
 </TS>

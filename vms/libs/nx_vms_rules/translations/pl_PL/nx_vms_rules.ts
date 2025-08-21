@@ -262,7 +262,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>Dla użytkowników</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -1085,7 +1085,7 @@
     </message>
     <message>
       <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
+      <translation>Wyślij e-mail</translation>
     </message>
     <message>
       <source>Additional Recipients</source>

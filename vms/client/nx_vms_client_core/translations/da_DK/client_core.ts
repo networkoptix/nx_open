@@ -13,11 +13,11 @@
     <name>QnSystemsModel</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nyt Site</translation>
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Dit Site</translation>
     </message>
     <message>
       <source>Owner: %1</source>
@@ -66,11 +66,11 @@
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation>LDAP-serverforbindelse timeout</translation>
+      <translation>LDAP server forbindelse timeout</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out.</source>
-      <translation>LDAP-serverforbindelse timeout.</translation>
+      <translation>LDAP server forbindelse timeout.</translation>
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>
@@ -138,7 +138,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>Forbindelsen til %1 er ikke klar endnu. Kontroller serverens&apos;internetforbindelse, eller prøv igen senere.</translation>
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
@@ -146,43 +146,43 @@
     </message>
     <message>
       <source>If this error persists, please contact your site administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+      <translation>Hvis denne fejl fortsætter, bedes du kontakte din webstedsadministrator.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>Log ind som en %1 bruger til webstedet i en nedluknings tilstand er forbudt. Du kan stadig oprette forbindelse som lokal bruger.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>Det er forbudt at logge ind som en %1 -bruger på webstedet i suspenderet tilstand. Du kan stadig oprette forbindelse som lokal bruger.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this site with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+      <translation>Log ind på %1 for at logge ind på dette websted med %2 brugeren</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a site administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+      <translation>Session varighed grænse kan ændres af en site administrator.</translation>
     </message>
     <message>
       <source>Your access to this site has expired.</source>
-      <translation type="unfinished">Your access to this site has expired.</translation>
+      <translation>Din adgang til dette site er udløbet.</translation>
     </message>
     <message>
       <source>Please contact the site administrator to regain access.</source>
-      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+      <translation>Kontakt venligst administratoren for at få adgang til sitet.</translation>
     </message>
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>For at logge ind på dette websted skal du deaktivere &quot;. Bed om en bekræftelses kode ved hvert login med din %1 konto&quot; i din %2.</translation>
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+      <translation>Denne bruger er blevet deaktiveret af en webstedsadministrator.</translation>
     </message>
     <message>
       <source>Failed to access site</source>
@@ -193,7 +193,7 @@
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Ukendt nummer</translation>
     </message>
     <message>
       <source>deleted camera</source>
@@ -228,15 +228,15 @@
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      <translation>
+        <numerusform>Kan ikke bekræfte identiteten af %n serverne</numerusform>
+        <numerusform>Kan ikke bekræfte identiteten af %n serverne</numerusform>
       </translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>For at lære mere om det aktuelle problem, læs dette %1.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
@@ -244,15 +244,15 @@
     </message>
     <message>
       <source>Review the certificate to ensure you trust the server you are connecting to.</source>
-      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
+      <translation>Gennemgå certifikatet for at sikre, at du har tillid til den server, du opretter forbindelse til.</translation>
     </message>
     <message>
       <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
-      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
+      <translation>Gennemgå servercertifikaterne for at sikre, at du har tillid til det websted, du opretter forbindelse til.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+      <translation>Dette kan skyldes et udløbet servercertifikat eller et ugyldigt certifikat. Kontakt din site administrator for yderligere undersøgelse.</translation>
     </message>
   </context>
   <context>
@@ -267,7 +267,7 @@
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>Klik for at vise kameraer</translation>
     </message>
   </context>
   <context>
@@ -275,19 +275,19 @@
     <message>
       <source>%1 (Copy)</source>
       <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
+      <translation>%1 (Kopi)</translation>
     </message>
     <message>
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
+      <translation>%1 (Kopi %2)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>Ukendt kamera</translation>
     </message>
   </context>
   <context>
@@ -305,12 +305,12 @@
     <name>nx::vms::client::core::DirectSystemFinder</name>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Site</translation>
     </message>
     <message>
       <source>Site (%1)</source>
       <comment>%1 is ip and port of the site</comment>
-      <translation type="unfinished">Site (%1)</translation>
+      <translation>Site (%1)</translation>
     </message>
   </context>
   <context>
@@ -356,11 +356,11 @@
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>Åben dør</translation>
     </message>
     <message>
       <source>Stop Object Tracking</source>
-      <translation type="unfinished">Stop Object Tracking</translation>
+      <translation>Stop objektsporing</translation>
     </message>
   </context>
   <context>
@@ -374,7 +374,7 @@
     <name>nx::vms::client::core::OrganizationsFilterModel</name>
     <message>
       <source>Other results</source>
-      <translation type="unfinished">Other results</translation>
+      <translation>Andre resultater</translation>
     </message>
   </context>
   <context>
@@ -385,7 +385,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Mapper</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -400,11 +400,11 @@
     <name>nx::vms::client::core::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation type="unfinished">Not recording</translation>
+      <translation>Optager ikke</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation type="unfinished">Recording everything</translation>
+      <translation>Optager alt</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
@@ -412,7 +412,7 @@
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation type="unfinished">Recording motion only</translation>
+      <translation>Kun optagelse af bevægelse</translation>
     </message>
     <message>
       <source>Recording objects only</source>
@@ -424,7 +424,7 @@
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation type="unfinished">Recording motion and low quality</translation>
+      <translation>Optagelse af bevægelse og lav kvalitet</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
@@ -432,7 +432,7 @@
     </message>
     <message>
       <source>Continuous</source>
-      <translation type="unfinished">Continuous</translation>
+      <translation>Kontinuerlig</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -440,7 +440,7 @@
     </message>
     <message>
       <source>Motion only</source>
-      <translation type="unfinished">Motion only</translation>
+      <translation>Kun bevægelse</translation>
     </message>
     <message>
       <source>Objects only</source>
@@ -452,7 +452,7 @@
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Bevægelse + Lav opløsning</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
@@ -463,7 +463,7 @@
     <name>nx::vms::client::core::SingleSystemDescription</name>
     <message>
       <source>Unnamed Site</source>
-      <translation type="unfinished">Unnamed Site</translation>
+      <translation>Unavngivet site</translation>
     </message>
   </context>
   <context>
@@ -474,7 +474,7 @@
     </message>
     <message>
       <source>press and hold</source>
-      <translation type="unfinished">press and hold</translation>
+      <translation>tryk og hold nede</translation>
     </message>
   </context>
   <context>
