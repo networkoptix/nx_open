@@ -1529,7 +1529,7 @@ LayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(
     QSet<QnResourcePtr> filtered;
     QnVirtualCameraResourceList cameras;
     QMap<qreal, int> aspectRatios;
-    qreal defaultAr = QnLayoutResource::kDefaultCellAspectRatio;
+    const qreal defaultAr = QnLayoutResource::kDefaultCellAspectRatio;
 
     auto addToFiltered =
         [&](const QnResourcePtr &resource)
@@ -1537,11 +1537,7 @@ LayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(
             if (filtered.contains(resource))
                 return;
 
-            bool allowed = QnResourceAccessFilter::isShareableMedia(resource)
-                || resource->hasFlags(Qn::desktop_camera)
-                || resource->hasFlags(Qn::local_media);
-
-            if (!allowed)
+            if (!QnResourceAccessFilter::isShareableViaVideowall(resource))
                 return;
 
             filtered << resource;
@@ -2199,6 +2195,8 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
 
     if (!layoutIsBeingDropped)
         filterAllowedMediaResources(targetResources);
+    else if (targetResources.front()->hasFlags(Qn::cross_system))
+        return; //< Disable dropping cross-system layouts to Video Wall.
 
     if (targetResources.isEmpty())
         return;
@@ -3290,15 +3288,8 @@ void QnWorkbenchVideoWallHandler::filterAllowedMediaResources(QnResourceList& re
     const auto isAllowed =
         [](const QnResourcePtr& resource)
         {
-            if (resource->hasFlags(Qn::cross_system))
+            if (!QnResourceAccessFilter::isShareableViaVideowall(resource))
                 return false;
-
-            if (!(QnResourceAccessFilter::isShareableMedia(resource)
-                || resource->hasFlags(Qn::desktop_camera)
-                || resource->hasFlags(Qn::local_media)))
-            {
-                return false;
-            }
 
             if (resource.objectCast<QnVirtualCameraResource>())
             {

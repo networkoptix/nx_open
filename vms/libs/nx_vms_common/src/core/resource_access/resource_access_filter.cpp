@@ -50,7 +50,11 @@ bool QnResourceAccessFilter::isShareable(Filter filter, const QnResourcePtr& res
 
 bool QnResourceAccessFilter::isShareableViaVideowall(const QnResourcePtr& resource)
 {
+    if (resource->hasFlags(Qn::cross_system))
+        return false;
+
     return resource->hasFlags(Qn::desktop_camera)
+        || resource->hasFlags(Qn::local_media)
         || isShareableMedia(resource);
 }
 
