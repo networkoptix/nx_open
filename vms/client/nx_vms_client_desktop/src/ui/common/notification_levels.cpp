@@ -19,6 +19,8 @@ int QnNotificationLevel::priority(nx::vms::common::SystemContext* systemContext,
     // team in the specification.
     static const std::vector priorityOrder = {
         // Important priorities.
+        MessageType::cloudStorageIsAvailable,
+        MessageType::cloudStorageIsEnabled,
         MessageType::notificationLanguageDiffers,
         MessageType::saasInShutdownState,
         MessageType::saasInSuspendedState,
@@ -90,6 +92,8 @@ nx::vms::event::Level QnNotificationLevel::valueOf(
         case MessageType::saasInSuspendedState:
         case MessageType::saasInShutdownState:
         case MessageType::notificationLanguageDiffers:
+        case MessageType::cloudStorageIsAvailable:
+        case MessageType::cloudStorageIsEnabled:
             return nx::vms::event::Level::important;
 
         case MessageType::saasTierIssue:

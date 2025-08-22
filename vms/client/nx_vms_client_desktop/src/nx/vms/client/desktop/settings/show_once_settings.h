@@ -75,6 +75,9 @@ public:
     /** Confirmation which is displayed on disconnecting from system. */
     Property<bool> disconnectFromSystem{this, "disconnectFromSystem"};
 
+    /** Warning which is displayed when cloud storage is available. */
+    Property<bool> cloudStorageIsAvailable{this, "cloudStorageIsAvailable"};
+
 private:
     /** Flag whether settings were successfully migrated from the 5.1 settings format. */
     Property<bool> migrationDone{this, "migrationDone"};

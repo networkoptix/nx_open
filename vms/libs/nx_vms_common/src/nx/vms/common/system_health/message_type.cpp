@@ -70,6 +70,8 @@ bool isMessageLocked(MessageType message)
         case MessageType::showIntercomInformer:
         case MessageType::showMissedCallInformer:
         case MessageType::notificationLanguageDiffers:
+        case MessageType::cloudStorageIsEnabled:
+        case MessageType::cloudStorageIsAvailable:
             return true;
 
         default:

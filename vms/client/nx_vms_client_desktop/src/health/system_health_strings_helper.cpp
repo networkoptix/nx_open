@@ -3,6 +3,7 @@
 #include "system_health_strings_helper.h"
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/branding.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/string.h>
@@ -19,16 +20,17 @@ namespace {
 
 static const int kMaxResourcesLines = 3;
 
-QStringList getSortedCameraList(const QSet<QnResourcePtr>& resources)
+template<typename T>
+QStringList getSortedResourcesNames(const QSet<QnResourcePtr>& resources)
 {
     QStringList result;
-    for (const auto& cameraResource: resources)
+    for (const auto& resource: resources)
     {
-        const auto camera = cameraResource.dynamicCast<QnVirtualCameraResource>();
-        if (!NX_ASSERT(camera))
+        const auto specificResource = resource.dynamicCast<T>();
+        if (!NX_ASSERT(specificResource))
             continue;
 
-        result << camera->getName();
+        result << specificResource->getName();
     }
     result.sort();
     return result;
@@ -112,6 +114,10 @@ QString QnSystemHealthStringsHelper::messageShortTitle(
             return tr("Intercom missed call");
         case MessageType::notificationLanguageDiffers:
             return tr("Notification and interface languages differ");
+        case MessageType::cloudStorageIsAvailable:
+            return tr("Cloud storage is available");
+        case MessageType::cloudStorageIsEnabled:
+            return tr("Cloud storage is enabled");
 
         default:
             break;
@@ -242,7 +248,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(
 
         case MessageType::defaultCameraPasswords:
         {
-            const auto cameras = getSortedCameraList(resources);
+            const auto cameras = getSortedResourcesNames<QnVirtualCameraResource>(resources);
             return cameras.size() > kMaxResourcesLines ? cameras.join("\n") : QString{};
         }
 
@@ -283,7 +289,14 @@ QString QnSystemHealthStringsHelper::messageTooltip(
         {
             messageParts << tr("Some cameras are set to record in a mode they do not support.");
             messageParts << ""; //< Additional line break by design.
-            messageParts += getSortedCameraList(resources);
+            messageParts += getSortedResourcesNames<QnVirtualCameraResource>(resources);
+        }
+
+        case MessageType::cloudStorageIsEnabled:
+        {
+            messageParts << tr("Cloud Storage is enabled");
+            messageParts += getSortedResourcesNames<QnMediaServerResource>(resources);
+            break;
         }
 
         default:

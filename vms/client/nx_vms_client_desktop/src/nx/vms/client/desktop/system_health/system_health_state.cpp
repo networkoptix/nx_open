@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_health/cloud_storage_watcher.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/system_health/invalid_recording_schedule_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
@@ -75,6 +76,7 @@ private:
     void updateServersWithoutStorages();
     void updateServersWithMetadataStorageIssues();
     void updateSaasIssues();
+    void updateServersWithCloudStorage();
 
 private:
     std::array<bool, (int) SystemHealthIndex::count> m_state;
@@ -82,6 +84,7 @@ private:
     std::unique_ptr<InvalidRecordingScheduleWatcher> m_invalidRecordingScheduleWatcher;
     std::unique_ptr<SystemInternetAccessWatcher> m_systemInternetAccessWatcher;
     std::unique_ptr<UserEmailsWatcher> m_userEmailsWatcher;
+    std::unique_ptr<CloudStorageWatcher> m_cloudStorageWatcher;
     nx::utils::ScopedConnections m_userConnections;
 };
 
@@ -95,7 +98,8 @@ SystemHealthState::Private::Private(SystemHealthState* q):
     m_invalidRecordingScheduleWatcher(
         std::make_unique<InvalidRecordingScheduleWatcher>(systemContext())),
     m_systemInternetAccessWatcher(std::make_unique<SystemInternetAccessWatcher>(systemContext())),
-    m_userEmailsWatcher(std::make_unique<UserEmailsWatcher>(systemContext()))
+    m_userEmailsWatcher(std::make_unique<UserEmailsWatcher>(systemContext())),
+    m_cloudStorageWatcher(std::make_unique<CloudStorageWatcher>(systemContext()))
 {
 #define updateSlot(index) [this]() { return update(SystemHealthIndex::index); }
 
@@ -239,6 +243,17 @@ SystemHealthState::Private::Private(SystemHealthState* q):
         updateSlot(notificationLanguageDiffers));
     update(SystemHealthIndex::notificationLanguageDiffers);
 
+    connect(m_cloudStorageWatcher.get(),
+        &CloudStorageWatcher::cloudStorageStateChanged,
+        q,
+        [this] { updateServersWithCloudStorage(); });
+    connect(&showOnceSettings()->cloudStorageIsAvailable,
+        &ShowOnceSettings::BaseProperty::changed,
+        q,
+        [this] { updateServersWithCloudStorage(); });
+
+    updateServersWithCloudStorage();
+
 #undef updateSlot
 }
 
@@ -357,6 +372,15 @@ void SystemHealthState::Private::updateSaasIssues()
     update(SystemHealthIndex::saasTierIssue);
 }
 
+void SystemHealthState::Private::updateServersWithCloudStorage()
+{
+    const auto servers = resourcePool()->servers();
+    const QSet<QnResourcePtr> resourceSet(servers.begin(), servers.end());
+    setResourcesForMessageType(SystemHealthIndex::cloudStorageIsEnabled, resourceSet);
+    update(SystemHealthIndex::cloudStorageIsAvailable);
+    update(SystemHealthIndex::cloudStorageIsEnabled);
+}
+
 bool SystemHealthState::Private::state(SystemHealthIndex index) const
 {
     return m_state[(int) index];
@@ -465,6 +489,16 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
             return user && user->locale() != appContext()->coreSettings()->locale();
         }
 
+        case SystemHealthIndex::cloudStorageIsAvailable:
+            return hasPowerUserPermissions()
+                && m_cloudStorageWatcher->availableCloudStorageCount() > 0
+                && m_cloudStorageWatcher->enabledCloudStorageCount() == 0
+                && !showOnceSettings()->cloudStorageIsAvailable();
+
+        case SystemHealthIndex::cloudStorageIsEnabled:
+            return hasPowerUserPermissions()
+                && m_cloudStorageWatcher->enabledCloudStorageCount() > 0;
+
         default:
             NX_ASSERT(false, "This system health index is not handled by SystemHealthState");
             return false;
@@ -485,6 +519,7 @@ QVariant SystemHealthState::Private::data(SystemHealthIndex index) const
         case SystemHealthIndex::cameraRecordingScheduleIsInvalid:
         case SystemHealthIndex::metadataStorageNotSet:
         case SystemHealthIndex::metadataOnSystemStorage:
+        case SystemHealthIndex::cloudStorageIsEnabled:
             return QVariant::fromValue(
                 m_resourcesForMessageType.value(index, QSet<QnResourcePtr>()));
 
