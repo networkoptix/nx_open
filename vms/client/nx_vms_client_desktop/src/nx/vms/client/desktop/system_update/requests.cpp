@@ -15,6 +15,9 @@ rest::Handle requestUpdateInformation(
     rest::JsonResultCallback&& callback,
     nx::utils::AsyncHandlerExecutor executor)
 {
+    if (!connection)
+        return {};
+
     return connection->getJsonResult(
         "/ec2/updateInformation",
         params.toRestParams(),
@@ -27,6 +30,9 @@ rest::Handle requestUpdateStatus(
     rest::JsonResultCallback&& callback,
     nx::utils::AsyncHandlerExecutor executor)
 {
+    if (!connection)
+        return {};
+
     return connection->getJsonResult(
         "/ec2/updateStatus",
         network::rest::Params{},
@@ -59,7 +65,7 @@ static void patchUpdateInfoFromOldServer(common::update::Information& updateInfo
 }
 
 UpdateContents getUpdateContents(
-    rest::ServerConnectionPtr proxyConnection,
+    const rest::ServerConnectionWeakPtr& weakProxy,
     const nx::Url& url,
     const common::update::UpdateInfoParams& params,
     const bool skipVersionEqualToCurrent)
@@ -123,7 +129,7 @@ UpdateContents getUpdateContents(
     contents.source = nx::format("%1 by getUpdateContents proxied by mediaserver", url);
 
     auto proxyCheck = promise->get_future();
-    requestUpdateInformation(proxyConnection, params,
+    const auto handle = requestUpdateInformation(weakProxy.lock(), params,
         [promise = std::move(promise), &contents](
             bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& result)
         {
@@ -151,9 +157,16 @@ UpdateContents getUpdateContents(
             }
 
             promise->set_value(success);
-        });
+        },
+        /*executor*/ {});
 
-    proxyConnection.reset();
+    if (!handle)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Cannot send update request");
+        contents.error = InformationError::networkError;
+        return contents;
+    }
+
     proxyCheck.wait();
 
     return contents;
