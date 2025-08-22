@@ -334,9 +334,9 @@
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Brugere</numerusform>
+        <numerusform>%n Brugere</numerusform>
       </translation>
     </message>
     <message>
