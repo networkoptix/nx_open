@@ -504,7 +504,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
                 setControlMode(false);
                 showControlledByAnotherUserMessage();
             }
-
         });
 
     for (const auto& info: runtimeInfoManager()->items()->getItems())
@@ -519,8 +518,8 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         setItemOnline(info.data.videoWallInstanceGuid, true);
     }
 
-    const auto clientMessageProcessor = qnClientMessageProcessor;
-    connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+    const auto messageProcessor = clientMessageProcessor();
+    connect(messageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
         [this]() { cleanupUnusedLayouts(); });
 
     if (m_videoWallMode.active)
@@ -530,7 +529,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(menu::DelayedOpenVideoWallItemAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
-        connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+        connect(messageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
             [this]
             {
                 if (m_videoWallMode.ready)
@@ -538,13 +537,11 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
                 m_videoWallMode.ready = true;
                 submitDelayedItemOpen();
             });
-        connect(clientMessageProcessor, &QnCommonMessageProcessor::videowallControlMessageReceived,
+        connect(messageProcessor, &QnCommonMessageProcessor::videowallControlMessageReceived,
             this, &QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived);
-
     }
     else
     {
-
         /* Control videowall actions */
 
         connect(action(menu::NewVideoWallAction), &QAction::triggered, this,

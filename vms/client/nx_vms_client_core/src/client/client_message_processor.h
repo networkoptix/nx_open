@@ -62,6 +62,3 @@ private:
     bool m_connected = false;
     HoldConnectionPolicy m_policy = HoldConnectionPolicy::none;
 };
-
-#define qnClientMessageProcessor \
-    static_cast<QnClientMessageProcessor*>(this->messageProcessor())

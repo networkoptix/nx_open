@@ -53,7 +53,7 @@ CameraSettingsAnalyticsEnginesWatcher::Private::Private(
     SystemContextAware(systemContext),
     store(store)
 {
-    const auto messageProcessor = qnClientMessageProcessor;
+    const auto messageProcessor = clientMessageProcessor();
 
     if (!NX_ASSERT(messageProcessor))
         return;

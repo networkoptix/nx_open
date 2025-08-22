@@ -38,7 +38,7 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+    connect(clientMessageProcessor(), &QnClientMessageProcessor::initialResourcesReceived, this,
         [this]
         {
             // Online status by default, page will go offline if will be unreachable on opening.

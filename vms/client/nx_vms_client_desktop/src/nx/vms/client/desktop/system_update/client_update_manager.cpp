@@ -147,7 +147,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
     NX_CRITICAL(notificationsManager);
 
     const QnClientConnectionStatus* connectionStatus =
-        qnClientMessageProcessor->connectionStatus();
+        clientMessageProcessor()->connectionStatus();
     connect(connectionStatus,
         &QnClientConnectionStatus::stateChanged,
         this,
