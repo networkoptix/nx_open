@@ -83,6 +83,9 @@ NX_REFLECTION_ENUM_CLASS(SiteHealthMessageType,
     cloudServiceDisabled = 40,
     integrationServiceDisabled = 41,
 
+    cloudStorageIsAvailable = 42, //< Generated on the client side
+    cloudStorageIsEnabled = 43, //< Generated on the client side
+
     count
 )
 

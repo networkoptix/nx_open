@@ -126,8 +126,19 @@ bool SystemHealthListModel::defaultAction(const QModelIndex& index)
 
     menu()->triggerIfPossible(action, d->parameters(index.row()));
 
-    if (d->message(index.row()) == MessageType::cloudPromo)
-        showOnceSettings()->cloudPromo = true;
+    switch (d->message(index.row()))
+    {
+        case MessageType::cloudPromo:
+            showOnceSettings()->cloudPromo = true;
+            break;
+
+        case MessageType::cloudStorageIsAvailable:
+            showOnceSettings()->cloudStorageIsAvailable = true;
+            break;
+
+        default:
+            break;
+    }
 
     return true;
 }
@@ -139,9 +150,15 @@ bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& pa
 
     for (int i = 0; i < count; ++i)
     {
-        if (d->message(row + i) == MessageType::cloudPromo)
+        const auto messageType = d->message(row + i);
+        if (messageType == MessageType::cloudPromo)
         {
             executeLater([]() { showOnceSettings()->cloudPromo = true; }, this);
+            break;
+        }
+        else if (messageType == MessageType::cloudStorageIsAvailable)
+        {
+            executeLater([]() { showOnceSettings()->cloudStorageIsAvailable = true; }, this);
             break;
         }
     }

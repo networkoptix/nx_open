@@ -73,6 +73,7 @@ typedef QSet<QnUserResourcePtr> QnUserResourceSet;
 class QnMediaServerResource;
 typedef QnSharedResourcePointer<QnMediaServerResource> QnMediaServerResourcePtr;
 typedef QnSharedResourcePointerList<QnMediaServerResource> QnMediaServerResourceList;
+typedef QSet<QnMediaServerResourcePtr> QnMediaServerResourceSet;
 
 class QnVideoWallResource;
 typedef QnSharedResourcePointer<QnVideoWallResource> QnVideoWallResourcePtr;

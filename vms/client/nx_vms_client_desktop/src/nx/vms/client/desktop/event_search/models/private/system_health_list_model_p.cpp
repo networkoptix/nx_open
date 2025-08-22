@@ -282,6 +282,7 @@ QnResourceList SystemHealthListModel::Private::displayedResourceList(int index) 
         case MessageType::cameraRecordingScheduleIsInvalid:
         case MessageType::metadataStorageNotSet:
         case MessageType::metadataOnSystemStorage:
+        case MessageType::cloudStorageIsEnabled:
             return getSortedResourceList(message);
 
         default:
@@ -584,6 +585,8 @@ menu::IDType SystemHealthListModel::Private::action(int index) const
         case MessageType::archiveRebuildCanceled:
         case MessageType::metadataStorageNotSet:
         case MessageType::metadataOnSystemStorage:
+        case MessageType::cloudStorageIsAvailable:
+        case MessageType::cloudStorageIsEnabled:
             return menu::ServerSettingsAction;
 
         case MessageType::noInternetForTimeSync:
@@ -642,6 +645,12 @@ menu::Parameters SystemHealthListModel::Private::parameters(int index) const
                 return {};
 
             return menu::Parameters(servers.front())
+                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagementPage);
+        }
+        case MessageType::cloudStorageIsAvailable:
+        case MessageType::cloudStorageIsEnabled:
+        {
+            return menu::Parameters(system()->currentServer())
                 .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagementPage);
         }
 
