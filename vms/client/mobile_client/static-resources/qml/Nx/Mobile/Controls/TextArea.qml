@@ -22,6 +22,8 @@ Flickable
     boundsBehavior: Flickable.StopAtBounds
     flickableDirection: Flickable.VerticalFlick
 
+    clip: true
+
     TextArea.flickable: TextArea
     {
         id: textArea
