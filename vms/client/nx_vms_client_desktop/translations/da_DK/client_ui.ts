@@ -2024,7 +2024,7 @@
     <name>PluginDiagnosticEventWidget</name>
     <message>
       <source>Source:</source>
-      <translation type="unfinished">Source:</translation>
+      <translation>Kilde:</translation>
     </message>
     <message>
       <source>Caption contains:</source>
@@ -2363,7 +2363,7 @@
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Kilde</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2493,7 +2493,7 @@
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Bevægelse + Lav opløsning</translation>
     </message>
     <message>
       <source>Do Not Record</source>
@@ -2796,7 +2796,7 @@
     </message>
     <message>
       <source>URL:</source>
-      <translation type="unfinished">URL:</translation>
+      <translation>URL:</translation>
     </message>
     <message>
       <source>Login:</source>

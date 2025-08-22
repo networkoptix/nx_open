@@ -1352,11 +1352,11 @@
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Vælg enhed...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Vælg kamera...</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -2488,31 +2488,31 @@ Licensnøgle: %2</translation>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n devices</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
+      <translation>
+        <numerusform>%1 af %n enheder</numerusform>
+        <numerusform>%1 af %n enheder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n cameras</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
+      <translation>
+        <numerusform>%1 af %n kameraer</numerusform>
+        <numerusform>%1 af %n kameraer</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Vælg mindst én enhed</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Vælg mindst ét kamera</translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n I/O modules</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
+      <translation>
+        <numerusform>%1 af %n I/O-moduler</numerusform>
+        <numerusform>%1 af %n I/O-moduler</numerusform>
       </translation>
     </message>
     <message>
@@ -2627,11 +2627,11 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Vælg mindst én enhed</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Vælg mindst ét kamera</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -2725,7 +2725,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Kilde</translation>
     </message>
     <message>
       <source>Action</source>
@@ -2744,7 +2744,7 @@ Licensnøgle: %2</translation>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>Servere der understøtter buzzer</translation>
     </message>
   </context>
   <context>
@@ -2766,17 +2766,17 @@ Licensnøgle: %2</translation>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
-      <translation type="unfinished">Select device</translation>
+      <translation>Vælg enhed</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Vælg kamera</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
+      <translation>
+        <numerusform>%1 understøtter ikke to-vejs lyd</numerusform>
+        <numerusform>%1 understøtter ikke to-vejs lyd</numerusform>
       </translation>
     </message>
   </context>
@@ -2862,9 +2862,9 @@ Licensnøgle: %2</translation>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
+      <translation>
+        <numerusform>%1 har ingen input-porte</numerusform>
+        <numerusform>%1 har ingen input-porte</numerusform>
       </translation>
     </message>
   </context>
@@ -2981,7 +2981,7 @@ Licensnøgle: %2</translation>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Optagelse eller bevægelsesdetektering er deaktiveret for %1</translation>
     </message>
   </context>
   <context>
@@ -2995,9 +2995,9 @@ Licensnøgle: %2</translation>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
+      <translation>
+        <numerusform>%1 har ingen output relæer</numerusform>
+        <numerusform>%1 har ingen output relæer</numerusform>
       </translation>
     </message>
   </context>
@@ -3028,7 +3028,7 @@ Licensnøgle: %2</translation>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>Optagelse er deaktiveret for %1</translation>
     </message>
   </context>
   <context>
@@ -3233,9 +3233,9 @@ Licensnøgle: %2</translation>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>%n af %1 valgte brugere er ikke %2 brugere og vil ikke få mobile notifikationer.</numerusform>
+        <numerusform>%n af %1 valgte brugere er ikke %2 brugere og vil ikke få mobile notifikationer.</numerusform>
       </translation>
     </message>
   </context>
@@ -3508,7 +3508,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Kilde</translation>
     </message>
     <message>
       <source>Action</source>
@@ -3591,18 +3591,18 @@ Licensnøgle: %2</translation>
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Vælg præcis ét kamera</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
-      <translation type="unfinished">%1 has no PTZ presets</translation>
+      <translation>%1 har ingen PTZ forudindstillinger</translation>
     </message>
   </context>
   <context>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>Servere, der understøtter fan diagnostik</translation>
     </message>
   </context>
   <context>
@@ -3631,7 +3631,7 @@ Licensnøgle: %2</translation>
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Vælg præcis ét kamera</translation>
     </message>
   </context>
   <context>
@@ -3872,7 +3872,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Server</source>
@@ -4132,7 +4132,7 @@ Licensnøgle: %2</translation>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
-      <translation type="unfinished">press and hold</translation>
+      <translation>tryk og hold nede</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
@@ -4262,7 +4262,7 @@ Licensnøgle: %2</translation>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>Servere, der understøtter PoE overvågning</translation>
     </message>
   </context>
   <context>
@@ -4522,46 +4522,46 @@ Licensnøgle: %2</translation>
     <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">%1 user does not have %2 permission for some of selected cameras</translation>
+      <translation>%1 bruger har ikke %2 tilladelse til nogle af de valgte kameraer</translation>
     </message>
     <message numerus="yes">
       <source>%n groups</source>
-      <translation type="unfinished">
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
+      <translation>
+        <numerusform>%n grupper</numerusform>
+        <numerusform>%n grupper</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
+      <translation>
+        <numerusform>%n brugere</numerusform>
+        <numerusform>%n brugere</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
       <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+      <translation>%1 og %2 har ikke %3 tilladelse til nogle af de valgte kameraer</translation>
     </message>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>%n grupper har ikke %1 tilladelse til nogle af de valgte kameraer</numerusform>
+        <numerusform>%n grupper har ikke %1 tilladelse til nogle af de valgte kameraer</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>%1 gruppe har ikke %2 tilladelse til nogle af de valgte kameraer</translation>
     </message>
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>%n brugere har ikke %1 tilladelse til nogle af de valgte kameraer</numerusform>
+        <numerusform>%n brugere har ikke %1 tilladelse til nogle af de valgte kameraer</numerusform>
       </translation>
     </message>
   </context>
@@ -4596,7 +4596,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Zoom Window</source>
-      <translation type="unfinished">Zoom Window</translation>
+      <translation>Zoom Vindue</translation>
     </message>
   </context>
   <context>
@@ -4607,7 +4607,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
@@ -4778,9 +4778,9 @@ Licensnøgle: %2</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Brugere</numerusform>
+        <numerusform>%n Brugere</numerusform>
       </translation>
     </message>
   </context>
@@ -4996,7 +4996,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation type="unfinished">UNAUTHORIZED</translation>
+      <translation>IKKE AUTORISERET</translation>
     </message>
     <message>
       <source>SERVER UNAVAILABLE</source>
@@ -5320,11 +5320,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>netværk</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6581,11 +6581,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Vælg mindst én enhed</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Vælg mindst ét kamera</translation>
     </message>
     <message>
       <source>Select at least one I/O module</source>
@@ -6837,16 +6837,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Brugere</numerusform>
+        <numerusform>%n Brugere</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n Grupper</numerusform>
+        <numerusform>%n Grupper</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7065,23 +7065,23 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Se arkiv</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Eksportér arkiv</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>Vis bogmærker</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Administrer bogmærker</translation>
     </message>
     <message>
       <source>User Input</source>
-      <translation type="unfinished">User Input</translation>
+      <translation>Bruger Input</translation>
     </message>
     <message>
       <source>Edit Settings</source>
@@ -7089,7 +7089,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>Se live</translation>
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
@@ -7105,11 +7105,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View Live.</source>
-      <translation type="unfinished">View Live.</translation>
+      <translation>Se live.</translation>
     </message>
     <message>
       <source>User Input.</source>
-      <translation type="unfinished">User Input.</translation>
+      <translation>Bruger Input.</translation>
     </message>
     <message>
       <source>Edit Settings.</source>
@@ -7149,7 +7149,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Ukendt nummer</translation>
     </message>
   </context>
   <context>
@@ -7577,7 +7577,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>Åben dør</translation>
     </message>
   </context>
   <context>
@@ -8050,7 +8050,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Bevægelse + Lav opløsning</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
@@ -8284,7 +8284,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>Klik for at vise kameraer</translation>
     </message>
   </context>
   <context>
@@ -8312,12 +8312,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 (Copy)</source>
       <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
+      <translation>%1 (Kopi)</translation>
     </message>
     <message>
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
+      <translation>%1 (Kopi %2)</translation>
     </message>
   </context>
   <context>
@@ -8508,7 +8508,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>Ukendt kamera</translation>
     </message>
   </context>
   <context>
@@ -8797,7 +8797,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Kilde</translation>
     </message>
     <message>
       <source>Action</source>
@@ -10078,7 +10078,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Try again</source>
-      <translation type="unfinished">Try again</translation>
+      <translation>Prøv igen</translation>
     </message>
     <message>
       <source>Cancel Update</source>
@@ -10542,7 +10542,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Power</source>
@@ -10611,7 +10611,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
@@ -10773,31 +10773,31 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     <name>nx::vms::client::desktop::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation type="unfinished">Not recording</translation>
+      <translation>Optager ikke</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation type="unfinished">Recording everything</translation>
+      <translation>Optager alt</translation>
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation type="unfinished">Recording motion only</translation>
+      <translation>Kun optagelse af bevægelse</translation>
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation type="unfinished">Recording motion and low quality</translation>
+      <translation>Optagelse af bevægelse og lav kvalitet</translation>
     </message>
     <message>
       <source>Continuous</source>
-      <translation type="unfinished">Continuous</translation>
+      <translation>Kontinuerlig</translation>
     </message>
     <message>
       <source>Motion only</source>
-      <translation type="unfinished">Motion only</translation>
+      <translation>Kun bevægelse</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Bevægelse + Lav opløsning</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
@@ -10982,7 +10982,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>Luk ned</translation>
     </message>
   </context>
   <context>
@@ -11400,7 +11400,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
@@ -11457,7 +11457,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Message</source>
@@ -11677,7 +11677,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>og</translation>
     </message>
     <message>
       <source>Your access to the System expires %1</source>
@@ -12130,7 +12130,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>og</translation>
     </message>
     <message>
       <source>New User</source>
@@ -12206,7 +12206,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>(%1 of %2)</source>
       <comment>Uploaded and total number of files will be substituted</comment>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 af %2)</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
@@ -12581,7 +12581,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
   </context>
   <context>
@@ -12819,7 +12819,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Kilde</translation>
     </message>
     <message>
       <source>Target</source>
@@ -12880,16 +12880,16 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Brugere</numerusform>
+        <numerusform>%n Brugere</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n Grupper</numerusform>
+        <numerusform>%n Grupper</numerusform>
       </translation>
     </message>
     <message>
@@ -12998,7 +12998,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Total</source>
-      <translation type="unfinished">Total</translation>
+      <translation>Total</translation>
     </message>
     <message>
       <source>Used</source>
@@ -13098,7 +13098,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 brugere</translation>
     </message>
   </context>
   <context>
@@ -13225,9 +13225,9 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Brugere</numerusform>
+        <numerusform>%n Brugere</numerusform>
       </translation>
     </message>
   </context>
