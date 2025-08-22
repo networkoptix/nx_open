@@ -555,7 +555,9 @@ FocusScope
                     }
 
                     sourceSize: Qt.size(20, 20)
-                    primaryColor: "dark17"
+                    primaryColor: selectionHighlight.isItemSelected
+                        ? ColorTheme.colors.light10
+                        : ColorTheme.colors.dark17
                 }
 
                 MouseArea
