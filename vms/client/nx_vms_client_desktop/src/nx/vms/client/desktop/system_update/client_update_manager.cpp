@@ -244,23 +244,24 @@ void ClientUpdateManager::Private::checkForUpdate()
             return;
     }
 
-    updateContentsFuture = std::async(std::launch::async,
-        [this]()
-        {
-            const UpdateContents updateContents =
-                system_update::getUpdateContents(connectedServerApi(),
-                    nx::vms::common::update::releaseListUrl(systemContext()),
-                    update::LatestDesktopClientVersionParams{
-                        nx::utils::SoftwareVersion(appContext()->version()),
-                        nx::build_info::publicationType(),
-                        api::protocolVersion()},
-                    false);
+    auto params = update::LatestDesktopClientVersionParams{
+        nx::utils::SoftwareVersion(appContext()->version()),
+        nx::build_info::publicationType(),
+        api::protocolVersion()};
 
-            NX_VERBOSE(this, "getUpdateContents() request has finished.");
-            QMetaObject::invokeMethod(
-                this,
-                [this, updateContents]() { handleUpdateContents(updateContents); },
-                Qt::QueuedConnection);
+    auto callback = nx::utils::AsyncHandlerExecutor(this).bind(
+        [this](UpdateContents contents){ handleUpdateContents(std::move(contents)); });
+
+    updateContentsFuture = std::async(std::launch::async,
+        [weakApi = std::weak_ptr(connectedServerApi()),
+            url = nx::vms::common::update::releaseListUrl(systemContext()),
+            params = std::move(params),
+            callback = std::move(callback)]() mutable
+        {
+            auto updateContents = system_update::getUpdateContents(weakApi, url, params, false);
+            NX_VERBOSE(typeid(ClientUpdateManager::Private),
+                "getUpdateContents() request has finished, error: %1", updateContents.error);
+            callback(std::move(updateContents));
         });
 }
 

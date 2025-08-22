@@ -15,17 +15,17 @@ rest::Handle requestUpdateInformation(
     const rest::ServerConnectionPtr& connection,
     const common::update::UpdateInfoParams& params,
     rest::JsonResultCallback&& callback,
-    nx::utils::AsyncHandlerExecutor executor = {});
+    nx::utils::AsyncHandlerExecutor executor);
 
 rest::Handle requestUpdateStatus(
     const rest::ServerConnectionPtr& connection,
     rest::JsonResultCallback&& callback,
-    nx::utils::AsyncHandlerExecutor executor = {});
+    nx::utils::AsyncHandlerExecutor executor);
 
 /** Get update info directly from the Internet or via the given proxy connection. */
 // TODO: #amalov Refactor to return future or take callback.
 UpdateContents getUpdateContents(
-    rest::ServerConnectionPtr proxyConnection,
+    const rest::ServerConnectionWeakPtr& weakProxy,
     const nx::Url& url,
     const nx::vms::common::update::UpdateInfoParams& params,
     const bool skipVersionEqualToCurrent = true);

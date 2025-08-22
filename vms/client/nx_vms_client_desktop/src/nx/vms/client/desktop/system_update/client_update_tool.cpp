@@ -247,8 +247,8 @@ std::future<UpdateContents> ClientUpdateTool::requestInternetUpdateInfo(
     const nx::Url& updateUrl,
     const nx::vms::update::PublicationInfoParams& params)
 {
-    return std::async(
-        [updateUrl, params, connection = m_serverConnection]()
+    return std::async(std::launch::async,
+        [updateUrl, params, connection = std::weak_ptr(m_serverConnection)]()
         {
             return system_update::getUpdateContents(connection, updateUrl, params);
         });
@@ -265,11 +265,10 @@ std::future<UpdateContents> ClientUpdateTool::requestUpdateInfoFromServer(
         return promise.get_future();
     }
 
-    return std::async(
-        [this, params]()
+    return std::async(std::launch::async,
+        [weakApi = std::weak_ptr(m_serverConnection), params]()
         {
-            UpdateContents contents = system_update::getUpdateContents(
-                m_serverConnection, nx::Url(), params);
+            auto contents = system_update::getUpdateContents(weakApi, nx::Url(), params);
             contents.sourceType = UpdateSourceType::mediaservers;
             contents.source = "mediaserver";
 

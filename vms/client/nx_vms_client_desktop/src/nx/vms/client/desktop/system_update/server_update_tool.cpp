@@ -1488,9 +1488,9 @@ QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 std::future<UpdateContents> ServerUpdateTool::checkForUpdate(
     const common::update::UpdateInfoParams& infoParams)
 {
-    auto api = connectedServerApi();
+    auto api = std::weak_ptr(connectedServerApi());
 
-    if (!api)
+    if (api.expired())
     {
         NX_WARNING(this, "checkForUpdate() - There's no server connection.");
         std::promise<UpdateContents> promise;
@@ -1499,7 +1499,7 @@ std::future<UpdateContents> ServerUpdateTool::checkForUpdate(
         return future;
     }
 
-    return std::async(
+    return std::async(std::launch::async,
         [updateUrl = nx::vms::common::update::releaseListUrl(systemContext()),
             api,
             infoParams]() -> UpdateContents
