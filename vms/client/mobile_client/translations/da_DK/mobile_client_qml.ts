@@ -1044,7 +1044,7 @@
     </message>
     <message>
       <source>PENDING</source>
-      <translation type="unfinished">PENDING</translation>
+      <translation>VENTENDE</translation>
     </message>
   </context>
   <context>

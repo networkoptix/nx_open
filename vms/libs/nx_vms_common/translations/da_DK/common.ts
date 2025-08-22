@@ -1061,7 +1061,7 @@
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Vælg mindst én bruger</translation>
     </message>
   </context>
   <context>
@@ -1477,15 +1477,15 @@
     <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Maksimalt antal hændelses log poster, der skal gemmes i databasen. Det reelle antal ikke-slettede poster kan være op til 20 % højere end den angivne værdi.</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Om nogle billeder skal cachelagres for den primære stream eller ej. Værdier: &apos;ja&apos; - altid aktiveret (kan bruge meget RAM), &apos;nej&apos; - altid deaktiveret, undtagen når det kræves af afspilningen (f.eks. HLS), &apos;auto&apos; - svarer til &apos;nej&apos;, men aktiveret ved forbedring af brugeroplevelsen (f.eks. når et Analytics-plugin arbejder på kameraet).</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>Maksimalt antal HTTP-forbindelser ved hjælp af transkodning for serveren. Chrome åbner 2 forbindelser på én gang og lukker derefter den første. Vi anbefaler at indstille denne parameter&apos;s værdi til 2 eller mere.</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
@@ -1666,7 +1666,7 @@
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages).</translation>
+      <translation>Vis enhedsadgangskoder gemt i VMS for administratorer (til websider).</translation>
     </message>
     <message>
       <source>Enable auto-discovery.</source>
@@ -1694,7 +1694,7 @@
     </message>
     <message>
       <source>Enable cross-domain policy.</source>
-      <translation type="unfinished">Enable cross-domain policy.</translation>
+      <translation>Aktivér politik på tværs af domæner.</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont.</source>
@@ -1706,19 +1706,19 @@
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB).</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB).</translation>
+      <translation>Maks. P2P-kø størrelse (bytes, 32-512MB).</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB).</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB).</translation>
+      <translation>Maks. P2P størrelse for alle klienter (bytes, 32-512 MB).</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB).</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB).</translation>
+      <translation>Maksimal størrelse på optagelses kø (bytes, 6-96 MB).</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000).</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000).</translation>
+      <translation>Maksimal optagelses kø størrelse (elementer, 250-4000).</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds).</source>
@@ -1726,31 +1726,31 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds).</translation>
+      <translation>Maks. RTSP forbindelses varighed (sekunder).</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching.</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching.</translation>
+      <translation>Aktivér UDP ventetid med cloud forbindelse.</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage.</source>
-      <translation type="unfinished">Enable cloud-connect relays usage.</translation>
+      <translation>Aktiver brug af cloud forbindelse relæer.</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays.</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays.</translation>
+      <translation>Gennemtving SSL til cloud forbindelse relæer.</translation>
     </message>
     <message>
       <source>Enable recording on EDGE.</source>
-      <translation type="unfinished">Enable recording on EDGE.</translation>
+      <translation>Aktivér optagelse på EDGE.</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P.</source>
-      <translation type="unfinished">Enable WebSocket for P2P.</translation>
+      <translation>Aktivér WebSocket til P2P.</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</translation>
+      <translation>Maks. tråd antal for fjernsynkronisering af arkiver (&lt;=0 - auto, maks. 32).</translation>
     </message>
     <message>
       <source>Update releases.json file URL.</source>
@@ -1758,23 +1758,23 @@
     </message>
     <message>
       <source>Target update information.</source>
-      <translation type="unfinished">Target update information.</translation>
+      <translation>Target opdaterings information.</translation>
     </message>
     <message>
       <source>Installed update information.</source>
-      <translation type="unfinished">Installed update information.</translation>
+      <translation>Oplysninger om installerede opdateringer.</translation>
     </message>
     <message>
       <source>Downloader peers for files.</source>
-      <translation type="unfinished">Downloader peers for files.</translation>
+      <translation>Downloader-peers til filer.</translation>
     </message>
     <message>
       <source>Client update settings.</source>
-      <translation type="unfinished">Client update settings.</translation>
+      <translation>Indstillinger for klientopdatering.</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization.</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization.</translation>
+      <translation>Tråd antal grænse for synkronisering af kameraarkiv.</translation>
     </message>
     <message>
       <source>Watermark settings.</source>
@@ -1794,19 +1794,19 @@
     </message>
     <message>
       <source>Session token count limit on a single Server.</source>
-      <translation type="unfinished">Session token count limit on a single Server.</translation>
+      <translation>Grænse for antal sessions tokens på en enkelt server.</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server.</source>
-      <translation type="unfinished">Max session token count per user on single Server.</translation>
+      <translation>Maks. antal sessions tokens pr. bruger på en enkelt server.</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud).</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud).</translation>
+      <translation>Opdateringsinterval for token cache for fjernsessioner (andre servere og cloud).</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud).</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud).</translation>
+      <translation>Timeout for token cache for fjernsession (andre servere og cloud).</translation>
     </message>
     <message>
       <source>Default video codec.</source>
@@ -1814,7 +1814,7 @@
     </message>
     <message>
       <source>Default codec for export video.</source>
-      <translation type="unfinished">Default codec for export video.</translation>
+      <translation>Standard codec til eksport af video.</translation>
     </message>
     <message>
       <source>Low quality screen video codec.</source>
@@ -1826,7 +1826,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update.</source>
-      <translation type="unfinished">URI for resource_data.json automatic update.</translation>
+      <translation>URI til automatisk opdatering af resource_data.json.</translation>
     </message>
     <message>
       <source>Meta data storage change policy.</source>
@@ -1834,15 +1834,15 @@
     </message>
     <message>
       <source>Persistent Servers for update storage.</source>
-      <translation type="unfinished">Persistent Servers for update storage.</translation>
+      <translation>Permanente servere til lagring af opdateringer.</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored.</source>
-      <translation type="unfinished">Persistent Servers where updates are stored.</translation>
+      <translation>Permanente servere, hvor opdateringer gemmes.</translation>
     </message>
     <message>
       <source>VMS Server version specific features.</source>
-      <translation type="unfinished">VMS Server version specific features.</translation>
+      <translation>VMS Server versions specifikke funktioner.</translation>
     </message>
     <message>
       <source>Default locale for new users.</source>
@@ -1850,23 +1850,23 @@
     </message>
     <message>
       <source>Additional local FS storage types for recording.</source>
-      <translation type="unfinished">Additional local FS storage types for recording.</translation>
+      <translation>Yderligere lokale FS  lagringstyper til optagelse.</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device.</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device.</translation>
+      <translation>Hold IO porttilstand aktiveret, når serveren opretter forbindelse til enheden.</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB).</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4MB).</translation>
+      <translation>Medie buffer størrelse (KB, 10KB-4MB).</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB).</translation>
+      <translation>Mediebufferstørrelse for enheder kun til lyd (KB, 1KB-1MB).</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure.</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure.</translation>
+      <translation>Tving tilladelser til monteringspunkt for Analytics DB lager i tilfælde af fejl.</translation>
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds).</source>
@@ -1874,15 +1874,15 @@
     </message>
     <message>
       <source>Storage encryption enabled.</source>
-      <translation type="unfinished">Storage encryption enabled.</translation>
+      <translation>Kryptering af lager aktiveret.</translation>
     </message>
     <message>
       <source>Current storage encryption key.</source>
-      <translation type="unfinished">Current storage encryption key.</translation>
+      <translation>Nuværende krypteringsnøgle for lagerplads.</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins.</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins.</translation>
+      <translation>Vis servere i ressourcetræet for ikke-administratorer.</translation>
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
@@ -1890,15 +1890,15 @@
     </message>
     <message>
       <source>HTTP header: Origin.</source>
-      <translation type="unfinished">HTTP header: Origin.</translation>
+      <translation>HTTP header: Oprindelse.</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options.</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options.</translation>
+      <translation>HTTP header: X-Frame indstillinger.</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras.</source>
-      <translation type="unfinished">Use only HTTPS for cameras.</translation>
+      <translation>Brug kun HTTPS til kameraer.</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings.</source>
@@ -1914,11 +1914,11 @@
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery.</translation>
+      <translation>Vis IP adresser til automatisk registrering.</translation>
     </message>
     <message>
       <source>Show mouse timeline preview.</source>
-      <translation type="unfinished">Show mouse timeline preview.</translation>
+      <translation>Vis forhåndsvisning af musens tidslinje.</translation>
     </message>
     <message>
       <source>LDAP settings.</source>
