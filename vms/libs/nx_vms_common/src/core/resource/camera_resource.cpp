@@ -19,6 +19,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <licensing/license.h>
+#include <nx/analytics/utils.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/media/stream_event.h>
 #include <nx/network/aio/aio_service.h>
@@ -386,58 +387,20 @@ QnVirtualCameraResource::QnVirtualCameraResource():
         }),
     m_cachedDeviceAgentManifests([this] { return deviceAgentManifests(); }),
     m_cachedSupportedEventTypes(
-        [this]
+        [this]()
         {
             return calculateSupportedEntities(
-                [](const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentManifest)
-                {
-                    std::set<QString> result;
-                    result.insert(deviceAgentManifest.supportedEventTypeIds.cbegin(),
-                        deviceAgentManifest.supportedEventTypeIds.cend());
-
-                    for (const auto& eventType: deviceAgentManifest.eventTypes)
-                        result.insert(eventType.id);
-
-                    for (const auto& supportedType: deviceAgentManifest.supportedTypes)
-                    {
-                        if (supportedType.objectTypeId.isEmpty()
-                            && !supportedType.eventTypeId.isEmpty())
-                        {
-                            result.insert(supportedType.eventTypeId);
-                        }
-                    }
-
-                    return result;
-                },
+                &nx::analytics::supportedEventTypeIdsFromManifest,
                 m_cachedDeviceAgentManifests.get());
         }),
     m_cachedSupportedObjectTypes(
-        [this]() -> std::map<nx::Uuid, std::set<QString>>
+        [this]() -> AnalyticsEntitiesByEngine
         {
             if (!hasVideo())
                 return {};
 
             return calculateSupportedEntities(
-                [](const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentManifest)
-                {
-                    std::set<QString> result;
-                    result.insert(deviceAgentManifest.supportedObjectTypeIds.cbegin(),
-                        deviceAgentManifest.supportedObjectTypeIds.cend());
-
-                    for (const auto& objectType: deviceAgentManifest.objectTypes)
-                        result.insert(objectType.id);
-
-                    for (const auto& supportedType: deviceAgentManifest.supportedTypes)
-                    {
-                        if (!supportedType.objectTypeId.isEmpty()
-                            && supportedType.eventTypeId.isEmpty())
-                        {
-                            result.insert(supportedType.objectTypeId);
-                        }
-                    }
-
-                    return result;
-                },
+                &nx::analytics::supportedObjectTypeIdsFromManifest,
                 m_cachedDeviceAgentManifests.get());
         }),
     m_cachedMediaStreams(
