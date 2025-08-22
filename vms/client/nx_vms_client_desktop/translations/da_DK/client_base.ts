@@ -3229,7 +3229,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Server</source>
@@ -3859,7 +3859,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Zoom Window</source>
-      <translation type="unfinished">Zoom Window</translation>
+      <translation>Zoom Vindue</translation>
     </message>
     <message>
       <source>Move to a dedicated window</source>
@@ -3874,7 +3874,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
@@ -4045,9 +4045,9 @@ Licensnøgle: %2</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Brugere</numerusform>
+        <numerusform>%n Brugere</numerusform>
       </translation>
     </message>
   </context>
@@ -4235,7 +4235,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation type="unfinished">UNAUTHORIZED</translation>
+      <translation>IKKE AUTORISERET</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
@@ -4452,7 +4452,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Delt</translation>
     </message>
     <message>
       <source>Isolated</source>
@@ -4580,7 +4580,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>netværk</translation>
     </message>
     <message>
       <source>smb</source>
@@ -4624,7 +4624,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Delt</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -4632,7 +4632,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>kan fjernes</translation>
     </message>
     <message>
       <source>Unknown size</source>
@@ -4652,7 +4652,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Adaptive</source>
-      <translation type="unfinished">Adaptive</translation>
+      <translation>Selvjusterende</translation>
     </message>
   </context>
   <context>
@@ -5037,7 +5037,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Betalt integrationstjenester deaktiveret</translation>
     </message>
   </context>
   <context>
@@ -5852,16 +5852,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Brugere</numerusform>
+        <numerusform>%n Brugere</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n Grupper</numerusform>
+        <numerusform>%n Grupper</numerusform>
       </translation>
     </message>
     <message>
@@ -6366,19 +6366,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Se arkiv</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Eksportér arkiv</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>Vis bogmærker</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Administrer bogmærker</translation>
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
@@ -6394,11 +6394,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View Live.</source>
-      <translation type="unfinished">View Live.</translation>
+      <translation>Se live.</translation>
     </message>
     <message>
       <source>User Input.</source>
-      <translation type="unfinished">User Input.</translation>
+      <translation>Bruger Input.</translation>
     </message>
     <message>
       <source>Edit Settings.</source>
@@ -6406,7 +6406,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Afspil lyd</translation>
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
@@ -7416,7 +7416,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Bevægelse + Lav opløsning</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
@@ -7802,7 +7802,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nyt Site</translation>
     </message>
   </context>
   <context>
@@ -9341,7 +9341,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nyt Site</translation>
     </message>
     <message>
       <source>Site was not found.</source>
@@ -9547,7 +9547,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Try again</source>
-      <translation type="unfinished">Try again</translation>
+      <translation>Prøv igen</translation>
     </message>
     <message>
       <source>Cancel Update</source>
@@ -10098,7 +10098,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Power</source>
@@ -10129,7 +10129,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
@@ -10405,7 +10405,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>Luk ned</translation>
     </message>
   </context>
   <context>
@@ -10885,7 +10885,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
@@ -10942,7 +10942,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Message</source>
@@ -11142,9 +11142,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Brug af betalt integrationstjeneste på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
+        <numerusform>Brug af betalt integrationstjeneste på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
       </translation>
     </message>
   </context>
@@ -11164,7 +11164,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>og</translation>
     </message>
     <message>
       <source>Your access to the Site expires %1</source>
@@ -11636,7 +11636,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>og</translation>
     </message>
     <message>
       <source>New User</source>
@@ -11890,7 +11890,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>(%1 of %2)</source>
       <comment>Uploaded and total number of files will be substituted</comment>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 af %2)</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
@@ -12159,7 +12159,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nyt Site</translation>
     </message>
   </context>
   <context>
@@ -12268,7 +12268,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -12740,7 +12740,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Site</translation>
     </message>
   </context>
   <context>
@@ -12860,7 +12860,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Total</source>
-      <translation type="unfinished">Total</translation>
+      <translation>Total</translation>
     </message>
     <message>
       <source>Used</source>
@@ -12915,7 +12915,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 brugere</translation>
     </message>
   </context>
   <context>
@@ -12976,9 +12976,9 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Brugere</numerusform>
+        <numerusform>%n Brugere</numerusform>
       </translation>
     </message>
   </context>
