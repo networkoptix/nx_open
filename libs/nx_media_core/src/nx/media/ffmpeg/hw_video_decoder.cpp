@@ -127,6 +127,9 @@ bool HwVideoDecoder::initializeHardware(const QnConstCompressedVideoDataPtr& dat
     while((typeIter = av_hwdevice_iterate_types(typeIter)) != AV_HWDEVICE_TYPE_NONE)
         NX_DEBUG(this, "available device %1", av_hwdevice_get_type_name(typeIter));
 
+    NX_DEBUG(this, "Trying to initialize hardware decoder, type: %1, codec: %2",
+        av_hwdevice_get_type_name(m_type), data->compressionType);
+
     const AVCodec* decoder = avcodec_find_decoder(data->compressionType);
     if (decoder == 0)
     {
