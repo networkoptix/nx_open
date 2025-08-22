@@ -252,8 +252,7 @@ void NotificationActionExecutor::onNotificationActionReceived(
 
     targetResources.remove({});
 
-    display()->showNotificationSplash(
-        targetResources.values(), QnNotificationLevel::convert(notificationAction->level()));
+    display()->showNotificationSplash(targetResources.values(), notificationAction->level());
 }
 
 void NotificationActionExecutor::execute(const ActionPtr& action)

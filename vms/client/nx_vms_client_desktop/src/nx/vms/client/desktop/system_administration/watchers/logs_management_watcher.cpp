@@ -940,7 +940,7 @@ struct LogsManagementWatcher::Private
                     true);
 
                 notificationManager->setLevel(clientLogLevelWarning,
-                    QnNotificationLevel::Value::ImportantNotification);
+                    nx::vms::event::Level::important);
 
                 notificationManager->setTooltip(clientLogLevelWarning,
                     tr("Debug logging is enabled.\nClient performance is degraded."));
@@ -974,7 +974,7 @@ struct LogsManagementWatcher::Private
             {
                 serverLogLevelWarning = notificationManager->add({}, {}, true);
                 notificationManager->setLevel(serverLogLevelWarning,
-                    QnNotificationLevel::Value::ImportantNotification);
+                    nx::vms::event::Level::important);
             }
 
             notificationManager->setTitle(serverLogLevelWarning,
@@ -1010,7 +1010,7 @@ struct LogsManagementWatcher::Private
             {
                 logsDownloadNotification = notificationManager->add({}, {}, true);
                 notificationManager->setLevel(logsDownloadNotification,
-                    QnNotificationLevel::Value::ImportantNotification);
+                    nx::vms::event::Level::important);
             }
 
             QList<UnitPtr> units;
@@ -1045,7 +1045,7 @@ struct LogsManagementWatcher::Private
                 }
             }
 
-            QnNotificationLevel::Value level;
+            nx::vms::event::Level level;
             QString title;
             QString description;
             std::optional<ProgressState> progress;
@@ -1055,14 +1055,14 @@ struct LogsManagementWatcher::Private
                 case State::hasSelection:
                 {
                     NX_ASSERT(cancelled, "Internal logic error");
-                    level = QnNotificationLevel::Value::ImportantNotification;
+                    level = nx::vms::event::Level::important;
                     title = tr("Logs download canceled");
                     break;
                 }
 
                 case State::loading:
                 {
-                    level = QnNotificationLevel::Value::ImportantNotification;
+                    level = nx::vms::event::Level::important;
                     title = tr("Downloading logs...");
                     description = shortList(resources); //TODO: #spanasenko Speed & time.
                     progress = {this->progress};
@@ -1071,7 +1071,7 @@ struct LogsManagementWatcher::Private
 
                 case State::finished:
                 {
-                    level = QnNotificationLevel::Value::SuccessNotification;
+                    level = nx::vms::event::Level::success;
                     title = tr("Logs downloaded");
                     description = shortList(resources);
                     progress = {ProgressState::completed};
@@ -1081,7 +1081,7 @@ struct LogsManagementWatcher::Private
                 case State::hasErrors:
                 case State::hasLocalErrors:
                 {
-                    level = QnNotificationLevel::Value::CriticalNotification;
+                    level = nx::vms::event::Level::critical;
                     title = tr("Logs download failed");
                     description = shortList(resources);
                     progress = {ProgressState::failed};

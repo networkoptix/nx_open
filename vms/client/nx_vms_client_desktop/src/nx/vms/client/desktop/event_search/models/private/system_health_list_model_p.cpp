@@ -898,15 +898,16 @@ QString SystemHealthListModel::Private::decorationPath(
             break;
     }
 
+    using namespace nx::vms::event;
     switch (QnNotificationLevel::valueOf(systemContext, message))
     {
-        case QnNotificationLevel::Value::CriticalNotification:
+        case Level::critical:
             return "20x20/Outline/error.svg";
 
-        case QnNotificationLevel::Value::ImportantNotification:
+        case Level::important:
             return "20x20/Outline/warning.svg";
 
-        case QnNotificationLevel::Value::SuccessNotification:
+        case Level::success:
             return "20x20/Outline/success.svg";
 
         default:

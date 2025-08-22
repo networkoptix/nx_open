@@ -351,7 +351,7 @@ void NotificationListModel::Private::onNotificationAction(
 
     EventData eventData;
     eventData.lifetime = kDisplayTimeout;
-    eventData.level = QnNotificationLevel::convert(action->level());
+    eventData.level = action->level();
     eventData.iconPath = iconPath(action, cloudSystemId);
     eventData.cloudSystemId = cloudSystemId;
 
@@ -372,7 +372,7 @@ void NotificationListModel::Private::onRepeatSoundAction(
     if (action->state() == nx::vms::rules::State::started)
     {
         EventData eventData;
-        eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::common);
+        eventData.level = nx::vms::event::Level::common;
         eventData.iconPath = eventIconPath(nx::vms::rules::Icon::inputSignal);
         eventData.sourceName = action->sourceName();
         if (NX_ASSERT(system()))
@@ -403,7 +403,7 @@ void NotificationListModel::Private::onAlarmLayoutAction(
 
     EventData eventData;
     eventData.lifetime = kDisplayTimeout;
-    eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::critical);
+    eventData.level = nx::vms::event::Level::critical;
     eventData.iconPath = "16x16/Outline/soft_trigger.svg";
     eventData.sourceName = action->sourceName();
 
@@ -527,7 +527,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(
     NX_VERBOSE(this, "Setting up acknowledge action id: %1", action->id());
 
     eventData.removable = false;
-    eventData.level = QnNotificationLevel::Value::CriticalNotification;
+    eventData.level = nx::vms::event::Level::critical;
 
     eventData.extraAction = CommandActionPtr::create();
     eventData.extraAction->setIconPath("20x20/Solid/bookmark.svg?primary=light4");

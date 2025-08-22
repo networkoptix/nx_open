@@ -58,8 +58,8 @@ public:
     CommandActionPtr additionalAction(const nx::Uuid& notificationId) const;
     void setAdditionalAction(const nx::Uuid& notificationId, CommandActionPtr value);
 
-    QnNotificationLevel::Value level(const nx::Uuid& notificationId) const;
-    void setLevel(const nx::Uuid& notificationId, QnNotificationLevel::Value level);
+    nx::vms::event::Level level(const nx::Uuid& notificationId) const;
+    void setLevel(const nx::Uuid& notificationId, nx::vms::event::Level level);
 
     QString additionalText(const nx::Uuid& notificationId) const;
     void setAdditionalText(const nx::Uuid& notificationId, QString additionalText);
@@ -87,7 +87,7 @@ signals:
     void descriptionChanged(const nx::Uuid& notificationId, const QString& description);
     void iconPathChanged(const nx::Uuid& notificationId, const QString& iconPath);
     void actionChanged(const nx::Uuid& notificationId, CommandActionPtr action);
-    void levelChanged(const nx::Uuid& notificationId, QnNotificationLevel::Value level);
+    void levelChanged(const nx::Uuid& notificationId, nx::vms::event::Level level);
     void additionalTextChanged(const nx::Uuid& notificationId, const QString& additionalText);
     void tooltipChanged(const nx::Uuid& notificationId, const QString& tooltip);
     void additionalActionChanged(const nx::Uuid& notificationId, CommandActionPtr action);
@@ -103,7 +103,7 @@ private:
         CommandActionPtr additionalAction = nullptr;
         QString format;
         QString iconPath;
-        QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
+        nx::vms::event::Level level = nx::vms::event::Level::none;
         QString additionalText;
         QString tooltip;
 

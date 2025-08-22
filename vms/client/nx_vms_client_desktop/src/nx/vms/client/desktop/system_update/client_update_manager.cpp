@@ -325,7 +325,7 @@ void ClientUpdateManager::Private::notifyUserAboutSuccessfulInstallation()
     notificationsManager->setProgress(
         installationNotificationId, ProgressState::completed);
     notificationsManager->setLevel(
-        installationNotificationId, QnNotificationLevel::Value::SuccessNotification);
+        installationNotificationId, nx::vms::event::Level::success);
     notificationsManager->setTooltip(installationNotificationId, {});
     notificationsManager->setAction(installationNotificationId, restartAction);
 }
@@ -398,7 +398,7 @@ void ClientUpdateManager::Private::showErrorNotification(const QString& message)
         notificationsManager->setTitle(errorNotificationId, message);
     }
 
-    notificationsManager->setLevel(errorNotificationId, QnNotificationLevel::Value::CriticalNotification);
+    notificationsManager->setLevel(errorNotificationId, nx::vms::event::Level::critical);
     notificationsManager->setIconPath(errorNotificationId, "20x20/Outline/error.svg");
 }
 

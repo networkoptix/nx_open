@@ -20,17 +20,18 @@ namespace {
 // Same as for other notifications.
 static const auto kFailedDisplayTimeout = std::chrono::milliseconds(12500);
 
-QString levelDecorationPath(QnNotificationLevel::Value level)
+QString levelDecorationPath(nx::vms::event::Level level)
 {
+    using namespace nx::vms::event;
     switch (level)
     {
-        case QnNotificationLevel::Value::SuccessNotification:
+        case Level::success:
             return "20x20/Outline/success.svg";
 
-        case QnNotificationLevel::Value::CriticalNotification:
+        case Level::critical:
             return "20x20/Outline/error.svg";
 
-        case QnNotificationLevel::Value::ImportantNotification:
+        case Level::important:
             return "20x20/Outline/warning.svg";
 
         default:

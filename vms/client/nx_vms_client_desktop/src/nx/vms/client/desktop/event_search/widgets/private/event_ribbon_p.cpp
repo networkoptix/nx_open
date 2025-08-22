@@ -130,7 +130,7 @@ EventRibbon::Private::Private(EventRibbon* q):
         {QEvent::Enter, QEvent::Leave, QEvent::HoverEnter, QEvent::HoverLeave, QEvent::HoverMove},
         this, &Private::updateHover))
 {
-    NX_ASSERT(Importance() == Importance::NoNotification);
+    NX_ASSERT(Importance() == Importance::none);
 
     q->setAttribute(Qt::WA_Hover);
     m_viewport->setAttribute(Qt::WA_Hover);
@@ -1436,12 +1436,12 @@ nx::utils::Interval<int> EventRibbon::Private::visibleRange() const
     return m_visible;
 }
 
-QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
+nx::vms::event::Level EventRibbon::Private::highestUnreadImportance() const
 {
     if (m_totalUnreadCount == 0)
         return Importance();
 
-    for (int i = int(Importance::LevelCount) - 1; i >= 0; --i)
+    for (int i = int(Importance::count) - 1; i >= 0; --i)
     {
         if (m_unreadCounts[i] > 0)
             return Importance(i);

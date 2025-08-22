@@ -280,7 +280,7 @@ struct ConnectActionsHandler::Private
         notificationsManager->setIconPath(
             channelPartnerNotificationId, "20x20/Outline/warning.svg");
         notificationsManager->setLevel(
-            channelPartnerNotificationId, QnNotificationLevel::Value::ImportantNotification);
+            channelPartnerNotificationId, nx::vms::event::Level::important);
         connect(notificationsManager, &workbench::LocalNotificationsManager::cancelRequested,
             [localSettings = q->system()->localSettings(),
             notificationsManager,

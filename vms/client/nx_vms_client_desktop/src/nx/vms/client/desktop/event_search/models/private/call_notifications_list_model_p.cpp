@@ -138,7 +138,7 @@ void CallNotificationsListModel::Private::addNotification(
             eventData.actionId = menu::OpenIntercomLayoutAction;
             eventData.title = tr("Calling...");
             eventData.iconPath = "20x20/Outline/call.svg";
-            eventData.level = QnNotificationLevel::Value::SuccessNotification;
+            eventData.level = nx::vms::event::Level::success;
 
             eventData.extraAction = CommandActionPtr(new CommandAction());
             eventData.extraAction->setText(tr("Open"));
@@ -181,7 +181,7 @@ void CallNotificationsListModel::Private::addNotification(
             eventData.actionId = menu::OpenMissedCallIntercomLayoutAction;
             eventData.title = tr("Missed call");
             eventData.iconPath = "20x20/Outline/missed_call.svg";
-            eventData.level = QnNotificationLevel::Value::CriticalNotification;
+            eventData.level = nx::vms::event::Level::critical;
             eventData.actionParameters.setArgument(Qn::ItemUuidRole, eventData.id);
 
             break;

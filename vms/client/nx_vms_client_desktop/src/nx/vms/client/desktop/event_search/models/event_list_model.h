@@ -38,7 +38,7 @@ public:
         bool removable = false;
         std::chrono::milliseconds lifetime{0};
         int helpId = -1;
-        QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
+        nx::vms::event::Level level = nx::vms::event::Level::none;
         std::chrono::microseconds previewTime{0}; //< The latest thumbnail's used if previewTime <= 0.
         nx::Uuid ruleId;
         bool forcePreviewLoader = false; //< Display loader on tile preview.

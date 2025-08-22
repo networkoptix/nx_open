@@ -358,7 +358,7 @@ namespace Qn
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
         ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */
         ProgressFormatRole,                         /**< Role for specifying progress format, when null default is used: "%p%" (QString). */
-        NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
+        NotificationLevelRole,                      /**< Role for notification level (nx::vms::event::Level). */
         CreateContextMenuRole,                      /**< Role for creating context menu (QSharedPointer<QMenu>). */
         ForcePreviewLoaderRole,                     /**< Display loading indicator on tile preview. */
         ShowVideoPreviewRole,                       /**< Display camera video stream on tile preview. */

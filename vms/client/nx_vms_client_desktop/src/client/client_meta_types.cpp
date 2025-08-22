@@ -199,7 +199,7 @@ void initializeMetatypesInternal()
     qRegisterMetaType<nx::cloud::db::api::SystemData>();
     qRegisterMetaType<rest::ServerConnectionPtr>();
     qRegisterMetaType<ExportMediaPersistentSettings>();
-    qRegisterMetaType<QnNotificationLevel::Value>();
+    qRegisterMetaType<nx::vms::event::Level>();
     qRegisterMetaType<nx::vms::common::update::Information>();
     qRegisterMetaType<UpdateDeliveryInfo>();
     qRegisterMetaType<UpdateContents>();

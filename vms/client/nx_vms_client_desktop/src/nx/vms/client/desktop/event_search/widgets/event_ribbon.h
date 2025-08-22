@@ -11,12 +11,12 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/interval.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
+#include <nx/vms/event/level.h>
 
 class QAbstractListModel;
 class QModelIndex;
 class QScrollBar;
 
-namespace QnNotificationLevel { enum class Value; }
 namespace nx::analytics::db { struct ObjectTrack; }
 
 namespace nx::vms::client::desktop {
@@ -86,7 +86,7 @@ public:
 
 signals:
     void countChanged();
-    void unreadCountChanged(int unreadCount, QnNotificationLevel::Value importance, QPrivateSignal);
+    void unreadCountChanged(int unreadCount, nx::vms::event::Level importance, QPrivateSignal);
     void visibleRangeChanged(const nx::utils::Interval<int>& value, QPrivateSignal);
 
     // Tile interaction.

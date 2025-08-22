@@ -5,8 +5,7 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/impl_ptr.h>
-
-namespace QnNotificationLevel { enum class Value; }
+#include <nx/vms/event/level.h>
 
 namespace nx::vms::client::desktop {
 
@@ -24,7 +23,7 @@ public:
     virtual ~NotificationListWidget() override;
 
 signals:
-    void unreadCountChanged(int count, QnNotificationLevel::Value importance);
+    void unreadCountChanged(int count, nx::vms::event::Level importance);
     void tileHovered(const QModelIndex& index, EventTile* tile);
 
 private:

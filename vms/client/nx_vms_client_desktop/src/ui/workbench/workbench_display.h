@@ -271,7 +271,7 @@ public:
 
     QTimer* playbackPositionBlinkTimer() const;
 
-    void showNotificationSplash(const QnResourceList& resources, QnNotificationLevel::Value level);
+    void showNotificationSplash(const QnResourceList& resources, nx::vms::event::Level level);
 
 public slots:
     void fitInView(bool animate);
@@ -364,7 +364,7 @@ protected slots:
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
 
-    void showSplashOnResource(const QnResourcePtr& resource, QnNotificationLevel::Value level);
+    void showSplashOnResource(const QnResourcePtr& resource, nx::vms::event::Level level);
 
     bool canShowLayoutBackground() const;
 

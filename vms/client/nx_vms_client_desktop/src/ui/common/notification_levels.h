@@ -9,26 +9,13 @@
 
 namespace QnNotificationLevel {
 
-enum class Value
-{
-    NoNotification = (int) nx::vms::event::Level::none,
-    CommonNotification = (int) nx::vms::event::Level::common,
-    OtherNotification = (int) nx::vms::event::Level::other,
-    SuccessNotification = (int) nx::vms::event::Level::success,
-    ImportantNotification = (int) nx::vms::event::Level::important,
-    CriticalNotification = (int) nx::vms::event::Level::critical,
-    LevelCount = (int) nx::vms::event::Level::count
-};
-
-Value convert(nx::vms::event::Level level);
-
-Value valueOf(
+nx::vms::event::Level valueOf(
     nx::vms::common::SystemContext* systemContext,
     nx::vms::common::system_health::MessageType messageType);
 int priority(nx::vms::common::SystemContext* systemContext,
     nx::vms::common::system_health::MessageType messageType);
 
-QColor notificationTextColor(Value level);
-QColor notificationColor(Value level);
+QColor notificationTextColor(nx::vms::event::Level level);
+QColor notificationColor(nx::vms::event::Level level);
 
 } // namespace QnNotificationLevel

@@ -207,7 +207,7 @@ public:
     bool unreadTrackingEnabled() const { return m_unreadTrackingEnabled; }
     void setUnreadTrackingEnabled(bool value);
     int unreadCount() const { return m_unreadItems.size(); }
-    QnNotificationLevel::Value unreadImportance() const { return m_unreadImportance; }
+    nx::vms::event::Level unreadImportance() const { return m_unreadImportance; }
     auto makeUnreadCountGuard();
 
     core::VisibleItemDataDecoratorModel* visibleItemDataModel() const;
@@ -287,8 +287,8 @@ private:
     nx::utils::PendingOperation m_fetchOperation;
 
     std::unique_ptr<core::AnalyticsSearchSetup> m_analyticsSetup;
-    QHash<QPersistentModelIndex, QnNotificationLevel::Value> m_unreadItems;
-    QnNotificationLevel::Value m_unreadImportance = QnNotificationLevel::Value::NoNotification;
+    QHash<QPersistentModelIndex, nx::vms::event::Level> m_unreadItems;
+    nx::vms::event::Level m_unreadImportance = nx::vms::event::Level::none;
     bool m_unreadTrackingEnabled = false;
 
     DetectableObjectTypeModel* m_objectTypeModel = nullptr; //< Owned by `m_analyticsSetup`.
@@ -741,13 +741,13 @@ auto RightPanelModelsAdapter::Private::makeUnreadCountGuard()
             if (oldCount == m_unreadItems.size())
                 return;
 
-            m_unreadImportance = QnNotificationLevel::Value::NoNotification;
+            m_unreadImportance = nx::vms::event::Level::none;
             for (const auto level: m_unreadItems)
             {
                 if (level > m_unreadImportance)
                     m_unreadImportance = level;
 
-                if (m_unreadImportance == QnNotificationLevel::Value::CriticalNotification)
+                if (m_unreadImportance == nx::vms::event::Level::critical)
                     break;
             }
 
@@ -776,7 +776,7 @@ RightPanelModelsAdapter::Private::Private(RightPanelModelsAdapter* q):
             const auto guard = makeUnreadCountGuard();
             m_unreadItems.removeIf(
                 [first, last](
-                    const QHash<QPersistentModelIndex, QnNotificationLevel::Value>::iterator it)
+                    const QHash<QPersistentModelIndex, nx::vms::event::Level>::iterator it)
                 {
                     return it.key().row() >= first && it.key().row() <= last;
                 });
@@ -1477,7 +1477,7 @@ void RightPanelModelsAdapter::Private::createUnread(int first, int count)
         if (visibleModel->isVisible(index))
             continue;
 
-        const auto level = index.data(Qn::NotificationLevelRole).value<QnNotificationLevel::Value>();
+        const auto level = index.data(Qn::NotificationLevelRole).value<nx::vms::event::Level>();
         m_unreadItems.insert(index, level);
     }
 }

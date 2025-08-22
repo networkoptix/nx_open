@@ -8,8 +8,7 @@
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
-
-namespace QnNotificationLevel { enum class Value; }
+#include <nx/vms/event/level.h>
 
 namespace nx::vms::client::desktop {
 
@@ -41,7 +40,7 @@ public:
     Q_ENUM(Tab)
 
 signals:
-    void unreadCountChanged(int count, QnNotificationLevel::Value importance);
+    void unreadCountChanged(int count, nx::vms::event::Level importance);
     void currentTabChanged(Tab current, QPrivateSignal);
 
 private:

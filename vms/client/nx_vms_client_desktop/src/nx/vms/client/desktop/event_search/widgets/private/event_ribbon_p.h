@@ -75,7 +75,7 @@ public:
     int count() const { return (int) m_tiles.size(); }
     int countWithoutDummies() const;
     int unreadCount() const;
-    QnNotificationLevel::Value highestUnreadImportance() const;
+    nx::vms::event::Level highestUnreadImportance() const;
 
     nx::utils::Interval<int> visibleRange() const;
 
@@ -145,7 +145,7 @@ private:
     const std::unique_ptr<QWidget> m_viewport;
     const std::unique_ptr<QTimer> m_autoCloseTimer;
 
-    using Importance = QnNotificationLevel::Value;
+    using Importance = nx::vms::event::Level;
     static constexpr int kApproximateTileHeight = 48;
 
     using AnimationPtr = core::VolatileUniquePtr<QVariantAnimation>;
@@ -189,7 +189,7 @@ private:
 
     QHash<QVariantAnimation*, QPersistentModelIndex> m_animations;
 
-    std::array<int, int(Importance::LevelCount)> m_unreadCounts{};
+    std::array<int, int(Importance::count)> m_unreadCounts{};
     int m_totalUnreadCount = 0;
 
     nx::utils::Guard makeUnreadCountGuard();

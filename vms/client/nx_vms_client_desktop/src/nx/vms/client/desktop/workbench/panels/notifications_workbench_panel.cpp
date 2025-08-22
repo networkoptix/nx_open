@@ -391,7 +391,7 @@ void NotificationsWorkbenchPanel::initEventPanel()
         });
 
     connect(m_widget, &EventPanel::unreadCountChanged, this,
-        [this](int count, QnNotificationLevel::Value level)
+        [this](int count, nx::vms::event::Level level)
         {
             m_showButton->setNotificationCount(count);
             m_showButton->setColor(QnNotificationLevel::notificationColor(level));

@@ -376,7 +376,7 @@ void WebDownloader::setState(State state)
         case State::Completed:
             NX_ASSERT(prevState == State::Downloading);
             progressManager->setLevel(
-                m_notificationId, QnNotificationLevel::Value::SuccessNotification);
+                m_notificationId, nx::vms::event::Level::success);
             progressManager->setProgress(m_notificationId,
                 ProgressState::completed);
             progressManager->setTitle(m_notificationId, tr("File downloaded"));
@@ -385,7 +385,7 @@ void WebDownloader::setState(State state)
         case State::Failed:
             NX_ASSERT(prevState == State::Downloading);
             progressManager->setLevel(
-                m_notificationId, QnNotificationLevel::Value::CriticalNotification);
+                m_notificationId, nx::vms::event::Level::critical);
             progressManager->setProgress(
                 m_notificationId, ProgressState::failed);
             progressManager->setTitle(m_notificationId, tr("File downloading failed"));

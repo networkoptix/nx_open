@@ -98,8 +98,7 @@ QColor color(const QVariantMap& details)
 {
     if (const auto level = details.value(rules::utils::kLevelDetailName); level.isValid())
     {
-        return QnNotificationLevel::notificationTextColor(QnNotificationLevel::convert(
-            level.value<nx::vms::event::Level>()));
+        return QnNotificationLevel::notificationTextColor(level.value<nx::vms::event::Level>());
     }
 
     return QPalette().light().color();

@@ -350,8 +350,8 @@ void WorkbenchUpdateWatcher::notifyUserAboutWorkbenchUpdate(
     m_private->notificationsManager->setLevel(
         updateNotificationId,
         majorVersionChange
-            ? QnNotificationLevel::Value::ImportantNotification
-            : QnNotificationLevel::Value::CommonNotification);
+            ? nx::vms::event::Level::important
+            : nx::vms::event::Level::common);
 
     m_private->notificationsManager->setIconPath(updateNotificationId, "20x20/Outline/download.svg");
 

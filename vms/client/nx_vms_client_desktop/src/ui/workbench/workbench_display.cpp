@@ -2524,7 +2524,7 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged()
 }
 
 void QnWorkbenchDisplay::showNotificationSplash(
-    const QnResourceList& resources, QnNotificationLevel::Value level)
+    const QnResourceList& resources, nx::vms::event::Level level)
 {
     if (qnRuntime->lightMode().testFlag(Qn::LightModeNoNotifications))
         return;
@@ -2550,7 +2550,7 @@ void QnWorkbenchDisplay::showNotificationSplash(
 
 void QnWorkbenchDisplay::showSplashOnResource(
     const QnResourcePtr& resource,
-    QnNotificationLevel::Value level)
+    nx::vms::event::Level level)
 {
     if (qnRuntime->lightMode().testFlag(Qn::LightModeNoNotifications))
         return;

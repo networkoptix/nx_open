@@ -13,8 +13,6 @@ class AnimationTimer;
 class VariantAnimator;
 class HoverFocusProcessor;
 
-namespace QnNotificationLevel { enum class Value; }
-
 namespace nx::vms::client::desktop {
 
 class ThumbnailTooltip;
@@ -52,7 +50,7 @@ signals:
 
 private:
     void rebuildTabs();
-    void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
+    void updateUnreadCounter(int count, nx::vms::event::Level importance);
     void showContextMenu(const QPoint& pos);
     void setTabCurrent(QWidget* tab, bool current);
     void at_eventTileHovered(const QModelIndex& index, EventTile* tile);

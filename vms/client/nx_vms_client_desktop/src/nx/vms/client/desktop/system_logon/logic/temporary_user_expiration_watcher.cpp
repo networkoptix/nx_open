@@ -136,16 +136,16 @@ void TemporaryUserExpirationWatcher::updateNotification()
 
     if (duration_cast<std::chrono::hours>(timeLeft) >= kImportantNotificationTime)
     {
-        if (currentLevel != QnNotificationLevel::Value::OtherNotification)
+        if (currentLevel != nx::vms::event::Level::other)
         {
             m_notificationManager->setLevel(
-                *m_notification, QnNotificationLevel::Value::OtherNotification);
+                *m_notification, nx::vms::event::Level::other);
         }
     }
-    else if (currentLevel != QnNotificationLevel::Value::ImportantNotification)
+    else if (currentLevel != nx::vms::event::Level::important)
     {
         m_notificationManager->setLevel(
-            *m_notification, QnNotificationLevel::Value::ImportantNotification);
+            *m_notification, nx::vms::event::Level::important);
     }
 }
 

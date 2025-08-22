@@ -208,14 +208,14 @@ void LocalNotificationsManager::setAdditionalAction(const nx::Uuid& notification
     emit additionalActionChanged(notificationId, value);
 }
 
-QnNotificationLevel::Value LocalNotificationsManager::level(const nx::Uuid& notificationId) const
+nx::vms::event::Level LocalNotificationsManager::level(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup.value(notificationId).level;
 }
 
 void LocalNotificationsManager::setLevel(
-    const nx::Uuid& notificationId, QnNotificationLevel::Value level)
+    const nx::Uuid& notificationId, nx::vms::event::Level level)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     const auto iter = m_lookup.find(notificationId);

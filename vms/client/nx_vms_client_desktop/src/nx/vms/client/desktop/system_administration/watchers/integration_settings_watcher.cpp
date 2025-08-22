@@ -59,7 +59,7 @@ IntegrationSettingsWatcher::IntegrationSettingsWatcher(SystemContext* context, Q
                     /*cancellable*/ false);
 
                 notificationsManager->setLevel(
-                    *m_notificationId, QnNotificationLevel::Value::ImportantNotification);
+                    *m_notificationId, nx::vms::event::Level::important);
 
                 m_connection.reset(connect(
                     notificationsManager,

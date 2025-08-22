@@ -504,7 +504,7 @@ void EventPanel::Private::rebuildTabs()
     m_counterLabel->raise();
 }
 
-void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)
+void EventPanel::Private::updateUnreadCounter(int count, nx::vms::event::Level importance)
 {
     m_counterLabel->setVisible(count > 0);
     if (count == 0)

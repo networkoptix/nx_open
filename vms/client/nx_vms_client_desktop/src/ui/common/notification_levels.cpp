@@ -3,7 +3,6 @@
 #include "notification_levels.h"
 
 #include <algorithm>
-#include <ranges>
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -11,11 +10,6 @@
 #include <nx/vms/common/saas/saas_service_manager.h>
 
 using namespace nx::vms::client::core;
-
-QnNotificationLevel::Value QnNotificationLevel::convert(nx::vms::event::Level level)
-{
-    return static_cast<QnNotificationLevel::Value>(level);
-}
 
 int QnNotificationLevel::priority(nx::vms::common::SystemContext* systemContext,
     nx::vms::common::system_health::MessageType messageType)
@@ -52,13 +46,13 @@ int QnNotificationLevel::priority(nx::vms::common::SystemContext* systemContext,
 
     const int level = static_cast<int>(valueOf(systemContext, messageType)) << 8;
     int priority = 0;
-    if (const auto it = std::ranges::find(priorityOrder, messageType); it != priorityOrder.end())
+    if (const auto it = std::find(priorityOrder.begin(), priorityOrder.end(), messageType); it != priorityOrder.end())
         priority = std::distance(priorityOrder.begin(), it);
 
     return level | priority;
 }
 
-QnNotificationLevel::Value QnNotificationLevel::valueOf(
+nx::vms::event::Level QnNotificationLevel::valueOf(
     nx::vms::common::SystemContext* systemContext,
     nx::vms::common::system_health::MessageType messageType)
 {
@@ -67,17 +61,17 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
     switch (messageType)
     {
         case MessageType::cloudPromo:
-            return QnNotificationLevel::Value::OtherNotification;
+            return nx::vms::event::Level::other;
 
         // Gray notifications.
         case MessageType::archiveRebuildCanceled:
-            return QnNotificationLevel::Value::CommonNotification;
+            return nx::vms::event::Level::common;
 
         // Green notifications.
         case MessageType::archiveRebuildFinished:
         case MessageType::archiveFastScanFinished: //< This one is never displayed though.
         case MessageType::showIntercomInformer:
-            return QnNotificationLevel::Value::SuccessNotification;
+            return nx::vms::event::Level::success;
 
         // Yellow notifications.
         case MessageType::emailIsEmpty:
@@ -96,18 +90,18 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
         case MessageType::saasInSuspendedState:
         case MessageType::saasInShutdownState:
         case MessageType::notificationLanguageDiffers:
-            return QnNotificationLevel::Value::ImportantNotification;
+            return nx::vms::event::Level::important;
 
         case MessageType::saasTierIssue:
         {
             if (!NX_ASSERT(systemContext))
-                return QnNotificationLevel::Value::CriticalNotification;
+                return nx::vms::event::Level::critical;
 
             auto saas = systemContext->saasServiceManager();
             std::optional<int> daysLeft = saas->tierGracePeriodDaysLeft();
             if (daysLeft.has_value() && *daysLeft <= 10)
-                return QnNotificationLevel::Value::CriticalNotification;
-            return QnNotificationLevel::Value::ImportantNotification;
+                return nx::vms::event::Level::critical;
+            return nx::vms::event::Level::important;
         }
 
         // Red notifications.
@@ -120,25 +114,26 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
         case MessageType::recordingServiceDisabled:
         case MessageType::cloudServiceDisabled:
         case MessageType::integrationServiceDisabled:
-            return QnNotificationLevel::Value::CriticalNotification;
+            return nx::vms::event::Level::critical;
 
         default:
             NX_ASSERT(false, "All cases must be handled here");
             break;
     }
-    return QnNotificationLevel::Value::CriticalNotification;
+    return nx::vms::event::Level::critical;
 }
 
-QColor QnNotificationLevel::notificationColor(Value level)
+QColor QnNotificationLevel::notificationColor(nx::vms::event::Level level)
 {
+    using namespace nx::vms::event;
     switch (level)
     {
-        case Value::NoNotification:        return Qt::transparent;
-        case Value::OtherNotification:     return colorTheme()->color("light1");
-        case Value::CommonNotification:    return colorTheme()->color("green");
-        case Value::ImportantNotification: return colorTheme()->color("yellow");
-        case Value::CriticalNotification:  return colorTheme()->color("red");
-        case Value::SuccessNotification:   return colorTheme()->color("green");
+        case Level::none:      return Qt::transparent;
+        case Level::other:     return colorTheme()->color("light1");
+        case Level::common:    return colorTheme()->color("green");
+        case Level::important: return colorTheme()->color("yellow");
+        case Level::critical:  return colorTheme()->color("red");
+        case Level::success:   return colorTheme()->color("green");
         default:
             NX_ASSERT(false, "All enum values must be handled");
             break;
@@ -146,15 +141,16 @@ QColor QnNotificationLevel::notificationColor(Value level)
     return QColor();
 }
 
-QColor QnNotificationLevel::notificationTextColor(Value level)
+QColor QnNotificationLevel::notificationTextColor(nx::vms::event::Level level)
 {
+    using namespace nx::vms::event;
     switch (level)
     {
-        case Value::ImportantNotification: return colorTheme()->color("yellow");
-        case Value::CriticalNotification:  return colorTheme()->color("red");
-        case Value::SuccessNotification:   return colorTheme()->color("green");
-        case Value::OtherNotification:     return colorTheme()->color("light1");
-        case Value::CommonNotification:
+        case Level::important: return colorTheme()->color("yellow");
+        case Level::critical:  return colorTheme()->color("red");
+        case Level::success:   return colorTheme()->color("green");
+        case Level::other:     return colorTheme()->color("light1");
+        case Level::common:
         default:
             return colorTheme()->color("light4");
     }

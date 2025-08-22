@@ -53,8 +53,7 @@ void LocalSessionTokenExpirationWatcher::notify(std::chrono::minutes timeLeft)
         m_notificationManager->add(
             tr("Your session expires soon"), "", /*cancellable*/ true);
 
-    m_notificationManager->setLevel(
-        *m_notification, QnNotificationLevel::Value::ImportantNotification);
+    m_notificationManager->setLevel(*m_notification, nx::vms::event::Level::important);
 
     setNotificationTimeLeft(timeLeft);
 
