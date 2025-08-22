@@ -376,9 +376,9 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Brugere</numerusform>
+        <numerusform>%n Brugere</numerusform>
       </translation>
     </message>
     <message>
@@ -663,7 +663,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Værdi</translation>
     </message>
   </context>
   <context>
@@ -1366,7 +1366,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>Joystick Undersøgelse</translation>
     </message>
   </context>
   <context>

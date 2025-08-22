@@ -21,31 +21,31 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n gange, først: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n gange, først: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+      <translation>
+        <numerusform>Første forekomst: %1 på %2 (%n gange i alt)</numerusform>
+        <numerusform>Første forekomst: %1 på %2 (%n gange i alt)</numerusform>
       </translation>
     </message>
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">Time: %1 on %2</translation>
+      <translation>Tid: %1 på %2</translation>
     </message>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Ukendt hændelse</translation>
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>Ukendt handling</translation>
     </message>
     <message>
       <source>Any event</source>
@@ -97,7 +97,7 @@
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Vælg mindst én bruger</translation>
     </message>
     <message>
       <source>Select exactly one camera</source>
@@ -129,11 +129,11 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>Forekommer Ved</translation>
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Start Når</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -149,7 +149,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Interval af handling</translation>
     </message>
     <message>
       <source>State</source>
@@ -157,15 +157,15 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>Lydstyrke</translation>
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Spole tilbage</translation>
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>På layout</translation>
     </message>
     <message>
       <source>Event Devices</source>
@@ -173,15 +173,15 @@
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Af typen</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Og billedtekst</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Og beskrivelse</translation>
     </message>
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
@@ -250,7 +250,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>Til brugere</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -290,7 +290,7 @@
     </message>
     <message>
       <source>Method</source>
-      <translation type="unfinished">Method</translation>
+      <translation>Metode</translation>
     </message>
     <message>
       <source>Select Integration Action</source>
@@ -334,7 +334,7 @@
     <name>nx::vms::rules::AcknowledgeAction</name>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Bekræft</translation>
     </message>
   </context>
   <context>
@@ -364,7 +364,7 @@
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 ved %2</translation>
     </message>
     <message>
       <source>And attributes</source>
@@ -390,12 +390,12 @@
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>Og Objekt</translation>
     </message>
     <message>
       <source>%1 at %2</source>
       <comment>Object %1 is detected at camera %2</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 ved %2</translation>
     </message>
   </context>
   <context>
@@ -413,18 +413,18 @@
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>Tilføj tags</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BuzzerAction</name>
     <message>
       <source>Buzzer</source>
-      <translation type="unfinished">Buzzer</translation>
+      <translation>Summer</translation>
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>Handlings begrænsning</translation>
     </message>
   </context>
   <context>
@@ -439,11 +439,11 @@
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>Indgangssignal på enhed</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>Med ID</translation>
     </message>
     <message>
       <source>Input Signal on Camera</source>
@@ -454,11 +454,11 @@
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation>Enhed frakoblet</translation>
     </message>
     <message>
       <source>Camera Disconnected</source>
-      <translation type="unfinished">Camera Disconnected</translation>
+      <translation>Kamera frakoblet</translation>
     </message>
     <message>
       <source>Device</source>
@@ -518,7 +518,7 @@
     </message>
     <message>
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">Camera IP Conflict</translation>
+      <translation>Kamera IP konflikt</translation>
     </message>
     <message>
       <source>Device #%1: %2 (%3)</source>
@@ -535,11 +535,11 @@
     <name>nx::vms::rules::DeviceOutputAction</name>
     <message>
       <source>Output ID</source>
-      <translation type="unfinished">Output ID</translation>
+      <translation>Output ID</translation>
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>Enheds Udgang</translation>
     </message>
   </context>
   <context>
@@ -554,7 +554,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>Kamera optagelse</translation>
     </message>
     <message>
       <source>On</source>
@@ -569,11 +569,11 @@
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Indstil til fuld skærm</translation>
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>Sæt til</translation>
     </message>
   </context>
   <context>
@@ -587,7 +587,7 @@
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>Ventilator fejl</translation>
     </message>
     <message>
       <source>Fan failure at %1</source>
@@ -602,11 +602,11 @@
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>Udelad log føring</translation>
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>Og kilde</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -625,15 +625,15 @@
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Content type</source>
-      <translation type="unfinished">Content type</translation>
+      <translation>Indhold type</translation>
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>HTTP(S) Anmodning</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Content</source>
@@ -698,11 +698,11 @@
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>For Plugin</translation>
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>Og Niveau Er</translation>
     </message>
     <message>
       <source>Integration Diagnostic at %1</source>
@@ -725,27 +725,27 @@
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is a cause of the event</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n gange)</numerusform>
+        <numerusform>%1 (%n gange)</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>Kunne ikke oprette forbindelse til LDAP-serveren.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>Synkroniseringen kunne ikke fuldføres inden for en timeout på %1 .</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>Ingen brugerkonti på LDAP-serveren matcher synkroniserings indstillingerne.</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>Nogle LDAP-brugere eller -grupper blev ikke fundet i LDAP databasen.</translation>
     </message>
     <message>
       <source>LDAP Sync Issue at %1</source>
@@ -753,7 +753,7 @@
     </message>
     <message>
       <source>LDAP Sync Issue</source>
-      <translation type="unfinished">LDAP Sync Issue</translation>
+      <translation>Ldap Synkroniserings problem</translation>
     </message>
   </context>
   <context>
@@ -784,7 +784,7 @@
     </message>
     <message>
       <source>Motion on Camera</source>
-      <translation type="unfinished">Motion on Camera</translation>
+      <translation>Bevægelse på kamera</translation>
     </message>
   </context>
   <context>
@@ -795,9 +795,9 @@
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>Ingen data modtaget i løbet af de sidste %n sekunder.</numerusform>
+        <numerusform>Ingen data modtaget i løbet af de sidste %n sekunder.</numerusform>
       </translation>
     </message>
     <message>
@@ -810,7 +810,7 @@
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>RTP pakketab detekteret.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
@@ -818,17 +818,17 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Enheden reagerer ikke på netværks anmodninger.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <translation>Adresse %1 er allerede i brug af %2 på primær stream.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <translation>Adresse %1 er allerede i brug af %2 på sekundær stream.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
@@ -840,15 +840,15 @@
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Forbindelsen til kameraet (primær stream) blev uventet lukket.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Forbindelsen til kameraet (sekundær strøm) blev uventet lukket.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Forbindelsen til enheden blev uventet lukket.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
@@ -864,7 +864,7 @@
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>Vis skrivebords notifikation</translation>
     </message>
     <message>
       <source>Force Acknowledgment</source>
@@ -908,21 +908,21 @@
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>Panik optagelse</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PlaySoundAction</name>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>Afspil lyd</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PoeOverBudgetEvent</name>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Forbrug</translation>
     </message>
     <message>
       <source>Server</source>
@@ -930,7 +930,7 @@
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>PoE over budget</translation>
     </message>
     <message>
       <source>PoE over budget on %1</source>
@@ -953,15 +953,15 @@
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>Udfør PTZ-forudindstilling</translation>
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>PTZ-forudindstilling</translation>
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>Udfør til brugere</translation>
     </message>
   </context>
   <context>
@@ -972,22 +972,22 @@
     </message>
     <message>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Body</translation>
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>Send mobil notifikation</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Lyd</translation>
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>Gentag Lyd</translation>
     </message>
   </context>
   <context>
@@ -1013,36 +1013,36 @@
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Optagelse på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
+        <numerusform>Optagelse på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Backup af cloud-lagring på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
+        <numerusform>Backup af cloud-lagring på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Brug af betalt integrationstjeneste på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
         <numerusform>Brug af betalt integrationstjeneste på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
       </translation>
     </message>
     <message>
       <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <translation>Tjenesteproblem</translation>
     </message>
     <message>
       <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <translation>Kunne ikke migrere licenser.</translation>
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <translation>Import af licenser blev sprunget over. Et nyt migreringsforsøg planlægges automatisk til senere.</translation>
     </message>
     <message>
       <source>Services Issue on %1</source>
@@ -1053,15 +1053,15 @@
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>Email Besked</translation>
     </message>
     <message>
       <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
+      <translation>Send E-Mail</translation>
     </message>
     <message>
       <source>Additional Recipients</source>
-      <translation type="unfinished">Additional Recipients</translation>
+      <translation>Yderligere modtagere</translation>
     </message>
   </context>
   <context>
@@ -1108,11 +1108,11 @@
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>Forbindelsen til serveren er mistet.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Serveren stoppede uventet.</translation>
     </message>
     <message>
       <source>%1 Failure</source>
@@ -1142,11 +1142,11 @@
     </message>
     <message>
       <source>Alarm: %1</source>
-      <translation type="unfinished">Alarm: %1</translation>
+      <translation>Alarm: %1</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>Tving Åbning Af Alarmlayout</translation>
     </message>
   </context>
   <context>
@@ -1176,11 +1176,11 @@
     </message>
     <message>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Ikon</translation>
     </message>
     <message>
       <source>By</source>
-      <translation type="unfinished">By</translation>
+      <translation>Af</translation>
     </message>
     <message>
       <source>User: %1</source>
@@ -1202,11 +1202,11 @@
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Tekst</translation>
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>På Enhed</translation>
     </message>
   </context>
   <context>
@@ -1220,47 +1220,47 @@
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>Lagringsproblem ved %1</translation>
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>Lagringsproblem</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>Der er opstået en I/O-fejl ved %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD/SSD-disk &quot;%1&quot; er fuld. Disken indeholder for mange data, der ikke administreres af VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Systemdisken &quot;%1&quot; er næsten fuld.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Analyselager &quot;%1&quot; er offline.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Analyselageret &quot;%1&quot; er næsten fuldt.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
-      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+      <translation>Arkivbackup mislykkedes. Kunne ikke backup af fil %1.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Analyselager &quot;%1&quot; databasefejl: Utilstrækkelige tilladelser på monteringspunktet.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Kan ikke initialisere AES-kryptering, mens optagelse er aktiveret i mediearkivet. Data er skrevet ukrypteret.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID-fejl: %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
@@ -1308,11 +1308,11 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>Vis tekst overlejring</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>Brugerdefineret tekst</translation>
     </message>
     <message>
       <source>Show To</source>
@@ -1346,7 +1346,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>Skriv til log</translation>
     </message>
   </context>
 </TS>
