@@ -4,6 +4,8 @@ import QtQuick 2.0
 import QtQuick.Controls 2.4
 import Nx.Core 1.0
 
+import "../Mobile/Controls/private"
+
 Popup
 {
     id: control
@@ -26,11 +28,7 @@ Popup
 
     background: null
 
-    Overlay.modal: Rectangle
-    {
-        color: ColorTheme.transparent(ColorTheme.colors.dark5, 0.4)
-        Behavior on opacity { NumberAnimation { duration: 200 } }
-    }
+    Overlay.modal: OverlayBackground { }
 
     // The dialog will try to keep this item visible (in the screen boundaries).
     property Item activeItem: null

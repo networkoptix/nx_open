@@ -5,6 +5,8 @@ import QtQuick.Controls
 
 import Nx.Core
 
+import "private"
+
 Drawer
 {
     id: control
@@ -43,10 +45,7 @@ Drawer
         return 20 + customPadding + d.keyboardHeight
     }
 
-    Overlay.modal: Rectangle
-    {
-        color: ColorTheme.transparent(ColorTheme.colors.dark1, 0.5)
-    }
+    Overlay.modal: OverlayBackground { }
 
     background: Item
     {
