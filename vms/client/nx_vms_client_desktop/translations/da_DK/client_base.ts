@@ -2623,7 +2623,7 @@ Licensnøgle: %2</translation>
     <message>
       <source>at</source>
       <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation type="unfinished">at</translation>
+      <translation>på</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -2729,7 +2729,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Handling</translation>
     </message>
     <message>
       <source>Target</source>
@@ -2737,7 +2737,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Handlingsinterval</translation>
     </message>
   </context>
   <context>
@@ -3438,7 +3438,7 @@ Licensnøgle: %2</translation>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>Panik optagelses tilstand skifter optagelsesindstillingerne for alle kameraer til maksimal FPS og kvalitet.</translation>
     </message>
   </context>
   <context>
@@ -3512,7 +3512,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Handling</translation>
     </message>
     <message>
       <source>Target</source>
@@ -3524,14 +3524,14 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation type="unfinished">All users</translation>
+      <translation>Alle brugere</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n gange)</numerusform>
+        <numerusform>%1 (%n gange)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3550,9 +3550,9 @@ Licensnøgle: %2</translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+      <translation>
+        <numerusform>%n Fjernede emner</numerusform>
+        <numerusform>%n Fjernede emner</numerusform>
       </translation>
     </message>
     <message>
@@ -4770,7 +4770,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Alle brugere</translation>
     </message>
     <message>
       <source>Select Users...</source>
@@ -6577,7 +6577,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Vælg mindst én bruger</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -6597,15 +6597,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Også indstillet på kilde kamera</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Udløs også på kilde kamera</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Optag også kilde kamera</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -6613,7 +6613,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>Afspil også på kilde kameraet</translation>
     </message>
     <message>
       <source>Also show source camera</source>
@@ -6770,7 +6770,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Alle brugere</translation>
     </message>
     <message>
       <source>Users with Digest Authentication</source>
@@ -6829,11 +6829,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>UserPickerHelper</name>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Alle brugere</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Vælg mindst én bruger</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -8801,7 +8801,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Handling</translation>
     </message>
     <message>
       <source>Target</source>
@@ -8977,7 +8977,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Tekst</translation>
     </message>
     <message>
       <source>Reset Speed</source>
@@ -10298,11 +10298,11 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
-      <translation type="unfinished">Alarm: %1</translation>
+      <translation>Alarm: %1</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Bekræft</translation>
     </message>
   </context>
   <context>
@@ -10538,7 +10538,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Forbrug</translation>
     </message>
     <message>
       <source>Status</source>
@@ -12622,7 +12622,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Indstil til fuld skærm</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
@@ -12800,7 +12800,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Værdi</translation>
     </message>
     <message>
       <source/>
@@ -12815,7 +12815,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Handling</translation>
     </message>
     <message>
       <source>Source</source>
@@ -12876,7 +12876,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Alle brugere</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -13085,7 +13085,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Alle brugere</translation>
     </message>
     <message>
       <source>Users</source>

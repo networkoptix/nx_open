@@ -338,7 +338,7 @@
     <name>BookmarkBusinessActionWidget</name>
     <message>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Fast varighed:</translation>
     </message>
     <message>
       <source>seconds</source>
@@ -350,11 +350,11 @@
     </message>
     <message>
       <source>Pre-recording:</source>
-      <translation type="unfinished">Pre-recording:</translation>
+      <translation>Før-optagelse:</translation>
     </message>
     <message>
       <source>Post-recording:</source>
-      <translation type="unfinished">Post-recording:</translation>
+      <translation>Efter-optagelse:</translation>
     </message>
   </context>
   <context>
@@ -434,7 +434,7 @@
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Handling</translation>
     </message>
     <message>
       <source>Comments:</source>
@@ -450,7 +450,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>På</translation>
     </message>
     <message>
       <source>Use event source server</source>
@@ -488,7 +488,7 @@
     <name>BuzzerBusinessActionWidget</name>
     <message>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Fast varighed:</translation>
     </message>
     <message>
       <source>seconds</source>
@@ -787,11 +787,11 @@
     <name>CameraOutputBusinessActionWidget</name>
     <message>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Fast varighed:</translation>
     </message>
     <message>
       <source>Output ID:</source>
-      <translation type="unfinished">Output ID:</translation>
+      <translation>Output ID:</translation>
     </message>
   </context>
   <context>
@@ -1203,7 +1203,7 @@
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>Godkendelsestype</translation>
     </message>
     <message>
       <source>Request Method</source>
@@ -1940,7 +1940,7 @@
     </message>
     <message>
       <source>Show to</source>
-      <translation type="unfinished">Show to</translation>
+      <translation>Vis til</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -2009,7 +2009,7 @@
     </message>
     <message>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>Lydstyrke:</translation>
     </message>
     <message>
       <source>Test...</source>
@@ -2167,7 +2167,7 @@
     </message>
     <message>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Body</translation>
     </message>
     <message>
       <source>Default text will be used if this field is empty</source>
@@ -2348,7 +2348,7 @@
     </message>
     <message>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Fast varighed:</translation>
     </message>
   </context>
   <context>
@@ -2466,7 +2466,7 @@
     </message>
     <message>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>Lydstyrke:</translation>
     </message>
     <message>
       <source>Test...</source>
@@ -2591,7 +2591,7 @@
     <name>SendmailBusinessActionWidget</name>
     <message>
       <source>Additional Recipients:</source>
-      <translation type="unfinished">Additional Recipients:</translation>
+      <translation>Yderligere modtagere:</translation>
     </message>
     <message>
       <source>Global Email Settings...</source>
@@ -2732,7 +2732,7 @@
     </message>
     <message>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Ikon</translation>
     </message>
   </context>
   <context>
@@ -2849,7 +2849,7 @@
     <name>TextOverlaySettingsWidget</name>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Tekst</translation>
     </message>
     <message>
       <source>Delete</source>
