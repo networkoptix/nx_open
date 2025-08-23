@@ -1120,25 +1120,6 @@
     </message>
   </context>
   <context>
-    <name>TextSelectionArea</name>
-    <message>
-      <source>Cut</source>
-      <translation>Вирізати</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Копіювати</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Вставити</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Обрати Все</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

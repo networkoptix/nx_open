@@ -1117,25 +1117,6 @@
     </message>
   </context>
   <context>
-    <name>TextSelectionArea</name>
-    <message>
-      <source>Cut</source>
-      <translation>剪下</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>複製</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>貼上</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>全部選擇</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

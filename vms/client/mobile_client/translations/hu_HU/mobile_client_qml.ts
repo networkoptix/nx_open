@@ -1118,25 +1118,6 @@
     </message>
   </context>
   <context>
-    <name>TextSelectionArea</name>
-    <message>
-      <source>Cut</source>
-      <translation>Kivágás</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Másolás</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Beillesztés</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Összes kijelölése</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

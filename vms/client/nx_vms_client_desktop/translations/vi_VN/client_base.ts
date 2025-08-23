@@ -4986,6 +4986,18 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Paid integration services disabled</source>
       <translation>Dịch vụ tích hợp trả phí đã bị vô hiệu hóa</translation>
     </message>
+    <message>
+      <source>Cloud storage is available</source>
+      <translation type="unfinished">Cloud storage is available</translation>
+    </message>
+    <message>
+      <source>Cloud storage is enabled</source>
+      <translation type="unfinished">Cloud storage is enabled</translation>
+    </message>
+    <message>
+      <source>Cloud Storage is enabled</source>
+      <translation type="unfinished">Cloud Storage is enabled</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>

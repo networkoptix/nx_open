@@ -1117,25 +1117,6 @@
     </message>
   </context>
   <context>
-    <name>TextSelectionArea</name>
-    <message>
-      <source>Cut</source>
-      <translation>Cắt</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Bản sao</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Dán</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>chọn tất cả</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

@@ -1117,25 +1117,6 @@
     </message>
   </context>
   <context>
-    <name>TextSelectionArea</name>
-    <message>
-      <source>Cut</source>
-      <translation>ตัด</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>สำเนา</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>แปะ</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>เลือกทั้งหมด</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

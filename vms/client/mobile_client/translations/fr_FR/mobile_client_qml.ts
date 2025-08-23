@@ -1118,25 +1118,6 @@
     </message>
   </context>
   <context>
-    <name>TextSelectionArea</name>
-    <message>
-      <source>Cut</source>
-      <translation>Couper</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Copier</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Coller</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Tout sélectionner</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

@@ -1120,25 +1120,6 @@
     </message>
   </context>
   <context>
-    <name>TextSelectionArea</name>
-    <message>
-      <source>Cut</source>
-      <translation>Wytnij</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Kopiuj</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Wklej</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Zaznacz wszystko</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

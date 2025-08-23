@@ -663,7 +663,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Værdi</translation>
     </message>
   </context>
   <context>
