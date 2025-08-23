@@ -1113,25 +1113,6 @@
     </message>
   </context>
   <context>
-    <name>TextSelectionArea</name>
-    <message>
-      <source>Cut</source>
-      <translation>切り取り</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>コピー</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>貼り付け</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>すべてを選択</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

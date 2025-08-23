@@ -1114,25 +1114,6 @@
     </message>
   </context>
   <context>
-    <name>TextSelectionArea</name>
-    <message>
-      <source>Cut</source>
-      <translation>Таслах</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Хуулах</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Буулгах</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Бүгдийг сонгох</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

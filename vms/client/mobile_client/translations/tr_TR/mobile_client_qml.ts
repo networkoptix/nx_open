@@ -1114,25 +1114,6 @@
     </message>
   </context>
   <context>
-    <name>TextSelectionArea</name>
-    <message>
-      <source>Cut</source>
-      <translation>Kes</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Kopyala</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Yapıştır</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Tümünü Seç</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

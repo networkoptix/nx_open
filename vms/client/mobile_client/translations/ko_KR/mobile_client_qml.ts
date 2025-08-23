@@ -1113,25 +1113,6 @@
     </message>
   </context>
   <context>
-    <name>TextSelectionArea</name>
-    <message>
-      <source>Cut</source>
-      <translation>잘라내기</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>복사</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>붙여넣기</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>모두 선택</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

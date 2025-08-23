@@ -163,15 +163,15 @@
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation>Avancerede visnings brugere</translation>
+      <translation>Avancerede Viewers</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation>Visninger</translation>
+      <translation>Viewers</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation>Live Visninger</translation>
+      <translation>Live Viewers</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
@@ -179,7 +179,7 @@
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation>Medlemmer af denne gruppe kan, ud over de tilladelser, der er givet af gruppen Seere, se og aktivere PTZ-positioner og PTZ-runder, bruge 2-vejs lyd, betjene I/O-modulknapper, oprette og redigere bogmærker og se hændelsesloggen.</translation>
+      <translation>Medlemmer af denne gruppe kan, ud over de tilladelser, der er givet af gruppen Seere, se og aktivere PTZ positioner og PTZ runder, bruge 2-vejs lyd, betjene I/O-modulknapper, oprette og redigere bogmærker og se hændelsesloggen.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
