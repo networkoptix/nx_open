@@ -198,19 +198,19 @@
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation>Avancerede visnings brugere</translation>
+      <translation>Avancerede Viewers</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation>Visninger</translation>
+      <translation>Viewers</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation>Live Visninger</translation>
+      <translation>Live Viewers</translation>
     </message>
     <message>
       <source>System Health Viewers</source>
-      <translation>System tilstands visninger</translation>
+      <translation>System tilstands Viewers</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
@@ -222,7 +222,7 @@
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation>Medlemmer af denne gruppe kan, ud over de tilladelser, der er givet af gruppen Seere, se og aktivere PTZ-positioner og PTZ-runder, bruge 2-vejs lyd, betjene I/O-modulknapper, oprette og redigere bogmærker og se hændelsesloggen.</translation>
+      <translation>Medlemmer af denne gruppe kan, ud over de tilladelser, der er givet af gruppen Seere, se og aktivere PTZ positioner og PTZ runder, bruge 2-vejs lyd, betjene I/O-modulknapper, oprette og redigere bogmærker og se hændelsesloggen.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
@@ -2114,7 +2114,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Enheden reagerer ikke på netværks anmodninger.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -2398,23 +2398,23 @@
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID-fejl: %1.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>Ikke nok licenser. Optagelse er blevet deaktiveret på følgende enheder:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>Ikke nok licenser. Optagelse er blevet deaktiveret på følgende kameraer:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>Ikke nok licenser. Optagelse er blevet deaktiveret på følgende I/O-moduler:</translation>
     </message>
     <message>
       <source>Also show source camera</source>
-      <translation type="unfinished">Also show source camera</translation>
+      <translation>Vis også kildekamera</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -2422,7 +2422,7 @@
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation type="unfinished">Also show on source camera</translation>
+      <translation>Vis også på kildekameraet</translation>
     </message>
     <message>
       <source>Also set on source camera</source>
@@ -2521,8 +2521,8 @@
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation>
-        <numerusform>Brug af betalt integrationstjeneste på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
-        <numerusform>Brug af betalt integrationstjeneste på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
+        <numerusform>Brug af betalt integrations tjeneste på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
+        <numerusform>Brug af betalt integrations tjeneste på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
       </translation>
     </message>
     <message>

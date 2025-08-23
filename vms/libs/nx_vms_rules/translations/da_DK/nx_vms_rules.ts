@@ -106,11 +106,11 @@
     </message>
     <message>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>På</translation>
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Fast varighed</translation>
     </message>
     <message>
       <source>Add Tags</source>
@@ -481,7 +481,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Forekommer på</translation>
     </message>
   </context>
   <context>
@@ -545,7 +545,7 @@
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Forbindelsen til kameraet (sekundær strøm) blev uventet lukket.</translation>
+      <translation>Forbindelsen til kameraet (sekundær stream) blev uventet lukket.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
