@@ -121,7 +121,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>På</translation>
     </message>
     <message>
       <source>To</source>
@@ -844,7 +844,7 @@
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Forbindelsen til kameraet (sekundær strøm) blev uventet lukket.</translation>
+      <translation>Forbindelsen til kameraet (sekundær stream) blev uventet lukket.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>

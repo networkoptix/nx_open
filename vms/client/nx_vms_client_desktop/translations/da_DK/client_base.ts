@@ -1056,7 +1056,7 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Opret forbindelse til Site</translation>
     </message>
     <message>
       <source>Site Administration...</source>
@@ -1511,7 +1511,7 @@ Licensnøgle: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Opret forbindelse til Site</translation>
     </message>
   </context>
   <context>
@@ -4037,7 +4037,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Alle brugere</translation>
     </message>
     <message>
       <source>Select Users...</source>
@@ -5798,7 +5798,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Alle brugere</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -5950,9 +5950,9 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n fjernede emner</numerusform>
+        <numerusform>%n fjernede emner</numerusform>
       </translation>
     </message>
   </context>
@@ -6096,7 +6096,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Alle brugere</translation>
     </message>
     <message>
       <source>Users with Digest Authentication</source>
@@ -8099,7 +8099,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Handling</translation>
     </message>
     <message>
       <source>Target</source>
@@ -8269,7 +8269,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Tekst</translation>
     </message>
     <message>
       <source>Reset Speed</source>
@@ -9867,7 +9867,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Bekræft</translation>
     </message>
   </context>
   <context>
@@ -10094,7 +10094,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Forbrug</translation>
     </message>
     <message>
       <source>Status</source>
@@ -11128,16 +11128,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Optagelse på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
+        <numerusform>Optagelse på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Backup af cloud-lagring på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
+        <numerusform>Backup af cloud-lagring på %n kanaler blev stoppet på grund af overforbrug af tjenesten.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -12317,7 +12317,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Indstil til fuld skærm</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
@@ -12626,7 +12626,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Værdi</translation>
     </message>
   </context>
   <context>
@@ -12652,7 +12652,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Værdi</translation>
     </message>
   </context>
   <context>
@@ -12663,7 +12663,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Handling</translation>
     </message>
     <message>
       <source>Target</source>
@@ -12712,7 +12712,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Alle brugere</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
@@ -12902,7 +12902,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Alle brugere</translation>
     </message>
     <message>
       <source>Users</source>
