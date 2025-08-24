@@ -939,7 +939,7 @@
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Introduktion til Cloud Layouts</translation>
     </message>
     <message>
       <source>Motion Search</source>
