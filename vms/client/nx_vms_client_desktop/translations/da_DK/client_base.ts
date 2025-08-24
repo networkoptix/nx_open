@@ -4600,7 +4600,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>Sti</translation>
     </message>
     <message>
       <source>Type</source>
@@ -8648,7 +8648,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::JumpToLiveButton</name>
     <message>
       <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
+      <translation>Gå til live</translation>
     </message>
   </context>
   <context>
