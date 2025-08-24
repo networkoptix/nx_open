@@ -1056,7 +1056,7 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Opret forbindelse til Site</translation>
     </message>
     <message>
       <source>Site Administration...</source>
@@ -1511,7 +1511,7 @@ Licensnøgle: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Opret forbindelse til Site</translation>
     </message>
   </context>
   <context>
@@ -4600,7 +4600,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>Sti</translation>
     </message>
     <message>
       <source>Type</source>
@@ -5041,15 +5041,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation type="unfinished">Cloud storage is available</translation>
+      <translation>Cloud lagring er tilgængelig</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation type="unfinished">Cloud storage is enabled</translation>
+      <translation>Cloud lagring er aktiveret</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
-      <translation type="unfinished">Cloud Storage is enabled</translation>
+      <translation>Cloud Lagring er aktiveret</translation>
     </message>
   </context>
   <context>
@@ -8660,7 +8660,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::JumpToLiveButton</name>
     <message>
       <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
+      <translation>Gå til live</translation>
     </message>
   </context>
   <context>

@@ -817,7 +817,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>Mappen er tom</translation>
     </message>
     <message>
       <source>Access to Resources Denied</source>
@@ -962,7 +962,7 @@
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Opret forbindelse til Site</translation>
     </message>
     <message>
       <source>Log in as</source>
