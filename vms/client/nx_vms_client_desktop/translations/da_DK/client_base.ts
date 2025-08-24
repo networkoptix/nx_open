@@ -5348,7 +5348,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>Sti</translation>
     </message>
     <message>
       <source>Type</source>
@@ -6617,11 +6617,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Also show source camera</source>
-      <translation type="unfinished">Also show source camera</translation>
+      <translation>Vis også kildekamera</translation>
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation type="unfinished">Also show on source camera</translation>
+      <translation>Vis også på kildekameraet</translation>
     </message>
     <message>
       <source>Use event source camera</source>
@@ -11591,7 +11591,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
+      <translation>Gå til live</translation>
     </message>
   </context>
   <context>
