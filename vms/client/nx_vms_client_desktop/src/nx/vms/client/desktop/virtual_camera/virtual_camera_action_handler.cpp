@@ -3,7 +3,6 @@
 #include "virtual_camera_action_handler.h"
 
 #include <QtCore/QDirIterator>
-#include <QtGui/QAction>
 
 #include <api/model/virtual_camera_reply.h>
 #include <api/server_rest_connection.h>
@@ -16,8 +15,8 @@
 #include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>

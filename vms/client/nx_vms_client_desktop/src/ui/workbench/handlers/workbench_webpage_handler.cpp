@@ -8,7 +8,6 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QTemporaryDir>
-#include <QtGui/QAction>
 #include <QtGui/QDesktopServices>
 
 #include <client/client_globals.h>
@@ -22,6 +21,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>

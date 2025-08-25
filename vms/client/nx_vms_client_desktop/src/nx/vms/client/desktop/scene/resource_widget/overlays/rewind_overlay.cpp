@@ -8,7 +8,7 @@
 #include <qt_graphics_items/graphics_widget.h>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/menu/actions.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_widget.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/window_context_aware.h>

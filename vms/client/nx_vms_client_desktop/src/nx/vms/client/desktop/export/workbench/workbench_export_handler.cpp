@@ -2,7 +2,6 @@
 
 #include "workbench_export_handler.h"
 
-#include <QtGui/QAction>
 #include <QtWidgets/QPushButton>
 
 #include <client/client_globals.h>
@@ -35,9 +34,9 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>

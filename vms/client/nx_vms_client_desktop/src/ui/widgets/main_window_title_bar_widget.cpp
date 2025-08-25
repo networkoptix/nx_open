@@ -25,8 +25,8 @@
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>

@@ -3,7 +3,6 @@
 #include "notifications_workbench_panel.h"
 
 #include <QtCore/QTimer>
-#include <QtGui/QAction>
 #include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/core/skin/skin.h>
@@ -12,6 +11,8 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <ui/animation/animator_group.h>

@@ -5,7 +5,6 @@
 #include <chrono>
 
 #include <QtCore/QList>
-#include <QtGui/QAction>
 
 #include <api/runtime_info_manager.h>
 #include <camera/cam_display.h>
@@ -24,6 +23,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/state/running_instances_manager.h>

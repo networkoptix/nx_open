@@ -2,7 +2,6 @@
 
 #include "cloud_actions_handler.h"
 
-#include <QtGui/QAction>
 #include <QtGui/QDesktopServices>
 
 #include <client/client_globals.h>
@@ -14,6 +13,7 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/system_context.h>

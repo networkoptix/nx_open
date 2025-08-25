@@ -75,7 +75,7 @@ menu::Manager* WindowContextAware::menu() const
     return windowContext()->menu();
 }
 
-QAction* WindowContextAware::action(const menu::IDType id) const
+menu::Action* WindowContextAware::action(const menu::IDType id) const
 {
     return menu()->action(id);
 }

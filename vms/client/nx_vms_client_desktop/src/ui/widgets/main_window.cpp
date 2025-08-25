@@ -5,7 +5,6 @@
 #include <QtCore/QEvent>
 #include <QtCore/QFile>
 #include <QtCore/QScopedValueRollback>
-#include <QtGui/QAction>
 #include <QtGui/QFileOpenEvent>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QWindowStateChangeEvent>
@@ -39,8 +38,8 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_action_handler.h>
 #include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/radass/radass_action_handler.h>
 #include <nx/vms/client/desktop/rules/vms_rules_action_handler.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>

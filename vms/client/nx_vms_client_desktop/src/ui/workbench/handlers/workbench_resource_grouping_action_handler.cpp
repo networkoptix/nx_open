@@ -2,8 +2,6 @@
 
 #include "workbench_resource_grouping_action_handler.h"
 
-#include <QtGui/QAction>
-
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_fwd.h>
@@ -11,8 +9,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>

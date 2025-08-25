@@ -39,8 +39,8 @@
 #include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/vms_event_search_widget.h>
 #include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/custom_style.h>

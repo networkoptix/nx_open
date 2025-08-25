@@ -10,6 +10,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/event_search/dialogs/event_log_dialog.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>

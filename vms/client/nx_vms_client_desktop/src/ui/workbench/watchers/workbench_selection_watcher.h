@@ -6,7 +6,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/menu/action_types.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchSelectionWatcher: public QObject, public QnWorkbenchContextAware {

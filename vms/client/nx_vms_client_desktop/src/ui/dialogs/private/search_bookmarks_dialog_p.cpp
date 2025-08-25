@@ -21,6 +21,7 @@
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>

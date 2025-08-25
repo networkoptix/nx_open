@@ -2,15 +2,13 @@
 
 #include "bookmark_search_synchronizer.h"
 
-#include <QtGui/QAction>
-
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/event_search/models/abstract_search_list_model.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_item_bookmarks_watcher.h>

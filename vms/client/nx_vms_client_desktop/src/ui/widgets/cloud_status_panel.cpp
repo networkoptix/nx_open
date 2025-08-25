@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>

@@ -7,7 +7,6 @@
 #include <QtCore/QStack>
 #include <QtCore/QTimer>
 #include <QtCore/qstring.h>
-#include <QtGui/QAction>
 #include <QtGui/QImageWriter>
 #include <QtGui/QPainter>
 #include <QtWidgets/QComboBox>
@@ -29,6 +28,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>

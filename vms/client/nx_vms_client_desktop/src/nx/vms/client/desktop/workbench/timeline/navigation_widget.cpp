@@ -3,11 +3,11 @@
 #include "navigation_widget.h"
 
 #include <QtCore/QScopedValueRollback>
-#include <QtGui/QAction>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>

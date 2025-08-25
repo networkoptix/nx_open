@@ -3,11 +3,11 @@
 #include "title_workbench_panel.h"
 
 #include <QtCore/QScopedValueRollback>
-#include <QtGui/QAction>
 
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <ui/animation/opacity_animator.h>

@@ -7,7 +7,6 @@
 #include <nx/vms/client/core/window_context_aware.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 
-class QAction;
 class QWidget;
 
 class QnWorkbenchContext;
@@ -16,7 +15,12 @@ class QnWorkbenchNavigator;
 
 namespace nx::vms::client::desktop {
 
-namespace menu { class Manager; }
+namespace menu {
+
+class Action;
+class Manager;
+
+} // namespace menu
 
 class MainWindow;
 class SystemContext;
@@ -47,7 +51,7 @@ public:
 
     menu::Manager* menu() const;
 
-    QAction* action(const menu::IDType id) const;
+    menu::Action* action(const menu::IDType id) const;
 
     MainWindow* mainWindow() const;
 

@@ -4,7 +4,6 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QScopedValueRollback>
-#include <QtGui/QAction>
 #include <QtWidgets/QMenu>
 
 #include <nx/utils/log/log.h>

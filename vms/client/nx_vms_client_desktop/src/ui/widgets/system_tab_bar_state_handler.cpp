@@ -7,6 +7,7 @@
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>

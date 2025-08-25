@@ -7,7 +7,6 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
 #include <QtCore/QtAlgorithms>
-#include <QtGui/QAction>
 #include <QtGui/QScreen>
 #include <QtGui/QWindow>
 #include <QtOpenGL/private/qopengltexturecache_p.h>
@@ -36,6 +35,7 @@
 #include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_target_provider.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>

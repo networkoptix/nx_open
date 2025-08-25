@@ -3,7 +3,6 @@
 #include "welcome_screen.h"
 
 #include <QtCore/QMimeData>
-#include <QtGui/QAction>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
@@ -37,8 +36,8 @@
 #include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/system_context.h>

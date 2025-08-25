@@ -18,7 +18,6 @@
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/system_administration/dialogs/integrations_dialog.h>

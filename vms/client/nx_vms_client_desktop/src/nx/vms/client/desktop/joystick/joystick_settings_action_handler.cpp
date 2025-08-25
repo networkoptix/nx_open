@@ -2,11 +2,9 @@
 
 #include "joystick_settings_action_handler.h"
 
-#include <QtGui/QAction>
-
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/menu/actions.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "dialog/joystick_settings_dialog.h"

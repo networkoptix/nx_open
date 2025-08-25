@@ -2,7 +2,6 @@
 
 #include "debug_actions_handler.h"
 
-#include <QtGui/QAction>
 #include <QtQml/QQmlEngine>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QPushButton>
@@ -16,8 +15,8 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/rules/event_test_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>

@@ -2,10 +2,8 @@
 
 #include "resource_tree_settings_action_handler.h"
 
-#include <QtGui/QAction>
-
 #include <core/resource/user_resource.h>
-#include <nx/vms/client/desktop/menu/actions.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <ui/workbench/workbench_context.h>
 

@@ -5,7 +5,6 @@
 #include <chrono>
 
 #include <QtCore/QStandardPaths>
-#include <QtGui/QAction>
 #include <QtMultimedia/QMediaDevices>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsView>
@@ -20,6 +19,7 @@
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/export/tools/export_storage_stream_recorder.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/resource/screen_recording/desktop_data_provider_wrapper.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/screen_recording_settings.h>

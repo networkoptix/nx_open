@@ -5,7 +5,6 @@
 #include <QtCore/QProcess>
 #include <QtCore/QScopeGuard>
 #include <QtCore/QScopedValueRollback>
-#include <QtGui/QAction>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImage>
 #include <QtGui/QImageWriter>
@@ -86,6 +85,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/profile_g/import_from_device_dialog.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>

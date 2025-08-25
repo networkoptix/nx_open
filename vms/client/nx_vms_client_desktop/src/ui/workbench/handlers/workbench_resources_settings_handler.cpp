@@ -2,8 +2,6 @@
 
 #include "workbench_resources_settings_handler.h"
 
-#include <QtGui/QAction>
-
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
@@ -20,6 +18,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>

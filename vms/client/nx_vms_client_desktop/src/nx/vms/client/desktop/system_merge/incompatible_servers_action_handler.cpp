@@ -2,8 +2,6 @@
 
 #include "incompatible_servers_action_handler.h"
 
-#include <QtGui/QAction>
-
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -16,6 +14,7 @@
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>

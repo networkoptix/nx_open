@@ -6,7 +6,6 @@
 
 #include <QtCore/QTimer>
 #include <QtCore/QWeakPointer>
-#include <QtGui/QAction>
 
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
@@ -35,10 +34,10 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameter_types.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource_helpers.h>

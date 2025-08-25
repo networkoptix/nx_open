@@ -7,7 +7,6 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QTimer>
-#include <QtGui/QAction>
 #include <QtQml/QtQml>
 
 #include <api/server_rest_connection.h>

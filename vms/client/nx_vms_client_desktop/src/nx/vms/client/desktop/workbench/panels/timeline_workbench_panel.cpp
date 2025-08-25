@@ -4,11 +4,11 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
-#include <QtGui/QAction>
 #include <QtWidgets/QMenu>
 
 #include <client/client_runtime_settings.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <nx/vms/client/desktop/workbench/timeline/control_widget.h>

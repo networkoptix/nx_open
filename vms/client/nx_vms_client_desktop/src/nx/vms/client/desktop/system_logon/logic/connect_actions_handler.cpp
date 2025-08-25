@@ -6,7 +6,6 @@
 
 #include <QtCore/QStandardPaths>
 #include <QtCore/QTimer>
-#include <QtGui/QAction>
 
 #include <api/http_client_pool.h>
 #include <api/runtime_info_manager.h>
@@ -62,6 +61,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>

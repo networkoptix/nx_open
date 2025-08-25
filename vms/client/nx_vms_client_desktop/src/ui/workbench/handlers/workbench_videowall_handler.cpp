@@ -4,7 +4,6 @@
 
 #include <algorithm>
 
-#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QPushButton>
@@ -49,6 +48,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource_helpers.h>

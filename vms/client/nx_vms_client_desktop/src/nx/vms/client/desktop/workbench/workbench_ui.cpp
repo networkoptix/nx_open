@@ -6,7 +6,6 @@
 #include <cmath> /* For std::floor. */
 
 #include <QtCore/QMargins>
-#include <QtGui/QAction>
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QGraphicsLayout>
 
@@ -27,6 +26,7 @@
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/left_panel/qml_resource_browser_widget.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameter_types.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>

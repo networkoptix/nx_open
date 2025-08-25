@@ -7,7 +7,6 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
-#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QGraphicsSceneContextMenuEvent>
@@ -42,6 +41,7 @@
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource_helpers.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>

@@ -5,7 +5,6 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QScopedValueRollback>
-#include <QtGui/QAction>
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
@@ -15,6 +14,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_target_provider.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>

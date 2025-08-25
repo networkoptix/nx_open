@@ -12,6 +12,7 @@
 #include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/svg_icon_colorer.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/utils/context_utils.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_panel.h>

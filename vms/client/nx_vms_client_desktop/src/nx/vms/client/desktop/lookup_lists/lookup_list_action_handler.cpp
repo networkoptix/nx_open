@@ -21,9 +21,9 @@
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_edit_dialog.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_lists_dialog.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <nx/vms/client/desktop/window_context.h>

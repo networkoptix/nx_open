@@ -4,15 +4,14 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
-#include <QtGui/QAction>
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>

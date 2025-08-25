@@ -2,14 +2,13 @@
 
 #include "main_window_title_bar_state.h"
 
-#include <QtGui/QAction>
-
 #include <network/system_helpers.h>
 #include <nx/reflect/instrument.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>

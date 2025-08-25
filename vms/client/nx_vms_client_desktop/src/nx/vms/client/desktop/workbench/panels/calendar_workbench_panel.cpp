@@ -2,10 +2,9 @@
 
 #include "calendar_workbench_panel.h"
 
-#include <QtGui/QAction>
-
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_pane_settings.h>

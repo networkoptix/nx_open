@@ -162,6 +162,8 @@ public:
      */
     QString checkConditionalText(const Parameters& parameters) const;
 
+
+
 protected:
     virtual bool event(QEvent* event) override;
 

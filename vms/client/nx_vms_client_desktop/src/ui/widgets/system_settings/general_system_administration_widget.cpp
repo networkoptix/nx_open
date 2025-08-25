@@ -3,7 +3,6 @@
 #include "general_system_administration_widget.h"
 #include "ui_general_system_administration_widget.h"
 
-#include <QtGui/QAction>
 #include <QtGui/QResizeEvent>
 #include <QtWidgets/QPushButton>
 
@@ -19,9 +18,9 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>

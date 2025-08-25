@@ -2,8 +2,7 @@
 
 #include "workbench_selection_watcher.h"
 
-#include <QtGui/QAction>
-
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_target_provider.h>
 #include <utils/common/delayed.h>
@@ -33,7 +32,6 @@ QnWorkbenchSelectionWatcher::QnWorkbenchSelectionWatcher(QObject *parent /*= nul
             const auto callback = [this]() { updateFromSelection(); };
             executeDelayedParented(callback, selectionUpdateTimeoutMs, this);
         });
-
 }
 
 QnWorkbenchSelectionWatcher::~QnWorkbenchSelectionWatcher() {

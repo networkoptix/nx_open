@@ -7,7 +7,6 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <ui/workbench/workbench_context_aware.h>

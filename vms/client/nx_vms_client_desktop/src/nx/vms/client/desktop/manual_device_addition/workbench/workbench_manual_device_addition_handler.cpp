@@ -2,15 +2,13 @@
 
 #include "workbench_manual_device_addition_handler.h"
 
-#include <QtGui/QAction>
-
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/new_device_addition_dialog.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 

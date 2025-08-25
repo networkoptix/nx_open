@@ -6,7 +6,6 @@
 
 #include <QtCore/QEventLoop>
 #include <QtCore/QTimer>
-#include <QtGui/QAction>
 
 #include <common/common_globals.h>
 #include <core/ptz/abstract_ptz_controller.h>
@@ -16,9 +15,9 @@
 #include <core/resource/resource_display_info.h>
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/ui/messages/ptz_messages.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>

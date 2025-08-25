@@ -11,7 +11,6 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
-#include <QtGui/QAction>
 #include <QtGui/QPalette>
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
@@ -66,6 +65,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>

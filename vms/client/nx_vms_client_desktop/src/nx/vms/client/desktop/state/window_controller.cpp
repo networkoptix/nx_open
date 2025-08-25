@@ -8,6 +8,7 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/build_info.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
 #include <ui/widgets/main_window.h>
 

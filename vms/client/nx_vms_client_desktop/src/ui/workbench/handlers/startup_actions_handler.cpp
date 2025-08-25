@@ -6,7 +6,6 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
-#include <QtGui/QAction>
 #include <QtQml/QQmlEngine>
 
 #include <api/common_message_processor.h>
@@ -37,6 +36,7 @@
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>

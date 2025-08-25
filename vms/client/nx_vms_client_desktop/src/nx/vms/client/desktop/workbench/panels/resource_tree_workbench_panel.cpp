@@ -4,11 +4,11 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
-#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/left_panel/qml_resource_browser_widget.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>

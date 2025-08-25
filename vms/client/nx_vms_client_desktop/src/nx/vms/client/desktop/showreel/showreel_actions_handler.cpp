@@ -2,12 +2,11 @@
 
 #include "showreel_actions_handler.h"
 
-#include <QtGui/QAction>
-
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>

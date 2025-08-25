@@ -4,8 +4,6 @@
 
 #include <chrono>
 
-#include <QtGui/QAction>
-
 #include <api/common_message_processor.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <core/resource/camera_bookmark.h>
@@ -21,9 +19,9 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/bookmarks/bookmark_tags_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
-#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
