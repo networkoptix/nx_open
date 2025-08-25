@@ -70,7 +70,7 @@ public:
     }
 
     static QString makeFileName(QString fileName, size_t backupNumber, Extension ext);
-    static QString makeBaseFileName(QString path);
+    static QString makeBaseFileName(QString path, bool removeRotationCounter = true);
 
     struct Settings
     {

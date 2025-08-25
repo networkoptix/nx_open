@@ -116,7 +116,7 @@ QString File::makeFileName(QString fileName, size_t backupNumber, File::Extensio
     }
 }
 
-QString File::makeBaseFileName(QString fullPath)
+QString File::makeBaseFileName(QString fullPath, bool removeRotationCounter)
 {
     // Remove the path.
     auto name = QFileInfo(fullPath).fileName();
@@ -132,13 +132,15 @@ QString File::makeBaseFileName(QString fullPath)
             }
         });
 
-    // Remove the rotation counter if any.
-    if (name.right(4).startsWith('_'))
+    if (removeRotationCounter)
     {
-        bool ok = false;
-        name.right(3).toUInt(&ok);
-        if (ok)
-            name.chop(4);
+        if (name.right(4).startsWith('_'))
+        {
+            bool ok = false;
+            name.right(3).toUInt(&ok);
+            if (ok)
+                name.chop(4);
+        }
     }
 
     // Return the base name with ".log" ending.
@@ -401,6 +403,12 @@ void File::rotateLeftovers()
             std::cerr << nx::toString(this).toStdString() << ": Too many log files, removing "
                 << fileName.toStdString() << '\n';
             dir.remove(fileName);
+        }
+        // Is indexed log, non unarchived with timestamp or current one
+        else if (fileName.endsWith(toQString(Extension::log)) && !fileName.right(8).startsWith("_"))
+        {
+            // do nothing with such files
+            continue;
         }
         else
         {
