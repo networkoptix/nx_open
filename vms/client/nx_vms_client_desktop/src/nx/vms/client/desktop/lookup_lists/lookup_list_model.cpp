@@ -13,6 +13,8 @@
 
 namespace {
 
+static const QString kDefaultAttributeName("Value");
+
 void renameColumnName(nx::vms::api::LookupListData& data)
 {
     if (!NX_ASSERT(data.attributeNames.size() == 1, "Generic Lists must have one attribute"))
@@ -41,6 +43,8 @@ LookupListModel::LookupListModel(nx::vms::api::LookupListData data, QObject* par
     QObject(parent),
     m_data(std::move(data))
 {
+    if (isGeneric() && m_data.attributeNames.empty())
+        m_data.attributeNames.push_back(kDefaultAttributeName);
 }
 
 LookupListModel::~LookupListModel()
@@ -57,6 +61,9 @@ QList<QString> LookupListModel::attributeNames() const
 
 void LookupListModel::setAttributeNames(QList<QString> value)
 {
+    if (!NX_ASSERT(!value.isEmpty(), "Lookup list attribute names cannot be empty"))
+        return;
+
     if (attributeNames() == value)
         return;
 
