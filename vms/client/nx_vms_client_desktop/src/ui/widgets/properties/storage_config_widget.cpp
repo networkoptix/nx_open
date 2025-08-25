@@ -1005,18 +1005,21 @@ void QnStorageConfigWidget::atAddExtStorage(bool addToMain)
         [this, dialog, addToMain]
         {
             QnStorageModelInfo item = dialog->storage();
+
+            // For obvious reason, the server doesn't save credentials in the url in the response.
+            const auto credentials = dialog->credentials();
+            QUrl url(item.url);
+            if (!url.scheme().isEmpty() && !credentials.isEmpty())
+            {
+                url.setUserName(credentials.user);
+                url.setPassword(credentials.password);
+                item.url = url.toString();
+            }
+
             // Check if somebody have added this storage right now.
             if (item.id.isNull())
             {
                 // New storages has tested and ready to add
-                const auto credentials = dialog->credentials();
-                QUrl url(item.url);
-                if (!url.scheme().isEmpty() && !credentials.isEmpty())
-                {
-                    url.setUserName(credentials.user);
-                    url.setPassword(credentials.password);
-                    item.url = url.toString();
-                }
                 item.id = QnStorageResource::fillID(m_server->getId(), item.url);
                 item.isBackup = !addToMain;
                 item.isUsed = true;
