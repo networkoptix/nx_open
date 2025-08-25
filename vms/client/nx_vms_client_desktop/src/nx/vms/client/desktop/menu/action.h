@@ -162,7 +162,10 @@ public:
      */
     QString checkConditionalText(const Parameters& parameters) const;
 
-
+    // QAction::trigger shouldn't be called directly in the majority of cases.
+    // Exceptions are buttons with setted actions. See, menu::ExitAction, for example.
+    // Unfortunately, QAction::trigger() is not virtual, so we cannot override it safely.
+    void trigger();
 
 protected:
     virtual bool event(QEvent* event) override;

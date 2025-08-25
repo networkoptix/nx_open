@@ -193,6 +193,8 @@ protected:
 private:
     void at_menu_destroyed(QObject* menuObj);
 
+    void triggerImpl(Action* action, const Parameters& parameters);
+
 private:
     /** Root action. Also contained in the maps. */
     Action* m_root = nullptr;
@@ -218,6 +220,9 @@ private:
 
     /** Last menu that was clicked by the user. */
     QMenu* m_lastClickedMenu = nullptr;
+
+    /** For debug purposes. The number of triggered actions in progress. */
+    int m_activeTriggerCount = 0;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Manager::CreationOptions)

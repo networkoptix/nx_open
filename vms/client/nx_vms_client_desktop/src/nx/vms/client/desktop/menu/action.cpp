@@ -446,6 +446,11 @@ void Action::updateToolTipSilent()
     updateToolTip(false);
 }
 
+void Action::trigger()
+{
+    WindowContextAware::menu()->trigger(m_id);
+}
+
 void Action::addConditionalText(ConditionWrapper&& condition, const QString& text)
 {
     m_conditionalTexts.emplace_back(std::move(condition), text);

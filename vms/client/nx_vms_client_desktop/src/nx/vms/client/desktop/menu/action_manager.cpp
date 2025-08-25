@@ -4,6 +4,8 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QThread>
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 
 #include <nx/utils/log/log.h>
@@ -102,9 +104,16 @@ void Manager::registerAction(Action* action)
     connect(action, &QAction::triggered, this,
         [this, id = action->id()]
         {
-            NX_DEBUG(this, "Triggered action %1 with parameters %2",
-                id,
-                currentParameters(sender()));
+            if (m_activeTriggerCount == 0)
+            {
+                NX_WARNING(this, "Potentially suspicious direct QAction %1 triggering", id);
+            }
+            else
+            {
+                NX_DEBUG(this, "Triggered action %1 with parameters %2",
+                    id,
+                    currentParameters(sender()));
+            }
         });
 
     emit actionRegistered(action->id());
@@ -178,9 +187,7 @@ bool Manager::triggerIfPossible(IDType id, const Parameters& parameters)
     if (action->checkCondition(action->scope(), parameters) != EnabledAction)
         return false;
 
-    QScopedValueRollback<Parameters> currentParameters(m_parametersByMenu[nullptr], parameters);
-    QScopedValueRollback<Action*> shortcut(m_shortcutAction, action);
-    action->trigger();
+    triggerImpl(action, parameters);
     return true;
 }
 
@@ -191,9 +198,7 @@ void Manager::triggerForced(IDType id, const Parameters& parameters)
     if (!action)
         return;
 
-    QScopedValueRollback<Parameters> currentParameters(m_parametersByMenu[nullptr], parameters);
-    QScopedValueRollback<Action*> shortcut(m_shortcutAction, action);
-    action->trigger();
+    triggerImpl(action, parameters);
 }
 
 QMenu* Manager::integrateMenu(QMenu* menu, const Parameters& parameters)
@@ -484,6 +489,18 @@ void Manager::at_menu_destroyed(QObject* menuObj)
     m_parametersByMenu.remove(menu);
     if (m_lastClickedMenu == menu)
         m_lastClickedMenu = nullptr;
+}
+
+
+void Manager::triggerImpl(Action* action, const Parameters& parameters)
+{
+    NX_ASSERT(action);
+    NX_ASSERT(QThread::currentThread() == qApp->thread());
+
+    QScopedValueRollback<Parameters> currentParameters(m_parametersByMenu[nullptr], parameters);
+    QScopedValueRollback<Action*> shortcut(m_shortcutAction, action);
+    QScopedValueRollback<int> counter(m_activeTriggerCount, m_activeTriggerCount + 1);
+    action->QAction::trigger();
 }
 
 bool Manager::eventFilter(QObject* watched, QEvent* event)
