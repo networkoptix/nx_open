@@ -4988,15 +4988,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation type="unfinished">Cloud storage is available</translation>
+      <translation>クラウドストレージが利用可能です</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation type="unfinished">Cloud storage is enabled</translation>
+      <translation>クラウドストレージが有効です</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
-      <translation type="unfinished">Cloud Storage is enabled</translation>
+      <translation>クラウドストレージが有効です</translation>
     </message>
   </context>
   <context>
