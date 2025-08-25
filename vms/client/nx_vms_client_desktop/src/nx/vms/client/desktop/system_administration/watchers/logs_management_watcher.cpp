@@ -320,7 +320,7 @@ void ClientLogCollector::run()
             }
 
             QuaZipFile zip(&archive);
-            if (!zip.open(QIODevice::WriteOnly, QuaZipNewInfo(File::makeBaseFileName(path), path)))
+            if (!zip.open(QIODevice::WriteOnly, QuaZipNewInfo(File::makeBaseFileName(path, false), path)))
             {
                 NX_ERROR(this,
                     "Could not add the log file for %1 to the archive: %2",
