@@ -20,3 +20,4 @@ ffmpeg/*:vorbis=False
 ffmpeg/*:vpx=False
 ffmpeg/*:openh264=False
 boost/*:header_only = True
+ffmpeg/*:av1=False
