@@ -54,13 +54,13 @@ private:
     void send(std::string data);
 
 private:
+    std::unordered_map<QString, nx::utils::Guard> m_guards;
     OnDone m_onDone;
     nx::network::SocketAddress m_address;
     std::unique_ptr<IncomingProcessor> m_incomingProcessor;
     std::unique_ptr<detail::OutgoingProcessor> m_outgoingProcessor;
     std::queue<rapidjson::Document> m_queuedRequests;
     std::unique_ptr<nx::network::websocket::WebSocket> m_socket;
-    std::unordered_map<QString, nx::utils::Guard> m_guards;
 };
 
 } // namespace nx::json_rpc
