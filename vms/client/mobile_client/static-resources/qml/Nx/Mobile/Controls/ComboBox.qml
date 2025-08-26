@@ -153,9 +153,10 @@ T.ComboBox
                     : ColorTheme.transparent(ColorTheme.colors.light4, 0.3)
 
                 text: control.editText
-                topPadding: 0
-                leftPadding: 0
-                rightPadding: 0
+                // Slightly adjust paddings so text selection handles would not be clipped.
+                topPadding: 2
+                leftPadding: 2
+                rightPadding: 2
                 onTextChanged:
                 {
                     control.errorText = ""
