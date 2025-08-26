@@ -5037,6 +5037,18 @@ If you intended to move analytics data to another storage location, please conta
         <source>Paid integration services disabled</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Cloud storage is available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud storage is enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud Storage is enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
