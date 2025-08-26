@@ -147,8 +147,11 @@ public:
         const QString& subscriptionId, const nx::Uuid& userId)
     {
         using namespace nx::network::rest;
+        auto userAccessData = UserAccessData{userId};
+        if (userId == kCloudServiceUserAccess.userId || userId == kVideowallUserAccess.userId)
+            userAccessData.access = UserAccessData::Access::ReadAllResources;
         return {json_rpc::Context{.subscribed = true, .subscriptionId = subscriptionId},
-            {.session = AuthSession{nx::Uuid{}}, .access = UserAccessData{userId}}};
+            {.session = AuthSession{nx::Uuid{}}, .access = std::move(userAccessData)}};
     }
 
 private:
