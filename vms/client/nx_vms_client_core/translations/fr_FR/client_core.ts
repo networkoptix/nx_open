@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation type="unfinished">Failed to access site</translation>
+      <translation>Impossible d'accéder au site</translation>
     </message>
   </context>
   <context>

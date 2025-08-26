@@ -4986,6 +4986,18 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>Paid integration services disabled</source>
       <translation>Layanan integrasi berbayar dinonaktifkan</translation>
     </message>
+    <message>
+      <source>Cloud storage is available</source>
+      <translation>Penyimpanan cloud tersedia</translation>
+    </message>
+    <message>
+      <source>Cloud storage is enabled</source>
+      <translation>Penyimpanan cloud diaktifkan</translation>
+    </message>
+    <message>
+      <source>Cloud Storage is enabled</source>
+      <translation>Penyimpanan Cloud diaktifkan</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>

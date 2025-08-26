@@ -5039,6 +5039,18 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>Paid integration services disabled</source>
       <translation>Services d'intégration payants désactivés</translation>
     </message>
+    <message>
+      <source>Cloud storage is available</source>
+      <translation type="unfinished">Cloud storage is available</translation>
+    </message>
+    <message>
+      <source>Cloud storage is enabled</source>
+      <translation type="unfinished">Cloud storage is enabled</translation>
+    </message>
+    <message>
+      <source>Cloud Storage is enabled</source>
+      <translation type="unfinished">Cloud Storage is enabled</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -6738,7 +6750,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>La sauvegarde sera désactivée pour les caméras nouvellement ajoutées sur tous les serveurs du site</translation>
     </message>
   </context>
   <context>

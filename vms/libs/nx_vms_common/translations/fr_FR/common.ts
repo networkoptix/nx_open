@@ -1470,7 +1470,7 @@
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Transcodage audio requis.</translation>
     </message>
   </context>
   <context>
@@ -1934,7 +1934,7 @@
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>
-      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+      <translation>Clé de chiffrement utilisée pour encoder les valeurs de cookies sécurisés.</translation>
     </message>
   </context>
 </TS>

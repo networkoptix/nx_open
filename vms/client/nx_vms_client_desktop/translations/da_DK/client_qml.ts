@@ -1294,7 +1294,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Brug</translation>
     </message>
   </context>
   <context>
@@ -2375,7 +2375,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>INGEN ADGANG</translation>
     </message>
   </context>
   <context>

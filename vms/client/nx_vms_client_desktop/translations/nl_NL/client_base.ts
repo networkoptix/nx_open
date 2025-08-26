@@ -5039,6 +5039,18 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Paid integration services disabled</source>
       <translation type="unfinished">Paid integration services disabled</translation>
     </message>
+    <message>
+      <source>Cloud storage is available</source>
+      <translation type="unfinished">Cloud storage is available</translation>
+    </message>
+    <message>
+      <source>Cloud storage is enabled</source>
+      <translation type="unfinished">Cloud storage is enabled</translation>
+    </message>
+    <message>
+      <source>Cloud Storage is enabled</source>
+      <translation type="unfinished">Cloud Storage is enabled</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>

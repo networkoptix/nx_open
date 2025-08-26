@@ -4986,6 +4986,18 @@ If you intended to move analytics data to another storage location, please conta
       <source>Paid integration services disabled</source>
       <translation>有料インテグレーションサービスが無効になっています</translation>
     </message>
+    <message>
+      <source>Cloud storage is available</source>
+      <translation>クラウドストレージが利用可能です</translation>
+    </message>
+    <message>
+      <source>Cloud storage is enabled</source>
+      <translation>クラウドストレージが有効です</translation>
+    </message>
+    <message>
+      <source>Cloud Storage is enabled</source>
+      <translation>クラウドストレージが有効です</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
