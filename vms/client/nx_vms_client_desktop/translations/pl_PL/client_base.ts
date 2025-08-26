@@ -5146,15 +5146,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation type="unfinished">Cloud storage is available</translation>
+      <translation>Pamięć w chmurze jest dostępna</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation type="unfinished">Cloud storage is enabled</translation>
+      <translation>Włączono przechowywanie w chmurze</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
-      <translation type="unfinished">Cloud Storage is enabled</translation>
+      <translation>Przechowywanie w chmurze jest włączone</translation>
     </message>
   </context>
   <context>

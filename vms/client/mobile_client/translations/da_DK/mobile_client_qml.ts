@@ -935,7 +935,7 @@
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Udløber aldrig</translation>
     </message>
     <message>
       <source>Shared link options</source>

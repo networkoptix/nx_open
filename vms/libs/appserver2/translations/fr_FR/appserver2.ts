@@ -217,11 +217,11 @@
     </message>
     <message>
       <source>It is forbidden to enable cloud backup for %1 since SaaS service is not active.</source>
-      <translation type="unfinished">It is forbidden to enable cloud backup for %1 since SaaS service is not active.</translation>
+      <translation>Il est interdit d'activer la sauvegarde cloud pour %1 car le service SaaS n'est pas actif.</translation>
     </message>
     <message>
       <source>It is forbidden to enable cloud backup for %1 because there is no appropriate SaaS service license.</source>
-      <translation type="unfinished">It is forbidden to enable cloud backup for %1 because there is no appropriate SaaS service license.</translation>
+      <translation>Il est interdit d’activer la sauvegarde cloud pour %1, car aucune licence de service SaaS appropriée n’est disponible.</translation>
     </message>
     <message>
       <source>There is not enough save permissions</source>

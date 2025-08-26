@@ -578,7 +578,7 @@
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Primær Stream</translation>
     </message>
     <message>
       <source>Secondary Stream</source>

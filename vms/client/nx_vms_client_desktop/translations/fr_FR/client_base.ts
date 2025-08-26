@@ -6750,7 +6750,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>La sauvegarde sera désactivée pour les caméras nouvellement ajoutées sur tous les serveurs du site</translation>
     </message>
   </context>
   <context>

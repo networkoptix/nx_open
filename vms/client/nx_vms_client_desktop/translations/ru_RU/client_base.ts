@@ -5147,15 +5147,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation type="unfinished">Cloud storage is available</translation>
+      <translation>Доступно облачное хранилище</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation type="unfinished">Cloud storage is enabled</translation>
+      <translation>Облачное хранилище включено</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
-      <translation type="unfinished">Cloud Storage is enabled</translation>
+      <translation>Облачное хранилище включено</translation>
     </message>
   </context>
   <context>
