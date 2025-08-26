@@ -1385,7 +1385,7 @@
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Transcodage audio requis.</translation>
     </message>
   </context>
   <context>

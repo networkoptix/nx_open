@@ -5004,7 +5004,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>INGEN ADGANG</translation>
     </message>
     <message>
       <source>DEVICE DISABLED</source>
@@ -5040,7 +5040,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>INGEN LIVE STREAMING</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -5203,7 +5203,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>Hvad skal man gøre med nuværende analysedata?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -7710,7 +7710,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>INGEN ADGANG</translation>
     </message>
   </context>
   <context>
@@ -7808,7 +7808,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Primær Stream</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
@@ -8124,7 +8124,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Primær Stream</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
@@ -9755,7 +9755,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>URL is invalid.</source>
-      <translation type="unfinished">URL is invalid.</translation>
+      <translation>URL er ugyldig.</translation>
     </message>
     <message>
       <source>The login cannot be empty.</source>
@@ -12495,7 +12495,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Other Systems</source>
-      <translation type="unfinished">Other Systems</translation>
+      <translation>Andre Systemer</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -12642,7 +12642,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Flere</translation>
     </message>
   </context>
   <context>
