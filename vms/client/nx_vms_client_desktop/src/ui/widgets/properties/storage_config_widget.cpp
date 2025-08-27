@@ -790,6 +790,8 @@ QnStorageConfigWidget::StorageConfigWarningFlags
 {
     StorageConfigWarningFlags flags;
 
+    const auto serverCount = resourcePool()->servers().size();
+
     for (const auto& storageInfo: m_model->storages())
     {
         const auto storageResource =
@@ -837,7 +839,11 @@ QnStorageConfigWidget::StorageConfigWarningFlags
 
         // Storages status and configuration messages.
         if (!storageInfo.isUsed)
+        {
             flags.setFlag(hasDisabledStorage);
+            if (storageResource->isCloudStorage() && serverCount > 1)
+                flags.setFlag(hasDisabledCloudStorageWithMultipleServers);
+        }
 
         if (storageInfo.isUsed &&
             storageInfo.storageType == nx::reflect::toString(StorageType::removable))
@@ -900,6 +906,16 @@ void QnStorageConfigWidget::updateWarnings()
                     " deleting outdated footage from it will continue."),
                 .level = BarDescription::BarLevel::Warning,
                 .isEnabledProperty = &messageBarSettings()->storageConfigHasDisabledWarning
+            });
+    }
+    if (flags.testFlag(hasDisabledCloudStorageWithMultipleServers))
+    {
+        messages.push_back(
+            {
+                .text = tr("Disabling cloud storage on one server will disable it on all servers. "
+                    "Local backup must be configured manually."),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->storageConfigCloudStorageWarning
             });
     }
     if (flags.testFlag(hasRemovableStorage))
