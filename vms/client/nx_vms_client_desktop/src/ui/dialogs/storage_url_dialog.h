@@ -68,8 +68,6 @@ private slots:
     void at_protocolComboBox_currentIndexChanged();
     void atStorageStatusReply(const StorageStatusReply& reply);
 
-    QString normalizePath(QString path);
-
 private:
     QScopedPointer<Ui::StorageUrlDialog> ui;
     QnServerStorageManager* m_storageManager;

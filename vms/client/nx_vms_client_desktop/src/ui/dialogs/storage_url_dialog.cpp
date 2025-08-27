@@ -22,6 +22,25 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/common/scoped_value_rollback.h>
 
+namespace {
+
+// Creates an URL string from user input, which may be either an URL string or a Windows
+// network path.
+QString normalizePath(const QString& path)
+{
+    static const QRegularExpression kLeadingSlashesRegExp("^/+");
+
+    QString result = path;
+    result.replace('\\', '/');
+    result.remove(kLeadingSlashesRegExp);
+    if (!result.contains("://"))
+        result.prepend("smb://");
+
+    return result;
+}
+
+} // namespace
+
 using namespace nx::vms::client::desktop;
 
 QnStorageUrlDialog::QnStorageUrlDialog(
@@ -98,30 +117,6 @@ nx::vms::api::Credentials QnStorageUrlDialog::credentials() const
     return nx::vms::api::Credentials(ui->loginLineEdit->text(), ui->passwordLineEdit->text());
 }
 
-QString QnStorageUrlDialog::normalizePath(QString path)
-{
-    QString separator = lit("/");
-    //const auto data = runtimeInfoManager()->item(m_server->getId()).data;
-    //if (data.platform.toLower() == lit("windows"))
-    //    separator = lit("\\");
-    QString result = path.replace('/', separator);
-    result = path.replace('\\', separator);
-    if (result.endsWith(separator))
-        result.chop(1);
-
-    if (result.isEmpty())
-        return result;
-
-    if (separator == lit("/"))
-    {
-        int i = 0;
-        while (result[i] == separator[0])
-            ++i;
-        return result.mid(i);
-    }
-    return result;
-}
-
 QnStorageUrlDialog::ProtocolDescription QnStorageUrlDialog::protocolDescription(const QString& protocol)
 {
     ProtocolDescription result;
@@ -156,16 +151,7 @@ QnStorageUrlDialog::ProtocolDescription QnStorageUrlDialog::protocolDescription(
 
 QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, const QString& password)
 {
-    QString urlString = normalizePath(path);
-
-    if (urlString.indexOf("://") == -1)
-    {
-        // The normalizePath() method removes all the preceding slashes which is critical for
-        // the network storage which URL starts with '//'. It is important to recover url here.
-        urlString = QString{"smb://%1"}.arg(urlString);
-    }
-
-    QUrl url{urlString};
+    auto url = QUrl(normalizePath(path)).adjusted(QUrl::StripTrailingSlash);
 
     if (!login.isEmpty())
         url.setUserName(login);
