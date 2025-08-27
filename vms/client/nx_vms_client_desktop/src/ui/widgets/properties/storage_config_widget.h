@@ -57,6 +57,7 @@ private:
         notEnoughLicensesForCloudStorage = 1 << 6,
         cloudBackupStopped = 1 << 7,
         cloudStorageUsedInSuspendedState = 1 << 8,
+        hasDisabledCloudStorageWithMultipleServers = 1 << 9
     };
     Q_DECLARE_FLAGS(StorageConfigWarningFlags, StorageConfigWarningFlag)
 
