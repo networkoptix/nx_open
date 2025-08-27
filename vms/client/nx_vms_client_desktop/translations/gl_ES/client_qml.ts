@@ -1366,7 +1366,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>Investigación do joystick</translation>
     </message>
   </context>
   <context>

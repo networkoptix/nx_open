@@ -4652,7 +4652,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Adaptive</source>
-      <translation type="unfinished">Adaptive</translation>
+      <translation>Adaptativo</translation>
     </message>
   </context>
   <context>
@@ -5041,15 +5041,15 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation type="unfinished">Cloud storage is available</translation>
+      <translation>O almacenamento na nube está dispoñible</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation type="unfinished">Cloud storage is enabled</translation>
+      <translation>Almacenamento na nube activado</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
-      <translation type="unfinished">Cloud Storage is enabled</translation>
+      <translation>Almacenamento na nube activado</translation>
     </message>
   </context>
   <context>
@@ -6750,7 +6750,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>Desactivarase a copia de seguridade para as cámaras engadidas recentemente en todos os servidores do sitio</translation>
     </message>
   </context>
   <context>
@@ -8950,7 +8950,7 @@ Lembra devolver o nivel de rexistro á súa configuración predeterminada despoi
     </message>
     <message>
       <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
-      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
+      <translation>O ficheiro dividido por tamaño debe ser maior que 10 MB e menor ou igual á metade dun valor definido para o límite de volume máximo</translation>
     </message>
   </context>
   <context>

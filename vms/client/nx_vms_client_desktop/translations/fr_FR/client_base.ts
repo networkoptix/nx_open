@@ -4652,7 +4652,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Adaptive</source>
-      <translation type="unfinished">Adaptive</translation>
+      <translation>Adaptatif</translation>
     </message>
   </context>
   <context>
@@ -8230,7 +8230,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Transcodage audio requis.</translation>
     </message>
   </context>
   <context>
