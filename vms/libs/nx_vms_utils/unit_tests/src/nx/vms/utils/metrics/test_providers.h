@@ -83,7 +83,7 @@ private:
 
     static ValueGroupProviders<Resource> makeProviders()
     {
-        return nx::utils::make_vector(
+        return nx::make_vector(
             makeValueGroupProvider<Resource>(
                 "_",
                 std::make_unique<ValueProvider<Resource>>(Scope::local,

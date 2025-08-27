@@ -2,17 +2,16 @@
 
 #pragma once
 
-#include <functional>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 /**@file
  * This file is for c++ utilities that are absent in modern c++ standards but can be easily
- * implemented using c++14. Some of them are in std::experimental, some present on selected
- * compilers, some are waiting in c++20 and further standards.
+ * implemented using the available c++ standard.
  */
 
-namespace nx::utils {
+namespace nx {
 
 /**
  * std::vector of non-copyable types cannot be initialized by the initializer list (it
@@ -31,25 +30,5 @@ auto make_vector(Elements&&... e)
     (result.emplace_back(std::forward<Elements>(e)), ...);
     return result;
 }
-
-#if !defined(__cpp_lib_bind_back)
-
-    template<typename F, typename... Bound>
-    constexpr auto bind_back(F&& f, Bound&&... bound)
-    {
-        return
-            [f = std::forward<F>(f), ... bound = std::forward<Bound>(bound)]<typename... Args>
-                requires std::invocable<F&&, Args&&..., Bound&&...>
-                (Args&&... args) mutable -> decltype(auto)
-            {
-                return std::invoke(std::forward<decltype(f)>(f),
-                    std::forward<Args>(args)...,
-                    std::forward<decltype(bound)>(bound)...);
-            };
-    }
-
-#else
-    using std::bind_back;
-#endif
 
 }   //namespace nx::utils
