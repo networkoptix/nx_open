@@ -110,7 +110,7 @@ template<typename ResourceType>
 template<typename... Providers>
 ValueGroupProvider<ResourceType>::ValueGroupProvider(QString id, Providers&&... providers):
     ValueGroupProvider(
-        id, nx::utils::make_vector(std::forward<Providers>(providers)...))
+        id, nx::make_vector(std::forward<Providers>(providers)...))
 {
 }
 

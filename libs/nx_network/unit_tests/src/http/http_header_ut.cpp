@@ -210,8 +210,7 @@ TEST_P(CookieParseTest, cookiesView)
     const auto& [headers, expected] = GetParam();
     const std::vector parsed = headers
         | nx::network::utils::cookiesView()
-        | nx::utils::ranges::to<std::vector>()
-        ;
+        | nx::ranges::to<std::vector>();
 
     if (expected.first.empty() && expected.second.empty())
     {

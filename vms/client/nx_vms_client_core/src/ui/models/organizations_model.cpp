@@ -2,6 +2,8 @@
 
 #include "organizations_model.h"
 
+#include <ranges>
+
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMetaObject>
 

@@ -21,12 +21,12 @@ concept CookieViewFilterPredicate =
         { std::invoke(std::forward<Filter>(f), cookieNameValue) } -> std::same_as<bool>;
     };
 
-constexpr nx::utils::ranges::Closure cookiesView =
-    []<CookieViewFilterPredicate Predicate = nx::utils::ranges::AlwaysTrue>(
+constexpr nx::Closure cookiesView =
+    []<CookieViewFilterPredicate Predicate = nx::AlwaysTrue>(
         const HttpHeaders& headers, Predicate&& filter = {})
-            -> nx::utils::ranges::ViewOf<std::pair<std::string_view, std::string_view>> auto
+            -> nx::ranges::ViewOf<std::pair<std::string_view, std::string_view>> auto
     {
-        using namespace nx::utils::ranges;
+        using namespace nx::ranges;
 
         const auto cookieHeaders = std::apply(
             [](auto... i)
@@ -41,7 +41,7 @@ constexpr nx::utils::ranges::Closure cookiesView =
                 [filterPredicate = std::forward<Predicate>(filter)](std::string_view v) mutable
                 {
                     return v
-                        | split(";")
+                        | nx::views::split(";")
                         | std::views::transform(trim)
                         | std::views::filter(
                             [](std::string_view v)
@@ -55,16 +55,13 @@ constexpr nx::utils::ranges::Closure cookiesView =
                             [](std::string_view s) -> std::pair<std::string_view, std::string_view>
                             {
                                 return s
-                                    | split("=")
+                                    | nx::views::split("=")
                                     | std::views::transform(trim)
-                                    | to_pair
-                                    ;
+                                    | to_pair;
                             })
-                        | std::views::filter(filterPredicate)
-                        ;
+                        | std::views::filter(filterPredicate);
                 })
-            | std::views::join
-            ;
+            | std::views::join;
     };
 
 } // namespace nx::network::utils
