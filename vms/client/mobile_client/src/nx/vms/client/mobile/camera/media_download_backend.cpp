@@ -154,7 +154,6 @@ void MediaDownloadBackend::Private::gatherProxyServerId(VideoDownloadContext&& c
             callback(std::move(context));
         });
 
-    requestContext->setTargetThread(q->thread());
     clientPool->sendRequest(requestContext);
 }
 

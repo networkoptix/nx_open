@@ -13,8 +13,7 @@
 #include <QtCore/QEventLoop>
 
 #include <api/http_client_pool.h>
-#include <nx/network/deprecated/asynchttpclient.h>
-#include <nx/network/http/http_client.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/random.h>
@@ -95,13 +94,18 @@ TEST_F(HttpClientPoolTest, GeneralTest)
         [&](ClientPool::ContextPtr context)
         {
             ASSERT_TRUE(context->hasResponse());
-            ASSERT_EQ(context->response.statusLine.statusCode, StatusCode::ok);
-            QByteArray msgBody = context->response.messageBody;
-            ASSERT_TRUE(msgBody.startsWith("SimpleTest"));
+            EXPECT_EQ(context->response.statusLine.statusCode, StatusCode::ok);
+
+            const auto& msgBody = context->response.messageBody;
+            EXPECT_TRUE(msgBody.starts_with("SimpleTest"));
+
+            const auto contentType =
+                getHeaderValue(context->response.headers, header::kContentType);
+
             if (msgBody == "SimpleTest2")
-                ASSERT_TRUE(context->response.contentType == QByteArray("application/text2"));
+                EXPECT_EQ(contentType, "application/text2");
             else
-                ASSERT_TRUE(context->response.contentType ==  QByteArray("application/text"));
+                EXPECT_EQ(contentType, "application/text");
 
             NX_MUTEX_LOCKER lock(&mutex);
             ++requestsFinished;

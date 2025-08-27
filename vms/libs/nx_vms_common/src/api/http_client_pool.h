@@ -4,7 +4,6 @@
 
 #include <optional>
 
-#include <QtCore/QPointer>
 #include <QtCore/QSharedPointer>
 
 #include <nx/network/http/http_async_client.h>
@@ -54,17 +53,6 @@ public:
         std::optional<nx::Uuid> gatewayId;
     };
 
-    // TODO: Should be merged with nx::network::http::Response
-    struct NX_VMS_COMMON_API Response
-    {
-        nx::network::http::StatusLine statusLine;
-        nx::String contentType;
-        nx::network::http::HttpHeaders headers;
-        QByteArray messageBody;
-
-        /** Clean up all internal values to default state. */
-        void reset();
-    };
 
     using Clock = std::chrono::steady_clock;
     using TimePoint = std::chrono::time_point<Clock>;
@@ -75,8 +63,7 @@ public:
      * Its data can be accessed from following threads:
      *  - thread for ClientPool::sendRequest. It can be main thread, or feature thread
      *  - AioThread, at a callback onHttpClientDone
-     *  - AioThread at final callback, if no `targetThread` is specified
-     *  - `targetThread` if it is specified
+     *  - AioThread at final callback
      */
     class NX_VMS_COMMON_API Context
     {
@@ -95,9 +82,11 @@ public:
         enum class State
         {
             initial,
+            /** Waiting in request queue. */
             sending,
+            /** Sent to AsyncClient, waiting for response. */
             waitingResponse,
-            /** Got an error in RestResponse */
+            /** Response received successfully. */
             hasResponse,
             /** Failed to get any response due to network error. */
             noResponse,
@@ -126,14 +115,6 @@ public:
 
         /** Callback to be called when response is received. */
         nx::MoveOnlyFunc<void (QSharedPointer<Context> context)> completionFunc;
-
-        QThread* targetThread() const;
-
-        /** Set thread for dispatched callback. */
-        void setTargetThread(QThread* thread);
-
-        /** Checks if target thread is dead. */
-        bool targetThreadIsDead() const;
 
         /** Check if there is any response. */
         bool hasResponse() const;
@@ -188,12 +169,8 @@ public:
     protected:
         State state = State::initial;
         mutable nx::Mutex mutex;
-        /**
-         * Target thread for callback.
-         * Empty value makes dispatcher invoke callback in AIO thread.
-         */
-        std::optional<QPointer<QThread>> thread;
     };
+
     using ContextPtr = QSharedPointer<Context>;
 
     ClientPool();

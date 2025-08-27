@@ -118,6 +118,12 @@ nx::log::Tag makeLogTag(
         nx::toString(instance), subTag, serverId.toSimpleString()));
 }
 
+Qn::SerializationFormat serializationFormat(const nx::network::http::HttpHeaders& headers)
+{
+    return Qn::serializationFormatFromHttpContentType(
+        nx::network::http::getHeaderValue(headers, nx::network::http::header::kContentType));
+}
+
 } // namespace
 
 // --------------------------- public methods -------------------------------------------
@@ -2734,8 +2740,8 @@ ServerConnection::Private::executeRequestAsync(
     // Asio thread.
 
     requestContext->parse(
-        Qn::serializationFormatFromHttpContentType(context->response.contentType),
-        context->response.messageBody,
+        serializationFormat(context->response.headers),
+        context->response.messageBody.toRawByteArray(),
         context->systemError,
         context->getStatusLine(),
         context->response.headers);
@@ -2792,8 +2798,8 @@ ServerConnection::Private::executeRequestAsync(
 
             // Asio thread.
             requestContext->parse(
-                Qn::serializationFormatFromHttpContentType(context->response.contentType),
-                context->response.messageBody,
+                serializationFormat(context->response.headers),
+                context->response.messageBody.toRawByteArray(),
                 context->systemError,
                 context->getStatusLine(),
                 context->response.headers);
@@ -3090,7 +3096,6 @@ nx::network::http::ClientPool::ContextPtr ServerConnection::prepareContext(
     context->completionFunc = std::move(callback);
     if (timeouts)
         context->timeouts = *timeouts;
-    context->setTargetThread(nullptr); //< Callback runs in target thread via AsyncHandlerExecutor.
 
     return context;
 }

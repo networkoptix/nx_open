@@ -329,6 +329,10 @@ public:
      * @return Can be NULL if no response has been received yet
      */
     const Response* response() const;
+
+    /** Move respose out and clear it if present, return empty response otherwise. */
+    Response takeResponse();
+
     std::string contentType() const;
 
     /**

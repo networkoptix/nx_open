@@ -127,7 +127,7 @@ struct CloudSystemFinder::Private
             {
                 onRequestComplete(cloudSystemId, context);
             });
-        context->setTargetThread(q->thread());
+
         clientPool->sendRequest(context);
     }
 
@@ -198,7 +198,8 @@ struct CloudSystemFinder::Private
         nx::vms::api::ModuleInformationWithAddresses moduleInformation;
 
         if (!success
-            || !parseModuleInformation(context->response.messageBody, &moduleInformation)
+            || !parseModuleInformation(
+                context->response.messageBody.toRawByteArray(), &moduleInformation)
                 // Prevent hanging of fake online cloud servers.
             || !tryRemoveAlienServerUnderLock(moduleInformation)
             || (cloudSystemId != moduleInformation.cloudSystemId)

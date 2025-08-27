@@ -462,7 +462,9 @@ public:
         const nx::network::http::StatusLine& statusLine,
         const nx::network::http::HttpHeaders& resultHeaders) override
     {
-        result = messageBody;
+        // Need to deep copy buffer, because it is made from raw data.
+        // FIXME: Think about moving the buffer straight to the end callback.
+        result = QByteArray(messageBody.constData(), messageBody.size());
         headers = resultHeaders;
 
         if (systemError != SystemError::noError

@@ -21,41 +21,12 @@ static constexpr AsyncClient::Timeouts kDefaultTimeouts{1min, 1min, 1min};
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
-// ClientPool::Response
-
-void ClientPool::Response::reset()
-{
-    statusLine = {};
-    messageBody = {};
-    contentType = nx::String();
-}
-
-//-------------------------------------------------------------------------------------------------
 // ClientPool::Context
 
 StatusLine ClientPool::Context::getStatusLine() const
 {
     NX_MUTEX_LOCKER lock(&mutex);
     return response.statusLine;
-}
-
-QThread* ClientPool::Context::targetThread() const
-{
-    return thread ? *thread : nullptr;
-}
-
-void ClientPool::Context::setTargetThread(QThread* targetThread)
-{
-    if (targetThread)
-        thread = targetThread;
-    else if (thread)
-        thread->clear();
-}
-
-bool ClientPool::Context::targetThreadIsDead() const
-{
-    NX_MUTEX_LOCKER lock(&mutex);
-    return thread.has_value() && *thread == nullptr;
 }
 
 bool ClientPool::Context::hasResponse() const
@@ -161,30 +132,18 @@ void ClientPool::Context::sendRequest(AsyncClient* httpClient)
 void ClientPool::Context::readHttpResponse(AsyncClient* httpClient)
 {
     NX_MUTEX_LOCKER lock(&mutex);
+
     stampReceived = Clock::now();
-    response.reset();
-
-    systemError = SystemError::noError;
-
-    if (httpClient->response())
-    {
-        response.statusLine = httpClient->response()->statusLine;
-        response.headers = httpClient->response()->headers;
-    }
-    else
-    {
-        response.statusLine = nx::network::http::StatusLine();
-        state = Context::State::noResponse;
-    }
+    systemError = httpClient->lastSysErrorCode();
 
     if (httpClient->failed())
     {
-        systemError = SystemError::connectionReset;
+        response = {};
+        state = Context::State::noResponse;
     }
     else
     {
-        response.contentType = httpClient->contentType();
-        response.messageBody = httpClient->fetchMessageBodyBuffer().takeByteArray();
+        response = httpClient->takeResponse();
         state = Context::State::hasResponse;
     }
 }
@@ -480,7 +439,7 @@ struct ClientPool::Private
 
         if (context)
         {
-            if (!context->targetThreadIsDead() && context->completionFunc)
+            if (context->completionFunc)
                 context->completionFunc(context);
             context.reset();
         }
@@ -528,7 +487,7 @@ struct ClientPool::Private
 
             for (const auto& context: requests)
             {
-                if (context && !context->targetThreadIsDead() && context->completionFunc)
+                if (context && context->completionFunc)
                     context->completionFunc(context);
             }
         }
@@ -576,6 +535,7 @@ int ClientPool::sendRequest(ContextPtr context)
         requestId = ++d->requestId;
         // Access to d->awaitingRequests is blocked, so no other thread can touch context as well.
         context->handle = requestId;
+        context->state = Context::State::sending;
         d->awaitingRequests.emplace(requestId, context);
         d->sendNextRequestUnsafe();
     }
@@ -629,7 +589,7 @@ bool ClientPool::terminate(int handle)
     auto url = context->getUrl();
     NX_VERBOSE(this, "terminate(%1) - terminating request to \"%2\"", handle, url);
     context->setCanceled();
-    if (!context->targetThreadIsDead() && context->completionFunc)
+    if (context->completionFunc)
         context->completionFunc(context);
     context.reset();
 

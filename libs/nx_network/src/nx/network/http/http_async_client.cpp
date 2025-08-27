@@ -690,6 +690,18 @@ const Response* AsyncClient::response() const
         : nullptr;
 }
 
+Response AsyncClient::takeResponse()
+{
+    Response result;
+    if (m_response.type == MessageType::response)
+    {
+        moveMessageBodyToResponse();
+        result = std::move(*m_response.response);
+        m_response.clear();
+    }
+    return result;
+}
+
 std::string AsyncClient::contentType() const
 {
     if (m_response.type == MessageType::none)
