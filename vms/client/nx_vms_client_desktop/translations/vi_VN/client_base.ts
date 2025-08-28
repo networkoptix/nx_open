@@ -4470,6 +4470,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Site suspended</source>
       <translation>Chi nhánh bị đình chỉ</translation>
     </message>
+    <message>
+      <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
+      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>

@@ -4470,6 +4470,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Site suspended</source>
       <translation>サイトはサスペンドされています</translation>
     </message>
+    <message>
+      <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
+      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
