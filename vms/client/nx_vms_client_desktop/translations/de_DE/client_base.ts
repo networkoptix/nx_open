@@ -4515,6 +4515,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Site suspended</source>
       <translation type="unfinished">Site suspended</translation>
     </message>
+    <message>
+      <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
+      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>

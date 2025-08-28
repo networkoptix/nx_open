@@ -4515,6 +4515,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>Site suspended</source>
       <translation type="unfinished">Site suspended</translation>
     </message>
+    <message>
+      <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
+      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
