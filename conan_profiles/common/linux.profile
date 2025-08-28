@@ -13,6 +13,11 @@ compiler.cppstd=20
 qt/*:compiler.cppstd=gnu20
 
 [options]
+cpython*:shared = False
+cpython*:optimizations = True
+cpython*:docstrings = False
+cpython*:with_curses = False
+cpython*:with_gdbm = False
 icu/*:data_packaging=library
 libmysqlclient/*:shared=True
 libpq/*:shared=True

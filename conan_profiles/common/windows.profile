@@ -6,8 +6,11 @@ os=Windows
 compiler=Visual Studio
 compiler.version=17
 compiler.cppstd=20
+cpython*:build_type=Release
+cpython*:compiler.runtime=MD
 
 [options]
+cpython*:shared = True
 libpq/*:shared=True
 opencv-static/*:cuda_arch_bin=5.0
 opencv-static/*:cudawarping=True

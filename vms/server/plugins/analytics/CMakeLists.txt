@@ -6,6 +6,10 @@ add_subdirectory(sample_analytics_plugin)
 add_subdirectory(stub_analytics_plugin)
 add_subdirectory(gpt4vision_analytics_plugin)
 
+if(withMqttPlugin)
+    add_subdirectory(mqtt_plugin)
+endif()
+
 if(withTests)
     add_subdirectory(unit_tests)
 endif()

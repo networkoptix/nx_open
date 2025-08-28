@@ -7,6 +7,7 @@ set(_withDocumentation ON)
 set(_withMiniLauncher ON)
 set(_withSdk ON)
 set(_withUnitTestsArchive ON)
+set(_withMqttPlugin ON)
 
 if(developerBuild)
     set(_withDistributions OFF)
@@ -14,6 +15,10 @@ if(developerBuild)
     set(_withMiniLauncher OFF)
     set(_withSdk OFF)
     set(_withUnitTestsArchive OFF)
+endif()
+
+if(NOT "${platform}" STREQUAL "linux" AND NOT "${platform}" STREQUAL "windows")
+    set(_withMqttPlugin OFF)
 endif()
 
 # Windows distributions cannot be built without release libraries.
@@ -28,6 +33,7 @@ option(withDistributions "Enable distributions" ${_withDistributions})
 option(withDocumentation "Generate documentation" ${_withDocumentation})
 option(withTests "Enable unit tests" ON)
 option(withUnitTestsArchive "Enable unit tests archive" ${_withUnitTestsArchive})
+option(withMqttPlugin "Enable MQTT plugin" ${_withMqttPlugin})
 set(withRootTool "false") #< Required in the build_info.json.
 
 # Platform-specific options.
