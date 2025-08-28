@@ -127,6 +127,13 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "[Dev] Overrides the current Client's Cloud Host. Allows to connect to the Server that \n"
         "uses the specified Cloud Host. Use 'auto' to allow client switch cloud host on the fly.");
 
+    // VMS-59730
+    NX_INI_STRING("",
+        unsupportedCloudServices,
+        "[Dev] Disables UI for specific cloud services. Allows to hide UI elements related to\n"
+        "certain cloud services, marking them as unavailable. Possible values:\n"
+        " * \"cloud_notifications\" - disables UI for cross-site notifications service.\n"
+        "Services can be combined using space, comma or semicolon.");
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();

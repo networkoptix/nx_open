@@ -43,6 +43,7 @@
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/thumbnails/remote_async_image_provider.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
+#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
@@ -213,6 +214,7 @@ struct ApplicationContext::Private
     std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
     std::unique_ptr<CloudLayoutsManager> cloudLayoutsManager;
     std::unique_ptr<CrossSystemLayoutsWatcher> crossSystemLayoutsWatcher;
+    std::unique_ptr<CloudServiceChecker> cloudServiceChecker;
 
     QString customExternalResourceFile;
 };
@@ -329,6 +331,8 @@ void ApplicationContext::initializeNetworkModules()
 
     if (d->knownServerConnectionsWatcher)
         d->knownServerConnectionsWatcher->start();
+
+    d->cloudServiceChecker = std::make_unique<CloudServiceChecker>();
 }
 
 void ApplicationContext::initializeCrossSystemModules()
@@ -561,6 +565,11 @@ bool ApplicationContext::isCertificateValidationLevelStrict() const
 NetworkModule* ApplicationContext::networkModule() const
 {
     return d->networkModule.get();
+}
+
+CloudServiceChecker* ApplicationContext::cloudServiceChecker() const
+{
+    return d->cloudServiceChecker.get();
 }
 
 SessionTokenTerminator* ApplicationContext::sessionTokenTerminator() const
