@@ -251,11 +251,27 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, std::unique_pt
     return success(res);
 }
 
+#if defined(_MSC_VER)
+__declspec(noinline) void keepAlive(volatile void const* p) {
+    _ReadWriteBarrier(); (void)p;
+}
+#else
+__attribute__((noinline)) void keepAlive(volatile void const* p) {
+    asm volatile("" : : "r"(p) : "memory");
+}
+#endif
+
 std::optional<detail::SocketAddress> UdpChannel::recvfrom(CPacket* packet)
 {
     assert(m_iSocket != INVALID_UDP_SOCKET);
 
-    sockaddr_storage addr;  // Large enough for both IPv4 and IPv6
+    // Something very fishy is happening here. We're getting stack ovewritten, but ASAN and stack protection cookies can't catch it.
+    // It's likely being written to from another thread. Adding a 2Kb stack protector somehow fixes this. At least we stop crashing.
+    alignas(64) volatile unsigned char stackProtector[2048];
+    stackProtector[0] = 0;        //< Observable write.
+    keepAlive(stackProtector);   //< Opaque sink, prevents DCE.
+
+    sockaddr_storage addr;  //< Large enough for both IPv4 and IPv6.
     socklen_t addr_len = sizeof(addr);
 
     int res = ::recvfrom(

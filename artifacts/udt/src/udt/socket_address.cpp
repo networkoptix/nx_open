@@ -18,17 +18,26 @@ SocketAddress::SocketAddress()
     setFamily(AF_INET);
 }
 
-SocketAddress::SocketAddress(const sockaddr_storage* addr, socklen_t addrLen):
-    m_length(addrLen)
-{
-    memcpy(&m_address, addr, addrLen);
+static constexpr socklen_t clamp_len(socklen_t v, socklen_t cap) {
+#ifndef __GNUC__
+    if constexpr (std::is_signed_v<socklen_t>)
+        if (v < 0) return 0;
+#endif
+    return (v <= cap) ? v : cap;
 }
 
-SocketAddress::SocketAddress(const sockaddr* addr, int addrLen):
-    m_length(addrLen)
+SocketAddress::SocketAddress(const sockaddr_storage* addr, socklen_t addrLen)
 {
-    memset(&m_address, 0, sizeof(m_address));
-    memcpy(&m_address, addr, addrLen);
+    const socklen_t cap = static_cast<socklen_t>(sizeof(m_address));
+    m_length = clamp_len(addrLen, cap);
+    memcpy(&m_address, addr, m_length);
+}
+
+SocketAddress::SocketAddress(const sockaddr* addr, socklen_t addrLen)
+{
+    const socklen_t cap = static_cast<socklen_t>(sizeof(m_address));
+    m_length = clamp_len(addrLen, cap);
+    memcpy(&m_address, addr, m_length);
 }
 
 struct sockaddr* SocketAddress::get()

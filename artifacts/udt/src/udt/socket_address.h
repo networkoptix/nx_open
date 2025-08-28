@@ -25,7 +25,7 @@ public:
      * Copies from addr.
      */
     SocketAddress(const sockaddr_storage* addr, socklen_t addrLen);
-    SocketAddress(const sockaddr* addr, int addrLen);
+    SocketAddress(const sockaddr* addr, socklen_t addrLen);
 
     struct sockaddr* get();
     const struct sockaddr* get() const;
