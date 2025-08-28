@@ -14,7 +14,6 @@
 
 #include <nx/utils/data_structures/time_out_cache.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue.h>

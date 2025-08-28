@@ -2,6 +2,8 @@
 
 #include "text_to_wave_server.h"
 
+#include <QtCore/QIODevice>
+
 #include <flite.h>
 
 extern "C" {
@@ -198,10 +200,6 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-template<>
-nx::speech_synthesizer::TextToWaveServer*
-    Singleton<nx::speech_synthesizer::TextToWaveServer>::s_instance = nullptr;
-
 namespace nx::speech_synthesizer {
 
 TextToWaveServer::TextToWaveServer(const QString& binaryPath):
@@ -214,6 +212,15 @@ TextToWaveServer::TextToWaveServer(const QString& binaryPath):
 TextToWaveServer::~TextToWaveServer()
 {
     stop();
+}
+
+std::unique_ptr<TextToWaveServer> TextToWaveServer::create(const QString& binaryPath)
+{
+    std::unique_ptr<TextToWaveServer> result(new TextToWaveServer(binaryPath));
+    result->start();
+    result->waitForStarted();
+
+    return result;
 }
 
 void TextToWaveServer::waitForStarted()

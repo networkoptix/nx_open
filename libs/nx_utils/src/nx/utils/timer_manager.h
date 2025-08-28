@@ -4,13 +4,12 @@
 
 #include <chrono>
 #include <functional>
+#include <optional>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
 #include "move_only_func.h"
-#include "singleton.h"
-#include "std/optional.h"
 #include "thread/mutex.h"
 #include "thread/wait_condition.h"
 #include "time/timer_event_handler.h"
@@ -197,10 +196,3 @@ std::optional<std::chrono::milliseconds> NX_UTILS_API parseOptionalTimerDuration
 
 } // namespace utils
 } // namespace nx
-
-// Workaround for the bug in the clang that doesn't look up for the instantiation of s_instance in
-// the same library (prevent -Wundefined-var-template).
-#if defined(__clang__)
-    template<>
-    nx::utils::TimerManager* Singleton<nx::utils::TimerManager>::s_instance;
-#endif

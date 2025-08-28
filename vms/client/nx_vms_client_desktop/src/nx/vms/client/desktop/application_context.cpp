@@ -34,6 +34,7 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/http/log/har.h>
 #include <nx/p2p/p2p_ini.h>
+#include <nx/speech_synthesizer/text_to_wave_server.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/debug.h>
 #include <nx/utils/external_resources.h>
@@ -365,6 +366,7 @@ struct ApplicationContext::Private
     std::unique_ptr<UploadManager> uploadManager;
     std::unique_ptr<QnForgottenSystemsManager> forgottenSystemsManager;
     std::unique_ptr<ResourcesChangesManager> resourcesChangesManager;
+    std::unique_ptr<nx::speech_synthesizer::TextToWaveServer> textToWaveServer;
     std::unique_ptr<WebPageDataCache> webPageDataCache;
     std::unique_ptr<QnQtbugWorkaround> qtBugWorkarounds;
     std::unique_ptr<core::DesktopResourceSearcher> desktopResourceSearcher;
@@ -770,6 +772,8 @@ ApplicationContext::ApplicationContext(
             d->initializeNetworkLogging();
             initializeTranslations(coreSettings()->locale());
             d->initializePlatformAbstraction();
+            d->textToWaveServer = nx::speech_synthesizer::TextToWaveServer::create(
+                QCoreApplication::applicationDirPath());
             d->performanceMonitor = std::make_unique<PerformanceMonitor>();
             d->statisticsModule = std::make_unique<ContextStatisticsModule>();
             d->initializeNetworkModules();
@@ -1015,6 +1019,11 @@ WebPageDataCache* ApplicationContext::webPageDataCache() const
 QnForgottenSystemsManager* ApplicationContext::forgottenSystemsManager() const
 {
     return d->forgottenSystemsManager.get();
+}
+
+nx::speech_synthesizer::TextToWaveServer* ApplicationContext::textToWaveServer() const
+{
+    return d->textToWaveServer.get();
 }
 
 nx::cloud::gateway::VmsGatewayEmbeddable* ApplicationContext::cloudGateway() const

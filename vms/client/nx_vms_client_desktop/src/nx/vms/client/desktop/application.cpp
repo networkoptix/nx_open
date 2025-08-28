@@ -53,7 +53,6 @@
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
-#include <nx/speech_synthesizer/text_to_wave_server.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/rlimit.h>
@@ -563,17 +562,11 @@ int runApplication(int argc, char** argv)
     auto application = std::make_unique<QApplication>(argc, argv);
     initApplication(startupParams);
 
-    // Initialize speech synthesis.
+    // Adding exe dir to plugin search path.
     const QString applicationDirPath = QCoreApplication::applicationDirPath();
     NX_ASSERT(!applicationDirPath.isEmpty(), "QApplication may not have been initialized.");
-    auto textToWaveServer = std::make_unique<nx::speech_synthesizer::TextToWaveServer>(
-        applicationDirPath);
-    textToWaveServer->start();
-    textToWaveServer->waitForStarted();
-
-    // Adding exe dir to plugin search path.
     QStringList pluginDirs = QCoreApplication::libraryPaths();
-    pluginDirs << QCoreApplication::applicationDirPath();
+    pluginDirs << applicationDirPath;
     QCoreApplication::setLibraryPaths(pluginDirs);
 #ifdef Q_OS_LINUX
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, lit("/etc/xdg"));

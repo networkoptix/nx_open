@@ -5,12 +5,11 @@
 #include <functional>
 #include <list>
 #include <map>
-
-#include <nx/utils/singleton.h>
-
-#include "http_types.h"
+#include <string>
 
 namespace nx::network::http {
+
+class Request;
 
 /**
  * Responsible for modifying HTTP request.

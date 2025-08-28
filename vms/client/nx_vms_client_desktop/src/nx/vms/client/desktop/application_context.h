@@ -19,6 +19,7 @@ struct QnStartupParameters;
 
 namespace nx::cloud::gateway { class VmsGatewayEmbeddable; }
 namespace nx::vms::client::core { class ObjectDisplaySettings; }
+namespace nx::speech_synthesizer{ class TextToWaveServer; }
 
 namespace nx::vms::client::desktop {
 
@@ -216,6 +217,8 @@ public:
     ResourcesChangesManager* resourcesChangesManager() const;
 
     QnForgottenSystemsManager* forgottenSystemsManager() const;
+
+    nx::speech_synthesizer::TextToWaveServer* textToWaveServer() const;
 
     WebPageDataCache* webPageDataCache() const;
 

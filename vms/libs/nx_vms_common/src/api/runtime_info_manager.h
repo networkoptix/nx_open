@@ -6,7 +6,6 @@
 #include <QtCore/QMap>
 #include <QtCore/QObject>
 
-#include <nx/utils/singleton.h>
 #include <nx/vms/api/data/runtime_data.h>
 #include <utils/common/threadsafe_item_storage.h>
 

@@ -6,14 +6,10 @@
 #include <optional>
 #include <string>
 
-#include <QtCore/QAtomicInt>
-
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/time.h>
 
 #include "log/log.h"
-
-template<> nx::utils::TimerManager* Singleton<nx::utils::TimerManager>::s_instance = nullptr;
 
 namespace nx {
 namespace utils {

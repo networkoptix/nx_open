@@ -2,6 +2,8 @@
 
 #include "http_mod_manager.h"
 
+#include "http_types.h"
+
 namespace nx::network::http {
 
 void HttpModManager::apply(Request* const request)

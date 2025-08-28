@@ -22,10 +22,6 @@
 #include "nx_network_ini.h"
 #include "socket_factory.h"
 
-template<>
-nx::network::SocketGlobalsHolder* Singleton<nx::network::SocketGlobalsHolder>::s_instance =
-    nullptr;
-
 namespace nx {
 namespace network {
 

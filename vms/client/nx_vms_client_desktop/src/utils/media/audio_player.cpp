@@ -9,6 +9,7 @@
 #include <core/resource/resource.h>
 #include <nx/speech_synthesizer/text_to_wave_server.h>
 #include <nx/utils/random.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <utils/common/util.h>
 
 class LocalAudioFileResource: public QnResource
@@ -205,7 +206,7 @@ void AudioPlayer::run()
             case sSynthesizingAutoPlay:
             {
                 if (!m_synthesizingTarget->open(QIODevice::WriteOnly) ||
-                    !nx::speech_synthesizer::TextToWaveServer::instance()->generateSoundSync(
+                    !nx::vms::client::desktop::appContext()->textToWaveServer()->generateSoundSync(
                         m_textToPlay, m_synthesizingTarget.get()))
                 {
                     emit done();

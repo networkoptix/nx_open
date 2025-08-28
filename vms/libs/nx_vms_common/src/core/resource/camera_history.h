@@ -6,7 +6,6 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/uuid.h>

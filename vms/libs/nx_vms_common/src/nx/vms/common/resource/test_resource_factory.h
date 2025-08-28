@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_factory.h>
-#include <nx/utils/singleton.h>
 
 namespace nx::vms::common::test {
 
