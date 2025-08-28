@@ -84,6 +84,11 @@ struct NX_VMS_API LoginSessionRequest
      * %example 100
      */
     std::optional<std::chrono::seconds> durationS;
+
+    /**%apidoc[opt]
+     * Apply response `token` to the current WebSocket connection. Useless for HTTP requests.
+     */
+    bool setSession = false;
 };
 #define LoginSessionRequest_Fields (username)(password)(setCookie)(durationS)
 NX_VMS_API_DECLARE_STRUCT_EX(LoginSessionRequest, (json))

@@ -39,7 +39,10 @@ public:
     virtual ~WebSocketClient() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     void setHandler(RequestHandler handler);
-    void connectAsync(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+
+    using ConnectHandler = nx::MoveOnlyFunc<void(
+        /*success*/ bool, SystemError::ErrorCode, std::optional<nx::network::http::Response>)>;
+    void connectAsync(ConnectHandler handler);
     void sendAsync(Request request, ResponseHandler handler);
     void setOnDone(OnDone onDone) { m_onDone = std::move(onDone); }
 
@@ -48,7 +51,7 @@ private:
     void onUpgrade();
 
 private:
-    std::vector<nx::MoveOnlyFunc<void(SystemError::ErrorCode)>> m_connectHandlers;
+    std::vector<ConnectHandler> m_connectHandlers;
     nx::Url m_url;
     RequestHandler m_handler;
     std::unique_ptr<nx::network::http::AsyncClient> m_handshakeClient;
