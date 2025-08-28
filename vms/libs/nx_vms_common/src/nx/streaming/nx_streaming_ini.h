@@ -18,7 +18,7 @@ struct NxStreamingIniConfig: public nx::kit::IniConfig
         "Enables time correction if timestamp difference between subsequent frames is too small.");
 
     NX_INI_INT(
-        5'000,
+        1'000,
         resyncThresholdMs,
         "If the difference between camera time and server time is bigger than the value of this\n"
         "setting an offset between the clocks of the camera and the server is recalculated");
