@@ -15,7 +15,7 @@ if(withDistributions)
     endif()
 endif()
 
-if(withMobileClient AND WINDOWS)
+if(withMobileClient AND (WINDOWS OR LINUX) AND arch STREQUAL x64)
     add_subdirectory(mobile_client_archive)
 endif()
 
