@@ -367,7 +367,7 @@ void LogsManagementWidget::setupUi()
     ui->finishedIconButton->setFlat(true);
     ui->progressBar->setFixedHeight(4);
 
-    setPaletteColor(ui->doneButton, QPalette::Button, finishedColor);
+    setAccentStyle(ui->doneButton);
     setPaletteColor(ui->activePage, QPalette::Window, core::colorTheme()->color("dark6"));
     ui->activePage->setAutoFillBackground(true);
     ui->activePage->setFixedHeight(kActiveHeaderHeight);
