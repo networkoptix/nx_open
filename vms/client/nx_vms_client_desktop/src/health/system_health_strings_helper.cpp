@@ -290,6 +290,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(
             messageParts << tr("Some cameras are set to record in a mode they do not support.");
             messageParts << ""; //< Additional line break by design.
             messageParts += getSortedResourcesNames<QnVirtualCameraResource>(resources);
+            break;
         }
 
         case MessageType::cloudStorageIsEnabled:
