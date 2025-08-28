@@ -230,6 +230,9 @@ private:
 
     GLuint textureId = 0;
     FboManager fboManager;
+
+    VideoFramePtr decodedFrame;
+    int outFrameNumber;
 };
 
 QMap<AVCodecID, QSize> AndroidVideoDecoderPrivate::maxResolutions;
@@ -480,6 +483,25 @@ QSize AndroidVideoDecoder::maxResolution(const AVCodecID codec)
 
     QMutexLocker lock(&AndroidVideoDecoderPrivate::maxResolutionsMutex);
     return AndroidVideoDecoderPrivate::maxResolutions[codec]; //< Return empty QSize if not found.
+}
+
+bool AndroidVideoDecoder::sendPacket(const QnConstCompressedVideoDataPtr& packet)
+{
+    d->outFrameNumber = decode(packet, &d->decodedFrame);
+    return d->outFrameNumber > 0;
+}
+
+bool AndroidVideoDecoder::receiveFrame(VideoFramePtr* decodedFrame)
+{
+    if (d->decodedFrame)
+        *decodedFrame = d->decodedFrame;
+    d->decodedFrame.reset();
+    return true;
+}
+
+int AndroidVideoDecoder::currentFrameNumber() const
+{
+    return d->outFrameNumber > 0 ? d->outFrameNumber : 0;
 }
 
 int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, VideoFramePtr* result)

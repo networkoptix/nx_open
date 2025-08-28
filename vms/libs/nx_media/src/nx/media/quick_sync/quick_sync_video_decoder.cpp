@@ -39,6 +39,25 @@ int QuickSyncVideoDecoder::decode(
     return m_impl->decode(frame, result);
 }
 
+bool QuickSyncVideoDecoder::sendPacket(const QnConstCompressedVideoDataPtr& packet)
+{
+    m_frameNumber = m_impl->decode(packet, &m_result);
+    return m_frameNumber > 0;
+}
+
+bool QuickSyncVideoDecoder::receiveFrame(VideoFramePtr* decodedFrame)
+{
+    if (m_result)
+        *decodedFrame = m_result;
+    m_result.reset();
+    return true;
+}
+
+int QuickSyncVideoDecoder::currentFrameNumber() const
+{
+    return m_frameNumber > 0 ? m_frameNumber : 0;
+}
+
 AbstractVideoDecoder::Capabilities QuickSyncVideoDecoder::capabilities() const
 {
     return Capability::hardwareAccelerated;

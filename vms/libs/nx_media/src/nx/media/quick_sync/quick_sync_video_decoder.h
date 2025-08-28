@@ -26,14 +26,20 @@ public:
     static bool isAvailable();
     static QSize maxResolution(const AVCodecID codec);
 
-    virtual int decode(
-        const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result = nullptr) override;
+    int decode(
+        const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result = nullptr);
+
+    virtual bool sendPacket(const QnConstCompressedVideoDataPtr& packet) override;
+    virtual bool receiveFrame(VideoFramePtr* decodedFrame) override;
+    virtual int currentFrameNumber() const override;
 
     virtual Capabilities capabilities() const override;
 
 private:
     // Should be shared due to output frames keep reference to decoder.
     std::shared_ptr<QuickSyncVideoDecoderImpl> m_impl;
+    VideoFramePtr m_result;
+    int m_frameNumber = 0;
 };
 
 } // namespace nx::media::quick_sync

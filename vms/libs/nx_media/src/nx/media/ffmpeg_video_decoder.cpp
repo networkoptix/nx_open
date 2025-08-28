@@ -244,8 +244,7 @@ VideoFrame* FfmpegVideoDecoder::fromAVFrame(const AVFrame* frame)
     return videoFrame;
 }
 
-int FfmpegVideoDecoder::decode(
-    const QnConstCompressedVideoDataPtr& compressedVideoData, VideoFramePtr* outDecodedFrame)
+bool FfmpegVideoDecoder::sendPacket(const QnConstCompressedVideoDataPtr& compressedVideoData)
 {
     Q_D(FfmpegVideoDecoder);
 
@@ -253,7 +252,7 @@ int FfmpegVideoDecoder::decode(
     {
         d->initContext(compressedVideoData);
         if (!d->codecContext)
-            return -1; //< error
+            return false; //< error
     }
 
     nx::media::ffmpeg::AvPacket avPacket(compressedVideoData.get());
@@ -267,12 +266,33 @@ int FfmpegVideoDecoder::decode(
     else
         packet->pts = packet->dts = d->lastPts;
 
-    int gotPicture = 0;
-    int res = nx::media::ffmpeg::old_api::decode(d->codecContext, d->frame, &gotPicture, packet);
-    if (res <= 0 || !gotPicture)
-        return res; //< Negative value means error, zero means buffering.
+    int result = avcodec_send_packet(d->codecContext, packet);
+    if (result == AVERROR(EAGAIN))
+    {
+        // We fully drain all the output in each decode call, so this should not ever happen.
+        NX_WARNING(this, "Failed to send packet to decoder, impossible EAGAIN");
+        return false;
+    }
+    if (result < 0)
+    {
+        NX_WARNING(this, "Failed to send packet to decoder, result: %1", result);
+        return false;
+    }
 
-    const int frameNum = qMax(0, d->codecContext->frame_num - 1);
+    return true;
+}
+
+bool FfmpegVideoDecoder::receiveFrame(VideoFramePtr* decodedFrame)
+{
+    Q_D(FfmpegVideoDecoder);
+    int result = avcodec_receive_frame(d->codecContext, d->frame);
+    if (result < 0)
+    {
+        if (result == AVERROR(EAGAIN) || result == AVERROR_EOF)
+            return true;
+
+        return false;
+    }
 
     VideoFrame* videoFrame = FfmpegVideoDecoderPrivate::fromAVFrame(
         &d->frame,
@@ -283,10 +303,16 @@ int FfmpegVideoDecoder::decode(
         d->frame = av_frame_alloc();
 
     if (!videoFrame)
-        return -1;
+        return false;
 
-    outDecodedFrame->reset(videoFrame);
-    return frameNum;
+    decodedFrame->reset(videoFrame);
+    return true;
+}
+
+int FfmpegVideoDecoder::currentFrameNumber() const
+{
+    Q_D(const FfmpegVideoDecoder);
+    return  qMax(0, d->codecContext->frame_num - 1);
 }
 
 double FfmpegVideoDecoder::getSampleAspectRatio() const

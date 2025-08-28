@@ -16,6 +16,7 @@ class JpegDecoderPrivate: public QObject
 public:
     JpegDecoderPrivate(): frameNumber(0) {}
     int frameNumber;
+    VideoFramePtr result;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -47,22 +48,39 @@ QSize JpegDecoder::maxResolution(const AVCodecID /*codec*/)
     return QSize();
 }
 
-int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result)
+bool JpegDecoder::sendPacket(const QnConstCompressedVideoDataPtr& packet)
 {
     Q_D(JpegDecoder);
 
-    if (!frame)
+    if (!packet)
         return 0; //< There is no internal buffer. Nothing to flush.
 
-    const QImage image = decompressJpegImage(frame->data(), frame->dataSize());
+    const QImage image = decompressJpegImage(packet->data(), packet->dataSize());
 
-    *result = std::make_shared<VideoFrame>(image);
+    d->result = std::make_shared<VideoFrame>(image);
 
-    if (!*result)
+    if (!d->result)
         return 0;
 
-    (*result)->setStartTime(frame->timestamp / 1000); //< convert usec to msec
+    d->result->setStartTime(packet->timestamp / 1000); //< convert usec to msec
     return d->frameNumber++;
+}
+
+bool JpegDecoder::receiveFrame(VideoFramePtr* decodedFrame)
+{
+    Q_D(JpegDecoder);
+
+    if (d->result)
+        *decodedFrame = d->result;
+    d->result.reset();
+    return true;
+}
+
+int JpegDecoder::currentFrameNumber() const
+{
+    Q_D(const JpegDecoder);
+
+    return d->frameNumber;
 }
 
 AbstractVideoDecoder::Capabilities JpegDecoder::capabilities() const

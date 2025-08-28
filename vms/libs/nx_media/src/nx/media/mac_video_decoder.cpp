@@ -270,9 +270,7 @@ QSize MacVideoDecoder::maxResolution(const AVCodecID codec)
     }
 }
 
-int MacVideoDecoder::decode(
-    const QnConstCompressedVideoDataPtr& videoData,
-    VideoFramePtr* outDecodedFrame)
+bool MacVideoDecoder::sendPacket(const QnConstCompressedVideoDataPtr& videoData)
 {
     Q_D(MacVideoDecoder);
 
@@ -294,20 +292,28 @@ int MacVideoDecoder::decode(
             return -1;
     }
 
-    if (!d->decoder->decode(compressedVideoData, &d->outFramePtr))
+    if (!d->decoder->sendPacket(compressedVideoData))
     {
-        const int ret = d->decoder->getLastDecodeResult(); //< Zero means buffering.
-        if (ret < 0)
-        {
-            NX_WARNING(this, "Failed to decode frame");
-            d->decoder.reset();
-        }
+        NX_WARNING(this, "Failed to decode frame");
+        d->decoder.reset();
+        return false;
+    }
 
-        return ret;
+    return true;
+}
+
+bool MacVideoDecoder::receiveFrame(VideoFramePtr* decodedFrame)
+{
+    Q_D(MacVideoDecoder);
+
+    if (!d->decoder->receiveFrame(&d->outFramePtr))
+    {
+        NX_WARNING(this, "Failed to receive frame");
+        d->decoder.reset();
+        return false;
     }
 
     const qint64 startTimeMs = d->outFramePtr->pkt_dts / 1000;
-
     if (qtPixelFormatForFrame(d->outFramePtr.get()) == QVideoFrameFormat::Format_Invalid)
     {
         NX_WARNING(this, "Unknown pixel format");
@@ -321,8 +327,14 @@ int MacVideoDecoder::decode(
     d->outFramePtr.reset(new CLVideoDecoderOutput());
     videoFrame->setStartTime(startTimeMs);
 
-    outDecodedFrame->reset(videoFrame);
-    return d->decoder->frameNum();
+    decodedFrame->reset(videoFrame);
+    return true;
+}
+
+int MacVideoDecoder::currentFrameNumber() const
+{
+    Q_D(const MacVideoDecoder);
+    return  d->decoder->currentFrameNumber();
 }
 
 AbstractVideoDecoder::Capabilities MacVideoDecoder::capabilities() const

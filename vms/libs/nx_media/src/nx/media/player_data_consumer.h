@@ -134,6 +134,8 @@ private:
     bool processVideoFrame(const QnCompressedVideoDataPtr& data);
     bool processAudioFrame(const QnCompressedAudioDataPtr& data);
 
+    void onDecodedFrame(VideoFramePtr frame);
+
     void enqueueVideoFrame(VideoFramePtr decodedFrame);
     int getBufferingMask() const;
     QnCompressedVideoDataPtr queueVideoFrame(const QnCompressedVideoDataPtr& videoFrame);

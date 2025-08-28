@@ -52,7 +52,9 @@ class SeamlessVideoDecoderPrivate: public QObject
 
 public:
     SeamlessVideoDecoderPrivate(
-        SeamlessVideoDecoder* parent, RenderContextSynchronizerPtr renderContextSynchronizer);
+        SeamlessVideoDecoder* parent,
+        SeamlessVideoDecoder::FrameHandler handler,
+        RenderContextSynchronizerPtr renderContextSynchronizer);
 
     // Store metadata from compressed frame.
     void pushMetadata(const QnConstCompressedVideoDataPtr& frame);
@@ -65,7 +67,6 @@ public:
     void updateSar(const QnConstCompressedVideoDataPtr& frame);
 
 public:
-    std::deque<VideoFramePtr> queue; /**< Temporary  buffer for decoded data. */
     VideoDecoderPtr videoDecoder;
     CodecParametersConstPtr currentCodecParameters;
     FrameBasicInfo prevFrameInfo;
@@ -89,11 +90,13 @@ public:
     bool resetDecoder = false;
     SeamlessVideoDecoder::VideoGeometryAccessor videoGeometryAccessor;
 
+    SeamlessVideoDecoder::FrameHandler handler;
     RenderContextSynchronizerPtr renderContextSynchronizer;
 };
 
 SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(
     SeamlessVideoDecoder* parent,
+    SeamlessVideoDecoder::FrameHandler handler,
     RenderContextSynchronizerPtr renderContextSynchronizer)
     :
     QObject(parent),
@@ -101,6 +104,7 @@ SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(
     videoDecoder(nullptr, nullptr),
     frameNumber(0),
     decoderFrameOffset(0),
+    handler(std::move(handler)),
     renderContextSynchronizer(renderContextSynchronizer)
 {
 }
@@ -160,9 +164,9 @@ int SeamlessVideoDecoderPrivate::decoderFrameNumToLocalNum(int value) const
 //-------------------------------------------------------------------------------------------------
 // SeamlessVideoDecoder
 
-SeamlessVideoDecoder::SeamlessVideoDecoder(RenderContextSynchronizerPtr renderContextSynchronizer):
+SeamlessVideoDecoder::SeamlessVideoDecoder(FrameHandler handler, RenderContextSynchronizerPtr renderContextSynchronizer):
     QObject(),
-    d_ptr(new SeamlessVideoDecoderPrivate(this, renderContextSynchronizer))
+    d_ptr(new SeamlessVideoDecoderPrivate(this, std::move(handler), renderContextSynchronizer))
 {
 }
 
@@ -208,15 +212,11 @@ void SeamlessVideoDecoder::pleaseStop()
 {
 }
 
-bool SeamlessVideoDecoder::decode(
-    const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result)
+bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
 {
     NX_VERBOSE(this, "Decode video frame: %1, resolution: %2x%3, flags: %4",
         frame->compressionType, frame->width, frame->height, frame->flags);
     Q_D(SeamlessVideoDecoder);
-    if (result)
-        result->reset();
-
     d->updateSar(frame);
     FrameBasicInfo frameInfo(frame);
     bool isSimilarParams;
@@ -244,16 +244,24 @@ bool SeamlessVideoDecoder::decode(
         d->resetDecoder = false;
         if (d->videoDecoder)
         {
-            for (;;)
+            if (d->videoDecoder->sendPacket(QnConstCompressedVideoDataPtr()))
             {
-                VideoFramePtr decodedFrame;
-                int decodedFrameNum = d->videoDecoder->decode(
-                    QnConstCompressedVideoDataPtr(), &decodedFrame);
-                if (!decodedFrame)
-                    break; //< decoder's buffer is flushed
+                for (;;)
+                {
+                    VideoFramePtr decodedFrame;
+                    if (!d->videoDecoder->receiveFrame(&decodedFrame))
+                    {
+                        NX_DEBUG(this, "Failed to flush video decoder");
+                        break;
+                    }
+                    if (!decodedFrame)
+                        break; //< decoder's buffer is flushed
 
-                pushFrame(decodedFrame, decodedFrameNum, d->sar);
+                    pushFrame(decodedFrame);
+                }
             }
+            else
+                NX_DEBUG(this, "Failed to start to flush video decoder");
         }
 
         // Release previous decoder in case the hardware decoder can handle only single instance.
@@ -284,48 +292,55 @@ bool SeamlessVideoDecoder::decode(
     }
 
     d->pushMetadata(frame);
-    int decodedFrameNum = -1;
     if (d->videoDecoder)
     {
-        VideoFramePtr decodedFrame;
-        decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
-
-        const bool isHwAccelerated = d->videoDecoder->capabilities().testFlag(
-            AbstractVideoDecoder::Capability::hardwareAccelerated);
-        if (d->allowSoftwareDecoderFallback && decodedFrameNum < 0 && isHwAccelerated)
+        if (!d->videoDecoder->sendPacket(frame))
         {
-            ++d->hardwareDecoderErrorCount;
-            if (d->hardwareDecoderErrorCount >= kMaxHarwdareDecoderErrors)
+            const bool isHwAccelerated = d->videoDecoder->capabilities().testFlag(
+                AbstractVideoDecoder::Capability::hardwareAccelerated);
+            if (d->allowSoftwareDecoderFallback && isHwAccelerated)
             {
-                NX_DEBUG(this, "Hardware decoder failed to decode video, try software one(from next key frame)");
-                setAllowHardwareAcceleration(false);
-                d->isSoftwareFallbackMode = true;
+                ++d->hardwareDecoderErrorCount;
+                if (d->hardwareDecoderErrorCount >= kMaxHarwdareDecoderErrors)
+                {
+                    NX_DEBUG(this, "Hardware decoder failed to decode video, try software one(from next key frame)");
+                    setAllowHardwareAcceleration(false);
+                    d->isSoftwareFallbackMode = true;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
-
-        if (decodedFrame)
+        else
         {
-            pushFrame(decodedFrame, decodedFrameNum, d->sar);
-            d->hardwareDecoderErrorCount = 0;
+            for (;;)
+            {
+                VideoFramePtr decodedFrame;
+                if (!d->videoDecoder->receiveFrame(&decodedFrame))
+                {
+                    NX_DEBUG(this, "Failed to receive video from decoder");
+                    return false;
+                }
+                if (!decodedFrame)
+                    break; //< Decoder's buffer is flushed.
+
+                d->hardwareDecoderErrorCount = 0;
+                pushFrame(decodedFrame);
+            }
         }
     }
-
-    if (d->queue.empty())
-    {
-        // Return false if decoding fails and no queued frames are left.
-        return decodedFrameNum >= 0;
-    }
-
-    *result = std::move(d->queue.front());
-    d->queue.pop_front();
     return true;
 }
 
-void SeamlessVideoDecoder::pushFrame(VideoFramePtr decodedFrame, int decodedFrameNum, double sar)
+void SeamlessVideoDecoder::pushFrame(VideoFramePtr decodedFrame)
 {
     Q_D(SeamlessVideoDecoder);
-    FrameMetadata metadata = d->findMetadata(d->decoderFrameNumToLocalNum(decodedFrameNum));
-    metadata.sar = sar;
+
+    auto frameNumber = d->videoDecoder->currentFrameNumber();
+    FrameMetadata metadata = d->findMetadata(d->decoderFrameNumToLocalNum(frameNumber));
+    metadata.sar = d->sar;
     if (qFuzzyCompare(metadata.sar, 1.0))
         metadata.sar = nx::media::getDefaultSampleAspectRatio(decodedFrame->size());
 
@@ -333,13 +348,7 @@ void SeamlessVideoDecoder::pushFrame(VideoFramePtr decodedFrame, int decodedFram
         metadata.flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
 
     metadata.serialize(decodedFrame);
-    d->queue.push_back(std::move(decodedFrame));
-}
-
-int SeamlessVideoDecoder::currentFrameNumber() const
-{
-    Q_D(const SeamlessVideoDecoder);
-    return d->frameNumber;
+    d->handler(decodedFrame);
 }
 
 QSize SeamlessVideoDecoder::currentResolution() const

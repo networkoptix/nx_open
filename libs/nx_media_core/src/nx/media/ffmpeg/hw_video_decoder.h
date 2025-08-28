@@ -45,7 +45,10 @@ public:
 
     AVPixelFormat getPixelFormat() { return m_targetPixelFormat; }
 
-    int64_t frameNum() const;
+    // To support AbstractVideoDecoder impl
+    bool sendPacket(const QnConstCompressedVideoDataPtr& packet);
+    bool receiveFrame(CLVideoDecoderOutputPtr* const outFrame);
+    int currentFrameNumber() const;
 
 private:
     bool initialize(const QnConstCompressedVideoDataPtr& frame);

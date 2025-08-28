@@ -38,8 +38,9 @@ public:
     // Create non-owning VideoFrame from AVFrame.
     static VideoFrame* fromAVFrame(const AVFrame* frame);
 
-    virtual int decode(
-        const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result = nullptr) override;
+    virtual bool sendPacket(const QnConstCompressedVideoDataPtr& packet) override;
+    virtual bool receiveFrame(VideoFramePtr* decodedFrame) override;
+    virtual int currentFrameNumber() const override;
 
     virtual double getSampleAspectRatio() const override;
 

@@ -109,11 +109,20 @@ public:
         return s_maxResolution;
     }
 
-    virtual int decode(
-        const QnConstCompressedVideoDataPtr& /*compressedVideoData*/,
-        VideoFramePtr* /*outDecodedFrame*/) override
+    virtual bool sendPacket(const QnConstCompressedVideoDataPtr& /*packet*/) override
     {
-        NX_INFO(this, "INTERNAL ERROR: decode() called");
+        NX_INFO(this, "INTERNAL ERROR: sendPacket() called");
+        return false;
+    }
+
+    virtual bool receiveFrame(VideoFramePtr* /*decodedFrame*/) override
+    {
+        NX_INFO(this, "INTERNAL ERROR: receiveFrame() called");
+        return false;
+    }
+
+    virtual int currentFrameNumber() const override
+    {
         return 0;
     }
 

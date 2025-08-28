@@ -294,7 +294,9 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         NX_MUTEX_LOCKER lock(&m_decoderMutex);
         while (m_videoDecoders.size() <= videoChannel)
         {
-            auto videoDecoder = new SeamlessVideoDecoder(m_renderContextSynchronizer);
+            auto videoDecoder = new SeamlessVideoDecoder(
+                [this](VideoFramePtr frame){ onDecodedFrame(std::move(frame)); },
+                m_renderContextSynchronizer);
             videoDecoder->setAllowOverlay(m_allowOverlay);
             videoDecoder->setAllowHardwareAcceleration(m_allowHardwareAcceleration);
             videoDecoder->setAllowSoftwareDecoderFallback(m_allowSoftwareDecoderFallback);
@@ -304,36 +306,35 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     }
     SeamlessVideoDecoder* videoDecoder = m_videoDecoders[videoChannel].get();
 
-    VideoFramePtr decodedFrame;
-    if (!videoDecoder->decode(data, &decodedFrame))
+    if (!videoDecoder->decode(data))
     {
         NX_WARNING(this, nx::format("Cannot decode the video frame. The frame is skipped."));
         // False result means we want to repeat this frame later, thus, returning true.
     }
-    else if (decodedFrame)
-    {
-        FrameMetadata metadata = FrameMetadata::deserialize(decodedFrame);
-        if (metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_Reverse))
-        {
-            if (!m_gopReverser)
-                m_gopReverser = std::make_unique<GopReverser>(kReorderBufferSizeBytes);
-            m_gopReverser->push(std::move(decodedFrame));
-            std::vector<VideoFramePtr> frames;
-            while (auto frame = m_gopReverser->pop())
-                frames.emplace_back(std::move(frame));
-            m_queueSize = std::max(m_queueSize, (int) frames.size());
-            for (auto& frame: frames)
-                enqueueVideoFrame(std::move(frame));
-        }
-        else
-        {
-            m_gopReverser.reset();
-            m_queueSize = kDefaultDecodedVideoQueueSize;
-            enqueueVideoFrame(std::move(decodedFrame));
-        }
-    }
-
     return true;
+}
+
+void PlayerDataConsumer::onDecodedFrame(VideoFramePtr decodedFrame)
+{
+    FrameMetadata metadata = FrameMetadata::deserialize(decodedFrame);
+    if (metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_Reverse))
+    {
+        if (!m_gopReverser)
+            m_gopReverser = std::make_unique<GopReverser>(kReorderBufferSizeBytes);
+        m_gopReverser->push(std::move(decodedFrame));
+        std::vector<VideoFramePtr> frames;
+        while (auto frame = m_gopReverser->pop())
+            frames.emplace_back(std::move(frame));
+        m_queueSize = std::max(m_queueSize, (int) frames.size());
+        for (auto& frame: frames)
+            enqueueVideoFrame(std::move(frame));
+    }
+    else
+    {
+        m_gopReverser.reset();
+        m_queueSize = kDefaultDecodedVideoQueueSize;
+        enqueueVideoFrame(std::move(decodedFrame));
+    }
 }
 
 bool PlayerDataConsumer::checkSequence(int sequence)
@@ -351,7 +352,7 @@ void PlayerDataConsumer::enqueueVideoFrame(VideoFramePtr decodedFrame)
 {
     NX_ASSERT(decodedFrame);
     NX_MUTEX_LOCKER lock(&m_queueMutex);
-    while (m_decodedVideo.size() >= m_queueSize && !needToStop())
+    while ((int)m_decodedVideo.size() >= m_queueSize && !needToStop())
         m_queueWaitCond.wait(&m_queueMutex);
     if (needToStop())
         return;

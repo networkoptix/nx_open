@@ -27,7 +27,10 @@ public:
     typedef std::function<QRect()> VideoGeometryAccessor;
 
 public:
-    SeamlessVideoDecoder(RenderContextSynchronizerPtr renderContextSynchronizer);
+    using FrameHandler = std::function<void(VideoFramePtr frame)>;
+
+    SeamlessVideoDecoder(
+        FrameHandler hanlder, RenderContextSynchronizerPtr renderContextSynchronizer);
 
     virtual ~SeamlessVideoDecoder();
 
@@ -49,17 +52,15 @@ public:
     bool isSoftwareDecoderFallbackMode();
 
     /**
-     * Decode a video frame. This is a sync function and it could take a lot of CPU. This call is
+     * Decode a video packet. This is a sync function and it could take a lot of CPU. This call is
      * not thread-safe.
-     * @param frame Compressed video data. If frame is null, then the function must flush internal
-     * decoder buffer. If no more frames in the buffer are left, function must return true as a
-     * result and null shared pointer in the 'result' parameter.
-     * @param result Decoded video data. If the decoder still fills internal buffer, then result
-     * can be empty but the function returns true.
-     * @return True if frame is decoded without errors. For null input data, return true while
-     * flushing internal buffer (result is not null)
+     * @param packet Compressed video data. If packet is null, then the function must flush
+     * internal decoder buffer. If a decoded frame is ready, the FrameHandler callback will be
+     * called. The handler may be called multiple times if multiple frames are ready or the decoder
+     * is in flush mode.
+     * @return True if packet is decoded without errors.
      */
-    bool decode(const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result = nullptr);
+    bool decode(const QnConstCompressedVideoDataPtr& packet);
 
     /**
      * @return Current frame number in range [0..INT_MAX]. This number will be used for the next
@@ -78,7 +79,7 @@ public:
     void pleaseStop();
 
 private:
-    void pushFrame(VideoFramePtr frame, int decodedFrameNum, double sar);
+    void pushFrame(VideoFramePtr frame);
 
 private:
     QScopedPointer<SeamlessVideoDecoderPrivate> d_ptr;

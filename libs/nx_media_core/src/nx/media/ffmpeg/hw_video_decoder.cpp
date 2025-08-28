@@ -231,8 +231,7 @@ bool HwVideoDecoder::initializeHardware(const QnConstCompressedVideoDataPtr& dat
     return true;
 }
 
-bool HwVideoDecoder::decode(
-    const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutputPtr* const outFrame)
+bool HwVideoDecoder::sendPacket(const QnConstCompressedVideoDataPtr& data)
 {
     if (!m_decoderContext && !initialize(data))
     {
@@ -267,9 +266,13 @@ bool HwVideoDecoder::decode(
         m_lastDecodeResult = status;
         return false;
     }
+    return true;
+}
 
+bool HwVideoDecoder::receiveFrame(CLVideoDecoderOutputPtr* const outFrame)
+{
     CLVideoDecoderOutput* const frame = outFrame->data();
-    status = avcodec_receive_frame(m_decoderContext, frame);
+    int status = avcodec_receive_frame(m_decoderContext, frame);
     if (status == AVERROR(EAGAIN) || status == AVERROR_EOF)
     {
         m_lastDecodeResult = 0;
@@ -294,7 +297,19 @@ bool HwVideoDecoder::decode(
     return true;
 }
 
-int64_t HwVideoDecoder::frameNum() const
+bool HwVideoDecoder::decode(
+    const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutputPtr* const outFrame)
+{
+    if (!sendPacket(data))
+        return false;
+
+    if (!receiveFrame(outFrame))
+        return false;
+
+    return true;
+}
+
+int HwVideoDecoder::currentFrameNumber() const
 {
     if (!m_decoderContext)
         return 0;

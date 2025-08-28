@@ -71,26 +71,26 @@ public:
     }
 
     /**
-     * Decode a video frame. This is a sync function and it could take a lot of CPU.
-     * It's guarantee all source frames have same codec context.
-     *
-     * @param compressedVideoData Compressed single frame data. If null, this function must flush
-     *     internal decoder buffer. If no more frames are left in the buffer, return zero value as
-     *     a result, and set outDecodedFrame to null.
-     *     ATTENTION: compressedVideoData->data() is guaranteed to be non-null, have dataSize() > 0
-     *     and have additional AV_INPUT_BUFFER_PADDING_SIZE bytes allocated after frame->dataSize(), which
-     *     is needed by e.g. ffmpeg decoders and can be zeroed by this function.
-     *
-     * @param outDecodedFrame Decoded video data. If decoder still fills its internal buffer, then
-     *     outDecodedFrame should be set to null, and the function should return 0.
-     *
-     * @return Decoded frame number (value >= 0), if the frame is decoded without errors. Return a
-     *     negative value on decoding error. For null input data, return positive value while the
-     *     decoder is flushing its internal buffer (outDecodedFrame is not set to null).
+     * Decode a video packet. This is a sync function and it could take a lot of CPU. This call is
+     * not thread-safe.
+     * @param packet Compressed video data. If packet is null, then the function must flush
+     * internal decoder buffer.
+     * It is possible that multiple frames are ready if the decoder is in flush mode.
+     * @return True if packet is decoded without errors.
      */
-    virtual int decode(
-        const QnConstCompressedVideoDataPtr& compressedVideoData,
-        VideoFramePtr* outDecodedFrame) = 0;
+    virtual bool sendPacket(const QnConstCompressedVideoDataPtr& packet) = 0;
+
+    /**
+     * Call receiveFrame in a loop after each sendPacket until it returns nullptr in decodedFrame.
+     * @param decodedFrame The decoded video frame, or nullptr if there are no ready frames.
+     * @return True if packet is decoded without errors.
+     */
+    virtual bool receiveFrame(VideoFramePtr* decodedFrame) = 0;
+
+    /**
+     * @return Current frame number in range [0..INT_MAX]. This number of the last decoded frame.
+     */
+    virtual int currentFrameNumber() const = 0;
 
     /**
      * Should be called before other methods. Allows to obtain video window coords for some
