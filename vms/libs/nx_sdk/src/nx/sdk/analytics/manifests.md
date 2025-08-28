@@ -288,6 +288,14 @@ Engine Manifest is a JSON Object containing the following fields:
 
     Optional. If omitted or empty, means there are no settings.
 
+- `"vectorizationModel"`: String
+
+    Plugin could provide vector attached to a best shot. At this case plugin should provide
+    vectorization model name. List of supported vectorization models can be read via
+    UtilityProvider.
+    Example: "openai/clip-vit-large-patch14-336".
+
+    Optional.
 ---------------------------------------------------------------------------------------------------
 ## DeviceAgent Manifest
 
