@@ -42,6 +42,47 @@ static enum AVPixelFormat getHwFormat(AVCodecContext *ctx, const enum AVPixelFor
     return AV_PIX_FMT_NONE;
 }
 
+static AVPixelFormat getHwPixelFormatForCodec(const AVCodec* codec, AVHWDeviceType deviceType)
+{
+    for (int i = 0; ; i++)
+    {
+        const AVCodecHWConfig* config = avcodec_get_hw_config(codec, i);
+        if (!config)
+            return AV_PIX_FMT_NONE;
+
+        if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX)
+            && config->device_type == deviceType)
+        {
+            return config->pix_fmt;
+        }
+    }
+}
+
+std::tuple<const AVCodec*, AVPixelFormat> findHwDecoderForCodec(
+    AVCodecID codecId,
+    AVHWDeviceType deviceType)
+{
+    void* opaque = nullptr;
+    const AVCodec* codec = nullptr;
+
+    while ((codec = av_codec_iterate(&opaque)))
+    {
+        if (!av_codec_is_decoder(codec))
+            continue;
+        if (codec->id != codecId)
+            continue;
+
+        auto pixelFormat = getHwPixelFormatForCodec(codec, deviceType);
+        if (pixelFormat != AV_PIX_FMT_NONE)
+            return {codec, pixelFormat};
+
+        NX_DEBUG(NX_SCOPE_TAG, "Codec %1 can decode %2 only in SW",
+            codec->name, avcodec_get_name(codecId));
+    }
+
+    return {nullptr, AV_PIX_FMT_NONE};
+}
+
 HwVideoDecoder::HwVideoDecoder(
     AVHWDeviceType type,
     nx::metric::Storage* metrics,
@@ -112,6 +153,9 @@ bool HwVideoDecoder::initializeSoftware(const QnConstCompressedVideoDataPtr& dat
             nx::media::ffmpeg::avErrorToString(status));
         return false;
     }
+
+    m_hardwareMode = false;
+
     return true;
 }
 
@@ -130,41 +174,21 @@ bool HwVideoDecoder::initializeHardware(const QnConstCompressedVideoDataPtr& dat
     NX_DEBUG(this, "Trying to initialize hardware decoder, type: %1, codec: %2",
         av_hwdevice_get_type_name(m_type), data->compressionType);
 
-    const AVCodec* decoder = avcodec_find_decoder(data->compressionType);
-    if (decoder == 0)
+    auto [decoder, pixelFormat] = findHwDecoderForCodec(data->compressionType, m_type);
+
+    if (pixelFormat == AV_PIX_FMT_NONE)
     {
-        NX_WARNING(this, "Could not find codec %1.", data->compressionType);
+        NX_WARNING(this, "Cannot find HW decoder for codec %1 (%2) and device type %3.",
+            data->compressionType,
+            avcodec_get_name(data->compressionType),
+            av_hwdevice_get_type_name(m_type));
         return false;
     }
 
-    for (int i = 0; ; i++)
-    {
-        const AVCodecHWConfig *config = avcodec_get_hw_config(decoder, i);
-        if (!config)
-        {
-            NX_DEBUG(this, "Decoder %1 does not support device type %2.",
-                    decoder->name, av_hwdevice_get_type_name(m_type));
-            return false;
-        }
-        if (config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX &&
-            config->device_type == m_type)
-        {
-            m_targetPixelFormat = config->pix_fmt;
-            break;
-        }
-    }
+    m_targetPixelFormat = pixelFormat;
 
-    if (m_targetPixelFormat == AV_PIX_FMT_NONE)
-    {
-        NX_WARNING(this, "Cannot find pixel format for decoder %1 and device type %2.",
-                decoder->name, av_hwdevice_get_type_name(m_type));
-        return false;
-    }
-    else
-    {
-        NX_DEBUG(this, "Found pixel format %1 for decoder %2 and device type %3.",
-            m_targetPixelFormat, decoder->name, av_hwdevice_get_type_name(m_type));
-    }
+    NX_DEBUG(this, "Found pixel format %1 for decoder %2 and device type %3.",
+        m_targetPixelFormat, decoder->name, av_hwdevice_get_type_name(m_type));
 
     if (!(m_decoderContext = avcodec_alloc_context3(decoder)))
         return false;
@@ -226,6 +250,7 @@ bool HwVideoDecoder::initializeHardware(const QnConstCompressedVideoDataPtr& dat
         return false;
     }
 
+    m_hardwareMode = true;
     NX_DEBUG(this, "Hardware decoder initialized: %1", decoder->name);
     decoderCtxGuard.disarm();
     return true;
@@ -293,7 +318,8 @@ bool HwVideoDecoder::receiveFrame(CLVideoDecoderOutputPtr* const outFrame)
     if (m_metrics)
         m_metrics->decodedPixels() += frame->width * frame->height;
 
-    m_hardwareMode = (bool) frame->hw_frames_ctx;
+    // Android MediaCodec decoder does not set hw_frames_ctx.
+    m_hardwareMode = (bool) frame->hw_frames_ctx || frame->format == AV_PIX_FMT_MEDIACODEC;
     return true;
 }
 

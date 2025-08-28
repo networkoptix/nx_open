@@ -6,14 +6,12 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/media/video_data_packet.h>
 
 #include "abstract_video_decoder.h"
 
-namespace nx {
-namespace media {
-
-class AndroidVideoDecoderPrivate;
+namespace nx::media {
 
 /**
  * Implements hardware android video decoder.
@@ -38,16 +36,13 @@ public:
     virtual bool receiveFrame(VideoFramePtr* decodedFrame) override;
     virtual int currentFrameNumber() const override;
 
-    int decode(const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result = nullptr);
-
     virtual Capabilities capabilities() const override;
+
 private:
-    std::shared_ptr<AndroidVideoDecoderPrivate> d;
-    // TODO: Fix: Q_DECLARE_PRIVATE requires QSharedPtr and d_ptr field.
-    Q_DECLARE_PRIVATE(AndroidVideoDecoder);
+    class Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace media
-} // namespace nx
+} // namespace nx::media
 
 #endif // Q_OS_ANDROID

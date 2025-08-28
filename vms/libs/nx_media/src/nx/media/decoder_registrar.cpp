@@ -11,7 +11,6 @@
 #include "ffmpeg_audio_decoder.h"
 #include "ffmpeg_video_decoder.h"
 
-#include "android_audio_decoder.h"
 #include "android_video_decoder.h"
 #include "jpeg_decoder.h"
 #include "mac_video_decoder.h"
@@ -31,8 +30,6 @@ void DecoderRegistrar::registerDecoders(const QMap<int, QSize>& maxFfmpegResolut
     {
         VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(
             "AndroidVideoDecoder", maxHardwareDecodersCount);
-        // HW audio decoder crashes in readOutputBuffer() for some reason. So far, disabling it.
-        //AudioDecoderRegistry::instance()->addPlugin<AndroidAudioDecoder>();
     }
     #endif
 

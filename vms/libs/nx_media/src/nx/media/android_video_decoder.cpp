@@ -1,10 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "android_video_decoder.h"
-#if defined(Q_OS_ANDROID)
 
-#include <deque>
-#include <queue>
+#if defined(Q_OS_ANDROID)
 
 #include <QtCore/QCache>
 #include <QtCore/QCoreApplication>
@@ -16,33 +14,32 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
-#include <QtMultimedia/private/qhwvideobuffer_p.h>
+#include <QtGui/private/qopenglextensions_p.h>
 #include <QtMultimedia/QVideoFrameFormat>
+#include <QtMultimedia/private/qhwvideobuffer_p.h>
 #include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtOpenGL/QOpenGLShaderProgram>
 
-#include <media/filters/h264_mp4_to_annexb.h>
+#include <nx/media/annexb_to_mp4.h>
+#include <nx/media/avframe_memory_buffer.h>
+#include <nx/media/ffmpeg/hw_video_decoder.h>
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
 #include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/thread/mutex.h>
+
+extern "C" {
+#include <libavcodec/jni.h>
+#include <libavcodec/mediacodec.h>
+} // extern "C"
 
 #include "fbo_manager.h"
 
 namespace nx::media {
 
 namespace {
-
-static const qint64 kDecodeOneFrameTimeout = 1000 * 33;
-
-// ATTENTION: These constants are coupled with the ones in QnVideoDecoder.java.
-static const int kNoInputBuffers = -7;
-static const int kCodecFailed = -8;
-
-// Some decoders may have no input buffers left because of long decoding time.
-// We will try to skip single output frame to clear space in input buffers.
-static const int kDequeueInputBufferRetyrCounter = 3;
 
 static const GLfloat g_vertex_data[] = {
     -1.f, 1.f,
@@ -62,7 +59,7 @@ static const GLfloat g_texture_data[] = {
  * Convert codec from ffmpeg enum to Android codec string representation.
  * Only codecs listed below are supported by AndroidVideoDecoder.
  */
-static QString codecToString(AVCodecID codecId)
+static QString androidMimeForCodec(AVCodecID codecId)
 {
     switch(codecId)
     {
@@ -79,19 +76,13 @@ static QString codecToString(AVCodecID codecId)
             return "video/mpeg2";
         case AV_CODEC_ID_VP8:
             return "video/x-vnd.on2.vp8";
+        case AV_CODEC_ID_VP9:
+            return "video/x-vnd.on2.vp9";
+        case AV_CODEC_ID_AV1:
+            return "video/av01";
         default:
             return QString();
     }
-}
-
-static void fillInputBuffer(
-    JNIEnv *env, jobject /*_this*/, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
-{
-    void* bytes = env->GetDirectBufferAddress(buffer);
-    void* srcData = (void*) srcDataPtr;
-    if (capacity < dataSize)
-        qWarning() << "fillInputBuffer: capacity less then dataSize." << capacity << "<" << dataSize;
-    memcpy(bytes, srcData, qMin(dataSize, capacity));
 }
 
 #define CHECK_GL_ERROR \
@@ -142,37 +133,34 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
-// AndroidVideoDecoderPrivate
+// AndroidVideoDecoder::Private
 
-class AndroidVideoDecoderPrivate: public QObject
+class AndroidVideoDecoder::Private
 {
-    Q_DECLARE_PUBLIC(AndroidVideoDecoder)
-    AndroidVideoDecoder *q_ptr;
-
 public:
-    AndroidVideoDecoderPrivate(const RenderContextSynchronizerPtr& synchronizer):
-        frameNumber(0),
+    Private(const RenderContextSynchronizerPtr& synchronizer):
+        outFramePtr(new CLVideoDecoderOutput()),
         initialized(false),
-        javaDecoder("com/nxvms/mobile/media/QnVideoDecoder"),
         synchronizer(synchronizer),
         program(nullptr)
     {
-        registerNativeMethods();
+        static std::once_flag initFfmpegJvmFlag;
+        std::call_once(initFfmpegJvmFlag,
+            []()
+            {
+                av_jni_set_java_vm(QJniEnvironment::javaVM(), nullptr);
+            });
     }
 
-    ~AndroidVideoDecoderPrivate()
+    ~Private()
     {
-        javaDecoder.callMethod<void>("releaseDecoder");
-    }
-
-    void releaseSurface()
-    {
-        javaDecoder.callMethod<void>("releaseSurface", "()V");
+        if (decoder)
+            closeCodecContext();
     }
 
     void updateTexImage()
     {
-        javaDecoder.callMethod<void>("updateTexImage");
+        surfaceTexture.callMethod<void>("updateTexImage");
     }
 
     QMatrix4x4 getTransformMatrix()
@@ -181,64 +169,151 @@ public:
 
         QJniEnvironment env;
         jfloatArray array = env->NewFloatArray(16);
-        javaDecoder.callMethod<void>("getTransformMatrix", "([F)V", array);
+        surfaceTexture.callMethod<void>("getTransformMatrix", "([F)V", array);
         env->GetFloatArrayRegion(array, 0, 16, matrix.data());
         env->DeleteLocalRef(array);
 
         return matrix;
     }
 
-    void registerNativeMethods()
-    {
-        JNINativeMethod methods[] {
-            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JII)V",
-                reinterpret_cast<void*>(nx::media::fillInputBuffer)}
-        };
-
-        QJniEnvironment env;
-        jclass objectClass = env->GetObjectClass(javaDecoder.object<jobject>());
-        env->RegisterNatives(
-            objectClass,
-            methods,
-            sizeof(methods) / sizeof(methods[0]));
-        env->DeleteLocalRef(objectClass);
-    }
-
     FboTextureHolder renderFrameToFbo();
     void createGlResources();
 
-    static void addMaxResolutionIfNeeded(const AVCodecID codec);
+    static QSize getMaxResolution(const AVCodecID codec);
+    static QJniObject getVideoCapabilities(const AVCodecID codec);
+    static bool isSizeSupported(const AVCodecID codec, const QSize& size);
 
-private:
+    void initContext(const QnConstCompressedVideoDataPtr& frame)
+    {
+        if (!frame || !frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+            return;
+
+        if (!nx::media::ffmpeg::HwVideoDecoder::isCompatible(
+            frame->compressionType,
+            QSize(frame->width, frame->height),
+            /* allowOverlay */ false))
+        {
+            NX_WARNING(this, "Decoder is not compatible with codec %1 resolution %2x%3",
+                frame->compressionType, frame->width, frame->height);
+            return;
+        }
+
+        NX_INFO(this, "Initializing decoder for codec %1 resolution %2x%3...",
+            frame->compressionType, frame->width, frame->height);
+
+        if (textureId == 0)
+        {
+            glGenTextures(1, &textureId);
+            if (textureId == 0)
+            {
+                NX_WARNING(this, "Failed to allocate GL texture");
+                return;
+            }
+        }
+
+        auto deleteGlTextureId = nx::utils::ScopeGuard(
+            [this]()
+            {
+                if (textureId != 0)
+                {
+                    glDeleteTextures(1, &textureId);
+                    textureId = 0;
+                }
+            });
+
+        QJniEnvironment env;
+
+        surfaceTexture = QJniObject(
+            "android/graphics/SurfaceTexture", (jint) textureId, (jboolean) false);
+
+        if (!surfaceTexture.isValid())
+        {
+            NX_WARNING(this, "Failed to initialize surface texture");
+            return;
+        }
+
+        surface = QJniObject(
+            "android/view/Surface",
+            "(Landroid/graphics/SurfaceTexture;)V",
+            surfaceTexture.object());
+
+        if (!surface.isValid())
+        {
+            NX_WARNING(this, "Failed to initialize surface");
+            surfaceTexture = {};
+            return;
+        }
+
+        deleteGlTextureId.disarm();
+
+        decoder = std::make_unique<nx::media::ffmpeg::HwVideoDecoder>(
+            AV_HWDEVICE_TYPE_MEDIACODEC,
+            /* metrics */ nullptr,
+            /* device */ std::string{},
+            /* options */ nullptr,
+            [this](AVHWDeviceContext* deviceContext)
+            {
+                if (deviceContext->type != AV_HWDEVICE_TYPE_MEDIACODEC)
+                {
+                    NX_WARNING(this, "Unexpected device context type: %1", deviceContext->type);
+                    return false;
+                }
+
+                auto hwctx = (AVMediaCodecContext*) deviceContext->hwctx;
+                if (!hwctx)
+                {
+                    NX_WARNING(this, "MediaCodec context not allocated");
+                    return false;
+                }
+
+                hwctx->surface = surface.object<jobject>();
+                NX_DEBUG(this, "MediaCodec context with surface %1", hwctx->surface);
+                return true;
+            });
+    }
+
+    void closeCodecContext()
+    {
+        frameSize = {};
+        decoder.reset();
+        surface = {};
+
+        if (surfaceTexture.isValid())
+            surfaceTexture.callMethod<void>("release");
+        surfaceTexture = {};
+
+        if (textureId != 0)
+        {
+            glDeleteTextures(1, &textureId);
+            textureId = 0;
+        }
+    }
+
     static QMap<AVCodecID, QSize> maxResolutions;
     static QMutex maxResolutionsMutex;
 
-    qint64 frameNumber;
-    H2645Mp4ToAnnexB filter;
-    bool initialized;
-    QJniObject javaDecoder;
+    std::unique_ptr<nx::media::ffmpeg::HwVideoDecoder> decoder;
+    AnnexbToMp4 m_annexbToMp4;
+    CLVideoDecoderOutputPtr outFramePtr;
+
+    bool initialized = false;
+    QJniObject surface;
+    QJniObject surfaceTexture;
     RenderContextSynchronizerPtr synchronizer;
     QSize frameSize;
 
-    QOpenGLShaderProgram *program;
-
-    typedef std::pair<int, qint64> PtsData;
-    std::deque<PtsData> frameNumToPtsCache;
-
+    std::unique_ptr<QOpenGLShaderProgram> program;
     std::unique_ptr<QOpenGLContext> threadGlCtx;
     std::unique_ptr<QOffscreenSurface> offscreenSurface;
 
     GLuint textureId = 0;
     FboManager fboManager;
-
-    VideoFramePtr decodedFrame;
-    int outFrameNumber;
 };
 
-QMap<AVCodecID, QSize> AndroidVideoDecoderPrivate::maxResolutions;
-QMutex AndroidVideoDecoderPrivate::maxResolutionsMutex;
+QMap<AVCodecID, QSize> AndroidVideoDecoder::Private::maxResolutions;
+QMutex AndroidVideoDecoder::Private::maxResolutionsMutex;
 
-FboTextureHolder AndroidVideoDecoderPrivate::renderFrameToFbo()
+FboTextureHolder AndroidVideoDecoder::Private::renderFrameToFbo()
 {
     QOpenGLFunctions* funcs = QOpenGLContext::currentContext()->functions();
 
@@ -320,19 +395,21 @@ FboTextureHolder AndroidVideoDecoderPrivate::renderFrameToFbo()
 
             glFlush();
             glFinish();
+
+            static_cast<QOpenGLExtensions *>(funcs)->flushShared();
         });
 }
 
-void AndroidVideoDecoderPrivate::createGlResources()
+void AndroidVideoDecoder::Private::createGlResources()
 {
-    QOpenGLContext *ctx = QOpenGLContext::currentContext();
-    QOpenGLFunctions *funcs = ctx->functions();
+    QOpenGLContext* ctx = QOpenGLContext::currentContext();
+    QOpenGLFunctions* funcs = ctx->functions();
 
     if (!program)
     {
-        program = new QOpenGLShaderProgram();
+        program = std::make_unique<QOpenGLShaderProgram>();
 
-        QOpenGLShader *vertexShader = new QOpenGLShader(QOpenGLShader::Vertex, program);
+        QOpenGLShader* vertexShader = new QOpenGLShader(QOpenGLShader::Vertex, program.get());
         vertexShader->compileSourceCode(
             "attribute highp vec4 vertexCoordsArray; \n"
             "attribute highp vec2 textureCoordArray; \n"
@@ -346,7 +423,7 @@ void AndroidVideoDecoderPrivate::createGlResources()
         program->addShader(vertexShader);
         CHECK_GL_ERROR
 
-        QOpenGLShader *fragmentShader = new QOpenGLShader(QOpenGLShader::Fragment, program);
+        QOpenGLShader* fragmentShader = new QOpenGLShader(QOpenGLShader::Fragment, program.get());
         fragmentShader->compileSourceCode(
             "#extension GL_OES_EGL_image_external : require \n"
             "varying highp vec2         textureCoords; \n"
@@ -373,7 +450,7 @@ AndroidVideoDecoder::AndroidVideoDecoder(
     const QSize& /*resolution*/)
     :
     AbstractVideoDecoder(),
-    d(new AndroidVideoDecoderPrivate(synchronizer))
+    d(new Private(synchronizer))
 {
     auto sharedContext = QOpenGLContext::globalShareContext();
     if (!NX_ASSERT(sharedContext))
@@ -400,45 +477,104 @@ AndroidVideoDecoder::AndroidVideoDecoder(
 
 AndroidVideoDecoder::~AndroidVideoDecoder()
 {
-    if (d->initialized)
-    {
-        d->releaseSurface();
-        glDeleteTextures(1, &d->textureId);
-    }
 }
 
-void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
+QJniObject AndroidVideoDecoder::Private::getVideoCapabilities(const AVCodecID codec)
+{
+    const QString codecMimeType = androidMimeForCodec(codec);
+    if (codecMimeType.isEmpty())
+        return {};
+
+    QJniEnvironment env;
+    const jclass codecListClass = env.findClass("android/media/MediaCodecList");
+    const jmethodID getCodecInfoAtMethodId = env.findStaticMethod(
+        codecListClass, "getCodecInfoAt", "(I)Landroid/media/MediaCodecInfo;");
+
+    const auto numCodecs = QJniObject::callStaticMethod<jint>(codecListClass, "getCodecCount");
+
+    for (jint i = 0; i < numCodecs; ++i)
+    {
+        const QJniObject codecInfo = QJniObject::callStaticMethod<jobject>(
+            codecListClass, getCodecInfoAtMethodId, i);
+
+        if (!codecInfo.isValid() || codecInfo.callMethod<jboolean>("isEncoder"))
+            continue;
+
+        const auto supportedMimeTypes = codecInfo.callMethod<QJniArray<jstring>>(
+            "getSupportedTypes", "()[Ljava/lang/String;").toContainer<QStringList>();
+
+        if (!supportedMimeTypes.contains(codecMimeType, Qt::CaseInsensitive))
+            continue;
+
+        const auto caps = codecInfo.callMethod<jobject>(
+            "getCapabilitiesForType",
+            "(Ljava/lang/String;)Landroid/media/MediaCodecInfo$CodecCapabilities;",
+            QJniObject::fromString(codecMimeType));
+
+        if (!caps.isValid())
+            continue;
+
+        const auto vcaps = caps.callMethod<jobject>(
+            "getVideoCapabilities", "()Landroid/media/MediaCodecInfo$VideoCapabilities;");
+
+        if (vcaps.isValid())
+            return vcaps;
+    }
+
+    return {};
+}
+
+QSize AndroidVideoDecoder::Private::getMaxResolution(const AVCodecID codec)
 {
     QMutexLocker lock(&maxResolutionsMutex);
 
-    const QString codecMimeType = codecToString(codec);
-    if (codecMimeType.isEmpty())
-        return;
+    auto existingMaxResolutionIterator = maxResolutions.find(codec);
+    if (existingMaxResolutionIterator != maxResolutions.end())
+        return existingMaxResolutionIterator.value();
 
-    if (!maxResolutions.contains(codec))
+    auto vcaps = getVideoCapabilities(codec);
+
+    if (!vcaps.isValid())
+        return {};
+
+    const jint h = vcaps.callMethod<jobject>("getSupportedHeights", "()Landroid/util/Range;")
+        .callMethod<jobject>("getUpper", "()Ljava/lang/Comparable;")
+        .callMethod<jint>("intValue");
+
+    const jint w = h > 0
+        ? vcaps.callMethod<jobject>("getSupportedWidthsFor",
+                "(I)Landroid/util/Range;", h)
+            .callMethod<jobject>("getUpper", "()Ljava/lang/Comparable;")
+            .callMethod<jint>("intValue")
+        : 0;
+
+    QSize maxSize{w, h};
+
+    if (maxSize.isEmpty())
     {
-        QJniObject jCodecName = QJniObject::fromString(codecMimeType);
-        QJniObject javaDecoder("com/nxvms/mobile/media/QnVideoDecoder");
-        jint maxWidth = javaDecoder.callMethod<jint>(
-            "maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
-        jint maxHeight = javaDecoder.callMethod<jint>(
-            "maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
-        const QSize maxSize{maxWidth, maxHeight};
-        if (maxSize.isEmpty())
-        {
-            // NOTE: Zeros come from JNI in case the Java class was not loaded due to some issue.
-            NX_WARNING(typeid(AndroidVideoDecoderPrivate),
-                nx::format("ERROR: Android Video Decoder failed to report max resolution for codec %1")
-                .arg(codecMimeType));
-        }
-        else
-        {
-            NX_INFO(typeid(AndroidVideoDecoderPrivate),
-                nx::format("Maximum hardware decoder resolution: %1 for codec %2")
-                .arg(maxSize).arg(codecMimeType));
-            maxResolutions[codec] = maxSize;
-        }
+        NX_WARNING(NX_SCOPE_TAG,
+            nx::format("Android Video Decoder failed to report max resolution for codec %1")
+            .arg(avcodec_get_name(codec)));
     }
+    else
+    {
+        NX_INFO(NX_SCOPE_TAG,
+            nx::format("Maximum hardware decoder resolution: %1 for codec %2")
+            .arg(maxSize).arg(avcodec_get_name(codec)));
+        maxResolutions[codec] = maxSize;
+    }
+
+    return maxSize;
+}
+
+bool AndroidVideoDecoder::Private::isSizeSupported(const AVCodecID codec, const QSize& size)
+{
+    const auto vcaps = AndroidVideoDecoder::Private::getVideoCapabilities(codec);
+    if (!vcaps.isValid())
+        return false;
+
+    return vcaps.callMethod<jboolean>(
+        "isSizeSupported", "(II)Z", (jint) size.width(), (jint) size.height());
 }
 
 bool AndroidVideoDecoder::isCompatible(
@@ -453,177 +589,131 @@ bool AndroidVideoDecoder::isCompatible(
     if (!allowOverlay) //< Considering AndroidVideoDecoder a hardware one.
         return false;
 
-    AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(codec);
-
-    QSize maxSize;
+    if (!AndroidVideoDecoder::Private::isSizeSupported(codec, resolution))
     {
-        QMutexLocker lock(&AndroidVideoDecoderPrivate::maxResolutionsMutex);
-        maxSize = AndroidVideoDecoderPrivate::maxResolutions[codec];
-    }
-    if (maxSize.isEmpty())
-        return false;
-
-    if (resolution.width() > maxSize.width() || resolution.height() > maxSize.height())
-    {
-        NX_WARNING(typeid(AndroidVideoDecoder),
-            nx::format("Codec for %1 is not compatible with resolution %2 because max is %3")
-            .arg(codecToString(codec)).arg(resolution).arg(maxSize));
+        NX_WARNING(NX_SCOPE_TAG,
+            nx::format("Codec for %1 is not compatible with resolution %2")
+                .arg(androidMimeForCodec(codec))
+                .arg(resolution));
         return false;
     }
 
-    NX_DEBUG(typeid(AndroidVideoDecoder), nx::format("Codec %1 is compatible with resolution %2")
-        .arg(codecToString(codec)).arg(resolution));
+    NX_DEBUG(NX_SCOPE_TAG,
+        nx::format("Codec %1 is compatible with resolution %2")
+            .arg(androidMimeForCodec(codec))
+            .arg(resolution));
 
     return true;
 }
 
 QSize AndroidVideoDecoder::maxResolution(const AVCodecID codec)
 {
-    AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(codec);
-
-    QMutexLocker lock(&AndroidVideoDecoderPrivate::maxResolutionsMutex);
-    return AndroidVideoDecoderPrivate::maxResolutions[codec]; //< Return empty QSize if not found.
+    return AndroidVideoDecoder::Private::getMaxResolution(codec);
 }
 
 bool AndroidVideoDecoder::sendPacket(const QnConstCompressedVideoDataPtr& packet)
 {
-    d->outFrameNumber = decode(packet, &d->decodedFrame);
-    return d->outFrameNumber > 0;
+    auto compressedVideoData = packet;
+    if (packet && nx::media::isAnnexb(packet.get()))
+    {
+        compressedVideoData = d->m_annexbToMp4.process(packet.get());
+        if (!compressedVideoData)
+        {
+            NX_WARNING(this, "Decoding failed, cannot convert to MP4 format");
+            return false;
+        }
+    }
+
+    if (d->frameSize.isEmpty())
+    {
+        if (compressedVideoData)
+            d->frameSize = getFrameSize(compressedVideoData.get());
+        if (d->frameSize.isEmpty())
+        {
+            NX_DEBUG(this, "Failed to initialize framebuffer, waiting for key frame");
+            return false; //< Wait for I frame to be able to extract data from the binary stream.
+        }
+        d->fboManager.init(d->frameSize);
+    }
+
+    if (!d->decoder)
+    {
+        d->initContext(compressedVideoData);
+        if (!d->decoder)
+            return false;
+    }
+
+    return d->decoder->sendPacket(compressedVideoData);
 }
 
 bool AndroidVideoDecoder::receiveFrame(VideoFramePtr* decodedFrame)
 {
-    if (d->decodedFrame)
-        *decodedFrame = d->decodedFrame;
-    d->decodedFrame.reset();
-    return true;
-}
-
-int AndroidVideoDecoder::currentFrameNumber() const
-{
-    return d->outFrameNumber > 0 ? d->outFrameNumber : 0;
-}
-
-int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, VideoFramePtr* result)
-{
-    QnConstCompressedVideoDataPtr frame;
-    if (frameSrc)
+    if (!d->decoder)
     {
-        // The filter keeps same frame in case of filtering is not required or
-        // it is not the H264/H265 codec.
-        frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(
-            d->filter.processData(frameSrc));
-        if (!frame)
-        {
-            NX_WARNING(this, "Failed to convert h264/h265 video to Annex B format");
-            return -1;
-        }
+        NX_WARNING(this, "Decoder is not initialized");
+        return false;
     }
 
-    QElapsedTimer tm;
-    tm.restart();
-    if (!d->initialized)
+    if (!d->decoder->receiveFrame(&d->outFramePtr) || !d->outFramePtr)
     {
-        if (!frame)
-        {
-            NX_DEBUG(this, "Failed to initialize decoder on flushing");
-            return -1;
-        }
-
-        d->frameSize = getFrameSize(frame.get());
-        if (d->frameSize.isEmpty())
-        {
-            NX_DEBUG(this, "Failed to initialize decoder, waiting for key frame");
-            return 0; //< Wait for I frame to be able to extract data from the binary stream.
-        }
-        d->fboManager.init(d->frameSize);
-
-        glGenTextures(1, &d->textureId);
-        QString codecName = codecToString(frame->compressionType);
-        QJniObject jCodecName = QJniObject::fromString(codecName);
-        d->initialized = d->javaDecoder.callMethod<jboolean>(
-            "init", "(Ljava/lang/String;III)Z",
-            jCodecName.object<jstring>(),
-            (jint) d->textureId,
-            d->frameSize.width(),
-            d->frameSize.height());
-        if (!d->initialized)
-        {
-            d->releaseSurface();
-            glDeleteTextures(1, &d->textureId);
-            NX_WARNING(this, "Failed to initialize decoder");
-            return -1; //< wait for I frame
-        }
+        const bool flushed = d->decoder->getLastDecodeResult() == 0;
+        if (flushed)
+            decodedFrame->reset();
+        return flushed;
     }
 
-    jlong outFrameNum = 0;
-    int retryCounter = 0;
-    do
-    {
-        if (frame)
+    const qint64 startTimeMs = d->outFramePtr->pts == DATETIME_INVALID
+        ? DATETIME_INVALID
+        : d->outFramePtr->pts / 1000; //< Convert usec to msec.
+
+    auto recreateFrameGuard = nx::utils::makeScopeGuard(
+        [this]()
         {
-            ++d->frameNumber; //< Put input frames in range [1..N].
-            d->frameNumToPtsCache.push_back(
-                AndroidVideoDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
-            outFrameNum = d->javaDecoder.callMethod<jlong>(
-                "decodeFrame", "(JIJ)J",
-                (jlong) frame->data(),
-                (jint) frame->dataSize(),
-                (jlong) d->frameNumber);
-            if (outFrameNum == kNoInputBuffers)
-            {
-                if (d->javaDecoder.callMethod<jlong>(
-                    "flushFrame", "(J)J", (jlong) kDecodeOneFrameTimeout) <= 0)
-                {
-                    break;
-                }
-            }
-            else if (outFrameNum == kCodecFailed)
-            {
-                // Subsequent call to decode() will reinitialize javaDecoder.
-                d->initialized = false;
-                d->releaseSurface();
-                glDeleteTextures(1, &d->textureId);
-                NX_WARNING(this, "Failed to decode frame");
-                return -1;
-            }
-        }
-        else
+            d->outFramePtr.reset(new CLVideoDecoderOutput());
+        });
+
+    const auto pixelFormat = static_cast<AVPixelFormat>(d->outFramePtr->format);
+
+    if (pixelFormat != AV_PIX_FMT_MEDIACODEC
+        && AvFrameMemoryBuffer::toQtPixelFormat(pixelFormat) != QVideoFrameFormat::Format_Invalid)
+    {
+        // Software frame format.
+
+        auto videoFrame = new VideoFrame(
+            std::make_unique<CLVideoDecoderOutputMemBuffer>(d->outFramePtr));
+        videoFrame->setStartTime(startTimeMs);
+        decodedFrame->reset(videoFrame);
+        return true;
+    }
+
+    if (d->outFramePtr->data[3])
+    {
+        if (av_mediacodec_release_buffer(
+            (AVMediaCodecBuffer*) d->outFramePtr->data[3], /*render*/ 1) < 0)
         {
-            outFrameNum = d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", (jlong) 0);
+            NX_WARNING(this, "Failed to render MediaCodec buffer");
+            return false;
         }
-    } while (outFrameNum == kNoInputBuffers && ++retryCounter < kDequeueInputBufferRetyrCounter);
-
-    if (outFrameNum <= 0)
+    }
+    else
     {
-        NX_WARNING(this, "Failed to decode frame, error code: %1", outFrameNum);
-        return outFrameNum;
+        NX_WARNING(this, "No MediaCodec buffer found in output frame");
+        return false;
     }
 
-    auto time1 = tm.elapsed();
-
-    // Got a frame.
-
-    qint64 frameTime = -1;
-
-    while (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first < outFrameNum)
-        d->frameNumToPtsCache.pop_front(); //< In case of decoder skipped some input frames
-    if (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first == outFrameNum)
+    if (d->frameSize.isEmpty())
     {
-        qint64 pts = d->frameNumToPtsCache.front().second;
-        frameTime = pts / 1000; //< usec to msec
-        d->frameNumToPtsCache.pop_front();
+        NX_DEBUG(this, "Failed to initialize framebuffer, waiting for key frame");
+        return false;
     }
 
-    // If we didn't find a timestamp for the frame, that usually means that android decoder
-    // provided a frame out of order. In this case we should just skip it.
-    if (frameTime < 0)
-    {
-        NX_WARNING(this, "Failed to decode frame, timestamp not found: %1, %2",
-            outFrameNum, frameTime);
-        return 0;
-    }
     FboTextureHolder textureHolder;
+
+    if (d->textureId == 0)
+    {
+        NX_WARNING(this, "Failed to allocate GL texture");
+        return false;
+    }
 
     if (d->threadGlCtx)
     {
@@ -642,23 +732,32 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
     if (textureHolder.isNull())
     {
         NX_WARNING(this, "Failed to render frame to FBO");
-        return -1;
+        return false;
     }
-
-    NX_VERBOSE(this, "Got frame num %1 decode time1=%2 time2=%3",
-        outFrameNum, time1, tm.elapsed());
 
     auto videoFrame = new VideoFrame(std::make_unique<TextureBuffer>(
         std::move(textureHolder),
         QVideoFrameFormat(d->frameSize, QVideoFrameFormat::Format_BGRX8888)));
-    videoFrame->setStartTime(frameTime);
+    videoFrame->setStartTime(startTimeMs);
 
-    result->reset(videoFrame);
-    return (int) outFrameNum - 1; //< convert range [1..N] to [0..N]
+    decodedFrame->reset(videoFrame);
+
+    return true;
+}
+
+int AndroidVideoDecoder::currentFrameNumber() const
+{
+    if (!d->decoder)
+        return -1;
+
+    return d->decoder->currentFrameNumber();
 }
 
 AbstractVideoDecoder::Capabilities AndroidVideoDecoder::capabilities() const
 {
+    if (d->decoder && !d->decoder->hardwareDecoder())
+        return Capability::noCapability;
+
     return Capability::hardwareAccelerated;
 }
 

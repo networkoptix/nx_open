@@ -74,7 +74,7 @@ class NxOpenConan(ConanFile):
         "mobile_user_manual:format": "pdf",
     }
 
-    ffmpeg_version_and_revision = "7.0.1#4ee6d2767776b078b672f2e7dade8aa3"
+    ffmpeg_version_and_revision = "7.0.1#96103b3aeaceafb173b5c82d34c7b3d2"
 
     python_requires = (
         "os_deps_from_deb_based_distro/0.5" "#43dce86a813993ad9acb644d3941e399",
