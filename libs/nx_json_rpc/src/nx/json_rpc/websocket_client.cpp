@@ -68,7 +68,7 @@ void WebSocketClient::setHandler(RequestHandler handler)
     m_handler = std::move(handler);
 }
 
-void WebSocketClient::connectAsync(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+void WebSocketClient::connectAsync(ConnectHandler handler)
 {
     post(
         [this, handler = std::move(handler)]() mutable
@@ -90,22 +90,43 @@ void WebSocketClient::stopWhileInAioThread()
     m_handshakeClient->pleaseStopSync();
     auto handlers = std::move(m_connectHandlers);
     for (const auto& handler: handlers)
-        handler(SystemError::interrupted);
+        handler(/*success*/ false, SystemError::interrupted, /*response*/ {});
 }
 
 void WebSocketClient::onUpgrade()
 {
+    bool success = true;
     SystemError::ErrorCode errorCode = SystemError::noError;
+    std::optional<nx::network::http::Response> response;
     nx::utils::ScopeGuard guard(
-        [&errorCode, handlers = std::move(m_connectHandlers)]()
+        [&success, &errorCode, &response, handlers = std::move(m_connectHandlers)]() mutable
         {
             for (const auto& handler: handlers)
-                handler(errorCode);
+                handler(success, errorCode, response);
         });
+
+    if (!m_handshakeClient->response())
+    {
+        success = false;
+        errorCode = m_handshakeClient->lastSysErrorCode();
+        NX_DEBUG(this,
+            "No response from %1 with error %2", m_handshakeClient->url(), errorCode);
+        return;
+    }
+
+    response = m_handshakeClient->takeResponse();
+    if (response->statusLine.statusCode != nx::network::http::StatusCode::switchingProtocols)
+    {
+        success = false;
+        NX_DEBUG(this,
+            "Connect to %1 is failed with response %2", m_handshakeClient->url(), *response);
+        return;
+    }
 
     auto socket = m_handshakeClient->takeSocket();
     if (!socket)
     {
+        success = false;
         errorCode = m_handshakeClient->lastSysErrorCode();
         NX_DEBUG(
             this, "Connect to %1 is failed with error %2", m_handshakeClient->url(), errorCode);
@@ -152,11 +173,22 @@ void WebSocketClient::sendAsync(Request request, ResponseHandler handler)
 
             connectAsync(
                 [this, request = std::move(request), handler = std::move(handler)](
-                    auto errorCode) mutable
+                    auto success, auto errorCode, auto response) mutable
                 {
-                    if (m_connection)
+                    if (success && m_connection)
                     {
                         m_connection->send(std::move(request), std::move(handler));
+                        return;
+                    }
+
+                    if (response)
+                    {
+                        rapidjson::Document document;
+                        document.Parse(response->messageBody.data(), response->messageBody.size());
+                        handler(Response::makeError(request.responseId(),
+                            Error::transportError,
+                            NX_FMT("Failed to establish connection to %1", m_url).toStdString(),
+                            std::move(document)));
                         return;
                     }
 

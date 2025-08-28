@@ -88,9 +88,9 @@ static void registerLoginRestHandlers(
      * Terminates the session for the specified token.
      * %caption Delete login Session
      * %ingroup Login
-     * %param:string token If the value "current" is used, the token is obtained from the
+     * %param:string token If the value "-" or "current" is used, the token is obtained from the
      *     authorization.
-     *     %example current
+     *     %example -
      * %param[ref] _local
      * %param[ref] _strict
      * %permissions Authorization is not required.
@@ -3145,9 +3145,18 @@ static void registerMiscRestHandlers(
      *     %param:{ClientExtensions} #1.extensions
      *
      **%apidoc GET /jsonrpc
-     * Allows executing API requests in the JSON RPC format over a WebSocket. For more information
-     * see the JSON-RPC section in the API Information page. JSON-RPC WebSocket Example can be
-     * found here [/ui/jsonrpc.html](/ui/jsonrpc.html).
+     * <p>
+     * Allows executing API requests in the JSON-RPC format over a WebSocket. For more information
+     * see the JSON-RPC section in the API Information page.
+     * </p>
+     * <p>
+     * Initial authorization is not required or must be a Session authorization. Later,
+     * authorization can be (re)applied using one of `rest.v{1-}.login.sessions.*` method request
+     * with `setSession=true`.
+     * </p>
+     * <p>
+     * JSON-RPC WebSocket Example can be found here [/ui/jsonrpc.html](/ui/jsonrpc.html).
+     * </p>
      * %jsonrpc[unused]
      * %caption JSON-RPC (WebSocket)
      * %ingroup Utilities
@@ -3156,9 +3165,18 @@ static void registerMiscRestHandlers(
      * %return Response with "switching protocols" HTTP status code.
      *
      **%apidoc OPTIONS /jsonrpc
-     * Allows executing API requests in the JSON RPC format over a WebSocket. For more information
-     * see the JSON-RPC section in the API Information page. JSON-RPC WebSocket Example can be found
-     * here [/ui/jsonrpc.html](/ui/jsonrpc.html).
+     * <p>
+     * Allows executing API requests in the JSON-RPC format over a WebSocket. For more information
+     * see the JSON-RPC section in the API Information page.
+     * </p>
+     * <p>
+     * Initial authorization is not required or must be a Session authorization. Later,
+     * authorization can be (re)applied using one of `rest.v{1-}.login.sessions.*` method request
+     * with `setSession=true`.
+     * </p>
+     * <p>
+     * JSON-RPC WebSocket Example can be found here [/ui/jsonrpc.html](/ui/jsonrpc.html).
+     * </p>
      * %jsonrpc[unused]
      * %caption JSON-RPC (WebSocket options)
      * %ingroup Utilities
