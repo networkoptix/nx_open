@@ -4517,7 +4517,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>Deaktivering av skylagringstjenesten på en server vil deaktivere den på alle servere. Lokal sikkerhetskopi må konfigureres manuelt.</translation>
     </message>
   </context>
   <context>

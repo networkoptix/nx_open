@@ -4472,7 +4472,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>Menonaktifkan penyimpanan cloud di satu server akan menonaktifkannya di semua server. Backup lokal harus dikonfigurasi secara manual.</translation>
     </message>
   </context>
   <context>

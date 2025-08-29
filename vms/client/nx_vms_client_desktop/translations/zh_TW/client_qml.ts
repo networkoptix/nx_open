@@ -1360,7 +1360,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>搖桿調查</translation>
     </message>
   </context>
   <context>
