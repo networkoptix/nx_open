@@ -522,9 +522,8 @@ void ActionHandler::addToLayout(
     }
 
     int layoutSize = layout->getItems().size();
-    auto tierLimit = systemContext()->saasServiceManager()->tierLimit(
-        nx::vms::api::SaasTierLimitName::maxDevicesPerLayout);
-    if (layoutSize >= qnRuntime->maxSceneItems() || (tierLimit.has_value() && layoutSize >= *tierLimit))
+    auto tierLimit = systemContext()->saasServiceManager()->tier().maxItemsInLayout;
+    if (layoutSize >= qnRuntime->maxSceneItems() || (tierLimit && layoutSize >= tierLimit))
     {
         if (workbench()->currentLayout()->resource() == layout)
         {

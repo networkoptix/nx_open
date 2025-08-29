@@ -611,7 +611,7 @@ VideoWallLicenseUsageHelper::VideoWallLicenseUsageHelper(
 bool VideoWallLicenseUsageHelper::isValid() const
 {
     const auto saas = systemContext()->saasServiceManager();
-    if (!saas->hasFeature(nx::vms::api::SaasTierLimitName::videowallEnabled))
+    if (!saas->hasFeature(nx::vms::api::SaasTierLimitName::videoWallAllowed))
         return false;
     const auto state = saas->saasState();
     if (state != nx::vms::api::SaasState::uninitialized)
@@ -622,7 +622,7 @@ bool VideoWallLicenseUsageHelper::isValid() const
 bool VideoWallLicenseUsageHelper::isValid(Qn::LicenseType licenseType) const
 {
     const auto saas = systemContext()->saasServiceManager();
-    if (!saas->hasFeature(nx::vms::api::SaasTierLimitName::videowallEnabled))
+    if (!saas->hasFeature(nx::vms::api::SaasTierLimitName::videoWallAllowed))
         return false;
     const auto state = saas->saasState();
     if (state != nx::vms::api::SaasState::uninitialized)
@@ -709,38 +709,38 @@ const QString ChannelPartnerServer::baseUrl(const common::SystemSettings* settin
 {
     auto url = nx::Url::fromUserInput(settings->cloudHost());
     url.setScheme(nx::network::http::kSecureUrlSchemeName);
-    url.setPath("/partners/api/v2");
+    url.setPath("/partners/api");
     return url.toString();
 }
 
 const nx::Url ChannelPartnerServer::reportUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
-    return baseUrl(settings) + NX_FMT("/cloud_systems/%1/system_usage_report/", systemId);
+    return baseUrl(settings) + NX_FMT("/v4/internal/systems/%1/usage_report/", systemId);
 }
 
 const nx::Url ChannelPartnerServer::quantityReportUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
-    return baseUrl(settings) + NX_FMT("/cloud_systems/%1/system_current_usage/", systemId);
+    return baseUrl(settings) + NX_FMT("/v2/cloud_systems/%1/system_current_usage/", systemId);
 }
 
 const nx::Url ChannelPartnerServer::saasServicesUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
-    return baseUrl(settings) + NX_FMT("/cloud_systems/%1/services/", systemId);
+    return baseUrl(settings) + NX_FMT("/v2/cloud_systems/%1/services/", systemId);
 }
 
 const nx::Url ChannelPartnerServer::migrateLicensesUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
-    return baseUrl(settings) + NX_FMT("/cloud_systems/%1/migrate_legacy_licenses/", systemId);
+    return baseUrl(settings) + NX_FMT("/v2/cloud_systems/%1/migrate_legacy_licenses/", systemId);
 }
 
 const nx::Url ChannelPartnerServer::saasDataUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
-    return baseUrl(settings) + NX_FMT("/cloud_systems/%1/saas_report/", systemId);
+    return baseUrl(settings) + NX_FMT("/v4/internal/systems/%1/saas_report/", systemId);
 }
 
 } // namespace nx::vms::license

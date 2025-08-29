@@ -35,11 +35,11 @@ namespace {
 
 constexpr std::array<SaasTierLimitName, 5> checkedTiers =
 {
-    SaasTierLimitName::maxServers,
+    SaasTierLimitName::maxServersPerSite,
     SaasTierLimitName::maxDevicesPerServer,
-    SaasTierLimitName::maxDevicesPerLayout,
-    SaasTierLimitName::ldapEnabled,
-    SaasTierLimitName::videowallEnabled
+    SaasTierLimitName::maxItemsInLayout,
+    SaasTierLimitName::ldapAllowed,
+    SaasTierLimitName::videoWallAllowed
 };
 
 void setJsonToDictionaryAsync(
@@ -329,16 +329,8 @@ void ServiceManager::setData(
     SaasData data,
     LocalTierLimits localTierLimits)
 {
-    for (const auto& [tierName, value]: localTierLimits)
-    {
-        if (!data.tierLimits.contains(tierName))
-        {
-            if (value.has_value())
-                data.tierLimits[tierName] = *value;
-            else
-                data.tierLimits.erase(tierName);
-        }
-    }
+    if (data.tier.name.isEmpty())
+        data.tier = localTierLimits; //< Allow to replace tier if it is not defined in cloud data.
 
     bool stateChanged = false;
     {
@@ -454,18 +446,45 @@ std::map<nx::Uuid, ServiceParamsType> ServiceManager::purchasedServices(
     return result;
 }
 
-std::optional<int> ServiceManager::tierLimit(SaasTierLimitName value) const
+TierData ServiceManager::tier() const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return tierUnsafe();
+}
+
+TierData ServiceManager::tierUnsafe() const
+{
+    return m_data.tier;
+}
+
+TierValue ServiceManager::tierLimit(SaasTierLimitName value) const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
     return tierLimitUnsafe(value);
 }
 
-std::optional<int> ServiceManager::tierLimitUnsafe(SaasTierLimitName value) const
+TierValue ServiceManager::tierLimitUnsafe(SaasTierLimitName value) const
 {
-    auto it = m_data.tierLimits.find(value);
-    if (it != m_data.tierLimits.end())
-        return it->second;
-    return std::nullopt;
+    const auto& tier = tierUnsafe();
+    switch (value)
+    {
+        case SaasTierLimitName::maxServersPerSite:
+            return tier.maxServersPerSite;
+        case SaasTierLimitName::maxDevicesPerServer:
+            return tier.maxDevicesPerServer;
+        case SaasTierLimitName::maxItemsInLayout:
+            return tier.maxItemsInLayout;
+        case SaasTierLimitName::maxDaysArchiveLocal:
+            return tier.maxDaysArchiveLocal;
+        case SaasTierLimitName::ldapAllowed:
+            return tier.ldapAllowed;
+        case SaasTierLimitName::videoWallAllowed:
+            return tier.videoWallAllowed;
+        case SaasTierLimitName::crossSiteAllowed:
+            return tier.crossSiteAllowed;
+    }
+    NX_ASSERT(false, "Unknown name %1", (int) value);
+    return 0;
 }
 
 int ServiceManager::allRecordingServices(const nx::Uuid& serverId) const
@@ -482,14 +501,14 @@ int ServiceManager::allRecordingServices(const nx::Uuid& serverId) const
 
 std::optional<int> ServiceManager::camerasTierLimitLeft(const nx::Uuid& serverId)
 {
-    const std::optional<int> limit = tierLimit(SaasTierLimitName::maxDevicesPerServer);
-    if (!limit.has_value())
-        return std::nullopt; // there is no limit
+    const int limit = tier().maxDevicesPerServer;
+    if (!limit)
+        return std::nullopt; //< There is no limit.
 
-    return *limit - allRecordingServices(serverId);
+    return limit - allRecordingServices(serverId);
 }
 
-int ServiceManager::tierLimitUsed(SaasTierLimitName value) const
+TierValue ServiceManager::tierLimitUsed(SaasTierLimitName value) const
 {
     switch (value)
     {
@@ -500,12 +519,12 @@ int ServiceManager::tierLimitUsed(SaasTierLimitName value) const
                 result = std::max(result, allRecordingServices(server->getId()));
             return result;
         }
-        case SaasTierLimitName::maxServers:
+        case SaasTierLimitName::maxServersPerSite:
         {
-            return resourcePool()->servers().size();
+            return (int) resourcePool()->servers().size();
         }
 
-        case SaasTierLimitName::maxDevicesPerLayout:
+        case SaasTierLimitName::maxItemsInLayout:
         {
             const auto layouts = resourcePool()->getResources<QnLayoutResource>();
             int existing = 0;
@@ -514,35 +533,63 @@ int ServiceManager::tierLimitUsed(SaasTierLimitName value) const
             return existing;
         }
 
-        case SaasTierLimitName::videowallEnabled:
-            return resourcePool()->getResources<QnVideoWallResource>().isEmpty() ? 0 : 1;
+        case SaasTierLimitName::videoWallAllowed:
+            return !resourcePool()->getResources<QnVideoWallResource>().isEmpty();
 
-        case SaasTierLimitName::ldapEnabled:
-            return globalSettings()->ldap().isValid(/*checkPassword*/ false) ? 1 : 0;
+        case SaasTierLimitName::ldapAllowed:
+            return globalSettings()->ldap().isValid(/*checkPassword*/ false);
 
     }
     NX_ASSERT(0, "Not implemented %1", static_cast<int>(value));
     return 0;
 }
 
-std::optional<int> ServiceManager::tierLimitLeft(SaasTierLimitName value) const
+TierUsageData ServiceManager::tiersUsages() const
 {
-    const std::optional<int> limit = tierLimit(value);
-    if (!limit.has_value())
-        return std::nullopt; // There is no limit.
-    return *limit - tierLimitUsed(value);
+    TierUsageData result;
+
+    result.videoWallUsed = std::get<bool>(tierLimitUsed(SaasTierLimitName::videoWallAllowed));
+    result.ldapUsed = std::get<bool>(tierLimitUsed(SaasTierLimitName::ldapAllowed));
+    result.servers = std::get<int>(tierLimitUsed(SaasTierLimitName::maxServersPerSite));
+    result.maxDevicesPerServer = std::get<int>(tierLimitUsed(SaasTierLimitName::maxDevicesPerServer));
+    result.maxItemsInLayout = std::get<int>(tierLimitUsed(SaasTierLimitName::maxItemsInLayout));
+
+    return result;
 }
 
 bool ServiceManager::tierLimitReached(SaasTierLimitName value) const
 {
-    const auto limit = tierLimit(value);
-    return limit && tierLimitUsed(value) > *limit;
+    return tierLimitReached(tierLimit(value), tierLimitUsed(value));
+}
+
+bool ServiceManager::tierLimitReached(TierValue limit, TierValue used) const
+{
+    if (std::holds_alternative<int>(limit))
+    {
+        int intLimit = std::get<int>(limit);
+        int intUsed = std::get<int>(used);
+        return intLimit != 0 && intUsed > intLimit;
+    }
+    else if (std::holds_alternative<bool>(limit))
+    {
+        bool boolLimit = std::get<bool>(limit);
+        bool boolUsed = std::get<bool>(used);
+        return !boolLimit && boolUsed;
+    }
+    else
+    {
+        NX_ASSERT(0, "Unexpected value");
+        return false;
+    }
 }
 
 bool ServiceManager::hasFeature(SaasTierLimitName value) const
 {
-    const auto limit = tierLimitLeft(value);
-    return limit.value_or(1) > 0; //< Features are enabled by default.
+    const auto limit = tierLimit(value);
+    if (std::holds_alternative<bool>(limit))
+        return std::get<bool>(limit);
+    NX_ASSERT(0, "This function intended for boolean tiers only!");
+    return false;
 }
 
 void ServiceManager::setLocalTierLimits(
@@ -619,30 +666,34 @@ bool ServiceManager::hasTierOveruse() const
 std::map<nx::Uuid, int> ServiceManager::overusedResourcesUnsafe(SaasTierLimitName feature) const
 {
     std::map<nx::Uuid, int> result;
-    const std::optional<int> limit = tierLimitUnsafe(feature);
-    if (!limit.has_value())
-        return result;
+    const auto& tier = this->tier();
 
     switch (feature)
     {
         case SaasTierLimitName::maxDevicesPerServer:
         {
-            for (const auto& server: systemContext()->resourcePool()->servers())
+            if (const auto limit = tier.maxDevicesPerServer)
             {
-                auto cameras = resourcePool()->getAllCameras(
-                    server, /*ignoreDesktopCameras*/ true);
-                if (cameras.size() > *limit)
-                    result.emplace(server->getId(), cameras.size());
+                for (const auto& server: systemContext()->resourcePool()->servers())
+                {
+                    auto cameras = resourcePool()->getAllCameras(
+                        server, /*ignoreDesktopCameras*/ true);
+                    if (cameras.size() > limit)
+                        result.emplace(server->getId(), cameras.size());
+                }
             }
             break;
         }
-        case SaasTierLimitName::maxDevicesPerLayout:
+        case SaasTierLimitName::maxItemsInLayout:
         {
-            const auto layouts = resourcePool()->getResources<QnLayoutResource>();
-            for (const auto& layout: layouts)
+            if (const auto limit = tier.maxItemsInLayout)
             {
-                if (layout->getItems().size() > *limit)
-                    result.emplace(layout->getId(), layout->getItems().size());
+                const auto layouts = resourcePool()->getResources<QnLayoutResource>();
+                for (const auto& layout: layouts)
+                {
+                    if (layout->getItems().size() > limit)
+                        result.emplace(layout->getId(), layout->getItems().size());
+                }
             }
             break;
         }
@@ -658,34 +709,14 @@ TierOveruseMap ServiceManager::tierOveruseDetails() const
     NX_MUTEX_LOCKER lock(&m_mutex);
     for (const auto& feature: checkedTiers)
     {
-        const std::optional<int> limit = tierLimitUnsafe(feature);
-        if (!limit.has_value())
-            continue;
+        const auto limit = tierLimitUnsafe(feature);
 
         TierOveruseData data;
         data.used = tierLimitUsed(feature);
-        if (data.used > *limit)
+        if (tierLimitReached(limit, data.used))
         {
-            data.allowed = *limit;
+            data.allowed = limit;
             data.details = overusedResourcesUnsafe(feature);
-            result.emplace(feature, std::move(data));
-        }
-    }
-    return result;
-}
-
-TierUsageMap ServiceManager::tiersUsageDetails() const
-{
-    TierUsageMap result;
-
-    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    for (const auto& feature: checkedTiers)
-    {
-        if (auto limit = tierLimitUnsafe(feature))
-        {
-            TierUsageData data;
-            data.allowed = *limit;
-            data.used = tierLimitUsed(feature);
             result.emplace(feature, std::move(data));
         }
     }

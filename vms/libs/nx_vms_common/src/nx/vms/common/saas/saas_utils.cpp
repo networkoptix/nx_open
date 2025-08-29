@@ -46,7 +46,7 @@ bool crossSiteNotificationsAllowed(SystemContext* systemContext)
 {
     const auto saas = systemContext->saasServiceManager();
     return saasServicesOperational(systemContext)
-        && saas->hasFeature(nx::vms::api::SaasTierLimitName::crossSiteFeaturesEnabled);
+        && saas->hasFeature(nx::vms::api::SaasTierLimitName::crossSiteAllowed);
 }
 
 bool localRecordingServicesOverused(SystemContext* systemContext)

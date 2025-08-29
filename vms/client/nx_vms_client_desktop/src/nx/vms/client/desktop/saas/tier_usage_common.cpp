@@ -17,25 +17,25 @@ public:
     {
         switch (limitType)
         {
-            case nx::vms::api::SaasTierLimitName::maxServers:
+            case nx::vms::api::SaasTierLimitName::maxServersPerSite:
                 return tr("Number of servers per Site");
 
             case nx::vms::api::SaasTierLimitName::maxDevicesPerServer:
                 return tr("Number of devices per server");
 
-            case nx::vms::api::SaasTierLimitName::maxDevicesPerLayout:
+            case nx::vms::api::SaasTierLimitName::maxItemsInLayout:
                 return tr("Number of items on layout");
 
-            case nx::vms::api::SaasTierLimitName::maxArchiveDays:
+            case nx::vms::api::SaasTierLimitName::maxDaysArchiveLocal:
                 return tr("Number of days of archive");
 
-            case nx::vms::api::SaasTierLimitName::ldapEnabled:
+            case nx::vms::api::SaasTierLimitName::ldapAllowed:
                 return tr("LDAP");
 
-            case nx::vms::api::SaasTierLimitName::videowallEnabled:
+            case nx::vms::api::SaasTierLimitName::videoWallAllowed:
                 return tr("Video Wall");
 
-            case nx::vms::api::SaasTierLimitName::crossSiteFeaturesEnabled:
+            case nx::vms::api::SaasTierLimitName::crossSiteAllowed:
                 return tr("Cross-Site features");
 
             default:
@@ -50,15 +50,15 @@ bool isBooleanTierLimitType(nx::vms::api::SaasTierLimitName limitType)
 {
     switch (limitType)
     {
-        case nx::vms::api::SaasTierLimitName::maxServers:
+        case nx::vms::api::SaasTierLimitName::maxServersPerSite:
         case nx::vms::api::SaasTierLimitName::maxDevicesPerServer:
-        case nx::vms::api::SaasTierLimitName::maxDevicesPerLayout:
-        case nx::vms::api::SaasTierLimitName::maxArchiveDays:
+        case nx::vms::api::SaasTierLimitName::maxItemsInLayout:
+        case nx::vms::api::SaasTierLimitName::maxDaysArchiveLocal:
             return false;
 
-        case nx::vms::api::SaasTierLimitName::ldapEnabled:
-        case nx::vms::api::SaasTierLimitName::videowallEnabled:
-        case nx::vms::api::SaasTierLimitName::crossSiteFeaturesEnabled:
+        case nx::vms::api::SaasTierLimitName::ldapAllowed:
+        case nx::vms::api::SaasTierLimitName::videoWallAllowed:
+        case nx::vms::api::SaasTierLimitName::crossSiteAllowed:
             return true;
 
     }
