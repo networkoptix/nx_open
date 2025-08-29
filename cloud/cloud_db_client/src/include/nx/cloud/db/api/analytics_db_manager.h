@@ -21,6 +21,7 @@ public:
      * Update organization data.
      */
     virtual void saveTracks(
+        bool autoVectorize,
         const SaveTracksData& data,
         nx::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
 

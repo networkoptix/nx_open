@@ -151,10 +151,7 @@ bool MultipartContentParser::setContentType(const std::string& str)
 
 void MultipartContentParser::setBoundary(const std::string& boundary)
 {
-    // Boundary can contain starting "--" depending on implementation.
-    m_boundary = nx::utils::startsWith(boundary, "--")
-        ? boundary.substr(2, boundary.size() - 2)
-        : boundary;
+    m_boundary = boundary;
 
     // Dropping starting and trailing quotes.
     while (!m_boundary.empty() && m_boundary[0] == '"')

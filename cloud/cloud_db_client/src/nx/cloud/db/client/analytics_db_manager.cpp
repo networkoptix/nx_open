@@ -50,13 +50,15 @@ ApiRequestsExecutor* AnalyticsDbManager::requestExecutor()
 }
 
 void AnalyticsDbManager::saveTracks(
+    bool autoVectorize,
     const api::SaveTracksData& data,
     nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
+    const auto vectorizeOnCloud = nx::format("vectorize=%1", autoVectorize);
     requestExecutor()->makeAsyncCall<void>(
         Method::post,
         kTracksPath,
-        /*urlQuery*/{ "vectorize=true" },
+        /*urlQuery*/{ vectorizeOnCloud },
         data,
         std::move(completionHandler));
 }

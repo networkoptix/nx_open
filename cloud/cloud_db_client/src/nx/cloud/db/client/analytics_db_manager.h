@@ -17,6 +17,7 @@ public:
         ApiRequestsExecutor* requestsExecutor);
 
     virtual void saveTracks(
+        bool autoVectorize,
         const api::SaveTracksData& data,
         nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
