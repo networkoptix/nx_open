@@ -1465,7 +1465,7 @@
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Netværksfejl</translation>
     </message>
     <message>
       <source>License activated</source>
@@ -4703,7 +4703,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Alle Enheder</translation>
     </message>
     <message>
       <source>All Cameras</source>
@@ -5718,7 +5718,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Netværksfejl</translation>
     </message>
     <message>
       <source>Hold to Speak</source>
@@ -11446,7 +11446,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Netværksfejl.</translation>
     </message>
     <message>
       <source>Server error.</source>
@@ -12831,7 +12831,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Alle Enheder</translation>
     </message>
     <message>
       <source>All Cameras</source>
