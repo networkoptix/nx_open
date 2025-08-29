@@ -1331,7 +1331,7 @@
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Netværksfejl</translation>
     </message>
     <message>
       <source>License activated</source>
@@ -3970,7 +3970,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Alle Enheder</translation>
     </message>
     <message>
       <source>All Cameras</source>
@@ -10947,7 +10947,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Netværksfejl.</translation>
     </message>
     <message>
       <source>Server error.</source>
@@ -11339,7 +11339,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Netværksfejl</translation>
     </message>
   </context>
   <context>

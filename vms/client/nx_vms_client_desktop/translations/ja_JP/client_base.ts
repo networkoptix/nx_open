@@ -4472,7 +4472,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>いずれかのサーバーでクラウドストレージを無効化すると、すべてのサーバーで無効化されます。ローカルバックアップを手動で設定する必要があります。</translation>
     </message>
   </context>
   <context>

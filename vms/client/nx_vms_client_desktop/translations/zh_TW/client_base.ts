@@ -4472,7 +4472,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>在一台伺服器上停用雲端儲存也會停用所有伺服器上的雲端儲存，必須手動設定本地備份。</translation>
     </message>
   </context>
   <context>
@@ -4992,15 +4992,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation type="unfinished">Cloud storage is available</translation>
+      <translation>雲端儲存現在可用</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation type="unfinished">Cloud storage is enabled</translation>
+      <translation>已啟用雲端儲存</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
-      <translation type="unfinished">Cloud Storage is enabled</translation>
+      <translation>已啟用雲端儲存</translation>
     </message>
   </context>
   <context>
@@ -6643,7 +6643,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>站點中所有伺服器新加入的攝影機將不會自動啟用備份設定</translation>
     </message>
   </context>
   <context>

@@ -4607,7 +4607,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>Отключение облачного хранилища на одном сервере приведёт к его отключению на всех серверах. Локальное резервное копирование необходимо настроить вручную.</translation>
     </message>
   </context>
   <context>
