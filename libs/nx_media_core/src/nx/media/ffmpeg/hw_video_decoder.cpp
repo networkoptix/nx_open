@@ -301,7 +301,7 @@ bool HwVideoDecoder::receiveFrame(CLVideoDecoderOutputPtr* const outFrame)
     if (status == AVERROR(EAGAIN) || status == AVERROR_EOF)
     {
         m_lastDecodeResult = 0;
-        return false;
+        return true;
     }
     else if (status < 0)
     {

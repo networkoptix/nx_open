@@ -66,6 +66,8 @@ public:
 
     void updateSar(const QnConstCompressedVideoDataPtr& frame);
 
+    bool swallowErrorAndContinue();
+
 public:
     VideoDecoderPtr videoDecoder;
     CodecParametersConstPtr currentCodecParameters;
@@ -159,6 +161,26 @@ void SeamlessVideoDecoderPrivate::clearMetadata()
 int SeamlessVideoDecoderPrivate::decoderFrameNumToLocalNum(int value) const
 {
     return value + decoderFrameOffset;
+}
+
+bool SeamlessVideoDecoderPrivate::swallowErrorAndContinue()
+{
+    const bool isHwAccelerated = videoDecoder->capabilities().testFlag(
+        AbstractVideoDecoder::Capability::hardwareAccelerated);
+
+    if (!allowSoftwareDecoderFallback || !isHwAccelerated)
+        return false;
+
+    ++hardwareDecoderErrorCount;
+
+    if (hardwareDecoderErrorCount >= kMaxHarwdareDecoderErrors)
+    {
+        NX_DEBUG(this, "Hardware decoder failed to decode video, try software one(from next key frame)");
+        q_ptr->setAllowHardwareAcceleration(false);
+        isSoftwareFallbackMode = true;
+    }
+
+    return true;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -296,21 +318,26 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
     {
         if (!d->videoDecoder->sendPacket(frame))
         {
-            const bool isHwAccelerated = d->videoDecoder->capabilities().testFlag(
-                AbstractVideoDecoder::Capability::hardwareAccelerated);
-            if (d->allowSoftwareDecoderFallback && isHwAccelerated)
+            // Drain decoder output queue. We should actually check for EAGAIN from sendPacket()
+            // but our API only returns bool.
+            for (;;)
             {
-                ++d->hardwareDecoderErrorCount;
-                if (d->hardwareDecoderErrorCount >= kMaxHarwdareDecoderErrors)
+                VideoFramePtr decodedFrame;
+                if (!d->videoDecoder->receiveFrame(&decodedFrame))
                 {
-                    NX_DEBUG(this, "Hardware decoder failed to decode video, try software one(from next key frame)");
-                    setAllowHardwareAcceleration(false);
-                    d->isSoftwareFallbackMode = true;
+                    if (!d->swallowErrorAndContinue())
+                        return false;
                 }
+                if (!decodedFrame)
+                    break; //< Decoder's output queue is drained.
+
+                pushFrame(decodedFrame);
             }
-            else
+
+            if (!d->videoDecoder->sendPacket(frame))
             {
-                return false;
+                if (!d->swallowErrorAndContinue())
+                    return false;
             }
         }
         else
