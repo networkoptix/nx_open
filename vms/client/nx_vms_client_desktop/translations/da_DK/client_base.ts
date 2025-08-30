@@ -4517,7 +4517,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>Deaktivering af cloudlagring på én server vil deaktivere det på alle servere. Lokal backup skal konfigureres manuelt.</translation>
     </message>
   </context>
   <context>
