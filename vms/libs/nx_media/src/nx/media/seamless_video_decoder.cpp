@@ -54,7 +54,7 @@ public:
     SeamlessVideoDecoderPrivate(
         SeamlessVideoDecoder* parent,
         SeamlessVideoDecoder::FrameHandler handler,
-        RenderContextSynchronizerPtr renderContextSynchronizer);
+        QRhi* rhi);
 
     // Store metadata from compressed frame.
     void pushMetadata(const QnConstCompressedVideoDataPtr& frame);
@@ -85,7 +85,6 @@ public:
     /** Associate extra information with output frames which corresponds to input frames. */
     std::deque<FrameMetadata> metadataQueue;
 
-    bool allowOverlay;
     bool allowHardwareAcceleration = false;
     bool allowSoftwareDecoderFallback = true;
     bool isSoftwareFallbackMode = false;
@@ -93,13 +92,13 @@ public:
     SeamlessVideoDecoder::VideoGeometryAccessor videoGeometryAccessor;
 
     SeamlessVideoDecoder::FrameHandler handler;
-    RenderContextSynchronizerPtr renderContextSynchronizer;
+    QRhi* rhi = nullptr;
 };
 
 SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(
     SeamlessVideoDecoder* parent,
     SeamlessVideoDecoder::FrameHandler handler,
-    RenderContextSynchronizerPtr renderContextSynchronizer)
+    QRhi* rhi)
     :
     QObject(parent),
     q_ptr(parent),
@@ -107,7 +106,7 @@ SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(
     frameNumber(0),
     decoderFrameOffset(0),
     handler(std::move(handler)),
-    renderContextSynchronizer(renderContextSynchronizer)
+    rhi(rhi)
 {
 }
 
@@ -186,20 +185,17 @@ bool SeamlessVideoDecoderPrivate::swallowErrorAndContinue()
 //-------------------------------------------------------------------------------------------------
 // SeamlessVideoDecoder
 
-SeamlessVideoDecoder::SeamlessVideoDecoder(FrameHandler handler, RenderContextSynchronizerPtr renderContextSynchronizer):
+SeamlessVideoDecoder::SeamlessVideoDecoder(
+    FrameHandler handler,
+    QRhi* rhi)
+    :
     QObject(),
-    d_ptr(new SeamlessVideoDecoderPrivate(this, std::move(handler), renderContextSynchronizer))
+    d_ptr(new SeamlessVideoDecoderPrivate(this, std::move(handler), rhi))
 {
 }
 
 SeamlessVideoDecoder::~SeamlessVideoDecoder()
 {
-}
-
-void SeamlessVideoDecoder::setAllowOverlay(bool value)
-{
-    Q_D(SeamlessVideoDecoder);
-    d->allowOverlay = value;
 }
 
 void SeamlessVideoDecoder::setAllowHardwareAcceleration(bool value)
@@ -291,9 +287,8 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
             frame->compressionType,
             frameInfo.size,
-            d->allowOverlay,
             d->allowHardwareAcceleration,
-            d->renderContextSynchronizer);
+            d->rhi);
         if (!d->videoDecoder)
         {
             NX_WARNING(this, "Failed to create video decoder, codec: %1, size: %2",

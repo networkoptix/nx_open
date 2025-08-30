@@ -56,7 +56,6 @@ extern "C" {
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 #include <utils/intent_listener_android.h>
 
-#include "gl_context_synchronizer.h"
 #include "ini.h"
 
 using namespace nx::vms::client;
@@ -318,13 +317,6 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     // is not very fast. So, we need to increase the limit to avoid "Too many open files" errors.
     nx::utils::rlimit::setMaxFileDescriptors(nx::build_info::isAndroid() ? 4096 : 1024);
 
-    if (nx::build_info::isMacOsX())
-    {
-        // We do not rely on Mac OS OpenGL implementation-related throttling.
-        // Otherwise all animations go faster.
-        qputenv("QSG_RENDER_LOOP", "basic");
-    }
-
     nx::kit::OutputRedirector::ensureOutputRedirection();
 
     // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
@@ -356,7 +348,11 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     QGuiApplication::setApplicationDisplayName(nx::branding::mobileClientDisplayName());
     QGuiApplication::setApplicationVersion(nx::build_info::mobileClientVersion());
 
-    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+    // Set required graphics API for HW video decoding.
+    if (nx::build_info::isAndroid())
+        QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+    else if (nx::build_info::isIos())
+        QQuickWindow::setGraphicsApi(QSGRendererInterface::Metal);
 
     QnMobileClientStartupParameters startupParams(application);
 

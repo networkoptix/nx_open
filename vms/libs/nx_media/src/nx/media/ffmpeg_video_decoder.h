@@ -8,6 +8,8 @@
 
 #include "abstract_video_decoder.h"
 
+class QRhi;
+
 namespace nx {
 namespace media {
 
@@ -24,13 +26,12 @@ public:
      */
     static void setMaxResolutions(const QMap<int, QSize>& maxResolutions);
 
-    FfmpegVideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution);
+    FfmpegVideoDecoder(const QSize& resolution, QRhi* rhi);
     virtual ~FfmpegVideoDecoder();
 
     static bool isCompatible(
         const AVCodecID codec,
         const QSize& resolution,
-        bool allowOverlay,
         bool allowHardwareAcceleration);
 
     static QSize maxResolution(const AVCodecID codec);

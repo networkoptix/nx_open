@@ -25,7 +25,10 @@ public:
         InitFunc initFunc = {});
     virtual ~HwVideoDecoder();
 
-    static bool isCompatible(const AVCodecID codec, const QSize& resolution, bool allowOverlay);
+    static bool isCompatible(
+        const AVCodecID codec,
+        const QSize& resolution,
+        bool allowHardwareAcceleration);
     static bool isAvailable();
     static QSize maxResolution(const AVCodecID codec);
 

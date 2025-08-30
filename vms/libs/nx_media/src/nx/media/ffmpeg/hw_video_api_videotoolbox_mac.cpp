@@ -44,12 +44,13 @@ class MacMemoryBuffer: public QHwVideoBuffer
 public:
     MacMemoryBuffer(const AVFrame* frame):
         QHwVideoBuffer(QVideoFrame::NoHandle),
-        m_frame(frame)
+        m_frame(av_frame_clone(frame))
     {
     }
 
     ~MacMemoryBuffer()
     {
+        av_frame_unref(m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode mode) override
@@ -115,7 +116,7 @@ public:
 
 private:
     std::unique_ptr<MacTextureMapper> m_textureSet;
-    const AVFrame* m_frame = nullptr;
+    AVFrame* m_frame = nullptr;
 };
 
 } // namespace
@@ -123,11 +124,6 @@ private:
 class MacVideoApiEntry: public VideoApiRegistry::Entry
 {
 public:
-    MacVideoApiEntry()
-    {
-        VideoApiRegistry::instance()->add(AV_HWDEVICE_TYPE_VIDEOTOOLBOX, this);
-    }
-
     virtual AVHWDeviceType deviceType() const override
     {
         return AV_HWDEVICE_TYPE_VIDEOTOOLBOX;
@@ -144,12 +140,16 @@ public:
             return {};
 
         auto result = std::make_shared<VideoFrame>(std::make_unique<MacMemoryBuffer>(frame));
-        result->setStartTime(frame->pkt_dts);
+        result->setStartTime(frame->pts / 1000);
 
         return result;
     }
 };
 
-MacVideoApiEntry g_macVideoApiEntry;
+VideoApiRegistry::Entry* getVideoToolboxApi()
+{
+    static MacVideoApiEntry apiEntry;
+    return &apiEntry;
+}
 
 } // namespace nx::media

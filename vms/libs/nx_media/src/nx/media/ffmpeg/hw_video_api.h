@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QHash>
+#include <QtGui/rhi/qrhi.h>
 
 #include <nx/media/media_fwd.h>
 #include <nx/media/ffmpeg/hw_video_decoder.h>
@@ -12,7 +13,6 @@ extern "C" {
 } // extern "C"
 
 struct AVFrame;
-class QRhi;
 
 namespace nx::media {
 
@@ -30,7 +30,7 @@ private:
 
 class VideoApiRegistry
 {
-    VideoApiRegistry() = default;
+    VideoApiRegistry();
 public:
     class Entry
     {
@@ -41,7 +41,12 @@ public:
         virtual nx::media::VideoFramePtr makeFrame(
             const AVFrame* frame,
             std::shared_ptr<VideoApiDecoderData> decoderData) const = 0;
-        virtual nx::media::ffmpeg::HwVideoDecoder::InitFunc initFunc(QRhi*) const { return {}; }
+        virtual nx::media::ffmpeg::HwVideoDecoder::InitFunc initFunc(
+            [[maybe_unused]] QRhi* rhi,
+            [[maybe_unused]] std::shared_ptr<VideoApiDecoderData>decoderData) const
+        {
+            return {};
+        }
         virtual std::unique_ptr<nx::media::ffmpeg::AvOptions> options(QRhi*) const { return {}; }
         virtual std::string device(QRhi*) const { return {}; }
         virtual std::shared_ptr<VideoApiDecoderData> createDecoderData(QRhi*) const { return {}; }
@@ -50,14 +55,27 @@ public:
 public:
     static VideoApiRegistry* instance();
 
-    void add(AVHWDeviceType deviceType, VideoApiRegistry::Entry* entry);
     VideoApiRegistry::Entry* get(AVHWDeviceType deviceType);
     VideoApiRegistry::Entry* get(const AVFrame* frame);
 
 private:
+    void add(VideoApiRegistry::Entry* entry);
     QHash<AVHWDeviceType, Entry*> m_entries;
 };
 
-// nx::media::VideoFramePtr makeVideoFrame(AVFrame* avFrame);
+#if defined(Q_OS_APPLE)
+    VideoApiRegistry::Entry* getVideoToolboxApi();
+#elif defined(Q_OS_WIN)
+    VideoApiRegistry::Entry* getD3D11Api();
+    VideoApiRegistry::Entry* getD3D12Api();
+#elif defined(Q_OS_ANDROID)
+    VideoApiRegistry::Entry* getMediaCodecApi();
+#elif defined(Q_OS_LINUX) && defined(__x86_64__)
+    VideoApiRegistry::Entry* getVaApiApi();
+#endif
+
+#if QT_CONFIG(vulkan) && !defined(Q_OS_ANDROID)
+    VideoApiRegistry::Entry* getVulkanApi();
+#endif
 
 } // namespace nx::media

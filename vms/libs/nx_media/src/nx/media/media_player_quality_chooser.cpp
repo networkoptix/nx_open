@@ -200,7 +200,6 @@ static Result applyTranscodingIfPossible(const QSize& desiredResolution, const P
     if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(
         input.transcodingCodec,
         resolution,
-        input.allowOverlay,
         input.allowHardwareAcceleration,
         *input.currentDecoders))
     {
@@ -246,7 +245,7 @@ static Result chooseHighStreamIfPossible(
     }
 
     if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-        highCodec, highResolution, input.allowOverlay, input.allowHardwareAcceleration, *input.currentDecoders))
+        highCodec, highResolution, input.allowHardwareAcceleration, *input.currentDecoders))
     {
         return {Player::HighVideoQuality, highResolution};
     }

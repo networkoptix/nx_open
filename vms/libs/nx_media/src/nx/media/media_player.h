@@ -97,8 +97,6 @@ class NX_MEDIA_API Player: public QObject
      */
     Q_PROPERTY(int videoQuality READ videoQuality WRITE setVideoQuality NOTIFY videoQualityChanged)
 
-    Q_PROPERTY(bool allowOverlay READ allowOverlay WRITE setAllowOverlay NOTIFY allowOverlayChanged)
-
     Q_PROPERTY(bool allowHardwareAcceleration READ allowHardwareAcceleration WRITE setAllowHardwareAcceleration NOTIFY allowHardwareAccelerationChanged)
 
     /**
@@ -262,9 +260,6 @@ public:
      */
     Q_INVOKABLE QList<int> availableVideoQualities(const QList<int>& videoQualities) const;
 
-    bool allowOverlay() const;
-    void setAllowOverlay(bool allowOverlay);
-
     QSize currentResolution() const;
 
     Q_INVOKABLE TranscodingSupportStatus transcodingStatus() const;
@@ -278,9 +273,6 @@ public:
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
     bool isAudioOnlyMode() const;
-
-    RenderContextSynchronizerPtr renderContextSynchronizer() const;
-    void setRenderContextSynchronizer(RenderContextSynchronizerPtr value);
 
     /**
      * Add new metadata consumer.
@@ -337,7 +329,6 @@ signals:
     void liveModeChanged();
     void aspectRatioChanged();
     void videoQualityChanged();
-    void allowOverlayChanged();
     void allowHardwareAccelerationChanged();
     void videoGeometryChanged();
     void currentResolutionChanged();

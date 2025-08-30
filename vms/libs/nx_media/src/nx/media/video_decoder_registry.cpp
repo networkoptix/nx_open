@@ -29,9 +29,8 @@ VideoDecoderRegistry* VideoDecoderRegistry::instance()
 VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
     const AVCodecID codec,
     const QSize& resolution,
-    bool allowOverlay,
     bool allowHardwareAcceleration,
-    RenderContextSynchronizerPtr renderContextSynchronizer)
+    QRhi* rhi)
 {
     QMutexLocker lock(&mutex);
     auto codecString =
@@ -49,10 +48,10 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
     {
         NX_DEBUG(this, "Checking video decoder: %1 with codec: %2", plugin.name, codecString());
         if (plugin.useCount < plugin.maxUseCount
-            && plugin.isCompatible(codec, resolution, allowOverlay, allowHardwareAcceleration))
+            && plugin.isCompatible(codec, resolution, allowHardwareAcceleration))
         {
             auto videoDecoder = VideoDecoderPtr(
-                plugin.createVideoDecoder(renderContextSynchronizer, resolution),
+                plugin.createVideoDecoder(resolution, rhi),
                 [](AbstractVideoDecoder* decoder)
                 {
                     QMutexLocker lock(&mutex);
@@ -76,7 +75,6 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
 bool VideoDecoderRegistry::hasCompatibleDecoder(
     const AVCodecID codec,
     const QSize& resolution,
-    bool allowOverlay,
     bool allowHardwareAcceleration,
     const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
@@ -111,7 +109,7 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
             continue;
         }
 
-        if (!plugin.isCompatible(codec, resolution, allowOverlay, allowHardwareAcceleration))
+        if (!plugin.isCompatible(codec, resolution, allowHardwareAcceleration))
         {
             NX_VERBOSE(this, nx::format("Plugin %1 is not compatible with codec %2").arg(plugin.name).arg(codecString()));
             continue;
@@ -137,20 +135,9 @@ QSize VideoDecoderRegistry::maxResolution(const AVCodecID codec)
     return result;
 }
 
-RenderContextSynchronizerPtr VideoDecoderRegistry::defaultRenderContextSynchronizer() const
-{
-    return m_defaultRenderContextSynchronizer;
-}
-
-void VideoDecoderRegistry::setDefaultRenderContextSynchronizer(RenderContextSynchronizerPtr value)
-{
-    m_defaultRenderContextSynchronizer = value;
-}
-
 void VideoDecoderRegistry::reinitialize()
 {
     m_plugins.clear();
-    m_defaultRenderContextSynchronizer = RenderContextSynchronizerPtr();
 }
 
 } // namespace media

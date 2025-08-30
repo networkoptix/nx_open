@@ -107,7 +107,10 @@ HwVideoDecoder::~HwVideoDecoder()
         m_metrics->decoders()--;
 }
 
-bool HwVideoDecoder::isCompatible(const AVCodecID /*codec*/, const QSize& /*resolution*/, bool /*allowOverlay*/)
+bool HwVideoDecoder::isCompatible(
+    const AVCodecID /*codec*/,
+    const QSize& /*resolution*/,
+    bool /*allowHardwareAcceleration*/)
 {
     return true;
 }

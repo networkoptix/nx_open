@@ -46,8 +46,7 @@ QSize qMax(const QSize& size1, const QSize& size2)
 // ---------------------- PlayerDataConsumer ---------------------
 
 PlayerDataConsumer::PlayerDataConsumer(
-    const std::unique_ptr<QnArchiveStreamReader>& archiveReader,
-    RenderContextSynchronizerPtr renderContextSynchronizer)
+    const std::unique_ptr<QnArchiveStreamReader>& archiveReader)
     :
     QnAbstractDataConsumer(kMaxMediaQueueLen),
     m_sequence(0),
@@ -57,7 +56,6 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_audioEnabled(true),
     m_needToResetAudio(true),
     m_speed(1),
-    m_renderContextSynchronizer(renderContextSynchronizer),
     m_archiveReader(archiveReader.get()),
     m_queueSize(kDefaultDecodedVideoQueueSize)
 {
@@ -296,8 +294,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         {
             auto videoDecoder = new SeamlessVideoDecoder(
                 [this](VideoFramePtr frame){ onDecodedFrame(std::move(frame)); },
-                m_renderContextSynchronizer);
-            videoDecoder->setAllowOverlay(m_allowOverlay);
+                m_rhi);
             videoDecoder->setAllowHardwareAcceleration(m_allowHardwareAcceleration);
             videoDecoder->setAllowSoftwareDecoderFallback(m_allowSoftwareDecoderFallback);
             videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
@@ -418,6 +415,11 @@ VideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 void PlayerDataConsumer::setPlaySpeed(double value)
 {
     m_speed = value;
+}
+
+void PlayerDataConsumer::setRhi(QRhi* rhi)
+{
+    m_rhi = rhi;
 }
 
 bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
@@ -583,11 +585,6 @@ void PlayerDataConsumer::setAudioEnabled(bool value)
 bool PlayerDataConsumer::isAudioEnabled() const
 {
     return m_audioEnabled;
-}
-
-void PlayerDataConsumer::setAllowOverlay(bool value)
-{
-    m_allowOverlay = value;
 }
 
 void PlayerDataConsumer::setAllowHardwareAcceleration(bool value)

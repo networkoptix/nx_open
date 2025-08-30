@@ -91,13 +91,8 @@ bool HwVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDataPtr& d
         return false;
     }
 
-    if (!nx::media::ffmpeg::HwVideoDecoder::isCompatible(
-        data->compressionType,
-        size,
-        /* allowOverlay */ false))
-    {
+    if (!nx::media::ffmpeg::HwVideoDecoder::isCompatible(data->compressionType, size, true))
         return false;
-    }
 
     if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
     {
@@ -155,6 +150,10 @@ bool HwVideoDecoderOldPlayer::decode(
             AVHWDeviceType hwType = deviceTypeFromRhi(m_rhi);
             auto api = VideoApiRegistry::instance()->get(hwType);
 
+            std::shared_ptr<VideoApiDecoderData> decoderData;
+            if (api)
+                decoderData = api->createDecoderData(m_rhi);
+
             std::unique_ptr<nx::media::ffmpeg::AvOptions> options;
             nx::media::ffmpeg::HwVideoDecoder::InitFunc initFunc;
             std::string device;
@@ -167,7 +166,7 @@ bool HwVideoDecoderOldPlayer::decode(
             }
             else
             {
-                initFunc = api->initFunc(m_rhi);
+                initFunc = api->initFunc(m_rhi, decoderData);
                 options = api->options(m_rhi);
                 device = api->device(m_rhi);
             }
@@ -180,8 +179,7 @@ bool HwVideoDecoderOldPlayer::decode(
                 initFunc);
 
             m_impl->setMultiThreadDecodePolicy(m_mtDecodingPolicy);
-            if (api)
-                m_decoderData = api->createDecoderData(m_rhi);
+            m_decoderData = decoderData;
         }
     }
 

@@ -7,7 +7,9 @@
 namespace nx::media::quick_sync {
 
 bool QuickSyncVideoDecoder::isCompatible(
-    const AVCodecID codec, const QSize& resolution, bool /*allowOverlay*/)
+    const AVCodecID codec,
+    const QSize& resolution,
+    bool /*allowHardwareAcceleration*/)
 {
     return QuickSyncVideoDecoderImpl::isCompatible(
         nullptr, codec, resolution.width(), resolution.height());
@@ -23,8 +25,7 @@ QSize QuickSyncVideoDecoder::maxResolution(const AVCodecID /*codec*/)
     return QSize(8192, 8192);
 }
 
-QuickSyncVideoDecoder::QuickSyncVideoDecoder(
-    const RenderContextSynchronizerPtr& /*synchronizer*/, const QSize& /*resolution*/)
+QuickSyncVideoDecoder::QuickSyncVideoDecoder(const QSize& /*resolution*/, QRhi*)
 {
     m_impl = std::make_shared<QuickSyncVideoDecoderImpl>();
 }

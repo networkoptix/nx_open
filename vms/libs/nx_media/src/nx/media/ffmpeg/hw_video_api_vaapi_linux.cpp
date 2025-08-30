@@ -360,12 +360,13 @@ class VaapiMemoryBuffer: public QHwVideoBuffer
 public:
     VaapiMemoryBuffer(const AVFrame* frame):
         QHwVideoBuffer(QVideoFrame::NoHandle),
-        m_frame(frame)
+        m_frame(av_frame_clone(frame))
     {
     }
 
     ~VaapiMemoryBuffer()
     {
+        av_frame_unref(m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode) override
@@ -582,7 +583,7 @@ public:
     }
 
 private:
-    const AVFrame* m_frame = nullptr;
+    AVFrame* m_frame = nullptr;
 };
 
 } // namespace
@@ -590,11 +591,6 @@ private:
 class VaApiVideoApiEntry: public VideoApiRegistry::Entry
 {
 public:
-    VaApiVideoApiEntry()
-    {
-        VideoApiRegistry::instance()->add(AV_HWDEVICE_TYPE_VAAPI, this);
-    }
-
     virtual AVHWDeviceType deviceType() const override
     {
         return AV_HWDEVICE_TYPE_VAAPI;
@@ -611,7 +607,7 @@ public:
             return {};
 
         auto result = std::make_shared<VideoFrame>(std::make_unique<VaapiMemoryBuffer>(frame));
-        result->setStartTime(frame->pkt_dts);
+        result->setStartTime(frame->pts / 1000);
 
         return result;
     }
@@ -627,7 +623,11 @@ public:
     }
 };
 
-VaApiVideoApiEntry g_vaApiVideoApiEntry;
+VideoApiRegistry::Entry* getVaApiApi()
+{
+    static VaApiVideoApiEntry apiEntry;
+    return &apiEntry;
+}
 
 } // namespace nx::media
 

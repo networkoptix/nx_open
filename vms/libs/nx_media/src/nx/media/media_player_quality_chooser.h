@@ -43,8 +43,6 @@ struct Params
 
     QnVirtualCameraResourcePtr camera;
 
-    bool allowOverlay = false;
-
     bool allowHardwareAcceleration = false;
 
     /** List of decoders currently used by the player. */

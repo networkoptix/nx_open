@@ -4,6 +4,8 @@
 
 #include <QtOpenGL/QOpenGLFramebufferObject>
 
+#include <nx/utils/log/log.h>
+
 namespace nx::media {
 
 class FboTexture
@@ -147,7 +149,10 @@ FboTextureHolder FboManager::getTexture(std::function<void(FboHolder&)> renderFu
     if (it == m_fbos.end())
     {
         if (m_fbos.size() >= kFboPoolSize)
+        {
+            NX_WARNING(this, "FBO manager is full");
             return {};
+        }
 
         // Create new FBO.
         m_fbos.emplace_back(m_frameSize);
@@ -157,6 +162,7 @@ FboTextureHolder FboManager::getTexture(std::function<void(FboHolder&)> renderFu
         if (!it->isValid())
         {
             m_fbos.pop_back();
+            NX_WARNING(this, "Failed to create FBO with size %1", m_frameSize);
             return {};
         }
     }

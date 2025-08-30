@@ -146,8 +146,8 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(
 QMap<int, QSize> FfmpegVideoDecoder::s_maxResolutions;
 
 FfmpegVideoDecoder::FfmpegVideoDecoder(
-    const RenderContextSynchronizerPtr& /*synchronizer*/,
-    const QSize& /*resolution*/)
+    const QSize& /*resolution*/,
+    QRhi* /*rhi*/)
     :
     AbstractVideoDecoder(),
     d_ptr(new FfmpegVideoDecoderPrivate())
@@ -161,7 +161,6 @@ FfmpegVideoDecoder::~FfmpegVideoDecoder()
 bool FfmpegVideoDecoder::isCompatible(
     const AVCodecID codec,
     const QSize& resolution,
-    bool /*allowOverlay*/,
     bool allowHardwareAcceleration)
 {
     if (!allowHardwareAcceleration)

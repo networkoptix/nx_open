@@ -226,8 +226,6 @@ public:
     // See property comment.
     int videoQuality = VideoQuality::HighVideoQuality;
 
-    bool allowOverlay = true;
-
     bool allowHardwareAcceleration = true;
 
     // Video geometry inside the application window.
@@ -246,8 +244,6 @@ public:
     bool isAudioEnabled = true;
 
     bool isAudioOnlyMode = false;
-
-    RenderContextSynchronizerPtr renderContextSynchronizer;
 
     using MetadataConsumerList = QList<QWeakPointer<AbstractMetadataConsumer>>;
     QHash<MetadataType, MetadataConsumerList> m_metadataConsumerByType;
@@ -314,8 +310,7 @@ Player::Private::Private(Player* parent):
     base_type(parent),
     q(parent),
     execTimer(new QTimer(this)),
-    miscTimer(new QTimer(this)),
-    renderContextSynchronizer(VideoDecoderRegistry::instance()->defaultRenderContextSynchronizer())
+    miscTimer(new QTimer(this))
 {
     connect(execTimer, &QTimer::timeout, this, &Private::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -809,7 +804,6 @@ void Player::Private::applyVideoQuality()
     input.liveMode = liveMode;
     input.positionMs = positionMs;
     input.camera = camera;
-    input.allowOverlay = allowOverlay;
     input.allowHardwareAcceleration = allowHardwareAcceleration;
     input.currentDecoders = &currentVideoDecoders;
 
@@ -909,9 +903,9 @@ bool Player::Private::initDataProvider()
     if (!archiveReader)
         return false;
 
-    dataConsumer.reset(new PlayerDataConsumer(archiveReader, renderContextSynchronizer));
+    dataConsumer.reset(new PlayerDataConsumer(archiveReader));
+    dataConsumer->setRhi(videoSurfaces.empty() ? nullptr : videoSurfaces[0]->rhi());
     dataConsumer->setPlaySpeed(speed);
-    dataConsumer->setAllowOverlay(allowOverlay);
     dataConsumer->setAllowHardwareAcceleration(allowHardwareAcceleration);
     dataConsumer->setAllowSoftwareDecoderFallback(allowSoftwareDecoderFallback);
     updateAudio();
@@ -1443,7 +1437,6 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
             d->liveMode,
             d->positionMs,
             camera,
-            /*allowOverlay*/ true,
             d->allowHardwareAcceleration,
             &currentDecoders
         }](int quality)
@@ -1497,23 +1490,6 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
     }
 
     return result;
-}
-
-bool Player::allowOverlay() const
-{
-    return d->allowOverlay;
-}
-
-void Player::setAllowOverlay(bool allowOverlay)
-{
-    if (d->allowOverlay == allowOverlay)
-    {
-        NX_DEBUG(this, "setAllowOverlay(%1): no change, ignoring", allowOverlay);
-        return;
-    }
-    NX_DEBUG(this, "setAllowOverlay(%1)", allowOverlay);
-    d->allowOverlay = allowOverlay;
-    emit allowOverlayChanged();
 }
 
 QSize Player::currentResolution() const
@@ -1572,16 +1548,6 @@ PlayerStatistics Player::currentStatistics() const
     result.codec = d->codecName;
     result.isHwAccelerated = d->isHwAccelerated;
     return result;
-}
-
-RenderContextSynchronizerPtr Player::renderContextSynchronizer() const
-{
-    return d->renderContextSynchronizer;
-}
-
-void Player::setRenderContextSynchronizer(RenderContextSynchronizerPtr value)
-{
-    d->renderContextSynchronizer = value;
 }
 
 void Player::testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader)

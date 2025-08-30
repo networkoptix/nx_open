@@ -354,7 +354,7 @@ class D3D12MemoryBuffer: public QHwVideoBuffer
 public:
     D3D12MemoryBuffer(const AVFrame* frame, std::shared_ptr<DecoderData> decoderData):
         QHwVideoBuffer(QVideoFrame::NoHandle),
-        m_frame(frame)
+        m_frame(av_frame_clone(frame))
     {
         const auto framesCtx = reinterpret_cast<AVHWFramesContext*>(m_frame->hw_frames_ctx->data);
         const auto ctx = framesCtx->device_ctx;
@@ -387,6 +387,7 @@ public:
 
     virtual ~D3D12MemoryBuffer() override
     {
+        av_frame_unref(m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode mode) override
@@ -441,7 +442,7 @@ public:
     }
 
 private:
-    const AVFrame* m_frame = nullptr;
+    AVFrame* m_frame = nullptr;
     QRhi* m_rhi = nullptr;
     std::shared_ptr<SharedTexture> m_sharedTexture;
 };
@@ -480,11 +481,6 @@ static int findAdapterIndexByVendorId(quint64 vendorId)
 class D3D12VideoApiEntry: public VideoApiRegistry::Entry
 {
 public:
-    D3D12VideoApiEntry()
-    {
-        VideoApiRegistry::instance()->add(AV_HWDEVICE_TYPE_D3D12VA, this);
-    }
-
     virtual AVHWDeviceType deviceType() const override
     {
         return AV_HWDEVICE_TYPE_D3D12VA;
@@ -510,7 +506,7 @@ public:
             std::make_unique<D3D12MemoryBuffer>(
                 frame,
                 std::dynamic_pointer_cast<DecoderData>(decoderData)));
-        result->setStartTime(frame->pkt_dts);
+        result->setStartTime(frame->pts / 1000);
 
         return result;
     }
@@ -534,6 +530,10 @@ public:
     }
 };
 
-D3D12VideoApiEntry g_d3d12VideoApiEntry;
+VideoApiRegistry::Entry* getD3D12Api()
+{
+    static D3D12VideoApiEntry apiEntry;
+    return &apiEntry;
+}
 
 } // namespace nx::media

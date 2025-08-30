@@ -10,10 +10,9 @@
 
 #include "ffmpeg_audio_decoder.h"
 #include "ffmpeg_video_decoder.h"
+#include "ffmpeg_hw_video_decoder.h"
 
-#include "android_video_decoder.h"
 #include "jpeg_decoder.h"
-#include "mac_video_decoder.h"
 
 #if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
     #include "quick_sync/quick_sync_video_decoder.h"
@@ -26,27 +25,8 @@ void DecoderRegistrar::registerDecoders(const QMap<int, QSize>& maxFfmpegResolut
 {
     // ATTENTION: Order of registration defines the priority of choosing: first comes first.
 
-    #if defined(Q_OS_ANDROID)
-    {
-        VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(
-            "AndroidVideoDecoder", maxHardwareDecodersCount);
-    }
-    #endif
-
-    #if defined(Q_OS_IOS) || defined(Q_OS_MACOS)
-    {
-        VideoDecoderRegistry::instance()->addPlugin<MacVideoDecoder>(
-            "MacVideoDecoder", maxHardwareDecodersCount);
-    }
-    #endif
-
-    #if defined(ENABLE_PROXY_DECODER)
-    {
-        static const int kHardwareDecodersCount = 1;
-        VideoDecoderRegistry::instance()->addPlugin<ProxyVideoDecoder>(
-            "ProxyVideoDecoder", kHardwareDecodersCount);
-    }
-    #endif
+    VideoDecoderRegistry::instance()->addPlugin<FfmpegHwVideoDecoder>(
+        "FfmpegHwVideoDecoder", maxHardwareDecodersCount);
 
     {
         FfmpegVideoDecoder::setMaxResolutions(maxFfmpegResolutions);

@@ -5,6 +5,8 @@
 #include <nx/media/abstract_video_decoder.h>
 #include <nx/media/video_data_packet.h>
 
+class QRhi;
+
 namespace nx::media::quick_sync {
 
 class QuickSyncVideoDecoderImpl;
@@ -18,11 +20,13 @@ public:
     };
 
 public:
-    QuickSyncVideoDecoder(
-        const RenderContextSynchronizerPtr& /*synchronizer*/, const QSize& /*resolution*/);
+    QuickSyncVideoDecoder(const QSize& /*resolution*/, QRhi*);
     ~QuickSyncVideoDecoder();
 
-    static bool isCompatible(const AVCodecID codec, const QSize& resolution, bool allowOverlay);
+    static bool isCompatible(
+        const AVCodecID codec,
+        const QSize& resolution,
+        bool allowHardwareAcceleration);
     static bool isAvailable();
     static QSize maxResolution(const AVCodecID codec);
 

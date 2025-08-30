@@ -53,12 +53,13 @@ class VulkanMemoryBuffer: public QHwVideoBuffer
 public:
     VulkanMemoryBuffer(const AVFrame* frame):
         base_type(QVideoFrame::NoHandle),
-        m_frame(frame)
+        m_frame(av_frame_clone(frame))
     {
     }
 
     ~VulkanMemoryBuffer()
     {
+        av_frame_unref(m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode /*mode*/) override
@@ -140,7 +141,7 @@ public:
     }
 
 private:
-    const AVFrame* m_frame = nullptr;
+    AVFrame* m_frame = nullptr;
 };
 
 int selectQueueFamily(
@@ -165,11 +166,6 @@ int selectQueueFamily(
 class VulkanVideoApiEntry: public VideoApiRegistry::Entry
 {
 public:
-    VulkanVideoApiEntry()
-    {
-        VideoApiRegistry::instance()->add(AV_HWDEVICE_TYPE_VULKAN, this);
-    }
-
     virtual AVHWDeviceType deviceType() const override
     {
         return AV_HWDEVICE_TYPE_VULKAN;
@@ -186,12 +182,14 @@ public:
             return {};
 
         auto result = std::make_shared<VideoFrame>(std::make_unique<VulkanMemoryBuffer>(frame));
-        result->setStartTime(frame->pkt_dts);
+        result->setStartTime(frame->pts / 1000);
 
         return result;
     }
 
-    virtual nx::media::ffmpeg::HwVideoDecoder::InitFunc initFunc(QRhi* rhi) const override
+    virtual nx::media::ffmpeg::HwVideoDecoder::InitFunc initFunc(
+        QRhi* rhi,
+        std::shared_ptr<VideoApiDecoderData> /*decoderData*/) const override
     {
         if (!NX_ASSERT(rhi->backend() == QRhi::Vulkan))
             return {};
@@ -257,7 +255,11 @@ public:
     }
 };
 
-VulkanVideoApiEntry g_vulkanVideoApiEntry;
+VideoApiRegistry::Entry* getVulkanApi()
+{
+    static VulkanVideoApiEntry apiEntry;
+    return &apiEntry;
+}
 
 } // namespace nx::media
 

@@ -8,11 +8,23 @@
 #include <nx/media/media_fwd.h>
 #include <nx/media/video_data_packet.h>
 
+class QRhi;
+
 namespace nx {
 namespace media {
 
 class AbstractVideoDecoder;
 typedef std::unique_ptr<AbstractVideoDecoder, void(*)(AbstractVideoDecoder*)> VideoDecoderPtr;
+
+template <typename T>
+concept HasDecoderStaticMethods = requires(T a) //< 'a' is a dummy variable, not actually used.
+{
+    { T::isCompatible(
+        /*codec*/ AV_CODEC_ID_H264,
+        /*resolution*/ QSize{},
+        /*allowHardwareAcceleration*/ true) } -> std::same_as<bool>;
+    { T::maxResolution(/*codec*/ AV_CODEC_ID_H264) } -> std::same_as<QSize>;
+};
 
 /**
  * Singleton. Allows to register various implementations for video decoders. The exact list of
@@ -30,9 +42,8 @@ public:
     VideoDecoderPtr createCompatibleDecoder(
         const AVCodecID codec,
         const QSize& resolution,
-        bool allowOverlay,
         bool allowHardwareAcceleration,
-        RenderContextSynchronizerPtr renderContextSynchronizer);
+        QRhi* rhi);
 
     /**
      * @return Whether a compatible video decoder is found.
@@ -40,7 +51,6 @@ public:
     bool hasCompatibleDecoder(
         const AVCodecID codec,
         const QSize& resolution,
-        bool allowOverlay,
         bool allowHardwareAcceleration,
         const std::vector<AbstractVideoDecoder*>& currentDecoders);
 
@@ -62,16 +72,14 @@ public:
     /** For tests. */
     void reinitialize();
 
-    RenderContextSynchronizerPtr defaultRenderContextSynchronizer() const;
-    void setDefaultRenderContextSynchronizer(RenderContextSynchronizerPtr value);
-
 private:
     struct Metadata
     {
-        std::function<AbstractVideoDecoder*(const RenderContextSynchronizerPtr& synchronizer,
-            const QSize& resolution)> createVideoDecoder;
+        std::function<AbstractVideoDecoder*(const QSize& resolution, QRhi* rhi)> createVideoDecoder;
         std::function<bool(
-            const AVCodecID codec, const QSize& resolution, bool allowOverlay, bool allowHardwareAcceleration)> isCompatible;
+            const AVCodecID codec,
+            const QSize& resolution,
+            bool allowHardwareAcceleration)> isCompatible;
         std::function<QSize(const AVCodecID codec)> maxResolution;
         int useCount = 0;
         int maxUseCount = std::numeric_limits<int>::max();
@@ -79,15 +87,15 @@ private:
         std::type_index typeIndex = std::type_index(typeid(nullptr));
     };
 
-    template<class Decoder>
+    template<HasDecoderStaticMethods Decoder>
     struct MetadataImpl: public Metadata
     {
         MetadataImpl(const QString& name, int maxUseCount)
         {
             createVideoDecoder =
-                [](const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution)
+                [](const QSize& resolution, QRhi* rhi)
                 {
-                    return new Decoder(synchronizer, resolution);
+                    return new Decoder(resolution, rhi);
                 };
             isCompatible = &Decoder::isCompatible;
             maxResolution = &Decoder::maxResolution;
@@ -99,7 +107,6 @@ private:
 
 private:
     std::vector<Metadata> m_plugins;
-    RenderContextSynchronizerPtr m_defaultRenderContextSynchronizer = nullptr;
 };
 
 } // namespace media

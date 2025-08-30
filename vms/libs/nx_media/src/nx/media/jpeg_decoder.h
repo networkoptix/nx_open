@@ -8,6 +8,8 @@
 
 #include "abstract_video_decoder.h"
 
+class QRhi;
+
 namespace nx {
 namespace media {
 
@@ -19,13 +21,12 @@ class JpegDecoderPrivate;
 class NX_MEDIA_API JpegDecoder: public AbstractVideoDecoder
 {
 public:
-    JpegDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution);
+    JpegDecoder(const QSize& resolution, QRhi* rhi);
     virtual ~JpegDecoder() override;
 
     static bool isCompatible(
         const AVCodecID codec,
         const QSize& resolution,
-        bool allowOverlay,
         bool allowHardwareAcceleration);
 
     static QSize maxResolution(const AVCodecID codec);

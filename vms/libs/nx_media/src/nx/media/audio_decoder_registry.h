@@ -10,8 +10,6 @@
 
 #include <nx/media/video_data_packet.h>
 
-#include "abstract_render_context_synchronizer.h"
-
 namespace nx {
 namespace media {
 

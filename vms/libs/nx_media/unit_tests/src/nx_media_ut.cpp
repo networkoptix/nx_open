@@ -22,6 +22,8 @@
 // TODO: #dklychkov Rename this test to something like quality_chooser_ut.
 // TODO: #dklychkov Implement Player test.
 
+class QRhi;
+
 namespace nx {
 namespace media {
 namespace test {
@@ -57,8 +59,7 @@ static QString qSizeToString(const std::optional<QSize>& size)
 class MockVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    MockVideoDecoder(
-        const RenderContextSynchronizerPtr& /*synchronizer*/, const QSize& /*resolution*/)
+    MockVideoDecoder(const QSize& /*resolution*/, QRhi*)
     {
     }
 
@@ -70,7 +71,7 @@ public:
     }
 
     static bool isCompatible(
-        const AVCodecID codec, const QSize& resolution, bool /*allowOverlay*/, bool /*allowHW*/)
+        const AVCodecID codec, const QSize& resolution, bool /*allowHW*/)
     {
         if (!s_maxResolution.isEmpty()
             && (resolution.width() > s_maxResolution.width()
@@ -478,7 +479,6 @@ void PlayerSetQualityTest::test(const TestCase& testCase)
     input.liveMode = true;
     input.positionMs = -1;
     input.camera = m_camera;
-    input.allowOverlay = true;
     input.currentDecoders = &currentDecoders;
 
     const auto& result = media_player_quality_chooser::chooseVideoQuality(

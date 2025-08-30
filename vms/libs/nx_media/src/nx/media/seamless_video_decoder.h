@@ -7,6 +7,8 @@
 #include <nx/media/media_fwd.h>
 #include <nx/media/video_data_packet.h>
 
+class QRhi;
+
 namespace nx {
 namespace media {
 
@@ -29,13 +31,9 @@ public:
 public:
     using FrameHandler = std::function<void(VideoFramePtr frame)>;
 
-    SeamlessVideoDecoder(
-        FrameHandler hanlder, RenderContextSynchronizerPtr renderContextSynchronizer);
+    SeamlessVideoDecoder(FrameHandler hanlder, QRhi* rhi);
 
     virtual ~SeamlessVideoDecoder();
-
-    /** Should be called before first decode(). */
-    void setAllowOverlay(bool value);
 
     /** Should be called before first decode(). */
     void setAllowHardwareAcceleration(bool value);

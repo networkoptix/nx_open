@@ -10,7 +10,6 @@
 
 #include <nx/media/video_data_packet.h>
 
-#include "abstract_render_context_synchronizer.h"
 #include "media_fwd.h"
 
 namespace nx {
@@ -19,7 +18,7 @@ namespace media {
 /**
  * Interface for video decoder implementation. Each derived class should provide a constructor with
  * the following signature:
- * <pre> ...VideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution); </pre>
+ * <pre> ...VideoDecoder(const QSize& resolution, QRhi* rhi); </pre>
  *
  */
 class NX_MEDIA_API AbstractVideoDecoder: public QObject
@@ -51,7 +50,6 @@ public:
     static bool isCompatible(
         const AVCodecID /*codec*/,
         const QSize& /*resolution*/,
-        bool /*allowOverlay*/,
         bool /*allowHardwareAcceleration*/)
     {
         return false;

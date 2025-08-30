@@ -16,6 +16,7 @@
 #include <utils/media/externaltimesource.h>
 
 class QnArchiveStreamReader;
+class QRhi;
 
 namespace nx::media {
 
@@ -38,8 +39,7 @@ public:
     typedef std::function<QRect()> VideoGeometryAccessor;
 
 public:
-    PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader,
-        RenderContextSynchronizerPtr renderContextSynchronizer);
+    PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader);
     virtual ~PlayerDataConsumer();
 
     VideoFramePtr dequeueVideoFrame();
@@ -90,13 +90,13 @@ public:
     void setAudioEnabled(bool value);
     bool isAudioEnabled() const;
 
-    void setAllowOverlay(bool value);
     void setAllowHardwareAcceleration(bool value);
 
     void setAllowSoftwareDecoderFallback(bool value);
     bool allowSoftwareDecoderFallback() const;
 
     void setPlaySpeed(double value);
+    void setRhi(QRhi* rhi);
 
     nx::media::StreamEventPacket mediaEvent() const;
 
@@ -207,15 +207,14 @@ private:
     int m_eofPacketCounter;
     std::atomic<bool> m_audioEnabled;
     std::atomic<bool> m_needToResetAudio;
-    std::atomic<bool> m_allowOverlay;
     std::atomic<bool> m_allowHardwareAcceleration {false};
     std::atomic<bool> m_allowSoftwareDecoderFallback {true};
     std::atomic<double> m_speed;
     nx::media::StreamEventPacket m_mediaEvent;
-    RenderContextSynchronizerPtr m_renderContextSynchronizer;
     const QnArchiveStreamReader* m_archiveReader = nullptr;
     std::unique_ptr<GopReverser> m_gopReverser;
     int m_queueSize;
+    QRhi* m_rhi = nullptr;
 };
 
 } // namespace nx::media
