@@ -939,7 +939,7 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>Deling</translation>
     </message>
     <message>
       <source>Share Link</source>

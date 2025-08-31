@@ -1330,11 +1330,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>E-mail-adressen er ikke indstillet for alle de valgte brugere.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>Der er ikke angivet en e-mailadresse for nogle af de valgte brugere.</translation>
     </message>
   </context>
   <context>
@@ -1353,7 +1353,7 @@
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>Live visning</translation>
     </message>
   </context>
   <context>
@@ -1364,7 +1364,7 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>Kontakt din kanalpartner for at få hjælp.</translation>
     </message>
   </context>
   <context>
@@ -1470,7 +1470,7 @@
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Lyd omkodning påkrævet.</translation>
     </message>
   </context>
   <context>
@@ -1506,11 +1506,11 @@
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>Lokal Site ID, null betyder, at Sitet ikke er oprettet endnu.</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>Aktiver eller deaktiver oprettelsen af nye Integration registreringsanmodninger</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
@@ -1554,15 +1554,15 @@
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h).</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h).</translation>
+      <translation>Opdateringsinterval for aktivt Site (sekunder, 1s-1t).</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h).</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h).</translation>
+      <translation>Proxyforbindelses timeout (sekunder, 1s-1t).</translation>
     </message>
     <message>
       <source>Proxy connection access policy.</source>
-      <translation type="unfinished">Proxy connection access policy.</translation>
+      <translation>Politik for adgang til proxyforbindelse.</translation>
     </message>
     <message>
       <source>Time synchronization enabled.</source>
@@ -1598,7 +1598,7 @@
     </message>
     <message>
       <source>Cloud Site ID.</source>
-      <translation type="unfinished">Cloud Site ID.</translation>
+      <translation>Cloud Site ID.</translation>
     </message>
     <message>
       <source>Cloud authorization key.</source>
@@ -1606,19 +1606,19 @@
     </message>
     <message>
       <source>Enable 2FA for the Site.</source>
-      <translation type="unfinished">Enable 2FA for the Site.</translation>
+      <translation>Aktiver 2FA for Sitet.</translation>
     </message>
     <message>
       <source>Site name.</source>
-      <translation type="unfinished">Site name.</translation>
+      <translation>Site navn.</translation>
     </message>
     <message>
       <source>Last master Site merge ID.</source>
-      <translation type="unfinished">Last master Site merge ID.</translation>
+      <translation>Sidste master Site fletnings ID.</translation>
     </message>
     <message>
       <source>Last slave Site merge ID.</source>
-      <translation type="unfinished">Last slave Site merge ID.</translation>
+      <translation>Sidste slave Site fletnings ID.</translation>
     </message>
     <message>
       <source>Disable Device vendors.</source>
@@ -1654,7 +1654,7 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>Maksimalt antal bogmærker. Værdi mindre end eller lig med 0 er uendelig.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
@@ -1690,7 +1690,7 @@
     </message>
     <message>
       <source>Cloud host override.</source>
-      <translation>Tilsidesættelse af cloud-vært.</translation>
+      <translation>Tilsidesættelse af cloud vært.</translation>
     </message>
     <message>
       <source>Enable cross-domain policy.</source>
@@ -1702,7 +1702,7 @@
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher.</source>
-      <translation>Aktivér sekventiel Flir ONVIF-søger.</translation>
+      <translation>Aktivér sekventiel Flir ONVIF søger.</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB).</source>
@@ -1710,11 +1710,11 @@
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB).</source>
-      <translation>Maks. P2P størrelse for alle klienter (bytes, 32-512 MB).</translation>
+      <translation>Maks P2P størrelse for alle klienter (bytes, 32-512MB).</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB).</source>
-      <translation>Maksimal størrelse på optagelses kø (bytes, 6-96 MB).</translation>
+      <translation>Maksimal størrelse på optagelses kø (bytes, 6-96MB).</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000).</source>
@@ -1722,7 +1722,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds).</source>
-      <translation>RTP-timeout (millisekunder).</translation>
+      <translation>RTP timeout (millisekunder).</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>
@@ -1782,7 +1782,7 @@
     </message>
     <message>
       <source>Pixelation settings.</source>
-      <translation type="unfinished">Pixelation settings.</translation>
+      <translation>Pixelering indstillinger.</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds).</source>
@@ -1790,7 +1790,7 @@
     </message>
     <message>
       <source>Apply session limit for Cloud tokens.</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens.</translation>
+      <translation>Anvend sessionsgrænse for Cloud tokens.</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server.</source>
@@ -1846,11 +1846,11 @@
     </message>
     <message>
       <source>Default locale for new users.</source>
-      <translation type="unfinished">Default locale for new users.</translation>
+      <translation>Standardlokalitet for nye brugere.</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording.</source>
-      <translation>Yderligere lokale FS  lagringstyper til optagelse.</translation>
+      <translation>Yderligere lokale FS lagringstyper til optagelse.</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device.</source>
@@ -1910,7 +1910,7 @@
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>Aktivér forældede HTTP Basic og Digest godkendelser (usikker).</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
