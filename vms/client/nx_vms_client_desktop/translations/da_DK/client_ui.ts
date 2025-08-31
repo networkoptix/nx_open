@@ -2230,7 +2230,7 @@
     </message>
     <message>
       <source>Rename...</source>
-      <translation type="unfinished">Rename...</translation>
+      <translation>Omdøb...</translation>
     </message>
     <message>
       <source>Delete...</source>
