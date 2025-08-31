@@ -6230,7 +6230,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Gemmer layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
@@ -9964,7 +9964,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>Log Ind</translation>
     </message>
   </context>
   <context>
