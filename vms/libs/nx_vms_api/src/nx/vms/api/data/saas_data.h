@@ -274,25 +274,25 @@ QN_FUSION_DECLARE_FUNCTIONS(Organization, (json), NX_VMS_API)
 /**%apidoc Defines possible list of Tier limits. */
 NX_REFLECTION_ENUM_CLASS(SaasTierLimitName,
     /**%apidoc Servers per Site limit. */
-    maxServers,
+    maxServersPerSite,
 
     /**%apidoc Devices per Server limit. */
     maxDevicesPerServer,
 
     /**%apidoc Devices per Layout limit. */
-    maxDevicesPerLayout,
+    maxItemsInLayout,
 
     /**%apidoc Maximum archive duration limit. */
-    maxArchiveDays,
+    maxDaysArchiveLocal,
 
-    /**%apidoc Whether LDAP feature is enabled. */
-    ldapEnabled,
+    /**%apidoc Whether LDAP feature is allowed. */
+    ldapAllowed,
 
-    /**%apidoc Whether Video Wall feature is enabled. */
-    videowallEnabled,
+    /**%apidoc Whether Video Wall feature is allowed. */
+    videoWallAllowed,
 
-    /**%apidoc Whether cross-site features are enabled. For example: cross-site layouts.*/
-    crossSiteFeaturesEnabled
+    /**%apidoc Whether cross-site features are allowed. For example: cross-site layouts.*/
+    crossSiteAllowed
 );
 
 struct NX_VMS_API SaasSecurity
@@ -322,6 +322,24 @@ NX_REFLECTION_INSTRUMENT(SaasSecurity, SaasSecurity_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(SaasSecurity, (json), NX_VMS_API)
 NX_REFLECTION_TAG_TYPE(SaasSecurity, jsonSerializeChronoDurationAsNumber)
 
+struct NX_VMS_API TierData
+{
+    QString name;
+    int maxServersPerSite = 0;
+    int maxDevicesPerServer = 0;
+    int maxItemsInLayout = 0;
+    int maxDaysArchiveLocal = 0;
+    bool ldapAllowed = true;
+    bool videoWallAllowed = true;
+    bool crossSiteAllowed = true;
+
+    bool operator==(const TierData&) const = default;
+};
+
+#define TierData_Fields (name)(maxServersPerSite)(maxDevicesPerServer)(maxItemsInLayout)(maxDaysArchiveLocal)(ldapAllowed)(videoWallAllowed)(crossSiteAllowed)
+NX_REFLECTION_INSTRUMENT(TierData, TierData_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(TierData, (json), NX_VMS_API)
+
 /**%apidoc SaasData from license server. */
 struct NX_VMS_API SaasData
 {
@@ -334,11 +352,8 @@ struct NX_VMS_API SaasData
     /**%apidoc The list of purchased services. */
     std::map<nx::Uuid, SaasPurchase> services;
 
-    /**%apidoc
-     * The map of values per SaaS Tier limit. SaaS Tier limit can be integer or boolean.
-     * For boolean values any non-zero value considered as 'true'.
-     */
-    std::map<SaasTierLimitName, int> tierLimits;
+    /**%apidoc Site tier limitations. */
+    TierData tier;
 
     /**%apidoc Security data. It is used to validate saas data. */
     SaasSecurity security;
@@ -348,29 +363,36 @@ struct NX_VMS_API SaasData
 
     bool operator==(const SaasData&) const = default;
 };
-#define SaasData_Fields (cloudSystemId)(channelPartner)(organization)(state)(services)(tierLimits)(security)(signature)
+#define SaasData_Fields (cloudSystemId)(channelPartner)(organization)(state)(services)(tier)(security)(signature)
 NX_REFLECTION_INSTRUMENT(SaasData, SaasData_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(SaasData, (json), NX_VMS_API)
 
 /**%apidoc Tier usage statistics. */
 struct NX_VMS_API TierUsageData
 {
-    /**%apidoc Count of allowed services. */
-    int allowed = 0;
-
-    /**%apidoc Count of used services. */
-    int used = 0;
+    int servers = 0;
+    int maxDevicesPerServer = 0;
+    int maxItemsInLayout = 0;
+    bool ldapUsed = false;
+    bool videoWallUsed = false;
 
     bool operator==(const TierUsageData&) const = default;
 };
-#define TierUsageData_Fields (allowed)(used)
+#define TierUsageData_Fields (servers)(maxItemsInLayout)(ldapUsed)(videoWallUsed)
 NX_REFLECTION_INSTRUMENT(TierUsageData, TierUsageData_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(TierUsageData, (json), NX_VMS_API)
-using TierUsageMap = std::map<nx::vms::api::SaasTierLimitName, TierUsageData>;
+
+using TierValue = std::variant<int, bool>;
 
 /**%apidoc Tier overuse statistics. */
-struct NX_VMS_API TierOveruseData: public TierUsageData
+struct NX_VMS_API TierOveruseData
 {
+    /**%apidoc Count of allowed services. */
+    TierValue allowed;
+
+    /**%apidoc Count of used services. */
+    TierValue used;
+
     /**%apidoc
      * List of overused resources. Key - resource id, value - overused value. That value always
      * bigger than value 'allowed'.
@@ -379,11 +401,10 @@ struct NX_VMS_API TierOveruseData: public TierUsageData
 
     bool operator==(const TierOveruseData&) const = default;
 };
-#define TierOveruseData_Fields TierUsageData_Fields (details)
+#define TierOveruseData_Fields (allowed)(used)(details)
 NX_REFLECTION_INSTRUMENT(TierOveruseData, TierOveruseData_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(TierOveruseData, (json), NX_VMS_API)
 using TierOveruseMap = std::map<nx::vms::api::SaasTierLimitName, TierOveruseData>;
-using TierUseMap = std::map<nx::vms::api::SaasTierLimitName, TierUsageData>;
 
 struct NX_VMS_API SaasWithServices: SaasData
 {
@@ -392,13 +413,14 @@ struct NX_VMS_API SaasWithServices: SaasData
     std::map<nx::Uuid, nx::vms::api::SaasService> servicesAvailable;
 
     /**%apidoc Tiers usage list for the Site. */
-    std::map<nx::vms::api::SaasTierLimitName, TierUsageData> tierUsages;
+    TierUsageData tierUsages;
 
     /**%apidoc Tiers overuse details. */
-    std::map<nx::vms::api::SaasTierLimitName, TierOveruseData> tiersOveruse;
+    TierOveruseMap tiersOveruse;
 };
 #define SaasWithServices_Fields SaasData_Fields(servicesAvailable)(tierUsages)(tiersOveruse)
 NX_REFLECTION_INSTRUMENT(SaasWithServices, SaasWithServices_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(SaasWithServices, (json), NX_VMS_API)
+
 
 } // namespace nx::vms::api

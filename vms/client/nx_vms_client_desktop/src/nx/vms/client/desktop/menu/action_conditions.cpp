@@ -1948,7 +1948,7 @@ ConditionWrapper hasVideoWallFeature()
         [](const Parameters& /*parameters*/, WindowContext* context)
         {
             return context->system()->saasServiceManager()->hasFeature(
-                nx::vms::api::SaasTierLimitName::videowallEnabled);
+                nx::vms::api::SaasTierLimitName::videoWallAllowed);
         });
 }
 
@@ -2553,8 +2553,8 @@ ConditionWrapper tierLimitsAllowMerge()
         [](const Parameters& /*parameters*/, WindowContext* context)
         {
             const auto saas = context->system()->saasServiceManager();
-            const auto tierLimit = saas->tierLimit(nx::vms::api::SaasTierLimitName::maxServers);
-            if (tierLimit.has_value() && *tierLimit <= 1)
+            const auto tierLimit = saas->tier().maxServersPerSite;
+            if (tierLimit == 1)
                 return InvisibleAction;
             return EnabledAction;
         });

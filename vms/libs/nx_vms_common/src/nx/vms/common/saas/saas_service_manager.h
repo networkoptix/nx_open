@@ -144,20 +144,25 @@ public:
     bool hasTierOveruse() const;
 
     /**
+     * @return Tier iformation.
+     */
+    nx::vms::api::TierData tier() const;
+
+    /**
      * @return Tier limitation by provided feature.
      */
-    std::optional<int> tierLimit(nx::vms::api::SaasTierLimitName value) const;
+    nx::vms::api::TierValue tierLimit(nx::vms::api::SaasTierLimitName value) const;
 
     /**
      * @return How many resource by specific tier limit are currently in use.
      */
-    int tierLimitUsed(nx::vms::api::SaasTierLimitName value) const;
+    nx::vms::api::TierValue tierLimitUsed(nx::vms::api::SaasTierLimitName value) const;
 
     /**
      * @return std::nullopt if there is not limit. Otherwise returns delta between tierLimit and
      * used resource.
      */
-    std::optional<int> tierLimitLeft(nx::vms::api::SaasTierLimitName value) const;
+    //std::optional<int> intTierLimitLeft(nx::vms::api::SaasTierLimitName value) const;
 
     std::optional<int> camerasTierLimitLeft(const nx::Uuid& serverId);
 
@@ -203,9 +208,9 @@ public:
      * @return statistic for all Tier features. For boolean features fields 'allowed' and 'used'
      * contains only values 1 or 0.
      */
-    nx::vms::api::TierUsageMap tiersUsageDetails() const;
+    nx::vms::api::TierUsageData tiersUsages() const;
 
-    using LocalTierLimits = std::map<nx::vms::api::SaasTierLimitName, std::optional<int>>;
+    using LocalTierLimits = nx::vms::api::TierData;
 
     /*
      * Used for test purpose only.
@@ -243,8 +248,10 @@ private:
         nx::vms::api::SaasTierLimitName feature) const;
     std::chrono::milliseconds calculateGracePeriodTime() const;
     void resetGracePeriodCache();
-    std::optional<int> tierLimitUnsafe(nx::vms::api::SaasTierLimitName value) const;
+    nx::vms::api::TierData tierUnsafe() const;
+    nx::vms::api::TierValue tierLimitUnsafe(nx::vms::api::SaasTierLimitName value) const;
     int allRecordingServices(const nx::Uuid& serverId) const;
+    bool tierLimitReached(nx::vms::api::TierValue limit, nx::vms::api::TierValue used) const;
 
 private:
     mutable nx::Mutex m_mutex;

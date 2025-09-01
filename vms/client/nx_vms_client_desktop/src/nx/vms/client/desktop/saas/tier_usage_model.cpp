@@ -88,10 +88,12 @@ QList<QStandardItem*> TierUsageModel::Private::createTierLimitRow(
 
     auto tierLimitAllowedItem = new QStandardItem();
     auto tierLimitUsedItem = new QStandardItem();
-    if (!isBooleanTierLimitType(tierType) && !hasDetails)
+    const bool isIntType = std::holds_alternative<int>(overuseData.allowed);
+    if (isIntType && !hasDetails)
     {
-        tierLimitAllowedItem->setData(QString::number(overuseData.allowed), Qt::DisplayRole);
-        tierLimitUsedItem->setData(QString::number(overuseData.used), Qt::DisplayRole);
+        NX_ASSERT(std::holds_alternative<int>(overuseData.used));
+        tierLimitAllowedItem->setData(QString::number(std::get<int>(overuseData.allowed)), Qt::DisplayRole);
+        tierLimitUsedItem->setData(QString::number(std::get<int>(overuseData.used)), Qt::DisplayRole);
     }
 
     const auto resourcePool = serviceManager->systemContext()->resourcePool();
@@ -102,7 +104,9 @@ QList<QStandardItem*> TierUsageModel::Private::createTierLimitRow(
         auto resourceNameItem = new QStandardItem(resource->getName());
         resourceNameItem->setData(qnResIconCache->icon(resource), Qt::DecorationRole);
 
-        auto tierLimitAllowedItem = new QStandardItem(QString::number(overuseData.allowed));
+        auto tierLimitAllowedItem = new QStandardItem(isIntType
+            ? QString::number(std::get<int>(overuseData.allowed))
+            : toString(std::get<bool>(overuseData.allowed)));
         auto tierLimitUsedItem = new QStandardItem(QString::number(it->second));
 
         QList<QStandardItem*> resourceRow(

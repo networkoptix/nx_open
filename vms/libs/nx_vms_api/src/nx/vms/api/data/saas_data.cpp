@@ -109,5 +109,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasData, (json), SaasData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasWithServices, (json), SaasWithServices_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TierUsageData, (json), TierUsageData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TierOveruseData, (json), TierOveruseData_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TierData, (json), TierData_Fields)
 
 } // namespace nx::vms::api

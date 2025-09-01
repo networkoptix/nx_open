@@ -89,7 +89,7 @@ void UserManagementTabWidget::updateTabVisibility()
 {
     const auto saas = system()->saasServiceManager();
     d->tabWidget->setTabVisible(d->ldapTabIndex,
-        saas->hasFeature(nx::vms::api::SaasTierLimitName::ldapEnabled));
+        saas->hasFeature(nx::vms::api::SaasTierLimitName::ldapAllowed));
 }
 
 void UserManagementTabWidget::loadDataToUi()

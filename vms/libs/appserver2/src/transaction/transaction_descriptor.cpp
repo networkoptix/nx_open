@@ -60,13 +60,13 @@ Result checkTierLimit(
 {
     using namespace nx::vms::api;
     const auto saasManager = systemContext->saasServiceManager();
-    std::optional<int> limit = saasManager->tierLimit(SaasTierLimitName::maxArchiveDays);
-    if (limit.has_value() && (param.maxArchivePeriodS.count() < 0
-            || std::chrono::seconds(param.maxArchivePeriodS) > std::chrono::days(*limit)))
+    int limit = saasManager->tier().maxDaysArchiveLocal;
+    if (limit && (param.maxArchivePeriodS.count() < 0
+            || std::chrono::seconds(param.maxArchivePeriodS) > std::chrono::days(limit)))
     {
         return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
             "Maximum number of archive seconds must be provided in range up to %1."),
-                *limit * 3600 * 24));
+                limit * 3600 * 24));
     }
     return Result();
 }
@@ -1675,11 +1675,10 @@ struct ModifyCameraDataAccess
                 std::optional<int> left = saasManager->camerasTierLimitLeft(param.parentId);
                 if (left.has_value() && *left < 1)
                 {
-                    const std::optional<int> available =
-                        saasManager->tierLimit(SaasTierLimitName::maxDevicesPerServer);
+                    const int available = saasManager->tier().maxDevicesPerServer;
                     return Result(ErrorCode::forbidden,
                         nx::format(ServerApiErrors::tr("Maximum number of Cameras for the Site "
-                        "is reached. Available %1."), *available));
+                            "is reached. Available %1."), available));
                 }
             }
         }
@@ -1703,15 +1702,12 @@ struct ModifyLayoutDataAccess
             {
                 using namespace nx::vms::api;
                 const auto saasManager = systemContext->saasServiceManager();
-                auto left = saasManager->tierLimitLeft(SaasTierLimitName::maxDevicesPerLayout);
-                if (left.has_value() && *left < itemsDelta)
+                auto maxItems = saasManager->tier().maxItemsInLayout;
+                if (maxItems && param.items.size() > maxItems)
                 {
-                    const std::optional<int> available =
-                        saasManager->tierLimit(SaasTierLimitName::maxDevicesPerLayout);
                     return Result(ErrorCode::forbidden,
                         nx::format(ServerApiErrors::tr("Maximum number of Layout items for the Site "
-                                                       "is reached. Available %1."),
-                            *available));
+                            "is reached. Available %1."), maxItems));
                 }
             }
         }

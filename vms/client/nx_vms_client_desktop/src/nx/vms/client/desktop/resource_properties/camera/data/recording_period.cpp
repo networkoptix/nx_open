@@ -113,7 +113,7 @@ RecordingPeriod RecordingPeriod::maxPeriod(const QnVirtualCameraResourceList& ca
     if (!cameras.empty())
     {
         const auto saasManager = cameras[0]->systemContext()->saasServiceManager();
-        const days maxDays(saasManager->tierLimit(SaasTierLimitName::maxArchiveDays).value_or(0));
+        const days maxDays(saasManager->tier().maxDaysArchiveLocal);
         result.setForcedMaxValue(duration_cast<seconds>(maxDays));
     }
 
