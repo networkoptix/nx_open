@@ -398,6 +398,11 @@ bool BackupSettingsViewWidget::isNetworkRequestRunning() const
     return m_backupSettingsDecoratorModel->isNetworkRequestRunning();
 }
 
+BackupSettingsDecoratorModel* BackupSettingsViewWidget::backupSettingsModel() const
+{
+    return m_backupSettingsDecoratorModel.get();
+}
+
 nx::vms::api::BackupSettings BackupSettingsViewWidget::globalBackupSettings() const
 {
     return m_backupSettingsDecoratorModel->globalBackupSettings();

@@ -32,6 +32,7 @@ public:
     void applyChanges();
     void discardChanges();
     bool isNetworkRequestRunning() const;
+    BackupSettingsDecoratorModel* backupSettingsModel() const;
 
     nx::vms::api::BackupSettings globalBackupSettings() const;
 

@@ -21,7 +21,9 @@
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
+#include <nx/vms/client/desktop/resource_dialogs/models/backup_settings_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
+#include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_store.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
@@ -111,6 +113,12 @@ BackupSettingsWidget::BackupSettingsWidget(ServerSettingsDialogStore* store, QWi
 
     m_backupSettingsViewWidget->resourceViewWidget()->initAlertBar(
         {.level = BarDescription::BarLevel::Warning, .isClosable = true});
+
+    m_store = store;
+    connect(m_backupSettingsViewWidget->backupSettingsModel(),
+        &BackupSettingsDecoratorModel::cloudStorageUsageChanged,
+        this,
+        &BackupSettingsWidget::updateAlertBar);
 }
 
 BackupSettingsWidget::~BackupSettingsWidget()
@@ -244,34 +252,42 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
                     std::move(newAddedCamerasItem));
             });
 
-        QString alertBarMessage;
-        if (cloudBackupStorage && saasState == nx::vms::api::SaasState::suspended)
-        {
-            alertBarMessage = tr("Cloud backup continues, but the site is currently suspended. "
-                "It must be active to modify the \"What to backup\" and \"Quality\" settings for a "
-                "device, or to enable cloud backup. You can also disable it. %1")
-                    .arg(nx::vms::common::saas::StringsHelper::recommendedAction(saasState));
-        }
-        else if (cloudBackupStorage && servicesStatus.status == nx::vms::api::UseStatus::overUse)
-        {
-            const auto formatter = nx::vms::time::Formatter::system();
-            alertBarMessage = tr("The number of devices selected for backup exceeds available "
-                "services. Add additional services or reduce the number of devices configured for "
-                "backup. On %1 the site will automatically limit the number of backed-up devices "
-                "to match the available services")
-                    .arg(formatter->toString(servicesStatus.issueExpirationDate));
-        }
-
-        m_backupSettingsViewWidget->resourceViewWidget()->footerWidget()->setHidden(
-            !alertBarMessage.isEmpty());
-        m_backupSettingsViewWidget->resourceViewWidget()->setInvalidMessage(alertBarMessage);
-
-        m_backupSettingsViewWidget->resourceViewWidget()->makeRequiredItemsVisible();
-        ui->backupBandwidthSettingsWidget->loadDataToUi();
+       updateAlertBar();
     }
 
     if (!state.backupStoragesStatus.hasActiveBackupStorage && hasChanges())
         discardChanges();
+}
+
+void BackupSettingsWidget::updateAlertBar()
+{
+    const auto cloudBackupStorage = m_store->state().backupStoragesStatus.usesCloudBackupStorage;
+    const auto saasState = m_store->state().saasProperties.saasState;
+    const auto servicesStatus = m_store->state().saasProperties.cloudStorageServicesStatus;
+    QString alertBarMessage;
+    if (cloudBackupStorage && saasState == nx::vms::api::SaasState::suspended)
+    {
+        alertBarMessage = tr("Cloud backup continues, but the site is currently suspended. "
+            "It must be active to modify the \"What to backup\" and \"Quality\" settings for a "
+            "device, or to enable cloud backup. You can also disable it. %1")
+                .arg(nx::vms::common::saas::StringsHelper::recommendedAction(saasState));
+    }
+    else if (cloudBackupStorage && m_backupSettingsViewWidget->backupSettingsModel()->hasOveruse())
+    {
+        const auto formatter = nx::vms::time::Formatter::system();
+        alertBarMessage = tr("The number of devices selected for backup exceeds available "
+            "services. Add additional services or reduce the number of devices configured for "
+            "backup. On %1 the site will automatically limit the number of backed-up devices "
+            "to match the available services")
+                .arg(formatter->toString(servicesStatus.issueExpirationDate));
+    }
+
+    m_backupSettingsViewWidget->resourceViewWidget()->footerWidget()->setHidden(
+        !alertBarMessage.isEmpty());
+    m_backupSettingsViewWidget->resourceViewWidget()->setInvalidMessage(alertBarMessage);
+
+    m_backupSettingsViewWidget->resourceViewWidget()->makeRequiredItemsVisible();
+    ui->backupBandwidthSettingsWidget->loadDataToUi();
 }
 
 void BackupSettingsWidget::setupPlaceholders()
