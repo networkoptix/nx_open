@@ -41,10 +41,12 @@ private:
     void loadState(const ServerSettingsDialogState& state);
 
     void setupPlaceholders();
+    void updateAlertBar();
 
 private:
     const std::unique_ptr<Ui::BackupSettingsWidget> ui;
     BackupSettingsViewWidget* m_backupSettingsViewWidget;
+    ServerSettingsDialogStore* m_store;
     QnMediaServerResourcePtr m_server;
 };
 

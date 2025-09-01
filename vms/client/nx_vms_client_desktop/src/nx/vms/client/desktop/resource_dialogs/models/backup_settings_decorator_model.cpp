@@ -362,6 +362,7 @@ void BackupSettingsDecoratorModel::Private::proposeServicesUsageChange()
             toRemove.insert(i.key()->getId());
     }
     cloudStorageUsageHelper->proposeChange(toAdd, toRemove);
+    emit q->cloudStorageUsageChanged();
 }
 
 bool BackupSettingsDecoratorModel::Private::isCloudStorageInSuspendedState() const
@@ -772,6 +773,11 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
                 d->proposeServicesUsageChange();
         }
     }
+}
+
+bool BackupSettingsDecoratorModel::hasOveruse() const
+{
+    return d->cloudStorageUsageHelper->licenseDeficit() > 0;
 }
 
 std::set<nx::Uuid> BackupSettingsDecoratorModel::backupEnabledCameras() const

@@ -46,6 +46,7 @@ public:
     void setBackupQuality(const QModelIndexList& indexes, CameraBackupQuality quality);
     void setBackupEnabled(const QModelIndexList& indexes, bool enabled);
     std::set<nx::Uuid> backupEnabledCameras() const;
+    bool hasOveruse() const;
 
     /**
      * If loaded state indicates that cloud backup storage is used, calling this method is
@@ -68,6 +69,7 @@ private:
 signals:
     void hasChangesChanged();
     void globalBackupSettingsChanged();
+    void cloudStorageUsageChanged();
 
 private:
     struct Private;
