@@ -8234,7 +8234,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Lyd omkodning påkrævet.</translation>
     </message>
   </context>
   <context>
