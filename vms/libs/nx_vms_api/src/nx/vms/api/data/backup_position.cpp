@@ -63,7 +63,7 @@ BackupPositionV1 BackupPositionV4::toV1() const
     BackupPositionV1 result = BackupPositionV1{
         .positionLowMs = media.positionLowMs,
         .positionHighMs = media.positionHighMs,
-        .bookmarkStartPositionMs = media.bookmarkStartPositionMs
+        .bookmarkStartPositionMs = media.bookmarkLowStartPositionMs
     };
     result.deviceId = deviceId;
     result.serverId = serverId;
@@ -77,7 +77,8 @@ BackupPositionV4 BackupPositionV4::fromV1(const BackupPositionV1& data)
     result.serverId = data.serverId;
     result.media.positionLowMs = data.positionLowMs;
     result.media.positionHighMs = data.positionHighMs;
-    result.media.bookmarkStartPositionMs = data.bookmarkStartPositionMs;
+    result.media.bookmarkLowStartPositionMs = data.bookmarkStartPositionMs;
+    result.media.bookmarkHighStartPositionMs = data.bookmarkStartPositionMs;
     return result;
 }
 

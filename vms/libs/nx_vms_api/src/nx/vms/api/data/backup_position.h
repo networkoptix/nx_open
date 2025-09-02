@@ -116,9 +116,14 @@ struct NX_VMS_API MediaBackupPosition
     std::chrono::system_clock::time_point positionHighMs = kDefaultBackupPosition;
 
     /**%apidoc[opt]
-     * Backup position of the video associated with bookmarks.
+     * Backup position of the hi quality video stream associated with bookmarks.
      */
-    std::chrono::system_clock::time_point bookmarkStartPositionMs = kDefaultBackupPosition;
+    std::chrono::system_clock::time_point bookmarkHighStartPositionMs = kDefaultBackupPosition;
+
+    /**%apidoc[opt]
+     * Backup position of the low quality video stream  video associated with bookmarks.
+     */
+    std::chrono::system_clock::time_point bookmarkLowStartPositionMs = kDefaultBackupPosition;
 
     bool operator==(const MediaBackupPosition& other) const = default;
 };
@@ -126,7 +131,8 @@ struct NX_VMS_API MediaBackupPosition
 #define MediaBackupPosition_Fields \
     (positionLowMs) \
     (positionHighMs) \
-    (bookmarkStartPositionMs)
+    (bookmarkLowStartPositionMs) \
+    (bookmarkHighStartPositionMs)
 
 QN_FUSION_DECLARE_FUNCTIONS(MediaBackupPosition, (json)(ubjson), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MediaBackupPosition, MediaBackupPosition_Fields)
