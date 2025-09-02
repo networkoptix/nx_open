@@ -30,6 +30,8 @@ public:
 
     void applyArguments(const ArgumentParser& arguments);
 
+    void applySettings();
+
     const std::string& cloudHost() const;
     hpm::api::MediatorConnector& mediatorConnector();
     MediatorAddressPublisher& addressPublisher();
@@ -47,7 +49,6 @@ private:
     std::unique_ptr<CloudConnectControllerImpl> m_impl;
 
     void loadSettings(const ArgumentParser& arguments);
-    void applySettings();
 };
 
 } // namespace nx::network::cloud

@@ -423,6 +423,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, showBorderInVideoWallMode,
         "[Support] Show window border in Video Wall mode to workaround graphics drivers issues.");
 
+    NX_INI_FLAG(true, enableHolePunching,
+        "[Support] Allow client to use UDP Hole Punching network feature.");
+
     // ---------------------------------------------------------------------------------------------
     // CI section.
     // Flags here are used for the client functional unit tests.

@@ -54,7 +54,7 @@ public:
     /**
      * Initialize network-related modules.
      */
-    void initializeNetworkModules();
+    void initializeNetworkModules(bool udpHolePunchingEnabled);
 
     QQmlEngine* qmlEngine() const;
 
