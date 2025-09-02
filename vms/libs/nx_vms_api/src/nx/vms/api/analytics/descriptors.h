@@ -201,6 +201,16 @@ NX_REFLECTION_INSTRUMENT(GroupDescriptor, nx_vms_api_analyitcs_GroupDescriptor_F
 struct ExtendedScopedDescriptor: public BaseScopedDescriptor
 {
     ExtendedScopedDescriptor() = default;
+    ExtendedScopedDescriptor(DescriptorScope scope, ExtendedTypeWithOptionalName extendedType):
+        BaseScopedDescriptor(std::move(scope),
+            NamedItem{.id = extendedType.id, .name = extendedType.name}),
+        icon(std::move(extendedType.icon)),
+        base(std::move(extendedType.base)),
+        omittedBaseAttributes(std::move(extendedType.omittedBaseAttributes)),
+        attributes(std::move(extendedType.attributes))
+    {
+    }
+
     ExtendedScopedDescriptor(DescriptorScope scope, ExtendedType extendedType):
         BaseScopedDescriptor(std::move(scope), extendedType),
         icon(std::move(extendedType.icon)),

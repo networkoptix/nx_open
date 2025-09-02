@@ -16,9 +16,7 @@ namespace nx::vms::api::analytics {
 
 struct NamedItem
 {
-    /**%apidoc[opt] */
     QString id;
-    /**%apidoc[opt] */
     QString name;
 
     bool operator==(const NamedItem& other) const = default;
@@ -26,8 +24,21 @@ struct NamedItem
 #define NamedItem_Fields (id)(name)
 NX_REFLECTION_INSTRUMENT(NamedItem, NamedItem_Fields);
 
+struct NamedItemWithOptionalName
+{
+    QString id;
+    /**%apidoc[opt] */
+    QString name;
+
+    bool operator==(const NamedItemWithOptionalName& other) const = default;
+};
+#define NamedItemWithOptionalName_Fields (id)(name)
+NX_REFLECTION_INSTRUMENT(NamedItemWithOptionalName,
+    NamedItemWithOptionalName_Fields);
+
 struct EnumType: public NamedItem
 {
+    /**%apidoc[opt] */
     std::optional<QString> base;
     /**%apidoc[opt] */
     std::vector<QString> baseItems;
@@ -225,7 +236,7 @@ NX_REFLECTION_INSTRUMENT(ItemObject, ItemObject_Fields);
 NX_REFLECTION_INSTRUMENT(DependentAttributeDescription, DependentAttributeDescription_Fields);
 NX_REFLECTION_INSTRUMENT(AttributeDescription, AttributeDescription_Fields);
 
-struct ExtendedType: public NamedItem
+struct ExtendedTypeCommon
 {
     /**%apidoc[opt] */
     QString icon; //< internal id or empty.
@@ -236,10 +247,26 @@ struct ExtendedType: public NamedItem
     /**%apidoc[opt] */
     std::vector<AttributeDescription> attributes;
 
+    bool operator==(const ExtendedTypeCommon& other) const = default;
+};
+#define ExtendedTypeCommon_Fields (icon)(base)(omittedBaseAttributes)(attributes)
+NX_REFLECTION_INSTRUMENT(ExtendedTypeCommon, ExtendedTypeCommon_Fields);
+
+struct ExtendedType: public NamedItem, public ExtendedTypeCommon
+{
     bool operator==(const ExtendedType& other) const = default;
 };
-#define ExtendedType_Fields NamedItem_Fields (icon)(base)(omittedBaseAttributes)(attributes)
+#define ExtendedType_Fields NamedItem_Fields ExtendedTypeCommon_Fields
 NX_REFLECTION_INSTRUMENT(ExtendedType, ExtendedType_Fields);
+
+struct ExtendedTypeWithOptionalName: public NamedItemWithOptionalName,
+    public ExtendedTypeCommon
+{
+    bool operator==(const ExtendedTypeWithOptionalName& other) const = default;
+};
+#define ExtendedTypeWithOptionalName_Fields NamedItemWithOptionalName_Fields ExtendedTypeCommon_Fields
+NX_REFLECTION_INSTRUMENT(ExtendedTypeWithOptionalName,
+    ExtendedTypeWithOptionalName_Fields);
 
 /** See the documentation in manifests.md. */
 enum class EventTypeFlag
@@ -307,7 +334,7 @@ constexpr auto nxReflectVisitAllEnumItems(ObjectTypeFlag*, Visitor&& visitor)
 /**
  * Description of the Analytics Object Type.
  */
-struct ObjectType: public ExtendedType
+struct ObjectType: public ExtendedTypeWithOptionalName
 {
     /**%apidoc[opt] */
     QString provider;
@@ -316,7 +343,7 @@ struct ObjectType: public ExtendedType
 
     bool operator==(const ObjectType& other) const = default;
 };
-#define ObjectType_Fields ExtendedType_Fields (provider)(flags)
+#define ObjectType_Fields ExtendedTypeWithOptionalName_Fields (provider)(flags)
 NX_REFLECTION_INSTRUMENT(ObjectType, ObjectType_Fields);
 
 struct HiddenExtendedType
