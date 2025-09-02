@@ -230,7 +230,7 @@ protected:
     * Initialize network-related modules.
     * Not called from the constructor, should be explicitly called from descendants instead.
     */
-    void initializeNetworkModules();
+    void initializeNetworkModules(bool udpHolePunchingEnabled);
 
     /**
     * Initialize cross-system-related modules.

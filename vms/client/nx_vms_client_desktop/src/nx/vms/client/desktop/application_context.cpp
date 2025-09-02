@@ -549,7 +549,7 @@ struct ApplicationContext::Private
             "dc",
             q->peerId());
         initializeServerCompatibilityValidator();
-        q->core::ApplicationContext::initializeNetworkModules();
+        q->core::ApplicationContext::initializeNetworkModules(ini().enableHolePunching);
     }
 
     void initializeCrossSystemModules()
