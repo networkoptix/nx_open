@@ -13,6 +13,8 @@
 #include <nx/branding.h>
 #include <nx/branding_proxy.h>
 #include <nx/build_info_proxy.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/cloud_connect_settings.h>
 #include <nx/p2p/p2p_ini.h>
 #include <nx/utils/external_resources.h>
 #include <nx/utils/i18n/translation_manager.h>
@@ -291,9 +293,16 @@ Qn::SerializationFormat ApplicationContext::serializationFormat() const
     return d->format;
 }
 
-void ApplicationContext::initializeNetworkModules()
+void ApplicationContext::initializeNetworkModules(bool udpHolePunchingEnabled)
 {
     NX_ASSERT(d->features.base.flags.testFlag(CommonFeatureFlag::networking));
+    NX_INFO(this, "Enable networking, UDP Hole Punching enabled: %1", udpHolePunchingEnabled);
+
+    if (!udpHolePunchingEnabled)
+    {
+        nx::network::SocketGlobals::instance().cloud().settings().isUdpHpEnabled = false;
+        nx::network::SocketGlobals::instance().cloud().applySettings();
+    }
 
     using namespace nx::vms::common;
 

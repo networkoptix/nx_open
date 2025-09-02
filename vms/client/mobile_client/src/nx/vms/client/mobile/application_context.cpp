@@ -61,7 +61,6 @@ struct ApplicationContext::Private
     std::unique_ptr<detail::CredentialsHelper> credentialsHelper;
     QPointer<QnCameraThumbnailProvider> cameraThumbnailProvider; //< Owned by the QML engine.
 
-    void initializeHolePunching();
     void initializeTranslations();
     void initializePushManager();
     void initializeEngine(const QnMobileClientStartupParameters& params);
@@ -70,19 +69,6 @@ struct ApplicationContext::Private
     void initializeTrafficLogginOptionHandling();
     void initOsSpecificStuff();
 };
-
-void ApplicationContext::Private::initializeHolePunching()
-{
-    if (!qnSettings->enableHolePunching()) {
-        // Disable UDP hole punching.
-        network::SocketGlobals::instance().cloud().applyArguments(
-            ArgumentParser({"--cloud-connect-disable-udp"}));
-    }
-    else
-    {
-        NX_DEBUG(this, "Hole punching is enabled");
-    }
-}
 
 void ApplicationContext::Private::initializeTranslations()
 {
@@ -235,8 +221,7 @@ ApplicationContext::ApplicationContext(
         .q = this,
         .credentialsHelper = std::make_unique<detail::CredentialsHelper>()})
 {
-    d->initializeHolePunching();
-    initializeNetworkModules();
+    initializeNetworkModules(qnSettings->enableHolePunching());
     initializeMetaTypes();
     d->initializeTranslations();
     d->initializeEngine(startupParams);
