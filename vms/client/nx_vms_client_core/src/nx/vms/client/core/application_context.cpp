@@ -10,6 +10,10 @@
 #include <finders/systems_finder.h>
 #include <nx/branding_proxy.h>
 #include <nx/build_info_proxy.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/cloud_connect_settings.h>
+#include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
@@ -148,8 +152,15 @@ ApplicationContext* ApplicationContext::instance()
     return s_instance;
 }
 
-void ApplicationContext::initializeNetworkModules()
+void ApplicationContext::initializeNetworkModules(bool udpHolePunchingEnabled)
 {
+    NX_INFO(this, "Enable networking, UDP Hole Punching enabled: %1", udpHolePunchingEnabled);
+
+    if (!udpHolePunchingEnabled)
+    {
+        nx::network::SocketGlobals::cloud().settings().isUdpHpEnabled = false;
+        nx::network::SocketGlobals::cloud().applySettings();
+    }
     d->initializeNetworkModules();
 }
 
