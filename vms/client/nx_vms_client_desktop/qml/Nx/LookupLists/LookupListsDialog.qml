@@ -372,6 +372,28 @@ Dialog
                 }
             }
 
+            MouseArea
+            {
+                anchors.fill: tableView
+                enabled: tableView.editing
+                onPressed: (mouse) =>
+                {
+                    mouse.accepted = false
+
+                    var focusItem = Window.activeFocusItem
+                    if (!focusItem)
+                        return
+
+                    var focusItemPos = focusItem.mapFromItem(tableView, mouse.x, mouse.y)
+                    if (!focusItem.contains(focusItemPos))
+                        focusItem.focus = false
+                }
+                onReleased: (mouse) =>
+                {
+                    mouse.accepted = false
+                }
+            }
+
             Label
             {
                 id: noEntriesLabel
