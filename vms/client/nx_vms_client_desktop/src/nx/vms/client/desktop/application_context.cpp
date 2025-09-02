@@ -60,9 +60,11 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
+#include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
@@ -356,11 +358,13 @@ struct ApplicationContext::Private
     std::unique_ptr<CustomCursors> customCursors;
 
     // Miscellaneous modules.
+    std::unique_ptr<DebugInfoStorage> debugInfoStorage;
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
     std::unique_ptr<PerformanceMonitor> performanceMonitor;
 
     std::unique_ptr<ApplauncherGuard> applauncherGuard;
     std::unique_ptr<QnClientAutoRunWatcher> autoRunWatcher;
+    std::unique_ptr<integrations::Storage> integrationStorage;
     std::unique_ptr<RadassController> radassController;
     std::unique_ptr<ResourceFactory> resourceFactory;
     std::unique_ptr<UploadManager> uploadManager;
@@ -772,6 +776,7 @@ ApplicationContext::ApplicationContext(
             d->initializeNetworkLogging();
             initializeTranslations(coreSettings()->locale());
             d->initializePlatformAbstraction();
+            d->debugInfoStorage = std::make_unique<DebugInfoStorage>();
             d->textToWaveServer = nx::speech_synthesizer::TextToWaveServer::create(
                 QCoreApplication::applicationDirPath());
             d->performanceMonitor = std::make_unique<PerformanceMonitor>();
@@ -787,6 +792,8 @@ ApplicationContext::ApplicationContext(
             d->initializeLocalResourcesSearch();
             d->applauncherGuard = std::make_unique<ApplauncherGuard>();
             d->autoRunWatcher = std::make_unique<QnClientAutoRunWatcher>();
+            d->integrationStorage = std::make_unique<integrations::Storage>(
+                runtimeSettings()->isDesktopMode());
             d->radassController = std::make_unique<RadassController>();
             d->resourceFactory = std::make_unique<ResourceFactory>();
             d->uploadManager = std::make_unique<UploadManager>();
@@ -976,9 +983,24 @@ RunningInstancesManager* ApplicationContext::runningInstancesManager() const
     return d->runningInstancesManager.get();
 }
 
+DebugInfoStorage* ApplicationContext::debugInfoStorage() const
+{
+    return d->debugInfoStorage.get();
+}
+
+integrations::Storage* ApplicationContext::integrationStorage() const
+{
+    return d->integrationStorage.get();
+}
+
 PerformanceMonitor* ApplicationContext::performanceMonitor() const
 {
     return d->performanceMonitor.get();
+}
+
+QnPlatformAbstraction* ApplicationContext::platform() const
+{
+    return d->platformAbstraction.get();
 }
 
 RadassController* ApplicationContext::radassController() const
@@ -1029,6 +1051,16 @@ nx::speech_synthesizer::TextToWaveServer* ApplicationContext::textToWaveServer()
 nx::cloud::gateway::VmsGatewayEmbeddable* ApplicationContext::cloudGateway() const
 {
     return d->cloudGateway.get();
+}
+
+LocalProxyServer* ApplicationContext::localProxyServer() const
+{
+    return d->localProxyServer.get();
+}
+
+CustomCursors* ApplicationContext::cursors() const
+{
+    return d->customCursors.get();
 }
 
 FontConfig* ApplicationContext::fontConfig() const

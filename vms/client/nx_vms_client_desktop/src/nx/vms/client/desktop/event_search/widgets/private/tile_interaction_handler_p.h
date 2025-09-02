@@ -3,8 +3,8 @@
 #pragma once
 
 #include <chrono>
+#include <set>
 
-#include <QtCore/QMap>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSet>
@@ -100,7 +100,7 @@ private:
 
 private:
     const QScopedPointer<nx::utils::PendingOperation> m_showPendingMessages;
-    QSet<nx::Uuid> m_messages;
+    std::set<QPointer<QObject>> m_messages;
     QStringList m_pendingMessages;
 };
 

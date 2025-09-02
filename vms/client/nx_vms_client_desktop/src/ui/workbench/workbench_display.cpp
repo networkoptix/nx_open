@@ -1326,7 +1326,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         if (startDisplay)
             mediaWidget->display()->start();
 
-        integrations::registerWidget(mediaWidget);
+        appContext()->integrationStorage()->registerWidget(mediaWidget);
     }
 
     return true;
@@ -1347,7 +1347,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item)
     widget->disconnect(this);
 
     if (const auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget))
-        integrations::unregisterWidget(mediaWidget);
+        appContext()->integrationStorage()->unregisterWidget(mediaWidget);
 
     for (int i = 0; i < Qn::ItemRoleCount; i++)
     {

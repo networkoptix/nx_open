@@ -329,7 +329,7 @@ void registerQmlTypesInternal()
     ui::scene::Instrument::registerQmlType();
     CursorManager::registerQmlType();
     CustomCursor::registerQmlType();
-    CustomCursors::registerQmlType();
+    CustomCursors::registerQmlType(appContext()->cursors());
     FocusFrameItem::registerQmlType();
     MotionRegionsItem::registerQmlType();
     GlobalToolTip::registerQmlType();

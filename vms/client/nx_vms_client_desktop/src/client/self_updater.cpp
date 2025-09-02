@@ -569,7 +569,7 @@ bool SelfUpdater::updateHelpFile(const HelpFileDescription& helpDescription)
     auto createShortcutInDir =
         [&targetFile, &helpDescription](const QString& destinationDir)
         {
-            bool success = qnPlatform->shortcuts()->createShortcut(
+            bool success = appContext()->platform()->shortcuts()->createShortcut(
                 targetFile,
                 destinationDir,
                 helpDescription.shortcutName);
@@ -917,7 +917,8 @@ bool SelfUpdater::updateMinilauncherIconsOnWindowsInDir(const QDir& dir)
 
         const auto completeBaseName = getCompleteBaseName(entry);
         // Acquire shortcut data.
-        auto info = qnPlatform->shortcuts()->getShortcutInfo(absolutePath, completeBaseName);
+        auto info = appContext()->platform()->shortcuts()->getShortcutInfo(
+            absolutePath, completeBaseName);
 
         NX_VERBOSE(this, "Shortcut parameters received");
 
@@ -940,7 +941,7 @@ bool SelfUpdater::updateMinilauncherIconsOnWindowsInDir(const QDir& dir)
 
             // Overwrite the shortcut.
             // This call clears shortcut icon, so the target binary icon will be used.
-            bool success = qnPlatform->shortcuts()->createShortcut(
+            bool success = appContext()->platform()->shortcuts()->createShortcut(
                 info.sourceFile,
                 absolutePath,
                 completeBaseName,

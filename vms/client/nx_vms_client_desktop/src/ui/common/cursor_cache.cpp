@@ -9,6 +9,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <platform/platform_abstraction.h>
 #include <ui/common/frame_section.h>
 
@@ -77,13 +78,12 @@ public:
 private:
     bool renderCursor(Qt::CursorShape shape, int rotation, QCursor* result)
     {
-        if (!qnPlatform)
-        {
-            NX_ASSERT(false, "Platform instance does not exist, cannot render cursor.");
-            return false;
-        }
+        auto platform = nx::vms::client::desktop::appContext()->platform();
 
-        const auto cursor = qnPlatform->images()->bitmapCursor(shape);
+        if (!NX_ASSERT(platform, "Platform instance does not exist, cannot render cursor."))
+            return false;
+
+        const auto cursor = platform->images()->bitmapCursor(shape);
         if (cursor.shape() != Qt::BitmapCursor)
         {
             // Not supported by the platform images implementation.

@@ -8,6 +8,7 @@
 #include <api/server_rest_connection.h>
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
+#include <client/client_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/motion_window.h>
 #include <core/resource_access/resource_access_filter.h>
@@ -138,7 +139,7 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
     isIoModule(camera && camera->hasFlags(Qn::io_module)),
     motionMetadataProvider(new client::core::ConsumingMotionMetadataProvider()),
     analyticsMetadataProvider(
-        AnalyticsMetadataProviderFactory::instance()->createMetadataProvider(resource)),
+        qnClientModule->analyticsMetadataProviderFactory()->createMetadataProvider(resource)),
     taxonomyManager(SystemContext::fromResource(resource)->taxonomyManager()),
     m_accessController(SystemContext::fromResource(resource)->accessController()),
     m_accessNotifier(m_accessController

@@ -13,14 +13,12 @@
 namespace nx::vms::api { enum class PeerType; }
 namespace nx::vms::license { class VideoWallLicenseUsageHelper; }
 
-namespace nx::vms::client::core::analytics {
-class AnalyticsMetadataProviderFactory;
-class AttributeHelper;
-} // namespace nx::vms::client::core::analytics
-
 namespace nx::vms::client::core {
+
 class AnalyticsSettingsManager;
-class AnalyticsAttributeHelper;
+
+namespace analytics { class AnalyticsMetadataProviderFactory; }
+
 } // namespace nx::vms::client::core
 
 namespace nx::vms::client::desktop {
@@ -47,6 +45,7 @@ public:
 
     QnStartupParameters startupParameters() const;
 
+    core::analytics::AnalyticsMetadataProviderFactory* analyticsMetadataProviderFactory() const;
     core::AnalyticsSettingsManager* analyticsSettingsManager() const;
 
     license::VideoWallLicenseUsageHelper* videoWallLicenseUsageHelper() const;

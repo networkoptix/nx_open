@@ -64,7 +64,7 @@ private:
 
     bool m_updatingSpeedSliderFromNavigator = false;
     bool m_updatingNavigatorFromSpeedSlider = false;
-    QSet<nx::Uuid> m_messages;
+    QPointer<QObject> m_banner;
 };
 
 } // nx::vms::client::desktop::workbench::timeline

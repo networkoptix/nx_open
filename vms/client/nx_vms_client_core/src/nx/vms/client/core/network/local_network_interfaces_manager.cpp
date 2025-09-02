@@ -7,10 +7,6 @@
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QNetworkInterface>
 
-template<>
-nx::vms::client::core::LocalNetworkInterfacesManager*
-    Singleton<nx::vms::client::core::LocalNetworkInterfacesManager>::s_instance = nullptr;
-
 namespace nx::vms::client::core {
 
 struct LocalNetworkInterfacesManager::Private

@@ -2,9 +2,7 @@
 
 #include "integrations.h"
 
-#include <client/client_runtime_settings.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/singleton.h>
 #include <nx/vms/client/desktop/ini.h>
 
 #include "config.h"
@@ -13,24 +11,16 @@
 
 namespace nx::vms::client::desktop::integrations {
 
-namespace {
-
-class Storage final: public QObject, public Singleton<Storage>
+struct Storage::Private
 {
-public:
     // Keeping raw pointers as all integrations are owned by this class.
     QList<Integration*> allIntegrations;
     QList<IServerApiProcessor*> serverApiProcessors;
     QList<IMenuActionFactory*> actionFactories;
     QList<IOverlayPainter*> overlayPainters;
 
-    explicit Storage(QObject* parent):
-        QObject(parent)
-    {}
-
     void addIntegration(Integration* integration)
     {
-        NX_ASSERT(integration->parent() == this);
         allIntegrations.push_back(integration);
         if (const auto serverApiProcessor = dynamic_cast<IServerApiProcessor*>(integration))
             serverApiProcessors.push_back(serverApiProcessor);
@@ -41,73 +31,46 @@ public:
     }
 };
 
-} // namespace
-
-void initialize(QObject* storageParent)
+Storage::Storage(bool desktopMode): d(new Private())
 {
-    NX_ASSERT(!Storage::instance());
-    auto storage = new Storage(storageParent);
-
-    if (qnRuntime->isDesktopMode())
-    {
-        storage->addIntegration(new OverlappedIdIntegration(storage));
-    }
+    if (desktopMode)
+        d->addIntegration(new OverlappedIdIntegration(this));
 }
 
-void connectionEstablished(
+Storage::~Storage()
+{
+}
+
+void Storage::connectionEstablished(
     const QnUserResourcePtr& currentUser,
     ec2::AbstractECConnectionPtr connection)
 {
-    auto storage = Storage::instance();
-    if (!NX_ASSERT(storage))
-        return;
-
-    for (const auto serverApiProcessor: storage->serverApiProcessors)
+    for (const auto serverApiProcessor: d->serverApiProcessors)
         serverApiProcessor->connectionEstablished(currentUser, connection);
 }
 
-void registerActions(menu::MenuFactory* factory)
+void Storage::registerActions(menu::MenuFactory* factory)
 {
-    auto storage = Storage::instance();
-    if (!NX_ASSERT(storage))
-        return;
-
-    for (const auto actionFactory: storage->actionFactories)
+    for (const auto actionFactory: d->actionFactories)
         actionFactory->registerActions(factory);
 }
 
-void registerWidget(QnMediaResourceWidget* widget)
+void Storage::registerWidget(QnMediaResourceWidget* widget)
 {
-    auto storage = Storage::instance();
-    if (!NX_ASSERT(storage))
-        return;
-
-    for (const auto overlayPainter: storage->overlayPainters)
+    for (const auto overlayPainter: d->overlayPainters)
         overlayPainter->registerWidget(widget);
 }
 
-void unregisterWidget(QnMediaResourceWidget* widget)
+void Storage::unregisterWidget(QnMediaResourceWidget* widget)
 {
-    auto storage = Storage::instance();
-    if (!NX_ASSERT(storage))
-        return;
-
-    for (const auto overlayPainter: storage->overlayPainters)
+    for (const auto overlayPainter: d->overlayPainters)
         overlayPainter->unregisterWidget(widget);
 }
 
-void paintVideoOverlays(QnMediaResourceWidget* widget, QPainter* painter)
+void Storage::paintVideoOverlays(QnMediaResourceWidget* widget, QPainter* painter)
 {
-    auto storage = Storage::instance();
-    if (!NX_ASSERT(storage))
-        return;
-
-    for (const auto overlayPainter: storage->overlayPainters)
+    for (const auto overlayPainter: d->overlayPainters)
         overlayPainter->paintVideoOverlay(widget, painter);
 }
 
 } // namespace nx::vms::client::desktop::integrations
-
-template<>
-nx::vms::client::desktop::integrations::Storage*
-    Singleton<nx::vms::client::desktop::integrations::Storage>::s_instance = nullptr;

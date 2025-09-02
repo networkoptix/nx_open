@@ -9,7 +9,9 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/state/startup_parameters.h>
 #include <nx/vms/client/desktop/state/window_geometry_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench_ui.h>
 #include <statistics/statistics_manager.h>
@@ -98,11 +100,10 @@ void ClientStateHandler::setClientProcessExecutionInterface(
 
 void ClientStateHandler::registerDelegate(const QString& id, ClientStateDelegatePtr delegate)
 {
-    if (NX_ASSERT(d->delegates.find(id) == d->delegates.cend(),
-        "Duplicate client state delegate id: \"%1\"", id))
+    if (auto [it, ok] = d->delegates.emplace(id, std::move(delegate));
+        NX_ASSERT(ok, "Duplicate client state delegate id: \"%1\"", id))
     {
-        d->delegates[id] = std::move(delegate);
-        d->delegates[id]->setReportStatisticsFunction(
+        it->second->setReportStatisticsFunction(
             [this](const QString& name, const QString& value)
             {
                 if (d->statisticsModule)
@@ -113,10 +114,11 @@ void ClientStateHandler::registerDelegate(const QString& id, ClientStateDelegate
 
 void ClientStateHandler::unregisterDelegate(const QString& id)
 {
-    if (d->delegates.contains(id))
-        d->delegates[id]->setReportStatisticsFunction({});
-
-    d->delegates.erase(id);
+    if (auto it = d->delegates.find(id); it != d->delegates.end())
+    {
+        it->second->setReportStatisticsFunction({});
+        d->delegates.erase(it);
+    }
 }
 
 void ClientStateHandler::clientStarted(StartupParameters parameters)
@@ -164,8 +166,8 @@ void ClientStateHandler::storeSystemIndependentState()
 
 void ClientStateHandler::connectionToSystemEstablished(
     bool fullRestoreIsEnabled,
-    SessionId sessionId,
-    core::LogonData logonData)
+    const SessionId& sessionId,
+    const core::LogonData& logonData)
 {
     if (!qnRuntime->isDesktopMode())
         return;
@@ -242,7 +244,7 @@ void ClientStateHandler::clientDisconnected()
 }
 
 void ClientStateHandler::createNewWindow(
-    std::optional<core::LogonData> logonData,
+    const std::optional<core::LogonData>& logonData,
     const QStringList& args)
 {
     SessionState state;
@@ -299,7 +301,7 @@ void ClientStateHandler::saveWindowsConfiguration()
     d->sharedMemoryManager->requestToSaveState();
 }
 
-void ClientStateHandler::restoreWindowsConfiguration(core::LogonData logonData)
+void ClientStateHandler::restoreWindowsConfiguration(const core::LogonData& logonData)
 {
     if (!NX_ASSERT(d->sessionId))
         return;

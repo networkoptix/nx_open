@@ -1923,7 +1923,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
     const bool videoFramePresent = result == Qn::NewFrameRendered || result == Qn::OldFrameRendered;
     if (videoFramePresent)
     {
-        integrations::paintVideoOverlays(this, painter);
+        appContext()->integrationStorage()->paintVideoOverlays(this, painter);
     }
     else
     {

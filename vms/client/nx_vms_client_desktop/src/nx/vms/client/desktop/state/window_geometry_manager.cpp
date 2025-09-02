@@ -12,6 +12,7 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/reflect/json.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/state/startup_parameters.h>
 #include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {

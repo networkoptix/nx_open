@@ -75,6 +75,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_state.h>
+#include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -1348,9 +1349,8 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     return supported ? EnabledAction : DisabledAction;
 }
 
-PtzCondition::PtzCondition(Ptz::Capabilities capabilities, bool disableIfPtzDialogVisible):
-    m_capabilities(capabilities),
-    m_disableIfPtzDialogVisible(disableIfPtzDialogVisible)
+PtzCondition::PtzCondition(Ptz::Capabilities capabilities):
+    m_capabilities(capabilities)
 {
 }
 
@@ -1379,10 +1379,6 @@ ActionVisibility PtzCondition::check(
             return InvisibleAction;
     }
 
-    const auto ptzManagementDialog = QnPtzManageDialog::instance();
-    if (m_disableIfPtzDialogVisible && ptzManagementDialog && ptzManagementDialog->isVisible())
-        return DisabledAction;
-
     return EnabledAction;
 }
 
@@ -1402,10 +1398,6 @@ ActionVisibility PtzCondition::check(
         if (mediaWidget->isZoomWindow())
             return InvisibleAction;
     }
-
-    const auto ptzManagementDialog = QnPtzManageDialog::instance();
-    if (m_disableIfPtzDialogVisible && ptzManagementDialog && ptzManagementDialog->isVisible())
-        return DisabledAction;
 
     return EnabledAction;
 }
@@ -2111,6 +2103,16 @@ ConditionWrapper canSavePtzPosition()
                 return widget->item()->dewarpingParams().enabled;
 
             return true;
+        });
+}
+
+ConditionWrapper ptzDialogVisible()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, WindowContext* context)
+        {
+            return context->workbenchContext()
+                ->findInstance<QnWorkbenchPtzDialogWatcher>()->isDialogVisible();
         });
 }
 

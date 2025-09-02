@@ -9,14 +9,13 @@
 
 #include <nx/reflect/enum_string_conversion.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/utils/singleton.h>
 
 namespace nx::vms::client::desktop {
 
  /**
  * Storage of custom debug-level information, which can be used from everywhere in the client code.
  */
-class DebugInfoStorage: public QObject, public Singleton<DebugInfoStorage>
+class DebugInfoStorage: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

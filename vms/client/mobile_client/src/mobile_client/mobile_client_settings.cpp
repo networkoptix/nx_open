@@ -2,12 +2,10 @@
 
 #include "mobile_client_settings.h"
 
-#include <QtCore/QSettings>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QSettings>
 
 #include <nx/reflect/json.h>
-
-template<> QnMobileClientSettings* Singleton<QnMobileClientSettings>::s_instance = nullptr;
 
 QnMobileClientSettings::QnMobileClientSettings(QObject* parent) :
     base_type(parent),

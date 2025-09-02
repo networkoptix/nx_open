@@ -4,26 +4,24 @@
 
 #include <optional>
 
-#include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/network/logon_data.h>
 
 #include "client_process_execution_interface.h"
-#include "session_id.h"
 #include "session_state.h"
-#include "startup_parameters.h"
 
 class QnStatisticsManager;
 class QnSessionRestoreStatisticsModule;
 
-namespace nx::vms::client::core { struct ConnectionInfo; }
+namespace nx::vms::client::core { struct LogonData; }
 
 namespace nx::vms::client::desktop {
 
 class WindowGeometryManager;
 class SharedMemoryManager;
+struct SessionId;
 
 class ClientStateDelegate
 {
@@ -142,8 +140,8 @@ public:
      */
     void connectionToSystemEstablished(
         bool fullRestoreIsEnabled,
-        SessionId sessionId,
-        core::LogonData logonData);
+        const SessionId& sessionId,
+        const core::LogonData& logonData);
 
     /**
      * Clear session state and ID.
@@ -159,7 +157,7 @@ public:
      * may contain only one item with serialized MimeData.
      */
     void createNewWindow(
-        std::optional<core::LogonData> logonData = std::nullopt,
+        const std::optional<core::LogonData>& logonData = std::nullopt,
         const QStringList& args = {});
 
     /**
@@ -173,7 +171,7 @@ public:
      *
      * @param logonData Logon data to run new client instances to connect to the same System.
      */
-    void restoreWindowsConfiguration(core::LogonData logonData);
+    void restoreWindowsConfiguration(const core::LogonData& logonData);
 
     /**
      * Delete window(s) configuration of the current session.

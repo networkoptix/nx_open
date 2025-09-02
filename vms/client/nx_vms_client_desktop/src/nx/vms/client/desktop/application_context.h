@@ -7,14 +7,14 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/application_context.h>
 
-class QOpenGLWidget;
-
+class QnClientCoreModule;
+class QnClientRuntimeSettings;
+class QnForgottenSystemsManager;
+class QnPlatformAbstraction;
 class QnResourceDiscoveryManager;
 class QnResourcePool;
+class QOpenGLWidget;
 
-class QnClientCoreModule;
-class QnForgottenSystemsManager;
-class QnClientRuntimeSettings;
 struct QnStartupParameters;
 
 namespace nx::cloud::gateway { class VmsGatewayEmbeddable; }
@@ -25,7 +25,10 @@ namespace nx::vms::client::desktop {
 
 class ClientStateHandler;
 class ContextStatisticsModule;
+class CustomCursors;
+class DebugInfoStorage;
 class FontConfig;
+class LocalProxyServer;
 class LocalSettings;
 class PerformanceMonitor;
 class RadassController;
@@ -43,6 +46,7 @@ class WebPageDataCache;
 class WindowContext;
 
 namespace joystick { class Manager; }
+namespace integrations { class Storage; }
 
 /**
  * Main context of the desktop client application. Exists through all application lifetime and is
@@ -199,10 +203,16 @@ public:
 
     RunningInstancesManager* runningInstancesManager() const;
 
+    DebugInfoStorage* debugInfoStorage() const;
+
+    integrations::Storage* integrationStorage() const;
+
     /**
      * Monitors system resources usage: CPU, memory, GPU, etc, in its own separate thread.
      */
     PerformanceMonitor* performanceMonitor() const;
+
+    QnPlatformAbstraction* platform() const;
 
     RadassController* radassController() const;
 
@@ -223,7 +233,9 @@ public:
     WebPageDataCache* webPageDataCache() const;
 
     nx::cloud::gateway::VmsGatewayEmbeddable* cloudGateway() const;
+    LocalProxyServer* localProxyServer() const;
 
+    CustomCursors* cursors() const;
     FontConfig* fontConfig() const;
 
     joystick::Manager* joystickManager() const;

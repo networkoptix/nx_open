@@ -40,7 +40,7 @@ QStringList getFormatJWTInfo(const nx::network::jws::Token<nx::cloud::db::api::C
     using namespace std::chrono_literals;
     static const QString kTemplate("&nbsp;&nbsp;%1: %2");
     QStringList result;
-    const auto filter = DebugInfoStorage::instance()->filter();
+    const auto filter = appContext()->debugInfoStorage()->filter();
     if (filter.contains(DebugInfoStorage::Field::all))
         return result;
 
@@ -119,12 +119,12 @@ void processToken(
             elideIfNeeded(displayToken);
         }
 
-        DebugInfoStorage::instance()->setValue(
+        appContext()->debugInfoStorage()->setValue(
             key, prefix + displayToken);
     }
     else
     {
-        DebugInfoStorage::instance()->removeValue(key);
+        appContext()->debugInfoStorage()->removeValue(key);
     }
 }
 
@@ -139,7 +139,7 @@ public:
     {
         using namespace nx::vms::client::core;
 
-        const auto filter = DebugInfoStorage::instance()->filter();
+        const auto filter = appContext()->debugInfoStorage()->filter();
         if (filter.contains(DebugInfoStorage::Field::token))
             return;
 
@@ -181,12 +181,12 @@ UserAuthDebugInfoWatcher::UserAuthDebugInfoWatcher(QObject* parent):
 
             if (!user)
             {
-                DebugInfoStorage::instance()->removeValue(kDigestDebugInfoKey);
-                DebugInfoStorage::instance()->removeValue(kTokenDebugInfoKey);
+                appContext()->debugInfoStorage()->removeValue(kDigestDebugInfoKey);
+                appContext()->debugInfoStorage()->removeValue(kTokenDebugInfoKey);
                 return;
             }
 
-            const auto filter = DebugInfoStorage::instance()->filter();
+            const auto filter = appContext()->debugInfoStorage()->filter();
             if (filter.contains(DebugInfoStorage::Field::digest))
                 return;
 
@@ -194,7 +194,7 @@ UserAuthDebugInfoWatcher::UserAuthDebugInfoWatcher(QObject* parent):
                 [user]()
                 {
                     const QString digestStatus = user->shouldDigestAuthBeUsed() ? "on" : "off";
-                    DebugInfoStorage::instance()->setValue(
+                    appContext()->debugInfoStorage()->setValue(
                         kDigestDebugInfoKey, "Digest: " + digestStatus);
                 };
 
@@ -213,11 +213,11 @@ UserAuthDebugInfoWatcher::UserAuthDebugInfoWatcher(QObject* parent):
         {
             if (status != core::CloudStatusWatcher::Status::Online)
             {
-                DebugInfoStorage::instance()->removeValue(kCloudAccessTokenDebugInfoKey);
+                appContext()->debugInfoStorage()->removeValue(kCloudAccessTokenDebugInfoKey);
                 return;
             }
 
-            const auto filter = DebugInfoStorage::instance()->filter();
+            const auto filter = appContext()->debugInfoStorage()->filter();
             if (filter.contains(DebugInfoStorage::Field::cloud_access_token))
                 return;
 

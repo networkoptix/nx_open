@@ -6,7 +6,6 @@
 #include <QtCore/QSharedPointer>
 
 #include <nx/utils/scoped_connections.h>
-#include <nx/utils/singleton.h>
 
 #include "abstract_system_finder.h"
 #include "system_description_fwd.h"

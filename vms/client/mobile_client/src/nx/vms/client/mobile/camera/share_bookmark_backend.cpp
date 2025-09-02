@@ -20,6 +20,7 @@
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/watchers/feature_access_watcher.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/system_context.h>

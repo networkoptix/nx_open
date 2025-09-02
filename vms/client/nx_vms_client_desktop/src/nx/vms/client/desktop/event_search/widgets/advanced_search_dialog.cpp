@@ -11,7 +11,6 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/log/format.h>
-#include <nx/utils/singleton.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/user_specific_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -26,10 +25,6 @@
 #endif
 
 #include "private/advanced_search_dialog_p.h"
-
-template<>
-nx::vms::client::desktop::AdvancedSearchDialog::StateDelegate*
-    Singleton<nx::vms::client::desktop::AdvancedSearchDialog::StateDelegate>::s_instance = nullptr;
 
 namespace nx::vms::client::desktop {
 
@@ -52,6 +47,10 @@ AdvancedSearchDialog::AdvancedSearchDialog(QObject* parent):
         {}),
     QnSessionAwareDelegate(parent)
 {
+    m_stateDelegate = std::make_shared<StateDelegate>();
+    appContext()->clientStateHandler()->registerDelegate(
+        kAdvancedSearchDialogKey, m_stateDelegate);
+
     rootObjectHolder()->object()->setProperty(
         "windowContext", QVariant::fromValue(windowContext()));
 
@@ -68,7 +67,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QObject* parent):
     const auto saveState =
         [this, quickWindow = QPointer<QQuickWindow>(window())]()
         {
-            const auto state = StateDelegate::instance();
+            const auto state = m_stateDelegate;
             if (!state || !quickWindow)
                 return;
 
@@ -94,7 +93,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QObject* parent):
     const auto restoreState =
         [this]()
         {
-            const auto state = StateDelegate::instance();
+            const auto state = m_stateDelegate;
             if (!state)
                 return;
 
@@ -151,18 +150,12 @@ AdvancedSearchDialog::AdvancedSearchDialog(QObject* parent):
     installEventHandler(window(), QEvent::Hide, this, saveState);
     installEventHandler(window(), QEvent::Show, this, restoreState);
 
-    connect(StateDelegate::instance(), &StateDelegate::aboutToBeSaved, this, saveState);
-    connect(StateDelegate::instance(), &StateDelegate::loaded, this, restoreState);
+    connect(m_stateDelegate.get(), &StateDelegate::aboutToBeSaved, this, saveState);
+    connect(m_stateDelegate.get(), &StateDelegate::loaded, this, restoreState);
     restoreState();
 }
 
-void AdvancedSearchDialog::registerStateDelegate()
-{
-    appContext()->clientStateHandler()->registerDelegate(
-        kAdvancedSearchDialogKey, std::make_unique<StateDelegate>());
-}
-
-void AdvancedSearchDialog::unregisterStateDelegate()
+AdvancedSearchDialog::~AdvancedSearchDialog()
 {
     appContext()->clientStateHandler()->unregisterDelegate(kAdvancedSearchDialogKey);
 }

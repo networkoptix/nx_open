@@ -95,7 +95,7 @@ Q_INVOKABLE QQuickWebEngineProfile* WebEngineProfileManager::getProfile(
     if (parentId.isNull())
         return d->getOrCreateProfile(name, offTheRecord);
 
-    const auto proxyAddress = LocalProxyServer::instance()->address();
+    const auto proxyAddress = appContext()->localProxyServer()->address();
 
     return d->getOrCreateProfile(name + "_" + resourceId,
         offTheRecord,
@@ -104,7 +104,7 @@ Q_INVOKABLE QQuickWebEngineProfile* WebEngineProfileManager::getProfile(
             .setHost(proxyAddress.address)
             .setPort(proxyAddress.port)
             .setUserName(resourceId)
-            .setPassword(QString::fromStdString(LocalProxyServer::instance()->password()))
+            .setPassword(QString::fromStdString(appContext()->localProxyServer()->password()))
             .toUrl() .toQUrl());
 }
 

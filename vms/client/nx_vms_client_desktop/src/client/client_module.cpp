@@ -34,7 +34,6 @@
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
@@ -98,8 +97,6 @@ QnClientModule::QnClientModule(
 
     d->analyticsMetadataProviderFactory.reset(new core::analytics::AnalyticsMetadataProviderFactory());
     d->analyticsMetadataProviderFactory->registerMetadataProviders();
-
-    integrations::initialize(this);
 
     d->licenseHealthWatcher.reset(new LicenseHealthWatcher(
         systemContext->licensePool()));
@@ -209,6 +206,12 @@ QnStartupParameters QnClientModule::startupParameters() const
 nx::vms::license::VideoWallLicenseUsageHelper* QnClientModule::videoWallLicenseUsageHelper() const
 {
     return d->videoWallLicenseUsageHelper.get();
+}
+
+core::analytics::AnalyticsMetadataProviderFactory*
+    QnClientModule::analyticsMetadataProviderFactory() const
+{
+    return d->analyticsMetadataProviderFactory.get();
 }
 
 core::AnalyticsSettingsManager* QnClientModule::analyticsSettingsManager() const

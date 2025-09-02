@@ -408,14 +408,8 @@ void NavigationWidget::updatePlaybackButtonsTooltips()
 
 void NavigationWidget::showMessage(const QString& text)
 {
-    if (!m_messages.isEmpty())
-        return;
-
-    const auto id = SceneBanners::instance()->add(text);
-    m_messages.insert(id);
-
-    connect(SceneBanners::instance(), &SceneBanners::removed, this,
-        [this](const nx::Uuid& id) { m_messages.remove(id); });
+    if (!m_banner)
+        m_banner = SceneBanner::show(text);
 }
 
 void NavigationWidget::at_stepBackwardButton_clicked()

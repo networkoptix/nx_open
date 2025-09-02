@@ -765,11 +765,13 @@ QPixmap TileInteractionHandler::createDragPixmap(const QnResourceList& resources
 
 void TileInteractionHandler::showMessage(const QString& text)
 {
-    const auto id = SceneBanners::instance()->add(text);
-    m_messages.insert(id);
+    if (const auto banner = SceneBanner::show(text))
+    {
+        connect(banner, &QObject::destroyed,
+            [this](QObject* banner) { m_messages.erase(banner); });
 
-    connect(SceneBanners::instance(), &SceneBanners::removed, this,
-        [this](const nx::Uuid& id) { m_messages.remove(id); });
+        m_messages.insert(banner);
+    }
 }
 
 void TileInteractionHandler::showMessageDelayed(const QString& text, milliseconds delay)
@@ -781,11 +783,15 @@ void TileInteractionHandler::showMessageDelayed(const QString& text, millisecond
 
 void TileInteractionHandler::hideMessages()
 {
-    const auto messages = m_messages;
-    for (const auto& id: messages)
-        SceneBanners::instance()->remove(id);
+    for (const auto& message: std::exchange(m_messages, {}))
+    {
+        if (message)
+        {
+            message->disconnect(this);
+            delete message;
+        }
+    }
 
-    m_messages.clear();
     m_pendingMessages.clear();
 }
 

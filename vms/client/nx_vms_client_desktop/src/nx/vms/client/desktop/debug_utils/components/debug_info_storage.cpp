@@ -9,10 +9,6 @@
 #include <nx/reflect/to_string.h>
 #include <nx/vms/client/desktop/ini.h>
 
-template<>
-nx::vms::client::desktop::DebugInfoStorage*
-    Singleton<nx::vms::client::desktop::DebugInfoStorage>::s_instance = nullptr;
-
 namespace nx::vms::client::desktop {
 
 QString toString(DebugInfoStorage::Field field)

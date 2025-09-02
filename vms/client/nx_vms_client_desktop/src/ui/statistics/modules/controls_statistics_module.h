@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <nx/utils/singleton.h>
 #include <statistics/abstract_statistics_module.h>
 
 class QnControlsStatisticsModule : public QnAbstractStatisticsModule

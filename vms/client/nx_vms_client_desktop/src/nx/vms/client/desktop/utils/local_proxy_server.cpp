@@ -17,10 +17,6 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
-template<>
-nx::vms::client::desktop::LocalProxyServer*
-    Singleton<nx::vms::client::desktop::LocalProxyServer>::s_instance = nullptr;
-
 namespace nx::vms::client::desktop {
 
 using namespace nx::network;
@@ -96,7 +92,7 @@ bool VmsServerConnector::auth(const std::string& user, const std::string& passwo
         m_resourceId = resourceId;
     }
 
-    return !m_exitNodeId.isNull() && password == LocalProxyServer::instance()->password();
+    return !m_exitNodeId.isNull() && password == appContext()->localProxyServer()->password();
 }
 
 void VmsServerConnector::connectTo(const SocketAddress& address, DoneCallback onDone)

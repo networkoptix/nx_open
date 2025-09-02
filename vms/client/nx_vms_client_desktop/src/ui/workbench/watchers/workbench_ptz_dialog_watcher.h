@@ -7,13 +7,22 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchItem;
+class QnPtzManageDialog;
 
 class QnWorkbenchPtzDialogWatcher: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
     QnWorkbenchPtzDialogWatcher(QObject* parent = nullptr);
+    virtual ~QnWorkbenchPtzDialogWatcher() override;
+
+    QnPtzManageDialog* dialog();
+
+    bool isDialogVisible() const;
 
 private:
     void closePtzManageDialog(QnWorkbenchItem* item = nullptr);
+
+private:
+    QPointer<QnPtzManageDialog> m_dialog;
 };

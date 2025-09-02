@@ -482,7 +482,7 @@ bool QnSystemHostsModel::isLocalhost(const QString& host, bool forcedConversion)
     if (nx::network::HostAddress(host).isLoopback())
         return true;
 
-    if (forcedConversion && qnLocalNetworkInterfacesManager->containsHost(host))
+    if (forcedConversion && appContext()->localNetworkInterfaceManager()->containsHost(host))
         return true;
 
     return false;

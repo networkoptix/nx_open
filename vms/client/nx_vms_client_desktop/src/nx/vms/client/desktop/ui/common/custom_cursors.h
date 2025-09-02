@@ -5,15 +5,11 @@
 #include <QtCore/QObject>
 #include <QtGui/QCursor>
 
-#include <nx/utils/singleton.h>
-
 namespace nx::vms::client::core { class Skin; }
 
 namespace nx::vms::client::desktop {
 
-class CustomCursors:
-    public QObject,
-    public Singleton<CustomCursors>
+class CustomCursors: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QCursor sizeAll MEMBER sizeAll CONSTANT)
@@ -26,7 +22,7 @@ public:
 public:
     CustomCursors(core::Skin* skin);
 
-    static void registerQmlType();
+    static void registerQmlType(CustomCursors* instance);
 
 private:
     struct Private;

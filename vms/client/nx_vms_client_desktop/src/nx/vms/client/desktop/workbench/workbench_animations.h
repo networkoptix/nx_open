@@ -8,7 +8,6 @@
 #include <QtCore/QObject>
 
 #include <nx/reflect/enum_instrument.h>
-#include <nx/utils/singleton.h>
 
 class VariantAnimator;
 class WidgetAnimator;
@@ -17,7 +16,7 @@ namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
 
-class Animations: public QObject, public Singleton<Animations>
+class Animations: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -89,7 +88,9 @@ public:
     );
 
     Animations(QObject* parent = nullptr);
-    virtual ~Animations();
+    virtual ~Animations() override;
+
+    static Animations* instance();
 
     void setupAnimator(VariantAnimator* animator, Id id);
     void setupAnimator(WidgetAnimator* animator, Id id);

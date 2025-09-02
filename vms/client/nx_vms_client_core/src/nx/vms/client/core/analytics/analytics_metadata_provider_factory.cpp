@@ -4,12 +4,6 @@
 
 #include <nx/vms/client/core/media/consuming_analytics_metadata_provider.h>
 
-#if not (defined(__clang__) && defined(_MSC_VER))
-template<>
-nx::vms::client::core::analytics::AnalyticsMetadataProviderFactory*
-    Singleton<nx::vms::client::core::analytics::AnalyticsMetadataProviderFactory>::s_instance = nullptr;
-#endif
-
 namespace nx::vms::client::core::analytics {
 
 void AnalyticsMetadataProviderFactory::registerMetadataProviders()

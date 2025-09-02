@@ -9,9 +9,6 @@
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/skin/skin.h>
 
-template<> nx::vms::client::desktop::CustomCursors*
-    Singleton<nx::vms::client::desktop::CustomCursors>::s_instance = nullptr;
-
 namespace {
 
 nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kCursorCloseTheme = {
@@ -47,12 +44,12 @@ CustomCursors::CustomCursors(core::Skin* skin)
     staticData().crossCursor = QCursor{skin->icon(kCrossIcon).pixmap(32, 32)};
 }
 
-void CustomCursors::registerQmlType()
+void CustomCursors::registerQmlType(CustomCursors* instance)
 {
     qmlRegisterSingletonType<CustomCursors>("nx.vms.client.desktop", 1, 0, "CustomCursors",
-        [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
+        [instance](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
         {
-            return core::withCppOwnership(instance());
+            return core::withCppOwnership(instance);
         });
 }
 

@@ -448,6 +448,11 @@ FontConfig* ApplicationContext::fontConfig() const
     return d->fontConfig.get();
 }
 
+LocalNetworkInterfacesManager* ApplicationContext::localNetworkInterfaceManager() const
+{
+    return d->localNetworkInterfacesManager.get();
+}
+
 nx::Uuid ApplicationContext::peerId() const
 {
     if (d->mode == Mode::unitTests)

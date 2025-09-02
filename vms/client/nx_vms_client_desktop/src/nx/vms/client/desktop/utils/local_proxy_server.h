@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/network/socks5/server.h>
-#include <nx/utils/singleton.h>
 
 namespace nx::vms::client::desktop {
 
@@ -14,7 +13,7 @@ namespace nx::vms::client::desktop {
  * In order to do so the login for SOCKS5 server should be the uuid string value of C,
  * and the password should be the SOCKS5 server generated password string.
  */
-class LocalProxyServer: public QObject, public Singleton<LocalProxyServer>
+class LocalProxyServer: public QObject
 {
     Q_OBJECT
 

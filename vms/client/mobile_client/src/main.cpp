@@ -365,8 +365,8 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     bool loggingIsInitialized = initializeLogging(startupParams);
     initializeNetworkLogging(); //< Should be initialized before ApplicationContext.
 
-    QnMobileClientSettings settings;
-    const auto applicationContext = std::make_unique<mobile::ApplicationContext>(startupParams);
+    const auto applicationContext = std::make_unique<mobile::ApplicationContext>(
+        startupParams, std::make_unique<QnMobileClientSettings>());
 
     if (!loggingIsInitialized)
     {

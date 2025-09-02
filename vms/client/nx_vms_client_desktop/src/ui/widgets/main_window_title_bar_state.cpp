@@ -10,6 +10,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/state/startup_parameters.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/window_context.h>

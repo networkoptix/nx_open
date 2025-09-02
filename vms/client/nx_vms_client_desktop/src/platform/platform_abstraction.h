@@ -4,16 +4,13 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/singleton.h>
 #include <platform/core_platform_abstraction.h>
 #include <platform/images/platform_images.h>
 #include <platform/shortcuts/platform_shortcuts.h>
 
 #include "notification/platform_notifier.h"
 
-class QnPlatformAbstraction:
-    public QnCorePlatformAbstraction,
-    public Singleton<QnPlatformAbstraction>
+class QnPlatformAbstraction: public QnCorePlatformAbstraction
 {
     Q_OBJECT
     typedef QnCorePlatformAbstraction base_type;
@@ -31,5 +28,3 @@ private:
     QnPlatformImages *m_images = nullptr;
     QnPlatformShortcuts *m_shortcuts = nullptr;
 };
-
-#define qnPlatform QnPlatformAbstraction::instance()

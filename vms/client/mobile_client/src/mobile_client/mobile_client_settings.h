@@ -2,21 +2,15 @@
 
 #pragma once
 
-#include <QtCore/QHash>
 #include <QtCore/QSize>
 
-#include <client_core/local_connection_data.h>
 #include <mobile_client/mobile_client_startup_parameters.h>
-#include <nx/utils/log/log_level.h>
-#include <nx/utils/singleton.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/maintenance/remote_log_session_data.h>
 #include <nx/vms/client/mobile/push_notification/details/push_notification_structures.h>
 #include <utils/common/property_storage.h>
 
-using nx::vms::client::core::ServerTimeWatcher;
-
-class QnMobileClientSettings : public QnPropertyStorage, public Singleton<QnMobileClientSettings>
+class QnMobileClientSettings : public QnPropertyStorage
 {
     Q_OBJECT
     using base_type = QnPropertyStorage;
@@ -173,4 +167,4 @@ private:
     bool m_loading;
 };
 
-#define qnSettings (QnMobileClientSettings::instance())
+#define qnSettings (nx::vms::client::mobile::appContext()->clientSettings())

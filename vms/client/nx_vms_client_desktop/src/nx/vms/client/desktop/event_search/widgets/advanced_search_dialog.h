@@ -16,16 +16,17 @@ class AdvancedSearchDialog:
 {
 public:
     AdvancedSearchDialog(QObject* parent = nullptr);
-
-    static void registerStateDelegate();
-    static void unregisterStateDelegate();
-
-    class StateDelegate;
+    virtual ~AdvancedSearchDialog() override;
 
     virtual bool tryClose(bool force) override;
 
 private:
     QScreen* defaultScreen() const;
+
+private:
+    class StateDelegate;
+
+    std::shared_ptr<StateDelegate> m_stateDelegate;
 };
 
 } // namespace nx::vms::client::desktop

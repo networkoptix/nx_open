@@ -4,6 +4,7 @@
 #include "ui_videowall_settings_dialog.h"
 
 #include <core/resource/videowall_resource.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/videowall/workbench_videowall_shortcut_helper.h>
 #include <platform/platform_abstraction.h>
 
@@ -23,7 +24,8 @@ void QnVideowallSettingsDialog::loadFromResource(const QnVideoWallResourcePtr& v
     ui->autoRunCheckBox->setChecked(videowall->isAutorun());
     ui->enableTimelineCheckBox->setChecked(videowall->isTimelineEnabled());
 
-    bool shortcutsSupported = qnPlatform->shortcuts()->supported();
+    bool shortcutsSupported =
+        nx::vms::client::desktop::appContext()->platform()->shortcuts()->supported();
     ui->shortcutCheckbox->setVisible(shortcutsSupported);
 
     if (!shortcutsSupported)
@@ -40,7 +42,7 @@ void QnVideowallSettingsDialog::submitToResource(const QnVideoWallResourcePtr& v
     videowall->setAutorun(ui->autoRunCheckBox->isChecked());
     videowall->setTimelineEnabled(ui->enableTimelineCheckBox->isChecked());
 
-    if (!qnPlatform->shortcuts()->supported())
+    if (!nx::vms::client::desktop::appContext()->platform()->shortcuts()->supported())
         return;
 
     VideoWallShortcutHelper videoWallShortcutHelper;

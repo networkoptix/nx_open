@@ -2,14 +2,9 @@
 
 #include "workbench_animations.h"
 
+#include <nx/utils/log/assert.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/widget_animator.h>
-
-#include <nx/utils/log/assert.h>
-
-template<>
-nx::vms::client::desktop::ui::workbench::Animations*
-    Singleton<nx::vms::client::desktop::ui::workbench::Animations>::s_instance = nullptr;
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -18,6 +13,8 @@ namespace workbench {
 namespace {
 
 static const qreal kDefaultSpeed = 0.01;
+
+Animations* g_instance = nullptr;
 
 int idx(Animations::Id id)
 {
@@ -29,6 +26,9 @@ int idx(Animations::Id id)
 Animations::Animations(QObject* parent):
     base_type(parent)
 {
+    if (NX_ASSERT(!g_instance, "Singleton is created more than once"))
+        g_instance = this;
+
     auto setup =
         [this](Id id, QEasingCurve::Type easing, int timeLimit)
         {
@@ -77,6 +77,13 @@ Animations::Animations(QObject* parent):
 
 Animations::~Animations()
 {
+    if (NX_ASSERT(g_instance == this))
+        g_instance = nullptr;
+}
+
+Animations* Animations::instance()
+{
+    return g_instance;
 }
 
 void Animations::setupAnimator(VariantAnimator* animator, Id id)

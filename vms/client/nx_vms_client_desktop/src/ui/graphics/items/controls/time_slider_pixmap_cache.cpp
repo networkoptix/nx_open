@@ -10,6 +10,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <platform/platform_abstraction.h>
 #include <ui/common/text_pixmap_cache.h>
 
@@ -32,7 +33,8 @@ QnTimeSliderPixmapCache::QnTimeSliderPixmapCache(int numLevels, QObject *parent)
     for (auto& newCache : m_pixmapByShortPositionKey)
         newCache = new ShortKeyCache(64 * 1024 * 1024);
 
-    connect(qnPlatform->notifier(), &QnPlatformNotifier::timeZoneChanged,
+    connect(nx::vms::client::desktop::appContext()->platform()->notifier(),
+        &QnPlatformNotifier::timeZoneChanged,
         this, &QnTimeSliderPixmapCache::clear);
 }
 

@@ -6,8 +6,6 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtQuick/QQuickWindow>
 
-template<> QnTextureSizeHelper* Singleton<QnTextureSizeHelper>::s_instance = nullptr;
-
 QnTextureSizeHelper::QnTextureSizeHelper(QQuickWindow *window, QObject *parent)
 :
     QObject(parent),

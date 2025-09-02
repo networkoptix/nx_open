@@ -39,10 +39,10 @@ namespace nx::vms::client::mobile {
 
 namespace {
 
-core::ApplicationContext::Features makeFeatures()
+core::ApplicationContext::Features makeFeatures(QnMobileClientSettings* settings)
 {
     auto result = core::ApplicationContext::Features::all();
-    result.ignoreCustomization = qnSettings->ignoreCustomization();
+    result.ignoreCustomization = settings->ignoreCustomization();
     return result;
 }
 
@@ -52,6 +52,7 @@ struct ApplicationContext::Private
 {
     ApplicationContext* const q;
     const nx::Uuid peerId = nx::Uuid::createUuid();
+    std::unique_ptr<QnMobileClientSettings> settings;
     std::unique_ptr<QnMobileClientResourceFactory> resourceFactory =
         std::make_unique<QnMobileClientResourceFactory>();
     std::unique_ptr<nx::client::mobile::QmlSettingsAdaptor> settingsAdaptor;
@@ -217,17 +218,19 @@ void ApplicationContext::Private::initOsSpecificStuff()
 
 ApplicationContext::ApplicationContext(
     const QnMobileClientStartupParameters& startupParams,
+    std::unique_ptr<QnMobileClientSettings> settings,
     QObject* parent)
     :
     base_type(Mode::mobileClient,
         Qn::SerializationFormat::json,
         api::PeerType::mobileClient,
-        makeFeatures(),
-        qnSettings->customCloudHost(),
+        makeFeatures(settings.get()),
+        settings->customCloudHost(),
         /*customExternalResourceFile*/ "mobile_client_external.dat",
         parent),
     d(new Private{
         .q = this,
+        .settings = std::move(settings),
         .credentialsHelper = std::make_unique<detail::CredentialsHelper>()})
 {
     initializeNetworkModules(qnSettings->enableHolePunching());
@@ -320,9 +323,19 @@ PushNotificationManager* ApplicationContext::pushManager() const
     return d->pushManager.get();
 }
 
+QnResourceFactory* ApplicationContext::resourceFactory() const
+{
+    return d->resourceFactory.get();
+}
+
 detail::CredentialsHelper* ApplicationContext::credentialsHelper() const
 {
     return d->credentialsHelper.get();
+}
+
+QnMobileClientSettings* ApplicationContext::clientSettings() const
+{
+    return d->settings.get();
 }
 
 nx::client::mobile::QmlSettingsAdaptor* ApplicationContext::settings() const

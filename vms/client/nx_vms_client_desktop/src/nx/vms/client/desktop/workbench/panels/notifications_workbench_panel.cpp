@@ -183,13 +183,10 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
 
     updateControlsGeometry();
-
-    AdvancedSearchDialog::registerStateDelegate();
 }
 
 NotificationsWorkbenchPanel::~NotificationsWorkbenchPanel()
 {
-    AdvancedSearchDialog::unregisterStateDelegate();
 }
 
 void NotificationsWorkbenchPanel::setX(qreal x)

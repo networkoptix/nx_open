@@ -12,8 +12,8 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/app_icons.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <platform/platform_abstraction.h>
@@ -60,7 +60,8 @@ bool VideoWallShortcutHelper::shortcutExists(const QnVideoWallResourcePtr& video
     if (destinationPath.isEmpty())
         return false;
 
-    return qnPlatform->shortcuts()->shortcutExists(destinationPath, videowall->getName());
+    return appContext()->platform()->shortcuts()->shortcutExists(
+        destinationPath, videowall->getName());
 }
 
 bool VideoWallShortcutHelper::createShortcut(const QnVideoWallResourcePtr& videowall) const
@@ -89,7 +90,7 @@ bool VideoWallShortcutHelper::createShortcut(const QnVideoWallResourcePtr& video
     arguments << "--auth";
     arguments << QString::fromUtf8(serverUrl.toEncoded());
 
-    return qnPlatform->shortcuts()->createShortcut(
+    return appContext()->platform()->shortcuts()->createShortcut(
         appPath,
         destinationPath,
         videowall->getName(),
@@ -103,7 +104,8 @@ bool VideoWallShortcutHelper::deleteShortcut(const QnVideoWallResourcePtr& video
     if (destinationPath.isEmpty())
         return true;
 
-    return qnPlatform->shortcuts()->deleteShortcut(destinationPath, videowall->getName());
+    return appContext()->platform()->shortcuts()->deleteShortcut(
+        destinationPath, videowall->getName());
 }
 
 void VideoWallShortcutHelper::setVideoWallAutorunEnabled(

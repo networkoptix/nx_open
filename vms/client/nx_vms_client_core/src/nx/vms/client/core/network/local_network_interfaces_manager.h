@@ -5,11 +5,10 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/utils/singleton.h>
 
 namespace nx::vms::client::core {
 
-class LocalNetworkInterfacesManager: public QObject, public Singleton<LocalNetworkInterfacesManager>
+class LocalNetworkInterfacesManager: public QObject
 {
     Q_OBJECT
     typedef QObject base_type;
@@ -26,5 +25,3 @@ private:
 };
 
 } // namespace nx::vms::client::core
-
-#define qnLocalNetworkInterfacesManager nx::vms::client::core::LocalNetworkInterfacesManager::instance()

@@ -4,9 +4,9 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/mobile_client_resource_factory.h>
-#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/mobile/application_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 
 void QnMobileClientMessageProcessor::updateResource(
@@ -22,7 +22,7 @@ void QnMobileClientMessageProcessor::updateResource(
 
 QnResourceFactory* QnMobileClientMessageProcessor::getResourceFactory() const
 {
-    return QnMobileClientResourceFactory::instance();
+    return nx::vms::client::mobile::appContext()->resourceFactory();
 }
 
 void QnMobileClientMessageProcessor::updateMainServerApiUrl(const QnMediaServerResourcePtr& server)

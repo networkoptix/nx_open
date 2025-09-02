@@ -19,9 +19,28 @@ QnWorkbenchPtzDialogWatcher::QnWorkbenchPtzDialogWatcher(QObject *parent):
         &QnWorkbenchPtzDialogWatcher::closePtzManageDialog);
 }
 
+QnWorkbenchPtzDialogWatcher::~QnWorkbenchPtzDialogWatcher()
+{
+    if (m_dialog)
+        delete m_dialog;
+}
+
+QnPtzManageDialog* QnWorkbenchPtzDialogWatcher::dialog()
+{
+    if (!m_dialog)
+        m_dialog = new QnPtzManageDialog(mainWindowWidget());
+
+    return m_dialog.get();
+}
+
+bool QnWorkbenchPtzDialogWatcher::isDialogVisible() const
+{
+    return m_dialog && m_dialog->isVisible();
+}
+
 void QnWorkbenchPtzDialogWatcher::closePtzManageDialog(QnWorkbenchItem* item)
 {
-    auto dialog = QnPtzManageDialog::instance();
+    auto dialog = m_dialog.get();
     if (!dialog || !dialog->isVisible() || dialog->widget().isNull())
         return;
 

@@ -6,6 +6,7 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QTimer>
 #include <QtGui/QGuiApplication>
 
 #include <client/client_message_processor.h>
@@ -33,10 +34,10 @@
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
-#include <nx/vms/client/mobile/system_context.h>
-#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/push_notification/details/push_ipc_data.h>
+#include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/delayed.h>
 

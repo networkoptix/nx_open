@@ -40,8 +40,6 @@
 
 #include <nx/utils/log/assert.h>
 
-template<> QnPlatformAbstraction* Singleton<QnPlatformAbstraction>::s_instance = nullptr;
-
 QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
     base_type(parent)
 {

@@ -7,10 +7,14 @@
 
 #include <utils/common/delayed.h>
 
-template<> nx::vms::client::desktop::SceneBanners*
-    Singleton<nx::vms::client::desktop::SceneBanners>::s_instance = nullptr;
-
 namespace nx::vms::client::desktop {
+
+namespace {
+
+SceneBanners* g_instance = nullptr;
+
+} // namespace
+
 
 using namespace std::chrono;
 using namespace nx::vms::client::core;
@@ -22,6 +26,9 @@ SceneBanners::SceneBanners(QWidget* parentWidget):
     QObject(parentWidget),
     d(new Private(this, parentWidget))
 {
+    if (NX_ASSERT(!g_instance, "Singleton is created more than once"))
+        g_instance = this;
+
     installEventHandler(d->container, QEvent::Resize, this,
         [this]()
         {
@@ -37,7 +44,15 @@ SceneBanners::SceneBanners(QWidget* parentWidget):
 
 SceneBanners::~SceneBanners()
 {
+    if (NX_ASSERT(g_instance == this))
+        g_instance = nullptr;
+
     delete d->container; //< It may be already deleted.
+}
+
+SceneBanners* SceneBanners::instance()
+{
+    return g_instance;
 }
 
 nx::Uuid SceneBanners::add(const QString& text,
@@ -73,7 +88,9 @@ SceneBanner::SceneBanner(const nx::Uuid& id, QObject* parent):
     QObject(parent),
     m_id(id)
 {
-    connect(SceneBanners::instance(), &SceneBanners::removed, this,
+    NX_CRITICAL(!m_id.isNull());
+
+    connect(banners(), &SceneBanners::removed, this,
         [this](const nx::Uuid& removedId)
         {
             if (m_id != removedId)
@@ -84,10 +101,15 @@ SceneBanner::SceneBanner(const nx::Uuid& id, QObject* parent):
         });
 }
 
+SceneBanners* SceneBanner::banners() const
+{
+    return static_cast<SceneBanners*>(parent());
+}
+
 SceneBanner::~SceneBanner()
 {
     // We can get here in the QObject destructor of the SceneBanners object, on children deletion.
-    if (auto sceneBanners = SceneBanners::instance())
+    if (auto sceneBanners = banners())
     {
         sceneBanners->disconnect(this);
 
@@ -100,18 +122,20 @@ SceneBanner* SceneBanner::show(const QString& text,
     std::optional<std::chrono::milliseconds> timeout,
     std::optional<QFont> font)
 {
-    const auto id = SceneBanners::instance()->add(text, timeout, font);
-    return new SceneBanner(id, SceneBanners::instance());
+    if (auto id = SceneBanners::instance()->add(text, timeout, font); !id.isNull())
+        return new SceneBanner(id, SceneBanners::instance());
+
+    return nullptr;
 }
 
 bool SceneBanner::hide(bool immediately)
 {
-    return SceneBanners::instance()->remove(m_id, immediately);
+    return banners()->remove(m_id, immediately);
 }
 
 bool SceneBanner::changeText(const QString& value)
 {
-    return SceneBanners::instance()->changeText(m_id, value);
+    return banners()->changeText(m_id, value);
 }
 
 } // namespace nx::vms::client::desktop

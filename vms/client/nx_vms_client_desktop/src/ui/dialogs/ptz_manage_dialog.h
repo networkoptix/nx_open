@@ -1,11 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef PTZ_TOURS_DIALOG_H
-#define PTZ_TOURS_DIALOG_H
+#pragma once
 
 #include <core/ptz/ptz_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/utils/singleton.h>
 #include <ui/dialogs/abstract_ptz_dialog.h>
 #include <ui/models/ptz_manage_model.h>
 
@@ -25,14 +23,14 @@ class QnHotkeysResourcePropertyAdaptor;
 class QnAbstractPtzHotkeyDelegate;
 class QnMediaResourceWidget;
 
-// TODO: #sivanov Remove singleton.
-class QnPtzManageDialog : public QnAbstractPtzDialog, public Singleton<QnPtzManageDialog> {
+class QnPtzManageDialog : public QnAbstractPtzDialog
+{
     Q_OBJECT
     typedef QnAbstractPtzDialog base_type;
 
 public:
     explicit QnPtzManageDialog(QWidget *parent = 0);
-    ~QnPtzManageDialog();
+    virtual ~QnPtzManageDialog() override;
 
     QPointer<QnMediaResourceWidget> widget() const;
     void setWidget(QnMediaResourceWidget* widget);
@@ -109,5 +107,3 @@ private:
     QString m_currentTourId;
     bool m_submitting;
 };
-
-#endif // PTZ_TOURS_DIALOG_H

@@ -835,7 +835,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
 
                 NX_ASSERT(qnRuntime->isVideoWallMode() || system()->user());
 
-                integrations::connectionEstablished(
+                appContext()->integrationStorage()->connectionEstablished(
                     system()->user(),
                     system()->messageBusConnection());
 

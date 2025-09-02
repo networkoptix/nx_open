@@ -28,6 +28,7 @@ class CloudServiceChecker;
 class CloudLayoutsManager;
 class CloudStatusWatcher;
 class FontConfig;
+class LocalNetworkInterfacesManager;
 class NetworkModule;
 class Skin;
 class Settings;
@@ -188,6 +189,8 @@ public:
     QnResourcePool* cloudLayoutsPool() const;
 
     FontConfig* fontConfig() const;
+
+    LocalNetworkInterfacesManager* localNetworkInterfaceManager() const;
 
     virtual nx::Uuid peerId() const;
 

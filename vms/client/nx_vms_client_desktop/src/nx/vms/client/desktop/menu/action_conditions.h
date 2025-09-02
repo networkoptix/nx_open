@@ -417,7 +417,7 @@ public:
 class PtzCondition: public Condition
 {
 public:
-    PtzCondition(Ptz::Capabilities capabilities, bool disableIfPtzDialogVisible);
+    PtzCondition(Ptz::Capabilities capabilities);
     virtual ActionVisibility check(const Parameters& parameters, WindowContext* context) override;
     virtual ActionVisibility check(const QnResourceList& resources, WindowContext* context) override;
     virtual ActionVisibility check(const QnResourceWidgetList& widgets, WindowContext* context) override;
@@ -427,7 +427,6 @@ private:
 
 private:
     Ptz::Capabilities m_capabilities;
-    bool m_disableIfPtzDialogVisible;
 };
 
 class NonEmptyVideowallCondition: public Condition
@@ -661,6 +660,8 @@ ConditionWrapper isShowreelReviewMode();
 
 /** Check that fisheye cameras can save position only when dewarping is enabled. */
 ConditionWrapper canSavePtzPosition();
+
+ConditionWrapper ptzDialogVisible();
 
 ConditionWrapper hasTimePeriod();
 

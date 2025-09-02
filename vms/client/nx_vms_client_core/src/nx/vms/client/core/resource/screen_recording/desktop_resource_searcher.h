@@ -3,7 +3,6 @@
 #pragma once
 
 #include <core/resource_management/resource_searcher.h>
-#include <nx/utils/singleton.h>
 
 struct QnAbstractDesktopResourceSearcherImpl;
 

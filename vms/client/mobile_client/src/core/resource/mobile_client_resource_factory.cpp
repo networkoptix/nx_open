@@ -10,9 +10,6 @@
 
 #include "mobile_client_camera.h"
 
-template<>
-QnMobileClientResourceFactory* Singleton<QnMobileClientResourceFactory>::s_instance = nullptr;
-
 QnResourcePtr QnMobileClientResourceFactory::createResource(
     const nx::Uuid &resourceTypeId,
     const QnResourceParams &)

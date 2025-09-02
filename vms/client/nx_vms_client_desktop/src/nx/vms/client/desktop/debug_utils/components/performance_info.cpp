@@ -72,7 +72,7 @@ PerformanceInfo::PerformanceInfo(QObject* parent):
     base_type(parent),
     d(new Private())
 {
-    const auto filter = DebugInfoStorage::instance()->filter();
+    const auto filter = appContext()->debugInfoStorage()->filter();
     if (filter.contains(DebugInfoStorage::Field::all))
         return;
 
@@ -124,7 +124,7 @@ void PerformanceInfo::setPerformanceValues(const QVariantMap& values)
 
     QStringList counters;
 
-    const auto filter = DebugInfoStorage::instance()->filter();
+    const auto filter = appContext()->debugInfoStorage()->filter();
     // Show main values.
     if (!filter.contains(DebugInfoStorage::Field::fps))
     {
@@ -163,7 +163,7 @@ void PerformanceInfo::setPerformanceValues(const QVariantMap& values)
         counters << QString("%1: %2").arg(i.key()).arg(i.value().toString());
 
     if (appContext()->performanceMonitor()->isDebugInfoVisible())
-        counters << DebugInfoStorage::instance()->debugInfo();
+        counters << appContext()->debugInfoStorage()->debugInfo();
 
     auto metrics = appContext()->metrics();
     qint64 requestsCount = metrics->totalServerRequests();

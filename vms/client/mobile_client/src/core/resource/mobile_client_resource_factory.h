@@ -4,13 +4,11 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/singleton.h>
 #include <nx/vms/client/core/resource/resource_factory.h>
 
 class QnMobileClientResourceFactory:
     public QObject,
-    public nx::vms::client::core::ResourceFactory,
-    public Singleton<QnMobileClientResourceFactory>
+    public nx::vms::client::core::ResourceFactory
 {
     Q_OBJECT
 public:

@@ -10,6 +10,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scoped_change_notifier.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 
@@ -230,8 +231,8 @@ bool SingleSystemDescription::hasLocalServer() const
             const auto host = getServerHost(moduleInformation.id).host();
             return !nx::network::SocketGlobals::addressResolver().isCloudHostname(host)
                 && (nx::network::HostAddress(host).isLoopback()
-                    || (NX_ASSERT(qnLocalNetworkInterfacesManager)
-                        && qnLocalNetworkInterfacesManager->containsHost(host)));
+                    || (NX_ASSERT(appContext()->localNetworkInterfaceManager())
+                        && appContext()->localNetworkInterfaceManager()->containsHost(host)));
         });
 }
 

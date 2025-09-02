@@ -37,8 +37,8 @@
 #include <QtQuickControls2/QQuickStyle>
 #include <QtWidgets/QApplication>
 #if QT_CONFIG(vulkan)
-#include <QtGui/QVulkanInstance>
-#include <QtGui/private/qvulkandefaultinstance_p.h>
+    #include <QtGui/QVulkanInstance>
+    #include <QtGui/private/qvulkandefaultinstance_p.h>
 #endif
 
 #include <client/client_module.h>
@@ -66,6 +66,7 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/state/startup_parameters.h>
 #include <nx/vms/client/desktop/state/window_controller.h>
 #include <nx/vms/client/desktop/state/window_geometry_manager.h>
 #include <nx/vms/client/desktop/system_context.h>

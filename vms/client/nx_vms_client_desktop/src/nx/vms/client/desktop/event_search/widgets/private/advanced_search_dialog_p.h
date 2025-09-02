@@ -6,7 +6,6 @@
 
 #include <QtCore/QSize>
 
-#include <nx/utils/singleton.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 
 #include "../advanced_search_dialog.h"
@@ -15,8 +14,7 @@ namespace nx::vms::client::desktop {
 
 class AdvancedSearchDialog::StateDelegate:
     public QObject,
-    public ClientStateDelegate,
-    public Singleton<StateDelegate>
+    public ClientStateDelegate
 {
     Q_OBJECT
 

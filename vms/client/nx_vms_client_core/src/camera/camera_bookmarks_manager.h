@@ -7,7 +7,6 @@
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/utils/singleton.h>
 #include <nx/vms/event/event_fwd.h>
 
 namespace nx::vms::client::core { class SystemContext; }

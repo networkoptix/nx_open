@@ -8,8 +8,6 @@
 #include <QtGui/QMatrix4x4>
 #include <QtGui/QOpenGLFunctions>
 
-#include <nx/utils/singleton.h>
-
 class QOpenGLWidget;
 class QOpenGLVertexArrayObject;
 

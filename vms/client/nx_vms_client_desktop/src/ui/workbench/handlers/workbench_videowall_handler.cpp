@@ -1762,7 +1762,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallAction_triggered()
             // Cleanup registry for the local pc. Remote PCs will cleanup autorun on first run.
             videoWallShortcutHelper.setVideoWallAutorunEnabled(videoWall->getId(), false);
 
-            if (qnPlatform->shortcuts()->supported()
+            if (appContext()->platform()->shortcuts()->supported()
                 && videoWallShortcutHelper.shortcutExists(videoWall))
             {
                 videoWallShortcutHelper.deleteShortcut(videoWall);

@@ -2,14 +2,12 @@
 
 #pragma once
 
-#include <nx/utils/singleton.h>
 #include <nx/vms/client/core/media/analytics_metadata_provider_factory.h>
 
 namespace nx::vms::client::core::analytics {
 
 class NX_VMS_CLIENT_CORE_API AnalyticsMetadataProviderFactory:
-    public core::AnalyticsMetadataProviderFactory,
-    public Singleton<AnalyticsMetadataProviderFactory>
+    public core::AnalyticsMetadataProviderFactory
 {
 public:
     void registerMetadataProviders();

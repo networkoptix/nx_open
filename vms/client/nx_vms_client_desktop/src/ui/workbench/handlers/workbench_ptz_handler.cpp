@@ -24,6 +24,7 @@
 #include <ui/dialogs/ptz_manage_dialog.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -333,7 +334,6 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
 
 QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler()
 {
-    delete QnPtzManageDialog::instance();
 }
 
 void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
@@ -475,10 +475,7 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
     if (!widget || !widget->ptzController())
         return;
 
-    QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
-    if (!dialog)
-        dialog = new QnPtzManageDialog(mainWindowWidget());
-
+    auto dialog = workbenchContext()->findInstance<QnWorkbenchPtzDialogWatcher>()->dialog();
     if (dialog->isVisible() && !dialog->tryClose(false))
         return;
 

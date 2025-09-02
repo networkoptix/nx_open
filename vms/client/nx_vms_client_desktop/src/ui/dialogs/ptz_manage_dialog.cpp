@@ -102,8 +102,6 @@ private:
     QnPtzPresetHotkeyItemDelegate hotkeyDelegate;
 };
 
-template<> QnPtzManageDialog* Singleton<QnPtzManageDialog>::s_instance = nullptr;
-
 QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::PtzManageDialog),

@@ -220,8 +220,8 @@ SystemContext::SystemContext(WindowContext* context,
         [this]()
         {
             serverTimeWatcher()->setTimeMode(qnSettings->serverTimeMode()
-                ? ServerTimeWatcher::serverTimeMode
-                : ServerTimeWatcher::clientTimeMode);
+                ? core::ServerTimeWatcher::serverTimeMode
+                : core::ServerTimeWatcher::clientTimeMode);
         };
     const auto notifier = qnSettings->notifier(QnMobileClientSettings::ServerTimeMode);
     connect(notifier, &QnPropertyNotifier::valueChanged, this, updateTimeMode);

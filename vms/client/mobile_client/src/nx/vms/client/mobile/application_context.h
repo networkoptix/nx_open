@@ -11,6 +11,8 @@ Q_MOC_INCLUDE("utils/mobile_app_info.h")
 
 class QnCameraThumbnailProvider;
 class QnMobileAppInfo;
+class QnMobileClientSettings;
+class QnResourceFactory;
 struct QnMobileClientStartupParameters;
 
 namespace nx::client::mobile { class QmlSettingsAdaptor; }
@@ -45,7 +47,9 @@ class ApplicationContext: public core::ApplicationContext
         CONSTANT)
 
 public:
-    ApplicationContext(const QnMobileClientStartupParameters& startupParams,
+    ApplicationContext(
+        const QnMobileClientStartupParameters& startupParams,
+        std::unique_ptr<QnMobileClientSettings> settings,
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 
@@ -64,8 +68,11 @@ public:
 
     PushNotificationManager* pushManager() const;
 
+    QnResourceFactory* resourceFactory() const;
+
     detail::CredentialsHelper* credentialsHelper() const;
 
+    QnMobileClientSettings* clientSettings() const;
     nx::client::mobile::QmlSettingsAdaptor* settings() const;
 
     QnCameraThumbnailProvider* cameraThumbnailProvider() const;

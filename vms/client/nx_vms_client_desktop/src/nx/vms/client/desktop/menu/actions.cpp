@@ -11,6 +11,7 @@
 #include <nx/build_info.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/radass/radass_action_factory.h>
@@ -294,12 +295,12 @@ void initialize(Manager* manager, Action* root)
     factory(PtzActivatePresetAction)
         .flags(SingleTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Ptz::Capability::presets, false));
+        .condition(new PtzCondition(Ptz::Capability::presets));
 
     factory(PtzActivateTourAction)
         .flags(SingleTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Ptz::Capability::tours, false));
+        .condition(new PtzCondition(Ptz::Capability::tours));
 
     factory(PtzActivateObjectAction)
         .flags(SingleTarget | WidgetTarget)
@@ -1427,7 +1428,7 @@ void initialize(Manager* manager, Action* root)
         .childFactory(new PtzPresetsToursFactory(manager))
         .text(ContextMenu::tr("PTZ"))
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Ptz::Capability::presets, false));
+        .condition(new PtzCondition(Ptz::Capability::presets));
 
     factory.beginSubMenu();
     {
@@ -1436,15 +1437,15 @@ void initialize(Manager* manager, Action* root)
             .flags(Scene | SingleTarget)
             .text(ContextMenu::tr("Save Current Position..."))
             .requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission)
-            .condition(ConditionWrapper(new PtzCondition(Ptz::Capability::presets, true))
-                && condition::canSavePtzPosition());
+            .condition(ConditionWrapper(new PtzCondition(Ptz::Capability::presets))
+                && condition::canSavePtzPosition() && !condition::ptzDialogVisible());
 
         factory(PtzManageAction)
             .mode(DesktopMode)
             .flags(Scene | SingleTarget)
             .text(ContextMenu::tr("Manage..."))
             .requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission)
-            .condition(ConditionWrapper(new PtzCondition(Ptz::Capability::tours, false))
+            .condition(ConditionWrapper(new PtzCondition(Ptz::Capability::tours))
                 && !condition::showreelIsRunning());
 
     } factory.endSubMenu();
@@ -2335,7 +2336,7 @@ void initialize(Manager* manager, Action* root)
     factory(PtzFocusAutoAction)
         .flags(NoTarget);
 
-    integrations::registerActions(&factory);
+    appContext()->integrationStorage()->registerActions(&factory);
 
     factory(ExportFinishedEvent)
         .flags(NoTarget);
