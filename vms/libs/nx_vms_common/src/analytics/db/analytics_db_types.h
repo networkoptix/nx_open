@@ -250,8 +250,10 @@ struct NX_VMS_COMMON_API Filter
     /** Method to search tracks: by attributes, text vector or both of them. */
     TextScope textScope{TextScope::attributes};
 
-    /** Used together with textScope::image. Used for cloud analytics data only */
-    nx::Uuid referenceBestShotId;
+    /** Used for cloud analytics data only.
+     * If not nullopt, only cloud tracks will be requested.
+     */
+    std::optional<nx::Uuid> referenceBestShotId;
 
     // TODO: #akolesnikov Move result options to a separate struct.
 

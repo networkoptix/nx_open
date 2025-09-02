@@ -325,8 +325,8 @@ void serializeToParams(const Filter& filter, nx::network::rest::Params* params)
         params->insert("textScope", nx::reflect::toString(filter.textScope));
     }
 
-    if (!filter.referenceBestShotId.isNull())
-        params->insert("referenceBestShotId", filter.referenceBestShotId.toSimpleString());
+    if (filter.referenceBestShotId)
+        params->insert("referenceBestShotId", filter.referenceBestShotId->toSimpleString());
 
     if (!filter.analyticsEngineId.isNull())
         params->insert("analyticsEngineId", filter.analyticsEngineId.toSimpleString());

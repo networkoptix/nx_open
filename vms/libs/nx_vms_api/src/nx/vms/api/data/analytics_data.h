@@ -513,12 +513,18 @@ NX_REFLECTION_INSTRUMENT(ObjectTrackFilterFreeText, ObjectTrackFilterFreeText_Fi
 
 struct ObjectTrackFilter: IdData, ObjectTrackFilterFreeText
 {
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(TextScope,
+        attributes,
+        vector,
+        both
+    );
+
     /**%apidoc[opt]:stringArray
      * If present, only Object Tracks originating from the specified Device(s) will be considered
      * for search. Device id (can be obtained from "id", "physicalId" or "logicalId" field via
      * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      */
-    json::ValueOrArray<QString> deviceId;
+    json::ValueOrArray<std::string> deviceId;
 
     /**%apidoc[opt]:stringArray
      * If present, only Object Tracks of the specified type(s) will be considered for search.
@@ -554,13 +560,26 @@ struct ObjectTrackFilter: IdData, ObjectTrackFilterFreeText
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
     /**%apidoc
+     * Method to search tracks: by attributes, text vector or both of them.
+     * Cloud-specific parameter.
+     * If TestScope::vector is requested, only Cloud tracks will be searched.
+     */
+    std::optional<ObjectTrackFilter::TextScope> textScope;
+
+    /**%apidoc
+     * Used for Cloud analytics data only.
+     * If not null, only Cloud tracks will be requested.
+     */
+    std::optional<nx::Uuid> referenceBestShotId;
+
+    /**%apidoc
      * If specified, only Object Tracks detected by specified engine will be considered for search.
      */
     std::optional<nx::Uuid> analyticsEngineId;
 };
 #define ObjectTrackFilter_Fields IdData_Fields ObjectTrackFilterFreeText_Fields \
     (deviceId)(objectTypeId)(startTimeMs)(endTimeMs)(boundingBox)(limit) \
-    (sortOrder)(analyticsEngineId)
+    (sortOrder)(textScope)(referenceBestShotId)(analyticsEngineId)
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackFilter, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackFilter, ObjectTrackFilter_Fields)
 
