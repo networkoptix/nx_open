@@ -6,7 +6,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std/future.h>
 
 namespace nx::network::cloud {
 
@@ -215,7 +214,7 @@ void CloudServerSocket::registerOnMediator(
 
 hpm::api::ResultCode CloudServerSocket::registerOnMediatorSync()
 {
-    nx::utils::promise<hpm::api::ResultCode> promise;
+    std::promise<hpm::api::ResultCode> promise;
     registerOnMediator(
         [&promise](hpm::api::ResultCode code) { promise.set_value(code); });
 
@@ -518,7 +517,7 @@ std::unique_ptr<AbstractStreamSocket> CloudServerSocket::acceptNonBlocking()
 
 std::unique_ptr<AbstractStreamSocket> CloudServerSocket::acceptBlocking()
 {
-    nx::utils::promise<SystemError::ErrorCode> promise;
+    std::promise<SystemError::ErrorCode> promise;
     std::unique_ptr<AbstractStreamSocket> acceptedSocket;
     acceptAsync(
         [&](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)

@@ -1,21 +1,21 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <future>
 #include <memory>
 #include <optional>
 
 #include <gtest/gtest.h>
 
-#include <nx/network/aio/aio_service.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/dns_resolver.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/resolve/custom_resolver.h>
-#include <nx/network/socket_global.h>
 #include <nx/network/socket_factory.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 

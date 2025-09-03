@@ -1,11 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <thread>
+
 #include <gtest/gtest.h>
 
 #include <QtCore/QDir>
 
 #include <nx/utils/service.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/time.h>
@@ -83,7 +84,7 @@ protected:
 		m_serviceContext->service.setOnStartedEventHandler(
 			[this](bool isStarted) { m_serviceStartedEvent.push(isStarted); });
 
-		m_serviceContext->mainThread = nx::utils::thread(
+		m_serviceContext->mainThread = std::thread(
 			[serviceContext = m_serviceContext.get()]()
 			{
 				serviceContext->serviceStarted = true;
@@ -162,7 +163,7 @@ private:
     struct ServiceContext
     {
         TestService service;
-        nx::utils::thread mainThread;
+        std::thread mainThread;
         std::atomic_bool execFinished = false;
 		std::atomic_bool serviceStarted = false;
 

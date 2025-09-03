@@ -8,7 +8,6 @@
 #include <nx/network/socket_attributes_cache.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/atomic_unique_ptr.h>
-#include <nx/utils/std/future.h>
 
 #include "detail/cloud_stream_socket_connector.h"
 #include "tunnel/tunnel_attributes.h"

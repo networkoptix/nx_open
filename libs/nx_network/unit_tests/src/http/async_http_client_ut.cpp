@@ -1,12 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <condition_variable>
 #include <chrono>
+#include <condition_variable>
+#include <future>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <thread>
 #include <vector>
-#include <queue>
 
 #include <gtest/gtest.h>
 
@@ -19,15 +20,12 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/byte_stream/custom_output_stream.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/future.h>
-#include <nx/utils/std/thread.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/sync_queue.h>
-
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/thread/thread.h>
-#include <nx/utils/byte_stream/custom_output_stream.h>
 
 #include "repeating_buffer_sender.h"
 
@@ -176,7 +174,7 @@ protected:
         const nx::Url url(nx::format("http://%1%2")
             .args(m_testHttpServer->serverAddress().toString(), path));
 
-        nx::utils::promise<void> promise;
+        std::promise<void> promise;
         NX_INFO(this, nx::format("testResult: %1").arg(url));
 
         const auto client = std::make_unique<AsyncClient>(ssl::kAcceptAnyCertificate);
@@ -250,7 +248,7 @@ private:
             "Hello, world",
             includeContentLength));
 
-        nx::utils::promise<void> promise;
+        std::promise<void> promise;
         client->doPost(
             commonTestUrl("/saveRequest"),
             [&promise]() { promise.set_value(); });
@@ -555,8 +553,8 @@ class HttpClientAsyncCustom:
 protected:
     void start(const nx::Buffer& response, bool breakAfterResponse = false)
     {
-        nx::utils::promise<SocketAddress> address;
-        serverThread = nx::utils::thread(
+        std::promise<SocketAddress> address;
+        serverThread = std::thread(
             [this, response, breakAfterResponse, &address]()
             {
                 const auto server = std::make_unique<nx::network::TCPServerSocket>(
@@ -602,7 +600,7 @@ protected:
     {
         client->setAdditionalHeaders(headers);
 
-        nx::utils::promise<void> clientDone;
+        std::promise<void> clientDone;
         client->doGet(
             url::Builder().setScheme(kUrlSchemeName).setEndpoint(serverAddress).setQuery(query),
             [client, &clientDone, &expectations]()
@@ -619,7 +617,7 @@ protected:
         serverThread.join();
     }
 
-    nx::utils::thread serverThread;
+    std::thread serverThread;
     SocketAddress serverAddress;
 };
 
@@ -920,7 +918,7 @@ private:
     struct ClientContext
     {
         std::unique_ptr<nx::network::http::AsyncClient> client;
-        nx::utils::promise<void> requestDonePromise;
+        std::promise<void> requestDonePromise;
         int requestsToSend;
     };
 

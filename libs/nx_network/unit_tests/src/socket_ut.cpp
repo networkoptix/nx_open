@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <condition_variable>
 #include <chrono>
+#include <condition_variable>
 #include <deque>
 #include <mutex>
 #include <thread>
@@ -18,10 +18,8 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/thread.h>
-#include <nx/utils/test_support/test_options.h>
-
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/test_support/test_options.h>
 
 namespace nx::network::test {
 
@@ -127,9 +125,9 @@ TEST(Socket, postCancellation)
         }
     };
 
-    std::vector<nx::utils::thread> testThreads;
+    std::vector<std::thread> testThreads;
     for (int i = 0; i < kTestThreadCount; ++i)
-        testThreads.emplace_back(nx::utils::thread(testFunctor));
+        testThreads.emplace_back(std::thread(testFunctor));
 
     for (auto& testThread : testThreads)
         testThread.join();

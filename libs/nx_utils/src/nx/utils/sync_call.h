@@ -3,8 +3,8 @@
 #pragma once
 
 #include <functional>
-
-#include <nx/utils/std/future.h>
+#include <future>
+#include <tuple>
 
 namespace detail {
 
@@ -12,7 +12,7 @@ template<typename ResultType, typename... OutArgs>
 std::tuple<ResultType, OutArgs...> makeSyncCall(
     std::function<void(std::function<void(ResultType, OutArgs...)>)> function)
 {
-    nx::utils::promise<ResultType> promise;
+    std::promise<ResultType> promise;
     auto future = promise.get_future();
     std::tuple<OutArgs...> resultArgs;
     function(
@@ -36,7 +36,7 @@ template<typename ResultType>
 std::tuple<ResultType> makeSyncCall(
     std::function<void(std::function<void(ResultType)>)> function)
 {
-    nx::utils::promise<ResultType> promise;
+    std::promise<ResultType> promise;
     auto future = promise.get_future();
     function([&promise](ResultType resCode) { promise.set_value(resCode); });
     return std::make_tuple(future.get());

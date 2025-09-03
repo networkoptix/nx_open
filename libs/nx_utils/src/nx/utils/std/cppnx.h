@@ -13,6 +13,14 @@
 
 namespace nx {
 
+template<typename T>
+std::future<std::remove_cvref_t<T>> makeReadyFuture(T&& value)
+{
+    std::promise<std::remove_cvref_t<T>> p;
+    p.set_value(std::forward<T>(value));
+    return p.get_future();
+}
+
 /**
  * std::vector of non-copyable types cannot be initialized by the initializer list (it
  * requires a copy constructor), but can be initialized by the following method:

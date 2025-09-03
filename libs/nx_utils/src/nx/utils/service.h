@@ -8,7 +8,6 @@
 
 #include "abstract_service_settings.h"
 #include "move_only_func.h"
-#include "std/future.h"
 #include "thread/stoppable.h"
 #include "thread/sync_queue.h"
 

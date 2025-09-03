@@ -7,7 +7,6 @@
 #include <QtCore/QString>
 
 #include <nx/media/audio/format.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -80,8 +79,8 @@ private:
     nx::WaitCondition m_cond;
     nx::Mutex m_mutex;
 
-    nx::utils::promise<void> m_initializedPromise;
-    nx::utils::future<void> m_initializedFuture;
+    std::promise<void> m_initializedPromise;
+    std::future<void> m_initializedFuture;
 
     QSharedPointer<SynthesizeSpeechTask> addTaskToQueue(const QString& text, QIODevice* dest);
 };

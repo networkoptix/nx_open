@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/abstract_socket.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/system_error.h>
 
 namespace nx {
@@ -36,7 +35,7 @@ protected:
 
     void whenCalledAcceptAsync()
     {
-        nx::utils::promise<SystemError::ErrorCode> acceptDone;
+        std::promise<SystemError::ErrorCode> acceptDone;
         m_serverSocket.acceptAsync(
             [&acceptDone](
                 SystemError::ErrorCode sysErrorCode,

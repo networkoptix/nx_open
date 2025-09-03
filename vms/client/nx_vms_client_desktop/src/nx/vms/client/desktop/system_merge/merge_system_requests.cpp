@@ -128,7 +128,7 @@ std::unique_ptr<nx::network::AbstractStreamSocket> takeSocketSync(
     nx::network::http::AsyncClient* client)
 {
     std::unique_ptr<nx::network::AbstractStreamSocket> socket;
-    nx::utils::promise<void> socketTakenPromise;
+    std::promise<void> socketTakenPromise;
     client->dispatch(
         [client, &socket, &socketTakenPromise]()
         {

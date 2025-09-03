@@ -2,8 +2,9 @@
 
 #pragma once
 
+#include <future>
+
 #include <nx/utils/interruption_flag.h>
-#include <nx/utils/std/future.h>
 
 #include "abstract_pollable.h"
 #include "pollable.h"
@@ -169,7 +170,7 @@ public:
         }
         else
         {
-            nx::utils::promise<Result> done;
+            std::promise<Result> done;
             post(
                 [this, &func, &done]()
                 {

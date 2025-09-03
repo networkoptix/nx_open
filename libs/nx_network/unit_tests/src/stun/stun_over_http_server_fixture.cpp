@@ -98,7 +98,7 @@ void StunOverHttpServerFixture::givenTunnelingServer()
 void StunOverHttpServerFixture::assertStunClientIsAbleToPerformRequest(
     AbstractAsyncClient* client)
 {
-    nx::utils::promise<
+    std::promise<
         std::tuple<SystemError::ErrorCode, nx::network::stun::Message>
     > responseReceived;
 

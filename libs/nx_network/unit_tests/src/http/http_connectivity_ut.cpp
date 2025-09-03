@@ -3,6 +3,7 @@
 #include <chrono>
 #include <memory>
 #include <queue>
+#include <thread>
 
 #include <gtest/gtest.h>
 
@@ -13,7 +14,6 @@
 #include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
-#include <nx/utils/std/thread.h>
 
 namespace nx::network::http {
 
@@ -42,7 +42,7 @@ public:
 private:
     nx::MoveOnlyFunc<void()> m_func;
     std::thread m_thread;
-    nx::utils::promise<void> m_resumed;
+    std::promise<void> m_resumed;
 
     void threadFunc()
     {

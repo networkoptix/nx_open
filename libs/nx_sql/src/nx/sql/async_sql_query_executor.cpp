@@ -46,10 +46,10 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
         m_queryQueue,
         &m_dbThreadPoolSize)
 {
-    m_dropConnectionThread = nx::utils::thread(
+    m_dropConnectionThread = std::thread(
         std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
 
-    m_queryTimeoutThread = nx::utils::thread([this]() { reportQueryTimeoutThreadMain(); });
+    m_queryTimeoutThread = std::thread([this]() { reportQueryTimeoutThreadMain(); });
 
     m_queryQueue.setOnItemStayTimeout([this](auto&&... args) {
         reportQueryCancellation(std::forward<decltype(args)>(args)...);

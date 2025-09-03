@@ -89,7 +89,7 @@ bool InstanceController::configureDb()
     if (m_dbConnectionOptions.driverType != RdbmsDriverType::sqlite)
         return true;
 
-    nx::utils::promise<DBResult> cacheFilledPromise;
+    std::promise<DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
     m_queryExecutor->executeUpdateWithoutTran(

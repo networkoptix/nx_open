@@ -1,12 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <future>
+#include <thread>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/std/future.h>
-#include <nx/utils/std/thread.h>
 
 namespace nx {
 namespace network {
@@ -19,7 +20,7 @@ public:
     StoppableTestClass():
         m_isRunning(true)
     {
-        m_thread = nx::utils::thread(
+        m_thread = std::thread(
             std::bind(&StoppableTestClass::threadMain, this));
     }
 
@@ -45,7 +46,7 @@ private:
     bool m_isRunning;
     nx::WaitCondition m_condition;
     nx::MoveOnlyFunc< void() > m_handler;
-    nx::utils::thread m_thread;
+    std::thread m_thread;
 
     void threadMain()
     {
@@ -66,7 +67,7 @@ private:
 TEST(QnStoppableAsync, SingleAsync)
 {
     StoppableTestClass s;
-    nx::utils::promise< bool > p;
+    std::promise< bool > p;
     s.pleaseStop([&]() { p.set_value(true); });
     ASSERT_TRUE(p.get_future().get());
     ASSERT_FALSE(s.isRunning());

@@ -41,7 +41,7 @@ SocketAddress SynchronousStreamSocketServer::endpoint() const
 
 void SynchronousStreamSocketServer::start()
 {
-    m_thread = nx::utils::thread(std::bind(&SynchronousStreamSocketServer::threadMain, this));
+    m_thread = std::thread(std::bind(&SynchronousStreamSocketServer::threadMain, this));
 }
 
 void SynchronousStreamSocketServer::stop()

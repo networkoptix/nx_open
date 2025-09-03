@@ -3,11 +3,10 @@
 #pragma once
 
 #include <functional>
+#include <future>
 #include <memory>
 
 #include "../move_only_func.h"
-#include "../std/future.h"
-#include "mutex.h"
 
 namespace nx {
 namespace utils {
@@ -37,7 +36,7 @@ public:
     ~BarrierWaiter();
 
 private:
-    nx::utils::promise<void> m_promise;
+    std::promise<void> m_promise;
 };
 
 } // namespace utils

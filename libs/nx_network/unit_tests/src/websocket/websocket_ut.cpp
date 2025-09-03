@@ -81,8 +81,8 @@ private:
     std::unique_ptr<TestStreamSocketDelegate> m_clientSocket;
     std::unique_ptr<TestStreamSocketDelegate> m_acceptedClientSocket;
     std::string m_lastError;
-    nx::utils::promise<std::string> m_connectedPromise;
-    nx::utils::future<std::string> m_connectedFuture;
+    std::promise<std::string> m_connectedPromise;
+    std::future<std::string> m_connectedFuture;
 
     template<typename F>
     bool checkedCall(F f, const std::string& errorString);
@@ -388,7 +388,7 @@ protected:
 
     void whenClientSends(int messageCount)
     {
-        auto readyPromise = std::make_shared<nx::utils::promise<void>>();
+        auto readyPromise = std::make_shared<std::promise<void>>();
         auto readyFuture = readyPromise->get_future();
         int sentCount = 0;
 
@@ -432,7 +432,7 @@ protected:
         while (true)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(15));
-            nx::utils::promise<int> doneCountPromise;
+            std::promise<int> doneCountPromise;
             auto doneCountFuture = doneCountPromise.get_future();
 
             serverWebSocket->post(
@@ -458,7 +458,7 @@ protected:
     template<typename SendAction>
     void assertCbErrorCode(SystemError::ErrorCode desiredEcode, SendAction sendAction)
     {
-        auto p = std::make_shared<nx::utils::promise<void>>();
+        auto p = std::make_shared<std::promise<void>>();
         auto f = p->get_future();
         SystemError::ErrorCode error = SystemError::noError;
 
@@ -1308,7 +1308,7 @@ TEST_P(WebSocket, SendAfterConnectionHasFailed)
     givenServerClientWebSockets();
 
     serverWebSocket->post([this]() { resetServerSocket(); });
-    utils::promise<SystemError::ErrorCode> failHandlerPromise;
+    std::promise<SystemError::ErrorCode> failHandlerPromise;
     auto failHandlerFuture = failHandlerPromise.get_future();
 
     clientWebSocket->sendAsync(

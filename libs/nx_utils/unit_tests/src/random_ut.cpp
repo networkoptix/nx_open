@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <array>
+#include <thread>
 
 #include <gtest/gtest.h>
 
@@ -8,7 +9,6 @@
 
 #include <nx/utils/random.h>
 #include <nx/utils/random_cryptographic_device.h>
-#include <nx/utils/std/thread.h>
 
 namespace nx {
 namespace utils {

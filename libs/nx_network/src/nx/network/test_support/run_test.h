@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <thread>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -9,7 +11,6 @@
 #include <nx/network/http/tunneling/detail/client_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/run_test.h>
 
 namespace nx::network::test {
@@ -58,8 +59,6 @@ inline int runTest(
         {
             ::testing::UnitTest::GetInstance()->listeners().Append(
                 new EventRecordingListener());
-
-            nx::utils::DetachedThreads detachedThreadsGuard;
 
             auto sgGuard = std::make_unique<SocketGlobalsHolder>(args, socketGlobalsFlags);
             SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("ut", nx::Uuid::createUuid());

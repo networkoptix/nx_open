@@ -14,7 +14,6 @@
 #include <nx/network/system_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std/future.h>
 #include <udt/udt.h>
 
 #include "../address_resolver.h"
@@ -976,7 +975,7 @@ std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::accept()
         return systemAccept();
 
     // This method always blocks.
-    nx::utils::promise<
+    std::promise<
         std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
     > acceptedSocketPromise;
 

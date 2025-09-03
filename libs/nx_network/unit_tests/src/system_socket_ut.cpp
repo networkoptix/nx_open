@@ -26,7 +26,7 @@ protected:
         m_client = std::make_unique<TCPSocket>(AF_INET);
         ASSERT_TRUE(m_client->setNonBlockingMode(true));
 
-        nx::utils::promise<SystemError::ErrorCode> connected;
+        std::promise<SystemError::ErrorCode> connected;
         m_client->connectAsync(
             m_tcpServerSocket.getLocalAddress(),
             [&connected](SystemError::ErrorCode resultCode)

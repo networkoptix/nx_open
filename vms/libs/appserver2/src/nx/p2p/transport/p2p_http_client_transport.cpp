@@ -4,7 +4,6 @@
 
 #include <nx/utils/byte_stream/custom_output_stream.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/future.h>
 #include <nx/network/http/custom_headers.h>
 #include "nx/p2p/transport/ping_headers.h"
 #include "nx/utils/scope_guard.h"

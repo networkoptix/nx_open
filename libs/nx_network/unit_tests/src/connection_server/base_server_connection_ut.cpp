@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <future>
 #include <optional>
 
 #include <gtest/gtest.h>
@@ -160,7 +161,7 @@ protected:
 
     void whenStartReadingConnection()
     {
-        nx::utils::promise<void> done;
+        std::promise<void> done;
         m_connection->post(
             [this, &done]()
             {

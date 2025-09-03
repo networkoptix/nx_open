@@ -1,11 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <thread>
 
+#include <gtest/gtest.h>
+
 #include <nx/utils/async_operation_guard.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/sync_queue.h>
 
 namespace nx {
@@ -17,7 +16,7 @@ class AsyncRunner
 public:
     AsyncRunner()
     {
-        m_thread = nx::utils::thread([this]()
+        m_thread = std::thread([this]()
         {
             while(1)
             {
@@ -43,7 +42,7 @@ public:
     }
 
 private:
-    utils::thread m_thread;
+    std::thread m_thread;
     utils::TestSyncQueue<std::function<void()>> m_tasks;
 };
 

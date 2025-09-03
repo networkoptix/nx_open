@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <future>
 #include <memory>
 
 #include <gtest/gtest.h>
@@ -459,7 +460,7 @@ protected:
 private:
     nx::utils::AtomicUniquePtr<AbstractStreamSocket> m_streamSocket;
     nx::Buffer m_readBuffer;
-    nx::utils::promise<void> m_done;
+    std::promise<void> m_done;
 
     void onSomeBytesRead(
         SystemError::ErrorCode sysErrorCode, std::size_t /*bytesRead*/)

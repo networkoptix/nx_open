@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include <thread>
+
 #include <nx/network/upnp/upnp_async_client.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -62,7 +63,7 @@ private:
     mutable nx::Mutex m_mutex;
     HostAddress m_externalIp;
     Mappings m_mappings;
-    nx::utils::thread m_thread;
+    std::thread m_thread;
     nx::utils::SyncQueue< std::function< void() > > m_tasks;
 };
 

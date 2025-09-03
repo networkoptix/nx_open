@@ -4,7 +4,6 @@
 
 #include <nx/network/stun/async_client.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/sync_call.h>
 
 #include "stun/stun_over_http_server_fixture.h"

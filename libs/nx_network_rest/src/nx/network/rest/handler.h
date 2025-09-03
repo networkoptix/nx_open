@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/json_rpc/messages.h>
+#include <nx/network/abstract_socket.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/auth/global_permission.h>
 #include <nx/utils/exception.h>
@@ -13,7 +14,6 @@
 #include "response.h"
 
 namespace nx::i18n { class TranslationManager; }
-namespace nx::network { class AbstractStreamSocket; }
 
 namespace nx::network::rest {
 

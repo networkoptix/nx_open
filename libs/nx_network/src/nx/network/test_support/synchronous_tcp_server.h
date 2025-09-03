@@ -4,11 +4,11 @@
 
 #include <atomic>
 #include <memory>
+#include <thread>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/byte_stream/pipeline.h>
-#include <nx/utils/std/thread.h>
 
 namespace nx {
 namespace network {
@@ -39,7 +39,7 @@ protected:
     bool isStopped() const;
 
 private:
-    nx::utils::thread m_thread;
+    std::thread m_thread;
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
     std::atomic<bool> m_stopped;
     nx::utils::AtomicUniquePtr<AbstractStreamSocket> m_connection;

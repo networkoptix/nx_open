@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/std/future.h>
 #include <nx/utils/timer_manager.h>
 
 using namespace std::chrono;

@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <atomic>
+#include <future>
 
 #include <gtest/gtest.h>
 
@@ -115,7 +116,7 @@ protected:
 
 private:
     TestPollable m_pollable;
-    nx::utils::promise<AbstractAioThread*> m_callMadePromise;
+    std::promise<AbstractAioThread*> m_callMadePromise;
     std::optional<AbstractAioThread*> m_callResult;
 };
 
@@ -165,7 +166,7 @@ TEST_F(BasicPollable, isInSelfAioThread)
 {
     ASSERT_FALSE(pollable().isInSelfAioThread());
 
-    nx::utils::promise<void> callMadePromise;
+    std::promise<void> callMadePromise;
     pollable().post(
         [this, &callMadePromise]()
         {
@@ -185,7 +186,7 @@ TEST_F(BasicPollable, stopWhileInAioThread)
 
 TEST_F(BasicPollable, post_cancelled_by_pleaseStopSync_called_within_aio_thread)
 {
-    nx::utils::promise<void> secondCallPosted;
+    std::promise<void> secondCallPosted;
     std::atomic<int> asyncCallsDone(0);
 
     pollable().post(

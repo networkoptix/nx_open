@@ -60,7 +60,7 @@ public:
 
     SystemError::ErrorCode writeSync(nx::Buffer data)
     {
-        nx::utils::promise<SystemError::ErrorCode> written;
+        std::promise<SystemError::ErrorCode> written;
         m_channel->sendAsync(
             &data,
             [&written](SystemError::ErrorCode sysErrorCode, std::size_t /*bytesWritten*/)
@@ -109,7 +109,7 @@ private:
     aio::AbstractAsyncChannel* m_channel;
     nx::Buffer m_dataRead;
     nx::Buffer m_readBuffer;
-    nx::utils::promise<SystemError::ErrorCode> m_readError;
+    std::promise<SystemError::ErrorCode> m_readError;
     std::atomic<std::size_t> m_totalBytesRead;
 
     void scheduleNextRead()
@@ -464,7 +464,7 @@ protected:
         nx::Buffer readBuffer;
         readBuffer.reserve(4*1024);
 
-        nx::utils::promise<SystemError::ErrorCode> ioCompleted;
+        std::promise<SystemError::ErrorCode> ioCompleted;
         channel().readSomeAsync(
             &readBuffer,
             [&ioCompleted](
