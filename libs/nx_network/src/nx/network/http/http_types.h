@@ -1013,6 +1013,11 @@ private:
     SocketAddress m_endpoint;
 };
 
+static constexpr char kETag[] = "ETag";
+static constexpr char kIfNoneMatch[] = "If-None-Match";
+static constexpr char kIfMatch[] = "If-Match";
+static constexpr char kXCache[] = "X-Cache";
+
 } // namespace header
 
 using ChunkExtension = std::pair<std::string, std::string>;

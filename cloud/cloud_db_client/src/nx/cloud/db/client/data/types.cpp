@@ -66,6 +66,9 @@ nx::network::http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resul
 
         case ResultCode::updateConflict:
             return nx::network::http::StatusCode::conflict;
+
+        case ResultCode::notModified:
+            return nx::network::http::StatusCode::notModified;
     }
 
     return nx::network::http::StatusCode::internalServerError;

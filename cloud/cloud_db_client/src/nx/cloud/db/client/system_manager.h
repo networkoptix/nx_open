@@ -26,6 +26,9 @@ public:
     virtual void getSystems(
         std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) override;
 
+    virtual void getSystemsWithCacheHeaders(
+        std::function<void(api::ResultCode, api::SystemDataExList, std::string, std::string)> completionHandler) override;
+
     virtual void getSystemsByEmail(
         const std::string& email,
         std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) override;

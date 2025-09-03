@@ -55,6 +55,20 @@ void SystemManager::getSystems(
     getSystemsFiltered(filter, std::move(completionHandler));
 }
 
+void SystemManager::getSystemsWithCacheHeaders(
+    std::function<void(api::ResultCode, api::SystemDataExList, std::string, std::string)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<
+        api::SystemDataExList,
+        HttpHeaderFetcher<nx::network::http::header::kETag>,
+        HttpHeaderFetcher<nx::network::http::header::kXCache>
+    >(
+        nx::network::http::Method::get,
+        kSystemsPath,
+        {}, // query
+        std::move(completionHandler));
+}
+
 void SystemManager::getSystemsByEmail(
     const std::string& email,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)

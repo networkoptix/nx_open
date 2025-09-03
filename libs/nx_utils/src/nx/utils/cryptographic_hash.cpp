@@ -294,6 +294,11 @@ Output calculateHash(const Input& data)
     return hash;
 }
 
+std::string md5(const std::string_view& data)
+{
+    return calculateHash<QnMd5CryptographicHashPrivate, QByteArray>(data).toHex().toStdString();
+}
+
 std::string sha1(const std::string_view& data)
 {
     return calculateHash<QnSha1CryptographicHashPrivate, std::string>(data);

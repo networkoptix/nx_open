@@ -61,6 +61,8 @@ inline QByteArray md5(const QByteArray& data)
     return QnCryptographicHash::hash(data, QnCryptographicHash::Md5);
 }
 
+NX_UTILS_API std::string md5(const std::string_view& data);
+
 inline QByteArray sha1(const QByteArray& data)
 {
     return QnCryptographicHash::hash(data, QnCryptographicHash::Sha1);
