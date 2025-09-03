@@ -4,8 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/std/future.h>
-
 namespace nx::network::upnp::test {
 
 using namespace nx::network::http;
@@ -35,13 +33,13 @@ TEST(UpnpAsyncClient, DISABLED_GetIp)
 {
     AsyncClient client;
     {
-        nx::utils::promise< HostAddress > prom;
+        std::promise< HostAddress > prom;
         client.externalIp(URL,
             [&](const HostAddress& v) { prom.set_value(v); });
         EXPECT_EQ(prom.get_future().get().toString(), EXTERNAL_IP);
     }
     {
-        nx::utils::promise< AsyncClient::MappingInfoResult > prom;
+        std::promise< AsyncClient::MappingInfoResult > prom;
         client.getMapping(URL, 8877, TCP,
             [&](AsyncClient::MappingInfoResult result)
         { prom.set_value(result); });
@@ -50,13 +48,13 @@ TEST(UpnpAsyncClient, DISABLED_GetIp)
         EXPECT_FALSE(prom.get_future().get().has_value());
     }
     {
-        nx::utils::promise< bool > prom;
+        std::promise< bool > prom;
         client.deleteMapping(URL, 8877, TCP,
             [&](bool v) { prom.set_value(v); });
         EXPECT_FALSE(prom.get_future().get()); // no such mapping
     }
     {
-        nx::utils::promise< AsyncClient::MappingInfoList > prom;
+        std::promise< AsyncClient::MappingInfoList > prom;
         client.getAllMappings(URL,
             [&](AsyncClient::MappingInfoList mappings, bool) { prom.set_value(mappings); });
         EXPECT_EQ(prom.get_future().get().size(), 2U); // mappings from Skype ;)
@@ -68,21 +66,21 @@ TEST(UpnpAsyncClient, DISABLED_Mapping)
 {
     AsyncClient client;
     {
-        nx::utils::promise< bool > prom;
+        std::promise< bool > prom;
         client.addMapping(URL, INTERNAL_IP, 80, 80, TCP, DESC, 0,
             [&](bool v) { prom.set_value(v); });
 
         EXPECT_FALSE(prom.get_future().get()); // wrong port
     }
     {
-        nx::utils::promise< bool > prom;
+        std::promise< bool > prom;
         client.addMapping(URL, INTERNAL_IP, 80, 8877, TCP, DESC, 0,
             [&](bool v) { prom.set_value(v); });
 
         ASSERT_TRUE(prom.get_future().get());
     }
     {
-        nx::utils::promise< SocketAddress > prom;
+        std::promise< SocketAddress > prom;
         client.getMapping(URL, 8877, TCP,
             [&](AsyncClient::MappingInfoResult result)
             { prom.set_value(SocketAddress(result->internalIp, result->internalPort)); });
@@ -91,7 +89,7 @@ TEST(UpnpAsyncClient, DISABLED_Mapping)
             SocketAddress(INTERNAL_IP, 80).toString());
     }
     {
-        nx::utils::promise< bool > prom;
+        std::promise< bool > prom;
         client.deleteMapping(URL, 8877, TCP,
             [&](bool v) { prom.set_value(v); });
 

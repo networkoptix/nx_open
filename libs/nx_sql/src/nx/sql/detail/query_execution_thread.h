@@ -5,7 +5,6 @@
 #include <atomic>
 #include <thread>
 
-#include <nx/utils/std/thread.h>
 #include <nx/utils/thread/long_runnable.h>
 
 #include "../db_connection_holder.h"

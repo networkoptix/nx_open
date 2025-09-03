@@ -12,7 +12,6 @@
 #include <nx/network/aio/aio_task_queue.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx::network::aio::test {
@@ -156,7 +155,7 @@ TEST_F(AioThread, socket_polled_notification)
             handlerCalledFlag = true;
         });
 
-    nx::utils::promise<void> started;
+    std::promise<void> started;
     m_aioThread.startMonitoring(
         &socket,
         aio::etRead,
@@ -229,7 +228,7 @@ protected:
 
     void whenStartMonitoringFailed()
     {
-        nx::utils::promise<void> done;
+        std::promise<void> done;
         m_aioThread.startMonitoring(
             m_tcpSocket.get(),
             aio::etRead,
@@ -244,7 +243,7 @@ protected:
 
     void whenInvokedStopMonitoring()
     {
-        nx::utils::promise<void> stopped;
+        std::promise<void> stopped;
         m_aioThread.post(
             m_tcpSocket.get(),
             [this, &stopped]()

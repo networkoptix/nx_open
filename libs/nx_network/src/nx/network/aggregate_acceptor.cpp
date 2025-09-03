@@ -3,6 +3,7 @@
 #include "aggregate_acceptor.h"
 
 #include <algorithm>
+#include <future>
 
 #include <nx/utils/log/log.h>
 
@@ -82,7 +83,7 @@ void AggregateAcceptor::acceptAsync(AcceptCompletionHandler handler)
 void AggregateAcceptor::cancelIOSync()
 {
     NX_VERBOSE(this, nx::format("Cancelling async IO synchronously..."));
-    nx::utils::promise<void> ioCancelledPromise;
+    std::promise<void> ioCancelledPromise;
     dispatch(
         [this, &ioCancelledPromise]() mutable
         {
@@ -97,7 +98,7 @@ bool AggregateAcceptor::add(std::unique_ptr<AbstractStreamSocketAcceptor> socket
 {
     NX_VERBOSE(this, nx::format("Add socket(%1)").arg(socket));
 
-    nx::utils::promise<void> socketAddedPromise;
+    std::promise<void> socketAddedPromise;
     dispatch(
         [this, &socketAddedPromise, socket = std::move(socket)]() mutable
         {
@@ -224,7 +225,7 @@ void AggregateAcceptor::cancelIoFromAioThread()
 template<typename FindIteratorFunc>
 void AggregateAcceptor::removeByIterator(FindIteratorFunc findIterator)
 {
-    nx::utils::promise<void> socketRemovedPromise;
+    std::promise<void> socketRemovedPromise;
     dispatch(
         [this, &socketRemovedPromise, &findIterator]()
         {

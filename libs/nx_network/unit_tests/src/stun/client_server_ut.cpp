@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <future>
 #include <thread>
 
 #include <gmock/gmock.h>
@@ -13,7 +14,6 @@
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/test_support/sync_queue.h>
 

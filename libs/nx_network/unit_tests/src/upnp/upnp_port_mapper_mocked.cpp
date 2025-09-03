@@ -10,7 +10,7 @@ namespace test {
 AsyncClientMock::AsyncClientMock():
     m_disabledPort(80)
 {
-    m_thread = nx::utils::thread(
+    m_thread = std::thread(
         [this]()
         {
             while (const auto task = m_tasks.pop())

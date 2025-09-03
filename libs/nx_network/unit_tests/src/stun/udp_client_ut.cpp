@@ -218,7 +218,7 @@ private:
     size_t m_messagesToIgnore;
     size_t m_totalMessagesReceived;
     std::mutex m_mutex;
-    nx::utils::promise<void> m_allResponsesHaveBeenReceived;
+    std::promise<void> m_allResponsesHaveBeenReceived;
     std::set<nx::Buffer> m_expectedTransactionIDs;
     std::function<void()> m_auxiliaryRequestHandler;
     std::unique_ptr<stun::UdpClient> m_client;
@@ -615,7 +615,7 @@ protected:
                 stun::bindingMethod,
                 stun::Header::makeTransactionId()));
 
-        nx::utils::promise<std::pair<SystemError::ErrorCode, stun::Message>> responsePromise;
+        std::promise<std::pair<SystemError::ErrorCode, stun::Message>> responsePromise;
         m_client.sendRequestTo(
             redirectionServer().server->address(),
             std::move(request),

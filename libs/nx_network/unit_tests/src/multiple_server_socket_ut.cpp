@@ -221,7 +221,7 @@ protected:
 
         bool terminated = false;
         std::atomic<bool> connectorDone(false);
-        nx::utils::thread establishConnectionThread(
+        std::thread establishConnectionThread(
             [this, &terminated, &connectorDone]()
             {
                 for (int i = 0; !terminated; ++i)
@@ -327,7 +327,7 @@ protected:
         const auto startTime = system_clock::now();
         while ((system_clock::now() < (startTime + testDurationLimit)) && !*isCancelled)
         {
-            nx::utils::promise<std::unique_ptr<AbstractStreamSocket>> accepted;
+            std::promise<std::unique_ptr<AbstractStreamSocket>> accepted;
             serverSocket()->acceptAsync(
                 [&accepted](
                     SystemError::ErrorCode /*sysErrorCode*/,
@@ -386,7 +386,7 @@ private:
     std::atomic<bool>* m_isCancelled;
     std::chrono::milliseconds m_testDurationLimit;
     std::chrono::steady_clock::time_point m_startTime;
-    nx::utils::promise<void> m_testDone;
+    std::promise<void> m_testDone;
 
     void onConnectionAccepted(
         SystemError::ErrorCode /*sysErrorCode*/,

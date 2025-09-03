@@ -284,7 +284,7 @@ void TestListeningPeer::setServerIdForModuleInformation(
 nx::hpm::api::ResultCode TestListeningPeer::updateTcpAddresses(
     std::vector<network::SocketAddress> addresses)
 {
-    nx::utils::promise<nx::hpm::api::ResultCode> promise;
+    std::promise<nx::hpm::api::ResultCode> promise;
     m_mediatorAddressPublisher->updateAddresses(
         std::move(addresses),
         [&promise](nx::hpm::api::ResultCode resultCode)

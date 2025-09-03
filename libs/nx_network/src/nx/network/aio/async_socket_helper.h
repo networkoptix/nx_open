@@ -5,6 +5,7 @@
 #include <atomic>
 #include <exception>
 #include <functional>
+#include <future>
 #include <queue>
 #include <type_traits>
 
@@ -14,7 +15,6 @@
 #include <nx/utils/log/format.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std/future.h>
 
 #include "../abstract_socket.h"
 #include "../address_resolver.h"
@@ -346,7 +346,7 @@ public:
         {
             //NX_ASSERT(!this->m_socket->impl()->aioThread->load()->isInAnyAioThread());
 
-            nx::utils::promise<void> promise;
+            std::promise<void> promise;
             this->m_socket->impl()->aioThread->load()->post(
                 this->m_socket,
                 [this, eventType, &promise]()
@@ -889,7 +889,7 @@ public:
         }
         else
         {
-            nx::utils::promise<void> promise;
+            std::promise<void> promise;
             this->post(
                 [this, &promise]()
                 {

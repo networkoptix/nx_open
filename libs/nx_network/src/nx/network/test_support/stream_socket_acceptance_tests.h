@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <thread>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/address_resolver.h>
@@ -17,7 +19,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_pipeline.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -58,7 +59,7 @@ protected:
 
         std::promise<bool> streamingServerResult;
         std::promise<SocketAddress> serverAddressAvailable;
-        nx::utils::thread serverThread(
+        std::thread serverThread(
             [this, &conf, &serverAddressAvailable, &streamingServerResult]()
             {
                 streamingServerResult.set_value(streamingServerMain(conf, &serverAddressAvailable));

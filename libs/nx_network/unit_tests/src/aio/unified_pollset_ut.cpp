@@ -10,7 +10,6 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/test_support/utils.h>
 
 #include "pollset_test_common.h"

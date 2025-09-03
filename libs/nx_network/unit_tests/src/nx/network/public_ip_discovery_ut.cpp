@@ -81,8 +81,8 @@ protected:
 private:
     std::unique_ptr<http::TestHttpServer> m_testHttpServer;
     std::unique_ptr<nx::network::PublicIPDiscovery> m_publicAddressFinder;
-    nx::utils::promise<void> m_finderHasFinished;
-    nx::utils::promise<void> m_eventHandlerHasBeenInvoked;
+    std::promise<void> m_finderHasFinished;
+    std::promise<void> m_eventHandlerHasBeenInvoked;
     std::optional<QString> m_foundIpAddress;
 
     void init()

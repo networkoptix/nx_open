@@ -4,14 +4,13 @@
 
 #include <iostream>
 #include <optional>
+#include <thread>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std/future.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/test_support/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
@@ -115,7 +114,7 @@ public:
 
     SocketAddress start()
     {
-        m_thread = std::make_unique<nx::utils::thread>([this](){ run(); });
+        m_thread = std::make_unique<std::thread>([this](){ run(); });
         const auto result = m_startedPromise.get_future().get();
         NX_GTEST_ASSERT_TRUE(result.hasSucceeded);
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -207,10 +206,10 @@ private:
     ServerSocketType m_server;
     SocketAddress m_endpointToBindTo = SocketAddress::anyPrivateAddress;
     Buffer m_testMessage = kTestMessage;
-    nx::utils::promise<ServerStartResult> m_startedPromise;
+    std::promise<ServerStartResult> m_startedPromise;
     ErrorHandling m_errorHandling{ErrorHandling::triggerAssert};
     std::atomic<bool> m_needToStop{false};
-    std::unique_ptr<nx::utils::thread> m_thread;
+    std::unique_ptr<std::thread> m_thread;
 };
 
 template<typename Socket, typename ... Args>
@@ -228,7 +227,7 @@ inline void transferSyncAsync(Sender* sender, Receiver* receiver)
 
     Buffer buffer;
     buffer.reserve(kTestMessage.size());
-    nx::utils::promise<std::tuple<SystemError::ErrorCode, size_t>> promise;
+    std::promise<std::tuple<SystemError::ErrorCode, size_t>> promise;
     receiver->readAsyncAtLeast(
         &buffer, kTestMessage.size(),
         [&](SystemError::ErrorCode code, size_t bytesRead)
@@ -246,7 +245,7 @@ inline void transferSyncAsync(Sender* sender, Receiver* receiver)
 template<typename Sender, typename Receiver>
 static inline void transferAsyncSync(Sender* sender, Receiver* receiver)
 {
-    nx::utils::promise<std::tuple<SystemError::ErrorCode, size_t>> promise;
+    std::promise<std::tuple<SystemError::ErrorCode, size_t>> promise;
     sender->sendAsync(
         &kTestMessage,
         [&](SystemError::ErrorCode code, size_t size)
@@ -279,7 +278,7 @@ static inline void transferSync(Sender* sender, Receiver* receiver)
 template<typename Sender, typename Receiver>
 static inline void transferAsync(Sender* sender, Receiver* receiver)
 {
-    nx::utils::promise<std::tuple<SystemError::ErrorCode, size_t>> sendPromise;
+    std::promise<std::tuple<SystemError::ErrorCode, size_t>> sendPromise;
     sender->sendAsync(
         &kTestMessage,
         [&](SystemError::ErrorCode code, size_t size)
@@ -289,7 +288,7 @@ static inline void transferAsync(Sender* sender, Receiver* receiver)
 
     Buffer buffer;
     buffer.reserve(kTestMessage.size());
-    nx::utils::promise<std::tuple<SystemError::ErrorCode, size_t>> readPromise;
+    std::promise<std::tuple<SystemError::ErrorCode, size_t>> readPromise;
     receiver->readAsyncAtLeast(
         &buffer, kTestMessage.size(),
         [&](SystemError::ErrorCode code, size_t size)
@@ -335,7 +334,7 @@ void socketSyncAsyncSwitch(
     const auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
     ASSERT_TRUE(client->setNonBlockingMode(true));
 
-    nx::utils::promise<SystemError::ErrorCode> connectPromise;
+    std::promise<SystemError::ErrorCode> connectPromise;
     client->connectAsync(
         *endpointToConnectTo,
         [&](SystemError::ErrorCode code)
@@ -414,7 +413,7 @@ void socketTransferFragmentation(
     for (size_t runNumber = 0; runNumber <= kTestRuns; ++runNumber)
     {
         NX_DEBUG(kLogTag, nx::format("Start transfer %1").arg(runNumber));
-        nx::utils::promise<std::tuple<SystemError::ErrorCode, size_t>> sendPromise;
+        std::promise<std::tuple<SystemError::ErrorCode, size_t>> sendPromise;
         client->sendAsync(
             &kMessage,
             [&sendPromise](SystemError::ErrorCode code, size_t size)
@@ -551,7 +550,7 @@ template<typename ClientSocketMaker>
 void multipleSocketsBoundToTheSameThreadReportCompletionWithinSameThread(const ClientSocketMaker& clientMaker)
 {
     aio::AbstractAioThread* aioThread(nullptr);
-    nx::utils::TestSyncQueue<nx::utils::thread::id> threadIdQueue;
+    nx::utils::TestSyncQueue<std::thread::id> threadIdQueue;
     std::vector<decltype(clientMaker())> sockets;
     auto socketsGuard = nx::utils::makeScopeGuard(
         [&sockets]()
@@ -583,7 +582,7 @@ void multipleSocketsBoundToTheSameThreadReportCompletionWithinSameThread(const C
         sockets.push_back(std::move(client));
     }
 
-    std::optional<nx::utils::thread::id> aioThreadId;
+    std::optional<std::thread::id> aioThreadId;
     for (size_t i = 0; i < clientCount; ++i)
     {
         const auto threadId = threadIdQueue.pop();
@@ -608,7 +607,7 @@ void socketConnectToBadAddress(
     ASSERT_TRUE(client->setSendTimeout(
         std::chrono::duration_cast<std::chrono::milliseconds>(sendTimeout).count()));
 
-    nx::utils::promise<SystemError::ErrorCode> connectCompletedPromise;
+    std::promise<SystemError::ErrorCode> connectCompletedPromise;
     client->connectAsync(
         SocketAddress("f9094d31-ae48-4e69-9ad4-3aa91488df3.com:123"),
         [&](SystemError::ErrorCode errorCode)
@@ -676,7 +675,7 @@ void serverSocketPleaseStopCancelsPostedCall(
     const ServerSocketMaker& serverMaker)
 {
     auto serverSocket = serverMaker();
-    nx::utils::promise<void> socketStopped;
+    std::promise<void> socketStopped;
     serverSocket->post(
         [&serverSocket, &socketStopped]()
         {

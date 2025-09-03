@@ -4,7 +4,6 @@
 
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/type_utils.h>
 
 #include "buffer_source.h"
@@ -382,7 +381,7 @@ std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
     // NOTE: m_asyncHttpClient->takeSocket() can only be called within m_asyncHttpClient's aio
     // thread.
     std::unique_ptr<AbstractStreamSocket> sock;
-    nx::utils::promise<void> socketTakenPromise;
+    std::promise<void> socketTakenPromise;
     m_asyncHttpClient->dispatch(
         [this, &sock, &socketTakenPromise]()
         {

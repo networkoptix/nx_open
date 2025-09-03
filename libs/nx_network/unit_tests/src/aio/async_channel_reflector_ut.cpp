@@ -1,11 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <future>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/aio/async_channel_reflector.h>
 #include <nx/network/aio/test/aio_test_async_channel.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/test_support/test_pipeline.h>
 
 namespace nx::network::aio::test {
@@ -94,7 +95,7 @@ private:
     utils::bstream::Pipe m_input;
     utils::bstream::test::NotifyingOutput m_output;
     nx::Buffer m_testData;
-    utils::promise<SystemError::ErrorCode> m_reflectorDone;
+    std::promise<SystemError::ErrorCode> m_reflectorDone;
     AsyncChannel* m_channelToReflect;
 
     void prepareTestData()

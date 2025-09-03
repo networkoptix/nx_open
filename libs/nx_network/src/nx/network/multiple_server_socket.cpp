@@ -4,7 +4,6 @@
 
 #include <optional>
 
-#include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/format.h>
 
@@ -203,7 +202,7 @@ std::unique_ptr<AbstractStreamSocket> MultipleServerSocket::accept()
         return nullptr;
     }
 
-    nx::utils::promise<
+    std::promise<
         std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
     > promise;
     acceptAsync(

@@ -168,7 +168,7 @@ static bool textToWave(
 class FliteEngine
 {
 public:
-    FliteEngine(const QString& /*binaryPath*/, nx::utils::promise<void>& initializedPromise)
+    FliteEngine(const QString& /*binaryPath*/, std::promise<void>& initializedPromise)
     {
         flite_init();
 

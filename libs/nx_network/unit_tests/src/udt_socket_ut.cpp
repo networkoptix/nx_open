@@ -10,7 +10,6 @@
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stream_socket_acceptance_tests.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
@@ -290,8 +289,8 @@ private:
     std::unique_ptr<UdtStreamSocket> m_clientSocket;
     std::unique_ptr<RandomDataTcpServer> m_server;
     std::unique_ptr<ConnectionsGenerator> m_generator;
-    nx::utils::promise<SystemError::ErrorCode> m_serverSocketConnected;
-    nx::utils::promise<SystemError::ErrorCode> m_clientSocketConnected;
+    std::promise<SystemError::ErrorCode> m_serverSocketConnected;
+    std::promise<SystemError::ErrorCode> m_clientSocketConnected;
     std::optional<std::chrono::milliseconds> m_connectTimeout;
 };
 
@@ -321,7 +320,7 @@ TEST_F(SocketUdtRendezvous, reusing_rendezvous_connection_stress_test)
             acceptorSocket->pleaseStopSync();
         });
 
-    nx::utils::promise<SystemError::ErrorCode> connectorConnectedPromise;
+    std::promise<SystemError::ErrorCode> connectorConnectedPromise;
     connectorSocket->connectAsync(
         acceptorSocket->getLocalAddress(),
         [&connectorConnectedPromise](
@@ -330,7 +329,7 @@ TEST_F(SocketUdtRendezvous, reusing_rendezvous_connection_stress_test)
             connectorConnectedPromise.set_value(errorCode);
         });
 
-    nx::utils::promise<SystemError::ErrorCode> acceptorConnectedPromise;
+    std::promise<SystemError::ErrorCode> acceptorConnectedPromise;
     acceptorSocket->connectAsync(
         connectorSocket->getLocalAddress(),
         [&acceptorConnectedPromise](

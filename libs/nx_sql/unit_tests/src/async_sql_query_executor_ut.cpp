@@ -1,25 +1,24 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <fstream>
+#include <future>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <QtCore/QDir>
 
-#include <nx/utils/random.h>
-#include <nx/utils/scope_guard.h>
-#include <nx/utils/std/algorithm.h>
-#include <nx/utils/std/future.h>
-#include <nx/utils/string.h>
-#include <nx/utils/test_support/utils.h>
-
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/sql/detail/query_execution_thread.h>
 #include <nx/sql/filter.h>
-#include <nx/sql/sql_cursor.h>
 #include <nx/sql/query.h>
+#include <nx/sql/sql_cursor.h>
 #include <nx/sql/test_support/db_connection_mock.h>
+#include <nx/utils/random.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/std/algorithm.h>
+#include <nx/utils/string.h>
+#include <nx/utils/test_support/utils.h>
 
 #include "base_db_test.h"
 
@@ -224,7 +223,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        nx::utils::promise<void> queryExecuted;
+        std::promise<void> queryExecuted;
 
         asyncSqlQueryExecutor().executeSelect(
             [this, &queryExecuted](QueryContext* queryContext)
@@ -246,7 +245,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        nx::utils::promise<void> queryExecuted;
+        std::promise<void> queryExecuted;
 
         asyncSqlQueryExecutor().executeUpdate(
             [this, &queryExecuted](QueryContext* queryContext)
@@ -306,7 +305,7 @@ private:
     DbConnectionEventsReceiver* m_eventsReceiver = nullptr;
     nx::utils::SyncQueue<DBResult> m_queryResults;
     int m_issuedRequestCount = 0;
-    nx::utils::promise<void> m_finishHangingQuery;
+    std::promise<void> m_finishHangingQuery;
     std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests = 0;
     std::atomic<int> m_concurrentDataModificationRequests = 0;
     bool m_lastDbOpenResult = false;

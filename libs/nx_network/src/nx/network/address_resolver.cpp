@@ -2,9 +2,10 @@
 
 #include "address_resolver.h"
 
+#include <future>
+
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/extension/stun_extension_types.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
 
@@ -118,7 +119,7 @@ std::deque<AddressEntry> AddressResolver::resolveSync(
     NatTraversalSupport natTraversalSupport,
     int ipVersion)
 {
-    utils::promise<std::pair<SystemError::ErrorCode, std::deque<AddressEntry>>> promise;
+    std::promise<std::pair<SystemError::ErrorCode, std::deque<AddressEntry>>> promise;
     auto handler =
         [&](SystemError::ErrorCode code, std::deque<AddressEntry> entries)
         {
@@ -134,11 +135,11 @@ std::deque<AddressEntry> AddressResolver::resolveSync(
 void AddressResolver::cancel(
     void* requestId, nx::MoveOnlyFunc<void()> handler)
 {
-    std::optional<utils::promise<bool>> promise;
+    std::optional<std::promise<bool>> promise;
     if (!handler)
     {
         // no handler means we have to wait for complete
-        promise = utils::promise<bool>();
+        promise = std::promise<bool>();
         handler = [&](){ promise->set_value(true); };
     }
 

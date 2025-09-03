@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <thread>
 #include <vector>
 
 #include <QtCore/QDir>
@@ -9,7 +10,6 @@
 
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_common.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 
 #include "../vms_gateway_process_public.h"

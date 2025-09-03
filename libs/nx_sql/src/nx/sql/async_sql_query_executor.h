@@ -8,9 +8,9 @@
 #include <functional>
 #include <future>
 #include <memory>
+#include <thread>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 #include <nx/utils/type_traits.h>
@@ -244,7 +244,7 @@ public:
     {
         std::invoke_result_t<QueryFunc, nx::sql::QueryContext*> result;
 
-        nx::utils::promise<nx::sql::DBResult> queryDonePromise;
+        std::promise<nx::sql::DBResult> queryDonePromise;
         executeSelect(
             [&queryFunc, &result](nx::sql::QueryContext* queryContext)
             {
@@ -396,13 +396,13 @@ private:
 
     const ConnectionOptions m_connectionOptions;
     mutable nx::Mutex m_mutex;
-    nx::utils::thread m_queryTimeoutThread;
+    std::thread m_queryTimeoutThread;
     nx::WaitCondition m_queryTimeoutThreadStoppedCondition;
     detail::QueryQueue m_queryQueue;
     std::atomic<std::size_t> m_dbThreadPoolSize{0};
     StatisticsCollector m_statisticsCollector;
     std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreads;
-    nx::utils::thread m_dropConnectionThread;
+    std::thread m_dropConnectionThread;
     nx::utils::SyncQueue<std::unique_ptr<detail::BaseQueryExecutor>> m_connectionsToDropQueue;
     std::atomic<bool> m_terminated = false;
     std::optional<ConnectionFactoryFunc> m_connectionFactory;

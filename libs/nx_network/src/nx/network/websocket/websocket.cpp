@@ -3,7 +3,6 @@
 #include "websocket.h"
 
 #include <nx/network/socket_global.h>
-#include <nx/utils/std/future.h>
 
 namespace nx::network::websocket {
 

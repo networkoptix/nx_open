@@ -1,11 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <atomic>
 #include <thread>
+#include <future>
 
-#include <nx/utils/std/thread.h>
+#include <gtest/gtest.h>
+
 #include <nx/utils/subscription.h>
 
 namespace nx::utils::test {
@@ -135,7 +135,7 @@ TEST_F(Subscription, is_thread_safe)
         &subscription1);
 
     // notify from different thread
-    nx::utils::thread thread([&]() { subscription.notify(3); });
+    std::thread thread([&]() { subscription.notify(3); });
 
     // wait for thread to start
     inHandler.get_future().wait();

@@ -45,7 +45,7 @@ public:
     Private(CrossSystemNotificationsListener* owner): q(owner) {}
     ~Private()
     {
-        nx::utils::promise<void> promise;
+        std::promise<void> promise;
         reconnectTimer.pleaseStop(
             [this, &promise]()
             {

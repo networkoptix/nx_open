@@ -1,9 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <future>
+
 #include "async_stoppable.h"
 
 #include <nx/network/aio/aio_service.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex_lock_analyzer.h>
 
 #include "socket_global.h"
@@ -26,7 +27,7 @@ void QnStoppableAsync::pleaseStopSync(const nx::network::aio::AIOService* aioSer
         NX_CRITICAL(!aioService->isInAnyAioThread());
     }
 
-    nx::utils::promise<void> promise;
+    std::promise<void> promise;
     auto fut = promise.get_future();
     pleaseStop([&]() { promise.set_value(); });
     fut.wait();

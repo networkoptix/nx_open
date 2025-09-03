@@ -100,7 +100,7 @@ void Timer::cancelSync()
     }
     else
     {
-        nx::utils::promise<void> cancelledPromise;
+        std::promise<void> cancelledPromise;
         cancelAsync([&cancelledPromise]() { cancelledPromise.set_value(); });
         cancelledPromise.get_future().wait();
     }

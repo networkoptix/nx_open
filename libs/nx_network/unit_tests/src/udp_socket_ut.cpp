@@ -1,19 +1,19 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <thread>
+
 #include <gtest/gtest.h>
 
-#include <nx/network/aio/aio_service.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/retry_timer.h>
-#include <nx/network/system_socket.h>
 #include <nx/network/socket_global.h>
-#include <nx/utils/uuid.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std/future.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace network {
@@ -61,7 +61,7 @@ protected:
     {
         std::unique_ptr<UDPSocket> socket;
         nx::Buffer readBuffer;
-        nx::utils::promise<void> readPromise;
+        std::promise<void> readPromise;
     };
 
     void udpSocketTransferTest(
@@ -337,7 +337,7 @@ TEST_F(UdpSocket, DISABLED_Performance)
     server.bind(SocketAddress::anyPrivateAddress);
     const auto address = server.getLocalAddress();
     NX_INFO(this, nx::format("%1").arg(address));
-    nx::utils::thread serverThread(
+    std::thread serverThread(
         [&]()
         {
             const auto startTime = std::chrono::steady_clock::now();
@@ -369,7 +369,7 @@ TEST_F(UdpSocket, DISABLED_Performance)
                     durationMs, nx::utils::bytesToString((uint64_t) bytesPerS)));
         });
 
-    nx::utils::thread clientThread(
+    std::thread clientThread(
         [&]()
         {
             UDPSocket client(AF_INET);

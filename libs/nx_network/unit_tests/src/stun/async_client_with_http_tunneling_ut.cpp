@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <future>
 #include <tuple>
 
 #include <gtest/gtest.h>
@@ -13,7 +14,6 @@
 #include <nx/network/test_support/stun_simple_server.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include "stun_over_http_server_fixture.h"
@@ -106,7 +106,7 @@ protected:
 
     void whenConnectToRegularStunServer()
     {
-        nx::utils::promise<SystemError::ErrorCode> done;
+        std::promise<SystemError::ErrorCode> done;
         m_client->connect(
             network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName)
                 .setEndpoint(m_stunServer.address()),

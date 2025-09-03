@@ -1,14 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <future>
 #include <memory>
 
 #include <gtest/gtest.h>
 
 #include <nx/network/http/http_types.h>
+#include <nx/network/ssl/context.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/stun/async_client_user.h>
 #include <nx/network/stun/stun_types.h>
-#include <nx/network/ssl/context.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/stun_async_client_acceptance_tests.h>
 #include <nx/network/test_support/stun_simple_server.h>
@@ -272,7 +273,7 @@ private:
 
     SystemError::ErrorCode connectToUrl(const nx::Url& url)
     {
-        nx::utils::promise<SystemError::ErrorCode> connectedPromise;
+        std::promise<SystemError::ErrorCode> connectedPromise;
         m_stunClient->connect(
             url,
             [&connectedPromise](SystemError::ErrorCode sysErrorCode)
@@ -382,7 +383,7 @@ protected:
             std::this_thread::sleep_for(
                 std::chrono::milliseconds(nx::utils::random::number<int>(0, 10)));
 
-            nx::utils::promise<void> clientUserRemoved;
+            std::promise<void> clientUserRemoved;
             clientUser->post(
                 [&clientUser, &clientUserRemoved, &clientUserStopped]()
                 {

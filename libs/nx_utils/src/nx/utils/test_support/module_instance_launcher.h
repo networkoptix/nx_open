@@ -2,13 +2,13 @@
 
 #pragma once
 
+#include <future>
+#include <thread>
 #include <vector>
 
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <nx/utils/std/future.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::utils::test {
@@ -35,12 +35,12 @@ public:
 
     void start()
     {
-        nx::utils::promise<void> moduleInstantiatedCreatedPromise;
+        std::promise<void> moduleInstantiatedCreatedPromise;
         auto moduleInstantiatedCreatedFuture = moduleInstantiatedCreatedPromise.get_future();
 
-        m_moduleStartedPromise = std::make_unique<nx::utils::promise<bool>>();
+        m_moduleStartedPromise = std::make_unique<std::promise<bool>>();
 
-        m_moduleProcessThread = nx::utils::thread(
+        m_moduleProcessThread = std::thread(
             [this, &moduleInstantiatedCreatedPromise]()->int
             {
                 beforeModuleCreation();
@@ -227,8 +227,8 @@ private:
     std::vector<char*> m_args;
     std::vector<ArgumentType> m_argTypes;
     std::unique_ptr<ModuleProcessType> m_moduleInstance;
-    nx::utils::thread m_moduleProcessThread;
-    std::unique_ptr<nx::utils::promise<bool /*result*/>> m_moduleStartedPromise;
+    std::thread m_moduleProcessThread;
+    std::unique_ptr<std::promise<bool /*result*/>> m_moduleStartedPromise;
     std::atomic_bool m_started = false;
     mutable std::mutex m_mutex;
 };

@@ -1,11 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <thread>
 
+#include <gtest/gtest.h>
+
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/thread/semaphore.h>
 
 namespace nx::test {
@@ -54,7 +53,7 @@ TEST(Semaphore, TwoThreads)
     ASSERT_TRUE(semaphore.tryAcquire());
     ASSERT_EQ(semaphore.available(), 0);
 
-    utils::thread thread(
+    std::thread thread(
         [&]()
         {
             NX_DEBUG(this, nx::format("Spawned thread"));

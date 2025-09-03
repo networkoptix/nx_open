@@ -1,11 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <thread>
 
+#include <gtest/gtest.h>
+
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
@@ -16,11 +16,11 @@ class SyncQueue:
     public ::testing::Test
 {
 protected:
-    nx::utils::thread pushAsync(
+    std::thread pushAsync(
         std::vector<int> values,
         std::chrono::milliseconds delay = std::chrono::milliseconds(0))
     {
-        return nx::utils::thread(
+        return std::thread(
             [this, values = std::move(values), delay]()
             {
                 for (const auto& value: values)
@@ -187,7 +187,7 @@ protected:
 private:
     struct ReaderContext
     {
-        nx::utils::thread thread;
+        std::thread thread;
     };
 
     using Readers = std::map<QueueReaderId, ReaderContext>;
@@ -204,7 +204,7 @@ private:
         {
             m_readers.emplace(
                 i,
-                ReaderContext{nx::utils::thread(
+                ReaderContext{std::thread(
                     std::bind(&SyncQueueTermination::readThreadMain, this, i))});
         }
     }

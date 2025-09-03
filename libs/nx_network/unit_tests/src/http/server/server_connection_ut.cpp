@@ -293,7 +293,7 @@ protected:
 
     void issueUpgradeRequest()
     {
-        nx::utils::promise<nx::network::http::Response> response;
+        std::promise<nx::network::http::Response> response;
 
         AsyncClient httpClient{ssl::kAcceptAnyCertificate};
         httpClient.doUpgrade(

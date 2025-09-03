@@ -1,12 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <future>
 #include <optional>
 #include <thread>
 
 #include <gtest/gtest.h>
 
-#include <nx/network/aio/async_channel_bridge.h>
 #include <nx/network/aio/abstract_async_channel.h>
+#include <nx/network/aio/async_channel_bridge.h>
 #include <nx/network/aio/test/aio_test_async_channel.h>
 #include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/random.h>
@@ -155,7 +156,7 @@ private:
     std::unique_ptr<aio::AsyncChannelBridge> m_bridge;
     std::unique_ptr<AsyncChannel> m_leftFile;
     std::unique_ptr<AsyncChannel> m_rightFile;
-    nx::utils::promise<SystemError::ErrorCode> m_bridgeDone;
+    std::promise<SystemError::ErrorCode> m_bridgeDone;
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
     nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_additionalOnBridgeDoneHandler;
 

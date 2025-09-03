@@ -1,11 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <thread>
 
+#include <gtest/gtest.h>
+
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx::test {
@@ -49,7 +48,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_2Threads)
     Mutex m1;
     Mutex m2;
 
-    utils::thread t1(
+    std::thread t1(
         [&]()
         {
             NX_MUTEX_LOCKER lock1(&m1);
@@ -58,7 +57,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_2Threads)
         });
 
 
-    utils::thread t2(
+    std::thread t2(
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -77,7 +76,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_3Threads)
     nx::Mutex m2;
     nx::Mutex m3;
 
-    utils::thread t1(
+    std::thread t1(
         [&]()
         {
             NX_MUTEX_LOCKER lock1(&m1);
@@ -86,7 +85,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_3Threads)
         });
 
 
-    utils::thread t2(
+    std::thread t2(
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -95,7 +94,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_3Threads)
             NX_DEBUG(this, nx::format("Thread 2"));
         });
 
-    utils::thread t3(
+    std::thread t3(
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -115,7 +114,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_WaitCondition)
     Mutex m2;
     WaitCondition c;
 
-    utils::thread t1(
+    std::thread t1(
         [&]()
         {
             NX_MUTEX_LOCKER lock1(&m1);
@@ -124,7 +123,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_WaitCondition)
             NX_DEBUG(this, nx::format("Thread 1"));
         });
 
-    utils::thread t2(
+    std::thread t2(
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -144,7 +143,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_WaitCondition_2Waiters)
     Mutex m2;
     WaitCondition c;
 
-    utils::thread t1(
+    std::thread t1(
         [&]()
         {
             NX_MUTEX_LOCKER lock1(&m1);
@@ -153,7 +152,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_WaitCondition_2Waiters)
             NX_DEBUG(this, nx::format("Thread 1"));
         });
 
-    utils::thread t2(
+    std::thread t2(
         [&]()
         {
             NX_MUTEX_LOCKER lock1(&m1);
@@ -162,7 +161,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_WaitCondition_2Waiters)
             NX_DEBUG(this, nx::format("Thread 2"));
         });
 
-    utils::thread t3(
+    std::thread t3(
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <filesystem>
+#include <future>
 
 #include <gtest/gtest.h>
 
@@ -36,7 +37,7 @@ protected:
     template<typename RecordStructure>
     std::vector<RecordStructure> executeSelect(const std::string_view& queryText)
     {
-        nx::utils::promise<nx::sql::DBResult> queryCompletedPromise;
+        std::promise<nx::sql::DBResult> queryCompletedPromise;
         auto future = queryCompletedPromise.get_future();
 
         std::vector<RecordStructure> records;
@@ -71,7 +72,7 @@ protected:
     template<typename DbQueryFunc>
     DBResult executeQuery(DbQueryFunc dbQueryFunc)
     {
-        nx::utils::promise<nx::sql::DBResult> queryCompletedPromise;
+        std::promise<nx::sql::DBResult> queryCompletedPromise;
 
         //starting async operation
         asyncSqlQueryExecutor().executeUpdate(

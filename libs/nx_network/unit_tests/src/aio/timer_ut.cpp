@@ -4,7 +4,6 @@
 
 #include <nx/network/aio/timer.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
@@ -88,7 +87,7 @@ TEST_F(AioTimer, destroying_in_timeout_handler)
 
 TEST_F(AioTimer, cancel_timer_does_not_cancel_posted_calls)
 {
-    nx::utils::promise<void> postInvokedPromise;
+    std::promise<void> postInvokedPromise;
 
     m_timer->start(
         std::chrono::seconds::zero(),

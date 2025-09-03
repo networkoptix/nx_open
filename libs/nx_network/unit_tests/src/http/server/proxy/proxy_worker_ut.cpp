@@ -5,7 +5,6 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/http/server/proxy/proxy_worker.h>
 #include <nx/network/system_socket.h>
-#include <nx/utils/std/future.h>
 
 namespace nx::network::http::server::proxy::test {
 
@@ -53,7 +52,7 @@ private:
     std::unique_ptr<proxy::ProxyWorker> m_requestProxyWorker;
     TestHttpServer m_httpServer;
     nx::Buffer m_staticResource;
-    nx::utils::promise<void> m_messageBodyEndReported;
+    std::promise<void> m_messageBodyEndReported;
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> m_messageBodySource;
     std::promise<nx::network::http::Response> m_proxiedResponse;
 

@@ -287,7 +287,7 @@ protected:
 
     void whenCancelledIoWithinAioThread()
     {
-        nx::utils::promise<void> done;
+        std::promise<void> done;
 
         m_acceptor.post(
             [&done, this]()
@@ -400,7 +400,7 @@ protected:
     template<typename Func>
     void executeInAcceptorsAioThread(Func func)
     {
-        nx::utils::promise<void> done;
+        std::promise<void> done;
         m_acceptor.post(
             [&func, &done]()
             {
