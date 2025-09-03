@@ -87,7 +87,7 @@
     <message>
       <source>User full name is controlled by the %1.</source>
       <comment>%1 is the short Cloud name</comment>
-      <translation type="unfinished">User full name is controlled by the %1.</translation>
+      <translation>Brugerens fulde navn styres af %1.</translation>
     </message>
     <message>
       <source>Creating an Administrator user is not allowed.</source>
@@ -240,7 +240,7 @@
     </message>
     <message>
       <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
-      <translation type="unfinished">User &apos;%1(%2) is not permitted to create new User Groups.&apos;</translation>
+      <translation>Bruger &apos;%1(%2) har ikke tilladelse til at oprette nye brugergrupper.&apos;</translation>
     </message>
     <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
@@ -294,11 +294,11 @@
     </message>
     <message>
       <source>Removal of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Removal of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>Fjernelse af brugeren med skrivebeskyttet attribut er forbudt for VMS.</translation>
     </message>
     <message>
       <source>the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</source>
-      <translation type="unfinished">the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</translation>
+      <translation>brugeren %1 har&apos;ikke &apos;generateEvents&apos; tilladelse</translation>
     </message>
   </context>
 </TS>
