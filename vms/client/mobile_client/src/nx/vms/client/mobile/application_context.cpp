@@ -245,8 +245,11 @@ ApplicationContext::ApplicationContext(
 
 ApplicationContext::~ApplicationContext()
 {
-    removeSystemContext(d->mainSystemContext.release());
-
+    // Main system context does not exist in self-update mode.
+    if (d->mainSystemContext)
+    {
+        removeSystemContext(d->mainSystemContext.release());
+    }
     qmlEngine()->removeImageProvider("thumbnail");
     resetEngine(); // Frees all systems contexts of the QML objects.
 
