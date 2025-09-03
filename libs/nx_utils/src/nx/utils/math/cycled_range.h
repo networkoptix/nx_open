@@ -3,9 +3,9 @@
 #pragma once
 
 #include <algorithm>
+#include <optional>
 
 #include <nx/utils/math/arithmetic.h>
-#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace utils {

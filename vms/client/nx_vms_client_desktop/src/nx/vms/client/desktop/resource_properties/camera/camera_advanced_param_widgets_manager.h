@@ -2,13 +2,14 @@
 
 #pragma once
 
+#include <optional>
+
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QTreeWidget>
 
 #include <core/resource/camera_advanced_param.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/utils/std/optional.h>
 
 namespace nx::vms::client::desktop {
 

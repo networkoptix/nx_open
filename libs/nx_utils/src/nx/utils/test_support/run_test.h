@@ -20,7 +20,6 @@
 #include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/rlimit.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std/filesystem.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include "test_options.h"

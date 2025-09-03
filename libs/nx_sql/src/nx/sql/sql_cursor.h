@@ -3,8 +3,8 @@
 #pragma once
 
 #include <future>
+#include <optional>
 
-#include <nx/utils/std/optional.h>
 #include <nx/utils/uuid.h>
 
 #include "async_sql_query_executor.h"

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 #include <string>
 
 #include <nx/network/abstract_socket.h>
@@ -10,7 +11,6 @@
 #include <nx/network/http/server/api_request_result.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/string_conversion.h>
-#include <nx/utils/std/optional.h>
 
 #include "relay_api_result_code.h"
 

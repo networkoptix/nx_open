@@ -2,10 +2,11 @@
 
 #include "test_with_db_helper.h"
 
+#include <optional>
+
 #include <QtCore/QDir>
 
 #include <nx/utils/log/format.h>
-#include <nx/utils/std/optional.h>
 #include <nx/utils/test_support/test_options.h>
 
 #include "../db_connection_holder.h"

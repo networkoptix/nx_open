@@ -51,7 +51,7 @@ DBResult BasicFixture::executeUpdate(const std::string_view& queryText)
         });
 }
 
-nx::utils::filesystem::path BasicFixture::dbFilePath() const
+std::filesystem::path BasicFixture::dbFilePath() const
 {
     return m_dbFilePath;
 }

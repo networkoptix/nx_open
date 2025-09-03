@@ -1,10 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <memory>
+#include <optional>
 
 #include <nx/sql/db_connection_holder.h>
 #include <nx/sql/detail/query_executor.h>
-#include <nx/utils/std/optional.h>
 
 #include "../base_db_test.h"
 

@@ -18,7 +18,6 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/filesystem.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 

@@ -32,7 +32,7 @@ FileBody::~FileBody()
 
 std::string FileBody::mimeType() const
 {
-    const auto extension = nx::utils::filesystem::path(m_filePath).extension();
+    const auto extension = std::filesystem::path(m_filePath).extension();
 
     if (extension == ".json")
         return "application/json";

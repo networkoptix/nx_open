@@ -17,7 +17,6 @@
 #include <nx/utils/exception.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/optional.h>
 
 using nx::kit::utils::isSpaceOrControlChar;
 

@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
-#include <nx/utils/std/optional.h>
 
 #include "../../http_async_client.h"
 #include "../../http_types.h"

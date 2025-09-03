@@ -47,13 +47,7 @@ void PrintTo(const QRectF& val, ::std::ostream* os)
         << val.height() << ")";
 }
 
-//-------------------------------------------------------------------------------------------------
-
-namespace nx::utils::filesystem {
-
-void PrintTo(const path& val, ::std::ostream* os)
+void PrintTo(const std::filesystem::path& val, ::std::ostream* os)
 {
     *os << val.string();
 }
-
-} // namespace nx::utils::filesystem

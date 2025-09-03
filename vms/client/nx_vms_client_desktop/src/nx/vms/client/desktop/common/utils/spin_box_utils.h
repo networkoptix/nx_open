@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QtGlobal>
+#include <optional>
 
-#include <nx/utils/std/optional.h>
+#include <QtCore/QtGlobal>
 
 class QSpinBox;
 class QDoubleSpinBox;

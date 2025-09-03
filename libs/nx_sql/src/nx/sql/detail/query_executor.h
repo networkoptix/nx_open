@@ -4,12 +4,12 @@
 
 #include <chrono>
 #include <functional>
+#include <optional>
 #include <tuple>
 
 #include <nx/telemetry/span.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/optional.h>
 
 #include "../abstract_db_connection.h"
 #include "../db_connection_holder.h"

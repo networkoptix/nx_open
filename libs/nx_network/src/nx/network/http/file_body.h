@@ -4,7 +4,6 @@
 
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/fs/file.h>
-#include <nx/utils/std/filesystem.h>
 
 #include "abstract_msg_body_source.h"
 

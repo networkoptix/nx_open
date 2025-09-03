@@ -5,6 +5,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
@@ -13,7 +14,6 @@
 #include <nx/utils/interruption_flag.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/optional.h>
 
 #include "stream_socket_server.h"
 

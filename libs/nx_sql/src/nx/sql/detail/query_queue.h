@@ -9,9 +9,9 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <optional>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
 #include "query_executor.h"

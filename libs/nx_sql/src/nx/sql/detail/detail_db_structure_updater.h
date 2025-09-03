@@ -2,13 +2,12 @@
 
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include <QtCore/QByteArray>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/future.h>
-#include <nx/utils/std/optional.h>
 
 #include "../async_sql_query_executor.h"
 #include "../query_context.h"

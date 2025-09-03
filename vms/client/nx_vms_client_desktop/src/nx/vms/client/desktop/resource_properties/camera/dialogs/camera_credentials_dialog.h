@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <nx/utils/std/optional.h>
+#include <optional>
+
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui { class CameraCredentialsDialog; }

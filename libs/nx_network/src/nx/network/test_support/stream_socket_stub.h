@@ -2,11 +2,12 @@
 
 #pragma once
 
+#include <optional>
+
 #include <nx/network/aio/timer.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/byte_stream/pipeline.h>
-#include <nx/utils/std/optional.h>
 
 namespace nx::network::test {
 

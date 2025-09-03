@@ -5,8 +5,7 @@
 #include <chrono>
 #include <deque>
 #include <numeric>
-
-#include <nx/utils/std/optional.h>
+#include <optional>
 
 #include "../time.h"
 
