@@ -259,10 +259,12 @@ ApplicationContext::ApplicationContext(
 
 ApplicationContext::~ApplicationContext()
 {
+    // Main system context does not exist in self-update mode.
     if (d->mainSystemContext)
+    {
         d->mainSystemContext->sessionManager()->resetSession();
-
-    removeSystemContext(d->mainSystemContext.release());
+        removeSystemContext(d->mainSystemContext.release());
+    }
 
     // Currently, throughout the derived client code (desktop, mobile) it's assumed everywhere
     // that all system contexts are of that most derived level. I.e. desktop client code expects
