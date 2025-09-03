@@ -4,16 +4,19 @@
 
 #include <nx/kit/ini_config.h>
 
-namespace nx::cloud::db::api {
+namespace nx::cloud {
 
 struct Ini: public nx::kit::IniConfig
 {
-    Ini(): IniConfig("cloud_db_client.ini") { reload(); }
+    Ini(): IniConfig("cloud_services.ini") { reload(); }
 
     NX_INI_STRING("", customizedAnalyticsDbUrl,
         "Overrides the current analytycs DB service url");
+
+    NX_INI_STRING("", customizedDeploymentServiceUrl,
+        "Overrides the current Deployment service url");
 };
 
 Ini& ini();
 
-} // nx::cloud::db::api
+} // nx::cloud

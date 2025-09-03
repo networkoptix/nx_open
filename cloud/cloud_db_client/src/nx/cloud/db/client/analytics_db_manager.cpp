@@ -2,7 +2,7 @@
 
 #include "analytics_db_manager.h"
 
-#include <cloud_db_client_ini.h>
+#include <nx/cloud/cloud_services_ini.h>
 #include <nx/network/http/rest/http_rest_client.h>
 
 #include "cdb_request_path.h"
@@ -24,7 +24,7 @@ AnalyticsDbManager::AnalyticsDbManager(
     :
     m_requestsExecutor(requestsExecutor)
 {
-    const QString customUrl(nx::cloud::db::api::ini().customizedAnalyticsDbUrl);
+    const QString customUrl(nx::cloud::ini().customizedAnalyticsDbUrl);
     if (!customUrl.isEmpty())
     {
         m_customRequestExecutor = std::make_unique<ApiRequestsExecutor>(
