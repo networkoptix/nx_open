@@ -784,8 +784,12 @@ ApplicationContext::~ApplicationContext()
     // Local resources context temporary implementation depends on main system context.
     d->localResourcesContext.reset();
 
-    // Remote session must be fully destroyed while application context still exists.
-    removeSystemContext(d->mainSystemContext.release());
+    // Main system context does not exist in self-update mode.
+    if (d->mainSystemContext)
+    {
+        // Remote session must be fully destroyed while application context still exists.
+        removeSystemContext(d->mainSystemContext.release());
+    }
     d->cloudLayoutsManager.reset();
 
     // Web Page icon cache uses application context.
