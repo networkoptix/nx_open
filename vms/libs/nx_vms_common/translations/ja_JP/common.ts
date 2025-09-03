@@ -1477,7 +1477,7 @@
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation>UPNPポートマッピングを有効にする</translation>
+      <translation>UPnP ポートマッピングを有効にする</translation>
     </message>
     <message>
       <source>Backup settings</source>

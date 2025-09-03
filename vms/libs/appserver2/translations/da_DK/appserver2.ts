@@ -5,206 +5,206 @@
     <name>ServerApiErrors</name>
     <message>
       <source>User Group &apos;%1&apos; does not exist.</source>
-      <translation type="unfinished">User Group &apos;%1&apos; does not exist.</translation>
+      <translation>Brugergruppe &apos;%1&apos; eksisterer ikke.</translation>
     </message>
     <message>
       <source>Cannot add to a non-local (%1) User Group &apos;%2(%3)&apos;.</source>
-      <translation type="unfinished">Cannot add to a non-local (%1) User Group &apos;%2(%3)&apos;.</translation>
+      <translation>Kan ikke tilføje til en ikke-lokal (%1) Brugergruppe &apos;%2(%3)&apos;.</translation>
     </message>
     <message>
       <source>Circular dependencies are forbidden. The User Group &apos;%1(%2)&apos; is already inherited by &apos;%3&apos;.</source>
-      <translation type="unfinished">Circular dependencies are forbidden. The User Group &apos;%1(%2)&apos; is already inherited by &apos;%3&apos;.</translation>
+      <translation>Cirkulære afhængigheder er forbudt. Brugergruppen &apos;%1(%2)&apos; er allerede arvet af &apos;%3&apos;.</translation>
     </message>
     <message>
       <source>Forbidden to add any Users to an LDAP User Group &apos;%1(%2)&apos;.</source>
-      <translation type="unfinished">Forbidden to add any Users to an LDAP User Group &apos;%1(%2)&apos;.</translation>
+      <translation>Det er forbudt at tilføje brugere til en LDAP brugergruppe &apos;%1(%2)&apos;.</translation>
     </message>
     <message>
       <source>Forbidden to add any User Groups to an LDAP User Group &apos;%1(%2)&apos;.</source>
-      <translation type="unfinished">Forbidden to add any User Groups to an LDAP User Group &apos;%1(%2)&apos;.</translation>
+      <translation>Det er forbudt at tilføje brugergrupper til en LDAP brugergruppe &apos;%1(%2)&apos;.</translation>
     </message>
     <message>
       <source>Forbidden to remove any Users from an LDAP User Group &apos;%1(%2)&apos;.</source>
-      <translation type="unfinished">Forbidden to remove any Users from an LDAP User Group &apos;%1(%2)&apos;.</translation>
+      <translation>Det er forbudt at fjerne brugere fra en LDAP brugergruppe &apos;%1(%2)&apos;.</translation>
     </message>
     <message>
       <source>Forbidden to remove any User Groups from an LDAP User Group &apos;%1(%2)&apos;.</source>
-      <translation type="unfinished">Forbidden to remove any User Groups from an LDAP User Group &apos;%1(%2)&apos;.</translation>
+      <translation>Det er forbudt at fjerne brugergrupper fra en LDAP brugergruppe &apos;%1(%2)&apos;.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to add the User &apos;%3(%4)&apos; to the User Group &apos;%5(%6)&apos;.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to add the User &apos;%3(%4)&apos; to the User Group &apos;%5(%6)&apos;.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at tilføje brugeren &apos;%3(%4)&apos; til brugergruppen &apos;%5(%6)&apos;.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to add the User Group &apos;%3(%4)&apos; to the User Group &apos;%5(%6)&apos;.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to add the User Group &apos;%3(%4)&apos; to the User Group &apos;%5(%6)&apos;.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at tilføje brugergruppen &apos;%3(%4)&apos; til brugergruppen &apos;%5(%6)&apos;.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to remove the User &apos;%3(%4)&apos; from the User Group &apos;%5(%6)&apos;.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to remove the User &apos;%3(%4)&apos; from the User Group &apos;%5(%6)&apos;.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at fjerne brugeren &apos;%3(%4)&apos; fra brugergruppen &apos;%5(%6)&apos;.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to remove the User Group &apos;%3(%4)&apos; from the User Group &apos;%5(%6)&apos;.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to remove the User Group &apos;%3(%4)&apos; from the User Group &apos;%5(%6)&apos;.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at fjerne brugergruppen &apos;%3(%4)&apos; fra brugergruppen &apos;%5(%6)&apos;.</translation>
     </message>
     <message>
       <source>Invalid access check for %1.</source>
       <comment>%1 is a C++ type name</comment>
-      <translation type="unfinished">Invalid access check for %1.</translation>
+      <translation>Ugyldig adgangskontrol for %1.</translation>
     </message>
     <message>
       <source>Request of User %1 with %2 permissions for %3 Resource with %4 permissions is forbidden.</source>
-      <translation type="unfinished">Request of User %1 with %2 permissions for %3 Resource with %4 permissions is forbidden.</translation>
+      <translation>Anmodning fra bruger %1 med %2 tilladelser for %3 Ressource med %4 tilladelser er forbudt.</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; is not permitted to modify %2.</source>
-      <translation type="unfinished">User &apos;%1&apos; is not permitted to modify %2.</translation>
+      <translation>Bruger &apos;%1&apos; har ikke tilladelse til at ændre %2.</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; is not permitted to create new resource.</source>
-      <translation type="unfinished">User &apos;%1&apos; is not permitted to create new resource.</translation>
+      <translation>Bruger &apos;%1&apos; har ikke tilladelse til at oprette en ny ressource.</translation>
     </message>
     <message>
       <source>Invalid Resource type %1.</source>
-      <translation type="unfinished">Invalid Resource type %1.</translation>
+      <translation>Ugyldig ressourcetype %1.</translation>
     </message>
     <message>
       <source>Empty Storage URL is not allowed.</source>
-      <translation type="unfinished">Empty Storage URL is not allowed.</translation>
+      <translation>Tom lager-URL er ikke tilladt.</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; is not permitted to remove %2.</source>
-      <translation type="unfinished">User &apos;%1&apos; is not permitted to remove %2.</translation>
+      <translation>Bruger &apos;%1&apos; har ikke tilladelse til at fjerne %2.</translation>
     </message>
     <message>
       <source>It is forbidden to delete own local storage %1.</source>
-      <translation type="unfinished">It is forbidden to delete own local storage %1.</translation>
+      <translation>Det er forbudt at slette eget lokale lager %1.</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; will not be saved because of the login duplication.</source>
-      <translation type="unfinished">User &apos;%1&apos; will not be saved because of the login duplication.</translation>
+      <translation>Bruger &apos;%1&apos; vil ikke blive gemt på grund af login-duplikering.</translation>
     </message>
     <message>
       <source>User full name is controlled by the %1.</source>
       <comment>%1 is the short Cloud name</comment>
-      <translation type="unfinished">User full name is controlled by the %1.</translation>
+      <translation>Brugerens fulde navn styres af %1.</translation>
     </message>
     <message>
       <source>Creating an Administrator user is not allowed.</source>
-      <translation type="unfinished">Creating an Administrator user is not allowed.</translation>
+      <translation>Det er ikke tilladt at oprette en administratorbruger.</translation>
     </message>
     <message>
       <source>Forbidden to modify User&apos;s &apos;type&apos; from &apos;%1&apos; to &apos;%2&apos;.</source>
-      <translation type="unfinished">Forbidden to modify User&apos;s &apos;type&apos; from &apos;%1&apos; to &apos;%2&apos;.</translation>
+      <translation>Det er forbudt at ændre bruger&apos;s &apos;type&apos; fra &apos;%1&apos; til &apos;%2&apos;.</translation>
     </message>
     <message>
       <source>Invalid temporary token</source>
-      <translation type="unfinished">Invalid temporary token</translation>
+      <translation>Ugyldig midlertidig token</translation>
     </message>
     <message>
       <source>Creation of a non-local (%1) User is forbidden for VMS.</source>
-      <translation type="unfinished">Creation of a non-local (%1) User is forbidden for VMS.</translation>
+      <translation>Oprettelse af en ikke-lokal (%1) Bruger er forbudt for VMS.</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; will not be saved because names differ: &apos;%1&apos; vs &apos;%2&apos; and changing name is forbidden for %3 users.</source>
       <comment>%3 is the short Cloud name</comment>
-      <translation type="unfinished">User &apos;%1&apos; will not be saved because names differ: &apos;%1&apos; vs &apos;%2&apos; and changing name is forbidden for %3 users.</translation>
+      <translation>Bruger &apos;%1&apos; vil ikke blive gemt, fordi navnene er forskellige: &apos;%1&apos; vs &apos;%2&apos; og navneændring er forbudt for %3 brugere.</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; will not be saved because names differ: &apos;%1&apos; vs &apos;%2&apos; and `password` has not been provided.</source>
-      <translation type="unfinished">User &apos;%1&apos; will not be saved because names differ: &apos;%1&apos; vs &apos;%2&apos; and `password` has not been provided.</translation>
+      <translation>Bruger &apos;%1&apos; vil ikke blive gemt, fordi navnene er forskellige: &apos;%1&apos; vs &apos;%2&apos; og `adgangskode` er ikke angivet.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to change his own property &apos;%3&apos;.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to change his own property &apos;%3&apos;.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at ændre sine egne egenskaber &apos;%3&apos;.</translation>
     </message>
     <message>
       <source>Change of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Change of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>Ændring af brugeren med read only attributten er forbudt for VMS.</translation>
     </message>
     <message>
       <source>Creation of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Creation of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>Oprettelse af brugeren med readonly-attributten er forbudt for VMS.</translation>
     </message>
     <message>
       <source>Change of `externalId` is forbidden.</source>
-      <translation type="unfinished">Change of `externalId` is forbidden.</translation>
+      <translation>Ændring af `externalId` er forbudt.</translation>
     </message>
     <message>
       <source>Cannot modify property &apos;%1&apos; of a non-local (%2) User &apos;%3(%4)&apos;.</source>
-      <translation type="unfinished">Cannot modify property &apos;%1&apos; of a non-local (%2) User &apos;%3(%4)&apos;.</translation>
+      <translation>Kan ikke ændre egenskaben &apos;%1&apos; af en ikke-lokal (%2) Bruger &apos;%3(%4)&apos;.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify User &apos;%3(%4)&apos; with &apos;%5&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify User &apos;%3(%4)&apos; with &apos;%5&apos; rights.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at ændre bruger &apos;%3(%4)&apos; med &apos;%5&apos; rettigheder.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create new Users.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create new Users.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at oprette nye brugere.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create a User with &apos;%3&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create a User with &apos;%3&apos; rights.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at oprette en bruger med &apos;%3&apos; rettigheder.</translation>
     </message>
     <message>
       <source>Expected Device id %1 is not equal to actual id %2 (`physicalId` %3).</source>
-      <translation type="unfinished">Expected Device id %1 is not equal to actual id %2 (`physicalId` %3).</translation>
+      <translation>Forventet enheds-id %1 er ikke lig med faktisk id %2 (`physicalId` %3).</translation>
     </message>
     <message>
       <source>Request of User %1 with %2 permissions to read Resource parameter `%3` is forbidden.</source>
-      <translation type="unfinished">Request of User %1 with %2 permissions to read Resource parameter `%3` is forbidden.</translation>
+      <translation>Anmodning fra bruger %1 med %2 tilladelser om at læse ressourceparameteren `%3` er forbudt.</translation>
     </message>
     <message>
       <source>Not enough integration licenses for camera %1.</source>
-      <translation type="unfinished">Not enough integration licenses for camera %1.</translation>
+      <translation>Ikke nok integrationslicenser til kamera %1.</translation>
     </message>
     <message>
       <source>Server %1 does not exist.</source>
-      <translation type="unfinished">Server %1 does not exist.</translation>
+      <translation>Server %1 findes ikke.</translation>
     </message>
     <message>
       <source>Storage %1 does not belong to this Server.</source>
-      <translation type="unfinished">Storage %1 does not belong to this Server.</translation>
+      <translation>Lagerplads %1 tilhører ikke denne server.</translation>
     </message>
     <message>
       <source>Storage %1 can not store analytics.</source>
-      <translation type="unfinished">Storage %1 can not store analytics.</translation>
+      <translation>Lagring %1 kan ikke gemme analyser.</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; with %2 permissions is not allowed to modify Resource parameter &apos;%3&apos;.</source>
-      <translation type="unfinished">User &apos;%1&apos; with %2 permissions is not allowed to modify Resource parameter &apos;%3&apos;.</translation>
+      <translation>Bruger &apos;%1&apos; med %2 tilladelser har ikke tilladelse til at ændre ressourceparameteren &apos;%3&apos;.</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; with %2 permissions is not allowed to modify Resource parameter of %3.</source>
-      <translation type="unfinished">User &apos;%1&apos; with %2 permissions is not allowed to modify Resource parameter of %3.</translation>
+      <translation>Bruger &apos;%1&apos; med %2 tilladelser har ikke tilladelse til at ændre ressourceparameteren for %3.</translation>
     </message>
     <message>
       <source>`scheduleEnabled` set to true is not allowed for Device creation.</source>
-      <translation type="unfinished">`scheduleEnabled` set to true is not allowed for Device creation.</translation>
+      <translation>`scheduleEnabled` angivet til true er ikke tilladt for oprettelse af enheder.</translation>
     </message>
     <message>
       <source>Saving Device attributes is forbidden: no saving permission.</source>
-      <translation type="unfinished">Saving Device attributes is forbidden: no saving permission.</translation>
+      <translation>Det er forbudt at gemme enhedsattributter: ingen tilladelse til at gemme.</translation>
     </message>
     <message>
       <source>Motion mask should be in range: x in [0, %1], y in [0, %2], width in [1, %3], height in [1, %4]</source>
-      <translation type="unfinished">Motion mask should be in range: x in [0, %1], y in [0, %2], width in [1, %3], height in [1, %4]</translation>
+      <translation>Bevægelsesmasken skal være inden for intervallet: x i [0, %1], y i [0, %2], bredde i [1, %3], højde i [1, %4]</translation>
     </message>
     <message>
       <source>Set %1 `scheduleEnabled` to true is forbidden: no license to enable recording.</source>
-      <translation type="unfinished">Set %1 `scheduleEnabled` to true is forbidden: no license to enable recording.</translation>
+      <translation>Hvis %1 `scheduleEnabled` sættes til true, er det forbudt: der er ingen licens til at aktivere optagelse.</translation>
     </message>
     <message>
       <source>It is forbidden to enable cloud backup for %1 since SaaS service is not active.</source>
-      <translation type="unfinished">It is forbidden to enable cloud backup for %1 since SaaS service is not active.</translation>
+      <translation>Det er forbudt at aktivere cloud backup for %1, da SaaS tjenesten ikke er aktiv.</translation>
     </message>
     <message>
       <source>It is forbidden to enable cloud backup for %1 because there is no appropriate SaaS service license.</source>
-      <translation type="unfinished">It is forbidden to enable cloud backup for %1 because there is no appropriate SaaS service license.</translation>
+      <translation>Det er forbudt at aktivere cloud backup for %1, da der ikke findes en passende SaaS servicelicens.</translation>
     </message>
     <message>
       <source>There is not enough save permissions</source>
-      <translation type="unfinished">There is not enough save permissions</translation>
+      <translation>Der er ikke nok gemte tilladelser</translation>
     </message>
     <message>
       <source>Device %1 not found</source>
@@ -212,93 +212,93 @@
     </message>
     <message>
       <source>There is no license for camera %1</source>
-      <translation type="unfinished">There is no license for camera %1</translation>
+      <translation>Der er ingen licens til kamera %1</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s attributes.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s attributes.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; er ikke tilladt at ændre Server&apos;s attributter.</translation>
     </message>
     <message>
       <source>User %1 with %2 permissions has no %3 permissions.</source>
-      <translation type="unfinished">User %1 with %2 permissions has no %3 permissions.</translation>
+      <translation>Bruger %1 med %2 tilladelser har ingen %3 tilladelser.</translation>
     </message>
     <message>
       <source>User %1 does not have %2 access to %3.</source>
-      <translation type="unfinished">User %1 does not have %2 access to %3.</translation>
+      <translation>Bruger %1 har ikke %2 adgang til %3.</translation>
     </message>
     <message>
       <source>Resource %1 does not exist.</source>
-      <translation type="unfinished">Resource %1 does not exist.</translation>
+      <translation>Ressourcen %1 findes ikke.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create a new Server.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create a new Server.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; er ikke tilladt at oprette en ny server.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; er ikke tilladt at ændre Server&apos;s indstillinger.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
-      <translation type="unfinished">User &apos;%1(%2) is not permitted to create new User Groups.&apos;</translation>
+      <translation>Bruger &apos;%1(%2) har ikke tilladelse til at oprette nye brugergrupper.&apos;</translation>
     </message>
     <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
-      <translation type="unfinished">Creation of a non-local (%1) User Group is forbidden for VMS.</translation>
+      <translation>Oprettelse af en ikke-lokal (%1) Brugergruppe er forbudt for VMS.</translation>
     </message>
     <message>
       <source>Cannot modify the built-in User Group %1(%2).</source>
-      <translation type="unfinished">Cannot modify the built-in User Group %1(%2).</translation>
+      <translation>Kan ikke ændre den indbyggede Brugergruppe %1(%2).</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at ændre brugergruppe &apos;%3(%4)&apos; med &apos;%5&apos; rettigheder.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to delete User Groups.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to delete User Groups.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at slette brugergrupper.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to delete the User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to delete the User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at slette brugergruppen &apos;%3(%4)&apos; med &apos;%5&apos; rettigheder.</translation>
     </message>
     <message>
       <source>Removing User Group is forbidden because it is still used by &apos;%1&apos;.</source>
-      <translation type="unfinished">Removing User Group is forbidden because it is still used by &apos;%1&apos;.</translation>
+      <translation>Det er forbudt at fjerne brugergruppen, fordi den stadig bruges af &apos;%1&apos;.</translation>
     </message>
     <message>
       <source>Removing User Group is forbidden because it is still inherited by &apos;%1&apos;.</source>
-      <translation type="unfinished">Removing User Group is forbidden because it is still inherited by &apos;%1&apos;.</translation>
+      <translation>Det er forbudt at fjerne brugergruppen, fordi den stadig nedarves af &apos;%1&apos;.</translation>
     </message>
     <message>
       <source>Cannot delete the built-in User Group %1(%2).</source>
-      <translation type="unfinished">Cannot delete the built-in User Group %1(%2).</translation>
+      <translation>Kan ikke slette den indbyggede brugergruppe %1(%2).</translation>
     </message>
     <message>
       <source>User %1 is not allowed to modify the Showreel with parentId %2.</source>
-      <translation type="unfinished">User %1 is not allowed to modify the Showreel with parentId %2.</translation>
+      <translation>Bruger %1 har ikke tilladelse til at ændre Showreel med overordnede Id %2.</translation>
     </message>
     <message>
       <source>Modifying of %1 entries out of %2 is not allowed for %3.</source>
       <comment>%3 is a C++ type name</comment>
-      <translation type="unfinished">Modifying of %1 entries out of %2 is not allowed for %3.</translation>
+      <translation>Ændring af %1 poster ud af %2 er ikke tilladt for %3.</translation>
     </message>
     <message>
       <source>%1 storage can be only in the backup storage pool.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 storage can be only in the backup storage pool.</translation>
+      <translation>%1 Lager kan kun være i backup-lagerpladsen.</translation>
     </message>
     <message>
       <source>Changing storage URL is prohibited.</source>
-      <translation type="unfinished">Changing storage URL is prohibited.</translation>
+      <translation>Ændring af lagrings URL er forbudt.</translation>
     </message>
     <message>
       <source>Removal of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Removal of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>Fjernelse af brugeren med skrivebeskyttet attribut er forbudt for VMS.</translation>
     </message>
     <message>
       <source>the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</source>
-      <translation type="unfinished">the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</translation>
+      <translation>brugeren %1 har&apos;ikke &apos;generateEvents&apos; tilladelse</translation>
     </message>
   </context>
 </TS>
