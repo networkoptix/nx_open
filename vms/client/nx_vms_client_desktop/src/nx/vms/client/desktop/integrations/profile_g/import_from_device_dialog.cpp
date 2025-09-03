@@ -10,7 +10,10 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
@@ -115,6 +118,9 @@ ImportFromDeviceDialog::ImportFromDeviceDialog(QWidget* parent):
     QmlProperty<QObject*>(rootObjectHolder(), "model") = &d->filterModel;
 
     d->filter.connectNotifySignal(this, [this]{ updateFilter(); });
+
+    QObject::connect(rootObjectHolder()->object(), SIGNAL(doubleClicked(int)),
+        this, SLOT(handleDoubleClick(int)));
 }
 
 ImportFromDeviceDialog::~ImportFromDeviceDialog()
@@ -125,6 +131,15 @@ bool ImportFromDeviceDialog::tryClose(bool /*force*/)
 {
     reject();
     return true;
+}
+
+void ImportFromDeviceDialog::handleDoubleClick(int row)
+{
+    const auto camera = d->filterModel.index(row, 0).data(nx::vms::client::core::ResourceRole)
+        .value<QnResourcePtr>();
+
+    if (camera)
+        menu()->trigger(menu::OpenInCurrentLayoutAction, menu::Parameters(camera));
 }
 
 void ImportFromDeviceDialog::updateFilter()

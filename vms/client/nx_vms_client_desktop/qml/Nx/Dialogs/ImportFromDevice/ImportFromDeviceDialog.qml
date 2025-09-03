@@ -21,6 +21,8 @@ Dialog
 
     readonly property string filter: searchEdit.text
 
+    signal doubleClicked(int row)
+
     width: 820
     height: 405
     minimumWidth: 400
@@ -88,7 +90,10 @@ Dialog
                 return tableView.width / totalColumnsWidth * columnWidths[column]
             }
 
-            delegate: CellDelegate {}
+            delegate: CellDelegate
+            {
+                onDoubleClicked: control.doubleClicked(row)
+            }
         }
     }
 }

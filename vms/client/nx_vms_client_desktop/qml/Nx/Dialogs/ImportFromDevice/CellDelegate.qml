@@ -13,6 +13,8 @@ import nx.vms.client.desktop
 
 Item
 {
+    signal doubleClicked(int row)
+
     implicitHeight: 26
 
     clip: true
@@ -46,5 +48,12 @@ Item
         color: model.foregroundColor
 
         text: model.display
+    }
+
+    MouseArea
+    {
+        anchors.fill: parent
+        acceptedButtons: Qt.LeftButton
+        onDoubleClicked: parent.doubleClicked(model.row)
     }
 }
