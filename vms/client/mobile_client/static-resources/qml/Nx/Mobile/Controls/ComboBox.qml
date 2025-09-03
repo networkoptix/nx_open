@@ -169,8 +169,6 @@ T.ComboBox
                 onAccepted: control.accepted()
 
                 background: null
-
-                Q.Component.onCompleted: TextInputWorkaround.setup(textField)
             }
         }
 

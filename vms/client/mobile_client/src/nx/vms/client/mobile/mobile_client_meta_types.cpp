@@ -36,13 +36,11 @@
 #include <nx/vms/client/mobile/session/ui_messages.h>
 #include <nx/vms/client/mobile/utils/navigation_bar_utils.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
-#include <nx/vms/client/mobile/workaround/text_input_workaround.h>
 #include <private/qqmlvaluetype_p.h>
 #include <resources/camera_access_rights_helper.h>
 #include <settings/qml_settings_adaptor.h>
 #include <ui/models/ordered_systems_model.h>
 #include <ui/models/systems_model.h>
-#include <ui/qml/text_input.h>
 #include <ui/timeline/timeline.h>
 #include <utils/developer_settings_helper.h>
 #include <utils/mobile_app_info.h>
@@ -80,12 +78,9 @@ void registerQmlTypes()
         "Use UserWatcher instance from the System Context");
 
     qmlRegisterType<QnOrderedSystemsModel>("Nx.Models", 1, 0, "OrderedSystemsModel");
-    qmlRegisterType<QnQuickTextInput>("Nx.Controls", 1, 0, "TextInput");
     qmlRegisterType<QnMobileClientUiController>("Nx.Mobile", 1, 0, "Controller");
     qmlRegisterType<nx::client::mobile::utils::DeveloperSettingsHelper>(
         "Nx.Settings", 1, 0, "DeveloperSettingsHelper");
-
-    TextInputWorkaround::registerQmlType();
 
     // Ptz related classes
     qmlRegisterUncreatableType<Ptz>("Nx.Mobile", 1, 0, "Ptz",
@@ -97,9 +92,6 @@ void registerQmlTypes()
 
     qmlRegisterType<NetworkInterfaceWatcher>(
         "nx.vms.client.mobile", 1, 0, "NetworkInterfaceWatcher");
-
-    qmlRegisterRevision<QQuickTextInput, 6>("Nx.Controls", 1, 0);
-    qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);
 
     core::CloudUrlHelper::registerSingletonType(
         utils::SystemUri::ReferralSource::MobileClient,

@@ -39,6 +39,7 @@ Flickable
         color: enabled
             ? ColorTheme.colors.light4
             : ColorTheme.transparent(ColorTheme.colors.light4, 0.3)
+        selectionColor: ColorTheme.colors.brand_core
 
         background: FieldBackground
         {
@@ -70,8 +71,6 @@ Flickable
             else if (control.contentY <= minY) // Cursor is below bottom position.
                 control.contentY = minY
         }
-
-        Component.onCompleted: TextInputWorkaround.setup(textArea)
     }
 
     // Update bounds to avoid QTBUG-60296 when initial position of text is wrong and shifted

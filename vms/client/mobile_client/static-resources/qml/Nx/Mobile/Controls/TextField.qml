@@ -96,6 +96,4 @@ QuickControls.TextField
             control.forceActiveFocus()
         }
     }
-
-    Component.onCompleted: TextInputWorkaround.setup(control)
 }

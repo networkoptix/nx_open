@@ -59,10 +59,9 @@ Item
         backgroundColor: "transparent"
         inactiveColor: ColorTheme.colors.dark6
         placeholderText: qsTr("Search")
-        enterKeyType: TextInput.EnterKeySearch
+        EnterKey.type: Qt.EnterKeySearch
 
         inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
-        cursorColor: color
 
         onAccepted: Qt.inputMethod.hide()
 

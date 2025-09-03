@@ -44,6 +44,7 @@ T.TextField
     color: enabled
         ? ColorTheme.colors.light4
         : ColorTheme.transparent(ColorTheme.colors.light4, 0.3)
+    selectionColor: ColorTheme.colors.brand_core
 
     background: FieldBackground
     {
@@ -74,6 +75,4 @@ T.TextField
             onClicked: control.actionButtonAction()
         }
     }
-
-    Component.onCompleted: TextInputWorkaround.setup(control)
 }
