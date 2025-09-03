@@ -1542,7 +1542,7 @@
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL.</source>
-      <translation>Anonym crashrapportserver API-URL.</translation>
+      <translation>Anonym Crash Rapport Server API-URL.</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings.</source>
@@ -1550,7 +1550,7 @@
     </message>
     <message>
       <source>Device storage information update interval.</source>
-      <translation>Opdateringsinterval for enhedslagringsoplysninger.</translation>
+      <translation>Opdateringsinterval for enheds lagrings oplysninger.</translation>
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h).</source>
@@ -1570,7 +1570,7 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID.</source>
-      <translation>Primær tidssynkroniseringsserver-ID.</translation>
+      <translation>Primær tids synkroniserings server ID.</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds).</source>
@@ -1582,7 +1582,7 @@
     </message>
     <message>
       <source>Sync time synchronization interval for network requests.</source>
-      <translation>Synkroniser tidssynkroniseringsinterval for netværksanmodninger.</translation>
+      <translation>Synkroniser tids synkroniserings interval for netværksanmodninger.</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
@@ -1602,7 +1602,7 @@
     </message>
     <message>
       <source>Cloud authorization key.</source>
-      <translation>Cloud-godkendelsesnøgle.</translation>
+      <translation>Cloud godkendelses nøgle.</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site.</source>
@@ -1622,7 +1622,7 @@
     </message>
     <message>
       <source>Disable Device vendors.</source>
-      <translation>Deaktivér Enhedssælgere.</translation>
+      <translation>Deaktivér Enheds leverandører.</translation>
     </message>
     <message>
       <source>Optimize Camera settings.</source>
@@ -1646,7 +1646,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730).</source>
-      <translation>Revisionssporperiode (dage, 14-730).</translation>
+      <translation>Revisions periode (dage, 14-730).</translation>
     </message>
     <message>
       <source>Event log period (days).</source>
@@ -1870,7 +1870,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds).</source>
-      <translation>Kontrollér tilladelser for videostreaming på VMS-serverperiode (millisekunder).</translation>
+      <translation>Kontrollér tilladelser for videostreaming på VMS serverperiode (millisekunder).</translation>
     </message>
     <message>
       <source>Storage encryption enabled.</source>
@@ -1922,11 +1922,11 @@
     </message>
     <message>
       <source>LDAP settings.</source>
-      <translation>LDAP- indstillinger.</translation>
+      <translation>LDAP indstillinger.</translation>
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
-      <translation>SMTP-indstillinger. Disse indstillinger er kun synlige for superbrugere.</translation>
+      <translation>SMTP indstillinger. Disse indstillinger er kun synlige for superbrugere.</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
