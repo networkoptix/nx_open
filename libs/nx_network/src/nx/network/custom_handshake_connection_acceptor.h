@@ -4,6 +4,7 @@
 
 #include <deque>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <nx/network/aio/aio_service.h>
@@ -13,7 +14,6 @@
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_stream_socket_acceptor.h"

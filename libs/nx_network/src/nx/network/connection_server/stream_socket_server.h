@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <set>
 #include <type_traits>
 
@@ -18,7 +19,6 @@
 #include <nx/reflect/type_utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/member_detector.h>
-#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 

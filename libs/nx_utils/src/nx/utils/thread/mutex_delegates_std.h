@@ -6,8 +6,6 @@
 #include <mutex>
 #include <shared_mutex>
 
-#include <nx/utils/std/optional.h>
-
 #include "mutex.h"
 
 namespace nx {

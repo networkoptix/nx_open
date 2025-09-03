@@ -5,6 +5,7 @@
 #include <chrono>
 #include <list>
 #include <map>
+#include <optional>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/http/server/proxy/proxy_handler.h>
@@ -12,7 +13,6 @@
 #include <nx/utils/basic_service_settings.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
-#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace cloud {

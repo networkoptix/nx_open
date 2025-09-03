@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QList>
 #include <QtCore/QSharedPointer>
 
-#include <nx/utils/std/optional.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {

@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include <optional>
+
 #include <QtWidgets/QWidget>
 
-#include <nx/utils/std/optional.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 
 class QLabel;

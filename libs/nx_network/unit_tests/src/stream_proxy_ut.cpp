@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <optional>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/connection_server/simple_message_server.h>
@@ -9,7 +11,6 @@
 #include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx::network::test {

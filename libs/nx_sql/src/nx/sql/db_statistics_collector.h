@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <deque>
+#include <optional>
 #include <unordered_map>
 
 #include <nx/reflect/instrument.h>
@@ -12,7 +13,6 @@
 #include <nx/utils/math/max_per_period.h>
 #include <nx/utils/math/sum_per_period.h>
 #include <nx/utils/math/summary_statistics_per_period.h>
-#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "types.h"

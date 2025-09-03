@@ -2,10 +2,11 @@
 
 #include "log_settings.h"
 
+#include <filesystem>
+
 #include <QtCore/QSettings>
 
 #include <nx/utils/deprecated_settings.h>
-#include <nx/utils/std/filesystem.h>
 #include <nx/utils/string.h>
 #include <nx/utils/time.h>
 
@@ -27,7 +28,7 @@ bool LoggerSettings::parse(const QString& str)
     {
         if (param.first == "file")
         {
-            const auto filePath = nx::utils::filesystem::path(param.second);
+            const auto filePath = std::filesystem::path(param.second);
 
             logBaseName = QString::fromStdString(filePath.filename().string());
             if (filePath.has_parent_path())

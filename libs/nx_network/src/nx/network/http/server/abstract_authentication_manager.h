@@ -3,9 +3,9 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/optional.h>
 #include <nx/utils/stree/attribute_dictionary.h>
 
 #include "../abstract_msg_body_source.h"

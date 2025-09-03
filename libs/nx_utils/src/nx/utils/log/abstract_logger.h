@@ -3,9 +3,9 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <set>
 
-#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/cf/cfuture.h>
 
 #include "log_writers.h"

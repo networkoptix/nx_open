@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include <optional>
+
 #include <nx/network/aio/timer.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/optional.h>
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
 

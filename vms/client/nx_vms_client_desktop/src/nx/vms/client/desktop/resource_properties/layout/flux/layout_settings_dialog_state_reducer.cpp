@@ -2,6 +2,7 @@
 
 #include "layout_settings_dialog_state_reducer.h"
 
+#include <optional>
 #include <set>
 
 #include <QtCore/QtMath>
@@ -10,7 +11,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/optional.h>
 #include <ui/common/image_processing.h>
 #include <utils/common/aspect_ratio.h>
 

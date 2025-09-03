@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include <QtCore/QBuffer>
@@ -12,7 +13,6 @@
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/stun/stun_types.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std/optional.h>
 #include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/utils/stree/node.h>
 #include <nx/utils/stree/stree_manager.h>

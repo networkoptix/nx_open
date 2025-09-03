@@ -3,9 +3,8 @@
 #pragma once
 
 #include <cmath>
+#include <optional>
 #include <type_traits>
-
-#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace utils {
