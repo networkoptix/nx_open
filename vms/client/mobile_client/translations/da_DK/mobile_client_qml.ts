@@ -61,7 +61,7 @@
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Forbedr video afkodnings ydelsen ved hjælp af maksimalt antal hardwaredekodere</translation>
+      <translation>Optimer video afkodnings ydelsen ved hjælp af maksimalt antal hardwaredekodere</translation>
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>
@@ -234,15 +234,15 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Udviklerindstillinger</translation>
+      <translation>Udvikler indstillinger</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Logningsniveau</translation>
+      <translation>Lognings niveau</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation>Kopiér log-ID</translation>
+      <translation>Kopiér log ID</translation>
     </message>
   </context>
   <context>
@@ -352,7 +352,7 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation>Prøv at ændre filtrene eller konfigurer objektgenkendelse i kameraets plugin-indstillinger</translation>
+      <translation>Prøv at ændre filtrene eller konfigurer objektgenkendelse i kameraets plugin indstillinger</translation>
     </message>
     <message>
       <source>Try changing the filters to display the results</source>
@@ -644,7 +644,7 @@
     </message>
     <message>
       <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
-      <translation>Transkodning understøttes ikke for servere med en version ældre end 3.0.</translation>
+      <translation>Transkodning understøttes ikke for servere med en version ældre end 3,0.</translation>
     </message>
   </context>
   <context>
@@ -689,11 +689,11 @@
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this layout</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this layout</translation>
+      <translation>Vi fandt&apos;t ikke nogen kameraer på dette layout</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
+      <translation>Vi fandt&apos;t ikke nogen kameraer på dette site. Du kan tilføje dem i vores desktop applikation</translation>
     </message>
     <message>
       <source>Stop Connecting</source>
@@ -723,7 +723,7 @@
     </message>
     <message>
       <source>Strict</source>
-      <translation>Strict</translation>
+      <translation>Streng</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
@@ -821,27 +821,27 @@
     </message>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Adgang til ressourcer nægtet</translation>
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Opret en organisation i Cloud Portal for at få adgang til den her</translation>
     </message>
     <message>
       <source>The resources in this organization are not available to your permission group</source>
-      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+      <translation>Ressourcerne i denne organisation er ikke tilgængelige for din tilladelsesgruppe</translation>
     </message>
     <message>
       <source>Connect a site to the organization to access it here</source>
-      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+      <translation>Forbind et site til organisationen for at få adgang til det her</translation>
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>Ingen tilgængelige sites blev fundet. Log ind på cloud kontoen eller forbind til en lokal server</translation>
     </message>
     <message>
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
+      <translation>Ingen tilgængelige sites blev fundet. Anmod om adgang til eksisterende sites eller om forbindelse til en lokal server</translation>
     </message>
   </context>
   <context>
@@ -868,7 +868,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>Notifikationer er slået fra i enhedens indstillinger</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -876,7 +876,7 @@
     </message>
     <message>
       <source>Early access to new features</source>
-      <translation type="unfinished">Early access to new features</translation>
+      <translation>Tidlig adgang til nye funktioner</translation>
     </message>
     <message>
       <source>Interface</source>
@@ -895,7 +895,7 @@
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>Nyt Bogmærke</translation>
     </message>
     <message>
       <source>Name</source>
@@ -907,7 +907,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>Beskyt med adgangskode (valgfri)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -915,11 +915,11 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>Opret &amp; Del</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>Gem &amp; Del</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
@@ -939,7 +939,7 @@
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
+      <translation>Muligheder for delte links</translation>
     </message>
     <message>
       <source>Sharing</source>
@@ -947,7 +947,7 @@
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>Del Link</translation>
     </message>
     <message>
       <source>Select Expiration</source>
@@ -966,7 +966,7 @@
     </message>
     <message>
       <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
+      <translation>Log ind som</translation>
     </message>
     <message>
       <source>Login</source>
@@ -998,7 +998,7 @@
     </message>
     <message>
       <source>Host:Port</source>
-      <translation type="unfinished">Host:Port</translation>
+      <translation>Vært:Port</translation>
     </message>
   </context>
   <context>
@@ -1036,15 +1036,15 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>NY</translation>
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>SUSPENDERET</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>LUK NED</translation>
     </message>
     <message>
       <source>PENDING</source>
@@ -1055,11 +1055,11 @@
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Adgang til ressourcer nægtet</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Sites i den suspenderede eller lukkede tilstand er ikke tilgængelige</translation>
     </message>
   </context>
   <context>
@@ -1095,7 +1095,7 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>Åbn %1</translation>
     </message>
   </context>
   <context>
@@ -1121,7 +1121,7 @@
     <name>TimeSelector</name>
     <message>
       <source>Period</source>
-      <translation type="unfinished">Period</translation>
+      <translation>Periode</translation>
     </message>
   </context>
   <context>
@@ -1139,7 +1139,7 @@
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation>Kan ikke afspille nogen videostrøm</translation>
+      <translation>Kan ikke afspille nogen video stream</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -1163,7 +1163,7 @@
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation>Ikke-understøttet firmwareversion</translation>
+      <translation>Ikke understøttet firmware version</translation>
     </message>
     <message>
       <source>Please update firmware</source>
@@ -1180,16 +1180,16 @@
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>I denne app kan I/O-modul kun bruges som lydinputenhed. For at bruge det som et kontrolmodul, skal du bruge desktop version af %1</translation>
+      <translation>I denne app kan I/O-modul kun bruges som lyd inputenhed. For at bruge det som et kontrolmodul, skal du bruge desktop version af %1</translation>
     </message>
     <message>
       <source>No live stream</source>
-      <translation>Ingen livestream</translation>
+      <translation>Ingen live stream</translation>
     </message>
     <message>
       <source>Set password on this camera using %1 client or camera web-page to view video</source>
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>Angiv adgangskode fordette kamera ved hjælp af %1 klient eller kamera web-side til at se video</translation>
+      <translation>Angiv adgangskode for dette kamera ved hjælp af %1 klient eller kamera web-side til at se video</translation>
     </message>
     <message>
       <source>Archive encrypted</source>
@@ -1197,7 +1197,7 @@
     </message>
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
+      <translation>Indtast krypteringsadgangskoden på skrivebordsklienten for at dekryptere dette arkiv, eller bed administratoren af dit websted om hjælp.</translation>
     </message>
     <message>
       <source>Information required</source>
@@ -1271,7 +1271,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Forbindelse afbrudt. Genopretter forbindelse...</translation>
     </message>
   </context>
 </TS>
