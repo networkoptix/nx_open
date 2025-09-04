@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include <expected>
 #include <string_view>
 
 #include <api/http_client_pool.h>
 #include <api/server_rest_connection_fwd.h>
-#include <nx/utils/std/expected.h>
 #include <nx/vms/common/api/helpers/parser_helper.h>
 
 #include "rest_types.h"
@@ -169,7 +169,7 @@ rest::ErrorOrData<T> parseMessageBody(
 
             NX_ASSERT(false, "Data cannot be deserialized:\n %1\nType: %2",
                 messageBody.left(kMessageBodyLogSize), typeid(T).name());
-            return nx::utils::unexpected(nx::network::rest::Result::notImplemented());
+            return std::unexpected(nx::network::rest::Result::notImplemented());
         }
         else
         {
@@ -181,19 +181,19 @@ rest::ErrorOrData<T> parseMessageBody(
                 if (std::holds_alternative<T>(data))
                     return std::get<T>(data);
                 else
-                    return nx::utils::unexpected(std::get<nx::network::rest::Result>(data));
+                    return std::unexpected(std::get<nx::network::rest::Result>(data));
             }
 
             NX_ASSERT(false, "Data cannot be deserialized:\n %1\nType: %2",
                 messageBody.left(kMessageBodyLogSize), typeid(T).name());
-            return nx::utils::unexpected(nx::network::rest::Result::notImplemented());
+            return std::unexpected(nx::network::rest::Result::notImplemented());
         }
     }
 
     auto result = nx::vms::common::api::parseRestResult(statusLine.statusCode, format, messageBody);
     *success = (result.errorId == nx::network::rest::ErrorId::ok);
 
-    return nx::utils::unexpected(result);
+    return std::unexpected(result);
 }
 
 template <typename T>
@@ -238,13 +238,13 @@ rest::ErrorOrData<T> parseJsonBody(
             if (std::holds_alternative<T>(data))
                 return std::get<T>(data);
             else
-                return nx::utils::unexpected(std::get<nx::network::rest::Result>(data));
+                return std::unexpected(std::get<nx::network::rest::Result>(data));
         }
 
         NX_ASSERT(false, "Data cannot be deserialized:\n %1\nType: %2",
             value, typeid(T).name());
 
-        return nx::utils::unexpected(nx::network::rest::Result::notImplemented());
+        return std::unexpected(nx::network::rest::Result::notImplemented());
     }
     else
     {
@@ -346,7 +346,7 @@ public:
     struct canHoldRestResult: std::false_type {};
 
     template<class... Ts>
-    struct canHoldRestResult<nx::utils::expected<Ts...>>:
+    struct canHoldRestResult<std::expected<Ts...>>:
         std::bool_constant<(std::is_same_v<nx::network::rest::Result, Ts> || ...)> {};
 
     static_assert(canHoldRestResult<rest::ErrorOrData<rest::EmptyResponseType>>::value,
@@ -365,7 +365,7 @@ public:
         {
             if (isSessionExpiredError(response))
             {
-                result = nx::utils::unexpected(
+                result = std::unexpected(
                     nx::network::rest::Result(nx::network::rest::ErrorId::sessionRequired));
                 return;
             }
@@ -378,12 +378,12 @@ public:
                 if (nx::reflect::json::deserialize(
                     nx::reflect::json::DeserializationContext{*response.error->data}, &restError))
                 {
-                    result = nx::utils::unexpected(restError);
+                    result = std::unexpected(restError);
                     return;
                 }
             }
 
-            result = nx::utils::unexpected(
+            result = std::unexpected(
                 nx::network::rest::Result::serviceUnavailable(
                     QString::fromStdString(response.error->message)));
             return;
@@ -427,7 +427,7 @@ public:
                     callback(
                         context->success,
                         handle,
-                        nx::utils::unexpected(
+                        std::unexpected(
                             nx::network::rest::Result::cantProcessRequest("Unknown error")));
                 }
                 else

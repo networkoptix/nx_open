@@ -112,7 +112,7 @@ static RSA* jwkToRsa(const Key& jwkKey)
     return rsa;
 }
 
-nx::utils::expected<KeyPair, std::string /*error*/>
+std::expected<KeyPair, std::string /*error*/>
     generateKeyPairForSigning(const Algorithm& /*algorithm*/)
 {
     // TODO: add support for algorithm.
@@ -236,13 +236,13 @@ ParsedKey& ParsedKey::operator=(ParsedKey&& rhs)
     return *this;
 }
 
-nx::utils::expected<ParsedKey, std::string /*error*/> parseKey(const Key& key)
+std::expected<ParsedKey, std::string /*error*/> parseKey(const Key& key)
 {
     if (key.alg() == "RS256")
     {
         RSA* rsa = jwkToRsa(key);
         if (!rsa)
-            return nx::utils::unexpected<std::string>("Cannot convert JWK to RSA");
+            return std::unexpected<std::string>("Cannot convert JWK to RSA");
 
         EVP_PKEY* signing_key = EVP_PKEY_new();
         EVP_PKEY_assign_RSA(signing_key, rsa);
@@ -253,18 +253,18 @@ nx::utils::expected<ParsedKey, std::string /*error*/> parseKey(const Key& key)
     {
         const auto k = key.get<std::string>("k");
         if (!k)
-            return nx::utils::unexpected<std::string>("Inappropriate key for HS256 signing: no 'k' attribute");
+            return std::unexpected<std::string>("Inappropriate key for HS256 signing: no 'k' attribute");
 
         // Decode the key from Base64URL.
         return ParsedKey(std::make_unique<ParsedKeyImpl>(key.alg(), key.kid(), nx::utils::fromBase64Url(*k)));
     }
 
-    return nx::utils::unexpected<std::string>("alg '" + key.alg() + "' is not supported");
+    return std::unexpected<std::string>("alg '" + key.alg() + "' is not supported");
 }
 
 //-------------------------------------------------------------------------------------------------
 
-nx::utils::expected<SignResult, std::string /*error*/> rs256Sign(
+std::expected<SignResult, std::string /*error*/> rs256Sign(
     const std::string_view message,
     const ParsedKey& key);
 
@@ -273,7 +273,7 @@ bool rs256Verify(
     const std::string_view signature,
     const ParsedKey& key);
 
-nx::utils::expected<SignResult, std::string /*error*/> hs256Sign(
+std::expected<SignResult, std::string /*error*/> hs256Sign(
     const std::string_view message,
     const ParsedKey& key);
 
@@ -284,19 +284,19 @@ bool hs256Verify(
 
 //-------------------------------------------------------------------------------------------------
 
-nx::utils::expected<std::string /*alg*/, std::string /*err*/> getAlgorithmForSigning(const Key& key)
+std::expected<std::string /*alg*/, std::string /*err*/> getAlgorithmForSigning(const Key& key)
 {
     const auto alg = key.alg();
     if (alg.empty())
-        return nx::utils::unexpected<std::string>("Key must specify alg to use for signing");
+        return std::unexpected<std::string>("Key must specify alg to use for signing");
 
     if (alg == "RS256" || alg == "HS256")
         return alg;
     else
-        return nx::utils::unexpected<std::string>("alg '" + alg + "' is not supported for signing");
+        return std::unexpected<std::string>("alg '" + alg + "' is not supported for signing");
 }
 
-nx::utils::expected<SignResult, std::string /*error*/> sign(
+std::expected<SignResult, std::string /*error*/> sign(
     const std::string_view message,
     const ParsedKey& key)
 {
@@ -305,29 +305,29 @@ nx::utils::expected<SignResult, std::string /*error*/> sign(
     else if (key.impl()->algorithm == "HS256")
         return hs256Sign(message, key);
     else
-        return nx::utils::unexpected<std::string>("alg '" + key.impl()->algorithm +
+        return std::unexpected<std::string>("alg '" + key.impl()->algorithm +
             "' is not supported for signing");
 }
 
-nx::utils::expected<SignResult, std::string /*error*/> sign(
+std::expected<SignResult, std::string /*error*/> sign(
     const std::string_view message,
     const Key& key)
 {
     const auto alg = key.alg();
     if (alg.empty())
-        return nx::utils::unexpected<std::string>("Key must specify alg to use for signing");
+        return std::unexpected<std::string>("Key must specify alg to use for signing");
 
     const auto keyOps = key.keyOps();
     if (std::count(keyOps.begin(), keyOps.end(), KeyOp::sign) == 0)
     {
-        return nx::utils::unexpected<std::string>("Cannot proceed with signing given a key "
+        return std::unexpected<std::string>("Cannot proceed with signing given a key "
             "that does not specify 'sign' operation");
     }
 
     const auto parsedKey = parseKey(key);
     if (!parsedKey)
     {
-        return nx::utils::unexpected<std::string>("Cannot parse the key for signing: " +
+        return std::unexpected<std::string>("Cannot parse the key for signing: " +
             parsedKey.error());
     }
 
@@ -368,7 +368,7 @@ bool verify(
 //-------------------------------------------------------------------------------------------------
 // RS256 asymmetric key signing and verification.
 
-nx::utils::expected<SignResult, std::string /*error*/> rs256Sign(
+std::expected<SignResult, std::string /*error*/> rs256Sign(
     const std::string_view message,
     const ParsedKey& key)
 {
@@ -409,7 +409,7 @@ bool rs256Verify(
 //--------------------------------------------------------------------------------------------------
 // HS256 symmetric key signing and verification.
 
-nx::utils::expected<SignResult, std::string /*error*/> hs256Sign(
+std::expected<SignResult, std::string /*error*/> hs256Sign(
     const std::string_view message,
     const ParsedKey& key)
 {

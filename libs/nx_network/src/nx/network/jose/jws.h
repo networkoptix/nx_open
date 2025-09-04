@@ -65,7 +65,7 @@ struct TokenEncodeResult
  * @return Encoded and signed token.
  */
 template<typename Payload>
-nx::utils::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*error*/>
+std::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*error*/>
     encodeAndSign(
         const std::string& tokenType,
         Payload&& tokenPayload,
@@ -95,7 +95,7 @@ nx::utils::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*erro
     nx::utils::toBase64Url(serializedPayload, &encodedToken);
     auto signResult = jwk::sign(encodedToken, key);
     if (!signResult)
-        return nx::utils::unexpected<std::string>("Signing error: " + signResult.error());
+        return std::unexpected<std::string>("Signing error: " + signResult.error());
 
     encodedToken += ".";
     encodedToken += signResult->signature;
@@ -112,12 +112,12 @@ nx::utils::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*erro
  * @return Encoded and signed token.
  */
 template<typename Payload>
-nx::utils::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*error*/>
+std::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*error*/>
     encodeAndSign(const std::string& tokenType, Payload&& tokenPayload, const jwk::Key& key)
 {
     const auto parsedKey = jwk::parseKey(key);
     if (!parsedKey)
-        return nx::utils::unexpected<std::string>("Cannot parse key: " + parsedKey.error());
+        return std::unexpected<std::string>("Cannot parse key: " + parsedKey.error());
 
     return encodeAndSign(tokenType, std::forward<Payload>(tokenPayload), *parsedKey);
 }
@@ -127,11 +127,11 @@ nx::utils::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*erro
  * Note: the token signature is omitted by this function. Use verifyToken to verify the signature.
  */
 template<typename Payload>
-nx::utils::expected<Token<Payload>, std::string /*err*/> decodeToken(const std::string_view encoded)
+std::expected<Token<Payload>, std::string /*err*/> decodeToken(const std::string_view encoded)
 {
     auto [parts, count] = nx::utils::split_n<3>(encoded, '.');
     if (count != 3)
-        return nx::utils::unexpected<std::string>("Invalid format");
+        return std::unexpected<std::string>("Invalid format");
 
     Token<Payload> token;
     nx::reflect::DeserializationResult result;
@@ -139,12 +139,12 @@ nx::utils::expected<Token<Payload>, std::string /*err*/> decodeToken(const std::
     const std::string headerJson = nx::utils::fromBase64Url(parts[0]);
     std::tie(token.header, result) = nx::reflect::json::deserialize<Header>(headerJson);
     if (!result)
-        return nx::utils::unexpected<std::string>("Error parsing token header: " + result.errorDescription);
+        return std::unexpected<std::string>("Error parsing token header: " + result.errorDescription);
 
     const std::string payloadJson = nx::utils::fromBase64Url(parts[1]);
     std::tie(token.payload, result) = nx::reflect::json::deserialize<Payload>(payloadJson);
     if (!result)
-        return nx::utils::unexpected<std::string>("Error parsing token payload: " + result.errorDescription);
+        return std::unexpected<std::string>("Error parsing token payload: " + result.errorDescription);
 
     return token;
 }

@@ -69,7 +69,7 @@ void AsyncClientMock::getMapping(
     if (m_mappings.size() <= index)
     {
         return m_tasks.push(
-            [callback] { callback(nx::utils::unexpected(ErrorCode::specifiedArrayIndexInvalid)); });
+            [callback] { callback(std::unexpected(ErrorCode::specifiedArrayIndexInvalid)); });
     }
 
     const auto mapping = *std::next(m_mappings.begin(), index);
@@ -94,7 +94,7 @@ void AsyncClientMock::getMapping(
     if (it == m_mappings.end())
     {
         return m_tasks.push(
-            [callback] { callback(nx::utils::unexpected(ErrorCode::unknown)); });
+            [callback] { callback(std::unexpected(ErrorCode::unknown)); });
     }
 
     const auto mapping = *it;

@@ -422,7 +422,7 @@ void AsyncClient::processMappingResponse(
     }
     else
     {
-        callback(nx::utils::unexpected(getErrorCode(response)));
+        callback(std::unexpected(getErrorCode(response)));
     }
 }
 

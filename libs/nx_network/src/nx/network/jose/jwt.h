@@ -53,13 +53,13 @@ using Token = jws::Token<ClaimSet>;
 /**
  * Encode and sign token. It is a wrapper around jws::encodeAndSign().
  */
-NX_NETWORK_API nx::utils::expected<jws::TokenEncodeResult<ClaimSet>, std::string /*error*/>
+NX_NETWORK_API std::expected<jws::TokenEncodeResult<ClaimSet>, std::string /*error*/>
     encodeAndSign(ClaimSet claimSet, const jwk::Key& key);
 
 /**
  * Decode token without verifying its signature. It is a wrapper around jws::decodeToken().
  */
-NX_NETWORK_API nx::utils::expected<Token, std::string /*err*/> decodeToken(
+NX_NETWORK_API std::expected<Token, std::string /*err*/> decodeToken(
     const std::string_view encoded);
 
 using jws::verifyToken;

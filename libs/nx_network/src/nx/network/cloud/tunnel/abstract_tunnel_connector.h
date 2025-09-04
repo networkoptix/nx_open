@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <expected>
 #include <functional>
 #include <memory>
 
@@ -10,12 +11,11 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/network/cloud/data/connect_data.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/expected.h>
 
 #include "../data/connection_result_data.h"
 #include "abstract_outgoing_tunnel_connection.h"
-#include "tunnel_connect_statistics.h"
 #include "tunnel.h"
+#include "tunnel_connect_statistics.h"
 
 namespace nx::network::cloud {
 

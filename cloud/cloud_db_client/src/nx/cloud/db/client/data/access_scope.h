@@ -2,13 +2,12 @@
 
 #pragma once
 
+#include <expected>
 #include <optional>
 #include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include <nx/utils/std/expected.h>
 
 namespace nx::cloud::db::api {
 
@@ -78,7 +77,7 @@ public:
      * KEY = "cloudSystemId" | text
      * VALUE = "*" | text
      */
-    static nx::utils::expected<AccessScope, std::string> buildAccessScope(const std::string& scope);
+    static std::expected<AccessScope, std::string> buildAccessScope(const std::string& scope);
 
     /**
      * Builds scope "cloudSystemId=*" [ SP https://defaultHost/ ]
