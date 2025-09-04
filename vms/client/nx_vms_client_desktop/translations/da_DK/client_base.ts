@@ -7729,7 +7729,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>Farve</translation>
     </message>
     <message>
       <source>Pointed</source>
