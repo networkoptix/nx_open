@@ -49,7 +49,7 @@ struct Comparator
 
 struct GroupedTaskQueue::Private
 {
-    GroupedTaskQueue* const q;
+    const QPointer<GroupedTaskQueue> q;
 
     std::set<QueueItem, Comparator> queue;
     GroupPriorities groupPriority;
