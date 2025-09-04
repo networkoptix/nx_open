@@ -13,7 +13,6 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/basic_factory.h>
-#include <nx/utils/std/cpp14.h>
 
 namespace nx::network {
 

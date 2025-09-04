@@ -2,7 +2,6 @@
 
 #include "pollset_factory.h"
 
-#include <nx/utils/std/cpp14.h>
 
 #include "pollset.h"
 #include "pollset_wrapper.h"

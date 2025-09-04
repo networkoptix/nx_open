@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 #include <nx/utils/log/format.h>
 
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
 
 template<typename ... Args>

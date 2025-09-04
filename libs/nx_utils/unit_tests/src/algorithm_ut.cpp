@@ -6,7 +6,6 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/std/algorithm.h>
-#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace utils {

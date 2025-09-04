@@ -41,7 +41,6 @@ extern "C" {
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/rlimit.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>

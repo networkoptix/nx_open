@@ -10,7 +10,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "../common_socket_impl.h"

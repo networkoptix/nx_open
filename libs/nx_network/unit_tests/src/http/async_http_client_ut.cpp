@@ -20,7 +20,6 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/utils.h>

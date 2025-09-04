@@ -5,7 +5,6 @@
 #include <memory>
 
 #include <nx/utils/buffer.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {

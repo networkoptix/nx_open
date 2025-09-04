@@ -8,7 +8,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>

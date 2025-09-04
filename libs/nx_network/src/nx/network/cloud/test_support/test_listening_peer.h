@@ -12,7 +12,6 @@
 #include <nx/network/socket.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/udt/udt_socket.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/stoppable.h>
 #include "nx/network/http/test_http_server.h"
 

@@ -8,7 +8,6 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/synchronous_tcp_server.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {

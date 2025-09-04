@@ -8,7 +8,6 @@
 
 #include <QtCore/QThread>
 
-#include <nx/utils/std/cpp14.h>
 
 #include "../move_only_func.h"
 #include "../type_utils.h"

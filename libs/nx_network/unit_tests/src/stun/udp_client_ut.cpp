@@ -13,7 +13,6 @@
 #include <nx/network/stun/udp_client.h>
 #include <nx/network/stun/udp_server.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/thread/mutex.h>

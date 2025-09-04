@@ -14,7 +14,6 @@
 
 #include <QtCore/QRandomGenerator>
 
-#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace utils {

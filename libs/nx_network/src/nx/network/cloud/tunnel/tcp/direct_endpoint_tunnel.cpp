@@ -4,7 +4,6 @@
 
 #include <nx/network/system_socket.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 
 static const nx::network::KeepAliveOptions kControlConnectionKeepAlive(
     std::chrono::minutes(1), std::chrono::seconds(10), 3);

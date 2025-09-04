@@ -13,7 +13,6 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx::network::http::test {

@@ -8,7 +8,6 @@
 #include <stdint.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "abstract_msg_body_source.h"
 

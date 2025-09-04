@@ -5,7 +5,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/time.h>
 
 namespace nx::network::aio::detail {

@@ -5,7 +5,6 @@
 #include <memory>
 #include <type_traits>
 
-#include <nx/utils/std/cpp14.h>
 
 #include "abstract_async_channel.h"
 

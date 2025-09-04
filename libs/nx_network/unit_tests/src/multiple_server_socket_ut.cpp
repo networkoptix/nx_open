@@ -10,7 +10,6 @@
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/utils.h>
 

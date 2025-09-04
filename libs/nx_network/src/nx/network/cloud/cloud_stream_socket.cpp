@@ -5,7 +5,6 @@
 #include <future>
 
 #include <nx/network/aio/aio_service.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 
 #include "tunnel/outgoing_tunnel.h"

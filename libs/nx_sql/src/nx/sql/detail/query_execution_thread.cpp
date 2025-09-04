@@ -8,7 +8,6 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "../db_statistics_collector.h"
 

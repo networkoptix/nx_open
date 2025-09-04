@@ -6,7 +6,6 @@
 
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/delayed.h>

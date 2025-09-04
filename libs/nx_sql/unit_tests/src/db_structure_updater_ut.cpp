@@ -8,7 +8,6 @@
 
 #include <nx/sql/db_connection_factory.h>
 #include <nx/sql/db_structure_updater.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/algorithm.h>
 
 #include "base_db_test.h"

@@ -9,7 +9,6 @@
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "outgoing_tunnel_connection_watcher.h"
 #include "outgoing_tunnel_pool.h"

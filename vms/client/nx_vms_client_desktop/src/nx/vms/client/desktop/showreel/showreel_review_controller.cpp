@@ -10,7 +10,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/utils/grid_walker.h>

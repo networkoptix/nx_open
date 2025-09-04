@@ -5,7 +5,6 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
 

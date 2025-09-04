@@ -8,7 +8,6 @@
 #include <QtCore/QRegularExpression>
 
 #include <nx/utils/debug.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <udt/udt.h>
 

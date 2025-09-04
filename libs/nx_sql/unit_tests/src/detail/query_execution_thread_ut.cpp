@@ -4,7 +4,6 @@
 
 #include <memory>
 
-#include <nx/utils/std/cpp14.h>
 
 #include <nx/sql/detail/query_execution_thread.h>
 

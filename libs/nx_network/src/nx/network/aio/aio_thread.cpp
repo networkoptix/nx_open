@@ -6,7 +6,6 @@
 #include <thread>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "aio_task_queue.h"
 #include "aio_thread_watcher.h"

@@ -5,7 +5,6 @@
 #include <map>
 #include <memory>
 
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 
 #include "node.h"

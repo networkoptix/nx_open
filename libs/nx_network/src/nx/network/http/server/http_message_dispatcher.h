@@ -10,7 +10,6 @@
 #include <nx/network/connection_server/message_dispatcher.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/data_structures/partitioned_concurrent_hash_map.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 
 #include "abstract_http_request_handler.h"

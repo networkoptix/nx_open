@@ -7,7 +7,6 @@
 
 #include <nx/sql/detail/query_queue.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx::sql::detail::test {

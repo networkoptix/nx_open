@@ -11,7 +11,6 @@
 #include "test_support/query_executor_factory.h"
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 
 namespace nx::sql {
 

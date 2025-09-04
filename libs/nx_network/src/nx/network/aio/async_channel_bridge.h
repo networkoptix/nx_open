@@ -6,7 +6,6 @@
 #include <optional>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "basic_pollable.h"
 #include "detail/async_channel_unidirectional_bridge.h"

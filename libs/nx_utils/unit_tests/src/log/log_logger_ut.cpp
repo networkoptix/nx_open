@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/log/log_logger.h>
-#include <nx/utils/std/cpp14.h>
 
 #include <QtCore/QDateTime>
 
