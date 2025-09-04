@@ -15,7 +15,6 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/buffer.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 
 #include "message_integrity.h"

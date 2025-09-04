@@ -5,7 +5,6 @@
 #include <QtCore/QDir>
 
 #include <nx/utils/service.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/thread/sync_queue.h>

@@ -2,7 +2,6 @@
 
 #include "upload_manager.h"
 
-#include <nx/utils/std/cpp14.h>
 
 #include "upload_worker.h"
 

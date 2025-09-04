@@ -3,7 +3,6 @@
 #include "outgoing_tunnel.h"
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/barrier_handler.h>
 
 #include "connector_factory.h"

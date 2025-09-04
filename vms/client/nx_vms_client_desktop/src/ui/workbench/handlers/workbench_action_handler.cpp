@@ -61,7 +61,6 @@
 #include <nx/utils/platform/process.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/storage_flags.h>

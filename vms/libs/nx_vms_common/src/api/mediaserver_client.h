@@ -18,7 +18,6 @@
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/sync_call.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/type_utils.h>

@@ -11,7 +11,6 @@
 #include <nx/utils/log/storage_info.h>
 #include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/test_options.h>
 
 namespace nx::log::test {

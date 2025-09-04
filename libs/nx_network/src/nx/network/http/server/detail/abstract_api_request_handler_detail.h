@@ -9,7 +9,6 @@
 
 #include <nx/utils/json/qt_geometry_reflect.h>
 #include <nx/utils/serialization/format.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "../../buffer_source.h"
 #include "../../detail/nxreflect_wrapper.h"

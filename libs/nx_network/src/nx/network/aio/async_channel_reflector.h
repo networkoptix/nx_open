@@ -6,7 +6,6 @@
 #include <memory>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "abstract_async_channel.h"
 #include "basic_pollable.h"

@@ -6,7 +6,6 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "nx/network/cloud/data/connection_result_data.h"
 #include "nx/network/http/http_status.h"

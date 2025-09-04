@@ -5,7 +5,6 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/random_online_endpoint_selector.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "cdb_connection.h"
 

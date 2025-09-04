@@ -4,7 +4,6 @@
 
 #include <iostream>
 
-#include <nx/utils/std/cpp14.h>
 #include <udt/udt.h>
 
 #include "../udt/udt_socket.h"

@@ -7,7 +7,6 @@
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "../run_time_options.h"
 

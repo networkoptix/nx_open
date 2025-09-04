@@ -16,7 +16,6 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/current_process.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/stree/stree_manager.h>
 
 #include "access_control/authentication_manager.h"

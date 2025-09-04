@@ -16,7 +16,6 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue.h>

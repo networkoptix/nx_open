@@ -17,7 +17,6 @@
 #include <atomic>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/time.h>
 #include <nx/utils/scope_guard.h>
 

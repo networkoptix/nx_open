@@ -8,7 +8,6 @@
 #include <nx/network/nettools.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/format.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "outgoing_tunnel_connection.h"
 #include "rendezvous_connector_with_verification.h"

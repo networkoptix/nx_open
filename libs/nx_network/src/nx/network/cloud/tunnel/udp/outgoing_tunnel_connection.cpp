@@ -6,7 +6,6 @@
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/barrier_handler.h>
 
 namespace nx::network::cloud::udp {

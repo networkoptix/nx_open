@@ -8,7 +8,6 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/pollset_factory.h>
 #include <nx/network/socket_global.h>
-#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {

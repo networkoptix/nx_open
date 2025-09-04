@@ -8,7 +8,6 @@
 #include <nx/network/url/url_parse_helper.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "connection_mediator_url_fetcher.h"
 #include "mediator/api/mediator_api_http_paths.h"

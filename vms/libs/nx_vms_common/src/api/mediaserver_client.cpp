@@ -5,7 +5,6 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/rest/params.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/type_utils.h>
 #include <nx/vms/api/data/login.h>
 

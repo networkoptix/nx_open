@@ -6,7 +6,6 @@
 
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/deprecated_settings.h>
-#include <nx/utils/std/cpp14.h>
 
 #include "logger_builder.h"
 #include "log_main.h"

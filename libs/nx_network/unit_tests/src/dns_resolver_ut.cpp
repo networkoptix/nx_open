@@ -12,7 +12,6 @@
 #include <nx/network/dns_resolver.h>
 #include <nx/network/resolve/custom_resolver.h>
 #include <nx/network/socket_global.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>

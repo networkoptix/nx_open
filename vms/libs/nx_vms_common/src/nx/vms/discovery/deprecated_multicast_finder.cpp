@@ -18,7 +18,6 @@
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 #include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/api/protocol_version.h>

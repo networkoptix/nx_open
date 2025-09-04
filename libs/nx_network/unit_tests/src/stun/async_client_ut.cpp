@@ -14,7 +14,6 @@
 #include <nx/network/test_support/stun_simple_server.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/sync_queue.h>
 
 namespace nx {

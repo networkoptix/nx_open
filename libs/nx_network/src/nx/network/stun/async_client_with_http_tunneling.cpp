@@ -8,7 +8,6 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {

@@ -5,7 +5,6 @@
 #include <list>
 #include <queue>
 
-#include <nx/utils/std/cpp14.h>
 
 #include "aggregate_acceptor.h"
 #include "aio/timer.h"

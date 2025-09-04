@@ -10,7 +10,6 @@
 #include <memory>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
