@@ -2,13 +2,13 @@
 
 #pragma once
 
+#include <expected>
 #include <string>
 #include <tuple>
 #include <vector>
 
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json/object.h>
-#include <nx/utils/std/expected.h>
 
 namespace nx::network::jwk {
 
@@ -82,7 +82,7 @@ NX_REFLECTION_ENUM_CLASS(Algorithm,
 /**
  * @return A [public, private] key pair.
  */
-NX_NETWORK_API nx::utils::expected<KeyPair, std::string /*error*/>
+NX_NETWORK_API std::expected<KeyPair, std::string /*error*/>
     generateKeyPairForSigning(const Algorithm& algorithm);
 
 struct SignResult
@@ -98,7 +98,7 @@ struct SignResult
  * @return algorithm that corresponds to the given key (if supported). This algorithm will be used
  * for signing with that key.
  */
-NX_NETWORK_API nx::utils::expected<std::string /*alg*/, std::string /*err*/>
+NX_NETWORK_API std::expected<std::string /*alg*/, std::string /*err*/>
     getAlgorithmForSigning(const Key& key);
 
 /**
@@ -107,7 +107,7 @@ NX_NETWORK_API nx::utils::expected<std::string /*alg*/, std::string /*err*/>
  * (e.g., memory allocation failure).
  * The resulting signature in base64URL-encoded and returned.
  */
-NX_NETWORK_API nx::utils::expected<SignResult, std::string /*error*/> sign(
+NX_NETWORK_API std::expected<SignResult, std::string /*error*/> sign(
     const std::string_view message,
     const Key& key);
 
@@ -140,12 +140,12 @@ private:
  * Prepare key for signing/verifying multiple messages in a more efficient way.
  * @return Parsed key or error text if the key is not supported.
  */
-NX_NETWORK_API nx::utils::expected<ParsedKey, std::string /*error*/> parseKey(const Key& key);
+NX_NETWORK_API std::expected<ParsedKey, std::string /*error*/> parseKey(const Key& key);
 
 /**
  * Sign message using the already parsed key.
  */
-NX_NETWORK_API nx::utils::expected<SignResult, std::string /*error*/> sign(
+NX_NETWORK_API std::expected<SignResult, std::string /*error*/> sign(
     const std::string_view message,
     const ParsedKey& key);
 

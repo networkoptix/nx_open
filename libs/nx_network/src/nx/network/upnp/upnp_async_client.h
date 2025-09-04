@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include <expected>
 #include <set>
 
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/reflect/enum_instrument.h>
-#include <nx/utils/std/expected.h>
 
 namespace nx::network::upnp {
 
@@ -80,7 +80,7 @@ public:
         QString toString() const;
     };
 
-    using MappingInfoResult = nx::utils::expected<MappingInfo, ErrorCode>;
+    using MappingInfoResult = std::expected<MappingInfo, ErrorCode>;
     using MappingInfoCallback = std::function<void(MappingInfoResult)>;
 
     using MappingInfoList = std::vector<MappingInfo>;

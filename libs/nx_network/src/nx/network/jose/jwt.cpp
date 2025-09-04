@@ -84,13 +84,13 @@ void ClaimSet::setJti(const std::string& val)
 
 //-------------------------------------------------------------------------------------------------
 
-nx::utils::expected<jws::TokenEncodeResult<ClaimSet>, std::string /*error*/>
+std::expected<jws::TokenEncodeResult<ClaimSet>, std::string /*error*/>
     encodeAndSign(ClaimSet claimSet, const jwk::Key& key)
 {
     return jws::encodeAndSign<ClaimSet>(kJwtTokenType, std::move(claimSet), key);
 }
 
-nx::utils::expected<Token, std::string /*err*/> decodeToken(const std::string_view encoded)
+std::expected<Token, std::string /*err*/> decodeToken(const std::string_view encoded)
 {
     return jws::decodeToken<ClaimSet>(encoded);
 }

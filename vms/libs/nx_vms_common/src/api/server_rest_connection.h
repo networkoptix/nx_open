@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <expected>
+
 #include <analytics/db/analytics_db_types.h>
 #include <api/helpers/request_helpers_fwd.h>
 #include <api/http_client_pool.h>
@@ -23,7 +25,6 @@
 #include <nx/network/rest/result.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/utils/std/expected.h>
 #include <nx/utils/system_error.h>
 #include <nx/vms/api/analytics/analytics_actions.h>
 #include <nx/vms/api/analytics/analytics_engine_settings_data.h>

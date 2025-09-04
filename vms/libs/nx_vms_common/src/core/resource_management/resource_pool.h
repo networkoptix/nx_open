@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <expected>
 #include <functional>
 #include <vector>
 
@@ -16,7 +17,6 @@
 #include <nx/string.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/expected.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 
@@ -134,7 +134,7 @@ public:
     QnVirtualCameraResourceList getCamerasByFlexibleIds(const std::vector<QString>& flexibleIdList) const;
 
     template<class Resource, class IdList>
-    std::vector<nx::utils::expected<QnSharedResourcePointer<Resource>, nx::Uuid /*notFound*/>>
+    std::vector<std::expected<QnSharedResourcePointer<Resource>, nx::Uuid /*notFound*/>>
         findResourcesByIds(const IdList& idList) const
     {
         // Consider adding `util::value_type_t<IdList>` type trait to deduce the container's value
@@ -143,7 +143,7 @@ public:
         static_assert(std::is_same_v<std::decay_t<decltype(*idList.begin())>, nx::Uuid>,
             "List of nx::Uuid is expected");
 
-        std::vector<nx::utils::expected<QnSharedResourcePointer<Resource>, nx::Uuid>> result;
+        std::vector<std::expected<QnSharedResourcePointer<Resource>, nx::Uuid>> result;
         result.reserve(idList.size());
 
         NX_READ_LOCKER locker(&m_resourcesMutex);
@@ -157,7 +157,7 @@ public:
             }
             else
             {
-                result.emplace_back(nx::utils::unexpected(id));
+                result.emplace_back(std::unexpected(id));
             }
         }
         return result;

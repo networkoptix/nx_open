@@ -111,7 +111,7 @@ struct SystemList
 NX_REFLECTION_INSTRUMENT(SystemList, (count)(next)(previous)(results));
 
 template<typename T>
-using CloudResult = nx::utils::expected<T, nx::cloud::db::api::ResultCode>;
+using CloudResult = std::expected<T, nx::cloud::db::api::ResultCode>;
 
 // Makes a GET request to the cloud API. Resumes on the main thread.
 template<typename T>
@@ -153,7 +153,7 @@ nx::coro::Task<CloudResult<T>> cloudGet(
                 [this, g = std::move(g)](nx::cloud::db::api::ResultCode code, auto data) mutable
                 {
                     if (code != nx::cloud::db::api::ResultCode::ok)
-                        m_result = nx::utils::unexpected(code);
+                        m_result = std::unexpected(code);
                     else
                         m_result = std::move(data);
 
@@ -165,7 +165,7 @@ nx::coro::Task<CloudResult<T>> cloudGet(
         CloudResult<T> await_resume()
         {
             if (!m_result)
-                return nx::utils::unexpected(nx::cloud::db::api::ResultCode::unknownError);
+                return std::unexpected(nx::cloud::db::api::ResultCode::unknownError);
 
             auto result = std::move(*m_result);
 
@@ -179,7 +179,7 @@ nx::coro::Task<CloudResult<T>> cloudGet(
     };
 
     if (!statusWatcher->cloudConnection() || statusWatcher->status() != CloudStatusWatcher::Online)
-        co_return nx::utils::unexpected(nx::cloud::db::api::ResultCode::networkError);
+        co_return std::unexpected(nx::cloud::db::api::ResultCode::networkError);
 
     co_return co_await Awaiter(statusWatcher->cloudConnection(), path, query);
 }

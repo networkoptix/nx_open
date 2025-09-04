@@ -139,7 +139,7 @@ class JoseJwsLoadTest:
 {
 protected:
     template<typename Key>
-    nx::utils::expected<nx::network::jws::TokenEncodeResult<jwt::ClaimSet>, std::string>
+    std::expected<nx::network::jws::TokenEncodeResult<jwt::ClaimSet>, std::string>
         generateToken(const Key& key)
     {
         jwt::ClaimSet claimSet;
@@ -152,7 +152,7 @@ protected:
         claimSet.setExp(std::chrono::duration_cast<std::chrono::seconds>(
             nx::utils::utcTime().time_since_epoch() + std::chrono::minutes(10)));
 
-        nx::utils::expected<nx::network::jws::TokenEncodeResult<jwt::ClaimSet>, std::string>
+        std::expected<nx::network::jws::TokenEncodeResult<jwt::ClaimSet>, std::string>
             tokenEncodeResult = nx::network::jws::encodeAndSign(
                 nx::network::jwt::kJwtTokenType, claimSet, key);
 

@@ -26,7 +26,7 @@ static bool isUrl(std::string_view str)
 
 namespace nx::cloud::db::api {
 
-nx::utils::expected<AccessScope, std::string> AccessScope::buildAccessScope(const std::string& scope)
+std::expected<AccessScope, std::string> AccessScope::buildAccessScope(const std::string& scope)
 {
     AccessScope result;
     std::optional<std::string> error;
@@ -48,7 +48,7 @@ nx::utils::expected<AccessScope, std::string> AccessScope::buildAccessScope(cons
     });
 
     if (error)
-        return nx::utils::unexpected<std::string>(std::move(*error));
+        return std::unexpected<std::string>(std::move(*error));
 
     return result;
 }

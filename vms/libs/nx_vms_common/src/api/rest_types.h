@@ -2,11 +2,12 @@
 
 #pragma once
 
+#include <expected>
+
 #include <QtCore/QString>
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/rest/result.h>
-#include <nx/utils/std/expected.h>
 
 #include "server_rest_connection_fwd.h"
 
@@ -15,7 +16,7 @@ namespace rest {
 struct EmptyResponseType {};
 
 template<typename Data>
-using ErrorOrData = nx::utils::expected<Data, nx::network::rest::Result>;
+using ErrorOrData = std::expected<Data, nx::network::rest::Result>;
 
 using ErrorOrEmpty = ErrorOrData<EmptyResponseType>;
 

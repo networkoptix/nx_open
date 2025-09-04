@@ -1662,7 +1662,7 @@ class JsonRpcResultContext: public BaseResultContext
 {
 public:
     JsonRpcResultContext(std::vector<nx::vms::api::JsonRpcRequest> requests):
-        result(nx::utils::unexpected(nx::network::rest::Result::notImplemented())),
+        result(std::unexpected(nx::network::rest::Result::notImplemented())),
         requestData(std::move(requests))
     {
     }
@@ -2062,7 +2062,7 @@ Handle ServerConnection::ldapAuthenticateAsync(
             {
                 nx::network::rest::Result result;
                 QJson::deserialize(body, &result);
-                callback(requestId, nx::utils::unexpected(std::move(result)), authResult);
+                callback(requestId, std::unexpected(std::move(result)), authResult);
                 return;
             }
 
