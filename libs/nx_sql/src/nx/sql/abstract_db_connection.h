@@ -55,11 +55,7 @@ public:
     {
         auto query = createQuery();
         query->prepare(sqlText);
-
-        nx::utils::apply_each(
-            [&query](const auto& arg) { query->addBindValue(arg); },
-            std::forward<Args>(args)...);
-
+        (query->addBindValue(std::forward<Args>(args)), ...);
         query->exec();
     }
 

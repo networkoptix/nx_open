@@ -74,8 +74,7 @@ TEST(Buffer, resize)
 TEST(Buffer, swap)
 {
     auto testData = std::make_tuple(QByteArray(100, 'x'), std::string(100, 'x'), "Hello");
-    nx::utils::tuple_for_each(
-        testData,
+    const auto swap =
         [](const auto& data)
         {
             nx::Buffer one(data);
@@ -85,14 +84,15 @@ TEST(Buffer, swap)
 
             ASSERT_EQ(data, two);
             ASSERT_EQ("raz, raz", one);
-        });
+        };
+
+    std::apply([swap](const auto&... data) { (swap(data), ...); }, testData);
 }
 
 TEST(Buffer, append)
 {
     auto testData = std::make_tuple(QByteArray(100, 'x'), std::string(100, 'x'), "Hello");
-    nx::utils::tuple_for_each(
-        testData,
+    const auto append =
         [](const auto& data)
         {
             nx::Buffer buf(data);
@@ -102,7 +102,8 @@ TEST(Buffer, append)
                 ASSERT_EQ(data + ", world", buf);
             else
                 ASSERT_EQ(std::string(data) + ", world", buf);
-        });
+        };
+    std::apply([append](const auto&... data) { (append(data), ...); }, testData);
 }
 
 TEST(Buffer, find)
