@@ -42,17 +42,88 @@ ChannelPartnerUserNotificationManager::ChannelPartnerUserNotificationManager(
 
 void ChannelPartnerUserNotificationManager::handleConnect()
 {
-    if (system()->localSettings()->channelPartnerUserNotificationClosed())
+    if (!checkBasicConstantVisibilityConditions())
         return;
 
+    if (checkBasicMutableVisibilityConditions() && systemContainsChannelPartnerUser(system()))
+    {
+        showNotification();
+    }
+    else
+    {
+        m_connections << connect(
+            system()->resourcePool(), &QnResourcePool::resourcesAdded,
+            this, &ChannelPartnerUserNotificationManager::handleUserAdded);
+
+        m_connections << connect(
+            system()->accessController(),
+            &nx::vms::client::core::AccessController::userChanged,
+            this,
+            &ChannelPartnerUserNotificationManager::handleUserChanged);
+
+        m_connections << connect(
+            system()->accessController(),
+            &nx::vms::client::core::AccessController::globalPermissionsChanged,
+            this,
+            &ChannelPartnerUserNotificationManager::handleUserChanged);
+    }
+}
+
+void ChannelPartnerUserNotificationManager::handleDisconnect()
+{
+    m_connections.reset();
+
+    if (m_notificationId.isNull())
+        return;
+
+    workbench()->windowContext()->localNotificationsManager()->remove(m_notificationId);
+    m_notificationId = {};
+}
+
+void ChannelPartnerUserNotificationManager::handleUserAdded(const QnResourceList& resources)
+{
+    if (!checkBasicConstantVisibilityConditions() || !checkBasicMutableVisibilityConditions())
+        return;
+
+    for (const auto& user: resources.filtered<nx::vms::client::core::UserResource>())
+    {
+        if (user && userIsChannelPartner(user))
+        {
+            showNotification();
+            return;
+        }
+    }
+}
+
+void ChannelPartnerUserNotificationManager::handleUserChanged()
+{
+    if (!checkBasicConstantVisibilityConditions() || !checkBasicMutableVisibilityConditions())
+        return;
+
+    if (systemContainsChannelPartnerUser(system()))
+        showNotification();
+}
+
+bool ChannelPartnerUserNotificationManager::checkBasicConstantVisibilityConditions() const
+{
+    if (system()->localSettings()->channelPartnerUserNotificationClosed())
+        return false;
+
+    if (!m_notificationId.isNull())
+        return false;
+
+    return true;
+}
+
+bool ChannelPartnerUserNotificationManager::checkBasicMutableVisibilityConditions() const
+{
     const bool isChannelPartnerUser = userIsChannelPartner(system()->user());
     const auto isPowerUser = system()->accessController()->hasPowerUserPermissions();
-    if (isChannelPartnerUser || !isPowerUser)
-        return;
+    return !isChannelPartnerUser && isPowerUser;
+}
 
-    if (!systemContainsChannelPartnerUser(system()))
-        return;
-
+void ChannelPartnerUserNotificationManager::showNotification()
+{
     const auto notificationsManager = workbench()->windowContext()->localNotificationsManager();
     m_notificationId = notificationsManager->add(
         tr("Channel Partner users have access to this site"),
@@ -78,15 +149,6 @@ void ChannelPartnerUserNotificationManager::handleConnect()
             m_notificationId = {};
             localSettings->channelPartnerUserNotificationClosed = true;
         });
-}
-
-void ChannelPartnerUserNotificationManager::handleDisconnect()
-{
-    if (m_notificationId.isNull())
-        return;
-
-    workbench()->windowContext()->localNotificationsManager()->remove(m_notificationId);
-    m_notificationId = {};
 }
 
 } // namespace nx::vms::client::desktop
