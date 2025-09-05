@@ -3,11 +3,10 @@
 #ifndef QN_FUSION_H
 #define QN_FUSION_H
 
-#include <type_traits> /* For std::enable_if, std::is_same, std::integral_constant. */
-#include <utility> /* For std::forward and std::declval. */
+#include <type_traits>
+#include <utility>
 
 #ifndef Q_MOC_RUN
-    #include <boost/mpl/if.hpp>
     #include <boost/preprocessor/cat.hpp>
     #include <boost/preprocessor/seq/for_each.hpp>
     #include <boost/preprocessor/tuple/elem.hpp>
@@ -118,8 +117,8 @@ namespace QnFusion {
      */
     template<class Setter, class T>
     struct setter_category:
-        boost::mpl::if_<
-            std::is_member_object_pointer<Setter>,
+        std::conditional<
+            std::is_member_object_pointer<Setter>::value,
             typed_member_setter_tag<T>,
             typed_function_setter_tag<T>
         >
@@ -135,7 +134,7 @@ namespace QnFusion {
      */
     template<class Access>
     struct access_member_type:
-        QnTypeTraits::remove_cvr<decltype(invoke(
+        std::remove_cvref<decltype(invoke(
             std::declval<typename Access::template at<getter_type, void>::type::result_type>(),
             std::declval<typename Access::template at<object_declval_type, void>::type::result_type>()
         ))>
@@ -197,7 +196,7 @@ namespace QnFusion {
      */
     template<class T>
     struct is_adapted:
-        QnFusionDetail::is_adapted<T>
+        std::bool_constant<requires(T t){ visit_members(t, std::type_identity<void>{}); }>
     {};
 
 } // namespace QnFusion
