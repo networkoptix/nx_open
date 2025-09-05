@@ -60,7 +60,7 @@ public:
         m_actualThread = std::make_unique<detail::thread>(
             [f1 = std::forward<Function>(f), argsTuple = std::move(argsTuple)]() mutable
             {
-                expandTupleIntoArgs(std::move(f1), std::move(argsTuple));
+                std::apply(std::move(f1), std::move(argsTuple));
             });
     }
 

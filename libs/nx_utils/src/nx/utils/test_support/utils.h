@@ -52,11 +52,12 @@
 #define NX_GTEST_ASSERT_ANY_OF(expectedValues, actual) do \
 { \
     const auto& actualValue = actual; \
-    bool foundMatchingValue = false; \
-    nx::utils::tuple_for_each( \
-        std::make_tuple expectedValues, \
-        [&actualValue, &foundMatchingValue](const auto& value) mutable \
-            { foundMatchingValue |= actualValue == value; }); \
+    bool foundMatchingValue = std::apply( \
+        [&actualValue](const auto&... values) { \
+            return ((actualValue == values) || ...); \
+        }, \
+        std::make_tuple expectedValues \
+    ); \
     ASSERT_TRUE(foundMatchingValue); \
 } while (0)
 
