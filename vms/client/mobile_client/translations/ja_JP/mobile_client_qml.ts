@@ -204,7 +204,7 @@
     <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
-      <translation>ログイン &quot;%1&quot; を削除しますか?</translation>
+      <translation>ログイン名 &quot;%1&quot; を削除しますか?</translation>
     </message>
     <message>
       <source>Login field cannot be empty</source>
@@ -961,7 +961,7 @@
     </message>
     <message>
       <source>Log in as</source>
-      <translation>ログイン:</translation>
+      <translation>ログイン名:</translation>
     </message>
     <message>
       <source>Login</source>
