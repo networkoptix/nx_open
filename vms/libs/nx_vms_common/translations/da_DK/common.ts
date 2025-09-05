@@ -254,11 +254,11 @@
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
-      <translation>Ukendt fejl. Kontakt support.</translation>
+      <translation>Ukendt fejl. Kontakt venligst support.</translation>
     </message>
     <message>
       <source>(unknown)</source>
-      <translation>(ukendt)</translation>
+      <translation>(Ukendt)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
