@@ -1099,25 +1099,6 @@
     </message>
   </context>
   <context>
-    <name>TextField</name>
-    <message>
-      <source>Cut</source>
-      <translation>Klipp ut</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Kopiera</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Klistra in</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Markera alla</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

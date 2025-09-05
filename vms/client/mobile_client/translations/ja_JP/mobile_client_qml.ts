@@ -204,7 +204,7 @@
     <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
-      <translation>ログイン &quot;%1&quot; を削除しますか?</translation>
+      <translation>ログイン名 &quot;%1&quot; を削除しますか?</translation>
     </message>
     <message>
       <source>Login field cannot be empty</source>
@@ -965,7 +965,7 @@
     </message>
     <message>
       <source>Log in as</source>
-      <translation>ログイン:</translation>
+      <translation>ログイン名:</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1095,25 +1095,6 @@
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>%1 を開く</translation>
-    </message>
-  </context>
-  <context>
-    <name>TextField</name>
-    <message>
-      <source>Cut</source>
-      <translation>切り取り</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>コピー</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>貼り付け</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>すべて選択</translation>
     </message>
   </context>
   <context>

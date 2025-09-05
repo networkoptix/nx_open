@@ -1101,25 +1101,6 @@
     </message>
   </context>
   <context>
-    <name>TextField</name>
-    <message>
-      <source>Cut</source>
-      <translation>Вырезать</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Копировать</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Вставить</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Выделить всё</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

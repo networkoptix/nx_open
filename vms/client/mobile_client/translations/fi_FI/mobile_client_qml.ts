@@ -1099,25 +1099,6 @@
     </message>
   </context>
   <context>
-    <name>TextField</name>
-    <message>
-      <source>Cut</source>
-      <translation>Leikkaa</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Kopioi</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Liitä</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Valitse kaikki</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

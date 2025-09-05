@@ -1098,25 +1098,6 @@
     </message>
   </context>
   <context>
-    <name>TextField</name>
-    <message>
-      <source>Cut</source>
-      <translation>Potong</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Salin</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Tempel</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Pilih Semua</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

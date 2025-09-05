@@ -1101,25 +1101,6 @@
     </message>
   </context>
   <context>
-    <name>TextField</name>
-    <message>
-      <source>Cut</source>
-      <translation>גזור</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>העתק</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>הדבק</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>בחר הכל</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

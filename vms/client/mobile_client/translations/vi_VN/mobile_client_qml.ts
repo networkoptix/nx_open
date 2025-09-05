@@ -1098,25 +1098,6 @@
     </message>
   </context>
   <context>
-    <name>TextField</name>
-    <message>
-      <source>Cut</source>
-      <translation>Cắt</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Bản sao</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Dán</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Chọn tất cả</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

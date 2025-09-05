@@ -1101,25 +1101,6 @@
     </message>
   </context>
   <context>
-    <name>TextField</name>
-    <message>
-      <source>Cut</source>
-      <translation>Oříznout</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>Kopírovat</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>Vložit</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Vybrat vše</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>

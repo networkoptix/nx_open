@@ -1098,25 +1098,6 @@
     </message>
   </context>
   <context>
-    <name>TextField</name>
-    <message>
-      <source>Cut</source>
-      <translation>ตัด</translation>
-    </message>
-    <message>
-      <source>Copy</source>
-      <translation>คัดลอก</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <translation>วาง</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>เลือกทั้งหมด</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>
