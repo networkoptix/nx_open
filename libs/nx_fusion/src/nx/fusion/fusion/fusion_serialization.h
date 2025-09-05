@@ -3,10 +3,6 @@
 #ifndef QN_FUSION_SERIALIZATION_H
 #define QN_FUSION_SERIALIZATION_H
 
-#ifndef Q_MOC_RUN
-    #include <boost/preprocessor/tuple/enum.hpp>
-#endif
-
 #include "fusion.h"
 #include "fusion_detail.h"
 
@@ -31,12 +27,12 @@ namespace QnFusion {
 
     template<class D>
     struct has_serialization_visitor_type:
-        QnFusionDetail::has_type<serialization_visitor_type<D> >
+        std::bool_constant<requires{ typename serialization_visitor_type<D>::type; }>
     {};
 
     template<class D>
     struct has_deserialization_visitor_type:
-        QnFusionDetail::has_type<deserialization_visitor_type<D> >
+        std::bool_constant<requires{ typename deserialization_visitor_type<D>::type; }>
     {};
 
 
