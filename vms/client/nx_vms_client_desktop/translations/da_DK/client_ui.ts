@@ -1144,7 +1144,7 @@
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>Site Indstillinger</translation>
     </message>
   </context>
   <context>
@@ -1571,7 +1571,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Flet Sites...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>
@@ -1924,7 +1924,7 @@
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Site Administration</translation>
     </message>
   </context>
   <context>

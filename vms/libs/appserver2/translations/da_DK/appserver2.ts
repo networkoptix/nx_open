@@ -5,11 +5,11 @@
     <name>ServerApiErrors</name>
     <message>
       <source>Maximum number of archive seconds must be provided in range up to %1.</source>
-      <translation type="unfinished">Maximum number of archive seconds must be provided in range up to %1.</translation>
+      <translation>Det maksimale antal arkiv sekunder skal angives inden for et område op til %1.</translation>
     </message>
     <message>
       <source>User Group &apos;%1&apos; does not exist.</source>
-      <translation>Brugergruppe &apos;%1&apos; eksisterer ikke.</translation>
+      <translation>Brugergruppen &apos;%1&apos; findes ikke.</translation>
     </message>
     <message>
       <source>Cannot add to a non-local (%1) User Group &apos;%2(%3)&apos;.</source>
@@ -83,7 +83,7 @@
     <message>
       <source>Removal of the User with Groups in an Organization is controlled by the %1</source>
       <comment>%1 is the short Cloud name</comment>
-      <translation type="unfinished">Removal of the User with Groups in an Organization is controlled by the %1</translation>
+      <translation>Fjernelse af brugeren med grupper i en organisation kontrolleres af %1</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; is not permitted to remove %2.</source>
@@ -157,7 +157,7 @@
     <message>
       <source>User Groups in an Organization are controlled by by the %1</source>
       <comment>%1 is the short Cloud name</comment>
-      <translation type="unfinished">User Groups in an Organization are controlled by by the %1</translation>
+      <translation>Brugergrupper i en organisation kontrolleres af %1</translation>
     </message>
     <message>
       <source>Expected Device id %1 is not equal to actual id %2 (`physicalId` %3).</source>
@@ -165,11 +165,11 @@
     </message>
     <message>
       <source>Maximum number of Cameras for the Site is reached. Available %1.</source>
-      <translation type="unfinished">Maximum number of Cameras for the Site is reached. Available %1.</translation>
+      <translation>Maksimalt antal kameraer for webstedet er nået. Tilgængelig %1.</translation>
     </message>
     <message>
       <source>Maximum number of Layout items for the Site is reached. Available %1.</source>
-      <translation type="unfinished">Maximum number of Layout items for the Site is reached. Available %1.</translation>
+      <translation>Maksimalt antal Layout elementer for webstedet er nået. Tilgængelig %1.</translation>
     </message>
     <message>
       <source>Request of User %1 with %2 permissions to read Resource parameter `%3` is forbidden.</source>
@@ -308,12 +308,12 @@
     <message>
       <source>%1 storage cannot be enabled due to insufficient services.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 storage cannot be enabled due to insufficient services.</translation>
+      <translation>%1 Lager kan ikke aktiveres på grund af utilstrækkelige tjenester.</translation>
     </message>
     <message>
       <source>Can&apos;t enable writing for local storage because there is an active %1 storage</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Can&apos;t enable writing for local storage because there is an active %1 storage</translation>
+      <translation>Kan&apos;t aktivere skrivning for lokal lagerplads, fordi der er en aktiv %1 lagerplads</translation>
     </message>
     <message>
       <source>Changing storage URL is prohibited.</source>
@@ -321,11 +321,11 @@
     </message>
     <message>
       <source>Invalid `storageArchiveMode` value.</source>
-      <translation type="unfinished">Invalid `storageArchiveMode` value.</translation>
+      <translation>Ugyldig `storageArchiveMode` værdi.</translation>
     </message>
     <message>
       <source>Changing `storageArchiveMode` to undefined is prohibited for existing storage.</source>
-      <translation type="unfinished">Changing `storageArchiveMode` to undefined is prohibited for existing storage.</translation>
+      <translation>Ændring af `storageArchiveMode` til udefineret er forbudt for eksisterende opbevaring.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`</source>
@@ -333,11 +333,11 @@
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create new User Groups.</translation>
+      <translation>Bruger &apos;%1(%2)&apos; har ikke tilladelse til at oprette nye brugergrupper.</translation>
     </message>
     <message>
       <source>It is forbidden to change Server deployment code</source>
-      <translation type="unfinished">It is forbidden to change Server deployment code</translation>
+      <translation>Det er forbudt at ændre Server implementering kode</translation>
     </message>
     <message>
       <source>Storage with the same url already exists</source>

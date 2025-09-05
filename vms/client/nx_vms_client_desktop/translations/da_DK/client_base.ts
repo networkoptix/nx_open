@@ -1060,7 +1060,7 @@
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Site Administration...</translation>
     </message>
     <message>
       <source>Site Update...</source>
@@ -1076,7 +1076,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Flet Sites...</translation>
     </message>
     <message>
       <source>Open in</source>
@@ -2683,11 +2683,11 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>Du vil blive logget ud af sitet. Sitet vil kun være tilgængeligt via lokalt netværk</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>Sitet vil kun være tilgængeligt via lokalt netværk</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
@@ -4644,7 +4644,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>Lagringen har forskellige læse- og skrive politikker på tværs af forskellige servere på webstedet</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
@@ -7999,7 +7999,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Site Administration</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -9277,7 +9277,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>Flet Sites</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
@@ -9290,7 +9290,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
-      <translation type="unfinished">Merging Sites...</translation>
+      <translation>Sammenfletter Sites...</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
@@ -11686,7 +11686,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>Brugeren med den angivne e-mail har allerede administrator adgang via Kanalpartneren</translation>
     </message>
   </context>
   <context>
