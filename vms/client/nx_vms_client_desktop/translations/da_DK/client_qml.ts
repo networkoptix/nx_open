@@ -471,7 +471,7 @@
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Luk Ned</translation>
     </message>
   </context>
   <context>
@@ -737,7 +737,7 @@
     </message>
     <message>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Filtrer</translation>
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
@@ -1261,7 +1261,7 @@
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Avancerede Indstillinger</translation>
     </message>
     <message>
       <source>Disconnect</source>

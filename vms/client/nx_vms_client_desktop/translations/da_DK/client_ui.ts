@@ -67,7 +67,7 @@
     <name>AdvancedSettingsWidget</name>
     <message>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation>Downmix lyd fra 5.1 til 2.1</translation>
+      <translation>Downmix lyd fra 5,1 til 2,1</translation>
     </message>
     <message>
       <source>Double Buffering</source>
@@ -553,7 +553,7 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Generer</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1567,7 +1567,7 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Generer</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1590,7 +1590,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>Bruger&apos;s lokale layouts</translation>
     </message>
   </context>
   <context>
