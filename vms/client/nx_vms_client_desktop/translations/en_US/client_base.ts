@@ -7536,6 +7536,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::ChannelPartnerUserNotificationManager</name>
+    <message>
+        <source>Channel Partner users have access to this site</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
         <source>Your confirmation is required to provide a token to</source>
@@ -7702,14 +7713,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Disconnect</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Channel Partner users have access to this site</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
         <translation></translation>
     </message>
 </context>
