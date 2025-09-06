@@ -531,7 +531,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Luk Ned</translation>
     </message>
     <message>
       <source>New</source>
@@ -871,7 +871,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Filtrer</translation>
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
@@ -1450,7 +1450,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Avancerede Indstillinger</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1565,7 +1565,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Gennemse...</translation>
     </message>
     <message>
       <source>Separator:</source>
@@ -1963,7 +1963,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensitet</translation>
     </message>
   </context>
   <context>
@@ -2235,7 +2235,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Brugernavn</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3116,7 +3116,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Tidsplan</translation>
     </message>
     <message>
       <source>Enable</source>

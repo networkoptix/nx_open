@@ -53,7 +53,7 @@
     </message>
     <message>
       <source>Analytics events</source>
-      <translation>Analyse-hændelser</translation>
+      <translation>Analyse hændelser</translation>
     </message>
     <message>
       <source>Any analytics event</source>
@@ -737,7 +737,7 @@
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation>Synkroniseringen kunne ikke fuldføres inden for en timeout på %1 .</translation>
+      <translation>Synkroniseringen kunne ikke fuldføres inden for en timeout på %1.</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>

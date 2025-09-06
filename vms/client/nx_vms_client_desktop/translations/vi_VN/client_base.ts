@@ -7414,6 +7414,17 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ChannelPartnerUserNotificationManager</name>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation>Người dùng Đối tác kênh có quyền truy cập vào Chi nhánh này</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation>Quyền truy cập của người dùng Đối tác kênh&apos; được quản lý ở cấp Tổ chức và họ không hiển thị trong quản lý người dùng Chi nhánh.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Tìm hiểu thêm&lt;/a&gt;</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
       <source>Your confirmation is required to provide a token to</source>
@@ -7581,14 +7592,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Disconnect</source>
       <translation>Ngắt kết nối</translation>
-    </message>
-    <message>
-      <source>Channel Partner users have access to this site</source>
-      <translation>Người dùng Đối tác kênh có quyền truy cập vào Chi nhánh này</translation>
-    </message>
-    <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation>Quyền truy cập của người dùng Đối tác kênh&apos; được quản lý ở cấp Tổ chức và họ không hiển thị trong quản lý người dùng Chi nhánh.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Tìm hiểu thêm&lt;/a&gt;</translation>
     </message>
   </context>
   <context>

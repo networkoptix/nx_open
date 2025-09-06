@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Site Servers</source>
-      <translation type="unfinished">Site Servers</translation>
+      <translation>Site servere</translation>
     </message>
   </context>
   <context>
@@ -67,7 +67,7 @@
     <name>AdvancedSettingsWidget</name>
     <message>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation>Downmix lyd fra 5.1 til 2.1</translation>
+      <translation>Downmix lyd fra 5,1 til 2,1</translation>
     </message>
     <message>
       <source>Double Buffering</source>
@@ -131,11 +131,11 @@
     </message>
     <message>
       <source>with</source>
-      <translation type="unfinished">with</translation>
+      <translation>med</translation>
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation type="unfinished">Simultaneous Streams</translation>
+      <translation>Samtidige Streams</translation>
     </message>
   </context>
   <context>
@@ -228,7 +228,7 @@
     </message>
     <message>
       <source>Site actions</source>
-      <translation type="unfinished">Site actions</translation>
+      <translation>Site handlinger</translation>
     </message>
   </context>
   <context>
@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Mbps</source>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -416,7 +416,7 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Generer</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -528,11 +528,11 @@
     </message>
     <message>
       <source>Use site presets</source>
-      <translation type="unfinished">Use site presets</translation>
+      <translation>Brug forudindstillinger for site</translation>
     </message>
     <message>
       <source>Native camera presets will not be available.</source>
-      <translation type="unfinished">Native camera presets will not be available.</translation>
+      <translation>Forudindstillinger for native kameraer vil ikke være tilgængelige.</translation>
     </message>
   </context>
   <context>
@@ -606,7 +606,7 @@
     </message>
     <message>
       <source>Restreaming Link</source>
-      <translation type="unfinished">Restreaming Link</translation>
+      <translation>Restreaming link</translation>
     </message>
   </context>
   <context>
@@ -760,7 +760,7 @@
     </message>
     <message>
       <source>This site is connected to</source>
-      <translation type="unfinished">This site is connected to</translation>
+      <translation>Dette site er forbundet til</translation>
     </message>
   </context>
   <context>
@@ -823,7 +823,7 @@
     </message>
     <message>
       <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
+      <translation>Opret en sikkerhedskopi af Site management data, eller gendanne Site management data fra en eksisterende backup</translation>
     </message>
   </context>
   <context>
@@ -1137,7 +1137,7 @@
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
-      <translation type="unfinished">Connect to the previous site on startup</translation>
+      <translation>Forbind til forrige site ved opstart</translation>
     </message>
   </context>
   <context>
@@ -1297,7 +1297,7 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Generer</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1320,7 +1320,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>Bruger&apos;s lokale layouts</translation>
     </message>
   </context>
   <context>
@@ -1489,7 +1489,7 @@
     </message>
     <message>
       <source>Open files folder</source>
-      <translation type="unfinished">Open files folder</translation>
+      <translation>Åbn filmappe</translation>
     </message>
   </context>
   <context>
@@ -1544,11 +1544,11 @@
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
-      <translation type="unfinished">Show timestamp on LIVE</translation>
+      <translation>Vis tidsstempel på LIVE</translation>
     </message>
     <message>
       <source>Custom Background Image</source>
-      <translation type="unfinished">Custom Background Image</translation>
+      <translation>Brugerdefineret Baggrundsbillede</translation>
     </message>
   </context>
   <context>
@@ -1656,7 +1656,7 @@
     </message>
     <message>
       <source>Address or Subnet Mask</source>
-      <translation type="unfinished">Address or Subnet Mask</translation>
+      <translation>Adresse eller undernetmaske</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1684,16 +1684,16 @@
     </message>
     <message>
       <source>Find Devices</source>
-      <translation type="unfinished">Find Devices</translation>
+      <translation>Find Enheder</translation>
     </message>
     <message>
       <source>
               Enter address, subnet range or subnet mask, login and password
               and click on the &quot;Search&quot; button
           </source>
-      <translation type="unfinished">
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
+      <translation>
+              Indtast adresse, undernet interval eller undernetmaske, login og adgangskode
+              og klik på &quot;Søg&quot; knap
           </translation>
     </message>
   </context>
@@ -1751,7 +1751,7 @@
     </message>
     <message>
       <source>Signature</source>
-      <translation type="unfinished">Signature</translation>
+      <translation>Signatur</translation>
     </message>
   </context>
   <context>
@@ -1781,7 +1781,7 @@
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Notifikationer På Site</translation>
     </message>
   </context>
   <context>
@@ -1917,7 +1917,7 @@
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
+      <translation>Fjernelse af denne forbindelse kan føre til fejl på Sitet.</translation>
     </message>
   </context>
   <context>
@@ -2088,11 +2088,11 @@
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
-      <translation type="unfinished">Organization&apos;s limits violation</translation>
+      <translation>Organisationens&apos;grænseoverskridelse</translation>
     </message>
     <message>
       <source>Service Allocation</source>
-      <translation type="unfinished">Service Allocation</translation>
+      <translation>Service Allokering</translation>
     </message>
   </context>
   <context>
@@ -2202,27 +2202,27 @@
     </message>
     <message>
       <source>Video Redaction</source>
-      <translation type="unfinished">Video Redaction</translation>
+      <translation>Videoredigering</translation>
     </message>
     <message>
       <source>Configure...</source>
-      <translation type="unfinished">Configure...</translation>
+      <translation>Konfigurer...</translation>
     </message>
     <message>
       <source>Blur</source>
-      <translation type="unfinished">Blur</translation>
+      <translation>Sløring</translation>
     </message>
     <message>
       <source>Exclude Cameras</source>
-      <translation type="unfinished">Exclude Cameras</translation>
+      <translation>Udeluk Kameraer</translation>
     </message>
     <message>
       <source>Apply session duration to Cloud users</source>
-      <translation type="unfinished">Apply session duration to Cloud users</translation>
+      <translation>Anvend sessionsvarighed til Cloud brugere</translation>
     </message>
     <message>
       <source>Remote Access Tool</source>
-      <translation type="unfinished">Remote Access Tool</translation>
+      <translation>Ekstern Adgangsværktøj</translation>
     </message>
     <message>
       <source>Administrators</source>
@@ -2303,11 +2303,11 @@
     </message>
     <message>
       <source>Remote Access</source>
-      <translation type="unfinished">Remote Access</translation>
+      <translation>Fjernadgang</translation>
     </message>
     <message>
       <source>Enable hardware decoding</source>
-      <translation type="unfinished">Enable hardware decoding</translation>
+      <translation>Aktiver hardwareafkodning</translation>
     </message>
   </context>
   <context>
@@ -2598,11 +2598,11 @@
     </message>
     <message>
       <source>Every</source>
-      <translation type="unfinished">Every</translation>
+      <translation>Hver</translation>
     </message>
     <message>
       <source>Force open in a dedicated window</source>
-      <translation type="unfinished">Force open in a dedicated window</translation>
+      <translation>Tving åbning i et dedikeret vindue</translation>
     </message>
   </context>
   <context>

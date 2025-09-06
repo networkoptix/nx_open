@@ -292,7 +292,7 @@
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation>Åbn i browser</translation>
+      <translation>Åbn i browser...</translation>
     </message>
     <message>
       <source>User Management...</source>
@@ -1112,7 +1112,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>Celle Billede Format</translation>
     </message>
     <message>
       <source>Layout</source>
@@ -1502,8 +1502,8 @@ Licensnøgle: %2</translation>
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>Form: Anden</numerusform>
-        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden:</numerusform>
+        <numerusform>Form: Anden:</numerusform>
       </translation>
     </message>
   </context>
@@ -3947,7 +3947,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Oprettet</translation>
     </message>
     <message>
       <source>Creator</source>
@@ -7538,6 +7538,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ChannelPartnerUserNotificationManager</name>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation type="unfinished">Channel Partner users have access to this site</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
       <source>Your confirmation is required to provide a token to</source>
@@ -7705,14 +7716,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Disconnect</source>
       <translation>Afbryd</translation>
-    </message>
-    <message>
-      <source>Channel Partner users have access to this site</source>
-      <translation type="unfinished">Channel Partner users have access to this site</translation>
-    </message>
-    <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -8084,7 +8087,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Alle servere er offline. Logs er ikke tilgængelige.</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
@@ -9928,7 +9931,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Notifikationer På Site</translation>
     </message>
   </context>
   <context>
@@ -10581,7 +10584,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -11235,7 +11238,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Oprettet</translation>
     </message>
     <message>
       <source>Creator</source>
@@ -12770,7 +12773,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::rules::SoundPicker</name>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Administrer</translation>
     </message>
   </context>
   <context>
