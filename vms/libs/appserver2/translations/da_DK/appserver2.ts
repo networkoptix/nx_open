@@ -5,7 +5,7 @@
     <name>ServerApiErrors</name>
     <message>
       <source>User Group &apos;%1&apos; does not exist.</source>
-      <translation>Brugergruppe &apos;%1&apos; eksisterer ikke.</translation>
+      <translation>Brugergruppen &apos;%1&apos; findes ikke.</translation>
     </message>
     <message>
       <source>Cannot add to a non-local (%1) User Group &apos;%2(%3)&apos;.</source>

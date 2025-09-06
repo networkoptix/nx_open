@@ -280,7 +280,7 @@
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation>Åbn i browser</translation>
+      <translation>Åbn i browser...</translation>
     </message>
     <message>
       <source>System Administration...</source>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation>Celle Billede Format</translation>
+      <translation>Celle Billede Format...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
@@ -1200,7 +1200,7 @@
     </message>
     <message>
       <source>No more than once per</source>
-      <translation>Ikke mere end én gang pr.</translation>
+      <translation>Ikke mere end én gang pr</translation>
     </message>
     <message>
       <source>Live</source>
@@ -1636,8 +1636,8 @@ Licensnøgle: %2</translation>
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>Form: Anden</numerusform>
-        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden:</numerusform>
+        <numerusform>Form: Anden:</numerusform>
       </translation>
     </message>
   </context>
@@ -4680,7 +4680,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Oprettet</translation>
     </message>
     <message>
       <source>Creator</source>
@@ -11732,7 +11732,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Oprettet</translation>
     </message>
     <message>
       <source>Creator</source>
@@ -12920,7 +12920,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::rules::SoundPicker</name>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Administrer</translation>
     </message>
   </context>
   <context>
