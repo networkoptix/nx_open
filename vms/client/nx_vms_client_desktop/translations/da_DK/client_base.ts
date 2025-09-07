@@ -1433,7 +1433,7 @@
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Ugyldig Licensnøgle</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
@@ -1473,7 +1473,7 @@
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>For at rapportere problemet, bedes du kontakte din Regional / Licens support:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
@@ -1485,7 +1485,7 @@
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Licens Nøgle</translation>
     </message>
     <message>
       <source>Failed to activate free license</source>
@@ -3247,7 +3247,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Failed to connect to Server</source>
-      <translation type="unfinished">Failed to connect to Server</translation>
+      <translation>Kunne ikke oprette forbindelse til serveren</translation>
     </message>
     <message>
       <source>Client and Server have different versions</source>
@@ -3305,7 +3305,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Download &amp; Installer</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
@@ -3829,7 +3829,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Licens Nøgle</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
@@ -3868,7 +3868,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Licens Nøgle</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3978,7 +3978,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation type="unfinished">Look and Feel</translation>
+      <translation>Udseende og følelse</translation>
     </message>
     <message>
       <source>Screen Recording</source>
@@ -4127,7 +4127,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>press and hold</source>
@@ -4310,7 +4310,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Hotkey</source>
-      <translation type="unfinished">Hotkey</translation>
+      <translation>Genvejstast</translation>
     </message>
     <message>
       <source>Home</source>
@@ -4318,7 +4318,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaljer</translation>
     </message>
     <message>
       <source>Tours</source>
@@ -4730,7 +4730,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Select Layouts...</source>
-      <translation type="unfinished">Select Layouts...</translation>
+      <translation>Vælg Layouts...</translation>
     </message>
     <message numerus="yes">
       <source>%n Layouts</source>
@@ -4774,7 +4774,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Select Users...</source>
-      <translation type="unfinished">Select Users...</translation>
+      <translation>Vælg Brugere...</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -4939,7 +4939,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaljer</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
@@ -5934,7 +5934,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Timestamp:</source>
-      <translation type="unfinished">Timestamp:</translation>
+      <translation>Tidsstempel:</translation>
     </message>
     <message>
       <source>Saving %1</source>
@@ -6593,7 +6593,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
     <message>
       <source>Also set on source camera</source>
@@ -6652,7 +6652,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Preset</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -6937,11 +6937,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Video omkodning er påkrævet. Eksporter session genstartet.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>Lyd omkodning er påkrævet. Eksporter session genstartet.</translation>
     </message>
   </context>
   <context>
@@ -7131,7 +7131,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Log Håndtering</translation>
     </message>
   </context>
   <context>
@@ -7969,7 +7969,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Webside</translation>
     </message>
     <message>
       <source>Expert</source>
@@ -8066,7 +8066,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -8242,7 +8242,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Copy to Clipboard</source>
-      <translation type="unfinished">Copy to Clipboard</translation>
+      <translation>Kopiér til udklipsholder</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -8686,7 +8686,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>Tilføj alle enheder</translation>
     </message>
     <message numerus="yes">
       <source>Add %n Devices</source>
@@ -8941,7 +8941,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Eksporter Indstillinger</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
@@ -8953,7 +8953,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Tidsstempel</translation>
     </message>
     <message>
       <source>Add Image</source>
@@ -8993,7 +8993,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Bogmærke Info</translation>
     </message>
     <message>
       <source>exported</source>
@@ -9461,7 +9461,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
-      <translation type="unfinished">Cannot connect to LDAP server</translation>
+      <translation>Kan ikke oprette forbindelse til LDAP serveren</translation>
     </message>
   </context>
   <context>
@@ -10146,7 +10146,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Download &amp; Installer</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
@@ -10178,7 +10178,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Updating to ...</source>
-      <translation type="unfinished">Updating to ...</translation>
+      <translation>Opdaterer til ...</translation>
     </message>
     <message>
       <source>Ready to update to</source>
@@ -10623,7 +10623,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Webside</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
@@ -12280,7 +12280,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Webside</translation>
     </message>
     <message>
       <source>You try to open the
@@ -12727,7 +12727,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Tidsplan</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -13130,7 +13130,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Toolbar</source>
@@ -13160,7 +13160,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Start Rundvisning</translation>
     </message>
     <message>
       <source>Start Showreel</source>

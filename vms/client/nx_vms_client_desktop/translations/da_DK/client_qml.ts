@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Tilføj indtastning</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - Avancerede indstillinger</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Log Ind Attribut</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -32,23 +32,23 @@
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Medlemskab</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Søg Timeout</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>For at aktivere digest godkendelse for LDAP-brugere, der allerede er tilføjet til VMS databasen, skal du aktivere det direkte i disse brugeres&apos; indstillinger.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>For at deaktivere digest godkendelse for LDAP-brugere, der allerede er tilføjet til VMS databasen, skal du deaktivere den direkte i disse brugeres&apos; indstillinger.</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>Tillad usikker (digest) godkendelse for importerede brugere</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,19 +56,19 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Synkroniser brugere</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Synkroniserings Interval</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>Gruppemedlems attribut</translation>
     </message>
     <message>
       <source>Proxy LDAP requests via server</source>
-      <translation type="unfinished">Proxy LDAP requests via server</translation>
+      <translation>Proxy LDAP anmodninger via server</translation>
     </message>
   </context>
   <context>
@@ -243,11 +243,11 @@
     <name>AnalyticsSettingsMenu</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Api Integrationer</translation>
     </message>
   </context>
   <context>
@@ -261,23 +261,23 @@
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Api Integrationer</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>API-integrationer interagerer med %1 Server via REST API og udveksler metadata</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Nye anmodninger</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>API Integration kan aktiveres efter bekræftelse af den kode, der modtages fra Integration udbyder. Nye anmodninger kan være deaktiveret for at forhindre uønsket interaktion.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>Aktiver %1?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -285,23 +285,23 @@
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Denne Integration vil være i stand til:
+ • ændre indstillinger på kameraer
+ • få adgang til arkiv
+ • behandle video streams
+ • udveksle metadata via netværket</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Aktiver Integration</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>Fjern %1?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Dette vil fjerne integrationsanmodning</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -309,14 +309,14 @@
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>Fjern anmodning</translation>
     </message>
   </context>
   <context>
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Dette felt må ikke være tomt</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -327,9 +327,9 @@
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>Batch Rediger - %n Brugere</numerusform>
+        <numerusform>Batch Rediger - %n Brugere</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -342,11 +342,11 @@
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>Bruger status</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Aktiveret</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -354,11 +354,11 @@
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Usikker (digest) godkendelse</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>behold aktuel værdi</translation>
     </message>
   </context>
   <context>
@@ -499,15 +499,15 @@
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP - Forbindelsesindstillinger</translation>
     </message>
     <message>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Vært</translation>
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>Login DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -515,11 +515,11 @@
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>Ignorer LDAP servercertifikat fejl</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
     <message>
       <source>Connecting...</source>
@@ -527,15 +527,15 @@
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>Brug StartTLS</translation>
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>Værten må ikke være tom</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>Login DN må ikke være tom</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -543,7 +543,7 @@
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>For at LDAP-brugere kan logge ind på %1, er det nødvendigt at etablere en forbindelse mellem %1 og en virksomheds LDAP server.</translation>
     </message>
   </context>
   <context>
@@ -622,11 +622,11 @@
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Liste Indstillinger</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Ny Liste</translation>
     </message>
     <message>
       <source>Name</source>
@@ -634,7 +634,7 @@
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>Kolonne Navn</translation>
     </message>
     <message>
       <source>OK</source>
@@ -650,7 +650,7 @@
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Generisk</translation>
     </message>
     <message>
       <source>Type</source>
@@ -729,11 +729,11 @@
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>Basis DN</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>Basis DN må ikke være tomt</translation>
     </message>
     <message>
       <source>Filter</source>
@@ -741,15 +741,15 @@
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>Base DN sætter udgangspunktet for LDAP søgninger og synkronisering.</translation>
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Filtre hjælper med at kontrollere adgang til systemet og synkronisering ved at angive, hvilke brugere og/eller grupper fra basis DN'et der har tilladelse.</translation>
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Rediger Søgebase</translation>
     </message>
   </context>
   <context>
@@ -832,7 +832,7 @@
     </message>
     <message>
       <source>Auto calibration failed</source>
-      <translation type="unfinished">Auto calibration failed</translation>
+      <translation>Automatisk kalibrering mislykkedes</translation>
     </message>
   </context>
   <context>
@@ -846,11 +846,11 @@
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the system level, group members have permissions to:</source>
-      <translation type="unfinished">At the system level, group members have permissions to:</translation>
+      <translation>På systemniveau har gruppemedlemmer tilladelser til:</translation>
     </message>
     <message>
       <source>At the system level, the user has permissions to:</source>
-      <translation type="unfinished">At the system level, the user has permissions to:</translation>
+      <translation>På systemniveau har brugeren tilladelser til:</translation>
     </message>
   </context>
   <context>
@@ -873,15 +873,15 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Rettigheder</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Medlemmer</translation>
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Tilføj Gruppe</translation>
     </message>
   </context>
   <context>
@@ -907,7 +907,7 @@
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Gruppe - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -923,11 +923,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Rettigheder</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Medlemmer</translation>
     </message>
   </context>
   <context>
@@ -950,7 +950,7 @@
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Medlemmer</translation>
     </message>
     <message>
       <source>Users</source>
@@ -962,19 +962,19 @@
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+      <translation>Der findes en anden gruppe med samme navn i systemet. Det anbefales at tildele grupperne unikke navne.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>Gruppen har en anden gruppe som både sin forælder, og som barn medlem, eller er en del af en sådan cirkulær referencekæde. Løs denne kæde for at forhindre forkert beregning af tilladelser.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Når kontinuerlig synkronisering med LDAP server er deaktiveret, synkroniserer grupper ikke automatisk. For at opdatere denne gruppe, start en manuel synkronisering.</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>Denne gruppe blev ikke fundet i LDAP databasen.</translation>
     </message>
   </context>
   <context>
@@ -989,19 +989,19 @@
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Ingen medlemmer</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Brug kontroller til venstre for at tilføje medlemmer</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Medlemmer resumé</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Nedarv medlemskab i nuværende gruppe</translation>
     </message>
   </context>
   <context>
@@ -1020,14 +1020,14 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Ingen grupper</translation>
     </message>
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n mere</numerusform>
+        <numerusform>%n mere</numerusform>
       </translation>
     </message>
   </context>
@@ -1068,30 +1068,30 @@
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>Digest godkendelse er udfaset og vil blive deaktiveret i den næste udgivelse og bør kun bruges, når standard bærer godkendelse ikke kan bruges.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>Digest godkendelse er udfaset og vil blive deaktiveret i den næste udgivelse og bør kun bruges, når standard bærer godkendelse ikke kan bruges. Brugerlogin må kun bestå af små bogstaver.</translation>
     </message>
   </context>
   <context>
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Utilstrækkelige tjenester</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>%n Der kræves passende integrationstjenester for at aktivere integrationen</numerusform>
+        <numerusform>%n Der kræves passende integrationstjenester for at aktivere integrationen</numerusform>
       </translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 passende tjenester tilgængelige</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1103,7 +1103,7 @@
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Nødvendige tjenester</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -1112,7 +1112,7 @@
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Der er flere kameraer, der bruger denne integration, end der er tilgængelige tjenester. Deaktiver venligst integrationen for nogle kameraer, eller tilføj mere passende tjenester. Ellers vil det ske automatisk den %1</translation>
     </message>
   </context>
   <context>
@@ -1237,7 +1237,7 @@
     <name>LdapSettings</name>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>ONLINE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1253,7 +1253,7 @@
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Seneste synkronisering</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1273,39 +1273,39 @@
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>Vær forsigtig, når du ændrer LDAP indstillinger. Forkert konfiguration kan forstyrre system tilgængeligheden for et stort antal brugere samtidigt.</translation>
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+      <translation>Tilslut dit system til en LDAP server for nemmere brugeradministration</translation>
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>Ikke konfigureret endnu</translation>
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Konfigurer</translation>
     </message>
     <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Kontinuerlig synkronisering med LDAP serveren er deaktiveret for dette system. Opdateringer af grupper, brugere og gruppemedlemskab sker udelukkende via manuel synkronisering.</translation>
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>Søg I Baser</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Tilføj Søgebase</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Angiv mindst én søgefase for at synkronisere brugere og grupper</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
+      <translation>Ingen brugere eller grupper matcher synkroniserings indstillingerne og er derfor føjet til systemdatabasen. Sørg for, at LDAP serverparametre og søgebaser er konfigureret korrekt.</translation>
     </message>
   </context>
   <context>
@@ -1400,7 +1400,7 @@
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Enhver %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1415,7 +1415,7 @@
     <name>LookupListTableCellDelegate</name>
     <message>
       <source>ANY</source>
-      <translation type="unfinished">ANY</translation>
+      <translation>ENHVER</translation>
     </message>
   </context>
   <context>
@@ -1438,7 +1438,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Opret Ny...</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1460,11 +1460,11 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Nyt Link - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Det tidligere link vil blive ugyldigt, når et nyt er udstedt</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1475,15 +1475,15 @@
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Ingen Lister</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Du har endnu ikke oprettet nogen lister. Med lister kan du gemme flere værdier, som du kan bruge i hændelses regler. Opret en ny liste for at begynde at tilføje poster.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Opret Ny...</translation>
     </message>
   </context>
   <context>
@@ -1535,7 +1535,7 @@
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Godkend</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1546,7 +1546,7 @@
     <name>ParentGroupsTab</name>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Tilføj Gruppe</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1554,28 +1554,28 @@
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Ingen brugerdefinerede grupper endnu</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Ingen grupper fundet</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Skift søgekriterier eller opret en ny gruppe</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Ingen grupper</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Brug kontrolelementerne til venstre for at føje til en gruppe</translation>
     </message>
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>Medlem af</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -1585,7 +1585,7 @@
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Indbygget</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1597,7 +1597,7 @@
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Skift adgangskode - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1605,7 +1605,7 @@
     </message>
     <message>
       <source>Current password</source>
-      <translation type="unfinished">Current password</translation>
+      <translation>Nuværende adgangskode</translation>
     </message>
     <message>
       <source>New password</source>
@@ -1624,42 +1624,42 @@
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Ingen brugerdefinerede tilladelser</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Ingen elementer blev fundet</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Tilføj automatisk afhængige tilladelser</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Brug %1 eller %2 for at vælge flere ressourcer, eller %3 for at fjerne markeringen</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>Ressourcetabellen giver dig et overblik over bruger- eller gruppetilladelser og giver dig mulighed for at tildele tilladelser til specifikke ressourcer.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Hvis du vælger en tilladelse, der afhænger af en anden tilladelse, vil begge tilladelser blive givet automatisk.</translation>
     </message>
   </context>
   <context>
     <name>Plugins</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Plugins er programmer, der kører på %1 -serveren for at muliggøre problemfri integration af videoanalyse.</translation>
     </message>
   </context>
   <context>
@@ -1756,64 +1756,63 @@ for at aktivere PTZ</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Tryk på piletasterne for at bevæge dig rundt. Brug plus- og minustasterne til at zoome.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Brug musehjulet til at zoome</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>Du kan aktivere denne guide igen ved at gå til Lokale indstillinger &gt; Avanceret &gt; Nulstil alle advarsler</translation>
     </message>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>Vi præsenterer dig for
+nye PTZ kontroller</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>Klik, dobbeltklik eller træk musemarkøren, mens du trykker på
+Shift-tasten for at bruge avanceret PTZ</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed.</translation>
+      <translation>Her er en hurtig guide
+om, hvad der har ændret sig.</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>For at bruge Target Lock Tracking,
+Tryk på Alt + klik for at følge objektet</translation>
     </message>
   </context>
   <context>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>i dag</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1 time</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24 timer</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-7 dage</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>-30 dage</translation>
     </message>
   </context>
   <context>
@@ -1854,45 +1853,45 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>Har %1 tilladelse</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Tilføj %1 og afhængige tilladelser</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>Tilføj %1 tilladelse</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Fjern %1 og afhængige tilladelser</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>Fjern tilladelsen %1</translation>
     </message>
     <message>
       <source>Also inherits it from</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from</translation>
+      <translation>Arver det også fra</translation>
     </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Nedarv %1 tilladelse fra</translation>
     </message>
     <message>
       <source>Already inherited from</source>
-      <translation type="unfinished">Already inherited from</translation>
+      <translation>Allerede arvet fra</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
-      <translation type="unfinished">Will stay inherited from</translation>
+      <translation>Vil blive arvet fra</translation>
     </message>
   </context>
   <context>
@@ -1918,7 +1917,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>Tilgængelig via tilladelser</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -1930,7 +1929,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Websider og integrationer</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -1938,7 +1937,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Sundheds Monitors</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -2047,19 +2046,19 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Systemet er blevet suspenderet. For at aktivere/deaktivere integrationsbrugen for den aktuelle enhed skal systemet være i aktiv tilstand. Kontakt din kanalpartner for at få flere oplysninger</translation>
     </message>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Systemet er blevet suspenderet. For at aktivere/deaktivere integrationsbrug for visse enheder skal systemet være i aktiv tilstand. Kontakt din kanalpartner for at få flere oplysninger</translation>
     </message>
     <message>
       <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Systemet er blevet lukket ned. For at aktivere denne integrationsbrug for den aktuelle enhed skal systemet være i aktiv tilstand. Kontakt din kanalpartner for at få flere oplysninger</translation>
     </message>
     <message>
       <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Systemet er blevet lukket ned. For at aktivere denne integrationsbrug for en enhed skal systemet være i aktiv tilstand. Kontakt din kanalpartner for at få flere oplysninger</translation>
     </message>
   </context>
   <context>
@@ -2262,7 +2261,7 @@ Press Alt + Click to follow object</translation>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Min. 3 tegn</translation>
     </message>
   </context>
   <context>
@@ -2276,15 +2275,15 @@ Press Alt + Click to follow object</translation>
     <name>SyncComboBox</name>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Aldrig</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Altid</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Ved login</translation>
     </message>
   </context>
   <context>
@@ -2292,36 +2291,36 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Valid from %1 to %2 (by server time)</source>
       <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+      <translation>Gyldig fra %1 til %2 (efter servertid)</translation>
     </message>
     <message>
       <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
       <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
+      <translation>Gyldig fra %1 til %2 (ved servertid) eller for %3 efter login</translation>
     </message>
   </context>
   <context>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Link Gyldig Indtil</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>Linket vil forblive tilgængeligt indtil den angivne dato (herunder, baseret på servertid)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Tilbagekald adgang efter login</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>Adgang kan tilbagekaldes tidligere, hvis gyldighedsperioden for link udløber</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>Ind</translation>
     </message>
   </context>
   <context>
@@ -2398,7 +2397,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>Tid er utilgængelig på grund af DST ændringer</translation>
     </message>
   </context>
   <context>
@@ -2415,7 +2414,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Ny Bruger</translation>
     </message>
     <message>
       <source>General</source>
@@ -2431,7 +2430,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Rettigheder</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2442,7 +2441,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Ny Bruger</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2478,11 +2477,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Tillad usikker (digest) godkendelse</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>Du skal kun angive brugeren&apos;s e-mailadresse.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2490,15 +2489,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Adgang</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Almindelig bruger med legitimationsoplysninger</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Midlertidig med link</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2506,14 +2505,14 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Det tilføjede system vil hurtigt blive synligt for brugere med en eksisterende cloud konto, mens brugere uden en eksisterende cloud konto vil modtage instruktioner via e-mail.</translation>
     </message>
   </context>
   <context>
     <name>UserEditDialog</name>
     <message>
       <source>User - %1</source>
-      <translation type="unfinished">User - %1</translation>
+      <translation>Bruger - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -2529,23 +2528,23 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Rettigheder</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">This user has not yet signed up for %1</translation>
+      <translation>Denne bruger har endnu ikke tilmeldt %1</translation>
     </message>
   </context>
   <context>
     <name>UserEnabledSwitch</name>
     <message>
       <source>Enabled user</source>
-      <translation type="unfinished">Enabled user</translation>
+      <translation>Aktiveret bruger</translation>
     </message>
     <message>
       <source>Disabled user</source>
-      <translation type="unfinished">Disabled user</translation>
+      <translation>Deaktiveret bruger</translation>
     </message>
   </context>
   <context>
@@ -2580,15 +2579,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>Angiv adgangskode for at aktivere usikker godkendelse</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Tillad usikker (digest) godkendelse</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>Denne bruger findes ikke i LDAP databasen og kan ikke logge ind.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2596,27 +2595,27 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>Adgang udløber</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Adgang Til Link</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Kopier Link</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Afslut</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Nyt Link...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Intet gyldigt link til denne bruger</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -2625,24 +2624,24 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Henter Link...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Sørg for, at denne computer er i stand til at oprette forbindelse til %1</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>LDAP server er offline. Brugeren kan ikke logge ind.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Når kontinuerlig synkronisering med LDAP-serveren er deaktiveret, synkroniseres brugermedlemskab i grupper ikke automatisk. Start en manuel synkronisering for at opdatere disse oplysninger.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Denne brugers login duplikerer en anden brugers login. Ingen af dem kan logge ind. For at løse dette problem kan du ændre brugerens login eller deaktivere eller slette brugere med duplikerede logins.</translation>
     </message>
   </context>
   <context>
@@ -2664,11 +2663,11 @@ Press Alt + Click to follow object</translation>
     <name>VmsRulesDialog</name>
     <message>
       <source>Vms Rules</source>
-      <translation type="unfinished">Vms Rules</translation>
+      <translation>Vms Regler</translation>
     </message>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Tilføj Regel</translation>
     </message>
     <message>
       <source>Duplicate</source>
@@ -2680,7 +2679,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Ingen poster</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -2688,7 +2687,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Nulstil Til Standard...</translation>
     </message>
   </context>
   <context>
