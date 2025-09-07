@@ -51,16 +51,31 @@ class BaseFusionDataHttpClient:
     using base_type = nx::network::aio::BasicPollable;
     using self_type = BaseFusionDataHttpClient<HandlerFunc, SerializationLibWrapper>;
 
+protected:
+    using HttpClientPtr = std::unique_ptr<nx::network::http::AsyncClient,
+        std::function<void(network::http::AsyncClient*)>>;
+
 public:
     BaseFusionDataHttpClient(
-        nx::Url url,
+        Url url, Credentials credentials, HttpClientPtr httpClient):
+        m_url(std::move(url)),
+        m_httpClient(std::move(httpClient))
+    {
+        NX_ASSERT(m_httpClient);
+
+        m_httpClient->setCredentials(std::move(credentials));
+        bindToAioThread(getAioThread());
+    }
+
+    BaseFusionDataHttpClient(
+        Url url,
         Credentials credentials,
         ssl::AdapterFunc adapterFunc)
         :
         m_url(std::move(url)),
-        m_httpClient(std::move(adapterFunc))
+        m_httpClient(std::make_unique<nx::network::http::AsyncClient>(std::move(adapterFunc)))
     {
-        m_httpClient.setCredentials(std::move(credentials));
+        m_httpClient->setCredentials(std::move(credentials));
         bindToAioThread(getAioThread());
     }
 
@@ -71,11 +86,11 @@ public:
         ssl::AdapterFunc proxyAdapterFunc)
         :
         m_url(std::move(url)),
-        m_httpClient(std::move(adapterFunc))
+        m_httpClient(std::make_unique<nx::network::http::AsyncClient>(std::move(adapterFunc)))
     {
-        m_httpClient.setCredentials(std::move(info.credentials));
-        m_httpClient.setProxyCredentials(std::move(info.proxyCredentials));
-        m_httpClient.setProxyVia(
+        m_httpClient->setCredentials(std::move(info.credentials));
+        m_httpClient->setProxyCredentials(std::move(info.proxyCredentials));
+        m_httpClient->setProxyVia(
             std::move(info.proxyEndpoint), info.isProxySecure, std::move(proxyAdapterFunc));
         bindToAioThread(getAioThread());
     }
@@ -85,7 +100,7 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
         base_type::bindToAioThread(aioThread);
-        m_httpClient.bindToAioThread(aioThread);
+        m_httpClient->bindToAioThread(aioThread);
     }
 
     void execute(nx::MoveOnlyFunc<HandlerFunc> handler)
@@ -93,12 +108,12 @@ public:
         m_handler = std::move(handler);
         if (!m_requestBody.empty())
             addRequestBody();
-        auto completionHandler = std::bind(&self_type::requestDone, this, &m_httpClient);
+        auto completionHandler = std::bind(&self_type::requestDone, this, m_httpClient.get());
 
         if (m_requestContentType.empty())
-            m_httpClient.doGet(m_url, std::move(completionHandler));
+            m_httpClient->doGet(m_url, std::move(completionHandler));
         else
-            m_httpClient.doPost(m_url, std::move(completionHandler));
+            m_httpClient->doPost(m_url, std::move(completionHandler));
     }
 
     void execute(
@@ -108,9 +123,9 @@ public:
         m_handler = std::move(handler);
         if (!m_requestBody.empty())
             addRequestBody();
-        auto completionHandler = std::bind(&self_type::requestDone, this, &m_httpClient);
+        auto completionHandler = std::bind(&self_type::requestDone, this, m_httpClient.get());
 
-        m_httpClient.doRequest(httpMethod, m_url, std::move(completionHandler));
+        m_httpClient->doRequest(httpMethod, m_url, std::move(completionHandler));
     }
 
     void executeUpgrade(
@@ -132,7 +147,7 @@ public:
         if (!m_requestBody.empty())
             addRequestBody();
 
-        m_httpClient.doUpgrade(
+        m_httpClient->doUpgrade(
             m_url,
             httpMethod,
             protocolToUpgradeConnectionTo,
@@ -141,24 +156,24 @@ public:
 
     void setRequestTimeout(std::chrono::milliseconds timeout)
     {
-        m_httpClient.setSendTimeout(timeout);
-        m_httpClient.setResponseReadTimeout(timeout);
-        m_httpClient.setMessageBodyReadTimeout(timeout);
+        m_httpClient->setSendTimeout(timeout);
+        m_httpClient->setResponseReadTimeout(timeout);
+        m_httpClient->setMessageBodyReadTimeout(timeout);
     }
 
-    std::unique_ptr<AbstractStreamSocket> takeSocket()
+    std::shared_ptr<AbstractStreamSocket> takeSocket()
     {
-        return m_httpClient.takeSocket();
+        return m_httpClient->takeSocket();
     }
 
     nx::network::http::AsyncClient& httpClient()
     {
-        return m_httpClient;
+        return *m_httpClient;
     }
 
     const nx::network::http::AsyncClient& httpClient() const
     {
-        return m_httpClient;
+        return *m_httpClient;
     }
 
     const nx::network::http::ApiRequestResult& lastFusionRequestResult() const
@@ -269,11 +284,11 @@ protected:
     }
 
 private:
-    nx::network::http::AsyncClient m_httpClient;
+    HttpClientPtr m_httpClient;
 
     virtual void stopWhileInAioThread() override
     {
-        m_httpClient.pleaseStopSync();
+        m_httpClient->pleaseStopSync();
     }
 
     void addRequestBody()
@@ -281,7 +296,7 @@ private:
         decltype(m_requestBody) requestBody;
         requestBody.swap(m_requestBody);
 
-        m_httpClient.setRequestBody(
+        m_httpClient->setRequestBody(
             std::make_unique<nx::network::http::BufferSource>(
                 m_requestContentType,
                 std::move(requestBody)));
@@ -321,9 +336,18 @@ public:
         :
         base_type(std::move(url), std::move(credentials), std::move(adapterFunc))
     {
-        bool ok = false;
-        std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serializeToJson(input);
-        this->m_requestContentType = "application/json";
+        init(input);
+    }
+
+    FusionDataHttpClient(
+        Url url,
+        Credentials credentials,
+        base_type::HttpClientPtr httpClient,
+        const InputData& input)
+        :
+        base_type(std::move(url), std::move(credentials), std::move(httpClient))
+    {
+        init(input);
     }
 
     FusionDataHttpClient(
@@ -336,12 +360,17 @@ public:
         base_type(
             std::move(url), std::move(info), std::move(adapterFunc), std::move(proxyAdapterFunc))
     {
+        init(input);
+    }
+
+private:
+    void init(const InputData& input)
+    {
         bool ok = false;
         std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serializeToJson(input);
         this->m_requestContentType = "application/json";
     }
 
-private:
     virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
         decltype(this->m_handler) handler;
@@ -385,6 +414,12 @@ public:
     {
     }
 
+    FusionDataHttpClient(
+        Url url, Credentials credentials, base_type::HttpClientPtr httpClient):
+        base_type(std::move(url), std::move(credentials), std::move(httpClient))
+    {
+    }
+
 private:
     virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
@@ -420,6 +455,35 @@ public:
         :
         base_type(std::move(url), std::move(credentials), std::move(adapterFunc))
     {
+        init(input);
+    }
+
+    FusionDataHttpClient(
+        Url url,
+        AuthInfo info,
+        ssl::AdapterFunc adapterFunc,
+        ssl::AdapterFunc proxyAdapterFunc,
+        const InputData& input)
+        :
+        base_type(
+            std::move(url), std::move(info), std::move(adapterFunc), std::move(proxyAdapterFunc))
+    {
+        init(input);
+    }
+
+    FusionDataHttpClient(
+        Url url,
+        Credentials credentials,
+        base_type::HttpClientPtr httpClient,
+        const InputData& input):
+        base_type(std::move(url), std::move(credentials), std::move(httpClient))
+    {
+        init(input);
+    }
+
+private:
+    void init(const InputData& input)
+    {
         if constexpr (std::is_same_v<InputData, std::string>)
         {
             this->m_requestBody = input;
@@ -430,21 +494,6 @@ public:
             std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serializeToJson(input);
         }
 
-        this->m_requestContentType = "application/json";
-    }
-
-    FusionDataHttpClient(
-        nx::Url url,
-        AuthInfo info,
-        ssl::AdapterFunc adapterFunc,
-        ssl::AdapterFunc proxyAdapterFunc,
-        const InputData& input)
-        :
-        base_type(
-            std::move(url), std::move(info), std::move(adapterFunc), std::move(proxyAdapterFunc))
-    {
-        bool ok = false;
-        std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serializeToJson(input);
         this->m_requestContentType = "application/json";
     }
 
@@ -493,6 +542,11 @@ public:
         :
         base_type(
             std::move(url), std::move(info), std::move(adapterFunc), std::move(proxyAdapterFunc))
+    {
+    }
+
+    FusionDataHttpClient(Url url, Credentials credentials, base_type::HttpClientPtr httpClient):
+        base_type(std::move(url), std::move(credentials), std::move(httpClient))
     {
     }
 

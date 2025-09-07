@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <deque>
 #include <future>
 #include <optional>
 #include <tuple>
@@ -57,8 +58,14 @@ class GenericApiClient:
 {
     using base_type = Base;
     using ResultType = typename ApiResultCodeDescriptor::ResultCode;
+
+protected:
+    using HttpClientPtr = std::unique_ptr<nx::network::http::AsyncClient,
+        std::function<void(network::http::AsyncClient*)>>;
+
 public:
-    GenericApiClient(const nx::Url& baseApiUrl, ssl::AdapterFunc adapterFunc);
+    GenericApiClient(
+        const Url& baseApiUrl, ssl::AdapterFunc adapterFunc, int idleConnectionsLimit = 0);
     ~GenericApiClient();
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -180,7 +187,7 @@ private:
 
     const nx::Url m_baseApiUrl;
     ssl::AdapterFunc m_adapterFunc;
-    std::map<network::aio::BasicPollable*, Context> m_activeRequests;
+    std::unordered_map<network::aio::BasicPollable*, Context> m_activeRequests;
     nx::Mutex m_mutex;
     std::optional<std::chrono::milliseconds> m_requestTimeout;
     unsigned int m_numRetries = 1;
@@ -192,9 +199,15 @@ private:
     std::chrono::milliseconds m_lastResponseTime{0};
     nx::network::http::HttpHeaders m_lastResponseHeaders;
 
-    template<typename Output, typename SerializationLibWrapper, typename... Args>
-    auto createHttpClient(const nx::Url& url, Args&&... args);
+    std::deque<std::shared_ptr<nx::network::http::AsyncClient>> m_idleClients;
+    int m_idleConnectionsLimit = 0;
+    nx::Mutex m_idleClientsMutex;
 
+    HttpClientPtr acquireClient();
+    void releaseClient(std::shared_ptr<nx::network::http::AsyncClient> client);
+    template<typename Output, typename SerializationLibWrapper, typename... Args>
+
+    auto createHttpClient(HttpClientPtr asyncClient, const Url& url, Args&&... args);
     std::string makeCacheKey(const network::http::Method& method, const std::string& requestPath);
 
     template<typename CachedType>
@@ -257,11 +270,13 @@ public:
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 GenericApiClient<ApiResultCodeDescriptor, Base>::GenericApiClient(
-    const nx::Url& baseApiUrl,
-    ssl::AdapterFunc adapterFunc)
+    const Url& baseApiUrl,
+    ssl::AdapterFunc adapterFunc,
+    int idleConnectionsLimit /* = 0 */)
     :
     m_baseApiUrl(baseApiUrl),
-    m_adapterFunc(std::move(adapterFunc))
+    m_adapterFunc(std::move(adapterFunc)),
+    m_idleConnectionsLimit(idleConnectionsLimit)
 {
 }
 
@@ -277,9 +292,16 @@ void GenericApiClient<ApiResultCodeDescriptor, Base>::bindToAioThread(
 {
     base_type::bindToAioThread(aioThread);
 
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    for (const auto& context : m_activeRequests)
-        context.second.client->bindToAioThread(aioThread);
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        for (const auto& context: m_activeRequests)
+            context.second.client->bindToAioThread(aioThread);
+    }
+    {
+        NX_MUTEX_LOCKER lock(&m_idleClientsMutex);
+        for (const auto& client: m_idleClients)
+            client->bindToAioThread(aioThread);
+    }
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
@@ -375,12 +397,13 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRe
     unsigned attemptNum,
     Handler handler)
 {
-    HttpHeaders headers;
+    auto httpClient = acquireClient();
 
     auto request = std::apply(
-        [this, &requestPath, &urlQuery](auto&&... inputArgs)
+        [this, &requestPath, &urlQuery, &httpClient](auto&&... inputArgs)
         {
             return this->template createHttpClient<Output, SerializationLibWrapper>(
+                std::move(httpClient),
                 network::url::Builder(m_baseApiUrl).appendPath(requestPath).setQuery(urlQuery),
                 std::forward<decltype(inputArgs)>(inputArgs)...);
         },
@@ -451,16 +474,63 @@ const nx::Url& GenericApiClient<ApiResultCodeDescriptor, Base>::baseApiUrl() con
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
+GenericApiClient<ApiResultCodeDescriptor, Base>::HttpClientPtr
+    GenericApiClient<ApiResultCodeDescriptor, Base>::acquireClient()
+{
+    std::shared_ptr<nx::network::http::AsyncClient> asyncClient;
+    {
+        NX_MUTEX_LOCKER lock(&m_idleClientsMutex);
+        if (!m_idleClients.empty())
+        {
+            asyncClient = m_idleClients.front();
+            m_idleClients.pop_front();
+        }
+    }
+
+    if (!asyncClient)
+        asyncClient = std::make_shared<network::http::AsyncClient>(m_adapterFunc);
+    else
+        asyncClient->assignOptions(m_clientOptions);
+
+    return HttpClientPtr(
+        asyncClient.get(),
+        [this, asyncClient](network::http::AsyncClient*) mutable
+        {
+            releaseClient(asyncClient);
+        }
+    );
+}
+
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
+void GenericApiClient<ApiResultCodeDescriptor, Base>::releaseClient(
+    std::shared_ptr<nx::network::http::AsyncClient> client)
+{
+    NX_ASSERT(client);
+    if (!client || m_idleConnectionsLimit <= 0)
+    {
+        client.reset();
+        return;
+    }
+
+    NX_MUTEX_LOCKER lock(&m_idleClientsMutex);
+    if ((int) m_idleClients.size() < m_idleConnectionsLimit)
+        m_idleClients.push_back(std::move(client));
+    else
+        client.reset();
+}
+
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename Output, typename SerializationLibWrapper, typename... Args>
 auto GenericApiClient<ApiResultCodeDescriptor, Base>::createHttpClient(
-    const nx::Url& url,
+    HttpClientPtr asyncClient,
+    const Url& url,
     Args&&... args)
 {
     using InputParamType = nx::utils::tuple_first_element_t<std::tuple<std::decay_t<Args>...>>;
 
     auto httpClient = std::make_unique<
         network::http::FusionDataHttpClient<InputParamType, Output, SerializationLibWrapper>>(
-            url, http::Credentials(), m_adapterFunc, std::forward<Args>(args)...);
+            url, http::Credentials(), std::move(asyncClient), std::forward<Args>(args)...);
     httpClient->bindToAioThread(this->getAioThread());
 
     httpClient->httpClient().assignOptions(m_clientOptions);
@@ -474,7 +544,7 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::createHttpClient(
         m_activeRequests.emplace(httpClientPtr, Context{std::move(httpClient)});
     }
 
-    return httpClientPtr;
+    return std::move(httpClientPtr);
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>

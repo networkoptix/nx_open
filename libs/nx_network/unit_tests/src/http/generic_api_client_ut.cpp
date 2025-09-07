@@ -41,8 +41,9 @@ class GenericApiClientChild:
 public:
     using base_type = http::GenericApiClient<>;
 
-    GenericApiClientChild(const nx::Url& baseApiUrl):
-        http::GenericApiClient<>(baseApiUrl, nx::network::ssl::kAcceptAnyCertificate)
+    GenericApiClientChild(const Url& baseApiUrl, int idleConnectionsLimit = 0):
+        http::GenericApiClient<>(
+            baseApiUrl, nx::network::ssl::kAcceptAnyCertificate, idleConnectionsLimit)
     {}
 
     using base_type::makeAsyncCall;
@@ -53,6 +54,7 @@ static constexpr char kTestPath[] = "/test";
 class GenericApiClient:
     public ::testing::Test
 {
+protected:
     using Client = GenericApiClientChild;
     using ResultType = nx::network::http::StatusCode::Value;
 
@@ -74,7 +76,10 @@ protected:
         m_server.registerRequestProcessorFunc(kTestPath,
             [this](auto&&... args) { handleTestRequest(std::forward<decltype(args)>(args)...); });
 
-        startInstanceAndClient();
+        m_client = std::make_unique<Client>(nx::network::url::Builder()
+                .setScheme(kUrlSchemeName)
+                .setEndpoint(m_server.serverAddress())
+                .toUrl());
 
         m_initialHttpClientCount = SocketGlobals::instance().debugCounters().httpClientConnectionCount;
     }
@@ -146,11 +151,6 @@ protected:
     nx::network::http::TestHttpServer m_server;
 
 private:
-    void startInstanceAndClient()
-    {
-        m_client = std::make_unique<Client>(nx::network::url::Builder()
-            .setScheme(kUrlSchemeName).setEndpoint(m_server.serverAddress()).toUrl());
-    }
 
     void handleTestRequest(
         RequestContext ctx,
@@ -385,6 +385,40 @@ TEST_F(GenericApiClientWithCaching, cache_is_update_if_etag_not_matched)
     whenRequestResource();
     thenExpectedResourceWasProvided();
     andCacheContainsRecentValue();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class GenericApiClientWithConnectionReuse: public GenericApiClient
+{
+public:
+
+protected:
+    virtual void SetUp() override
+    {
+        GenericApiClient::SetUp();
+        m_client = std::make_unique<Client>(nx::network::url::Builder()
+                .setScheme(kUrlSchemeName)
+                .setEndpoint(m_server.serverAddress())
+                .toUrl(),
+            1);
+    }
+
+public:
+    void whenResetClient()
+    {
+        m_client->pleaseStopSync();
+        m_client.reset();
+    }
+};
+
+TEST_F(GenericApiClientWithConnectionReuse, connection_hold_by_generic_client)
+{
+    whenPerformApiCall();
+    thenApiCallSucceeded();
+    andHttpClientCountIs(1);
+    whenResetClient();
+    andHttpClientCountIs(0);
 }
 
 } // namespace nx::network::http::test
