@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Credits</source>
-      <translation type="unfinished">Credits</translation>
+      <translation>Kreditter</translation>
     </message>
     <message>
       <source>GPU Information</source>
@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Log Håndtering</translation>
     </message>
     <message>
       <source>Download</source>
@@ -127,7 +127,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Åbn Filmappe</translation>
     </message>
   </context>
   <context>
@@ -233,11 +233,11 @@
     </message>
     <message>
       <source>Server actions</source>
-      <translation type="unfinished">Server actions</translation>
+      <translation>Server handlinger</translation>
     </message>
     <message>
       <source>System actions</source>
-      <translation type="unfinished">System actions</translation>
+      <translation>System handlinger</translation>
     </message>
     <message>
       <source>Select all</source>
@@ -245,11 +245,11 @@
     </message>
     <message>
       <source>Sessions</source>
-      <translation type="unfinished">Sessions</translation>
+      <translation>Sessioner</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaljer</translation>
     </message>
     <message>
       <source>Audit Trail</source>
@@ -261,11 +261,11 @@
     </message>
     <message>
       <source>Email settings</source>
-      <translation type="unfinished">Email settings</translation>
+      <translation>Email indstillinger</translation>
     </message>
     <message>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation type="unfinished">All servers are offline. Audit data is not available.</translation>
+      <translation>Alle servere er offline. Revisionsdata er ikke tilgængelige.</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -292,7 +292,7 @@
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Unlimited</source>
@@ -361,7 +361,7 @@
     <name>BookmarkOverlaySettingsWidget</name>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Bogmærke Info</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -369,22 +369,22 @@
     </message>
     <message>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Område Bredde</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Skriftstørrelse</translation>
     </message>
     <message>
       <source>Include description</source>
-      <translation type="unfinished">Include description</translation>
+      <translation>Inkluder beskrivelse</translation>
     </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
     <message>
       <source>Popular tags</source>
-      <translation type="unfinished">Popular tags</translation>
+      <translation>Populære tags</translation>
     </message>
     <message>
       <source>Name</source>
@@ -396,7 +396,7 @@
     </message>
     <message>
       <source>Timeout</source>
-      <translation type="unfinished">Timeout</translation>
+      <translation>Timeout</translation>
     </message>
     <message>
       <source>Tags</source>
@@ -404,7 +404,7 @@
     </message>
     <message>
       <source>List of tags divided by commas</source>
-      <translation type="unfinished">List of tags divided by commas</translation>
+      <translation>Liste over tags divideret med kommaer</translation>
     </message>
   </context>
   <context>
@@ -426,11 +426,11 @@
     <name>BusinessRuleWidget</name>
     <message>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Hændelse</translation>
     </message>
     <message>
       <source>Schedule...</source>
-      <translation type="unfinished">Schedule...</translation>
+      <translation>Tidsplan...</translation>
     </message>
     <message>
       <source>Action</source>
@@ -438,15 +438,15 @@
     </message>
     <message>
       <source>Comments:</source>
-      <translation type="unfinished">Comments:</translation>
+      <translation>Bemærkninger:</translation>
     </message>
     <message>
       <source>When</source>
-      <translation type="unfinished">When</translation>
+      <translation>Når</translation>
     </message>
     <message>
       <source>Do</source>
-      <translation type="unfinished">Do</translation>
+      <translation>Udfør</translation>
     </message>
     <message>
       <source>At</source>
@@ -454,11 +454,11 @@
     </message>
     <message>
       <source>Use event source server</source>
-      <translation type="unfinished">Use event source server</translation>
+      <translation>Brug hændelses kilde server</translation>
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
+      <translation>Brug kamera hændelses kilden</translation>
     </message>
   </context>
   <context>
@@ -481,7 +481,7 @@
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
   </context>
   <context>
@@ -510,7 +510,7 @@
     <name>CameraCredentialsDialog</name>
     <message>
       <source>Authentication credentials</source>
-      <translation type="unfinished">Authentication credentials</translation>
+      <translation>Godkendelses oplysninger</translation>
     </message>
   </context>
   <context>
@@ -525,19 +525,19 @@
     </message>
     <message>
       <source>Keep camera stream and profile settings</source>
-      <translation type="unfinished">Keep camera stream and profile settings</translation>
+      <translation>Behold kamera stream og profilindstillinger</translation>
     </message>
     <message>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation>Beregn bitrate pr. GOP i stedet for bitrate pr. sekund</translation>
     </message>
     <message>
       <source>It will increase bitrate for camera.</source>
-      <translation type="unfinished">It will increase bitrate for camera.</translation>
+      <translation>Det vil øge bitrate for kameraet.</translation>
     </message>
     <message>
       <source>Disable secondary stream</source>
-      <translation type="unfinished">Disable secondary stream</translation>
+      <translation>Deaktiver sekundær stream</translation>
     </message>
     <message>
       <source>Motion Detection</source>
@@ -545,7 +545,7 @@
     </message>
     <message>
       <source>Media Streaming</source>
-      <translation type="unfinished">Media Streaming</translation>
+      <translation>Medie Streaming</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -565,23 +565,23 @@
     </message>
     <message>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Stol på kameraets tidsstempel</translation>
     </message>
     <message>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Forudindstillinger for native kameraer vil ikke være tilgængelige.</translation>
     </message>
     <message>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Dette kamera understøtter panorering og tilt</translation>
     </message>
     <message>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Dette kamera understøtter zoom</translation>
     </message>
     <message>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Detekter bevægelse under import af arkiv</translation>
     </message>
     <message>
       <source>Stream Settings</source>
@@ -589,7 +589,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Brug Media2 til at hente profiler</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
@@ -629,54 +629,54 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>ONVIF Indstillinger</translation>
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>Optag ikke primær stream</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>Optag ikke sekundær strøm</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>Sekundær Stream Profil</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>Primær Stream Profil</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Webside</translation>
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation type="unfinished">Web Page Port</translation>
+      <translation>Webside Port</translation>
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>Send ikke Stop PTZ kommando</translation>
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>Optag ikke lyd</translation>
     </message>
     <message>
       <source>Import from Device</source>
-      <translation type="unfinished">Import from Device</translation>
+      <translation>Importer fra enhed</translation>
     </message>
     <message>
       <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
+      <translation>Importer video automatisk</translation>
     </message>
   </context>
   <context>
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Add</source>
@@ -699,7 +699,7 @@
     </message>
     <message>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <source>Firmware</source>
@@ -711,7 +711,7 @@
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Webside</translation>
     </message>
     <message>
       <source>Primary Stream</source>
@@ -723,11 +723,11 @@
     </message>
     <message>
       <source>MAC Address</source>
-      <translation type="unfinished">MAC Address</translation>
+      <translation>MAC Adresse</translation>
     </message>
     <message>
       <source>Show on layout</source>
-      <translation type="unfinished">Show on layout</translation>
+      <translation>Vis på layout</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -735,7 +735,7 @@
     </message>
     <message>
       <source>Camera rules</source>
-      <translation type="unfinished">Camera rules</translation>
+      <translation>Kamera regler</translation>
     </message>
     <message>
       <source>Logical ID</source>
@@ -746,7 +746,7 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <translation>Input ID</translation>
     </message>
   </context>
   <context>
@@ -760,7 +760,7 @@
     <name>CameraListDialog</name>
     <message>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>Tilføj Enhed...</translation>
     </message>
   </context>
   <context>
@@ -798,7 +798,7 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>Erstatning Af Kamera</translation>
     </message>
     <message>
       <source>Name</source>
@@ -818,7 +818,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>Ny Enhed</translation>
     </message>
   </context>
   <context>
@@ -833,11 +833,11 @@
     </message>
     <message>
       <source>Copying Schedule</source>
-      <translation type="unfinished">Copying Schedule</translation>
+      <translation>Kopierer Tidsplan</translation>
     </message>
     <message>
       <source>Copy Schedule to...</source>
-      <translation type="unfinished">Copy Schedule to...</translation>
+      <translation>Kopiér tidsplan til...</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
@@ -871,11 +871,11 @@
     </message>
     <message>
       <source>Enable audio</source>
-      <translation type="unfinished">Enable audio</translation>
+      <translation>Aktivér lyd</translation>
     </message>
     <message>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>Rediger Streams...</translation>
     </message>
     <message>
       <source>Enable 2-way audio</source>
@@ -886,7 +886,7 @@
     <name>CameraStreamsDialog</name>
     <message>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>Streams Adresser</translation>
     </message>
   </context>
   <context>
@@ -907,19 +907,19 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>BETA</translation>
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>Tilgængelige Handlinger</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>Video Eksport</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>Live video og arkiv</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -931,7 +931,7 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>Læs mere på hjælpesiden</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
@@ -947,11 +947,11 @@
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>Søger Bogmærker, Objekter, Hændelser</translation>
     </message>
     <message>
       <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
+      <translation>I fremtiden</translation>
     </message>
   </context>
   <context>
@@ -976,11 +976,11 @@
     <name>ConnectionTestingDialog</name>
     <message>
       <source>Connection Test</source>
-      <translation type="unfinished">Connection Test</translation>
+      <translation>Forbindelsestest</translation>
     </message>
     <message>
       <source>Testing connection...</source>
-      <translation type="unfinished">Testing connection...</translation>
+      <translation>Test af forbindelse...</translation>
     </message>
   </context>
   <context>
@@ -991,18 +991,18 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>Denne handling kan kun indstilles for øjeblikkelige begivenheder</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>Vælg en anden hændelse eller handling</translation>
     </message>
   </context>
   <context>
     <name>CustomBusinessEventWidget</name>
     <message>
       <source>Source contains:</source>
-      <translation type="unfinished">Source contains:</translation>
+      <translation>Kilde indeholder:</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -1018,7 +1018,7 @@
     </message>
     <message>
       <source>Omit Logging</source>
-      <translation type="unfinished">Omit Logging</translation>
+      <translation>Udelad Logning</translation>
     </message>
   </context>
   <context>
@@ -1032,15 +1032,15 @@
     <name>DatabaseManagementWidget</name>
     <message>
       <source>Create Backup...</source>
-      <translation type="unfinished">Create Backup...</translation>
+      <translation>Opret Backup...</translation>
     </message>
     <message>
       <source>Restore from Backup...</source>
-      <translation type="unfinished">Restore from Backup...</translation>
+      <translation>Gendan fra backup...</translation>
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+      <translation>Opret en sikkerhedskopi af system administrations data, eller gendan system administrations data fra en eksisterende sikkerhedskopi</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1048,7 +1048,7 @@
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>Åbn Mappe</translation>
     </message>
   </context>
   <context>
@@ -1059,15 +1059,15 @@
     </message>
     <message>
       <source>SELECT SERVER</source>
-      <translation type="unfinished">SELECT SERVER</translation>
+      <translation>VÆLG SERVER</translation>
     </message>
     <message>
       <source>Known Address</source>
-      <translation type="unfinished">Known Address</translation>
+      <translation>Kendt Adresse</translation>
     </message>
     <message>
       <source>Subnet Scan</source>
-      <translation type="unfinished">Subnet Scan</translation>
+      <translation>Subnet Scanning</translation>
     </message>
     <message>
       <source>Address</source>
@@ -1075,7 +1075,7 @@
     </message>
     <message>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Tip</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1083,11 +1083,11 @@
     </message>
     <message>
       <source>End IP</source>
-      <translation type="unfinished">End IP</translation>
+      <translation>Slut IP</translation>
     </message>
     <message>
       <source>Start IP</source>
-      <translation type="unfinished">Start IP</translation>
+      <translation>Start IP</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1107,7 +1107,7 @@
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>Tilføj alle enheder</translation>
     </message>
     <message>
       <source>Add Devices</source>
@@ -1137,15 +1137,15 @@
     <name>EulaDialog</name>
     <message>
       <source>Copy to Clipboard</source>
-      <translation type="unfinished">Copy to Clipboard</translation>
+      <translation>Kopiér til udklipsholder</translation>
     </message>
     <message>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>Jeg Accepterer Ikke</translation>
     </message>
     <message>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>Jeg Accepterer</translation>
     </message>
   </context>
   <context>
@@ -1164,7 +1164,7 @@
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Alle servere er offline. Logs er ikke tilgængelige.</translation>
     </message>
     <message>
       <source>Event Rules...</source>
@@ -1175,7 +1175,7 @@
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
-      <translation type="unfinished">Login to authenticate (optional)</translation>
+      <translation>Log ind for at godkende (valgfrit)</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1183,7 +1183,7 @@
     </message>
     <message>
       <source>Password to authenticate (optional)</source>
-      <translation type="unfinished">Password to authenticate (optional)</translation>
+      <translation>Adgangskode til godkendelse (valgfrit)</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1191,15 +1191,15 @@
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) URL</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S) Indhold</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>Indhold Type</translation>
     </message>
     <message>
       <source>Authentication Type</source>
@@ -1207,58 +1207,58 @@
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>Anmodnings Metode</translation>
     </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
       <source>PTZ preset:</source>
-      <translation type="unfinished">PTZ preset:</translation>
+      <translation>PTZ forudindstilling:</translation>
     </message>
   </context>
   <context>
     <name>ExitFullscreenActionWidget</name>
     <message>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>På layout</translation>
     </message>
   </context>
   <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Eksporter Indstillinger</translation>
     </message>
     <message>
       <source>Make read-only</source>
-      <translation type="unfinished">Make read-only</translation>
+      <translation>Gør skrivebeskyttet</translation>
     </message>
   </context>
   <context>
     <name>ExportMediaSettingsWidget</name>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Eksporter Indstillinger</translation>
     </message>
     <message>
       <source>Apply Filters</source>
-      <translation type="unfinished">Apply Filters</translation>
+      <translation>Anvend Filtre</translation>
     </message>
     <message>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>Rotation, dewarping, billedforbedring osv.</translation>
     </message>
     <message>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>Anvendelse af filtre og tilføje overlays kræver omkodning, som vil øge CPU-brug og kan tage betydelig tid.</translation>
     </message>
   </context>
   <context>
     <name>ExportPasswordWidget</name>
     <message>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Beskyt med adgangskode</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1273,15 +1273,15 @@
     </message>
     <message>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>Enkelt Kamera</translation>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Eksporter Indstillinger</translation>
     </message>
     <message>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>Multi Video</translation>
     </message>
   </context>
   <context>
@@ -1322,7 +1322,7 @@
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Gennemse...</translation>
     </message>
   </context>
   <context>
@@ -1336,7 +1336,7 @@
     <name>FullscreenCameraActionWidget</name>
     <message>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>På layout</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -1347,23 +1347,23 @@
     <name>GeneralPreferencesWidget</name>
     <message>
       <source>Misc</source>
-      <translation type="unfinished">Misc</translation>
+      <translation>Diverse</translation>
     </message>
     <message>
       <source>Auto Pause Video</source>
-      <translation type="unfinished">Auto Pause Video</translation>
+      <translation>Auto Pause Video</translation>
     </message>
     <message>
       <source>after</source>
-      <translation type="unfinished">after</translation>
+      <translation>efter</translation>
     </message>
     <message>
       <source>Minutes of Inactivity</source>
-      <translation type="unfinished">Minutes of Inactivity</translation>
+      <translation>Minutters inaktivitet</translation>
     </message>
     <message>
       <source>Add...</source>
-      <translation type="unfinished">Add...</translation>
+      <translation>Tilføj...</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -1371,23 +1371,23 @@
     </message>
     <message>
       <source>Local Media Folders</source>
-      <translation type="unfinished">Local Media Folders</translation>
+      <translation>Lokale Mediemapper</translation>
     </message>
     <message>
       <source>Audio Input</source>
-      <translation type="unfinished">Audio Input</translation>
+      <translation>Lydindgang</translation>
     </message>
     <message>
       <source>First Source</source>
-      <translation type="unfinished">First Source</translation>
+      <translation>Første Kilde</translation>
     </message>
     <message>
       <source>Second Source</source>
-      <translation type="unfinished">Second Source</translation>
+      <translation>Anden Kilde</translation>
     </message>
     <message>
       <source>Run Application when PC Boots up</source>
-      <translation type="unfinished">Run Application when PC Boots up</translation>
+      <translation>Kør program når PC starter op</translation>
     </message>
     <message>
       <source>Startup</source>
@@ -1399,7 +1399,7 @@
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>Afspil lyd fra alle kameraer på layout</translation>
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
@@ -1407,7 +1407,7 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>Tillad computeren at gå i dvaletilstand i tomgang</translation>
     </message>
   </context>
   <context>
@@ -1421,15 +1421,15 @@
     <name>ImageControlWidget</name>
     <message>
       <source>Image Control</source>
-      <translation type="unfinished">Image Control</translation>
+      <translation>Billede Kontrol</translation>
     </message>
     <message>
       <source>Aspect ratio</source>
-      <translation type="unfinished">Aspect ratio</translation>
+      <translation>Billedformat</translation>
     </message>
     <message>
       <source>Default rotation</source>
-      <translation type="unfinished">Default rotation</translation>
+      <translation>Standard rotation</translation>
     </message>
   </context>
   <context>
@@ -1448,7 +1448,7 @@
     </message>
     <message>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Gennemsigtighed</translation>
     </message>
     <message>
       <source>Default</source>
@@ -1456,22 +1456,22 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Gennemse...</translation>
     </message>
   </context>
   <context>
     <name>ImagePreviewDialog</name>
     <message>
       <source>Image View</source>
-      <translation type="unfinished">Image View</translation>
+      <translation>Billede Visning</translation>
     </message>
     <message>
       <source>Loading Image...Please Wait.</source>
-      <translation type="unfinished">Loading Image...Please Wait.</translation>
+      <translation>Indlæser Billede... Vent venligst.</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Intet billede</translation>
     </message>
   </context>
   <context>
@@ -1486,11 +1486,11 @@
     </message>
     <message>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>Eksport dato</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Skriftstørrelse</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1505,18 +1505,18 @@
     </message>
     <message>
       <source>Enable tile interface</source>
-      <translation type="unfinished">Enable tile interface</translation>
+      <translation>Aktiver flise interface</translation>
     </message>
   </context>
   <context>
     <name>LayoutBackgroundSettingsWidget</name>
     <message>
       <source>Processing Image...Please Wait.</source>
-      <translation type="unfinished">Processing Image...Please Wait.</translation>
+      <translation>Behandler Billede... Vent venligst.</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Gennemse...</translation>
     </message>
     <message>
       <source>Clear</source>
@@ -1524,27 +1524,27 @@
     </message>
     <message>
       <source>View...</source>
-      <translation type="unfinished">View...</translation>
+      <translation>Vis...</translation>
     </message>
     <message>
       <source>Width:</source>
-      <translation type="unfinished">Width:</translation>
+      <translation>Bredde:</translation>
     </message>
     <message>
       <source>Keep Aspect Ratio</source>
-      <translation type="unfinished">Keep Aspect Ratio</translation>
+      <translation>Behold billedformat</translation>
     </message>
     <message>
       <source>Opacity:</source>
-      <translation type="unfinished">Opacity:</translation>
+      <translation>Gennemsigtighed:</translation>
     </message>
     <message>
       <source>Height:</source>
-      <translation type="unfinished">Height:</translation>
+      <translation>Højde:</translation>
     </message>
     <message>
       <source>Crop to monitor aspect ratio</source>
-      <translation type="unfinished">Crop to monitor aspect ratio</translation>
+      <translation>Beskær til skærmformat</translation>
     </message>
   </context>
   <context>
@@ -1555,11 +1555,11 @@
     </message>
     <message>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Bredde</translation>
     </message>
     <message>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Højde</translation>
     </message>
     <message>
       <source>Logical ID</source>
@@ -1575,7 +1575,7 @@
     </message>
     <message>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Minimum Gitter Størrelse</translation>
     </message>
   </context>
   <context>
@@ -1586,7 +1586,7 @@
     </message>
     <message>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>Delte layouts</translation>
     </message>
     <message>
       <source>User&apos;s local layouts</source>
@@ -1597,11 +1597,11 @@
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
-      <translation type="unfinished">License Details</translation>
+      <translation>Licens Detaljer</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Generisk</translation>
     </message>
     <message>
       <source>Features</source>
@@ -1616,26 +1616,26 @@
     </message>
     <message>
       <source>License issues:</source>
-      <translation type="unfinished">License issues:</translation>
+      <translation>Licensproblemer:</translation>
     </message>
   </context>
   <context>
     <name>LicenseWidget</name>
     <message>
       <source>Manual Activation</source>
-      <translation type="unfinished">Manual Activation</translation>
+      <translation>Manuel Aktivering</translation>
     </message>
     <message>
       <source>Select License File...</source>
-      <translation type="unfinished">Select License File...</translation>
+      <translation>Vælg Licensfil...</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Gennemse...</translation>
     </message>
     <message>
       <source>License will be bound to the current server</source>
-      <translation type="unfinished">License will be bound to the current server</translation>
+      <translation>Licens vil være bundet til den aktuelle server</translation>
     </message>
     <message>
       <source>Activate Free License</source>
@@ -1647,19 +1647,19 @@
     </message>
     <message>
       <source>Internet Activation</source>
-      <translation type="unfinished">Internet Activation</translation>
+      <translation>Internet aktivering</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Licens Nøgle</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Ugyldig Licensnøgle</translation>
     </message>
     <message>
       <source>Activation Key File</source>
-      <translation type="unfinished">Activation Key File</translation>
+      <translation>Aktiverings Nøgle Fil</translation>
     </message>
     <message>
       <source>Hardware ID</source>
@@ -1681,26 +1681,26 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>Lognings Niveau</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>Opdel fil efter størrelse</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>Opdel fil efter tid</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>Begræns Maks. Lydstyrke</translation>
     </message>
   </context>
   <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Vært</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1716,19 +1716,19 @@
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
     <message>
       <source>Use Credentials</source>
-      <translation type="unfinished">Use Credentials</translation>
+      <translation>Brug Legitimationsoplysninger</translation>
     </message>
     <message>
       <source>Use Link</source>
-      <translation type="unfinished">Use Link</translation>
+      <translation>Brug Link</translation>
     </message>
     <message>
       <source>Link</source>
-      <translation type="unfinished">Link</translation>
+      <translation>Link</translation>
     </message>
   </context>
   <context>
@@ -1759,30 +1759,30 @@
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Download fuldført!</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Kunne ikke gemme logs til den valgte mappe</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Åbn Filmappe</translation>
     </message>
   </context>
   <context>
     <name>LookAndFeelPreferencesWidget</name>
     <message>
       <source>Look and Feel</source>
-      <translation type="unfinished">Look and Feel</translation>
+      <translation>Udseende og følelse</translation>
     </message>
     <message>
       <source>Background Image</source>
-      <translation type="unfinished">Background Image</translation>
+      <translation>Baggrundsbillede</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Gennemse...</translation>
     </message>
     <message>
       <source>Language</source>
@@ -1790,7 +1790,7 @@
     </message>
     <message>
       <source>Time Mode</source>
-      <translation type="unfinished">Time Mode</translation>
+      <translation>Tidstilstand</translation>
     </message>
     <message>
       <source>Image</source>
@@ -1802,11 +1802,11 @@
     </message>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensitet</translation>
     </message>
     <message>
       <source>Show additional info in tree</source>
-      <translation type="unfinished">Show additional info in tree</translation>
+      <translation>Vis yderligere info i træ</translation>
     </message>
     <message>
       <source>seconds</source>
@@ -1814,15 +1814,15 @@
     </message>
     <message>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>Rundvisning cyklus</translation>
     </message>
     <message>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+      <translation>IP adresser til kameraer og servere, grupper til brugere osv.</translation>
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>Vis sigte overlay for PTZ kameraer</translation>
     </message>
   </context>
   <context>
@@ -1856,11 +1856,11 @@
     <name>MultiServerUpdatesWidget</name>
     <message>
       <source>Updating to...</source>
-      <translation type="unfinished">Updating to...</translation>
+      <translation>Opdaterer til...</translation>
     </message>
     <message>
       <source>You have the latest version installed</source>
-      <translation type="unfinished">You have the latest version installed</translation>
+      <translation>Du har den nyeste version installeret</translation>
     </message>
     <message>
       <source>Download</source>
@@ -1868,11 +1868,11 @@
     </message>
     <message>
       <source>Browse</source>
-      <translation type="unfinished">Browse</translation>
+      <translation>Gennemse</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Download &amp; Installer</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1880,7 +1880,7 @@
     </message>
     <message>
       <source>Link copied</source>
-      <translation type="unfinished">Link copied</translation>
+      <translation>Link kopieret</translation>
     </message>
     <message>
       <source>Advanced Update Settings</source>
@@ -1888,7 +1888,7 @@
     </message>
     <message>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation type="unfinished">It looks like the update process is taking more time than usual. Please keep waiting.</translation>
+      <translation>Det ser ud til, at opdateringsprocessen tager mere tid end normalt. Fortsæt med at vente.</translation>
     </message>
     <message>
       <source>Advanced settings</source>
@@ -1896,11 +1896,11 @@
     </message>
     <message>
       <source>Get Update File</source>
-      <translation type="unfinished">Get Update File</translation>
+      <translation>Hent Opdateringsfil</translation>
     </message>
     <message>
       <source>Check Again</source>
-      <translation type="unfinished">Check Again</translation>
+      <translation>Kontroller Igen</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -1911,18 +1911,18 @@
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Vælg Layouts</translation>
     </message>
   </context>
   <context>
     <name>NewVirtualCameraDialog</name>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Nyt Virtuelt Kamera...</translation>
     </message>
     <message>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Til server</translation>
     </message>
   </context>
   <context>
@@ -1951,7 +1951,7 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>Forbindelses Indstillinger</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1959,31 +1959,31 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Server Adresse</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>Sikkerheds Protokol</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>Email Indstillinger</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>Support Signatur</translation>
     </message>
     <message>
       <source>System Signature</source>
-      <translation type="unfinished">System Signature</translation>
+      <translation>System Signatur</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Brugernavn</translation>
     </message>
     <message>
       <source>Mail from</source>
-      <translation type="unfinished">Mail from</translation>
+      <translation>Mail fra</translation>
     </message>
   </context>
   <context>
@@ -1994,11 +1994,11 @@
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Brugernavn</translation>
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation type="unfinished">Sign in to web page</translation>
+      <translation>Log ind på site</translation>
     </message>
   </context>
   <context>
@@ -2013,11 +2013,11 @@
     </message>
     <message>
       <source>Test...</source>
-      <translation type="unfinished">Test...</translation>
+      <translation>Test...</translation>
     </message>
     <message>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Afspil til brugere</translation>
     </message>
   </context>
   <context>
@@ -2044,7 +2044,7 @@
     </message>
     <message>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>FEJL</translation>
     </message>
     <message>
       <source>WARNING</source>
@@ -2052,18 +2052,18 @@
     </message>
     <message>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>INFO</translation>
     </message>
   </context>
   <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Gennemtving Bekræftelse</translation>
     </message>
     <message>
       <source>Use custom text:</source>
-      <translation type="unfinished">Use custom text:</translation>
+      <translation>Brug brugerdefineret tekst:</translation>
     </message>
     <message>
       <source>to</source>
@@ -2074,11 +2074,11 @@
     <name>PopupSettingsWidget</name>
     <message>
       <source>Show all notifications</source>
-      <translation type="unfinished">Show all notifications</translation>
+      <translation>Vis alle notifikationer</translation>
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>System Notifikationer</translation>
     </message>
     <message>
       <source>Events</source>
@@ -2093,15 +2093,15 @@
     </message>
     <message>
       <source>Go To Position</source>
-      <translation type="unfinished">Go To Position</translation>
+      <translation>Gå Til Position</translation>
     </message>
     <message>
       <source>Create Tour</source>
-      <translation type="unfinished">Create Tour</translation>
+      <translation>Opret Rundvisning</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Start Rundvisning</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2109,11 +2109,11 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaljer</translation>
     </message>
     <message>
       <source>No Tour Selected</source>
-      <translation type="unfinished">No Tour Selected</translation>
+      <translation>Ingen Rundvisning Valgt</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -2121,18 +2121,18 @@
     </message>
     <message>
       <source>No preview available</source>
-      <translation type="unfinished">No preview available</translation>
+      <translation>Ingen forhåndsvisning tilgængelig</translation>
     </message>
     <message>
       <source>Get Preview</source>
-      <translation type="unfinished">Get Preview</translation>
+      <translation>Hent Forhåndsvisning</translation>
     </message>
   </context>
   <context>
     <name>PtzPresetDialog</name>
     <message>
       <source>Save Position</source>
-      <translation type="unfinished">Save Position</translation>
+      <translation>Gem Position</translation>
     </message>
     <message>
       <source>Name:</source>
@@ -2151,11 +2151,11 @@
     </message>
     <message>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>Sprog Indstillinger</translation>
     </message>
     <message>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>Tilpasset underretnings indhold</translation>
     </message>
     <message>
       <source>Header</source>
@@ -2163,7 +2163,7 @@
     </message>
     <message>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>Standardtitel for underretninger vil blive brugt hvis efterladt tom</translation>
     </message>
     <message>
       <source>Body</source>
@@ -2171,11 +2171,11 @@
     </message>
     <message>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>Standard tekst vil blive brugt hvis dette felt er tomt</translation>
     </message>
     <message>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>Tilføj kilde enhedsnavn i brødtekst</translation>
     </message>
   </context>
   <context>
@@ -2200,11 +2200,11 @@
     <name>QnCompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing Compatibility Version...</source>
-      <translation type="unfinished">Installing Compatibility Version...</translation>
+      <translation>Installerer Kompatibilitetsversion...</translation>
     </message>
     <message>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Genstart til den opdaterede version, når den er klar</translation>
     </message>
   </context>
   <context>
@@ -2218,7 +2218,7 @@
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <source>Notification Sounds</source>
-      <translation type="unfinished">Notification Sounds</translation>
+      <translation>Notifikations lyde</translation>
     </message>
     <message>
       <source>Play</source>
@@ -2226,7 +2226,7 @@
     </message>
     <message>
       <source>Add...</source>
-      <translation type="unfinished">Add...</translation>
+      <translation>Tilføj...</translation>
     </message>
     <message>
       <source>Rename...</source>
@@ -2234,14 +2234,14 @@
     </message>
     <message>
       <source>Delete...</source>
-      <translation type="unfinished">Delete...</translation>
+      <translation>Slet...</translation>
     </message>
   </context>
   <context>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Add URL</source>
-      <translation type="unfinished">Add URL</translation>
+      <translation>Tilføj URL</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -2253,7 +2253,7 @@
     </message>
     <message>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to System malfunction.</translation>
+      <translation>Fjernelse af denne forbindelse kan føre til systemfejl.</translation>
     </message>
   </context>
   <context>
@@ -2271,57 +2271,57 @@
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
-      <translation type="unfinished">Launch video wall when Windows starts.</translation>
+      <translation>Start videovæg, når Windows starter.</translation>
     </message>
     <message>
       <source>Place shortcut on desktop.</source>
-      <translation type="unfinished">Place shortcut on desktop.</translation>
+      <translation>Placer genvej på skrivebordet.</translation>
     </message>
     <message>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>Aktiver tidslinje på videovæg</translation>
     </message>
   </context>
   <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Hurtig gennemgang</translation>
     </message>
     <message>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>Oprindelig videolængde</translation>
     </message>
     <message>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>Eksporteret videolængde</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Hastighed</translation>
     </message>
     <message>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>Billedinterval</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Nulstil Hastighed</translation>
     </message>
   </context>
   <context>
     <name>ReconnectInfoDialog</name>
     <message>
       <source>Reconnecting...</source>
-      <translation type="unfinished">Reconnecting...</translation>
+      <translation>Genopretter forbindelse...</translation>
     </message>
     <message>
       <source>Please wait while the connection is being restored...</source>
-      <translation type="unfinished">Please wait while the connection is being restored...</translation>
+      <translation>Vent venligst mens forbindelsen genoprettes...</translation>
     </message>
     <message>
       <source>Server name</source>
-      <translation type="unfinished">Server name</translation>
+      <translation>Server navn</translation>
     </message>
   </context>
   <context>
@@ -2340,11 +2340,11 @@
     </message>
     <message>
       <source>Pre-Recording:</source>
-      <translation type="unfinished">Pre-Recording:</translation>
+      <translation>Før-Optagelse:</translation>
     </message>
     <message>
       <source>Post-Recording:</source>
-      <translation type="unfinished">Post-Recording:</translation>
+      <translation>Efter-Optagelse:</translation>
     </message>
     <message>
       <source>Fixed duration:</source>
@@ -2355,11 +2355,11 @@
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
-      <translation type="unfinished">Temporary Folder</translation>
+      <translation>Midlertidig Mappe</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Gennemse...</translation>
     </message>
     <message>
       <source>Source</source>
@@ -2371,34 +2371,34 @@
     </message>
     <message>
       <source>Recording Quality</source>
-      <translation type="unfinished">Recording Quality</translation>
+      <translation>Optagelseskvalitet</translation>
     </message>
     <message>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>En kraftfuld computer anbefales til &quot;Bedste&quot; kvalitet og opløsning.</translation>
     </message>
     <message>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Skærm</translation>
     </message>
     <message>
       <source>Additional Options</source>
-      <translation type="unfinished">Additional Options</translation>
+      <translation>Yderligere Indstillinger</translation>
     </message>
     <message>
       <source>Capture Cursor</source>
-      <translation type="unfinished">Capture Cursor</translation>
+      <translation>Optag Markør</translation>
     </message>
   </context>
   <context>
     <name>RecordingThresholdWidget</name>
     <message>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Før-optagelse</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>Efter-optagelse</translation>
     </message>
   </context>
   <context>
@@ -2435,34 +2435,34 @@
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>
-      <translation type="unfinished">No services found</translation>
+      <translation>Ingen tjenester fundet</translation>
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
-      <translation type="unfinished">Contact your Channel Partner to add services</translation>
+      <translation>Kontakt din kanalpartner for at tilføje tjenester</translation>
     </message>
     <message>
       <source>Channel Partner Contact</source>
-      <translation type="unfinished">Channel Partner Contact</translation>
+      <translation>Kanal Partner Kontakt</translation>
     </message>
     <message>
       <source>Services Usage</source>
-      <translation type="unfinished">Services Usage</translation>
+      <translation>Brug Af Tjenester</translation>
     </message>
     <message>
       <source>Services state</source>
-      <translation type="unfinished">Services state</translation>
+      <translation>Tjenesternes tilstand</translation>
     </message>
   </context>
   <context>
     <name>SayTextBusinessActionWidget</name>
     <message>
       <source>Speak the following:</source>
-      <translation type="unfinished">Speak the following:</translation>
+      <translation>Tal med følgende:</translation>
     </message>
     <message>
       <source>Type any text here</source>
-      <translation type="unfinished">Type any text here</translation>
+      <translation>Skriv en hvilken som helst tekst her</translation>
     </message>
     <message>
       <source>Volume:</source>
@@ -2470,22 +2470,22 @@
     </message>
     <message>
       <source>Test...</source>
-      <translation type="unfinished">Test...</translation>
+      <translation>Test...</translation>
     </message>
     <message>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Tal med brugerne</translation>
     </message>
   </context>
   <context>
     <name>ScheduleSettingsWidget</name>
     <message>
       <source>Schedule Settings</source>
-      <translation type="unfinished">Schedule Settings</translation>
+      <translation>Planlægnings Indstillinger</translation>
     </message>
     <message>
       <source>Record Always</source>
-      <translation type="unfinished">Record Always</translation>
+      <translation>Optag Altid</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -2497,11 +2497,11 @@
     </message>
     <message>
       <source>Do Not Record</source>
-      <translation type="unfinished">Do Not Record</translation>
+      <translation>Optag Ikke</translation>
     </message>
     <message>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>Bitrate</translation>
     </message>
     <message>
       <source>FPS</source>
@@ -2532,11 +2532,11 @@
     </message>
     <message>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>Vis vandmærke med brugernavn over video</translation>
     </message>
     <message>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>Vandmærke Forhåndsvisning</translation>
     </message>
     <message>
       <source>to</source>
@@ -2544,7 +2544,7 @@
     </message>
     <message>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>Begræns sessionens varighed</translation>
     </message>
     <message>
       <source>Data protection</source>
@@ -2552,7 +2552,7 @@
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Brug kun HTTPS til at oprette forbindelse til kameraer</translation>
     </message>
     <message>
       <source>User Activity</source>
@@ -2584,7 +2584,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-power users</source>
-      <translation type="unfinished">Display servers in tree for non-power users</translation>
+      <translation>Vis servere i træet for ikke-superbrugere</translation>
     </message>
   </context>
   <context>
@@ -2595,7 +2595,7 @@
     </message>
     <message>
       <source>Global Email Settings...</source>
-      <translation type="unfinished">Global Email Settings...</translation>
+      <translation>Globale E-Mail Indstillinger...</translation>
     </message>
   </context>
   <context>
@@ -2630,25 +2630,25 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaljer</translation>
     </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
     <message>
       <source>Select Servers</source>
-      <translation type="unfinished">Select Servers</translation>
+      <translation>Vælg Servere</translation>
     </message>
   </context>
   <context>
     <name>ServerSettingsWidget</name>
     <message>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Failover</translation>
     </message>
     <message>
       <source>Failover Priority...</source>
@@ -2683,7 +2683,7 @@
     </message>
     <message>
       <source>Force Alarm Layout opening</source>
-      <translation type="unfinished">Force Alarm Layout opening</translation>
+      <translation>Gennemtving åbning af alarmlayout</translation>
     </message>
   </context>
   <context>
@@ -2694,37 +2694,37 @@
     </message>
     <message>
       <source>Display text for:</source>
-      <translation type="unfinished">Display text for:</translation>
+      <translation>Vis tekst for:</translation>
     </message>
     <message>
       <source>Use custom text:</source>
-      <translation type="unfinished">Use custom text:</translation>
+      <translation>Brug brugerdefineret tekst:</translation>
     </message>
     <message>
       <source>Rule will work only for prolonged events</source>
-      <translation type="unfinished">Rule will work only for prolonged events</translation>
+      <translation>Reglen gælder kun for langvarige hændelser</translation>
     </message>
   </context>
   <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
-      <translation type="unfinished">Watermark Check</translation>
+      <translation>Vandmærke Tjek</translation>
     </message>
     <message>
       <source>Checked File:</source>
-      <translation type="unfinished">Checked File:</translation>
+      <translation>Kontrolleret Fil:</translation>
     </message>
     <message>
       <source>Check Result:</source>
-      <translation type="unfinished">Check Result:</translation>
+      <translation>Tjek Resultat:</translation>
     </message>
   </context>
   <context>
     <name>SoftwareTriggerBusinessEventWidget</name>
     <message>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Tilgængelig for</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2739,23 +2739,23 @@
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
-      <translation type="unfinished">Current Statistics</translation>
+      <translation>Aktuel statistik</translation>
     </message>
     <message>
       <source>Forecast for Full Storage Usage</source>
-      <translation type="unfinished">Forecast for Full Storage Usage</translation>
+      <translation>Prognose for fuld lager Forbrug</translation>
     </message>
     <message>
       <source>Server is offline. Statistics are not available.</source>
-      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
+      <translation>Serveren er offline. Statistik er ikke tilgængelige.</translation>
     </message>
     <message>
       <source>Additional storage</source>
-      <translation type="unfinished">Additional storage</translation>
+      <translation>Yderligere lagerplads</translation>
     </message>
     <message>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Basisprognose for data registreret under</translation>
     </message>
   </context>
   <context>
@@ -2774,7 +2774,7 @@
     </message>
     <message>
       <source>Reindex Backup</source>
-      <translation type="unfinished">Reindex Backup</translation>
+      <translation>Genindeksér Backup</translation>
     </message>
   </context>
   <context>
@@ -2792,7 +2792,7 @@
     </message>
     <message>
       <source>Protocol:</source>
-      <translation type="unfinished">Protocol:</translation>
+      <translation>Protokol:</translation>
     </message>
     <message>
       <source>URL:</source>
@@ -2811,15 +2811,15 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Vis alle brugere</translation>
     </message>
     <message>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Vælg Brugere</translation>
     </message>
     <message>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Intet matcher din søgning.</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2834,15 +2834,15 @@
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation type="unfinished">Send anonymous usage and crash statistics to software developers</translation>
+      <translation>Send anonym brugs- og nedbruds statistik til softwareudviklere</translation>
     </message>
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
+      <translation>Advarsel! Dette vil gøre Kvalitet og Billede hastighed (FPS) indstillinger i Optagelsesskemaet irrelevant.</translation>
     </message>
     <message>
       <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
+      <translation>Brugerdefineret sprog til Cloud notifikationer</translation>
     </message>
   </context>
   <context>
@@ -2857,22 +2857,22 @@
     </message>
     <message>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Skriftstørrelse</translation>
     </message>
     <message>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>Indtast almindelig tekst eller HTML</translation>
     </message>
     <message>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Område Bredde</translation>
     </message>
   </context>
   <context>
     <name>TimeSynchronizationWidget</name>
     <message>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>Synkroniser tid med internettet</translation>
     </message>
     <message>
       <source>VMS Time</source>
@@ -2880,22 +2880,22 @@
     </message>
     <message>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>Synkroniser ikke tid mellem servere</translation>
     </message>
   </context>
   <context>
     <name>TimestampOverlaySettingsWidget</name>
     <message>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Tidsstempel</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Skriftstørrelse</translation>
     </message>
     <message>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>Format</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2906,22 +2906,22 @@
     <name>UserGroupsWidget</name>
     <message>
       <source>Search users</source>
-      <translation type="unfinished">Search users</translation>
+      <translation>Søg brugere</translation>
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Tilføj Gruppe</translation>
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>Slet</translation>
     </message>
   </context>
   <context>
     <name>UserListWidget</name>
     <message>
       <source>Search users</source>
-      <translation type="unfinished">Search users</translation>
+      <translation>Søg brugere</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2929,14 +2929,14 @@
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>Slet</translation>
     </message>
   </context>
   <context>
     <name>VersionSelectionDialog</name>
     <message>
       <source>Choose a specific build</source>
-      <translation type="unfinished">Choose a specific build</translation>
+      <translation>Vælg en specifik build</translation>
     </message>
   </context>
   <context>
@@ -2947,7 +2947,7 @@
     </message>
     <message>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>Registrer bevægelse</translation>
     </message>
     <message>
       <source>Sensitivity</source>
@@ -2966,7 +2966,7 @@
     </message>
     <message>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>Ignorer tidszone i uploadede filer</translation>
     </message>
   </context>
   <context>
@@ -2977,7 +2977,7 @@
     </message>
     <message>
       <source>Upload Footage</source>
-      <translation type="unfinished">Upload Footage</translation>
+      <translation>Upload optagelser</translation>
     </message>
     <message>
       <source>Upload File...</source>
@@ -2996,7 +2996,7 @@
     </message>
     <message>
       <source>SELECT SERVER</source>
-      <translation type="unfinished">SELECT SERVER</translation>
+      <translation>VÆLG SERVER</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -3015,7 +3015,7 @@
     <name>WeekTimeScheduleDialog</name>
     <message>
       <source>Schedule Settings</source>
-      <translation type="unfinished">Schedule Settings</translation>
+      <translation>Planlægnings Indstillinger</translation>
     </message>
     <message>
       <source>On</source>
@@ -3027,18 +3027,18 @@
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Tidsplan</translation>
     </message>
     <message>
       <source>Note: Schedule is based on server time.</source>
-      <translation type="unfinished">Note: Schedule is based on server time.</translation>
+      <translation>Bemærk: Skema er baseret på servertid.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LicenseManagerWidget</name>
     <message>
       <source>Active Licenses</source>
-      <translation type="unfinished">Active Licenses</translation>
+      <translation>Aktive Licenser</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -3046,11 +3046,11 @@
     </message>
     <message>
       <source>Details...</source>
-      <translation type="unfinished">Details...</translation>
+      <translation>Detaljer...</translation>
     </message>
     <message>
       <source>The software is licensed to</source>
-      <translation type="unfinished">The software is licensed to</translation>
+      <translation>Softwaren er licenseret til</translation>
     </message>
     <message>
       <source>New License</source>
@@ -3061,15 +3061,15 @@
     <name>nx::vms::client::desktop::WatermarkPreviewDialog</name>
     <message>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>Forhåndsvisning af vandmærke</translation>
     </message>
     <message>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Gennemsigtighed</translation>
     </message>
     <message>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>Frekvens</translation>
     </message>
   </context>
 </TS>

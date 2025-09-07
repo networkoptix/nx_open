@@ -177,11 +177,11 @@
     </message>
     <message>
       <source>Your access to this system has expired.</source>
-      <translation type="unfinished">Your access to this system has expired.</translation>
+      <translation>Din adgang til dette system er udløbet.</translation>
     </message>
     <message>
       <source>Please contact the system administrator to regain access.</source>
-      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+      <translation>Kontakt venligst system administratoren for at få adgang igen.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
@@ -191,17 +191,17 @@
     <message>
       <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>Det er forbudt at logge ind som en %1 -bruger på systemet i en nedlukket tilstand. Du kan stadig oprette forbindelse som lokal bruger.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>Det er forbudt at logge ind som en %1 -bruger på systemet i suspenderet tilstand. Du kan stadig oprette forbindelse som lokal bruger.</translation>
     </message>
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>For at logge ind på dette system skal du deaktivere &quot;. Bed om en bekræftelses kode ved hvert login med din %1 konto&quot; i din %2.</translation>
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
@@ -236,7 +236,7 @@
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>Gennemgå certifikaterne for serverne fra dette system.</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
@@ -245,7 +245,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>Dette kan skyldes et udløbet servercertifikat eller et ugyldigt certifikat. Kontakt din systemadministrator for yderligere undersøgelse.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
