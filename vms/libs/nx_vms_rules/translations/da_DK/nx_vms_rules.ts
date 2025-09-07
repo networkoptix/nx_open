@@ -5,7 +5,7 @@
     <name>BasicAction</name>
     <message>
       <source>Tooltip text</source>
-      <translation type="unfinished">Tooltip text</translation>
+      <translation>Værktøjstip tekst</translation>
     </message>
   </context>
   <context>
@@ -13,7 +13,7 @@
     <message>
       <source>On %1 --&gt; %2</source>
       <comment>%1 is the event name, %2 is the action name</comment>
-      <translation type="unfinished">On %1 --&gt; %2</translation>
+      <translation>På %1 --&gt; %2</translation>
     </message>
   </context>
   <context>
@@ -85,15 +85,15 @@
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation type="unfinished">Invalid field type is provided</translation>
+      <translation>Der er angivet en ugyldig felttype</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>Uventet valideringspolitik</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>Vælg mindst én server</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Not all servers are suitable</source>
-      <translation type="unfinished">Not all servers are suitable</translation>
+      <translation>Ikke alle servere er egnede</translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
@@ -141,11 +141,11 @@
     </message>
     <message>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Før-optagelse</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>Efter-Optagelse</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>Event Devices</source>
-      <translation type="unfinished">Event Devices</translation>
+      <translation>Hændelses Enheder</translation>
     </message>
     <message>
       <source>Of Type</source>
@@ -186,15 +186,15 @@
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>Feltet %1 værdi skal angives for den givne valideringspolitik</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>Valgte lokale layout kan kun vises til ejeren %1</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>Ingen af de valgte brugere har adgang til det valgte layout</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
@@ -206,47 +206,47 @@
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>Valgte enheder blev fjernet</numerusform>
+        <numerusform>Valgte enheder blev fjernet</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>Valgte kameraer blev fjernet</numerusform>
+        <numerusform>Valgte kameraer blev fjernet</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>Valgte servere blev fjernet</numerusform>
+        <numerusform>Valgte servere blev fjernet</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>Valgte layout blev fjernet</numerusform>
+        <numerusform>Valgte layout blev fjernet</numerusform>
       </translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>Tidsværdi kan ikke være mindre end nul</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>Varighed kan ikke være mindre end nul</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>Værdien kan ikke være mindre end %1</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>Værdi kan ikke være mere end %1</translation>
     </message>
     <message>
       <source>To Users</source>
@@ -258,23 +258,23 @@
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>Felt &quot;%1&quot; skal være et objekt</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
-      <translation type="unfinished">Unable to deserialize properties for field: %1</translation>
+      <translation>Egenskaber for feltet %1kan ikke deserialisere</translation>
     </message>
     <message>
       <source>Event: %1 is not registered</source>
-      <translation type="unfinished">Event: %1 is not registered</translation>
+      <translation>Hændelsen: %1 er ikke registreret</translation>
     </message>
     <message>
       <source>Action: %1 is not registered</source>
-      <translation type="unfinished">Action: %1 is not registered</translation>
+      <translation>Handling: %1 er ikke registreret</translation>
     </message>
     <message>
       <source>Rule validation failed: %1</source>
-      <translation type="unfinished">Rule validation failed: %1</translation>
+      <translation>Regelvalidering mislykkedes: %1</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -294,28 +294,28 @@
     </message>
     <message>
       <source>Select Integration Action</source>
-      <translation type="unfinished">Select Integration Action</translation>
+      <translation>Vælg Integration Handling</translation>
     </message>
     <message>
       <source>Integration not found for Integration Action %1</source>
-      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+      <translation>Integration ikke fundet for Integration Action %1</translation>
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
-      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+      <translation>Ikke understøttet JSON værdi type i nøgle %1</translation>
     </message>
     <message>
       <source>Total number of events</source>
-      <translation type="unfinished">Total number of events</translation>
+      <translation>Samlet antal hændelser</translation>
     </message>
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>Fjernet emne</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>Fjernet enhed</translation>
     </message>
     <message>
       <source>Removed camera</source>
@@ -323,11 +323,11 @@
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>Fjernet server</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>Fjernet layout</translation>
     </message>
   </context>
   <context>
@@ -341,17 +341,17 @@
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>Tom tekst er ikke tilladt</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>Ugyldig e-mailadresse %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%n af %1 yderligere e-mailadresser er ugyldige</numerusform>
+        <numerusform>%n af %1 yderligere e-mailadresser er ugyldige</numerusform>
       </translation>
     </message>
   </context>
@@ -368,14 +368,14 @@
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>Og attributter</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
       <source>Analytics event type is not selected</source>
-      <translation type="unfinished">Analytics event type is not selected</translation>
+      <translation>Analyse hændelses typen er ikke valgt</translation>
     </message>
   </context>
   <context>
@@ -402,7 +402,7 @@
     <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
       <source>Analytics object type is not selected</source>
-      <translation type="unfinished">Analytics object type is not selected</translation>
+      <translation>Analyse objekt type er ikke valgt</translation>
     </message>
   </context>
   <context>
@@ -447,7 +447,7 @@
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>Input signal på kameraet</translation>
     </message>
   </context>
   <context>
@@ -470,30 +470,30 @@
     </message>
     <message>
       <source>Device disconnected</source>
-      <translation type="unfinished">Device disconnected</translation>
+      <translation>Enheden er frakoblet</translation>
     </message>
     <message>
       <source>Camera disconnected</source>
-      <translation type="unfinished">Camera disconnected</translation>
+      <translation>Kameraet er frakoblet</translation>
     </message>
     <message>
       <source>I/O Module disconnected</source>
-      <translation type="unfinished">I/O Module disconnected</translation>
+      <translation>I/O-modul frakoblet</translation>
     </message>
     <message>
       <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device disconnected at %1</translation>
+      <translation>Enheden blev afbrudt ved %1</translation>
     </message>
     <message>
       <source>Camera disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera disconnected at %1</translation>
+      <translation>Kameraet er frakoblet ved %1</translation>
     </message>
     <message>
       <source>I/O Module disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module disconnected at %1</translation>
+      <translation>I/O-modul frakoblet ved %1</translation>
     </message>
   </context>
   <context>
@@ -523,12 +523,12 @@
     <message>
       <source>Device #%1: %2 (%3)</source>
       <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+      <translation>Enhed #%1: %2 (%3)</translation>
     </message>
     <message>
       <source>Camera #%1: %2 (%3)</source>
       <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
+      <translation>Kamera #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -591,7 +591,7 @@
     </message>
     <message>
       <source>Fan failure at %1</source>
-      <translation type="unfinished">Fan failure at %1</translation>
+      <translation>Ventilator fejl ved %1</translation>
     </message>
   </context>
   <context>
@@ -614,11 +614,11 @@
     </message>
     <message>
       <source>Related devices:</source>
-      <translation type="unfinished">Related devices:</translation>
+      <translation>Relaterede enheder:</translation>
     </message>
     <message>
       <source>Related cameras:</source>
-      <translation type="unfinished">Related cameras:</translation>
+      <translation>Relaterede kameraer:</translation>
     </message>
   </context>
   <context>
@@ -641,38 +641,38 @@
     </message>
     <message>
       <source>HTTP authentication</source>
-      <translation type="unfinished">HTTP authentication</translation>
+      <translation>HTTP godkendelse</translation>
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>Brugerdefinerede overskrifter</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
     <message>
       <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
-      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+      <translation>Bruger- og adgangskodefelter skal udfyldes i tilfælde af den valgte grundlæggende metode eller metode til fordøjelse</translation>
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
-      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+      <translation>Token felt skal udfyldes i tilfælde af ihændehaverens godkendelsestype valgt</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
-        <numerusform>Some of the headers are not valid</numerusform>
+      <translation>
+        <numerusform>Nogle af overskrifterne er ikke gyldige</numerusform>
+        <numerusform>Nogle af overskrifterne er ikke gyldige</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
-        <numerusform>All the headers are not valid</numerusform>
+      <translation>
+        <numerusform>Alle overskrifter er ikke gyldige</numerusform>
+        <numerusform>Alle overskrifter er ikke gyldige</numerusform>
       </translation>
     </message>
   </context>
@@ -680,18 +680,18 @@
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>Not allowed HTTP method</source>
-      <translation type="unfinished">Not allowed HTTP method</translation>
+      <translation>Ikke tilladt HTTP metode</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::IntegrationAction</name>
     <message>
       <source>Integration Action</source>
-      <translation type="unfinished">Integration Action</translation>
+      <translation>Integration Handling</translation>
     </message>
     <message>
       <source>Integration Action Parameters</source>
-      <translation type="unfinished">Integration Action Parameters</translation>
+      <translation>Parametre For Integrationshandlinger</translation>
     </message>
   </context>
   <context>
@@ -706,11 +706,11 @@
     </message>
     <message>
       <source>Integration Diagnostic at %1</source>
-      <translation type="unfinished">Integration Diagnostic at %1</translation>
+      <translation>Integration Diagnosticering ved %1</translation>
     </message>
     <message>
       <source>Integration Diagnostic</source>
-      <translation type="unfinished">Integration Diagnostic</translation>
+      <translation>Integration Diagnostik</translation>
     </message>
   </context>
   <context>
@@ -749,7 +749,7 @@
     </message>
     <message>
       <source>LDAP Sync Issue at %1</source>
-      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+      <translation>LDAP synkroniserings problem på %1</translation>
     </message>
     <message>
       <source>LDAP Sync Issue</source>
@@ -765,15 +765,15 @@
     <message>
       <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">Not enough licenses on %1</translation>
+      <translation>Ikke nok licenser på %1</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+      <translation>Optagelse er blevet deaktiveret på følgende enheder:</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
+      <translation>Optagelse er blevet deaktiveret på følgende kameraer:</translation>
     </message>
   </context>
   <context>
@@ -852,7 +852,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>Mislykkedes at tvinge til at bruge kameraets tid, da det halter for meget. Websted tid vil blive brugt i stedet.</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -868,22 +868,22 @@
     </message>
     <message>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Gennemtving Bekræftelse</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ObjectLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>Listen er ikke valgt</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>Liste med det givne id &apos;%1&apos; findes ikke</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+      <translation>Liste med den givne id &apos;%1&apos; har ugyldig objekttype - &apos;%2&apos;, forventet - &apos;%3&apos;</translation>
     </message>
   </context>
   <context>
@@ -897,11 +897,11 @@
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
       <source>Zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+      <translation>Nul varighed kan ikke angives for '%1' begivenhedstilstand</translation>
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+      <translation>Ikke nul varighed kan ikke angives for '%1' begivenhedstilstand</translation>
     </message>
   </context>
   <context>
@@ -934,19 +934,19 @@
     </message>
     <message>
       <source>PoE over budget on %1</source>
-      <translation type="unfinished">PoE over budget on %1</translation>
+      <translation>PoE over budget på %1</translation>
     </message>
     <message>
       <source>Current power consumption: %1 watts</source>
-      <translation type="unfinished">Current power consumption: %1 watts</translation>
+      <translation>Strømforbrug: %1 watt</translation>
     </message>
     <message>
       <source>Upper consumption limit: %1 watts</source>
-      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+      <translation>Øvre forbrugsgrænse: %1 watt</translation>
     </message>
     <message>
       <source>Lower consumption limit: %1 watts</source>
-      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+      <translation>Nedre forbrugsgrænse: %1 watt</translation>
     </message>
   </context>
   <context>
@@ -994,19 +994,19 @@
     <name>nx::vms::rules::Rule</name>
     <message>
       <source>`%1` event filter field alerts:</source>
-      <translation type="unfinished">`%1` event filter field alerts:</translation>
+      <translation>`%1` event filter felt advarsler:</translation>
     </message>
     <message>
       <source>`%1` action builder field alerts:</source>
-      <translation type="unfinished">`%1` action builder field alerts:</translation>
+      <translation>`%1` alarmer i felt til handlingsgenerator:</translation>
     </message>
     <message>
       <source>Rule is not completed. One filter and one builder are required</source>
-      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+      <translation>Reglen er ikke fuldført. Ét filter og én builder er påkrævet</translation>
     </message>
     <message>
       <source>The given filter is not compatible with the given builder</source>
-      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+      <translation>Det givne filter er ikke kompatibelt med den givne builder</translation>
     </message>
   </context>
   <context>
@@ -1046,7 +1046,7 @@
     </message>
     <message>
       <source>Services Issue on %1</source>
-      <translation type="unfinished">Services Issue on %1</translation>
+      <translation>Tjenesteproblem på %1</translation>
     </message>
   </context>
   <context>
@@ -1073,7 +1073,7 @@
     <message>
       <source>%1 certificate error</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 certificate error</translation>
+      <translation>%1 certifikat fejl</translation>
     </message>
   </context>
   <context>
@@ -1085,19 +1085,19 @@
     <message>
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 Conflict</translation>
+      <translation>%1 Konflikt</translation>
     </message>
     <message>
       <source>Discovered a server with the same ID in the same local network</source>
-      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+      <translation>Opdagede en server med samme ID i det samme lokale netværk</translation>
     </message>
     <message>
       <source>Servers in the same local network have conflict on the following devices</source>
-      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+      <translation>Servere i det samme lokale netværk har konflikt på følgende enheder</translation>
     </message>
     <message>
       <source>Server: %1</source>
-      <translation type="unfinished">Server: %1</translation>
+      <translation>Server: %1</translation>
     </message>
   </context>
   <context>
@@ -1116,11 +1116,11 @@
     </message>
     <message>
       <source>%1 Failure</source>
-      <translation type="unfinished">%1 Failure</translation>
+      <translation>%1 Fejl</translation>
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>Den lokale database blev fundet beskadiget og kunne ikke gendannes. En ny tom database er blevet initialiseret. En sikkerhedskopi af den beskadigede database er blevet gemt til reference.</translation>
     </message>
   </context>
   <context>
@@ -1131,7 +1131,7 @@
     </message>
     <message>
       <source>%1 Started</source>
-      <translation type="unfinished">%1 Started</translation>
+      <translation>%1 Startet</translation>
     </message>
   </context>
   <context>
@@ -1153,7 +1153,7 @@
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
       <source>Endpoint</source>
-      <translation type="unfinished">Endpoint</translation>
+      <translation>Endpoint</translation>
     </message>
     <message>
       <source>Content</source>
@@ -1161,7 +1161,7 @@
     </message>
     <message>
       <source>Internal HTTPS Request</source>
-      <translation type="unfinished">Internal HTTPS Request</translation>
+      <translation>Intern HTTPS anmodning</translation>
     </message>
   </context>
   <context>
@@ -1184,14 +1184,14 @@
     </message>
     <message>
       <source>User: %1</source>
-      <translation type="unfinished">User: %1</translation>
+      <translation>Bruger: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
       <source>Sound is not selected</source>
-      <translation type="unfinished">Sound is not selected</translation>
+      <translation>Lyd er ikke valgt</translation>
     </message>
   </context>
   <context>
@@ -1213,7 +1213,7 @@
     <name>nx::vms::rules::StateFieldValidator</name>
     <message>
       <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
-      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
+      <translation>`%1` status er ikke gyldig for `%2` begivenhed og `%3` handling med de givne parametre</translation>
     </message>
   </context>
   <context>
@@ -1264,44 +1264,44 @@
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>Ikke nok HDD/SSD/netværkshastighed til optagelse til %1.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>Kunne ikke hente hændelses beskrivelsen</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation type="unfinished">Event does not have source camera</translation>
+      <translation>Hændelsen har ikke kilde kamera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Vælg mindst et layout</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>Listen er ikke valgt</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>Liste med det givne id &apos;%1&apos; findes ikke</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+      <translation>Liste med den givne id &apos;%1&apos; er ikke en generisk liste</translation>
     </message>
     <message>
       <source>Invalid UUID string</source>
-      <translation type="unfinished">Invalid UUID string</translation>
+      <translation>Ugyldig UUID streng</translation>
     </message>
   </context>
   <context>
@@ -1316,30 +1316,30 @@
     </message>
     <message>
       <source>Show To</source>
-      <translation type="unfinished">Show To</translation>
+      <translation>Vis Til</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
       <source>Url cannot be empty</source>
-      <translation type="unfinished">Url cannot be empty</translation>
+      <translation>Url må ikke være tom</translation>
     </message>
     <message>
       <source>Url must be valid</source>
-      <translation type="unfinished">Url must be valid</translation>
+      <translation>Url skal være gyldig</translation>
     </message>
     <message>
       <source>Url should not contains user or password</source>
-      <translation type="unfinished">Url should not contains user or password</translation>
+      <translation>Url bør ikke indeholde bruger eller adgangskode</translation>
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>Slutpunktet må ikke være tomt</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>Slutpunktet må&apos;ikke indeholde mellemrum</translation>
     </message>
   </context>
   <context>
