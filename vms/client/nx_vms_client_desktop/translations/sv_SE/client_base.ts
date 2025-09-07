@@ -7538,6 +7538,17 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ChannelPartnerUserNotificationManager</name>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation>Channel Partner-användare har tillgång till denna webbplats</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation>Kanalpartner-användare&apos; -åtkomst hanteras på organisationsnivå och de är inte synliga i webbplatsens användarhantering.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Läs mer&lt;/a&gt;</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
       <source>Your confirmation is required to provide a token to</source>
@@ -7705,14 +7716,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Disconnect</source>
       <translation>Koppla från</translation>
-    </message>
-    <message>
-      <source>Channel Partner users have access to this site</source>
-      <translation>Channel Partner-användare har tillgång till denna webbplats</translation>
-    </message>
-    <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation>Kanalpartner-användare&apos; -åtkomst hanteras på organisationsnivå och de är inte synliga i webbplatsens användarhantering.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Läs mer&lt;/a&gt;</translation>
     </message>
   </context>
   <context>

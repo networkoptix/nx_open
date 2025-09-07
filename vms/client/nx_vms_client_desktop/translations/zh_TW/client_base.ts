@@ -7414,6 +7414,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ChannelPartnerUserNotificationManager</name>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation>通路夥伴使用者可以造訪此站點</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation>通路夥伴使用者的存取權限是在組織層級進行管理，因此不會出現在站點的使用者管理頁面。&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;了解更多&lt;/a&gt;</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
       <source>Your confirmation is required to provide a token to</source>
@@ -7581,14 +7592,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Disconnect</source>
       <translation>斷線</translation>
-    </message>
-    <message>
-      <source>Channel Partner users have access to this site</source>
-      <translation>通路夥伴使用者可以造訪此站點</translation>
-    </message>
-    <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation>通路夥伴使用者的存取權限是在組織層級進行管理，因此不會出現在站點的使用者管理頁面。&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;了解更多&lt;/a&gt;</translation>
     </message>
   </context>
   <context>

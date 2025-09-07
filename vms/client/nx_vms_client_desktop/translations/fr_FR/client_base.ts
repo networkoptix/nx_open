@@ -7538,6 +7538,17 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ChannelPartnerUserNotificationManager</name>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation>Les utilisateurs du partenaire de distribution ont accès à ce site</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation>L'accès des utilisateurs des partenaires de distribution&apos; est géré au niveau de l'organisation et n'est pas visible dans la gestion des utilisateurs du site.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;En savoir plus&lt;/a&gt;</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
       <source>Your confirmation is required to provide a token to</source>
@@ -7705,14 +7716,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Disconnect</source>
       <translation>Déconnecter</translation>
-    </message>
-    <message>
-      <source>Channel Partner users have access to this site</source>
-      <translation>Les utilisateurs du partenaire de distribution ont accès à ce site</translation>
-    </message>
-    <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation>L'accès des utilisateurs des partenaires de distribution&apos; est géré au niveau de l'organisation et n'est pas visible dans la gestion des utilisateurs du site.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;En savoir plus&lt;/a&gt;</translation>
     </message>
   </context>
   <context>

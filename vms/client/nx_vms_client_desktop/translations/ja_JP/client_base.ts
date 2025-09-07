@@ -7415,6 +7415,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ChannelPartnerUserNotificationManager</name>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation>チャネルパートナーのユーザーはこのサイトにアクセスできます。</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation>チャネルパートナーユーザーのアクセス権限は組織レベルで管理されており、サイトのユーザー管理では表示されません。&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;詳細はこちら&lt;/a&gt;</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
       <source>Your confirmation is required to provide a token to</source>
@@ -7582,14 +7593,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Disconnect</source>
       <translation>切断</translation>
-    </message>
-    <message>
-      <source>Channel Partner users have access to this site</source>
-      <translation>チャネルパートナーのユーザーはこのサイトにアクセスできます。</translation>
-    </message>
-    <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation>チャネルパートナーユーザーのアクセス権限は組織レベルで管理されており、サイトのユーザー管理では表示されません。&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;詳細はこちら&lt;/a&gt;</translation>
     </message>
   </context>
   <context>

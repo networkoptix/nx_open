@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Tilføj indtastning</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - Avancerede Indstillinger</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Login-attribut</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -32,23 +32,23 @@
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Medlemskab</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Søg Timeout</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>For at aktivere digest godkendelse for LDAP-brugere, der allerede er tilføjet til VMS databasen, skal du aktivere det direkte i disse brugeres&apos; indstillinger.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>For at deaktivere digest godkendelse for LDAP-brugere, der allerede er tilføjet til VMS databasen, skal du deaktivere den direkte i disse brugeres&apos; indstillinger.</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>Tillad usikker (digest) godkendelse for importerede brugere</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,23 +56,23 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Synkroniser brugere</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Synkroniserings interval</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>Gruppemedlems attribut</translation>
     </message>
     <message>
       <source>Proxy LDAP requests via server</source>
-      <translation type="unfinished">Proxy LDAP requests via server</translation>
+      <translation>Proxy LDAP anmodninger via server</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Notifikations Sprog</translation>
     </message>
   </context>
   <context>
@@ -123,23 +123,23 @@
     </message>
     <message>
       <source>Offline client updates</source>
-      <translation type="unfinished">Offline client updates</translation>
+      <translation>Offline klient opdateringer</translation>
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
-      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+      <translation>Offline opdateringer er aktiveret, og filer gemmes på servere.</translation>
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>Aktivering af denne indstilling vil aktivere download af yderligere filer til servere, som kan bruges til at opdatere forbinder klienter selv uden internetadgang.</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>Dette vil slette alle opdateringsfiler på servere.</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>Fortsæt alligevel?</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -168,7 +168,7 @@
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>Vælg / Fravælg Alle</translation>
     </message>
   </context>
   <context>
@@ -230,19 +230,19 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>Flise Indstillinger</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>Tabel Indstillinger</translation>
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>Skift til tabelvisning</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>Skift til kortvisning</translation>
     </message>
   </context>
   <context>
@@ -261,22 +261,22 @@
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>Tjek indstillinger for Site Administration for at konfigurere dette plugin.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Dette plugin har ingen indstillinger på Site niveau.</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSettingsMenu</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Api Integrationer</translation>
     </message>
   </context>
   <context>
@@ -284,31 +284,31 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>Integrationer tillader problemfri udnyttelse af video analytics på forskellige enheder fra VMS.
+Vælg en Integration for at begynde at konfigurere dens parametre.</translation>
     </message>
   </context>
   <context>
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Api Integrationer</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>API-integrationer interagerer med %1 Server via REST API og udveksler metadata</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Nye anmodninger</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>API Integration kan aktiveres efter bekræftelse af den kode, der modtages fra Integration udbyder. Nye anmodninger kan være deaktiveret for at forhindre uønsket interaktion.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>Aktiver %1?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -316,23 +316,23 @@ Select an Integration to begin configuring its parameters.</translation>
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Denne Integration vil være i stand til:
+ • ændre indstillinger på kameraer
+ • få adgang til arkiv
+ • behandle video streams
+ • udveksle metadata via netværket</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Aktiver Integration</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>Fjern %1?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Dette vil fjerne integrationsanmodning</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -340,14 +340,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>Fjern anmodning</translation>
     </message>
   </context>
   <context>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>Forkert parringskode</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -358,7 +358,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Dette felt må ikke være tomt</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -369,9 +369,9 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>Batch Rediger - %n Brugere</numerusform>
+        <numerusform>Batch Rediger - %n Brugere</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -384,11 +384,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>Bruger status</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Aktiveret</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -396,18 +396,18 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Usikker (digest) godkendelse</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>behold aktuel værdi</translation>
     </message>
   </context>
   <context>
     <name>BookmarkView</name>
     <message>
       <source>Shared by link</source>
-      <translation type="unfinished">Shared by link</translation>
+      <translation>Delt af link</translation>
     </message>
   </context>
   <context>
@@ -531,7 +531,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Luk Ned</translation>
     </message>
     <message>
       <source>New</source>
@@ -563,15 +563,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP - Forbindelsesindstillinger</translation>
     </message>
     <message>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Vært</translation>
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>Login DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -579,11 +579,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>Ignorer LDAP servercertifikat fejl</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
     <message>
       <source>Connecting...</source>
@@ -591,15 +591,15 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>Brug StartTLS</translation>
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>Værten må ikke være tom</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>Login DN må ikke være tom</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -607,7 +607,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>For at LDAP-brugere kan logge ind på %1, er det nødvendigt at etablere en forbindelse mellem %1 og en virksomheds LDAP server.</translation>
     </message>
   </context>
   <context>
@@ -647,7 +647,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>Brugerdefinerede HTTP headers</translation>
     </message>
     <message>
       <source>Add</source>
@@ -678,7 +678,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation>360° ligerektangulær</translation>
+      <translation>360° lige rektangulær</translation>
     </message>
   </context>
   <context>
@@ -704,11 +704,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Liste Indstillinger</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Ny Liste</translation>
     </message>
     <message>
       <source>Name</source>
@@ -716,7 +716,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>Kolonne Navn</translation>
     </message>
     <message>
       <source>OK</source>
@@ -732,7 +732,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Generisk</translation>
     </message>
     <message>
       <source>Type</source>
@@ -744,25 +744,25 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>Vælg type</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>Fjernelse af attributter vil slette alle tilknyttede data</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>Sletning af listen vil slette alle data inde i det.</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>Slet Liste?</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>Denne liste er tilknyttet %n Hændelses regler. Er du sikker på, at du vil slette den?</numerusform>
+        <numerusform>Denne liste er tilknyttet %n Hændelses regler. Er du sikker på, at du vil slette den?</numerusform>
       </translation>
     </message>
   </context>
@@ -770,11 +770,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>Hændelsestest</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
   </context>
   <context>
@@ -799,15 +799,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>Eksporter Lister</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>Eksporterer</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>Åbn Fil Mappe...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -863,27 +863,27 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>Basis DN</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>Basis DN må ikke være tomt</translation>
     </message>
     <message>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Filtrer</translation>
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>Base DN sætter udgangspunktet for LDAP søgninger og synkronisering.</translation>
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Rediger Søgebase</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Filtre hjælper med at styre adgangen til sitet og synkroniseringen ved at angive, hvilke brugere og/eller grupper fra Base DN der er tilladt.</translation>
     </message>
   </context>
   <context>
@@ -973,14 +973,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Auto calibration failed</source>
-      <translation type="unfinished">Auto calibration failed</translation>
+      <translation>Automatisk kalibrering mislykkedes</translation>
     </message>
   </context>
   <context>
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>Nogle værdier kunne ikke automatisk matches. Kortlæg dem manuelt.</translation>
     </message>
     <message>
       <source>Back</source>
@@ -1002,11 +1002,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>På site niveau, gruppemedlemmer har tilladelse til:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>På site niveau, brugeren har tilladelser til:</translation>
     </message>
   </context>
   <context>
@@ -1029,15 +1029,15 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Rettigheder</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Medlemmer</translation>
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Tilføj Gruppe</translation>
     </message>
   </context>
   <context>
@@ -1063,7 +1063,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Gruppe - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -1079,11 +1079,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Rettigheder</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Medlemmer</translation>
     </message>
   </context>
   <context>
@@ -1106,7 +1106,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Medlemmer</translation>
     </message>
     <message>
       <source>Users</source>
@@ -1118,19 +1118,19 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>Gruppen har en anden gruppe som både sin forælder, og som barn medlem, eller er en del af en sådan cirkulær referencekæde. Løs denne kæde for at forhindre forkert beregning af tilladelser.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Når kontinuerlig synkronisering med LDAP server er deaktiveret, synkroniserer grupper ikke automatisk. For at opdatere denne gruppe, start en manuel synkronisering.</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>Denne gruppe blev ikke fundet i LDAP databasen.</translation>
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>En anden gruppe med samme navn eksisterer. Det anbefales at tildele unikke navne til grupperne.</translation>
     </message>
   </context>
   <context>
@@ -1145,19 +1145,19 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Ingen medlemmer</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Brug kontroller til venstre for at tilføje medlemmer</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Medlemmer resumé</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Nedarv medlemskab i nuværende gruppe</translation>
     </message>
   </context>
   <context>
@@ -1168,7 +1168,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Ingen grupper</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -1178,12 +1178,12 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>INDBYGGET</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>BRUGERDEFINERET</translation>
     </message>
   </context>
   <context>
@@ -1223,30 +1223,30 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>Digest godkendelse er udfaset og vil blive deaktiveret i den næste udgivelse og bør kun bruges, når standard bærer godkendelse ikke kan bruges.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>Digest godkendelse er udfaset og vil blive deaktiveret i den næste udgivelse og bør kun bruges, når standard bærer godkendelse ikke kan bruges. Brugerlogin må kun bestå af små bogstaver.</translation>
     </message>
   </context>
   <context>
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Utilstrækkelige tjenester</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>%n Der kræves passende integrationstjenester for at aktivere integrationen</numerusform>
+        <numerusform>%n Der kræves passende integrationstjenester for at aktivere integrationen</numerusform>
       </translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 passende tjenester tilgængelige</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1258,7 +1258,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Nødvendige tjenester</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -1267,7 +1267,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Der er flere kameraer, der bruger denne integration, end der er tilgængelige tjenester. Deaktiver venligst integrationen for nogle kameraer, eller tilføj mere passende tjenester. Ellers vil det ske automatisk den %1</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -1301,7 +1301,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>Administrer Integrationer</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1316,7 +1316,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Dette plugin har ingen indstillinger på Site niveau.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -1412,7 +1412,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>Log ind på sitet for at konfigurere hvordan du åbner layout</translation>
     </message>
   </context>
   <context>
@@ -1426,7 +1426,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LdapSettings</name>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>ONLINE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1442,7 +1442,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Seneste synkronisering</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1450,7 +1450,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Avancerede Indstillinger</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1462,39 +1462,39 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>Ikke konfigureret endnu</translation>
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Konfigurer</translation>
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>Søg I Baser</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Tilføj Søgebase</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Angiv mindst én søgefase for at synkronisere brugere og grupper</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>Tilslut dit Site til en LDAP server for nemmere brugerstyring</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Kontinuerlig import fra LDAP-serveren er deaktiveret for dette site. Opdateringer til grupper og bruger og gruppe medlemskab vil udelukkende ske gennem manuel synkronisering.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Ingen brugere eller grupper matcher synkroniserings indstillingerne og føjes til site DB. Sørg for, at LDAP serverparametre og filtre er konfigureret korrekt.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>Vær forsigtig, når du ændrer LDAP indstillinger. Forkert konfiguration kan forstyrre site tilgængelighed for et stort antal brugere samtidigt.</translation>
     </message>
   </context>
   <context>
@@ -1530,7 +1530,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Enhver %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1553,11 +1553,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>Importer Liste</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>Import Muligheder</translation>
     </message>
     <message>
       <source>File:</source>
@@ -1565,15 +1565,15 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Gennemse...</translation>
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>Separator:</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>Data indeholder header</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1589,31 +1589,31 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>Importerer</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>Kunne ikke åbne fil</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>Sørg for, at filen findes, og du har adgang til den valgte fil</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>Retter importerede poster</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>Kunne ikke importere valgte fil</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>Filen synes at være tom.</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>Sørg venligst for, at den valgte fil findes, og du har adgang.</translation>
     </message>
   </context>
   <context>
@@ -1640,7 +1640,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 valgt:</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1648,27 +1648,27 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Ingen poster</translation>
     </message>
     <message>
       <source>New List...</source>
-      <translation type="unfinished">New List...</translation>
+      <translation>Ny Liste...</translation>
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>Kunne ikke gemme filen</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>Sørg for, at du har adgang til valgte mappe og tilstrækkelig diskplads</translation>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Eksport mislykkedes</translation>
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>Eksporter Valgte</translation>
     </message>
   </context>
   <context>
@@ -1714,9 +1714,9 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n mere</numerusform>
+        <numerusform>%n mere</numerusform>
       </translation>
     </message>
   </context>
@@ -1724,11 +1724,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Nyt Link - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Det tidligere link vil blive ugyldigt, når et nyt er udstedt</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1739,22 +1739,22 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Ingen Lister</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Du har endnu ikke oprettet nogen lister. Med lister kan du gemme flere værdier, som du kan bruge i hændelses regler. Opret en ny liste for at begynde at tilføje poster.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Opret Ny...</translation>
     </message>
   </context>
   <context>
     <name>NotificationsPanel</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Ingen nye notifikationer</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
@@ -1783,9 +1783,9 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>med %n attributter</numerusform>
+        <numerusform>med %n attributter</numerusform>
       </translation>
     </message>
     <message>
@@ -1824,7 +1824,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Godkend</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1832,14 +1832,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation>Integration parringskode</translation>
     </message>
   </context>
   <context>
     <name>ParentGroupsTab</name>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Tilføj Gruppe</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1847,28 +1847,28 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Ingen brugerdefinerede grupper endnu</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Ingen grupper fundet</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Skift søgekriterier eller opret en ny gruppe</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Ingen grupper</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Brug kontrolelementerne til venstre for at føje til en gruppe</translation>
     </message>
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>Medlem af</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -1878,7 +1878,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Indbygget</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1890,7 +1890,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Skift adgangskode - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1898,7 +1898,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Current password</source>
-      <translation type="unfinished">Current password</translation>
+      <translation>Nuværende adgangskode</translation>
     </message>
     <message>
       <source>New password</source>
@@ -1917,64 +1917,64 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Ingen brugerdefinerede tilladelser</translation>
     </message>
   </context>
   <context>
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>Påkrævet tilladelsesgruppe</translation>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>Vis Tilladelser</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>Skjul Tilladelser</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Ingen elementer blev fundet</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Tilføj automatisk afhængige tilladelser</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Brug %1 eller %2 for at vælge flere ressourcer, eller %3 for at fjerne markeringen</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>Ressourcetabellen giver dig et overblik over bruger- eller gruppetilladelser og giver dig mulighed for at tildele tilladelser til specifikke ressourcer.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Hvis du vælger en tilladelse, der afhænger af en anden tilladelse, vil begge tilladelser blive givet automatisk.</translation>
     </message>
   </context>
   <context>
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensitet</translation>
     </message>
   </context>
   <context>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Vælg Objekter</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Alle Objekter</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -1992,12 +1992,12 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Plugins</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
       <comment>%1 is like Nx Witness</comment>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Plugins er programmer, der kører på %1 -serveren for at muliggøre problemfri integration af videoanalyse.</translation>
     </message>
   </context>
   <context>
@@ -2067,18 +2067,18 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>Filtrer efter</translation>
     </message>
     <message>
       <source>Find similar</source>
-      <translation type="unfinished">Find similar</translation>
+      <translation>Find lignende</translation>
     </message>
   </context>
   <context>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>Vælg attribut</translation>
     </message>
   </context>
   <context>
@@ -2093,7 +2093,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Færdig</translation>
     </message>
   </context>
   <context>
@@ -2121,64 +2121,63 @@ for at aktivere PTZ</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Tryk på piletasterne for at bevæge dig rundt. Brug plus- og minustasterne til at zoome.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Brug musehjulet til at zoome</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>Du kan aktivere denne guide igen ved at gå til Lokale indstillinger &gt; Avanceret &gt; Nulstil alle advarsler</translation>
     </message>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>Vi præsenterer dig for
+nye PTZ kontroller</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>Klik, dobbeltklik eller træk musemarkøren, mens du trykker på
+Shift-tasten for at bruge avanceret PTZ</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed.</translation>
+      <translation>Her er en hurtig guide
+om, hvad der har ændret sig.</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>For at bruge Target Lock Tracking,
+Tryk på Alt + klik for at følge objektet</translation>
     </message>
   </context>
   <context>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>i dag</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1 time</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24 timer</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-7 dage</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>-30 dage</translation>
     </message>
   </context>
   <context>
@@ -2211,11 +2210,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>Serveren er ikke konfigureret til fjernadgangs funktionen</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>Fjernadgangs værktøj er i øjeblikket deaktiveret. Aktiver det eller kontakt din administrator for at aktivere det.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -2227,19 +2226,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>Forbind %1 klientprogram til localhost:%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>Lokal port</translation>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation type="unfinished">An error occurred</translation>
+      <translation>Der opstod en fejl</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Brugernavn</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2247,7 +2246,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>Fjernadgang er utilgængelig</translation>
     </message>
   </context>
   <context>
@@ -2266,45 +2265,45 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>Har %1 tilladelse</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Tilføj %1 og afhængige tilladelser</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>Tilføj %1 tilladelse</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Fjern %1 og afhængige tilladelser</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>Fjern %1 tilladelse</translation>
     </message>
     <message>
       <source>Also inherits it from</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from</translation>
+      <translation>Arver det også fra</translation>
     </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Nedarv %1 tilladelse fra</translation>
     </message>
     <message>
       <source>Already inherited from</source>
-      <translation type="unfinished">Already inherited from</translation>
+      <translation>Allerede arvet fra</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
-      <translation type="unfinished">Will stay inherited from</translation>
+      <translation>Vil blive arvet fra</translation>
     </message>
   </context>
   <context>
@@ -2330,7 +2329,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>Tilgængelig via tilladelser</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2342,7 +2341,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Websider og integrationer</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -2350,7 +2349,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Sundheds Monitors</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -2455,19 +2454,19 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Sitet er blevet suspenderet. For at aktivere/deaktivere integrationsbrugen for den aktuelle enhed, skal sitet være i aktiv tilstand. Kontakt din kanalpartner for detaljer</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Sitet er blevet suspenderet. For at aktivere/deaktivere integrationsbrugen for nogle enheder skal sitet være i aktiv tilstand. Kontakt din kanalpartner for detaljer</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Sitet er blevet lukket ned. For at aktivere dette integrationsforbrug for den aktuelle enhed, skal sitet være i aktiv tilstand. Kontakt din kanalpartner for detaljer</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Sitet er blevet lukket ned. For at aktivere dette integrationsforbrug for nogle enheder skal sitet være i aktiv tilstand. Kontakt din kanalpartner for detaljer</translation>
     </message>
   </context>
   <context>
@@ -2543,11 +2542,11 @@ Press Alt + Click to follow object</translation>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation type="unfinished">Accept API Integrations registration requests</translation>
+      <translation>Accepter anmodninger om registrering af API-integrationer</translation>
     </message>
     <message>
       <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+      <translation>Aktivering af registreringsanmodninger for API-integrationer giver tredjeparter mulighed for at indsende godkendelsesanmodninger via integration. Selvom der findes sikkerhedsforanstaltninger, anbefales langvarig brug ikke. Overvåg brugen nøje, og deaktiver denne indstilling, når alle nødvendige integrationer er installeret.</translation>
     </message>
   </context>
   <context>
@@ -2674,7 +2673,7 @@ Press Alt + Click to follow object</translation>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Min. 3 tegn</translation>
     </message>
   </context>
   <context>
@@ -2688,15 +2687,15 @@ Press Alt + Click to follow object</translation>
     <name>SyncComboBox</name>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Aldrig</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Altid</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Ved login</translation>
     </message>
   </context>
   <context>
@@ -2704,36 +2703,36 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Valid from %1 to %2 (by server time)</source>
       <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+      <translation>Gyldig fra %1 til %2 (efter servertid)</translation>
     </message>
     <message>
       <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
       <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
+      <translation>Gyldig fra %1 til %2 (ved servertid) eller for %3 efter login</translation>
     </message>
   </context>
   <context>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Link Gyldig Indtil</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>Linket vil forblive tilgængeligt indtil den angivne dato (herunder, baseret på servertid)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Tilbagekald adgang efter login</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>Adgang kan tilbagekaldes tidligere, hvis gyldighedsperioden for link udløber</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>Ind</translation>
     </message>
   </context>
   <context>
@@ -2744,19 +2743,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>Ingen Favorit Sites</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>Ingen Skjulte Sites</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>Du kan tilføje site til favoritterne fra den sammenhængsafhængige menu</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>Du kan skjule sites fra hovedlisten i den sammenhængs afhængige menu</translation>
     </message>
   </context>
   <context>
@@ -2810,7 +2809,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>Tid er utilgængelig på grund af DST ændringer</translation>
     </message>
   </context>
   <context>
@@ -2827,7 +2826,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Ny Bruger</translation>
     </message>
     <message>
       <source>General</source>
@@ -2843,7 +2842,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Rettigheder</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2854,7 +2853,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Ny Bruger</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2890,11 +2889,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Tillad usikker (digest) godkendelse</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>Du skal kun angive bruger&apos;s e-mail-adresse.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2902,15 +2901,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Adgang</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Almindelig bruger med legitimationsoplysninger</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Midlertidig med link</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2918,18 +2917,18 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Det tilføjede site vil hurtigt blive synligt for brugere med en eksisterende cloud konto, mens brugere uden en eksisterende cloud konto vil modtage instruktioner via e-mail.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Notifikations Sprog</translation>
     </message>
   </context>
   <context>
     <name>UserEditDialog</name>
     <message>
       <source>User - %1</source>
-      <translation type="unfinished">User - %1</translation>
+      <translation>Bruger - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -2945,23 +2944,23 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Rettigheder</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">This user has not yet signed up for %1</translation>
+      <translation>Denne bruger har endnu ikke tilmeldt %1</translation>
     </message>
   </context>
   <context>
     <name>UserEnabledSwitch</name>
     <message>
       <source>Enabled user</source>
-      <translation type="unfinished">Enabled user</translation>
+      <translation>Aktiveret bruger</translation>
     </message>
     <message>
       <source>Disabled user</source>
-      <translation type="unfinished">Disabled user</translation>
+      <translation>Deaktiveret bruger</translation>
     </message>
   </context>
   <context>
@@ -2996,15 +2995,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>Angiv adgangskode for at aktivere usikker godkendelse</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Tillad usikker (digest) godkendelse</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>Denne bruger findes ikke i LDAP databasen og kan ikke logge ind.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -3012,27 +3011,27 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>Adgang udløber</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Adgang Til Link</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Kopier Link</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Afslut</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Nyt Link...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Intet gyldigt link til denne bruger</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -3041,32 +3040,32 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Henter Link...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Sørg for, at denne computer er i stand til at oprette forbindelse til %1</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>LDAP server er offline. Brugeren kan ikke logge ind.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Når kontinuerlig synkronisering med LDAP-serveren er deaktiveret, synkroniseres brugermedlemskab i grupper ikke automatisk. Start en manuel synkronisering for at opdatere disse oplysninger.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Denne brugers login duplikerer en anden brugers login. Ingen af dem kan logge ind. For at løse dette problem kan du ændre brugerens login eller deaktivere eller slette brugere med duplikerede logins.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Notifikations Sprog</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>Grænseflade Sprog</translation>
     </message>
   </context>
   <context>
@@ -3088,7 +3087,7 @@ Press Alt + Click to follow object</translation>
     <name>VmsRulesDialog</name>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Tilføj Regel</translation>
     </message>
     <message>
       <source>Duplicate</source>
@@ -3100,7 +3099,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Ingen poster</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -3108,7 +3107,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Nulstil Til Standard...</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -3116,11 +3115,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 valgt:</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Tidsplan</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -3132,7 +3131,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>Test hændelser...</translation>
     </message>
   </context>
   <context>
