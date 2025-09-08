@@ -178,6 +178,12 @@ bool FfmpegMuxer::addAudio(const AVCodecParameters* codecParameters)
 
 bool FfmpegMuxer::open(std::optional<QnAviArchiveMetadata> metadata)
 {
+    if (m_initialized)
+    {
+        NX_WARNING(this, "Double initialization");
+        return false;
+    }
+
     if (m_formatCtx->nb_streams == 0)
         return false;
 
