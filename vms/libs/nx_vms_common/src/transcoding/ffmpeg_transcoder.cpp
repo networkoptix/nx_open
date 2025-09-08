@@ -236,7 +236,11 @@ bool QnFfmpegTranscoder::open(const AVCodecParameters* codecParameters)
     if (!result)
         return false;
 
-    return m_muxer.open();
+    if (!m_muxer.open())
+        return false;
+
+    m_initialized = true;
+    return true;
 }
 
 bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)

@@ -38,7 +38,7 @@ public:
         int fixedFrameRate = 0;
         // Set codec-specific params for output stream.
         QnCodecParams::Value params;
-        Qn::StreamQuality quality;
+        Qn::StreamQuality quality = Qn::StreamQuality::normal;
         // It used to skip some video frames inside GOP when transcoding is used.
         int64_t startTimeUs = 0;
         // Set this to true if stream will mux into RTP.
