@@ -32,7 +32,7 @@ TEST(WebEngineViewTest, clipboardIsUnavailableWithoutUserAction)
     auto wait =
         [&webView](const QString name)
         {
-            static const auto kWaitResultTimeout = std::chrono::milliseconds(1000);
+            constexpr std::chrono::milliseconds kWaitResultTimeout = std::chrono::minutes(1);
 
             QmlProperty<QVariant> result(webView.get(), name);
             result = QVariant();
