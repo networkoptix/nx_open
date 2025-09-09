@@ -17,6 +17,7 @@
 #include <nx/vms/api/analytics/integration_manifest.h>
 #include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/vms/api/data/rect_as_string.h>
+#include <nx/vms/api/json/value_or_array.h>
 
 namespace nx::vms::api::analytics {
 
@@ -51,8 +52,7 @@ NX_REFLECTION_INSTRUMENT(
  */
 struct NX_VMS_API PushDeviceAgentManifestData
 {
-    /**%apidoc Engine id */
-    nx::Uuid id;
+    nx::Uuid engineId;
 
     /**%apidoc
      * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
@@ -65,7 +65,7 @@ struct NX_VMS_API PushDeviceAgentManifestData
     bool operator==(const PushDeviceAgentManifestData& other) const = default;
 };
 #define nx_vms_api_analytics_PushDeviceAgentManifestData_Fields \
-    (id) \
+    (engineId) \
     (deviceId) \
     (deviceAgentManifest)
 QN_FUSION_DECLARE_FUNCTIONS(
@@ -388,5 +388,21 @@ struct NX_VMS_API ApiEventMetadataPacket
 QN_FUSION_DECLARE_FUNCTIONS(ApiEventMetadataPacket, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ApiEventMetadataPacket,
     nx_vms_api_analytics_ApiEventMetadataPacket_Fields)
+
+struct NX_VMS_API RequestDeviceAgentManifest
+{
+    /**%apidoc
+     * Flexible Device id. Can be obtained from "id", "physicalId" or "logicalId" field via
+     * `GET /rest/v{1-}/devices` or MAC address (not supported for certain cameras).
+     */
+    std::string deviceId;
+
+    /**%apidoc[opt]:uuidArray */
+    json::ValueOrArray<nx::Uuid> engineId;
+};
+#define nx_vms_api_analytics_RequestDeviceAgentManifest_Fields (deviceId)(engineId)
+QN_FUSION_DECLARE_FUNCTIONS(RequestDeviceAgentManifest, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(RequestDeviceAgentManifest,
+    nx_vms_api_analytics_RequestDeviceAgentManifest_Fields)
 
 } // namespace nx::vms::api::analytics

@@ -55,6 +55,8 @@
 
 namespace {
 
+namespace api = nx::vms::api;
+
 using namespace nx::vms::common;
 
 using StreamFpsSharingMethod = QnVirtualCameraResource::StreamFpsSharingMethod;
@@ -216,12 +218,6 @@ const QString QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty(
 
 const QString QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty(
     "userEnabledAnalyticsEngines");
-
-const QString QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty(
-    "deviceAgentsSettingsValuesProperty");
-
-const QString QnVirtualCameraResource::kDeviceAgentManifestsProperty(
-    "deviceAgentManifests");
 
 const QString QnVirtualCameraResource::kAnalyzedStreamIndexes(
     "analyzedStreamIndexes");
@@ -2863,7 +2859,7 @@ void QnVirtualCameraResource::emitPropertyChanged(
         emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
         emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
     }
-    else if (key == kDeviceAgentManifestsProperty)
+    else if (key == api::device_properties::kDeviceAgentManifestsKey)
     {
         m_cachedDeviceAgentManifests.reset();
         m_cachedSupportedEventTypes.reset();
@@ -2893,7 +2889,7 @@ void QnVirtualCameraResource::emitPropertyChanged(
         m_cachedBackupMegapixels.reset();
     }
 
-    if (key == kDeviceAgentManifestsProperty || key == kAnalyzedStreamIndexes)
+    if (key == api::device_properties::kDeviceAgentManifestsKey || key == kAnalyzedStreamIndexes)
     {
         auto cachedAnalyzedStreamIndex = m_cachedAnalyzedStreamIndex.lock();
         cachedAnalyzedStreamIndex->clear();
@@ -2976,7 +2972,7 @@ AnalyticsEntitiesByEngine QnVirtualCameraResource::supportedObjectTypes(
 QnVirtualCameraResource::DeviceAgentManifestMap
     QnVirtualCameraResource::deviceAgentManifests() const
 {
-    const auto data = getProperty(kDeviceAgentManifestsProperty).toStdString();
+    const auto data = getProperty(api::device_properties::kDeviceAgentManifestsKey).toStdString();
     if (data.empty())
         return {};
 
@@ -3017,7 +3013,7 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
     auto manifests = m_cachedDeviceAgentManifests.get();
     manifests[engineId] = manifest;
     setProperty(
-        kDeviceAgentManifestsProperty,
+        api::device_properties::kDeviceAgentManifestsKey,
         QString::fromUtf8(nx::reflect::json::serialize(manifests)));
     saveProperties();
 }

@@ -3018,17 +3018,35 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
         GlobalPermission::powerUser,
         std::make_unique<PushEngineManifestHandler>(serverModule, serverConnector));
 
-    /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/deviceAgents/{deviceId}/manifest
+    /**%apidoc POST /rest/v{4-}/analytics/engines/{engineId}/deviceAgents/{deviceId}/manifest
      * Equivalent of IDeviceAgent::pushManifest().
      * %caption Push Device Agent Manifest
      * %ingroup Analytics
      * %struct PushDeviceAgentManifestData
      * %param[ref] _strict,_ticket,_local
      * %permissions Power User.
+     * %return:{DeviceAgentManifest}
+     *
+     *%apidoc GET /rest/v{4-}/analytics/engines/{engineId}/deviceAgents/{deviceId}/manifest
+     * %caption Get Device Agent Manifest
+     * %ingroup Analytics
+     * %struct RequestDeviceAgentManifest
+     * %param[ref] _strict,_ticket,_local,_stripDefault
+     * %permissions View Archive on selected Device.
+     * %return:{DeviceAgentManifest}
+     *
+     *%apidoc GET /rest/v{4-}/analytics/engines/%2A/deviceAgents/{deviceId}/manifest
+     * %caption Get Device Agent Manifests
+     * %ingroup Analytics
+     * %struct RequestDeviceAgentManifest
+     * %param[unused] engineId
+     * %param[ref] _strict,_ticket,_local,_stripDefault
+     * %permissions View Archive on selected Device.
+     * %return:{std::map<nx::Uuid, DeviceAgentManifest>} Manifests by Engine Id
      */
-    reg("rest/v{4-}/analytics/engines/:id/deviceAgents/:deviceId/manifest",
+    reg("rest/v{4-}/analytics/engines/:engineId/deviceAgents/:deviceId/manifest",
         GlobalPermission::powerUser,
-        std::make_unique<PushDeviceAgentManifestHandler>(serverModule, serverConnector));
+        std::make_unique<DeviceAgentManifestHandler>(serverModule));
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/integrationDiagnosticEvent
      * Equivalent of IEngine::pushIntegrationDiagnosticEvent().

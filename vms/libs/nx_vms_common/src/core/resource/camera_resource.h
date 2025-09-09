@@ -62,8 +62,6 @@ public:
     static const QString kCompatibleAnalyticsEnginesProperty;
     static const QString kUserEnabledAnalyticsEnginesProperty;
     // This property kept here only because of statistics filtering.
-    static const QString kDeviceAgentsSettingsValuesProperty;
-    static const QString kDeviceAgentManifestsProperty;
     static const QString kAnalyzedStreamIndexes;
     static const QString kVirtualCameraIgnoreTimeZone;
     static const QString kHttpPortParameterName;

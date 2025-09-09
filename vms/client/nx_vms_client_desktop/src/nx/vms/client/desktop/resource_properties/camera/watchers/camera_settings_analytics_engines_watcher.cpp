@@ -138,7 +138,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::setCamera(
             {
                 if (resource == camera
                     && (key == QnVirtualCameraResource::kAnalyzedStreamIndexes
-                        || key == QnVirtualCameraResource::kDeviceAgentManifestsProperty))
+                        || key == api::device_properties::kDeviceAgentManifestsKey))
                 {
                     updateStore();
                 }
