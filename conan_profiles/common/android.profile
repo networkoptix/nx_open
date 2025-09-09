@@ -8,7 +8,7 @@ compiler.libcxx=c++_shared
 compiler.cppstd=20
 
 os=Android
-os.api_level=22
+os.api_level=26
 
 [options]
 qt/*:qtwebengine=False
