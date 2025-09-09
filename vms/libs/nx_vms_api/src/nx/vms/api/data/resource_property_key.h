@@ -136,6 +136,23 @@ inline const QString kMotionStreamKey = "motionStream";
 inline const QString kAudioCodec = "audioCodec";
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Properties removed from DeviceModel::parameters (never used via parameters)
+////////////////////////////////////////////////////////////////////////////////
+
+/// Used internally by `QnVirtualCameraResource`. Exposed via
+/// QnVirtualCameraResource::deviceAgentManifests() -> not used anywhere.
+/// QnVirtualCameraResource::setDeviceAgentManifest is used for setting the property
+/// Available via GET /rest/v{4-}/analytics/engines/%2A/deviceAgents/{id}/manifest
+inline const QString kDeviceAgentManifestsKey = "deviceAgentManifests";
+
+/// Used internally by `resource::Camera`.
+/// Exposed via Camera::deviceAgentSettingsValues() -> not used anywhere.
+/// Camera::setDeviceAgentSettingsValues(const nx::Uuid& engineId, const QJsonObject& settingsValues)
+/// is used in integration_helpers.cpp
+/// Available via GET /rest/v{4-}/analytics/engines/{engineId}/deviceAgents/{deviceId}/settings
+inline const QString kDeviceAgentsSettingsValuesKey = "deviceAgentsSettingsValuesProperty";
+
+////////////////////////////////////////////////////////////////////////////////
 /// Unmapped Properties
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -21,6 +21,8 @@ using nx::vms::api::analytics::DeviceAgentManifest;
 using nx::vms::common::SystemContext;
 using nx::vms::common::SystemContextAware;
 
+namespace api = nx::vms::api;
+
 namespace nx::analytics::taxonomy {
 
 struct SupportInfo
@@ -96,7 +98,7 @@ struct ResourceSupportProxy::Private:
     {
         {
             NX_MUTEX_LOCKER lock(&mutex);
-            if (key != QnVirtualCameraResource::kDeviceAgentManifestsProperty)
+            if (key != api::device_properties::kDeviceAgentManifestsKey)
                 return;
 
             supportInfoCache.erase(resourceId);

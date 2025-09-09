@@ -43,4 +43,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiEventMetadata, (json),
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiEventMetadataPacket, (json),
     nx_vms_api_analytics_ApiEventMetadataPacket_Fields, (brief, true))
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(RequestDeviceAgentManifest, (json),
+    nx_vms_api_analytics_RequestDeviceAgentManifest_Fields, (brief, true))
+
 } // namespace nx::vms::api::analytics

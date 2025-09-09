@@ -299,6 +299,10 @@ void extractParametersToFields(DeviceModelV4* m)
     }
     if (!m->ptz->panTiltSensitivity)
         m->ptz->panTiltSensitivity = ptz::kDefaultSensitivity;
+
+    // -- Erased options --------------------------------------------------
+    m->parameters.erase(device_properties::kDeviceAgentManifestsKey);
+    m->parameters.erase(device_properties::kDeviceAgentsSettingsValuesKey);
 }
 
 // Fields that marked as `readonly` for apidoc must not be included here, because they are ignored
