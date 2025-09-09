@@ -133,6 +133,7 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "[Dev] Disables UI for specific cloud services. Allows to hide UI elements related to\n"
         "certain cloud services, marking them as unavailable. Possible values:\n"
         " * \"cloud_notifications\" - disables UI for cross-site notifications service.\n"
+        " * \"push_notifications\" - disables UI for push notifications service.\n"
         "Services can be combined using space, comma or semicolon.");
 };
 

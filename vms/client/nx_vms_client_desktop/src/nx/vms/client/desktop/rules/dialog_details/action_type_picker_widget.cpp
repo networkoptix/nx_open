@@ -7,16 +7,25 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/rules/actions/push_notification_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/compatibility.h>
 #include <nx/vms/rules/utils/field.h>
+#include <nx/vms/rules/utils/type.h>
 #include <ui/common/palette.h>
 
+namespace {
+
+const auto kPushNotificationActionId =
+    nx::vms::rules::utils::type<nx::vms::rules::PushNotificationAction>();
+
+} // namespace
 namespace nx::vms::client::desktop::rules {
 
 ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* parent):
@@ -29,8 +38,20 @@ ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* 
     ui->setupUi(this);
     setPaletteColor(ui->doLabel, QPalette::WindowText, QPalette().color(QPalette::Light));
 
+    auto itemFilters = defaultItemFilters();
+    if (!appContext()->cloudServiceChecker()->hasService(
+            nx::vms::client::core::CloudService::push_notifications))
+    {
+        const auto customFilter = [](const nx::vms::common::SystemContext* /*systemContext*/,
+            const nx::vms::rules::ItemDescriptor& description)
+        {
+            return description.id != kPushNotificationActionId;
+        };
+        itemFilters.push_back(customFilter);
+    }
+
     const auto sortedListOfActions = sortItems(filterItems(systemContext(),
-        defaultItemFilters(),
+        itemFilters,
         systemContext()->vmsRulesEngine()->actions().values()));
     for (const auto& actionDescriptor: sortedListOfActions)
         ui->actionTypeComboBox->addItem(actionDescriptor.displayName, actionDescriptor.id);

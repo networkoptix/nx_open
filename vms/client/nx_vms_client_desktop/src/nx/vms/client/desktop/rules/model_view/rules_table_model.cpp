@@ -16,6 +16,7 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/rules/utils/strings.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -31,6 +32,7 @@
 #include <nx/vms/rules/action_builder_fields/target_servers_field.h>
 #include <nx/vms/rules/action_builder_fields/target_users_field.h>
 #include <nx/vms/rules/action_builder_fields/text_field.h>
+#include <nx/vms/rules/actions/push_notification_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/object_lookup_field.h>
@@ -46,6 +48,7 @@
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/resource.h>
 #include <nx/vms/rules/utils/rule.h>
+#include <nx/vms/rules/utils/type.h>
 
 namespace nx::vms::client::desktop::rules {
 
@@ -55,6 +58,9 @@ constexpr auto kAttentionIconPath = "20x20/Solid/attention.svg?primary=yellow";
 
 constexpr auto kEnabledForegroundColor = "light10";
 constexpr auto kDisabledForegroundColor = "dark16";
+
+const auto kPushNotificationActionType =
+    nx::vms::rules::utils::type<nx::vms::rules::PushNotificationAction>();
 
 QString iconPath(QnResourceIconCache::Key iconKey, bool enabled)
 {
@@ -381,8 +387,19 @@ void RulesTableModel::initialise()
     m_ruleIds.clear();
     m_ruleIds.reserve(rules.size());
 
+    const auto hasPushNotificationsService = appContext()->cloudServiceChecker()->hasService(
+            nx::vms::client::core::CloudService::push_notifications);
+
     for (const auto& rule: rules)
+    {
+        if (!hasPushNotificationsService
+            && rule.second->actionBuilders().first()->actionType() == kPushNotificationActionType)
+        {
+            continue;
+        }
+
         m_ruleIds.push_back(rule.first);
+    }
 }
 
 bool RulesTableModel::isIndexValid(const QModelIndex& index) const

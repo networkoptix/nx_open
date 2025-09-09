@@ -16,6 +16,7 @@
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/rules/helpers/help_id.h>
@@ -26,6 +27,7 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
+#include <nx/vms/rules/actions/push_notification_action.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/engine.h>
@@ -37,11 +39,11 @@
 #include <nx/vms/rules/utils/event_log.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/resource.h>
+#include <nx/vms/rules/utils/type.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 
-#include "../utils/event_data.h"
 #include "../utils/vms_rules_type_comparator.h"
 #include "private/event_model_data.h"
 
@@ -52,6 +54,9 @@ using namespace nx::vms::rules;
 using namespace nx::vms::rules::utils;
 
 namespace {
+
+const auto kPushNotificationActionType =
+    nx::vms::rules::utils::type<nx::vms::rules::PushNotificationAction>();
 
 struct ResourceData
 {
@@ -335,8 +340,18 @@ public:
     {
         m_events.clear();
         m_events.reserve(records.size());
+        const auto hasPushNotificationsService = appContext()->cloudServiceChecker()->hasService(
+            nx::vms::client::core::CloudService::push_notifications);
         for (auto&& record: records)
+        {
+            if (!hasPushNotificationsService
+                && record.actionData.value(kType).toString()== kPushNotificationActionType)
+            {
+                continue;
+            }
+
             m_events.emplace_back(std::move(record));
+        }
 
         updateIndex();
     }
