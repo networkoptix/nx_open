@@ -28,7 +28,7 @@ private:
     QRhi* const m_rhi;
 };
 
-class VideoApiRegistry
+class NX_MEDIA_API VideoApiRegistry
 {
     VideoApiRegistry();
 public:
@@ -49,7 +49,10 @@ public:
         }
         virtual std::unique_ptr<nx::media::ffmpeg::AvOptions> options(QRhi*) const { return {}; }
         virtual std::string device(QRhi*) const { return {}; }
-        virtual std::shared_ptr<VideoApiDecoderData> createDecoderData(QRhi*) const { return {}; }
+        virtual std::shared_ptr<VideoApiDecoderData> createDecoderData(QRhi*, const QSize&) const
+        {
+            return {};
+        }
     };
 
 public:
@@ -58,9 +61,12 @@ public:
     VideoApiRegistry::Entry* get(AVHWDeviceType deviceType);
     VideoApiRegistry::Entry* get(const AVFrame* frame);
 
+    static void enableLegacyMediaCodec();
+
 private:
     void add(VideoApiRegistry::Entry* entry);
     QHash<AVHWDeviceType, Entry*> m_entries;
+    static bool useLegacyMediaCodec;
 };
 
 #if defined(Q_OS_APPLE)
@@ -70,6 +76,7 @@ private:
     VideoApiRegistry::Entry* getD3D12Api();
 #elif defined(Q_OS_ANDROID)
     VideoApiRegistry::Entry* getMediaCodecApi();
+    VideoApiRegistry::Entry* getNdkMediaCodecApi();
 #elif defined(Q_OS_LINUX) && defined(__x86_64__)
     VideoApiRegistry::Entry* getVaApiApi();
 #endif

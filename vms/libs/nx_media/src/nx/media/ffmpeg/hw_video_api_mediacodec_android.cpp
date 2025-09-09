@@ -385,8 +385,6 @@ FboTextureHolder DecoderData::textureFromFrame(const AVFrame* frame)
     return textureHolder;
 }
 
-} // namespace
-
 class AndroidVideoApiEntry: public VideoApiRegistry::Entry
 {
 public:
@@ -436,7 +434,9 @@ public:
         return {};
     }
 
-    virtual std::shared_ptr<VideoApiDecoderData> createDecoderData(QRhi* rhi) const override
+    virtual std::shared_ptr<VideoApiDecoderData> createDecoderData(
+        QRhi* rhi,
+        const QSize&) const override
     {
         return std::make_shared<DecoderData>(rhi);
     }
@@ -472,6 +472,8 @@ public:
             };
     }
 };
+
+} // namespace
 
 VideoApiRegistry::Entry* getMediaCodecApi()
 {

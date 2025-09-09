@@ -434,7 +434,8 @@ public:
         return options;
     }
 
-    virtual std::shared_ptr<VideoApiDecoderData> createDecoderData(QRhi* rhi) const override
+    virtual std::shared_ptr<VideoApiDecoderData> createDecoderData(
+        QRhi* rhi, const QSize&) const override
     {
         return std::make_shared<DecoderData>(rhi);
     }

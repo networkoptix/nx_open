@@ -54,7 +54,8 @@ std::unique_ptr<QRhiTexture> createTextureFromHandle(
     int plane,
     quint64 handle,
     int layout,
-    QRhiTexture::Flags textureFlags)
+    QRhiTexture::Flags textureFlags,
+    uint64_t externalFormat)
 {
     if (!handle)
         return {};
@@ -86,6 +87,8 @@ std::unique_ptr<QRhiTexture> createTextureFromHandle(
 
     std::unique_ptr<QRhiTexture> tex(
         rhi.newTexture(texDesc->rhiTextureFormat(plane, &rhi), planeSize, 1, textureFlags));
+
+    tex->setExternalFormat(externalFormat);
 
     if (tex->createFrom({handle, layout}))
         return tex;

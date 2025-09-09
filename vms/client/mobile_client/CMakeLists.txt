@@ -317,7 +317,7 @@ if(ANDROID)
     endif()
 
     target_link_libraries(mobile_client PUBLIC
-        GLESv2 z log)
+        GLESv2 z log mediandk android)
 
     get_android_extra_libs(extra_libs)
     list(APPEND extra_libs ${push_extra_libs})

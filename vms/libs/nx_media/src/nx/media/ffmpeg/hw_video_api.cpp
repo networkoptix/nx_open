@@ -36,6 +36,13 @@ VideoApiRegistry::Entry* VideoApiRegistry::get(const AVFrame* frame)
     return hwFramesContext ? get(hwFramesContext->device_ctx->type) : nullptr;
 }
 
+bool VideoApiRegistry::useLegacyMediaCodec = false;
+
+void VideoApiRegistry::enableLegacyMediaCodec()
+{
+    useLegacyMediaCodec = true;
+}
+
 VideoApiRegistry::VideoApiRegistry()
 {
     static std::once_flag registerEntries;
@@ -48,7 +55,7 @@ VideoApiRegistry::VideoApiRegistry()
                 add(getD3D11Api());
                 add(getD3D12Api());
             #elif defined(Q_OS_ANDROID)
-                add(getMediaCodecApi());
+                add(useLegacyMediaCodec ? getMediaCodecApi() : getNdkMediaCodecApi());
             #elif defined(Q_OS_LINUX) && defined(__x86_64__)
                 add(getVaApiApi());
             #endif

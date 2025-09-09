@@ -68,9 +68,11 @@ public:
         if (!frame || !frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
             return;
 
+        QSize frameSize(frame->width, frame->height);
+
         if (!nx::media::ffmpeg::HwVideoDecoder::isCompatible(
             frame->compressionType,
-            QSize(frame->width, frame->height),
+            frameSize,
             /*allowHardwareAcceleration*/ true))
         {
             NX_WARNING(this, "Decoder is not compatible with codec %1 resolution %2x%3",
@@ -87,7 +89,7 @@ public:
 
         std::shared_ptr<VideoApiDecoderData> data;
         if (api)
-            data = api->createDecoderData(rhi);
+            data = api->createDecoderData(rhi, frameSize);
 
         std::unique_ptr<nx::media::ffmpeg::AvOptions> options;
         nx::media::ffmpeg::HwVideoDecoder::InitFunc initFunc;

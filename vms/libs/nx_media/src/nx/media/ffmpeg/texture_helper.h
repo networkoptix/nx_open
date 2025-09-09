@@ -23,7 +23,8 @@ std::unique_ptr<QRhiTexture> createTextureFromHandle(
     int plane,
     quint64 handle,
     int layout = 0,
-    QRhiTexture::Flags textureFlags = {});
+    QRhiTexture::Flags textureFlags = {},
+    uint64_t externalFormat = 0);
 
 QVideoFrameFormat::PixelFormat toQtPixelFormat(const AVFrame* frame);
 

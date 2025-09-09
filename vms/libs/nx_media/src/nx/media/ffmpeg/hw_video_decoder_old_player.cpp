@@ -152,7 +152,7 @@ bool HwVideoDecoderOldPlayer::decode(
 
             std::shared_ptr<VideoApiDecoderData> decoderData;
             if (api)
-                decoderData = api->createDecoderData(m_rhi);
+                decoderData = api->createDecoderData(m_rhi, m_resolution);
 
             std::unique_ptr<nx::media::ffmpeg::AvOptions> options;
             nx::media::ffmpeg::HwVideoDecoder::InitFunc initFunc;
