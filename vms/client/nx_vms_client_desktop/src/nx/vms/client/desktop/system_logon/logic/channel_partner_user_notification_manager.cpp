@@ -13,6 +13,8 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/event/level.h>
 
 namespace nx::vms::client::desktop {
@@ -67,6 +69,23 @@ void ChannelPartnerUserNotificationManager::handleConnect()
             this,
             &ChannelPartnerUserNotificationManager::handleUserChanged);
     }
+
+    m_connections << connect(
+        system()->saasServiceManager(),
+        &nx::vms::common::saas::ServiceManager::dataChanged,
+        this,
+        [this]
+        {
+            if (m_notificationId.isNull())
+                return;
+
+            if (!nx::vms::common::saas::saasInitialized(system()))
+            {
+                // Most probably, the System has been disconnected from the Cloud.
+                workbench()->windowContext()->localNotificationsManager()->remove(m_notificationId);
+                m_notificationId = {};
+            }
+        });
 }
 
 void ChannelPartnerUserNotificationManager::handleDisconnect()
