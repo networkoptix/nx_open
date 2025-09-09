@@ -31,6 +31,7 @@ extern "C" {
 #include <nx/cloud/db/api/oauth_data.h>
 #include <nx/kit/output_redirector.h>
 #include <nx/media/decoder_registrar.h>
+#include <nx/media/ffmpeg/hw_video_api.h>
 #include <nx/media/media_fwd.h>
 #include <nx/media/video_decoder_registry.h>
 #include <nx/network/http/log/har.h>
@@ -348,11 +349,23 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     QGuiApplication::setApplicationDisplayName(nx::branding::mobileClientDisplayName());
     QGuiApplication::setApplicationVersion(nx::build_info::mobileClientVersion());
 
+    auto settings = std::make_unique<QnMobileClientSettings>();
+
     // Set required graphics API for HW video decoding.
     if (nx::build_info::isAndroid())
-        QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+    {
+        const auto graphicsApi = settings->videoRenderingApi().toLower();
+        QQuickWindow::setGraphicsApi(
+            graphicsApi == "vulkan"
+                ? QSGRendererInterface::Vulkan
+                : QSGRendererInterface::OpenGL);
+        if (graphicsApi.contains("legacy"))
+            nx::media::VideoApiRegistry::enableLegacyMediaCodec();
+    }
     else if (nx::build_info::isIos())
+    {
         QQuickWindow::setGraphicsApi(QSGRendererInterface::Metal);
+    }
 
     QnMobileClientStartupParameters startupParams(application);
 
@@ -361,7 +374,7 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     initializeNetworkLogging(); //< Should be initialized before ApplicationContext.
 
     const auto applicationContext = std::make_unique<mobile::ApplicationContext>(
-        startupParams, std::make_unique<QnMobileClientSettings>());
+        startupParams, std::move(settings));
 
     if (!loggingIsInitialized)
     {

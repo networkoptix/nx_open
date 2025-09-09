@@ -57,6 +57,8 @@ public:
         EnableSoftwareDecoderFallback,
         ShowHowShareWorksNotification,
 
+        VideoRenderingApi,
+
         VariableCount
     };
 
@@ -159,6 +161,11 @@ private:
             bool,
             enableSoftwareDecoderFallback, setEnableSoftwareDecoderFallback,
             EnableSoftwareDecoderFallback, true)
+
+        QN_DECLARE_RW_PROPERTY(
+            QString,
+            videoRenderingApi, setVideoRenderingApi,
+            VideoRenderingApi, "opengles") //< Only used on Android.
 
     QN_END_PROPERTY_STORAGE()
 

@@ -101,6 +101,11 @@ class QmlSettingsAdaptor: public QObject
         WRITE setEnableSoftwareDecoderFallback
         NOTIFY enableSoftwareDecoderFallbackChanged)
 
+    Q_PROPERTY(QString videoRenderingApi
+        READ videoRenderingApi
+        WRITE setVideoRenderingApi
+        NOTIFY videoRenderingApiChanged)
+
 public:
     explicit QmlSettingsAdaptor(QObject* parent = nullptr);
 
@@ -156,6 +161,9 @@ public:
     bool enableSoftwareDecoderFallback() const;
     void setEnableSoftwareDecoderFallback(bool value);
 
+    QString videoRenderingApi() const;
+    void setVideoRenderingApi(const QString& value);
+
 signals:
     void liveVideoPreviewsChanged();
     void lastUsedQualityChanged();
@@ -174,6 +182,7 @@ signals:
     void useVideoDownloadFeatureChanged();
     void useMaxHardwareDecodersCountChanged();
     void enableSoftwareDecoderFallbackChanged();
+    void videoRenderingApiChanged();
 };
 
 } // namespace mobile

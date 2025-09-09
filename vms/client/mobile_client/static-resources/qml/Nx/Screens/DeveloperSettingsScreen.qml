@@ -191,6 +191,41 @@ BaseSettingsScreen
             }
         }
 
+        Row
+        {
+            spacing: 8
+
+            visible: Qt.platform.os == "android"
+
+            Text
+            {
+                text: "Rendering API"
+                font.pixelSize: 16
+                color: ColorTheme.colors.light16
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            QuickControls.ComboBox
+            {
+                id: videoRenderingApiComboBox
+
+                model: ["opengles-legacy", "opengles", "vulkan"]
+                currentIndex: !!appContext.settings.videoRenderingApi
+                    ? model.indexOf(appContext.settings.videoRenderingApi)
+                    : -1
+
+                width: 200
+
+                onCurrentValueChanged: {
+                    if (appContext.settings.videoRenderingApi == currentValue)
+                        return
+
+                    appContext.settings.videoRenderingApi = currentValue
+                    d.openRestartDialog()
+                }
+            }
+        }
+
         Column
         {
             visible: !!d.logSessionId

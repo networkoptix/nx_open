@@ -71,6 +71,9 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
                 case QnMobileClientSettings::SupportMetaOrganizations:
                     emit supportMetaOrganizationsChanged();
 
+                case QnMobileClientSettings::VideoRenderingApi:
+                    emit videoRenderingApiChanged();
+
                 default:
                     break;
             }
@@ -279,6 +282,17 @@ bool QmlSettingsAdaptor::enableSoftwareDecoderFallback() const
 void QmlSettingsAdaptor::setEnableSoftwareDecoderFallback(bool value)
 {
     qnSettings->setEnableSoftwareDecoderFallback(value);
+    qnSettings->save();
+}
+
+QString QmlSettingsAdaptor::videoRenderingApi() const
+{
+    return qnSettings->videoRenderingApi();
+}
+
+void QmlSettingsAdaptor::setVideoRenderingApi(const QString& value)
+{
+    qnSettings->setVideoRenderingApi(value);
     qnSettings->save();
 }
 
