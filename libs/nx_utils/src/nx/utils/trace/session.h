@@ -1,5 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#pragma once
+
+#ifndef __EMSCRIPTEN__
+
 #include <QtCore/QFile>
 
 #include "trace_categories.h"
@@ -21,3 +25,5 @@ private:
 };
 
 } // nx::utils::trace
+
+#endif

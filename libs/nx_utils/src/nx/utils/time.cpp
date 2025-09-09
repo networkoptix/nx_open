@@ -8,7 +8,7 @@
 
 #include <nx/utils/log/log.h>
 
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_WASM)
     #include <time.h>
     #include <sys/time.h>
     #include <unistd.h>
@@ -38,7 +38,7 @@ static std::optional<system_clock::time_point> fixedUtcTime;
 
 static std::optional<std::chrono::steady_clock::time_point> testMonotonicTime;
 
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_WASM)
     std::chrono::microseconds durationSinceBoot()
     {
         timespec bootTime;
@@ -159,7 +159,7 @@ std::chrono::milliseconds systemUptime()
 {
     #if defined(Q_OS_WINDOWS)
         return std::chrono::milliseconds(GetTickCount64());
-    #elif defined(Q_OS_LINUX) || defined(Q_OS_DARWIN)
+    #elif defined(Q_OS_LINUX) || defined(Q_OS_DARWIN) || defined(Q_OS_WASM)
         return std::chrono::duration_cast<std::chrono::milliseconds>(durationSinceBoot());
     #else
         #error "Unsupported platform"

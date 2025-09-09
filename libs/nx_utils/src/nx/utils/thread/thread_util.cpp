@@ -10,7 +10,7 @@
     #include <pthread.h>
 #endif
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__EMSCRIPTEN__)
     #include <sys/types.h>
     #include <sys/syscall.h>
     #include <unistd.h>
@@ -19,7 +19,7 @@
 
 uintptr_t currentThreadSystemId()
 {
-#if __linux__
+#if defined(__linux__) || defined(__EMSCRIPTEN__)
     /* This one is purely for debugging purposes.
     * QThread::currentThreadId is implemented via pthread_self,
     * which is not an identifier you see in GDB. */

@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#ifndef __EMSCRIPTEN__
+
 #include "allocation_analyzer.h"
 
 #include <chrono>
@@ -143,3 +145,5 @@ std::optional<std::string> AllocationAnalyzer::generateReport() const
 }
 
 } // namespace nx::utils::debug
+
+#endif

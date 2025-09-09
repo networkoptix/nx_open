@@ -33,7 +33,7 @@
 namespace nx {
 namespace utils {
 
-bool CurrentProcess::changeUser( const QString& userName )
+bool CurrentProcess::changeUser([[maybe_unused]] const QString& userName )
 {
     #if defined( Q_OS_LINUX ) || defined( Q_OS_MAC )
         return ::changeUser( getpwnam( userName.toStdString().c_str() ) );
@@ -42,7 +42,7 @@ bool CurrentProcess::changeUser( const QString& userName )
     #endif
 }
 
-bool CurrentProcess::changeUser( const uint userId )
+bool CurrentProcess::changeUser([[maybe_unused]] const uint userId )
 {
     #if defined( Q_OS_LINUX ) || defined( Q_OS_MAC )
         return ::changeUser( getpwuid( static_cast< uid_t >( userId ) ) );

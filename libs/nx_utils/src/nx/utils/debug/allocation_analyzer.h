@@ -2,6 +2,8 @@
 
 #pragma once
 
+#ifndef __EMSCRIPTEN__
+
 #include <atomic>
 #include <memory>
 #include <optional>
@@ -39,3 +41,5 @@ private:
 };
 
 } // namespace nx::utils::debug
+
+#endif

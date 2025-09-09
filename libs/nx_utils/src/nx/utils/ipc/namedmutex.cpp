@@ -6,7 +6,7 @@
     #include <windows.h>
 #endif
 
-#include <QSystemSemaphore>
+#include <QtCore/QSystemSemaphore>
 
 namespace nx::utils {
 

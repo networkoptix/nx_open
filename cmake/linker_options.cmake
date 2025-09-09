@@ -1,6 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-if(ANDROID OR IOS)
+if(ANDROID OR IOS OR EMSCRIPTEN)
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 else()
     set(BUILD_SHARED_LIBS ON CACHE INTERNAL "")

@@ -29,3 +29,7 @@ endif()
 if(withMobileClient)
     add_subdirectory(mobile_client)
 endif()
+
+if(EMSCRIPTEN)
+    add_subdirectory(web_assembly_client)
+endif()

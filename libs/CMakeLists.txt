@@ -14,8 +14,13 @@ add_subdirectory(nx_codec)
 add_subdirectory(nx_json_rpc)
 add_subdirectory(nx_media_core)
 add_subdirectory(nx_network)
-add_subdirectory(nx_network_rest)
-add_subdirectory(nx_telemetry)
+
+if(NOT EMSCRIPTEN)
+    # Libs are currently not adjusted for Emscripten due to their dependencies.
+    add_subdirectory(nx_telemetry)
+    add_subdirectory(nx_network_rest)
+endif()
+
 add_subdirectory(nx_preprocessor)
 add_subdirectory(nx_reflect)
 add_subdirectory(nx_rtp)

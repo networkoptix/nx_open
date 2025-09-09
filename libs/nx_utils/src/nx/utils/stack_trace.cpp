@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#ifndef __EMSCRIPTEN__
+
 #include "stack_trace.h"
 
 #include <cpptrace/cpptrace.hpp>
@@ -15,3 +17,5 @@ std::string stackTrace()
 }
 
 } // namespace nx
+
+#endif

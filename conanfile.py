@@ -146,9 +146,11 @@ class NxOpenConan(ConanFile):
         self.install_system_requirements(packages)
 
     def build_requirements(self):
-        self.build_requires("apidoctool/3.0" "#483c5073667ee722756e0ca31e18972a")
         self.build_requires("qt-host/6.9.1" "#593e82a6bad53a827e568d713f62867a")
-        self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
+
+        if not self.isEmscripten:
+            self.build_requires("apidoctool/3.0" "#483c5073667ee722756e0ca31e18972a")
+            self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
 
         if self.isLinux or self.isWindows:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
@@ -170,34 +172,37 @@ class NxOpenConan(ConanFile):
                 self.build_requires("AndroidSDK/34" "#eea6103b2dcc6cd808d0e8c2ee512bf9")
             if "ANDROID_NDK" not in os.environ:
                 self.build_requires("AndroidNDK/r26d" "#0ae8a952a8b231f98f2f7f2d61fd249a")
-        else:
+        elif not self.isEmscripten:
             # Java runtime for apidoctool.
             self.tool_requires("openjdk-jre/17.0.12" "#ceed4d8b4fdfbd3f680688f67488dc27")
 
     def requirements(self):
-        self.requires("cpptrace/0.8.3" "#336ded531d0cad8ec579eb05079591e0")
+        if not self.isEmscripten:
+            self.requires("cpptrace/0.8.3" "#336ded531d0cad8ec579eb05079591e0")
 
-        self.requires("opentelemetry-cpp/1.17.0" "#feb089e3fbaef23a752681d2b96379bd")
-        # OpenTelemetry dependencies.
-        self.requires("c-ares/1.34.3" "#1f1b2f929424608c837837ea6379ae15")
-        self.requires("protobuf/5.27.0" "#56d591557e0fc6a4356fc1dbc6ffbe56")
-        self.requires("grpc/1.67.1" "#af343deb43728d9f31d2a7c9fc0728f5")
-        self.requires("abseil/20240116.2" "#129b9a5c87da55d656811cb53e915b41")
-        self.requires("re2/20230301" "#5504bfc6731b5c7a12ff524a6b2205c1")
-        self.requires("opentelemetry-proto/1.3.2" "#14665af6359f2a239e81925285e5b654")
+            self.requires("opentelemetry-cpp/1.17.0" "#feb089e3fbaef23a752681d2b96379bd")
+            # OpenTelemetry dependencies.
+            self.requires("c-ares/1.34.3" "#1f1b2f929424608c837837ea6379ae15")
+            self.requires("protobuf/5.27.0" "#56d591557e0fc6a4356fc1dbc6ffbe56")
+            self.requires("grpc/1.67.1" "#af343deb43728d9f31d2a7c9fc0728f5")
+            self.requires("abseil/20240116.2" "#129b9a5c87da55d656811cb53e915b41")
+            self.requires("re2/20230301" "#5504bfc6731b5c7a12ff524a6b2205c1")
+            self.requires("opentelemetry-proto/1.3.2" "#14665af6359f2a239e81925285e5b654")
 
-        self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
-        self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
-        self.requires("libmp3lame/3.100" "#da13ecbaf0d06421ae586b7226d985ad")
-        self.requires("openssl/1.1.1q" "#cf9c0c761f39805e5a258dc39daff2bd")
-        self.requires("qt/6.9.1" "#4501609577f0788ad8e72a0d5c1dca28")
-        self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
         self.requires("boost/1.83.0" "#d150c9edc8081c98965b05ea9c2df318")
+        self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
+        self.requires("openssl/1.1.1q" "#e648f58c45605a06b7be93cafb31ab98")
+        self.requires("qt/6.9.1" "#9233be3a7ba31f6cf5a446735a9c37a6")
         self.requires("rapidjson/cci.20230929" "#751fc0dfc70af706c708706450fc2ab7")
         self.requires("zlib/1.3.1" "#99d6f9ea0a1dd63d973392c24ce0aa9b")
-        self.requires("perfetto/47.0" "#fefcb910df242e7dca2a309cac9396cb")
 
-        if self.settings.os not in ("Android", "iOS"):
+        if not self.isEmscripten:
+            self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
+            self.requires("libmp3lame/3.100" "#da13ecbaf0d06421ae586b7226d985ad")
+            self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
+            self.requires("perfetto/47.0" "#fefcb910df242e7dca2a309cac9396cb")
+
+        if self.settings.os not in ("Android", "iOS", "Emscripten"):
             # Qt dependency.
             self.requires("icu/74.2" "#a0ffc2036da25e5dbe72dc941074a6c4")
             # FFmpeg dependencies.
@@ -400,8 +405,12 @@ class NxOpenConan(ConanFile):
         return self.settings.os == "iOS"
 
     @property
+    def isEmscripten(self):
+        return self.settings.os == "Emscripten"
+
+    @property
     def haveMediaserver(self):
-        return not (self.isAndroid or self.isIos)
+        return not (self.isAndroid or self.isIos or self.isEmscripten)
 
     @property
     def haveDesktopClient(self):

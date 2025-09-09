@@ -57,7 +57,7 @@ std::string toString(ErrorCode errorCode)
         return "DNS server failure";
 
     char errorBuffer[1024]; //< 1024 is taken from glibc perror implementation.
-    #if defined(__APPLE__) || defined(ANDROID) || defined(__ANDROID__)
+    #if defined(__APPLE__) || defined(ANDROID) || defined(__ANDROID__) || defined(__EMSCRIPTEN__)
         // POSIX strerror_r implementation returns error code, not the error message. If the
         // function fails, return an empty string.
         if (!strerror_r(errorCode, errorBuffer, sizeof(errorBuffer)))

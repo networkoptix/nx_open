@@ -1,8 +1,10 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-find_package(perfetto REQUIRED)
-nx_fix_target_interface_for_cuda(perfetto::perfetto)
-find_package(CPPTRACE REQUIRED)
+if(NOT EMSCRIPTEN)
+    find_package(perfetto REQUIRED)
+    nx_fix_target_interface_for_cuda(perfetto::perfetto)
+    find_package(CPPTRACE REQUIRED)
+endif()
 
 if(IOS)
     set(ios_sources "src/nx/utils/log/log_ios.mm")
@@ -11,24 +13,28 @@ endif()
 set(aes_library_root "${open_source_root}/artifacts/tiny_aes_c")
 file(GLOB_RECURSE aes_library_sources "${aes_library_root}/src/tiny_aes_c/*")
 
+set(libs
+    Boost::headers
+    OpenSSL::OpenSSL
+    Qt6::Core Qt6::Xml
+    quazip
+    nx_branding
+    nx_build_info
+    nx_kit
+    nx_reflect)
+
+if(NOT EMSCRIPTEN)
+    list(APPEND libs CPPTRACE::CPPTRACE perfetto::perfetto)
+endif()
+
 nx_add_target(nx_utils LIBRARY
     NO_MOC
     ADDITIONAL_SOURCES
         ${ios_sources}
         ${aes_library_sources}
     PUBLIC_LIBS
-        CPPTRACE::CPPTRACE
-        perfetto::perfetto
-        Boost::headers
-        OpenSSL::OpenSSL
-        Qt6::Core Qt6::Xml
-        quazip
-        nx_branding
-        nx_build_info
-        nx_kit
-        nx_reflect
-    FOLDER common/libs
-)
+        ${libs}
+    FOLDER common/libs)
 
 set(mocableFiles
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/counter.h
@@ -87,10 +93,6 @@ if(MACOSX)
     find_library(Foundation_LIBRARY Foundation)
     mark_as_advanced(Foundation_LIBRARY)
     target_link_libraries(nx_utils PUBLIC ${Foundation_LIBRARY})
-endif()
-
-if(NOT WINDOWS)
-    target_link_libraries(nx_utils PRIVATE z)
 endif()
 
 if(withTests)

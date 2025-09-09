@@ -2,6 +2,8 @@
 
 #pragma once
 
+#ifndef __EMSCRIPTEN__
+
 #define PERFETTO_COMPONENT_EXPORT NX_UTILS_API
 
 #include <perfetto.h>
@@ -14,3 +16,5 @@ PERFETTO_DEFINE_CATEGORIES(
     perfetto::Category("models")
         .SetDescription("Events from data models")
 );
+
+#endif

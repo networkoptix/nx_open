@@ -12,7 +12,7 @@ qt6_wrap_cpp(moc_sources
 
 add_definitions(-DQUAZIP_BUILD)
 
-if(IOS)
+if(IOS OR EMSCRIPTEN)
     set(quazip_library_type "STATIC")
 else()
     set(quazip_library_type "SHARED")
@@ -23,7 +23,8 @@ add_library(quazip ${quazip_library_type} ${sources} ${moc_sources})
 set_target_properties(quazip PROPERTIES FOLDER third_party)
 
 target_include_directories(quazip PUBLIC ${quazip_dir}/..)
-if(WINDOWS)
+
+if(WINDOWS OR EMSCRIPTEN)
     find_package(ZLIB REQUIRED)
     add_library(z ALIAS ZLIB::ZLIB)
 endif()

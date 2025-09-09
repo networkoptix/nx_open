@@ -6,7 +6,7 @@
 
 namespace nx::utils {
 
-#if !defined(Q_OS_IOS)
+#if !defined(Q_OS_IOS) && !defined(Q_OS_WASM)
 
 std::unique_ptr<QProcess> startProcess(
     const QString& executablePath,
