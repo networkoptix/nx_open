@@ -18,7 +18,7 @@ required_conan_version = ">=1.53.0"
 
 
 # Help packages are not required to be built from the same commit.
-VMS_HELP_VERSION = "6.1.0-e19940c31bf8f19029f801c132c4902b74a331f3"
+VMS_HELP_VERSION = "6.1.0-c13297795d662c039fbae120562fa5809a3aacb0"
 QUICK_START_GUIDE_VERSION = "6.1.0-c13297795d662c039fbae120562fa5809a3aacb0"
 MOBILE_USER_MANUAL_VERSION = "25.1-c2500bc43bb3a9a50c04a866856ad879203aabbf"
 
