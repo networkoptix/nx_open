@@ -249,10 +249,7 @@ QString calculateLogNameSuffix(
     if (sharedMemoryManager)
     {
         const int idx = sharedMemoryManager->currentInstanceIndex();
-        if (idx == 0)
-            idxSuffix = QString();
-        else if (idx > 0)
-            idxSuffix = "_" + QString::number(idx);
+        idxSuffix = "_" + QString::number(idx + 1);
     }
 
     if (startupParams.selfUpdateMode)
