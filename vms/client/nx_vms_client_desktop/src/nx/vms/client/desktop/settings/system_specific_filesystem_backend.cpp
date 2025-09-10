@@ -2,6 +2,7 @@
 
 #include "system_specific_filesystem_backend.h"
 
+#include <QtCore/QDirIterator>
 #include <QtCore/QStandardPaths>
 
 #include <nx/utils/log/log.h>
@@ -13,6 +14,12 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
+QString basePath()
+{
+    return QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
+        + "/settings/";
+}
+
 QDir calculatePath(SystemContext* systemContext)
 {
     static const QString kLocalSettingsPlaceholder = "_logged_out_";
@@ -22,9 +29,7 @@ QDir calculatePath(SystemContext* systemContext)
         ? kLocalSettingsPlaceholder
         : systemId.toString(QUuid::WithBraces);
 
-    return QDir(QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
-        + "/settings/"
-        + systemIdPath);
+    return QDir(basePath() + systemIdPath);
 }
 
 } // namespace
@@ -104,5 +109,28 @@ bool SystemSpecificFileSystemBackend::writeDocumentation(const QString& docText)
 
     return base_type::writeDocumentation(docText);
 }
+
+QStringList SystemSpecificFileSystemBackend::systemSpecificStoragePaths()
+{
+    QStringList result;
+
+    QDirIterator it(basePath());
+    while (it.hasNext())
+    {
+        it.next();
+
+        if (!it.fileInfo().isDir())
+            continue;
+
+        auto uid = QUuid::fromString(it.fileName());
+        if (uid.isNull())
+            continue;
+
+        result << it.filePath();
+    }
+
+    return result;
+}
+
 
 } // namespace nx::vms::client::desktop

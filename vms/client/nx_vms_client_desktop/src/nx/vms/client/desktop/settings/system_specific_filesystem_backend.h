@@ -31,6 +31,8 @@ public:
     virtual bool sync() override;
     virtual bool writeDocumentation(const QString& docText) override;
 
+    static QStringList systemSpecificStoragePaths();
+
 private:
     /** System-specific settings shall not be written when the user is logged out. */
     bool m_valid = false;
