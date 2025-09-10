@@ -29,6 +29,7 @@ extern "C" {
 #include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
 
+#include "gl_common.h"
 #include "hw_video_api.h"
 #include "texture_helper.h"
 
@@ -251,63 +252,6 @@ static const quint32 *fourccFromPixelFormat(const QVideoFrameFormat::PixelFormat
     return nullptr;
 }
 
-QString eglErrorString(EGLint error)
-{
-    switch (error)
-    {
-        case EGL_SUCCESS: return "No error";
-        case EGL_NOT_INITIALIZED: return "EGL not initialized or failed to initialize";
-        case EGL_BAD_ACCESS: return "Resource inaccessible";
-        case EGL_BAD_ALLOC: return "Cannot allocate resources";
-        case EGL_BAD_ATTRIBUTE: return "Unrecognized attribute or attribute value";
-        case EGL_BAD_CONTEXT: return "Invalid EGL context";
-        case EGL_BAD_CONFIG: return "Invalid EGL frame buffer configuration";
-        case EGL_BAD_CURRENT_SURFACE: return "Current surface is no longer valid";
-        case EGL_BAD_DISPLAY: return "Invalid EGL display";
-        case EGL_BAD_SURFACE: return "Invalid surface";
-        case EGL_BAD_MATCH: return "Inconsistent arguments";
-        case EGL_BAD_PARAMETER: return "Invalid argument";
-        case EGL_BAD_NATIVE_PIXMAP: return "Invalid native pixmap";
-        case EGL_BAD_NATIVE_WINDOW: return "Invalid native window";
-        case EGL_CONTEXT_LOST: return "Context lost";
-    }
-    return QString("Unknown error 0x%1").arg((int) error, 0, 16);
-}
-
-QString glErrorString(GLenum error)
-{
-    switch (error)
-    {
-        case GL_NO_ERROR:
-            return "No error has been recorded.";
-        case GL_INVALID_ENUM:
-            return "An unacceptable value is specified for an enumerated argument.";
-
-        case GL_INVALID_VALUE:
-            return "A numeric argument is out of range.";
-
-        case GL_INVALID_OPERATION:
-            return "The specified operation is not allowed in the current state.";
-
-        case GL_INVALID_FRAMEBUFFER_OPERATION:
-            return "The framebuffer object is not complete.";
-
-        case GL_OUT_OF_MEMORY:
-            return "There is not enough memory left to execute the command.";
-
-        case GL_STACK_UNDERFLOW:
-            return "An attempt has been made to perform an operation that would cause an internal"
-                " stack to underflow.";
-
-        case GL_STACK_OVERFLOW:
-            return "An attempt has been made to perform an operation that would cause an internal"
-                " stack to overflow.";
-
-        default:
-            return QString("Unknown error 0x%1").arg((int) error, 0, 16);
-    }
-}
-
 class VideoFrameTextures: public QVideoFrameTextures
 {
 public:
@@ -457,12 +401,40 @@ public:
 
         QOpenGLFunctions functions(converter->m_glContext);
 
-        EGLImage images[4];
+        EGLImage images[4] = {};
         GLuint glTextures[4] = {};
         functions.glGenTextures(nPlanes, glTextures);
-        GLenum glError = functions.glGetError();
-        if (glError != GL_NO_ERROR)
-            NX_WARNING(this, "glGenTextures() failed %1 %2", glError, glErrorString(glError));
+        for (int i = 0; i < nPlanes; ++i)
+        {
+            if (!glTextures[i])
+            {
+                NX_ERROR(this, "glGenTextures() failed: %1", glAllErrors(&functions));
+                if (i > 0)
+                    functions.glDeleteTextures(i - 1, glTextures);
+                return {};
+            }
+        }
+        (void) glAllErrors(&functions); // Clean up error flags from any previous calls.
+
+        nx::utils::ScopeGuard cleanupImages(
+            [&]()
+            {
+                for (int i = 0; i < nPlanes; ++i)
+                {
+                    if (images[i])
+                    {
+                        functions.glActiveTexture(GL_TEXTURE0 + i);
+                        functions.glBindTexture(GL_TEXTURE_2D, 0);
+                        eglDestroyImage(converter->m_eglDisplay, images[i]);
+                    }
+                }
+            });
+
+        nx::utils::ScopeGuard cleanupTextures(
+            [&]()
+            {
+                functions.glDeleteTextures(nPlanes, glTextures);
+            });
 
         const auto drm_format_modifier = converter->useModifiers()
             ? prime.objects[0].drm_format_modifier
@@ -471,7 +443,7 @@ public:
             ? EGL_NONE
             : EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT;
 
-        for (int i = 0;  i < nPlanes;  ++i)
+        for (int i = 0; i < nPlanes; ++i)
         {
             int layer = 0;
             int plane = i;
@@ -521,48 +493,43 @@ public:
                     converter->m_rhi = nullptr;
                     return nullptr;
                 }
-                if (error)
-                {
-                    NX_WARNING(this,
-                        "eglCreateImage failed for plane %1 with error %2 %3",
-                        i,
-                        error,
-                        eglErrorString(error));
-                    return nullptr;
-                }
+
+                NX_ASSERT(error != EGL_SUCCESS);
+
+                NX_WARNING(this,
+                    "eglCreateImage failed for plane %1 with error %2 %3",
+                    i,
+                    error,
+                    eglErrorString(error));
+                return nullptr;
             }
 
             functions.glActiveTexture(GL_TEXTURE0 + i);
-            glError = functions.glGetError();
-            if (glError != GL_NO_ERROR)
-                NX_WARNING(this, "glActiveTexture() failed %1 %2", glError, glErrorString(glError));
+            auto errStrings = glAllErrors(&functions);
+            if (!errStrings.empty())
+                NX_WARNING(this, "glActiveTexture failed %1", errStrings);
 
             functions.glBindTexture(GL_TEXTURE_2D, glTextures[i]);
 
-            glError = functions.glGetError();
-            if (glError != GL_NO_ERROR)
-                NX_WARNING(this, "glBindTexture() failed %1 %2", glError, glErrorString(glError));
+            errStrings = glAllErrors(&functions);
+            if (!errStrings.empty())
+                NX_WARNING(this, "glBindTexture failed: %1", errStrings);
 
             auto eglImageTargetTexture2D =
                 (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)converter->m_eglImageTargetTexture2D;
             eglImageTargetTexture2D(GL_TEXTURE_2D, images[i]);
 
-            glError = functions.glGetError();
-            if (glError != GL_NO_ERROR)
+            errStrings = glAllErrors(&functions);
+            if (!errStrings.empty())
             {
                 NX_WARNING(this,
-                    "glEGLImageTargetTexture2DOES() failed %1 %2", glError, glErrorString(glError));
+                    "glEGLImageTargetTexture2DOES failed: %1", errStrings);
             }
         }
 
-        for (int i = 0;  i < nPlanes;  ++i)
-        {
-            functions.glActiveTexture(GL_TEXTURE0 + i);
-            functions.glBindTexture(GL_TEXTURE_2D, 0);
-            eglDestroyImage(converter->m_eglDisplay, images[i]);
-        }
-
         auto textures = std::make_unique<VideoFrameTextures>(nPlanes);
+
+        cleanupTextures.disarm();
 
         for (int plane = 0; plane < 4; ++plane)
         {
