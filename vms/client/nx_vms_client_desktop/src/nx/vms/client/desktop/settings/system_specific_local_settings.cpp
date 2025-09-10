@@ -32,4 +32,19 @@ SystemSpecificLocalSettings::SystemSpecificLocalSettings(SystemContext* systemCo
         });
 }
 
+void SystemSpecificLocalSettings::resetWarningsForAllSystems()
+{
+    const auto list = SystemSpecificFileSystemBackend::systemSpecificStoragePaths();
+    NX_DEBUG(NX_SCOPE_TAG, "Reset warnings in %1 system specific storages", list.size());
+
+    for (const auto& path: list)
+    {
+        std::unique_ptr<FileSystemBackend> backend(new FileSystemBackend(path));
+        backend->writeValue("channelPartnerUserNotificationClosed", "false");
+    }
+
+    // Update the current instance. The changed() signals are sent inside.
+    load();
+}
+
 } // namespace nx::vms::client::desktop

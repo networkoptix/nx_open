@@ -57,6 +57,8 @@ public:
     /** Notification of Channel Partner User on a site was closed by user */
     Property<bool> channelPartnerUserNotificationClosed{this,
         "channelPartnerUserNotificationClosed"};
+
+    void resetWarningsForAllSystems();
 };
 
 } // namespace nx::vms::client::desktop
