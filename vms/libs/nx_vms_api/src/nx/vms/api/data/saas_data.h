@@ -378,7 +378,7 @@ struct NX_VMS_API TierUsageData
 
     bool operator==(const TierUsageData&) const = default;
 };
-#define TierUsageData_Fields (servers)(maxItemsInLayout)(ldapUsed)(videoWallUsed)
+#define TierUsageData_Fields (servers)(maxDevicesPerServer)(maxItemsInLayout)(ldapUsed)(videoWallUsed)
 NX_REFLECTION_INSTRUMENT(TierUsageData, TierUsageData_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(TierUsageData, (json), NX_VMS_API)
 
