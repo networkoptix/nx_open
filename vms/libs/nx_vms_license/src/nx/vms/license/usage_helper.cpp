@@ -716,7 +716,7 @@ const QString ChannelPartnerServer::baseUrl(const common::SystemSettings* settin
 const nx::Url ChannelPartnerServer::reportUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
-    return baseUrl(settings) + NX_FMT("/v2/cloud_systems/%1/system_usage_report/", systemId);
+    return baseUrl(settings) + NX_FMT("/v4/internal/systems/%1/usage_report/", systemId);
 }
 
 const nx::Url ChannelPartnerServer::quantityReportUrl(const common::SystemSettings* settings)
@@ -740,7 +740,7 @@ const nx::Url ChannelPartnerServer::migrateLicensesUrl(const common::SystemSetti
 const nx::Url ChannelPartnerServer::saasDataUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
-    return baseUrl(settings) + NX_FMT("/v2/cloud_systems/%1/saas_report/", systemId);
+    return baseUrl(settings) + NX_FMT("/v4/internal/systems/%1/saas_report/", systemId);
 }
 
 } // namespace nx::vms::license
