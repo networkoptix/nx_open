@@ -70,6 +70,7 @@ NX_REFLECTION_ENUM_CLASS(ResultCode,
 );
 
 std::string toString(ResultCode resultCode);
+bool isSuccessCode(ResultCode code);
 
 struct Result
 {
@@ -86,6 +87,7 @@ struct Result
 
     bool ok() const { return code == ResultCode::ok; }
     bool isTechnicalError();
+    bool isSuccess() const { return isSuccessCode(code); }
     bool isBusinessLogicError();
 
     std::string toString() const
