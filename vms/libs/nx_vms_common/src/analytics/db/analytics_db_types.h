@@ -108,7 +108,7 @@ struct BestShot: public BaseTrackImage
 
     bool initialized() const { return timestampUs > 0; }
 
-    std::optional<QByteArray> vectorData;
+    std::optional<nx::common::metadata::VectorData> vectorData;
 };
 #define BestShot_analytics_storage_Fields BaseTrackImage_analytics_storage_Fields(vectorData)
 QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson), NX_VMS_COMMON_API);

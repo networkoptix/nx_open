@@ -150,11 +150,20 @@ NX_REFLECTION_INSTRUMENT(ObjectMetadata, ObjectMetadata_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
+struct NX_VMS_COMMON_API VectorData
+{
+    QByteArray data;
+    std::string model;
+};
+#define VectorData_Fields (data)(model)
+QN_FUSION_DECLARE_FUNCTIONS(VectorData, (json)(ubjson), NX_VMS_COMMON_API);
+NX_REFLECTION_INSTRUMENT(VectorData, VectorData_Fields)
+
 struct NX_VMS_COMMON_API BestShotMetadata: public BaseMetadata
 {
     ImageLocation location = ImageLocation::internal;
     std::vector<Attribute> attributes;
-    std::optional<QByteArray> vectorData;
+    std::optional<VectorData> vectorData;
 
     BestShotMetadata() = default;
     BestShotMetadata(const BaseMetadata& base): BaseMetadata(base) {}

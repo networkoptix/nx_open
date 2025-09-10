@@ -56,6 +56,14 @@ struct TitleWithFlagData
 };
 NX_REFLECTION_INSTRUMENT(TitleWithFlagData, (text)(imageInfo)(isImageAvailable))
 
+struct VectorData
+{
+    QByteArray data;
+    std::string model;
+};
+#define VectorData_Fields (data)(model)
+NX_REFLECTION_INSTRUMENT(VectorData, VectorData_Fields)
+
 struct TrackData
 {
     nx::Uuid id;
@@ -68,7 +76,7 @@ struct TrackData
     std::map<std::string, std::string> attributes;
     QByteArray objectRegion;
     std::optional<ObjectTrackVideoFrameImageInfoData> bestShot;
-    std::optional<QByteArray> vector;
+    std::optional<VectorData> vector;
 };
 #define TrackData_Fields (id)(deviceId)(siteId)(engineId)(objectTypeId)(startTimeMs)(endTimeMs)(attributes)(objectRegion)(bestShot)(vector)
 NX_REFLECTION_INSTRUMENT(TrackData, TrackData_Fields)

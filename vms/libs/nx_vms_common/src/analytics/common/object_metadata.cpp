@@ -19,6 +19,8 @@ namespace common {
 namespace metadata {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    VectorData, (json)(ubjson), VectorData_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     BestShotMetadata, (json)(ubjson), BestShotMetadata_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     TitleMetadata, (json)(ubjson), TitleMetadata_Fields, (brief, true))
