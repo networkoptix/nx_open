@@ -18,4 +18,12 @@ bool Result::isBusinessLogicError()
     return !ok() && !isTechnicalError();
 }
 
+bool isSuccessCode(ResultCode code)
+{
+    return code == ResultCode::ok
+        || code == ResultCode::created
+        || code == ResultCode::partialContent
+        || code == ResultCode::noContent;
+}
+
 } // namespace nx::cloud::db::api
