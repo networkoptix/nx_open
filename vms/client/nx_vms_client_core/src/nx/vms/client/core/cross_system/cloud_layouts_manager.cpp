@@ -28,6 +28,7 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/delayed.h>
 
@@ -226,6 +227,12 @@ struct CloudLayoutsManager::Private
 
     void updateLayouts()
     {
+        if (!appContext()->cloudServiceChecker()->hasService(
+                nx::vms::client::core::CloudService::docdb))
+        {
+            return;
+        }
+
         QUrlQuery query;
         query.addQueryItem("matchPrefix", "");
         query.addQueryItem("responseType", "dataOnly");

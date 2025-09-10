@@ -789,6 +789,11 @@ ConditionWrapper hardwareVideoDecodingDisabled();
 
 ConditionWrapper parentServerHasActiveBackupStorage();
 
+/**
+ * Check whether Document Database service is enabled.
+ */
+ConditionWrapper hasDocDBService();
+
 } // namespace condition
 
 } // namespace menu

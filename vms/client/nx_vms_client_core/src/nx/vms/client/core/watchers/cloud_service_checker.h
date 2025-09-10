@@ -12,7 +12,8 @@ namespace nx::vms::client::core {
 NX_REFLECTION_ENUM_CLASS(CloudService,
     none = 0,
     cloud_notifications = 1 << 0,
-    push_notifications = 1 << 1
+    push_notifications = 1 << 1,
+    docdb = 1 << 2
 );
 
 class NX_VMS_CLIENT_CORE_API CloudServiceChecker: public QObject
