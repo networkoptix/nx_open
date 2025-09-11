@@ -289,4 +289,14 @@ void LocalNotificationsManager::interact(const nx::Uuid& notificationId)
     emit interactionRequested(notificationId);
 }
 
+void LocalNotificationsManager::activateLink(const nx::Uuid& notificationId, const QString& linkUrl)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!m_lookup.contains(notificationId))
+        return;
+
+    lock.unlock();
+    emit linkActivated(notificationId, linkUrl);
+}
+
 } // namespace nx::vms::client::desktop::workbench

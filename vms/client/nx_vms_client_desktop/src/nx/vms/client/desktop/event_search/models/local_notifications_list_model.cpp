@@ -221,18 +221,29 @@ QVariant LocalNotificationsListModel::data(const QModelIndex& index, int role) c
     }
 }
 
-bool LocalNotificationsListModel::setData(const QModelIndex& index, const QVariant& /*value*/, int role)
+bool LocalNotificationsListModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     if (!index.isValid() || index.model() != this || index.column() != 0
-        || index.row() < 0 || index.row() >= rowCount()
-        || role != core::DefaultNotificationRole)
+        || index.row() < 0 || index.row() >= rowCount())
     {
         return false;
     }
 
-    windowContext()->localNotificationsManager()->interact(
-        m_notifications[index.row()]);
-    return true;
+    if (role == core::DefaultNotificationRole)
+    {
+        windowContext()->localNotificationsManager()->interact(
+            m_notifications[index.row()]);
+        return true;
+    }
+
+    if (role == core::ActivateLinkRole)
+    {
+        windowContext()->localNotificationsManager()->activateLink(
+            m_notifications[index.row()], value.toString());
+        return true;
+    }
+
+    return false;
 }
 
 bool LocalNotificationsListModel::removeRows(int row, int count, const QModelIndex& parent)

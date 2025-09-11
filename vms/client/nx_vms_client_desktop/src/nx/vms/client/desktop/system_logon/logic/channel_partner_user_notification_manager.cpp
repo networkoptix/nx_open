@@ -7,6 +7,7 @@
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/user.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -148,14 +149,21 @@ void ChannelPartnerUserNotificationManager::showNotification()
         tr("Channel Partner users have access to this site"),
         tr("Channel Partner users' access is managed at the Organization level, "
             "and they are not visible in site user management."
-            "<br/><br/><a href=\"%1\">Learn more</a>")
-        .arg(HelpTopic::relativeUrlForTopic(HelpTopic::Id::ChannelPartnerUser)),
+            "<br/><br/><a href='#'>Learn more</a>"),
         /*cancellable*/ true);
     notificationsManager->setIconPath(
         m_notificationId, "20x20/Outline/warning.svg");
     notificationsManager->setLevel(
         m_notificationId, QnNotificationLevel::Value::ImportantNotification);
-    QObject::connect(notificationsManager, &workbench::LocalNotificationsManager::cancelRequested,
+    connect(notificationsManager, &workbench::LocalNotificationsManager::linkActivated,
+        [this](const nx::Uuid& notificationId, const QString& linkUrl)
+        {
+            if (notificationId != m_notificationId)
+                return;
+
+            HelpHandler::openHelpTopic(HelpTopic::Id::ChannelPartnerUser);
+        });
+    connect(notificationsManager, &workbench::LocalNotificationsManager::cancelRequested,
         [this,
         localSettings = system()->localSettings(),
         notificationsManager](
