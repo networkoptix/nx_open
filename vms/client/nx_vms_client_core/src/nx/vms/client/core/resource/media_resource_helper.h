@@ -36,6 +36,7 @@ class MediaResourceHelper: public ResourceHelper
     Q_PROPERTY(bool needsCloudAuthorization READ needsCloudAuthorization
         NOTIFY needsCloudAuthorizationChanged);
     Q_PROPERTY(QString crossSystemName READ crossSystemName NOTIFY crossSystemNameChanged)
+    Q_PROPERTY(bool crossSystemOnline READ crossSystemOnline NOTIFY crossSystemOnlineChanged)
     Q_PROPERTY(QString qualifiedResourceName READ qualifiedResourceName
         NOTIFY qualifiedResourceNameChanged)
     using base_type = ResourceHelper;
@@ -57,6 +58,7 @@ public:
     bool audioEnabled() const;
     bool needsCloudAuthorization() const;
     QString crossSystemName() const;
+    bool crossSystemOnline() const;
     QString qualifiedResourceName() const;
     MediaPlayer::VideoQuality livePreviewVideoQuality() const;
     Q_INVOKABLE MediaPlayer::VideoQuality streamQuality(
@@ -77,6 +79,7 @@ signals:
     void needsCloudAuthorizationChanged();
     void crossSystemNameChanged();
     void qualifiedResourceNameChanged();
+    void crossSystemOnlineChanged();
 
 private:
     class Private;

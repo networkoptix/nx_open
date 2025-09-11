@@ -48,6 +48,7 @@ NxObject
         (controller.needsCloudAuthorization && (appContext.cloudStatusWatcher.status
             === CloudStatusWatcher.Offline))
         || (!controller.needsCloudAuthorization
+            && resourceHelper.crossSystemOnline
             && (resource?.flags & ResourceFlag.cross_system)
             && (resource?.flags & ResourceFlag.fake))
     readonly property bool mediaLoading:
