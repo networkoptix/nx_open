@@ -172,6 +172,14 @@ QString MediaResourceHelper::crossSystemName() const
     return systemDescription ? systemDescription->name() : QString{};
 }
 
+bool MediaResourceHelper::crossSystemOnline() const
+{
+    if (!d->crossSystem)
+        return false;
+
+    return d->crossSystem->systemDescription() && d->crossSystem->systemDescription()->isOnline();
+}
+
 QString MediaResourceHelper::qualifiedResourceName() const
 {
     return crossSystemName().isEmpty()
@@ -296,6 +304,10 @@ void MediaResourceHelper::Private::handleResourceChanged()
                 connect(
                     crossSystem->systemDescription().get(), &SystemDescription::systemNameChanged,
                     q, &MediaResourceHelper::crossSystemNameChanged);
+
+                connect(crossSystem->systemDescription().get(),
+                    &SystemDescription::onlineStateChanged,
+                    q, &MediaResourceHelper::crossSystemOnlineChanged);
             }
         }
     }
