@@ -2,9 +2,9 @@
 
 #include "text_to_wave_server.h"
 
-#include <QtCore/QIODevice>
-
 #include <flite.h>
+
+#include <QtCore/QIODevice>
 
 extern "C" {
 
@@ -216,6 +216,13 @@ TextToWaveServer::~TextToWaveServer()
 
 std::unique_ptr<TextToWaveServer> TextToWaveServer::create(const QString& binaryPath)
 {
+    static std::atomic_flag initGuard = /*false*/ ATOMIC_FLAG_INIT;
+    if (!NX_ASSERT(!initGuard.test_and_set(),
+        "Only one instance of TextToWaveServer is allowed due to library limitations."))
+    {
+        return nullptr;
+    }
+
     std::unique_ptr<TextToWaveServer> result(new TextToWaveServer(binaryPath));
     result->start();
     result->waitForStarted();
