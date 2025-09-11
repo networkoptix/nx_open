@@ -29,7 +29,11 @@ execute_process(
 file(GLOB_RECURSE mobile_client_qml_files CONFIGURE_DEPENDS "${compiled_qml_directory}/*")
 nx_store_known_files(${mobile_client_qml_files})
 
-nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf QT_PREFIX .)
+if(LINUX)
+    nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
+else()
+    nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf QT_PREFIX .)
+endif()
 
 set(intermediate_config_file "${CMAKE_CURRENT_BINARY_DIR}/intermediate_config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${intermediate_config_file}")

@@ -65,8 +65,12 @@ qt_plugins = [
     'platforminputcontexts',
     'platforms',
     'tls',
-    'xcbglintegrations',
+    'webview',
 ]
+if tools.is_linux():
+    qt_plugins += [
+        'xcbglintegrations',
+    ]
 
 nx_libraries = [
     'nx_branding',
@@ -157,7 +161,7 @@ def create_mobile_client_archive(config, output_file):
         tools.zip_files_to(zip, tools.openal_files(sys_lib_dir), sys_lib_dir, target_lib_dir)
         tools.zip_files_to(zip, tools.quazip_files_to(sys_lib_dir), sys_lib_dir, target_lib_dir)
         tools.zip_files_to(zip, tools.nx_files(sys_lib_dir, nx_libraries), sys_lib_dir, target_lib_dir)
-        tools.zip_files_to(zip, tools.icu_files(binaries_dir), binaries_dir)
+        tools.zip_files_to(zip, tools.icu_files(sys_lib_dir), sys_lib_dir, target_lib_dir)
         tools.zip_files_to(zip, tools.find_all_files(locale_resources_directory), qt_directory)
         tools.zip_files_to(zip, tools.find_all_files(webengine_locales_directory), qt_directory)
         tools.zip_files_to(
@@ -200,7 +204,9 @@ def create_mobile_client_archive(config, output_file):
         zip.write(
             binaries_dir / mobile_client_binary_name,
             f'{target_bin_dir}/{mobile_client_binary_name}')
-        zip.write(current_binary_dir / 'qt.conf', 'qt.conf')
+        zip.write(current_binary_dir / 'qt.conf', target_bin_dir + '/qt.conf')
+        if tools.is_linux():
+            zip.write(current_binary_dir / 'qt.conf', target_libexec_dir + '/qt.conf')
 
         # Write metadata
         distribution_output_dir = Path(config['distribution_output_dir'])

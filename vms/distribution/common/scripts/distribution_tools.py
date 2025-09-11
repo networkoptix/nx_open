@@ -137,7 +137,7 @@ def hidapi_files(source_dir):
 
 def openal_files(source_dir):
     template = 'OpenAL32' if is_windows() else 'openal'
-    yield os.path.join(source_dir, dynamic_library_filename(template))
+    yield os.path.join(source_dir, dynamic_library_filename(template, version='1'))
 
 
 def quazip_files_to(source_dir):
