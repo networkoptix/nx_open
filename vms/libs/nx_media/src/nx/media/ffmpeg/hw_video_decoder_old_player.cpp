@@ -201,8 +201,10 @@ bool HwVideoDecoderOldPlayer::decode(
         return false;
     }
 
-    m_lastStatus = 0;
+    if ((*outFramePtr)->width <= 0 || (*outFramePtr)->height <= 0 || !(*outFramePtr)->data[0])
+        return false;
 
+    m_lastStatus = 0;
     if ((*outFramePtr)->hw_frames_ctx)
     {
         const auto frame = (*outFramePtr).get();
