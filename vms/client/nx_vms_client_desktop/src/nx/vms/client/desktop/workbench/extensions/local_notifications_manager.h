@@ -75,11 +75,16 @@ public:
     // Just emits interactionRequested after validity check.
     void interact(const nx::Uuid& notificationId);
 
+    // Common UI should call this function if a link is activated.
+    // Just emits linkActivated after validity check.
+    void activateLink(const nx::Uuid& notificationId, const QString& linkUrl);
+
 signals:
     void added(const nx::Uuid& notificationId);
     void removed(const nx::Uuid& notificationId);
     void cancelRequested(const nx::Uuid& notificationId);
     void interactionRequested(const nx::Uuid& notificationId);
+    void linkActivated(const nx::Uuid& notificationId, const QString& linkUrl);
     void progressChanged(const nx::Uuid& notificationId, std::optional<ProgressState> progress);
     void progressFormatChanged(const nx::Uuid& notificationId, const QString& format);
     void cancellableChanged(const nx::Uuid& notificationId, bool isCancellable);
