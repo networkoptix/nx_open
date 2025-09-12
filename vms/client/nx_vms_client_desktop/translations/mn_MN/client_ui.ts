@@ -2226,7 +2226,7 @@
     </message>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Админууд</translation>
     </message>
     <message>
       <source>Available to</source>
@@ -2234,7 +2234,7 @@
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Хүчтэй хэрэглэгчид</translation>
     </message>
   </context>
   <context>
