@@ -22,9 +22,14 @@ public:
         std::string raw;
     };
 
+    CollectionHash(std::vector<Item> list = {});
+    CollectionHash(const CollectionHash&) = default;
+    CollectionHash& operator=(const CollectionHash&) = default;
+
     std::pair<Value, bool /*changed*/> calculate(Item item);
     Value calculate(std::vector<Item> list);
     Value remove(const ItemId& id);
+    const Value& combinedHash() const { return m_combinedHash; }
 
     enum Check { item, list };
     static bool check(Check check, ValueView in, ValueView out);

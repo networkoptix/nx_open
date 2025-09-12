@@ -29,6 +29,11 @@ static Hash combineHashes(const std::map<CollectionHash::ItemId, Hash>& hashes)
 
 } // namespace
 
+CollectionHash::CollectionHash(std::vector<Item> list)
+{
+    calculate(std::move(list));
+}
+
 std::pair<CollectionHash::Value, bool /*changed*/> CollectionHash::calculate(Item item)
 {
     auto hash = calculateHash(std::move(item.raw));
