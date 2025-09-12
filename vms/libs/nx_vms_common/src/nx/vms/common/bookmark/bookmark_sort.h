@@ -40,7 +40,7 @@ void sortBookmarks(
 {
     using BookmarkType = typename Bookmarks::value_type;
     const auto pred = detail::bookmarkSortPredicate<BookmarkType>(field, order, resourcePool);
-    std::sort(bookmarks.begin(), bookmarks.end(), pred);
+    std::ranges::sort(bookmarks, pred);
 }
 
 /** Merge sorted by start time and uuid bookmarks lists around specified time point. */

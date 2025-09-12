@@ -196,8 +196,7 @@ AssertTimer::~AssertTimer()
     typedef std::pair<std::string, TimeInfo> Record;
 
     std::vector<Record> sorted(m_times.begin(), m_times.end());
-    std::sort(sorted.begin(), sorted.end(),
-        [](const Record& a, const Record& b) { return a.second < b.second; });
+    std::ranges::sort(sorted,[](const Record& a, const Record& b) { return a.second < b.second; });
 
     size_t toPrint = kShowTheMostCount;
     for (const auto& record: sorted)

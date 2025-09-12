@@ -19,8 +19,8 @@ std::optional<nx::vms::api::StorageSpaceData> selectOne(
                 && !data.isExternal;
         });
 
-    std::sort(
-        filtered.begin(), filtered.end(),
+    std::ranges::sort(
+        filtered,
         [](const auto& data1, const auto& data2) { return data1.totalSpace > data2.totalSpace; });
 
     return filtered.empty()
@@ -44,8 +44,8 @@ QList<nx::Uuid> selectServers(
     if (serverToMaxStorageSpace.empty())
         return QList<nx::Uuid>();
 
-    std::sort(
-        serverToMaxStorageSpace.begin(), serverToMaxStorageSpace.end(),
+    std::ranges::sort(
+        serverToMaxStorageSpace,
         [](const auto& p1, const auto& p2) { return p1.second > p2.second; });
 
     QList<nx::Uuid> result;

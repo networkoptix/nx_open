@@ -43,7 +43,7 @@ public:
     void setPoints(const QVector<point_type> &points) {
         m_points = points;
 
-        std::sort(m_points.begin(), m_points.end(), PointLess());
+        std::ranges::sort(m_points, PointLess());
     }
 
     T operator()(const T &x) const{
@@ -139,6 +139,5 @@ private:
     Qn::ExtrapolationMode m_extrapolationMode;
     QVector<point_type> m_points;
 };
-
 
 #endif // QN_INTERPOLATOR_H

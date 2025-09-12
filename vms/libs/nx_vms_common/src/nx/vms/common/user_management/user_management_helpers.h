@@ -120,7 +120,7 @@ QStringList userGroupNames(
 
     auto groups = systemContext->userGroupManager()->getGroupsByIds(groupIds);
 
-    std::sort(groups.begin(), groups.end(), lessFunc);
+    std::ranges::sort(groups, lessFunc);
 
     QStringList result;
     for (const auto& group: groups)

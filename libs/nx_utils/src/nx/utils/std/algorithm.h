@@ -241,7 +241,7 @@ decltype(auto) y_combinator(Functor&& functor)
 template <typename T, typename Allocator, typename Compare>
 void unique_sort(std::vector<T, Allocator>* vec, Compare comp)
 {
-    std::sort(vec->begin(), vec->end(), comp);
+    std::ranges::sort(*vec, comp);
     vec->erase(
         std::unique(vec->begin(), vec->end(),
             [comp = std::move(comp)](const auto& lhs, const auto& rhs) -> bool
@@ -263,7 +263,7 @@ void unique_sort(std::vector<T, Allocator>* vec)
 template<typename T, typename Allocator, typename SortPredicate = std::less<>>
 void sort(std::vector<T, Allocator>* v, SortPredicate p = {})
 {
-    std::sort(v->begin(), v->end(), std::move(p));
+    std::ranges::sort(*v, std::move(p));
 }
 
 /**
@@ -337,7 +337,7 @@ template <typename T, typename Allocator>
 template<typename T, typename Allocator, typename SortPredicate = std::less<>>
 [[nodiscard]] std::vector<T, Allocator> sorted(std::vector<T, Allocator> v, SortPredicate p = {})
 {
-    std::sort(v.begin(), v.end(), std::move(p));
+    std::ranges::sort(v, std::move(p));
     return v;
 }
 

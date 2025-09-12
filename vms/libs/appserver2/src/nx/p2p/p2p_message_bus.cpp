@@ -956,7 +956,7 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
 
     for (const auto& number: moreNumbersToResolve)
         connectionContext->awaitingNumbersToResolve.push_back(number);
-    std::sort(connectionContext->awaitingNumbersToResolve.begin(), connectionContext->awaitingNumbersToResolve.end());
+    std::ranges::sort(connectionContext->awaitingNumbersToResolve);
 
     if (connection->remotePeer().dataFormat == Qn::SerializationFormat::ubjson)
     {

@@ -108,8 +108,8 @@ std::unordered_map<nx::Uuid, std::vector<ResourceParamData>> toParameterMap(
     std::vector<ResourceParamWithRefData> parametersWithIds)
 {
     std::unordered_map<nx::Uuid, std::vector<ResourceParamData>> result;
-    std::sort(parametersWithIds.begin(),
-        parametersWithIds.end(),
+    std::ranges::sort(
+        parametersWithIds,
         [](const auto& lhs, const auto& rhs) { return lhs.getId() < rhs.getId(); });
 
     for (auto l = parametersWithIds.begin(); l != parametersWithIds.end();)

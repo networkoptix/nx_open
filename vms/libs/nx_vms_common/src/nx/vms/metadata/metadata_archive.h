@@ -222,7 +222,7 @@ protected:
         {
             return left.startTimeMs > right.startTimeMs;
         };
-        std::sort(data->begin(), data->end(), descendingOrder ? descComparator : ascComparator);
+        std::ranges::sort(*data, descendingOrder ? descComparator : ascComparator);
     }
 
 private:

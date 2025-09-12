@@ -373,12 +373,18 @@ QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseS
 {
     QStringList result = list;
     if (caseSensitive == Qt::CaseSensitive)
-        std::sort(result.begin(), result.end(), [](const QString &left, const QString &right)
     {
-        return naturalStringCompare(left, right, Qt::CaseSensitive) < 0;
-    });
+        std::ranges::sort(
+            result,
+            [](const QString& left, const QString& right)
+            {
+                return naturalStringCompare(left, right, Qt::CaseSensitive) < 0;
+            });
+    }
     else
-        std::sort(result.begin(), result.end(), naturalStringLess);
+    {
+        std::ranges::sort(result, naturalStringLess);
+    }
     return result;
 }
 
@@ -682,7 +688,6 @@ static QByteArray doFormatJsonString(std::string_view data)
     }
     return result;
 }
-
 
 QByteArray formatJsonString(const QByteArray& data)
 {

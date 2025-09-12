@@ -358,16 +358,16 @@ void sortEntityTypeTree(std::vector<EngineScope<EntityType>>* inOutEntityTypeTre
     {
         for (GroupScope<EntityType>& groupScope: engineScope.groups)
         {
-            std::sort(groupScope.entities.begin(),
-                groupScope.entities.end(),
+            std::ranges::sort(
+                groupScope.entities,
                 [](const EntityType* first, const EntityType* second)
                 {
                     return first->name() < second->name();
                 });
         }
 
-        std::sort(engineScope.groups.begin(),
-            engineScope.groups.end(),
+        std::ranges::sort(
+            engineScope.groups,
             [](const GroupScope<EntityType>& first, GroupScope<EntityType>& second)
             {
                 if (!first.group)
@@ -380,7 +380,8 @@ void sortEntityTypeTree(std::vector<EngineScope<EntityType>>* inOutEntityTypeTre
             });
     }
 
-    std::sort(inOutEntityTypeTree->begin(), inOutEntityTypeTree->end(),
+    std::ranges::sort(
+        *inOutEntityTypeTree,
         [](const EngineScope<EntityType>& first, EngineScope<EntityType>& second)
         {
             if (!first.engine)

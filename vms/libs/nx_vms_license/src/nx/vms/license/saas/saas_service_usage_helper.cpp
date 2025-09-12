@@ -50,8 +50,8 @@ CloudServiceUsageHelper::CloudServiceUsageHelper(
 
 void CloudServiceUsageHelper::sortCameras(QnVirtualCameraResourceList* inOutCameras)
 {
-    std::sort(
-        inOutCameras->begin(), inOutCameras->end(),
+    std::ranges::sort(
+        *inOutCameras,
         [](const auto& left, const auto& right)
         {
             const int leftMegapixels = getMegapixels(left);

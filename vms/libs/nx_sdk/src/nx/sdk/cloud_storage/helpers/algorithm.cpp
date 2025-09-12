@@ -274,7 +274,8 @@ void sortAndLimitBookmarks(const BookmarkFilter& filter, std::vector<Bookmark>* 
 {
     const bool isAsc = filter.order == SortOrder::ascending;
     std::sort(
-        outBookmarks->begin(), outBookmarks->end(),
+        outBookmarks->begin(),
+        outBookmarks->end(),
         [&filter, isAsc](const auto& b1, const auto& b2)
         {
             using Column = BookmarkFilter::SortColumn;

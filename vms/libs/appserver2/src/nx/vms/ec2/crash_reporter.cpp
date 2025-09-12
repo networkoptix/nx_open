@@ -50,8 +50,8 @@ static QFileInfoList readCrashes([[maybe_unused]] const QString& prefix = QStrin
     // Qt has a crossplatform bug in build in sort by QDir::Time
     // - linux: time decrements along the list
     // - windows: time increments along the list
-    std::sort(
-        files.begin(), files.end(),
+    std::ranges::sort(
+        files,
         [](const QFileInfo& left, const QFileInfo& right)
         {
             return left.lastModified() > right.lastModified();

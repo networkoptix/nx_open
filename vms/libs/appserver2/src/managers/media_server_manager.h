@@ -168,7 +168,8 @@ int QnMediaServerManager<T>::saveStorages(
      * It prevents potential issue when several backup storages
      * exists in the same time.
      */
-    std::sort(data.begin(), data.end(),
+    std::ranges::sort(
+        data,
         [](const StorageData& left, const StorageData& right)
         {
             if (left.usedForWriting != right.usedForWriting)
