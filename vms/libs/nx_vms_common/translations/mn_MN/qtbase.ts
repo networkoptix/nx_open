@@ -487,7 +487,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Directory:</source>
-      <translation type="unfinished">Directory:</translation>
+      <translation>Лавлах</translation>
     </message>
     <message>
       <source>File &amp;name:</source>
@@ -535,15 +535,15 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Directories</source>
-      <translation type="unfinished">Directories</translation>
+      <translation>Лавлахууд</translation>
     </message>
     <message>
       <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-      <translation type="unfinished">%1
-Directory not found.
-Please verify the correct directory name was given.</translation>
+      <translation>%1
+Лавлах олдсонгүй.
+Лавлахын нэрийг зөв өгсөн эсэхийг шалгана уу?</translation>
     </message>
     <message>
       <source>%1 already exists.
@@ -570,8 +570,8 @@ Please verify the correct file name was given.</source>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation type="unfinished">&apos;%1&apos; is write protected.
-Do you want to delete it anyway?</translation>
+      <translation>&apos;%1&apos;бичихээс хамгаалагдсан.
+Та үнэхээр устгамаар байна уу?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
@@ -579,7 +579,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
-      <translation type="unfinished">Could not delete directory.</translation>
+      <translation>Лөвлөхыг устгаж чадсангүй.</translation>
     </message>
     <message>
       <source>Recent Places</source>
@@ -619,7 +619,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation type="unfinished">Alias</translation>
+      <translation>Богино нэр</translation>
     </message>
     <message>
       <source>Shortcut</source>
@@ -748,7 +748,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
+      <translation>QT_LAYOUT_DIRECTION</translation>
     </message>
   </context>
   <context>
@@ -763,7 +763,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>No such file or directory</source>
-      <translation type="unfinished">No such file or directory</translation>
+      <translation>Ийм файл эсвэл лавлах байхгүй.</translation>
     </message>
     <message>
       <source>No space left on device</source>
@@ -775,7 +775,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation type="unfinished">file to open is a directory</translation>
+      <translation>Нээх файл нь лавлах байна</translation>
     </message>
   </context>
   <context>
@@ -986,7 +986,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation type="unfinished">Filename refers to a directory</translation>
+      <translation>Файлын нэр нь лавлахыг хэлнэ</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
@@ -1080,7 +1080,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Temporary Directory</source>
-      <translation type="unfinished">Temporary Directory</translation>
+      <translation>Түр зуурын лавлах</translation>
     </message>
     <message>
       <source>Home</source>
