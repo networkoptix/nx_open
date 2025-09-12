@@ -246,6 +246,19 @@ public:
     }
 
 protected:
+    template<typename Data>
+    nx::network::rest::CollectionHash calculateEtags(const std::vector<Data>& list) {
+        auto d = static_cast<Derived*>(this);
+        std::vector<nx::network::rest::CollectionHash::Item> data;
+        data.reserve(list.size());
+        for (const auto& item: list)
+        {
+            data.emplace_back(d->subscriptionId(nx::utils::model::getId(item)),
+                nx::reflect::json::serialize(item));
+        }
+        return nx::network::rest::CollectionHash{std::move(data)};
+    }
+
     template<typename Id, typename Data>
     std::vector<Data> updateCombinedEtag(Id id, std::vector<Data> result,
         const Request& request, ResponseAttributes* responseAttributes)
@@ -253,43 +266,74 @@ protected:
         if (!responseAttributes)
             return result;
 
+        const bool processJsonRpcEtag = request.jsonRpcContext()
+            && (request.jsonRpcContext()->subscribed
+                || request.jsonRpcContext()->subs == nx::network::rest::json_rpc::Subs::subscribe);
+        nx::network::rest::CollectionHash::Value etag;
         auto d = static_cast<Derived*>(this);
         if (id == Id{})
         {
-            std::vector<nx::network::rest::CollectionHash::Item> data;
-            data.reserve(result.size());
-            for (const auto& item: result)
+            auto etags = calculateEtags(result);
+            etag = etags.combinedHash();
+            if (processJsonRpcEtag)
             {
-                data.emplace_back(d->subscriptionId(nx::utils::model::getId(item)),
-                    nx::reflect::json::serialize(item));
+                m_etags.lock()->put(request.userSession.access.userId, std::move(etags));
+                auto providedEtag =
+                    nx::network::http::getHeaderValue(request.httpHeaders(), "If-None-Match");
+                if (!providedEtag.empty()
+                    && nx::network::rest::CollectionHash::check(
+                        nx::network::rest::CollectionHash::Check::list,
+                        nx::utils::fromHex(providedEtag),
+                        etag))
+                {
+                    result.clear();
+                }
             }
-            nx::network::rest::CollectionHash etags;
-            nx::network::http::insertOrReplaceHeader(&responseAttributes->httpHeaders,
-                {"ETag", nx::utils::toHex(etags.calculate(std::move(data)))});
-            m_etags.lock()->put(request.userSession.access.userId, std::move(etags));
         }
         else if (!result.empty())
         {
             nx::network::rest::CollectionHash::Item item{
                 d->subscriptionId(id), nx::reflect::json::serialize(result.front())};
             auto lock = m_etags.lock();
-            auto etags = lock->getValue(request.userSession.access.userId);
-            if (etags)
+            if (auto etags = lock->getValue(request.userSession.access.userId))
             {
-                const auto [etag, changed] = etags->get().calculate(std::move(item));
-                if (!changed && request.jsonRpcContext() && request.jsonRpcContext()->subscribed)
-                    return {};
-
-                nx::network::http::insertOrReplaceHeader(
-                    &responseAttributes->httpHeaders, {"ETag", nx::utils::toHex(etag)});
+                if (processJsonRpcEtag)
+                {
+                    bool changed = false;
+                    std::tie(etag, changed) = etags->get().calculate(std::move(item));
+                    // NOTE: Here we considering that item is not changed only for notifications.
+                    // Initial subscription request for single item always sends item in response
+                    // because of current limitations.
+                    if (!changed && request.jsonRpcContext()->subscribed)
+                        result.clear();
+                }
+                else
+                {
+                    nx::network::rest::CollectionHash copy{etags->get()};
+                    etag = copy.calculate(std::move(item)).first;
+                }
             }
             else
             {
                 lock.unlock();
-                d->read({}, request, responseAttributes); //< CollectionHash for all items.
-                if constexpr (requires { result = d->read(id, request, responseAttributes); })
-                    result = d->read(std::move(id), request, responseAttributes);
+                if (processJsonRpcEtag)
+                {
+                    d->read({}, request, responseAttributes); //< Fill m_etags for the usage below.
+                    lock = m_etags.lock();
+                    if (auto etags = lock->getValue(request.userSession.access.userId))
+                        etag = etags->get().calculate(std::move(item)).first;
+                }
+                else
+                {
+                    auto etags = calculateEtags(d->read({}, request, /*responseAttributes*/ nullptr));
+                    etag = etags.calculate(std::move(item)).first;
+                }
             }
+        }
+        if (!etag.empty())
+        {
+            nx::network::http::insertOrReplaceHeader(
+                &responseAttributes->httpHeaders, {"ETag", nx::utils::toHex(etag)});
         }
         return result;
     }
