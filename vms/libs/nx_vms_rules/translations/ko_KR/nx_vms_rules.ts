@@ -131,7 +131,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation/>
     </message>
     <message>
       <source>Duration</source>

@@ -55,7 +55,7 @@
     <name>BookmarkFacadeStrings</name>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Камерыг устгасан</translation>
     </message>
     <message>
       <source>Site Event</source>
@@ -155,35 +155,35 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Админууд</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Хүчтэй хэрэглэгчид</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>Дэвшилтэт үзэгчид</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>Үзэгчид</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>Шууд үзэгчид</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>Энэ бүлгийн гишүүд шууд видео, I/O модуль болон вэб хуудсыг үзэх боломжтой.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>Энэ бүлгийн гишүүд Үзэгчдийн бүлгээс олгосон зөвшөөрлөөс гадна PTZ байрлал болон PTZ аяллыг харах, идэвхжүүлэх, 2 талын аудио ашиглах, I/O модулийн товчлууруудыг ажиллуулах, хавчуурга үүсгэх, засах, Үйл явдлын бүртгэлийг үзэх боломжтой.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>Энэ бүлгийн гишүүд Live Viewers бүлгээс олгосон зөвшөөрлөөс гадна архив болон Хавчуурга үзэх, экспортлох боломжтой.</translation>
     </message>
     <message>
       <source>Site Health Viewers</source>
@@ -379,11 +379,11 @@
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open device issues dialog for more details.</translation>
+      <translation>Хэт олон медиа алдаа. Дэлгэрэнгүй мэдээллийг авахын тулд төхөөрөмжийн асуудлын харилцах цонхыг нээнэ үү.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open camera issues dialog for more details.</translation>
+      <translation>Хэт олон медиа алдаа. Дэлгэрэнгүй мэдээллийг камерын асуудлын харилцах цонхыг нээнэ үү.</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
@@ -403,7 +403,7 @@
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open I/O module issues dialog for more details.</translation>
+      <translation>Хэт олон медиа алдаа. Нэмэлт мэдээлэл авахын тулд I/O модулийн асуудлуудын харилцах цонхыг нээнэ үү.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
@@ -487,27 +487,27 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+      <translation>Хэрэв идэвхгүй болгосон бол Бичлэгийг идэвхжүүлж, төхөөрөмжийн тохиргооноос FPS-ийг бууруулж үзээрэй (алдаа &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
+      <translation>Хэрэв идэвхгүй болгосон бол Камерын тохиргооноос Бичлэгийг идэвхжүүлж, FPS-ийг бууруулж үзээрэй (алдаа &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+      <translation>Хэрэв идэвхгүй болгосон бол I/O модулийн тохиргооноос Бичлэгийг идэвхжүүлж үзнэ үү (алдаа &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+      <translation>Төхөөрөмжөөс буруу өгөгдөл хүлээн авлаа. Дэлгэрэнгүй: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+      <translation>Камераас буруу өгөгдөл хүлээн авлаа. Дэлгэрэнгүй: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>Оролт гаралтын модулиас буруу өгөгдөл хүлээн авлаа. Дэлгэрэнгүй: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -531,7 +531,7 @@
     <name>QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Камерыг устгасан</translation>
     </message>
   </context>
   <context>
@@ -614,15 +614,15 @@
     </message>
     <message>
       <source>Professional</source>
-      <translation type="unfinished">Professional</translation>
+      <translation>Мэргэжлийн</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Үзүүрийн </translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -638,7 +638,7 @@
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation type="unfinished">Analog Encoder</translation>
+      <translation>Аналог кодлогч</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -650,15 +650,15 @@
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation type="unfinished">Edge Licenses</translation>
+      <translation>Edge лицензүүд</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
-      <translation type="unfinished">Vmax Licenses</translation>
+      <translation>Vmax лицензүүд</translation>
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation type="unfinished">Analog Encoder Licenses</translation>
+      <translation>Аналог кодлогчийн лицензүүд</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
@@ -666,11 +666,11 @@
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation type="unfinished">I/O Module Licenses</translation>
+      <translation>I/O модулийн лицензүүд</translation>
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation type="unfinished">Start Licenses</translation>
+      <translation>Лицензүүдийг эхлүүлэх</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -686,105 +686,105 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Цаг хугацаа</translation>
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Цагийн лицензүүд</translation>
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Гүүр</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>Гүүрний лицензүүд</translation>
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Цагийн лиценз</numerusform>
         <numerusform>%n Time Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>Аналог лицензүүд</numerusform>
         <numerusform>%n Analog Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>Про лицензүүд</numerusform>
         <numerusform>%n Professional Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge лицензүүд</numerusform>
         <numerusform>%n Edge Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax лицензүүд</numerusform>
         <numerusform>%n Vmax Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Аналог кодлогчийн лицензүүд</numerusform>
         <numerusform>%n Analog Encoder Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>Ханын дэлгэцийн лицензүүд</numerusform>
         <numerusform>%n Video Wall Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n I/O модулийн лицензүүд</numerusform>
         <numerusform>%n I/O Module Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Лицензүүдийг эхлүүлэх</numerusform>
         <numerusform>%n Start Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Гүүр болох лицензүүд</numerusform>
         <numerusform>%n Bridge Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>Хүчингүй лицензүүд</numerusform>
         <numerusform>%n Invalid Licenses</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Үнэгүй лицензүүд</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Үнэгүй лицензүүд</numerusform>
         <numerusform>%n Free Licenses</numerusform>
       </translation>
     </message>
@@ -1026,7 +1026,7 @@
     <message numerus="yes">
       <source>%n devices</source>
       <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
+        <numerusform>%nБүх төхөөрөмж</numerusform>
         <numerusform>%n devices</numerusform>
       </translation>
     </message>
@@ -1287,7 +1287,7 @@
       <source>Days</source>
       <comment>Capitalized full suffix for displaying days</comment>
       <translation type="unfinished">
-        <numerusform>Days</numerusform>
+        <numerusform>Өдөр</numerusform>
         <numerusform>Days</numerusform>
       </translation>
     </message>
@@ -1435,39 +1435,39 @@
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+      <translation>Гаралтын мета өгөгдлийн урсгалыг хуваарилж чадсангүй.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation type="unfinished">Invalid audio codec information.</translation>
+      <translation>Аудио кодлогчийн мэдээлэл буруу байна.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
+      <translation>Видео эсвэл аудио кодлогч нь сонгосон форматтай нийцэхгүй байна.</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Видеоны кодыг өөрчлөх шаардлагатай.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
+      <translation>Өгөгдлийн экспортын нөөцийн төрөл буруу байна.</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Өгөгдөл экспорт хийгээгүй.</translation>
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Архивын агуулгыг экспортлохын тулд энэ хэсгийг нээнэ үү.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>Архив одоо боломжгүй байна. Дараа дахин оролдоно уу.</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Файл бичих алдаа.</translation>
     </message>
     <message>
       <source>Audio transcoding required.</source>
@@ -1515,31 +1515,31 @@
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
-      <translation type="unfinished">Anonymous statistics report allowed.</translation>
+      <translation>Нэргүй статистик мэдээг зөвшөөрдөг.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time.</source>
-      <translation type="unfinished">Anonymous statistics report last time.</translation>
+      <translation>Сүүлийн удаа нэргүй статистик мэдээлэв.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version.</source>
-      <translation type="unfinished">Anonymous statistics report last version.</translation>
+      <translation>Нэргүй статистик тайлангийн сүүлийн хувилбар.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number.</source>
-      <translation type="unfinished">Anonymous statistics report last number.</translation>
+      <translation>Нэргүй статистик мэдээний сүүлийн дугаар.</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle.</source>
-      <translation type="unfinished">Anonymous statistics time cycle.</translation>
+      <translation>Нэргүй статистикийн цагийн мөчлөг.</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update.</source>
-      <translation type="unfinished">Anonymous statistics report delay after update.</translation>
+      <translation>Нэргүй статистик мэдээ шинэчлэгдсэний дараа саатдаг.</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL.</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL.</translation>
+      <translation>Нэргүй статистикийн тайлан серверийн URL.</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL.</source>
@@ -1547,7 +1547,7 @@
     </message>
     <message>
       <source>Anonymous statistics report Client settings.</source>
-      <translation type="unfinished">Anonymous statistics report Client settings.</translation>
+      <translation>Нэргүй статистикийн тайлан Үйлчлүүлэгчийн тохиргоо.</translation>
     </message>
     <message>
       <source>Device storage information update interval.</source>
@@ -1559,7 +1559,7 @@
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h).</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h).</translation>
+      <translation>Прокси холболтын завсарлага (секунд, 1с-1цаг).</translation>
     </message>
     <message>
       <source>Proxy connection access policy.</source>
@@ -1567,23 +1567,23 @@
     </message>
     <message>
       <source>Time synchronization enabled.</source>
-      <translation type="unfinished">Time synchronization enabled.</translation>
+      <translation>Цагийн синхрончлол идэвхжсэн.</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID.</source>
-      <translation type="unfinished">Primary time synchronization Server ID.</translation>
+      <translation>Үндсэн цагийн синхрончлолын серверийн ID.</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds).</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds).</translation>
+      <translation>Орон нутгийн болон эх сурвалж цагийн хоорондох хамгийн их ялгаа (миллисекунд).</translation>
     </message>
     <message>
       <source>OS time change check period.</source>
-      <translation type="unfinished">OS time change check period.</translation>
+      <translation>Үйлдлийн систем-ийн цагийн өөрчлөлтийг шалгах хугацаа.</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests.</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests.</translation>
+      <translation>Сүлжээний хүсэлтийн синхрончлолын синхрончлолын интервал.</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
@@ -1591,7 +1591,7 @@
     </message>
     <message>
       <source>Cloud owner account.</source>
-      <translation type="unfinished">Cloud owner account.</translation>
+      <translation>Клоуд эзэмшигчийн бүртгэл.</translation>
     </message>
     <message>
       <source>Organization Id.</source>
@@ -1603,7 +1603,7 @@
     </message>
     <message>
       <source>Cloud authorization key.</source>
-      <translation type="unfinished">Cloud authorization key.</translation>
+      <translation>Клоуд зөвшөөрлийн түлхүүр.</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site.</source>
@@ -1623,35 +1623,35 @@
     </message>
     <message>
       <source>Disable Device vendors.</source>
-      <translation type="unfinished">Disable Device vendors.</translation>
+      <translation>Төхөөрөмжийн үйлдвэрлэгчдийг идэвхгүй болгох.</translation>
     </message>
     <message>
       <source>Optimize Camera settings.</source>
-      <translation type="unfinished">Optimize Camera settings.</translation>
+      <translation>Камерын тохиргоог оновчтой болгох.</translation>
     </message>
     <message>
       <source>Thumbnails auto-update.</source>
-      <translation type="unfinished">Thumbnails auto-update.</translation>
+      <translation>Өнгөц зургийг автоматаар шинэчлэх.</translation>
     </message>
     <message>
       <source>Send plain-text emails.</source>
-      <translation type="unfinished">Send plain-text emails.</translation>
+      <translation>Энгийн тексттэй имэйл илгээх.</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails.</source>
-      <translation type="unfinished">Use Windows line feed in emails.</translation>
+      <translation>Имэйлд Windows шугамын хангамжийг ашиглах.</translation>
     </message>
     <message>
       <source>Enable audit trail.</source>
-      <translation type="unfinished">Enable audit trail.</translation>
+      <translation>Аудитын мөрийг идэвхжүүлэх.</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730).</source>
-      <translation type="unfinished">Audit trail period (days, 14-730).</translation>
+      <translation>Аудитын хугацаа (өдөр, 14-730).</translation>
     </message>
     <message>
       <source>Event log period (days).</source>
-      <translation type="unfinished">Event log period (days).</translation>
+      <translation>Үйл явдлын бүртгэлийн хугацаа (өдөр).</translation>
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
@@ -1671,27 +1671,27 @@
     </message>
     <message>
       <source>Enable auto-discovery.</source>
-      <translation type="unfinished">Enable auto-discovery.</translation>
+      <translation>Автоматаар илрүүлэхийг идэвхжүүл.</translation>
     </message>
     <message>
       <source>Enable auto-update notifications.</source>
-      <translation type="unfinished">Enable auto-update notifications.</translation>
+      <translation>Автоматаар шинэчлэх мэдэгдлийг идэвхжүүлэх.</translation>
     </message>
     <message>
       <source>Enable update notifications.</source>
-      <translation type="unfinished">Enable update notifications.</translation>
+      <translation>Шинэчлэлийн мэдэгдлийг идэвхжүүлэх.</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping.</source>
-      <translation type="unfinished">Enable UPNP port-mapping.</translation>
+      <translation>UPNP портын зураглалыг идэвхжүүлэх.</translation>
     </message>
     <message>
       <source>Backup settings.</source>
-      <translation type="unfinished">Backup settings.</translation>
+      <translation>Нөөцлөх тохиргоо.</translation>
     </message>
     <message>
       <source>Cloud host override.</source>
-      <translation type="unfinished">Cloud host override.</translation>
+      <translation>Cloud хостыг хүчингүй болгох.</translation>
     </message>
     <message>
       <source>Enable cross-domain policy.</source>
@@ -1699,15 +1699,15 @@
     </message>
     <message>
       <source>Enable RTSP for Arecont.</source>
-      <translation type="unfinished">Enable RTSP for Arecont.</translation>
+      <translation>Arecont-д зориулсан RTSP-г идэвхжүүлнэ үү.</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher.</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher.</translation>
+      <translation>Дараалсан Flir ONVIF хайгчийг идэвхжүүлнэ үү.</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB).</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB).</translation>
+      <translation>P2P дарааллын дээд хэмжээ (байт, 32-512 Мб).</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB).</source>
@@ -1931,7 +1931,7 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>Хамгийн их үзэгдэл (0 өгөгдмөл гэсэн үг)</translation>
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>

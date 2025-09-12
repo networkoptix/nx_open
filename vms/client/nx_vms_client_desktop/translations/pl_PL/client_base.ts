@@ -7791,8 +7791,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Użytkownicy Channel Partner mają dostęp do tej witryny</translation>
     </message>
     <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation>Dostęp użytkowników Partnerów kanałowych jest zarządzany na poziomie organizacji i nie są oni widoczni w zarządzaniu użytkownikami witryny.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Dowiedz się więcej&lt;/a&gt;</translation>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</translation>
     </message>
   </context>
   <context>

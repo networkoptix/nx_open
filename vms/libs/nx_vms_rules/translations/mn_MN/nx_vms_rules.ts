@@ -319,7 +319,7 @@
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Камерыг устгасан</translation>
     </message>
     <message>
       <source>Removed server</source>
