@@ -1371,7 +1371,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Yeni Site</translation>
     </message>
   </context>
   <context>
@@ -1470,7 +1470,7 @@
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Ses kod dönüştürmesi gerekiyor.</translation>
     </message>
   </context>
   <context>

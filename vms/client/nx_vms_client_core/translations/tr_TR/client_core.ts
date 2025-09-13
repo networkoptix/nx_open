@@ -13,7 +13,7 @@
     <name>QnSystemsModel</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Yeni Site</translation>
     </message>
   </context>
   <context>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation>Sunucu uyuşmazlığı</translation>
+      <translation>Uyumsuz sunucu</translation>
     </message>
     <message>
       <source>Server has a different version:</source>
@@ -137,7 +137,7 @@
     </message>
     <message>
       <source>If this error persists, please contact your site administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+      <translation>Bu hata devam ederse lütfen sistem yöneticinizle iletişime geçin.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
@@ -223,9 +223,9 @@
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Sunucu kimliği doğrulanamıyor</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform/>
       </translation>
     </message>
     <message>
