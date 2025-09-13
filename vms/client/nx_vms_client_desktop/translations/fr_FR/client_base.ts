@@ -7545,7 +7545,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>L'accès des utilisateurs des partenaires de distribution&apos; est géré au niveau de l'organisation et n'est pas visible dans la gestion des utilisateurs du site.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;En savoir plus&lt;/a&gt;</translation>
     </message>
   </context>
   <context>

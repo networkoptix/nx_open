@@ -7422,7 +7422,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>チャネルパートナーユーザーのアクセス権限は組織レベルで管理されており、サイトのユーザー管理では表示されません。&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;詳細はこちら&lt;/a&gt;</translation>
     </message>
   </context>
   <context>

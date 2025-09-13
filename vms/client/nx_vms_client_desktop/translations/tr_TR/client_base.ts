@@ -1042,16 +1042,16 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Öğeleri Sessize Al</numerusform>
-        <numerusform>Mute Items</numerusform>
+        <numerusform>Öğeleri Sessize Al</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Öğelerin sesini aç</numerusform>
-        <numerusform>Unmute Items</numerusform>
+        <numerusform>Öğelerin Sesini Aç</numerusform>
       </translation>
     </message>
     <message>
@@ -1220,11 +1220,11 @@
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>Tüm Dosyalar</translation>
     </message>
   </context>
   <context>
@@ -5398,30 +5398,30 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>%n Cihaz video duvarında açılamadı:</numerusform>
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+      <translation>
+        <numerusform>%n cihaz(lar) Video duvarında açılamadı:</numerusform>
+        <numerusform>%n Cihaz(lar) video duvarında açılamadı:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n cameras on the video wall:</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%n kamera(lar) Video duvarında açılamadı:</numerusform>
         <numerusform>%n Kamera video duvarında açılamadı:</numerusform>
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı cihazlarına ekleme yapamazsınız.</numerusform>
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+        <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı cihazlarına ekleme yapamazsınız.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı kameralarına ekleme yapamazsınız.</numerusform>
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+        <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı kameralarına ekleme yapamazsınız.</numerusform>
       </translation>
     </message>
     <message>
@@ -5645,9 +5645,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%n items were not deleted.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n öğe silinmedi.</numerusform>
-        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n öğe silinmedi.</numerusform>
       </translation>
     </message>
     <message>
@@ -5677,16 +5677,16 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bu ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecektir.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>Bu ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecektir.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecek.</numerusform>
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecek.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5806,9 +5806,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kaynak Sunucu ve %n Sunucular</numerusform>
-        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Kaynak Sunucu ve %n Sunucular</numerusform>
       </translation>
     </message>
     <message>
@@ -6071,9 +6071,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>LDAP veritabanında mevcut %n LDAP grubu bulunamadı.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>LDAP veritabanında mevcut %n LDAP grubu bulunamadı.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6093,9 +6093,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Grup silinemedi.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>%n Grup silinemedi.</numerusform>
       </translation>
     </message>
     <message>
@@ -6142,9 +6142,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>LDAP sunucusu çevrimdışı. %n kullanıcı giriş yapamıyor.</numerusform>
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>LDAP sunucusu çevrimdışı. %n kullanıcı giriş yapamıyor.</numerusform>
       </translation>
     </message>
     <message>
@@ -6153,9 +6153,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
-      <translation type="unfinished">
-        <numerusform>%n Kullanıcı silinemedi.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
+      <translation>
+        <numerusform>%n kullanıcı(lar) silinemedi.</numerusform>
+        <numerusform>%n kullanıcı(ları) silinemedi.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6655,14 +6655,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n uygun bulut depolama hizmetleri gereklidir</numerusform>
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+        <numerusform>%n uygun bulut depolama hizmetleri gereklidir</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n MP</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n MP</numerusform>
         <numerusform>%n MP</numerusform>
       </translation>
@@ -6684,9 +6684,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n uygun bulut depolama hizmeti mevcut</numerusform>
-        <numerusform>%n suitable cloud storage services available</numerusform>
+        <numerusform>%n uygun bulut depolama hizmeti mevcut</numerusform>
       </translation>
     </message>
     <message>
@@ -10304,9 +10304,9 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 ve %n ekran düzeni daha</numerusform>
-        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 ve %n ekran düzeni daha</numerusform>
       </translation>
     </message>
     <message>
@@ -10317,9 +10317,9 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 ve %n video duvarı daha</numerusform>
-        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 ve %n video duvarı daha</numerusform>
       </translation>
     </message>
     <message>
@@ -10330,9 +10330,9 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 ve %n grup daha</numerusform>
-        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 ve %n grup daha</numerusform>
       </translation>
     </message>
   </context>

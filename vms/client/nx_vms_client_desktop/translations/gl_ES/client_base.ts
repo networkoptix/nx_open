@@ -7545,7 +7545,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>O acceso dos usuarios dos partner/socios de canle xestiónase a nivel de organización e non son visibles na xestión de usuarios do sitio.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Máis información&lt;/a&gt;</translation>
     </message>
   </context>
   <context>

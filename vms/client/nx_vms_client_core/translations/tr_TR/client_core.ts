@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation>Sunucu uyuşmazlığı</translation>
+      <translation>Uyumsuz sunucu</translation>
     </message>
     <message>
       <source>Server has a different version:</source>
@@ -223,9 +223,9 @@
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Sunucu kimliği doğrulanamıyor</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform/>
       </translation>
     </message>
     <message>

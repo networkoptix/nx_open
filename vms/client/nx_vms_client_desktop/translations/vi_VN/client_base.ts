@@ -7421,7 +7421,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>Quyền truy cập của người dùng Đối tác kênh&apos; được quản lý ở cấp Tổ chức và họ không hiển thị trong quản lý người dùng Chi nhánh.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Tìm hiểu thêm&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
