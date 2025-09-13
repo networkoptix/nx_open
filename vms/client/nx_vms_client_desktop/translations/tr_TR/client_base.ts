@@ -5,23 +5,23 @@
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
-      <translation type="unfinished">For the duration of event</translation>
+      <translation>Etkinlik süresince</translation>
     </message>
     <message>
       <source>Of fixed duration</source>
-      <translation type="unfinished">Of fixed duration</translation>
+      <translation>Belirlenmiş Zaman</translation>
     </message>
     <message>
       <source>Event occurs</source>
-      <translation type="unfinished">Event occurs</translation>
+      <translation>Etkinlik Oluşunca</translation>
     </message>
     <message>
       <source>Event starts</source>
-      <translation type="unfinished">Event starts</translation>
+      <translation>Etkinlik Başlayınca</translation>
     </message>
     <message>
       <source>Event stops</source>
-      <translation type="unfinished">Event stops</translation>
+      <translation>Etkinlik Durunca</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -92,7 +92,7 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>İptal edildi</translation>
     </message>
     <message>
       <source>Added</source>
@@ -1042,46 +1042,46 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Öğeleri Sessize Al</numerusform>
-        <numerusform>Mute Items</numerusform>
+        <numerusform>Öğeleri Sessize Al</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Öğelerin sesini aç</numerusform>
-        <numerusform>Unmute Items</numerusform>
+        <numerusform>Öğelerin Sesini Aç</numerusform>
       </translation>
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Siteye bağlan</translation>
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Site Yönetimi...</translation>
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>Site Güncellemesi...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation type="unfinished">Lists Management...</translation>
+      <translation>Liste Yönetimi...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>Tüm entegrasyonlar...</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Sistemleri Birleştir...</translation>
     </message>
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>Bununla aç</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -1096,7 +1096,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>Dedike Pencere</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1104,11 +1104,11 @@
     </message>
     <message>
       <source>JavaScript API...</source>
-      <translation type="unfinished">JavaScript API...</translation>
+      <translation>JavaScript API...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
-      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+      <translation>Şu Anda Bağlı Olan Siteye Birleştir...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
@@ -1220,11 +1220,11 @@
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>Tüm Dosyalar</translation>
     </message>
   </context>
   <context>
@@ -1376,11 +1376,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Sitenizin İnternet erişimi yoksa, aktivasyon dosyasını almak için lütfen sağlanan Lisans Anahtarını ve Donanım Kimliğini %1 gönderin.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Sitenizin İnternet erişimi yoksa, aktivasyon dosyasını almak için lütfen Lisans Anahtarınızı ve Sunucu Donanım Kimliğinizi Bölge / Lisans destek ekibinize gönderin:</translation>
     </message>
   </context>
   <context>
@@ -1510,7 +1510,7 @@ License Key: %2</source>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Siteye bağlan</translation>
     </message>
   </context>
   <context>
@@ -3068,7 +3068,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>Tüm entegrasyonlar</translation>
     </message>
   </context>
   <context>
@@ -5398,30 +5398,30 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>%n Cihaz video duvarında açılamadı:</numerusform>
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+      <translation>
+        <numerusform>%n cihaz(lar) Video duvarında açılamadı:</numerusform>
+        <numerusform>%n Cihaz(lar) video duvarında açılamadı:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n cameras on the video wall:</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%n kamera(lar) Video duvarında açılamadı:</numerusform>
         <numerusform>%n Kamera video duvarında açılamadı:</numerusform>
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı cihazlarına ekleme yapamazsınız.</numerusform>
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+        <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı cihazlarına ekleme yapamazsınız.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı kameralarına ekleme yapamazsınız.</numerusform>
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+        <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı kameralarına ekleme yapamazsınız.</numerusform>
       </translation>
     </message>
     <message>
@@ -5645,9 +5645,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%n items were not deleted.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n öğe silinmedi.</numerusform>
-        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n öğe silinmedi.</numerusform>
       </translation>
     </message>
     <message>
@@ -5677,16 +5677,16 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bu ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecektir.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>Bu ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecektir.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecek.</numerusform>
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecek.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5806,9 +5806,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kaynak Sunucu ve %n Sunucular</numerusform>
-        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Kaynak Sunucu ve %n Sunucular</numerusform>
       </translation>
     </message>
     <message>
@@ -6071,9 +6071,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>LDAP veritabanında mevcut %n LDAP grubu bulunamadı.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>LDAP veritabanında mevcut %n LDAP grubu bulunamadı.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6093,9 +6093,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Grup silinemedi.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>%n Grup silinemedi.</numerusform>
       </translation>
     </message>
     <message>
@@ -6142,9 +6142,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>LDAP sunucusu çevrimdışı. %n kullanıcı giriş yapamıyor.</numerusform>
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>LDAP sunucusu çevrimdışı. %n kullanıcı giriş yapamıyor.</numerusform>
       </translation>
     </message>
     <message>
@@ -6153,9 +6153,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
-      <translation type="unfinished">
-        <numerusform>%n Kullanıcı silinemedi.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
+      <translation>
+        <numerusform>%n kullanıcı(lar) silinemedi.</numerusform>
+        <numerusform>%n kullanıcı(ları) silinemedi.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6249,11 +6249,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Video kod dönüştürme gerekiyor. Dışa aktarma oturumu yeniden başlatıldı.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>Ses kod dönüştürme gerekiyor. Dışa aktarma oturumu yeniden başlatıldı.</translation>
     </message>
   </context>
   <context>
@@ -6655,14 +6655,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n uygun bulut depolama hizmetleri gereklidir</numerusform>
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+        <numerusform>%n uygun bulut depolama hizmetleri gereklidir</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n MP</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n MP</numerusform>
         <numerusform>%n MP</numerusform>
       </translation>
@@ -6684,9 +6684,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n uygun bulut depolama hizmeti mevcut</numerusform>
-        <numerusform>%n suitable cloud storage services available</numerusform>
+        <numerusform>%n uygun bulut depolama hizmeti mevcut</numerusform>
       </translation>
     </message>
     <message>
@@ -7544,7 +7544,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>Kanal Ortağı kullanıcılarının&apos; erişimi Kuruluş düzeyinde yönetilir ve site kullanıcı yönetiminde görünmezler.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Daha fazla bilgi edinin&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -7820,7 +7820,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Yeni Site</translation>
     </message>
   </context>
   <context>
@@ -8001,7 +8001,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Site Yönetimi</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -8236,7 +8236,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Ses kod dönüştürmesi gerekiyor.</translation>
     </message>
   </context>
   <context>
@@ -9279,7 +9279,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>Sistemleri Birleştir</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
@@ -9359,7 +9359,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Yeni Site</translation>
     </message>
     <message>
       <source>Site was not found.</source>
@@ -10304,9 +10304,9 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 ve %n ekran düzeni daha</numerusform>
-        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 ve %n ekran düzeni daha</numerusform>
       </translation>
     </message>
     <message>
@@ -10317,9 +10317,9 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 ve %n video duvarı daha</numerusform>
-        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 ve %n video duvarı daha</numerusform>
       </translation>
     </message>
     <message>
@@ -10330,9 +10330,9 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 ve %n grup daha</numerusform>
-        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 ve %n grup daha</numerusform>
       </translation>
     </message>
   </context>
@@ -10821,7 +10821,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Sertifika ayrıntıları</translation>
     </message>
   </context>
   <context>
@@ -12174,7 +12174,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Yeni Site</translation>
     </message>
   </context>
   <context>

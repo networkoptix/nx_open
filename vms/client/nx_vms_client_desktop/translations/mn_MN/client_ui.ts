@@ -2146,7 +2146,7 @@
     <name>SecuritySettingsWidget</name>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Аудитын мөрийг идэвхжүүлэх</translation>
     </message>
     <message>
       <source>Display watermark with username over video</source>
@@ -2548,7 +2548,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Цаг хугацаа</translation>
     </message>
     <message>
       <source>Ignore timezone in uploaded files</source>

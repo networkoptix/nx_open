@@ -1571,7 +1571,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Sistemleri Birleştir...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>
@@ -1924,7 +1924,7 @@
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Site Yönetimi</translation>
     </message>
   </context>
   <context>
