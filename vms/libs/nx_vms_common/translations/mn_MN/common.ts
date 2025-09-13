@@ -878,9 +878,9 @@
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%nБүх төхөөрөмж</numerusform>
+        <numerusform>%nБүх төхөөрөмж</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1083,7 +1083,7 @@
     <message>
       <source>Days</source>
       <comment>Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Өдөр</translation>
     </message>
     <message>
       <source>Wks</source>

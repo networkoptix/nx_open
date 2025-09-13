@@ -2329,7 +2329,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Цаг хугацаа</translation>
     </message>
     <message>
       <source>Description</source>
@@ -8902,11 +8902,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Файл бичих алдаа.</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Өгөгдөл экспорт хийгээгүй.</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -8914,15 +8914,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Видеоны кодыг өөрчлөх шаардлагатай.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>Архив одоо боломжгүй байна. Дараа дахин оролдоно уу.</translation>
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Архивын агуулгыг экспортлохын тулд энэ хэсгийг нээнэ үү.</translation>
     </message>
     <message>
       <source>Audio transcoding required.</source>
