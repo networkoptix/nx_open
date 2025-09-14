@@ -5,23 +5,23 @@
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
-      <translation type="unfinished">For the duration of event</translation>
+      <translation>Etkinlik süresince</translation>
     </message>
     <message>
       <source>Of fixed duration</source>
-      <translation type="unfinished">Of fixed duration</translation>
+      <translation>Belirlenmiş Zaman</translation>
     </message>
     <message>
       <source>Event occurs</source>
-      <translation type="unfinished">Event occurs</translation>
+      <translation>Etkinlik Oluşunca</translation>
     </message>
     <message>
       <source>Event starts</source>
-      <translation type="unfinished">Event starts</translation>
+      <translation>Etkinlik Başlayınca</translation>
     </message>
     <message>
       <source>Event stops</source>
-      <translation type="unfinished">Event stops</translation>
+      <translation>Etkinlik Durunca</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -92,7 +92,7 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>İptal edildi</translation>
     </message>
     <message>
       <source>Added</source>
@@ -1056,32 +1056,32 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Siteye bağlan</translation>
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Site Yönetimi...</translation>
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>Site Güncellemesi...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation type="unfinished">Lists Management...</translation>
+      <translation>Liste Yönetimi...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>Tüm entegrasyonlar...</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Sistemleri Birleştir...</translation>
     </message>
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>Bununla aç</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -1096,7 +1096,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>Dedike Pencere</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1104,11 +1104,11 @@
     </message>
     <message>
       <source>JavaScript API...</source>
-      <translation type="unfinished">JavaScript API...</translation>
+      <translation>JavaScript API...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
-      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+      <translation>Şu Anda Bağlı Olan Siteye Birleştir...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
@@ -1376,11 +1376,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Sitenizin İnternet erişimi yoksa, aktivasyon dosyasını almak için lütfen sağlanan Lisans Anahtarını ve Donanım Kimliğini %1 gönderin.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Sitenizin İnternet erişimi yoksa, aktivasyon dosyasını almak için lütfen Lisans Anahtarınızı ve Sunucu Donanım Kimliğinizi Bölge / Lisans destek ekibinize gönderin:</translation>
     </message>
   </context>
   <context>
@@ -1510,7 +1510,7 @@ License Key: %2</source>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Siteye bağlan</translation>
     </message>
   </context>
   <context>
@@ -3068,7 +3068,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>Tüm entegrasyonlar</translation>
     </message>
   </context>
   <context>
@@ -6249,11 +6249,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Video kod dönüştürme gerekiyor. Dışa aktarma oturumu yeniden başlatıldı.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>Ses kod dönüştürme gerekiyor. Dışa aktarma oturumu yeniden başlatıldı.</translation>
     </message>
   </context>
   <context>
@@ -7544,7 +7544,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>Kanal Ortağı kullanıcılarının&apos; erişimi Kuruluş düzeyinde yönetilir ve site kullanıcı yönetiminde görünmezler.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Daha fazla bilgi edinin&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -7820,7 +7820,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Yeni Site</translation>
     </message>
   </context>
   <context>
@@ -8001,7 +8001,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Site Yönetimi</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -8236,7 +8236,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Ses kod dönüştürmesi gerekiyor.</translation>
     </message>
   </context>
   <context>
@@ -9279,7 +9279,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>Sistemleri Birleştir</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
@@ -9359,7 +9359,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Yeni Site</translation>
     </message>
     <message>
       <source>Site was not found.</source>
@@ -10821,7 +10821,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Sertifika ayrıntıları</translation>
     </message>
   </context>
   <context>
@@ -12174,7 +12174,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Yeni Site</translation>
     </message>
   </context>
   <context>
