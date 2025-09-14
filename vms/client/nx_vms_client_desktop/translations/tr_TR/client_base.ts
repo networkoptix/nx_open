@@ -6935,11 +6935,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Video kod dönüştürme gerekiyor. Dışa aktarma oturumu yeniden başlatıldı.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>Ses kod dönüştürme gerekiyor. Dışa aktarma oturumu yeniden başlatıldı.</translation>
     </message>
   </context>
   <context>
@@ -8924,7 +8924,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Ses kod dönüştürmesi gerekiyor.</translation>
     </message>
   </context>
   <context>
@@ -11316,7 +11316,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Sertifika ayrıntıları</translation>
     </message>
   </context>
   <context>
