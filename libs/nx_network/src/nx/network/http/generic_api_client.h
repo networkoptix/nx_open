@@ -320,10 +320,10 @@ void GenericApiClient<ResultCode, Base>::setRetryPolicy(unsigned numOfRetries, R
 
 template<HasResultCodeT ResultCode, typename Base>
 void GenericApiClient<ResultCode, Base>::setRetryPolicy(
-    unsigned numOfRetries, nx::MoveOnlyFunc<bool(ResultType)> m_isRequstSucceded)
+    unsigned numOfRetries, nx::MoveOnlyFunc<bool(ResultType)> isRequstSucceded)
 {
     m_numRetries = numOfRetries;
-    m_isRequstSucceded = std::move(m_isRequstSucceded);
+    m_isRequestSucceeded = std::move(isRequstSucceded);
 }
 
 template<HasResultCodeT ResultCode, typename Base>
@@ -342,6 +342,9 @@ std::optional<Credentials> GenericApiClient<ResultCode, Base>::getHttpCredential
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 void GenericApiClient<ApiResultCodeDescriptor, Base>::stopWhileInAioThread()
 {
+    for (auto& client: m_idleClients)
+        client->pleaseStopSync();
+
     base_type::stopWhileInAioThread();
 
     m_activeRequests.clear();
@@ -635,8 +638,12 @@ void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(
         }
     }
 
-    handler(resultCode, std::move(output)..., ResponseFetchers()(
-        response ? *response : network::http::Response())...);
+    network::http::Response responseVal;
+    if (response)
+        responseVal = std::move(*response);
+    // Call releaseClient before calling handler to make sure <this> is still a valid ptr.
+    ctx.client.reset();
+    handler(resultCode, std::move(output)..., ResponseFetchers()(responseVal)...);
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
