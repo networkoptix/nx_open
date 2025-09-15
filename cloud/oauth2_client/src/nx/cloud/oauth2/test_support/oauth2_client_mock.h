@@ -112,7 +112,9 @@ public:
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
             completionHandler) override;
 
-     void setCredentials(network::http::Credentials credentials) override;
+    void setCredentials(network::http::Credentials credentials) override;
+
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
 protected:
     template <class Request, class Response, class CompletionHandler>

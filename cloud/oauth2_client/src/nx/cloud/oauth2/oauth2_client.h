@@ -81,6 +81,9 @@ public:
             completionHandler) = 0;
 
     virtual void setCredentials(network::http::Credentials credentials) = 0;
+
+    // It shouldn't be here.
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) = 0;
 };
 
 class NX_OAUTH2_CLIENT_API Oauth2Client:
@@ -92,7 +95,10 @@ class NX_OAUTH2_CLIENT_API Oauth2Client:
 public:
     Oauth2Client(
         const nx::Url& url,
-        const std::optional<nx::network::http::Credentials>& credentials);
+        const std::optional<nx::network::http::Credentials>& credentials,
+        int idleConnectionsLimit);
+
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     void issueToken(
         const db::api::IssueTokenRequest& request,
@@ -151,7 +157,7 @@ public:
 };
 
 using Oauth2ClientFactoryFunc = std::unique_ptr<AbstractOauth2Client>(
-    const nx::Url&, const std::optional<nx::network::http::Credentials>&);
+    const nx::Url&, const std::optional<nx::network::http::Credentials>&, int);
 
 class NX_OAUTH2_CLIENT_API Oauth2ClientFactory:
     public nx::utils::BasicFactory<Oauth2ClientFactoryFunc>

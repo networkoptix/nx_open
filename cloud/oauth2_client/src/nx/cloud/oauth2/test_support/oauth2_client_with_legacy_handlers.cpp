@@ -11,7 +11,7 @@ using namespace db::api;
 
 Oauth2ClientWithLegacyHandlers::Oauth2ClientWithLegacyHandlers(
     const nx::Url& url, const std::optional<nx::network::http::Credentials>& credentials):
-    Oauth2Client(url, credentials)
+    Oauth2Client(url, credentials, 0)
 {
 }
 

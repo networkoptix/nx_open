@@ -547,7 +547,7 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::createHttpClient(
         m_activeRequests.emplace(httpClientPtr, Context{std::move(httpClient)});
     }
 
-    return std::move(httpClientPtr);
+    return httpClientPtr;
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>

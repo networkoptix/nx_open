@@ -23,7 +23,8 @@ class Connection:
 public:
     Connection(
         const nx::Url& baseUrl,
-        nx::network::ssl::AdapterFunc adapterFunc);
+        nx::network::ssl::AdapterFunc adapterFunc,
+        int idleConnectionsLimit = 0);
 
     virtual api::AccountManager* accountManager() override;
     virtual api::SystemManager* systemManager() override;

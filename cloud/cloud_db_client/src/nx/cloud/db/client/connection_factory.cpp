@@ -12,8 +12,9 @@ namespace nx::cloud::db::client {
 
 static constexpr auto kDefaultRequestTimeout = std::chrono::seconds(11);
 
-ConnectionFactory::ConnectionFactory():
-    m_cloudUrl("https://" + nx::network::SocketGlobals::cloud().cloudHost() + "/")
+ConnectionFactory::ConnectionFactory(int clientIdleConnectionsLimit /* = 0 */):
+    m_cloudUrl("https://" + nx::network::SocketGlobals::cloud().cloudHost() + "/"),
+    m_clientIdleConnectionsLimit(clientIdleConnectionsLimit)
 {
 }
 
@@ -34,7 +35,7 @@ void ConnectionFactory::connect(
 std::unique_ptr<api::Connection> ConnectionFactory::createConnection()
 {
     auto connection = std::make_unique<Connection>(
-        m_cloudUrl, nx::network::ssl::kDefaultCertificateCheck);
+        m_cloudUrl, nx::network::ssl::kDefaultCertificateCheck, m_clientIdleConnectionsLimit);
     connection->setRequestTimeout(kDefaultRequestTimeout);
     return connection;
 }

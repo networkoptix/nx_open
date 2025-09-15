@@ -13,8 +13,9 @@ static constexpr auto kDefaultRequestTimeout = std::chrono::seconds(10);
 
 Oauth2Client::Oauth2Client(
     const nx::Url& url,
-    const std::optional<nx::network::http::Credentials>& credentials):
-    base_type(url, nx::network::ssl::kDefaultCertificateCheck)
+    const std::optional<nx::network::http::Credentials>& credentials,
+    int idleConnectionsLimit):
+    base_type(url, nx::network::ssl::kDefaultCertificateCheck, idleConnectionsLimit)
 {
     setRequestTimeout(kDefaultRequestTimeout);
     if (credentials)
@@ -160,10 +161,17 @@ void Oauth2Client::setCredentials(network::http::Credentials credentials)
     httpClientOptions().setCredentials(credentials);
 }
 
+void Oauth2Client::bindToAioThread(network::aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+}
+
 Oauth2ClientFactory::Oauth2ClientFactory():
-    base_type([](const nx::Url& url,
-        const std::optional<nx::network::http::Credentials>& credentials)
-        { return std::make_unique<Oauth2Client>(url, credentials); })
+    base_type([](
+        const nx::Url& url,
+        const std::optional<nx::network::http::Credentials>& credentials,
+        int idleConnectionsLimit)
+        { return std::make_unique<Oauth2Client>(url, credentials, idleConnectionsLimit); })
 {
 }
 
