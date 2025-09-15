@@ -18,16 +18,19 @@ public:
     void handleDisconnect();
 
     void handleUserAdded(const QnResourceList& resources);
-    void handleUserChanged();
+    void handleUserRemoved(const QnResourceList& resources);
 
 private:
-    bool checkBasicConstantVisibilityConditions() const;
-    bool checkBasicMutableVisibilityConditions() const;
-    void showNotification();
+    inline bool notificationHasBeenClosed() const;
+    inline bool userCanSeeNotification() const;
+    inline bool systemHasChannelPartner() const;
+
+    void updateNotificationState();
 
 private:
     nx::utils::ScopedConnections m_connections;
     nx::Uuid m_notificationId;
+    bool m_hasChannelPartner = false; //< Cached value.
 };
 
 } // namespace nx::vms::client::desktop
