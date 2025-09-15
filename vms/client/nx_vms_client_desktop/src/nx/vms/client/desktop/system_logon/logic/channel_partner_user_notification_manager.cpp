@@ -22,7 +22,7 @@ namespace nx::vms::client::desktop {
 
 bool userIsChannelPartner(const QnUserResourcePtr& user)
 {
-    return user->attributes().testFlag(nx::vms::api::UserAttribute::hidden);
+    return user && user->attributes().testFlag(nx::vms::api::UserAttribute::hidden);
 }
 
 bool systemContainsChannelPartnerUser(nx::vms::client::desktop::SystemContext* system)
@@ -107,7 +107,7 @@ void ChannelPartnerUserNotificationManager::handleUserAdded(const QnResourceList
 
     for (const auto& user: resources.filtered<nx::vms::client::core::UserResource>())
     {
-        if (user && userIsChannelPartner(user))
+        if (userIsChannelPartner(user))
         {
             showNotification();
             return;
