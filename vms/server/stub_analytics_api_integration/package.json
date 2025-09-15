@@ -17,5 +17,8 @@
   "devDependencies": {
     "electron": "^34.0.0",
     "electron-reloader": "^1.2.3"
+  },
+  "overrides": {
+    "debug": "4.4.1"
   }
 }
