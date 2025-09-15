@@ -15,8 +15,6 @@
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/notification_levels.h>
-#include <nx/vms/common/saas/saas_service_manager.h>
-#include <nx/vms/common/saas/saas_utils.h>
 
 namespace nx::vms::client::desktop {
 
@@ -45,117 +43,30 @@ ChannelPartnerUserNotificationManager::ChannelPartnerUserNotificationManager(
 
 void ChannelPartnerUserNotificationManager::handleConnect()
 {
-    if (!checkBasicConstantVisibilityConditions())
-        return;
-
-    if (checkBasicMutableVisibilityConditions() && systemContainsChannelPartnerUser(system()))
-    {
-        showNotification();
-    }
-    else
-    {
-        m_connections << connect(
-            system()->resourcePool(), &QnResourcePool::resourcesAdded,
-            this, &ChannelPartnerUserNotificationManager::handleUserAdded);
-
-        m_connections << connect(
-            system()->accessController(),
-            &nx::vms::client::core::AccessController::userChanged,
-            this,
-            &ChannelPartnerUserNotificationManager::handleUserChanged);
-
-        m_connections << connect(
-            system()->accessController(),
-            &nx::vms::client::core::AccessController::globalPermissionsChanged,
-            this,
-            &ChannelPartnerUserNotificationManager::handleUserChanged);
-    }
-
+    // Handle user list changes.
     m_connections << connect(
-        system()->saasServiceManager(),
-        &nx::vms::common::saas::ServiceManager::dataChanged,
+        system()->resourcePool(), &QnResourcePool::resourcesAdded,
+        this, &ChannelPartnerUserNotificationManager::handleUserAdded);
+    m_connections << connect(
+        system()->resourcePool(), &QnResourcePool::resourcesRemoved,
+        this, &ChannelPartnerUserNotificationManager::handleUserRemoved);
+
+    // Handle current User permission changes.
+    m_connections << connect(
+        system()->accessController(),
+        &nx::vms::client::core::AccessController::userChanged,
         this,
-        [this]
-        {
-            if (m_notificationId.isNull())
-                return;
+        &ChannelPartnerUserNotificationManager::updateNotificationState);
+    m_connections << connect(
+        system()->accessController(),
+        &nx::vms::client::core::AccessController::globalPermissionsChanged,
+        this,
+        &ChannelPartnerUserNotificationManager::updateNotificationState);
 
-            if (!nx::vms::common::saas::saasInitialized(system()))
-            {
-                // Most probably, the System has been disconnected from the Cloud.
-                workbench()->windowContext()->localNotificationsManager()->remove(m_notificationId);
-                m_notificationId = {};
-            }
-        });
-}
-
-void ChannelPartnerUserNotificationManager::handleDisconnect()
-{
-    m_connections.reset();
-
-    if (m_notificationId.isNull())
-        return;
-
-    workbench()->windowContext()->localNotificationsManager()->remove(m_notificationId);
-    m_notificationId = {};
-}
-
-void ChannelPartnerUserNotificationManager::handleUserAdded(const QnResourceList& resources)
-{
-    if (!checkBasicConstantVisibilityConditions() || !checkBasicMutableVisibilityConditions())
-        return;
-
-    for (const auto& user: resources.filtered<nx::vms::client::core::UserResource>())
-    {
-        if (userIsChannelPartner(user))
-        {
-            showNotification();
-            return;
-        }
-    }
-}
-
-void ChannelPartnerUserNotificationManager::handleUserChanged()
-{
-    if (!checkBasicConstantVisibilityConditions() || !checkBasicMutableVisibilityConditions())
-        return;
-
-    if (systemContainsChannelPartnerUser(system()))
-        showNotification();
-}
-
-bool ChannelPartnerUserNotificationManager::checkBasicConstantVisibilityConditions() const
-{
-    if (system()->localSettings()->channelPartnerUserNotificationClosed())
-        return false;
-
-    if (!m_notificationId.isNull())
-        return false;
-
-    return true;
-}
-
-bool ChannelPartnerUserNotificationManager::checkBasicMutableVisibilityConditions() const
-{
-    const bool isChannelPartnerUser = userIsChannelPartner(system()->user());
-    const auto isPowerUser = system()->accessController()->hasPowerUserPermissions();
-    return !isChannelPartnerUser && isPowerUser;
-}
-
-void ChannelPartnerUserNotificationManager::showNotification()
-{
+    // Handle user interactions with the Notification.
     const auto notificationsManager = workbench()->windowContext()->localNotificationsManager();
-    m_notificationId = notificationsManager->add(
-        tr("Channel Partner users have access to this site"),
-        tr("Channel Partner users' access is managed at the Organization level, "
-            "and they are not visible in site user management."
-            "<br/><br/><a href='#'>Learn more</a>"),
-        /*cancellable*/ true);
-    notificationsManager->setIconPath(
-        m_notificationId, "20x20/Outline/warning.svg");
-    notificationsManager->setLevel(
-        m_notificationId, QnNotificationLevel::Value::ImportantNotification);
-    connect(notificationsManager, &workbench::LocalNotificationsManager::linkActivated,
+    m_connections << connect(
+        notificationsManager, &workbench::LocalNotificationsManager::linkActivated,
         [this](const nx::Uuid& notificationId, const QString& linkUrl)
         {
             if (notificationId != m_notificationId)
@@ -163,19 +74,109 @@ void ChannelPartnerUserNotificationManager::showNotification()
 
             HelpHandler::openHelpTopic(HelpTopic::Id::ChannelPartnerUser);
         });
-    connect(notificationsManager, &workbench::LocalNotificationsManager::cancelRequested,
-        [this,
-        localSettings = system()->localSettings(),
-        notificationsManager](
-            const nx::Uuid& notificationId)
+    m_connections << connect(
+        notificationsManager, &workbench::LocalNotificationsManager::cancelRequested,
+        [this, localSettings = system()->localSettings()](const nx::Uuid& notificationId)
         {
             if (notificationId != m_notificationId)
                 return;
 
-            notificationsManager->remove(m_notificationId);
-            m_notificationId = {};
             localSettings->channelPartnerUserNotificationClosed = true;
+            // Notification state is updated below.
         });
+
+    // Handle settings changes. Also shows the Notification if User clicks 'Reset All Warnings'.
+    m_connections << connect(system()->localSettings(), &SystemSpecificLocalSettings::changed,
+        [this, localSettings = system()->localSettings()](
+            const utils::property_storage::BaseProperty* property)
+        {
+            if (!property)
+                return;
+
+            if (property->name == localSettings->channelPartnerUserNotificationClosed.name)
+                updateNotificationState();
+        });
+
+    m_hasChannelPartner = systemContainsChannelPartnerUser(system());
+    updateNotificationState();
+}
+
+void ChannelPartnerUserNotificationManager::handleDisconnect()
+{
+    m_connections.reset();
+    m_hasChannelPartner = false;
+    updateNotificationState();
+}
+
+void ChannelPartnerUserNotificationManager::handleUserAdded(const QnResourceList& resources)
+{
+    for (const auto& user: resources.filtered<nx::vms::client::core::UserResource>())
+        m_hasChannelPartner |= userIsChannelPartner(user);
+
+    updateNotificationState();
+}
+
+void ChannelPartnerUserNotificationManager::handleUserRemoved(const QnResourceList& resources)
+{
+    bool update = false;
+    for (const auto& user: resources.filtered<nx::vms::client::core::UserResource>())
+        update |= userIsChannelPartner(user);
+
+    if (update)
+    {
+        m_hasChannelPartner = systemContainsChannelPartnerUser(system());
+        updateNotificationState();
+    }
+}
+
+bool ChannelPartnerUserNotificationManager::notificationHasBeenClosed() const
+{
+    return system()->localSettings()->channelPartnerUserNotificationClosed();
+}
+
+bool ChannelPartnerUserNotificationManager::userCanSeeNotification() const
+{
+    const bool isChannelPartnerUser = userIsChannelPartner(system()->user());
+    const auto isPowerUser = system()->accessController()->hasPowerUserPermissions();
+    return !isChannelPartnerUser && isPowerUser;
+}
+
+bool ChannelPartnerUserNotificationManager::systemHasChannelPartner() const
+{
+    return m_hasChannelPartner;
+}
+
+void ChannelPartnerUserNotificationManager::updateNotificationState()
+{
+    const bool show =
+        userCanSeeNotification() && !notificationHasBeenClosed()
+            && systemHasChannelPartner();
+
+    if (show)
+    {
+        if (!m_notificationId.isNull())
+            return;
+
+        const auto notificationsManager = workbench()->windowContext()->localNotificationsManager();
+        m_notificationId = notificationsManager->add(
+            tr("Channel Partner users have access to this site"),
+            tr("Channel Partner users' access is managed at the Organization level, "
+                "and they are not visible in site user management."
+                "<br/><br/><a href='#'>Learn more</a>"),
+            /*cancellable*/ true);
+        notificationsManager->setIconPath(
+            m_notificationId, "20x20/Outline/warning.svg");
+        notificationsManager->setLevel(
+            m_notificationId, QnNotificationLevel::Value::ImportantNotification);
+    }
+    else
+    {
+        if (m_notificationId.isNull())
+            return;
+
+        workbench()->windowContext()->localNotificationsManager()->remove(m_notificationId);
+        m_notificationId = {};
+    }
 }
 
 } // namespace nx::vms::client::desktop
