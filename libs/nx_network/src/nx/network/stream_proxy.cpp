@@ -57,11 +57,6 @@ void StreamProxy::setConnectToDestinationTimeout(
     m_connectToDestinationTimeout = timeout;
 }
 
-void StreamProxy::closeAllConnectionsAsync()
-{
-    stopProxyChannels([]() {});
-}
-
 void StreamProxy::onAcceptCompletion(
     SystemError::ErrorCode systemErrorCode,
     std::unique_ptr<AbstractStreamSocket> connection)

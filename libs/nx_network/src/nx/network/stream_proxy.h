@@ -70,8 +70,6 @@ public:
     void setConnectToDestinationTimeout(
         std::optional<std::chrono::milliseconds> timeout);
 
-    void closeAllConnectionsAsync();
-
 private:
     using StreamProxyChannels =
         std::list<std::unique_ptr<detail::StreamProxyChannel>>;
