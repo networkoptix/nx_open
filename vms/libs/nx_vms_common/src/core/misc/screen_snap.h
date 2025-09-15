@@ -20,19 +20,13 @@ struct NX_VMS_COMMON_API QnScreenSnap
     static QnScreenSnap decode(int encoded);
     static int snapsPerScreen();
 
-    bool operator==(const QnScreenSnap& other) const
-    {
-        return (screenIndex == other.screenIndex && snapIndex == other.snapIndex);
-    }
-
-    bool operator!=(const QnScreenSnap& other) const
-    {
-        return !(*this == other);
-    }
+    bool operator==(const QnScreenSnap&) const = default;
 };
 
 struct NX_VMS_COMMON_API QnScreenSnaps
 {
+    std::array<QnScreenSnap, 4> values;
+
     QnScreenSnap& left() { return values[0]; }
     const QnScreenSnap& left() const { return values[0]; }
 
@@ -45,19 +39,9 @@ struct NX_VMS_COMMON_API QnScreenSnaps
     QnScreenSnap& bottom() { return values[3]; }
     const QnScreenSnap& bottom() const { return values[3]; }
 
-    std::array<QnScreenSnap, 4> values;
-
     bool isValid() const;
 
-    bool operator==(const QnScreenSnaps& other) const
-    {
-        return values == other.values;
-    }
-
-    bool operator!=(const QnScreenSnaps& other) const
-    {
-        return !(*this == other);
-    }
+    bool operator==(const QnScreenSnaps& other) const = default;
 };
 
 QDebug operator<<(QDebug dbg, const QnScreenSnap& snap);

@@ -22,11 +22,6 @@ bool Timestamp::operator<=(const Timestamp& right) const
         : ticks <= right.ticks;
 }
 
-bool Timestamp::operator==(const Timestamp& right) const
-{
-    return sequence == right.sequence && ticks == right.ticks;
-}
-
 bool Timestamp::operator>(quint64 right) const
 {
     return sequence > 0

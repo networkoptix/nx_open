@@ -14,21 +14,6 @@ QString CameraMediaStreamInfo::resolutionToString(const QSize& resolution)
     return QString::fromLatin1("%1x%2").arg(resolution.width()).arg(resolution.height());
 }
 
-bool CameraMediaStreamInfo::operator==(const CameraMediaStreamInfo& rhs) const
-{
-    return transcodingRequired == rhs.transcodingRequired
-        && codec == rhs.codec
-        && encoderIndex == rhs.encoderIndex
-        && resolution == rhs.resolution
-        && transports == rhs.transports
-        && customStreamParams == rhs.customStreamParams;
-}
-
-bool CameraMediaStreamInfo::operator!=(const CameraMediaStreamInfo& rhs) const
-{
-    return !(*this == rhs);
-}
-
 QSize CameraMediaStreamInfo::getResolution() const
 {
     const auto delimiter = resolution.indexOf('x');

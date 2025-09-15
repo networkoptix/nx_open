@@ -677,7 +677,6 @@ BookmarkFilter::SortColumn BookmarkFilter::sortColumnFromString(const std::strin
     throw std::logic_error("Unexpected value of the SortColumn string: " + s);
 }
 
-
 BookmarkFilter::BookmarkFilter(const char* urlParams)
 {
     std::vector<std::string> params = split(urlParams, "&");

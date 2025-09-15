@@ -143,7 +143,6 @@ QPainterPath QnMotionRegion::getRegionBySensPath(int value) const {
     return m_pathCache[value];
 }
 
-
 QVector<QRect> QnMotionRegion::getRectsBySens(int value) const
 {
     QVector<QRect> rects = m_data[value].rects();

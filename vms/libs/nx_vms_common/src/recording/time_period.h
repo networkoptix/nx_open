@@ -163,15 +163,7 @@ struct NX_VMS_COMMON_API QnTimePeriod
     void setDuration(std::chrono::milliseconds value);
     std::chrono::milliseconds duration() const;
 
-    constexpr bool operator==(const QnTimePeriod& other) const
-    {
-        return startTimeMs == other.startTimeMs && durationMs == other.durationMs;
-    }
-
-    constexpr bool operator!=(const QnTimePeriod& other) const
-    {
-        return !(*this == other);
-    }
+    constexpr bool operator==(const QnTimePeriod&) const = default;
 
     constexpr bool operator<(const QnTimePeriod& other) const
     {

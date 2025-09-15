@@ -108,11 +108,6 @@ public:
 
         bool operator==(const KeyInformation& rhs) const;
 
-        bool operator!=(const KeyInformation& rhs) const
-        {
-            return !(*this == rhs);
-        }
-
         const char* algorithm() const { return OBJ_nid2ln(algorithmId); }
 
         bool parsePem(const std::string& str);

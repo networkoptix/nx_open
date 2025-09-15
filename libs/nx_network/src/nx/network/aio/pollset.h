@@ -63,8 +63,7 @@ public:
         aio::EventType eventType() const;
         void* userData();
 
-        bool operator==( const const_iterator& right ) const;
-        bool operator!=( const const_iterator& right ) const;
+        bool operator==(const const_iterator& right) const;
 
     private:
         ConstIteratorImplOld* m_impl;

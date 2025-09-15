@@ -355,11 +355,6 @@ bool PollSet::const_iterator::operator==(const const_iterator& right) const
         && (m_impl->fdIndex == right.m_impl->fdIndex);
 }
 
-bool PollSet::const_iterator::operator!=(const const_iterator& right) const
-{
-    return !(*this == right);
-}
-
 //-------------------------------------------------------------------------------------------------
 // PollSet.
 

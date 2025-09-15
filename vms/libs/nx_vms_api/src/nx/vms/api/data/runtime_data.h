@@ -71,7 +71,6 @@ struct NX_VMS_API RuntimeData
     * customization checking.
     */
     bool operator==(const RuntimeData& other) const;
-    bool operator!=(const RuntimeData& other) const { return !operator==(other); }
 };
 
 #define RuntimeData_Fields \

@@ -117,7 +117,6 @@ public:
     ~HostAddress();
 
     bool operator==(const HostAddress& right) const;
-    bool operator!=(const HostAddress& right) const;
     bool operator<(const HostAddress& right) const;
 
     /**
@@ -263,8 +262,7 @@ public:
 
     SocketAddress& operator=(const SocketAddress&) = default;
     SocketAddress& operator=(SocketAddress&&) = default;
-    bool operator==(const SocketAddress& rhs) const;
-    bool operator!=(const SocketAddress& rhs) const;
+    bool operator==(const SocketAddress&) const = default;
     bool operator<(const SocketAddress& rhs) const;
 
     std::string toString() const;
@@ -321,8 +319,7 @@ struct NX_NETWORK_API KeepAliveOptions
         std::chrono::milliseconds probeSendPeriod = std::chrono::milliseconds::zero(),
         int probeCount = 0);
 
-    bool operator==(const KeepAliveOptions& rhs) const;
-    bool operator!=(const KeepAliveOptions& rhs) const;
+    bool operator==(const KeepAliveOptions&) const = default;
 
     /** Maximum time before lost connection can be acknowledged. */
     std::chrono::milliseconds maxDelay() const;

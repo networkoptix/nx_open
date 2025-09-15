@@ -88,12 +88,6 @@ bool TimerManager::TimerGuard::operator==(
     return m_timerId == right.m_timerId;
 }
 
-bool TimerManager::TimerGuard::operator!=(
-    const TimerManager::TimerGuard& right) const
-{
-    return m_timerId != right.m_timerId;
-}
-
 //-------------------------------------------------------------------------------------------------
 
 TimerManager::TimerManager(const char* threadName, QObject* parent):

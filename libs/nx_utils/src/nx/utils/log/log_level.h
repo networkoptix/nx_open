@@ -66,8 +66,7 @@ public:
     Tag operator+(const Tag& rhs) const;
 
     bool operator<(const Tag& rhs) const;
-    bool operator==(const Tag& rhs) const;
-    bool operator!=(const Tag& rhs) const;
+    bool operator==(const Tag&) const = default;
 
 private:
     QString m_value;
@@ -96,7 +95,6 @@ public:
 
     bool operator<(const Filter& rhs) const;
     bool operator==(const Filter& rhs) const;
-    bool operator!=(const Filter& rhs) const;
 
 private:
     class Impl;

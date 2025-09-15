@@ -101,8 +101,6 @@ public:
         }
         return m_length == other.m_length;
     }
-
-    constexpr bool operator!=(const string_view& other) const { return !(*this == other); }
 };
 
 //-------------------------------------------------------------------------------------------------

@@ -309,7 +309,6 @@ struct NX_VMS_COMMON_API Filter
         Options options = Option::none) const;
 
     bool operator==(const Filter& right) const;
-    bool operator!=(const Filter& right) const;
 
 private:
     template<typename ObjectTrackType>

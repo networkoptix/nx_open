@@ -533,16 +533,6 @@ QnVirtualCameraResource::~QnVirtualCameraResource()
     directDisconnectAll();
 }
 
-bool QnVirtualCameraResource::MotionStreamIndex::operator==(const MotionStreamIndex& other) const
-{
-    return index == other.index && isForced == other.isForced;
-}
-
-bool QnVirtualCameraResource::MotionStreamIndex::operator!=(const MotionStreamIndex& other) const
-{
-    return !(*this == other);
-}
-
 nx::Uuid QnVirtualCameraResource::makeCameraIdFromPhysicalId(const QString& physicalId)
 {
     // ATTENTION: This logic is similar to the one in nx::vms::api::CameraData::fillId().

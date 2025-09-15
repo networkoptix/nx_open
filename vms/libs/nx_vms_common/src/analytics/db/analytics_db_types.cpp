@@ -285,11 +285,6 @@ bool Filter::operator==(const Filter& right) const
         && referenceBestShotId == right.referenceBestShotId;
 }
 
-bool Filter::operator!=(const Filter& right) const
-{
-    return !(*this == right);
-}
-
 //-------------------------------------------------------------------------------------------------
 
 void serializeToParams(const Filter& filter, nx::network::rest::Params* params)

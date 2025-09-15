@@ -66,7 +66,6 @@ public:
         aio::EventType eventType() const;
 
         bool operator==(const const_iterator& right) const;
-        bool operator!=(const const_iterator& right) const;
 
     private:
         ConstIteratorImpl* m_impl;

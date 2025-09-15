@@ -23,12 +23,6 @@ bool QnAbstractStorageResource::FileInfo::operator==(
     return absoluteFilePath() == other.absoluteFilePath();
 }
 
-bool QnAbstractStorageResource::FileInfo::operator!=(
-    const QnAbstractStorageResource::FileInfo& other) const
-{
-    return !operator==(other);
-}
-
 QnAbstractStorageResource::FileInfo QnAbstractStorageResource::FileInfo::fromQFileInfo(
     const QFileInfo& fi)
 {

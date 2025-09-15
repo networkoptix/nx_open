@@ -33,7 +33,6 @@ public:
         FileInfo() = default;
 
         bool operator==(const FileInfo& other) const;
-        bool operator!=(const FileInfo& other) const;
 
         static FileInfo fromQFileInfo(const QFileInfo &fi);
 

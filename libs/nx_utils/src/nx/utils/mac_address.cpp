@@ -135,16 +135,6 @@ QString MacAddress::toString() const
     return bytes.join(kAllowedDelimiters[0]);
 }
 
-bool MacAddress::operator==(const MacAddress& other) const
-{
-    return m_data == other.m_data;
-}
-
-bool MacAddress::operator!=(const MacAddress& other) const
-{
-    return m_data != other.m_data;
-}
-
 bool MacAddress::operator<(const MacAddress& other) const
 {
     return m_data < other.m_data;

@@ -1676,6 +1676,18 @@ struct TransactionPersistentInfo
 
 struct QnAbstractTransaction
 {
+    ApiCommand::Value command;
+
+    /** Id of peer that generated transaction. */
+    nx::Uuid peerID;
+
+    TransactionPersistentInfo persistentInfo;
+
+    TransactionType transactionType;
+    HistoryAttributes historyAttributes;
+
+    using PersistentInfo = TransactionPersistentInfo;
+
     static nx::Uuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
     static nx::Uuid makeHash(const QByteArray& extraData, const nx::vms::api::DiscoveryData& data);
 
@@ -1702,26 +1714,7 @@ struct QnAbstractTransaction
     {
     }
 
-    using PersistentInfo = TransactionPersistentInfo;
-
-    ApiCommand::Value command;
-
-    /** Id of peer that generated transaction. */
-    nx::Uuid peerID;
-
-    TransactionPersistentInfo persistentInfo;
-
-    TransactionType transactionType;
-    HistoryAttributes historyAttributes;
-
-    bool operator==(const QnAbstractTransaction& other) const
-    {
-        return command == other.command
-            && peerID == other.peerID
-            && persistentInfo == other.persistentInfo
-            && transactionType == other.transactionType
-            && historyAttributes == other.historyAttributes;
-    }
+    bool operator==(const QnAbstractTransaction&) const = default;
 
     QString toString() const;
     bool isLocal() const { return transactionType == TransactionType::Local; }
@@ -1768,18 +1761,14 @@ public:
         NX_ASSERT(0, "Constructing from transaction with another Params type is disallowed");
     }
 
-    T params;
-
     bool operator==(const QnTransaction& other) const
     {
         return QnAbstractTransaction::operator==(other)
             && params == other.params;
     }
 
-    bool operator!=(const QnTransaction& other) const
-    {
-        return !(*this == other);
-    }
+public:
+    T params;
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::PersistentInfo, (json)(ubjson)(xml)(csv_record))

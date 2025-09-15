@@ -58,15 +58,7 @@ public:
     bool operator<(const Uuid& other) const;
     bool operator>(const Uuid& other) const;
 
-    constexpr bool operator!=(const Uuid& other) const
-    {
-        return m_uuid != other.m_uuid;
-    }
-
-    constexpr bool operator==(const Uuid& other) const
-    {
-        return m_uuid == other.m_uuid;
-    }
+    constexpr bool operator==(const Uuid& other) const = default;
 
     Uuid& operator=(const Uuid&) = default;
     Uuid& operator=(Uuid&&) = default;

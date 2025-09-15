@@ -29,15 +29,7 @@ public:
     /** Debug string representation. */
     QString toString() const;
 
-    friend bool operator==(const QnVideoWallItemIndex& l, const QnVideoWallItemIndex& r)
-    {
-        return l.m_videowall == r.m_videowall && l.m_uuid == r.m_uuid;
-    }
-
-    friend bool operator!=(const QnVideoWallItemIndex& l, const QnVideoWallItemIndex& r)
-    {
-        return !(l == r);
-    }
+    bool operator==(const QnVideoWallItemIndex&) const = default;
 
 private:
     QnVideoWallResourcePtr m_videowall;

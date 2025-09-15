@@ -77,11 +77,6 @@ bool MutexLockKey::operator==(const MutexLockKey& rhs) const
         && lockID == rhs.lockID;
 }
 
-bool MutexLockKey::operator!=(const MutexLockKey& rhs) const
-{
-    return !(*this == rhs);
-}
-
 QString MutexLockKey::toString() const
 {
     return QString("%1:%2. mutex %3, relock number %4").
@@ -120,19 +115,6 @@ bool LockGraphEdgeData::TwoMutexLockData::operator<(const TwoMutexLockData& rhs)
         return false;
 
     return secondLocked < rhs.secondLocked;
-}
-
-bool LockGraphEdgeData::TwoMutexLockData::operator==(const TwoMutexLockData& rhs) const
-{
-    return
-        threadID == rhs.threadID &&
-        firstLocked == rhs.firstLocked &&
-        secondLocked == rhs.secondLocked;
-}
-
-bool LockGraphEdgeData::TwoMutexLockData::operator!=(const TwoMutexLockData& rhs) const
-{
-    return !(*this == rhs);
 }
 
 LockGraphEdgeData::LockGraphEdgeData()

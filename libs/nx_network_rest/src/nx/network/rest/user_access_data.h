@@ -88,11 +88,6 @@ inline bool operator==(const UserAccessData& lhs, const UserAccessData& rhs)
     return lhs.userId == rhs.userId && lhs.access == rhs.access;
 }
 
-inline bool operator!=(const UserAccessData& lhs, const UserAccessData& rhs)
-{
-    return !operator==(lhs, rhs);
-}
-
 struct UserSession
 {
     AuthSession session;

@@ -35,11 +35,6 @@ public:
         return gradient.stops() == other.gradient.stops();
     }
 
-    bool operator!=(const GradientWrapper& other) const
-    {
-        return !(*this == other);
-    }
-
     const QGradient& getGradient() const
     {
         return gradient;

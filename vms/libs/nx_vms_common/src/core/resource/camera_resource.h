@@ -73,8 +73,7 @@ public:
         nx::vms::api::StreamIndex index = nx::vms::api::StreamIndex::undefined;
         bool isForced = false;
 
-        bool operator==(const MotionStreamIndex& other) const;
-        bool operator!=(const MotionStreamIndex& other) const;
+        bool operator==(const MotionStreamIndex&) const = default;
     };
 
     enum class StreamFpsSharingMethod

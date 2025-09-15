@@ -41,7 +41,6 @@ public:
 
     bool operator<(const MutexLockKey& rhs) const;
     bool operator==(const MutexLockKey& rhs) const;
-    bool operator!=(const MutexLockKey& rhs) const;
 
     QString toString() const;
 };
@@ -64,8 +63,7 @@ public:
             MutexLockKey secondLocked);
 
         bool operator<(const TwoMutexLockData& rhs) const;
-        bool operator==(const TwoMutexLockData& rhs) const;
-        bool operator!=(const TwoMutexLockData& rhs) const;
+        bool operator==(const TwoMutexLockData& rhs) const = default;
     };
 
     //!Information about mutex lock

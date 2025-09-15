@@ -36,11 +36,6 @@ void QnResourceAccessSubject::operator=(const QnResourceAccessSubject& other)
     m_id = other.m_id;
 }
 
-bool QnResourceAccessSubject::operator!=(const QnResourceAccessSubject& other) const
-{
-    return !(*this == other);
-}
-
 bool QnResourceAccessSubject::operator==(const QnResourceAccessSubject& other) const
 {
     return m_id == other.m_id;

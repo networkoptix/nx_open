@@ -107,16 +107,6 @@ bool Tag::operator<(const Tag& rhs) const
     return m_value < rhs.m_value;
 }
 
-bool Tag::operator==(const Tag& rhs) const
-{
-    return m_value == rhs.m_value;
-}
-
-bool Tag::operator!=(const Tag& rhs) const
-{
-    return m_value != rhs.m_value;
-}
-
 //-------------------------------------------------------------------------------------------------
 // Filter
 
@@ -203,11 +193,6 @@ bool Filter::operator<(const Filter& rhs) const
 bool Filter::operator==(const Filter& rhs) const
 {
     return toString() == rhs.toString();
-}
-
-bool Filter::operator!=(const Filter& rhs) const
-{
-    return !(*this == rhs);
 }
 
 //-------------------------------------------------------------------------------------------------

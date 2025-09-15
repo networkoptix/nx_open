@@ -31,8 +31,7 @@ public:
     const Data& bytes() const;
     QString toString() const;
 
-    bool operator==(const MacAddress& other) const;
-    bool operator!=(const MacAddress& other) const;
+    bool operator==(const MacAddress&) const = default;
     bool operator<(const MacAddress& other) const;
 
 private:

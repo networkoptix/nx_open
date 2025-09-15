@@ -232,12 +232,6 @@ bool UnifiedPollSet::const_iterator::operator==(
         && m_impl->udtSocketIter == right.m_impl->udtSocketIter;
 }
 
-bool UnifiedPollSet::const_iterator::operator!=(
-    const UnifiedPollSet::const_iterator& right) const
-{
-    return !(*this == right);
-}
-
 /*********************************
 UnifiedPollSet
 **********************************/

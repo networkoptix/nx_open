@@ -183,7 +183,6 @@ public:
     }
 };
 
-
 //-------------------------------------------------------------------------------------------------
 // PollSet::const_iterator.
 
@@ -250,11 +249,6 @@ bool PollSet::const_iterator::operator==(const const_iterator& right) const
 {
     return (m_impl->pollSetImpl == right.m_impl->pollSetImpl)
         && (m_impl->currentIndex == right.m_impl->currentIndex);
-}
-
-bool PollSet::const_iterator::operator!=(const const_iterator& right) const
-{
-    return !(*this == right);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -27,7 +27,6 @@ public:
 
     void operator=(const QnResourceAccessSubject& other);
     bool operator==(const QnResourceAccessSubject& other) const;
-    bool operator!=(const QnResourceAccessSubject& other) const;
     bool operator<(const QnResourceAccessSubject& other) const;
     bool operator>(const QnResourceAccessSubject& other) const;
 

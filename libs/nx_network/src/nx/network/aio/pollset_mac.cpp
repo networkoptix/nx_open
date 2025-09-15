@@ -155,11 +155,6 @@ bool PollSet::const_iterator::operator==(const const_iterator& right) const
         && (m_impl->currentIndex == right.m_impl->currentIndex);
 }
 
-bool PollSet::const_iterator::operator!=(const const_iterator& right) const
-{
-    return !(*this == right);
-}
-
 //-------------------------------------------------------------------------------------------------
 // PollSet.
 

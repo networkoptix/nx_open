@@ -49,21 +49,6 @@ int Format::bytesPerFrame() const
     return (sampleSize * channelCount) / 8;
 }
 
-bool Format::operator==(const Format& other) const
-{
-    return sampleRate == other.sampleRate
-        && channelCount == other.channelCount
-        && sampleSize == other.sampleSize
-        && codec == other.codec
-        && byteOrder == other.byteOrder
-        && sampleType == other.sampleType;
-}
-
-bool Format::operator!=(const Format& other) const
-{
-    return !(*this == other);
-}
-
 QString Format::toString() const
 {
     return NX_FMT(

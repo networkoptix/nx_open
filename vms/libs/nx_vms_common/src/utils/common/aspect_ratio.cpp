@@ -101,13 +101,3 @@ bool QnAspectRatio::isRotated90(qreal angle)
 {
     return qAbs(90 - qAbs((int)angle % 180)) < 45;
 }
-
-bool QnAspectRatio::operator ==(const QnAspectRatio& other) const
-{
-    return m_width == other.m_width && m_height == other.m_height;
-}
-
-bool QnAspectRatio::operator!=(const QnAspectRatio& other) const
-{
-    return !(*this == other);
-}

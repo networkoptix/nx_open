@@ -29,8 +29,7 @@ struct NX_VMS_API Timestamp
     Timestamp() = default;
     Timestamp(quint64 sequence, quint64 ticks): sequence(sequence), ticks(ticks) {}
 
-    bool operator==(const Timestamp& right) const;
-    bool operator!=(const Timestamp& right) const { return !(*this == right); }
+    bool operator==(const Timestamp&) const = default;
 
     bool operator<(const Timestamp& right) const;
     bool operator<=(const Timestamp& right) const;

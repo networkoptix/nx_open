@@ -17,8 +17,6 @@ public:
     static const QLatin1String anyResolution;
     static QString resolutionToString( const QSize& resolution = QSize() );
 
-    nx::vms::api::StreamIndex getEncoderIndex() const;
-
     // We have to keep compatibility with previous version. So, this field stay int
     int encoderIndex;
     //!has format "1920x1080" or "*" to notify that any resolution is supported
@@ -38,6 +36,7 @@ public:
     int codec;
     std::map<QString, QString> customStreamParams; // TODO remove outdated field
 
+public:
     CameraMediaStreamInfo(
         nx::vms::api::StreamIndex encoderIndex = nx::vms::api::StreamIndex::undefined,
         const QSize& _resolution = QSize(),
@@ -51,14 +50,13 @@ public:
         //TODO #akolesnikov delegate to next constructor after moving to vs2013
     }
 
-    bool operator==( const CameraMediaStreamInfo& rhs ) const;
-    bool operator!=( const CameraMediaStreamInfo& rhs ) const;
+    bool operator==(const CameraMediaStreamInfo&) const = default;
+    nx::vms::api::StreamIndex getEncoderIndex() const;
     QSize getResolution() const;
     std::optional<double> getAspectRatio() const;
 };
 
 #define CameraMediaStreamInfo_Fields (encoderIndex)(resolution)(transports)(transcodingRequired)(codec)(customStreamParams)
-
 
 class NX_VMS_COMMON_API CameraMediaStreams
 {

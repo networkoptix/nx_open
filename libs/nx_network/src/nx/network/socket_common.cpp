@@ -104,11 +104,6 @@ bool HostAddress::operator==(const HostAddress& rhs) const
         && m_scopeId.value_or(0) == rhs.m_scopeId.value_or(0);
 }
 
-bool HostAddress::operator!=(const HostAddress& rhs) const
-{
-    return !(*this == rhs);
-}
-
 bool HostAddress::operator<(const HostAddress& rhs) const
 {
     if (isIpAddress() != rhs.isIpAddress())
@@ -501,16 +496,6 @@ SocketAddress::SocketAddress(const sockaddr_in6& ipv6Endpoint):
 
 SocketAddress::~SocketAddress() = default;
 
-bool SocketAddress::operator==(const SocketAddress& rhs) const
-{
-    return address == rhs.address && port == rhs.port;
-}
-
-bool SocketAddress::operator!=(const SocketAddress& rhs) const
-{
-    return !(*this == rhs);
-}
-
 bool SocketAddress::operator<(const SocketAddress& rhs) const
 {
     if (address < rhs.address)
@@ -641,18 +626,6 @@ KeepAliveOptions::KeepAliveOptions(
     probeSendPeriod(probeSendPeriod),
     probeCount(probeCount)
 {
-}
-
-bool KeepAliveOptions::operator==(const KeepAliveOptions& rhs) const
-{
-    return inactivityPeriodBeforeFirstProbe == rhs.inactivityPeriodBeforeFirstProbe
-        && probeSendPeriod == rhs.probeSendPeriod
-        && probeCount == rhs.probeCount;
-}
-
-bool KeepAliveOptions::operator!=(const KeepAliveOptions& rhs) const
-{
-    return !(*this == rhs);
 }
 
 std::chrono::milliseconds KeepAliveOptions::maxDelay() const

@@ -45,11 +45,6 @@ public:
             || (isEmpty() && other.isEmpty());
     }
 
-    bool operator!=(const Interval& other) const
-    {
-        return !(*this == other);
-    }
-
     bool intersects(const Interval& other) const
     {
         return !intersected(other).isEmpty();

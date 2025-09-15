@@ -62,7 +62,6 @@ struct NX_VMS_COMMON_API QnUserHash
     QString idForToStringFromPtr() const { return toString(); }
 
     bool operator==(const QnUserHash& rhs) const;
-    bool operator!=(const QnUserHash& rhs) const { return !(*this == rhs); }
 
     QByteArray hashPassword(const QString& password) const;
     bool checkPassword(const QString& password) const;

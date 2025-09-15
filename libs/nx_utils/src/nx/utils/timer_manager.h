@@ -63,7 +63,6 @@ public:
 
         operator bool_type() const;
         bool operator==(const TimerGuard& right) const;
-        bool operator!=(const TimerGuard& right) const;
 
     private:
         TimerManager* m_timerManager;

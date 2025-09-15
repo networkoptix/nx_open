@@ -50,8 +50,7 @@ public:
 
     int bytesPerFrame() const;
 
-    bool operator==(const Format& other) const;
-    bool operator!=(const Format& other) const;
+    bool operator==(const Format&) const = default;
 
     QString toString() const;
 };
