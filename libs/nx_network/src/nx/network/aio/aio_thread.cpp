@@ -325,8 +325,9 @@ void AioThread::stopMonitoringInternal(Pollable* sock, aio::EventType eventType)
     if (!handlingData)
         return; //< Socket is not polled.
 
-    if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0)
-        return;   // Socket already marked for removal.
+    if (handlingData->markedForRemoval.load() > 0)
+        return;   //< Socket already marked for removal.
+
     ++handlingData->markedForRemoval;
 
     const bool inAIOThread = currentThreadSystemId() == systemThreadId();
