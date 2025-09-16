@@ -34,7 +34,6 @@ public:
     //!if \a true this stream is produced by transcoding one of native (having this flag set to \a false) stream
     bool transcodingRequired;
     int codec;
-    std::map<QString, QString> customStreamParams; // TODO remove outdated field
 
 public:
     CameraMediaStreamInfo(
@@ -56,7 +55,7 @@ public:
     std::optional<double> getAspectRatio() const;
 };
 
-#define CameraMediaStreamInfo_Fields (encoderIndex)(resolution)(transports)(transcodingRequired)(codec)(customStreamParams)
+#define CameraMediaStreamInfo_Fields (encoderIndex)(resolution)(transports)(transcodingRequired)(codec)
 
 class NX_VMS_COMMON_API CameraMediaStreams
 {
