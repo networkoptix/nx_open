@@ -97,6 +97,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Dev] Whether to show Server's setup wizard dialog in a modal window (default).\n"
         "Developers can change to non-modal for debugging of web-based components.");
 
+    NX_INI_FLAG(true, modalOAuthDialog,
+        "[Dev] Whether to show OAuth Login dialog in a modal window (default).\n"
+        "Developers can change to non-modal for debugging of web-based components.");
+
     NX_INI_STRING("", autoUpdateCheckVersionOverride,
         "[Dev] Background updates check will use this version instead of the latest version.");
 
