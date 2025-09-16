@@ -271,7 +271,7 @@ private:
     void onDone();
 
     AsyncHttpClient(const AsyncHttpClient&);
-    AsyncHttpClient& operator=(const AsyncHttpClient&);
+    AsyncHttpClient& operator=(const AsyncHttpClient&) = delete;
 };
 
 /**
@@ -378,12 +378,7 @@ public:
         return m_obj ? &AsyncHttpClientPtr::this_type_does_not_support_comparisons : 0;
     }
 
-    bool operator<(const AsyncHttpClientPtr& right) const { return m_obj < right.m_obj; }
-    bool operator<=(const AsyncHttpClientPtr& right) const { return m_obj <= right.m_obj; }
-    bool operator>(const AsyncHttpClientPtr& right) const { return m_obj > right.m_obj; }
-    bool operator>=(const AsyncHttpClientPtr& right) const { return m_obj >= right.m_obj; }
-    bool operator==(const AsyncHttpClientPtr& right) const { return m_obj == right.m_obj; }
-    bool operator!=(const AsyncHttpClientPtr& right) const { return m_obj != right.m_obj; }
+    auto operator<=>(const AsyncHttpClientPtr& right) const = default;
 
 private:
     std::shared_ptr<AsyncHttpClient> m_obj;
@@ -426,11 +421,6 @@ void NX_NETWORK_API downloadFileAsyncEx(
     AuthType authType = AuthType::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = {},
     const std::string_view& method = nx::network::http::Method::get);
-
-void downloadFileAsyncEx(
-    const nx::Url& url,
-    std::function<void(SystemError::ErrorCode, int, std::string, nx::Buffer)> completionHandler,
-    nx::network::http::AsyncHttpClientPtr httpClientCaptured);
 
 using UploadCompletionHandler = std::function<void(SystemError::ErrorCode, int httpStatus)>;
 

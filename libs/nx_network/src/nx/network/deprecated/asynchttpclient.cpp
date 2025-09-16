@@ -447,6 +447,8 @@ void AsyncHttpClient::onDone()
 //-------------------------------------------------------------------------------------------------
 // Utilities.
 
+namespace {
+
 void downloadFileAsyncEx(
     const nx::Url& url,
     DownloadCompletionHandlerEx completionHandlerEx,
@@ -512,6 +514,8 @@ void downloadFileAsyncEx(
         requestCompletionFunc(httpClientCaptured);
     }
 }
+
+} // namespace
 
 void downloadFileAsyncEx(
     ssl::AdapterFunc adapterFunc,
@@ -593,8 +597,8 @@ void uploadDataAsync(
         if (httpClient->failed())
             return callback(SystemError::connectionReset, nx::network::http::StatusCode::ok);
 
-        const auto response = httpClient->response();
-        const auto statusLine = response->statusLine;
+        const auto* response = httpClient->response();
+        const auto& statusLine = response->statusLine;
         if ((statusLine.statusCode != nx::network::http::StatusCode::ok)
             && (statusLine.statusCode != nx::network::http::StatusCode::partialContent))
         {
@@ -631,7 +635,6 @@ SystemError::ErrorCode uploadDataSync(
     SystemError::ErrorCode result = SystemError::noError;
     std::mutex mutex;
     std::condition_variable waiter;
-
 
     const auto callback = [&result, &mutex, &waiter, &done, httpCode]
         (SystemError::ErrorCode errorCode, int statusCode)
