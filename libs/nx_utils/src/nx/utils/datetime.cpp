@@ -2,7 +2,15 @@
 
 #include "datetime.h"
 
+#include <cstdio>
+#include <cstring>
+#include <ctime>
+
 #include <QtCore/QTimeZone>
+
+#ifdef _WIN32
+    #include <time.h>
+#endif
 
 #include "nx_utils_ini.h"
 #include "std_string_utils.h"
@@ -17,6 +25,21 @@ namespace {
 static constexpr const char* kWeekDays[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
 static constexpr const char* kMonths[] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+// Cross-platform timegm replacement
+std::time_t timegmCrossPlatform(struct tm* tm)
+{
+#ifdef _WIN32
+    return _mkgmtime(tm);
+#else
+    return timegm(tm);
+#endif
+}
+
+// Forward declarations for lock-free parsing functions
+std::int64_t parseRfc1123DateLockFree(const std::string_view& str);
+std::int64_t parseRfc850DateLockFree(const std::string_view& str);
+std::int64_t parseAnsiCDateLockFree(const std::string_view& str);
 
 QDateTime parseRfc1123Date(const std::string_view& str)
 {
@@ -56,6 +79,168 @@ QDateTime parseAnsiCDate(const std::string_view& str)
     return QLocale(QLocale::C).toDateTime(
         QByteArray::fromRawData(str.data(), str.size()),
         str[8] == ' ' ? kAnsiCTemplatePadded : kAnsiCTemplate);
+}
+
+// Lock-free parsing helper functions
+std::int64_t parseRfc1123DateLockFree(const std::string_view& str)
+{
+    // Format: "Sun, 06 Nov 1994 08:49:37"
+    // Expected length: 25 characters
+    if (str.length() < 25)
+        return -1;
+
+    struct tm tm = {};
+    char monthStr[4] = {};
+
+    // Parse: "Sun, 06 Nov 1994 08:49:37"
+    if (sscanf(str.data(),
+            "%*3s, %2d %3s %4d %2d:%2d:%2d",
+            &tm.tm_mday,
+            monthStr,
+            &tm.tm_year,
+            &tm.tm_hour,
+            &tm.tm_min,
+            &tm.tm_sec)
+        != 6)
+        return -1;
+
+    // Convert month name to number
+    static constexpr const char* kMonths[] = {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+    tm.tm_mon = -1;
+    for (int i = 0; i < 12; ++i)
+    {
+        if (strncmp(monthStr, kMonths[i], 3) == 0)
+        {
+            tm.tm_mon = i;
+            break;
+        }
+    }
+    if (tm.tm_mon == -1)
+        return -1;
+
+    tm.tm_year -= 1900; // tm_year is years since 1900
+
+    // Convert to time_t and then to milliseconds
+    std::time_t timeT = timegmCrossPlatform(&tm);
+    if (timeT == -1)
+        return -1;
+
+    return static_cast<std::int64_t>(timeT) * 1000;
+}
+
+std::int64_t parseRfc850DateLockFree(const std::string_view& str)
+{
+    // Format: "Sunday, 06-Nov-94 08:49:37"
+    // Expected length: 28 characters
+    if (str.length() < 28)
+        return -1;
+
+    struct tm tm = {};
+    char monthStr[4] = {};
+    int year;
+
+    // Parse: "Sunday, 06-Nov-94 08:49:37"
+    if (sscanf(str.data(),
+            "%*[^,], %2d-%3s-%2d %2d:%2d:%2d",
+            &tm.tm_mday,
+            monthStr,
+            &year,
+            &tm.tm_hour,
+            &tm.tm_min,
+            &tm.tm_sec)
+        != 6)
+        return -1;
+
+    // Convert month name to number
+    static constexpr const char* kMonths[] = {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+    tm.tm_mon = -1;
+    for (int i = 0; i < 12; ++i)
+    {
+        if (strncmp(monthStr, kMonths[i], 3) == 0)
+        {
+            tm.tm_mon = i;
+            break;
+        }
+    }
+    if (tm.tm_mon == -1)
+        return -1;
+
+    // Convert 2-digit year to 4-digit year
+    if (year < 50)
+        tm.tm_year = year + 2000 - 1900; // 00-49 -> 2000-2049
+    else
+        tm.tm_year = year + 1900 - 1900; // 50-99 -> 1950-1999
+
+    // Convert to time_t and then to milliseconds
+    std::time_t timeT = timegmCrossPlatform(&tm);
+    if (timeT == -1)
+        return -1;
+
+    return static_cast<std::int64_t>(timeT) * 1000;
+}
+
+std::int64_t parseAnsiCDateLockFree(const std::string_view& str)
+{
+    // Format: "Sun Nov  6 08:49:37 1994" or "Sun Nov 16 08:49:37 1994"
+    // Expected length: 24 or 25 characters
+    if (str.length() < 24)
+        return -1;
+
+    struct tm tm = {};
+    char monthStr[4] = {};
+
+    // Try parsing with space-padded day first
+    if (sscanf(str.data(),
+            "%*3s %3s %2d %2d:%2d:%2d %4d",
+            monthStr,
+            &tm.tm_mday,
+            &tm.tm_hour,
+            &tm.tm_min,
+            &tm.tm_sec,
+            &tm.tm_year)
+        != 6)
+    {
+        // Try parsing with single-digit day
+        if (sscanf(str.data(),
+                "%*3s %3s %d %2d:%2d:%2d %4d",
+                monthStr,
+                &tm.tm_mday,
+                &tm.tm_hour,
+                &tm.tm_min,
+                &tm.tm_sec,
+                &tm.tm_year)
+            != 6)
+            return -1;
+    }
+
+    // Convert month name to number
+    static constexpr const char* kMonths[] = {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+    tm.tm_mon = -1;
+    for (int i = 0; i < 12; ++i)
+    {
+        if (strncmp(monthStr, kMonths[i], 3) == 0)
+        {
+            tm.tm_mon = i;
+            break;
+        }
+    }
+    if (tm.tm_mon == -1)
+        return -1;
+
+    tm.tm_year -= 1900; // tm_year is years since 1900
+
+    // Convert to time_t and then to milliseconds
+    std::time_t timeT = timegmCrossPlatform(&tm);
+    if (timeT == -1)
+        return -1;
+
+    return static_cast<std::int64_t>(timeT) * 1000;
 }
 
 } // anonymous namespace
@@ -173,6 +358,37 @@ QDateTime parseDateToQDateTime(const std::string_view& str)
     return parseAnsiCDate(date);
 }
 
+std::int64_t parseDateToMillisSinceEpoch(const std::string_view& str)
+{
+    auto date = nx::utils::trim(str);
+
+    // Sanity check
+    if (date.length() < 8)
+        return -1;
+
+    // If the string ends with " GMT" it is either RFC 1123 or RFC 850
+    if (nx::utils::endsWith(date, " GMT"))
+    {
+        // Remove " GMT" suffix
+        date = date.substr(0, date.length() - 4);
+        std::int64_t result = -1;
+
+        // RFC 1123 date: first three characters are abbreviated day of the week, like "Sun",
+        // followed by a comma
+        if (date.length() >= 4 && date[3] == ',')
+            result = parseRfc1123DateLockFree(date);
+
+        if (result == -1)
+            result = parseRfc850DateLockFree(date);
+
+        if (result != -1)
+            return result;
+    }
+
+    // Fall back to ANSI C date
+    return parseAnsiCDateLockFree(date);
+}
+
 std::string formatDateTime(std::chrono::system_clock::time_point tp)
 {
     const auto msecsSinceEpoch =
@@ -234,5 +450,11 @@ milliseconds parseDateTimeMsec(const QString& dateTimeStr)
 
     return duration_cast<milliseconds>(microseconds{usecSinceEpoch});
 }
+
+// Explicit template instantiations for common duration types
+template std::string formatDateTimeLockFree(const std::chrono::seconds& durationSinceEpoch);
+template std::string formatDateTimeLockFree(const std::chrono::milliseconds& durationSinceEpoch);
+template std::string formatDateTimeLockFree(const std::chrono::microseconds& durationSinceEpoch);
+template std::string formatDateTimeLockFree(const std::chrono::nanoseconds& durationSinceEpoch);
 
 } // namespace nx::utils

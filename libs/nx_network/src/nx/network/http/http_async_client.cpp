@@ -1436,10 +1436,10 @@ void AsyncClient::prepareRequestHeaders(
     bool useHttp11,
     const Method& httpMethod)
 {
-    nx::network::http::insertOrReplaceHeader(
-        &m_request.headers,
-        HttpHeader("Date", nx::utils::formatDateTime(
-            QDateTime::fromMSecsSinceEpoch(nx::utils::millisSinceEpoch().count()))));
+    nx::network::http::insertOrReplaceHeader(&m_request.headers,
+        HttpHeader(
+            "Date", nx::utils::formatDateTimeLockFree(nx::utils::utcTime().time_since_epoch())));
+
     nx::network::http::insertOrReplaceHeader(
         &m_request.headers,
         HttpHeader(

@@ -611,8 +611,9 @@ void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(
         getResultCode(error, response, requestPtr->lastFusionRequestResult(), output...);
     const auto date = http::getHeaderValue(
         response ? response->headers : network::http::HttpHeaders{}, "Date");
-    m_lastResponseTime = std::chrono::milliseconds(
-        date.empty() ? 0 : nx::utils::parseDateToQDateTime(date).currentMSecsSinceEpoch());
+    m_lastResponseTime = date.empty()
+        ? std::chrono::milliseconds(0)
+        : std::chrono::milliseconds(nx::utils::parseDateToMillisSinceEpoch(date));
     m_lastResponseHeaders = response
         ? std::move(response->headers)
         : nx::network::http::HttpHeaders{};
