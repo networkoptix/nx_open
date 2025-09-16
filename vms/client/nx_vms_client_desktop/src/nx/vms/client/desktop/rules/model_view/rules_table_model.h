@@ -35,7 +35,8 @@ public:
         RuleIdRole = Qt::UserRole,
         ResourceIdsRole,
         IsSystemRuleRole,
-        SortDataRole
+        SortDataRole,
+        ActionTypeRole
     };
     Q_ENUM(Roles)
 

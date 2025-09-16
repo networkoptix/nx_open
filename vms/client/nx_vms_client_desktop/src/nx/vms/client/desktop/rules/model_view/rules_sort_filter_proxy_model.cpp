@@ -6,21 +6,27 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_field.h>
+#include <nx/vms/rules/actions/push_notification_action.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/utils/type.h>
 
 #include "rules_table_model.h"
 
 namespace nx::vms::client::desktop::rules {
 
 namespace {
+
+const auto kPushNotificationActionType =
+    nx::vms::rules::utils::type<nx::vms::rules::PushNotificationAction>();
 
 /** Returns whether any of the given camera resources match the given pattern. */
 bool matches(const QString& pattern, const UuidSet& ids)
@@ -81,6 +87,17 @@ bool RulesSortFilterProxyModel::filterAcceptsRow(
     if (isSystem && !vms::rules::ini().showSystemRules)
         return false;
 
+    const auto actionColumnIndex =
+        m_rulesTableModel->index(sourceRow, RulesTableModel::ActionColumn, sourceParent);
+
+    if (actionColumnIndex.data(RulesTableModel::ActionTypeRole).toString()
+            == kPushNotificationActionType
+        && !appContext()->cloudServiceChecker()->hasService(
+            nx::vms::client::core::CloudService::push_notifications))
+    {
+        return false;
+    }
+
     const auto filterRegExp = filterRegularExpression();
     if (filterRegExp.pattern().isEmpty())
         return true;
@@ -89,8 +106,6 @@ bool RulesSortFilterProxyModel::filterAcceptsRow(
         m_rulesTableModel->index(sourceRow, RulesTableModel::EventColumn, sourceParent);
     const auto sourceColumnIndex =
         m_rulesTableModel->index(sourceRow, RulesTableModel::SourceColumn, sourceParent);
-    const auto actionColumnIndex =
-        m_rulesTableModel->index(sourceRow, RulesTableModel::ActionColumn, sourceParent);
     const auto targetColumnIndex =
         m_rulesTableModel->index(sourceRow, RulesTableModel::TargetColumn, sourceParent);
     const auto commentColumnIndex =
