@@ -7544,8 +7544,8 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation type="unfinished">Channel Partner users have access to this site</translation>
     </message>
     <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation>El acceso a los usuarios&apos; del Portal de Canales es administrado en el nivel de la Organización y no son visibles en el sitio de administración del usuario. &lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt; Aprenda más en &lt;/a&gt;</translation>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
+      <translation>El acceso a los usuarios&apos; del Portal de Canales es administrado en el nivel de la Organización y no son visibles en el sitio de administración del usuario. &lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt; Aprenda más en &lt;/a&gt;</translation>
     </message>
   </context>
   <context>

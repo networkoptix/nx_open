@@ -7544,8 +7544,8 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
       <translation>Os usuarios de partners/socios de canle teñen acceso a este sitio</translation>
     </message>
     <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation>O acceso dos usuarios dos partner/socios de canle&apos; xestiónase a nivel de organización e non son visibles na xestión de usuarios do sitio.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Máis información&lt;/a&gt;</translation>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
+      <translation>O acceso dos usuarios dos partner/socios de canle xestiónase a nivel de organización e non son visibles na xestión de usuarios do sitio.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Máis información&lt;/a&gt;</translation>
     </message>
   </context>
   <context>

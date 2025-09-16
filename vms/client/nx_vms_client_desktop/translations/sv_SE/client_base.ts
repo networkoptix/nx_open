@@ -7544,8 +7544,8 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Channel Partner-användare har tillgång till denna webbplats</translation>
     </message>
     <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation>Kanalpartner-användare&apos; -åtkomst hanteras på organisationsnivå och de är inte synliga i webbplatsens användarhantering.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Läs mer&lt;/a&gt;</translation>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
+      <translation>Kanalpartner-användare&apos; -åtkomst hanteras på organisationsnivå och de är inte synliga i webbplatsens användarhantering.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Läs mer&lt;/a&gt;</translation>
     </message>
   </context>
   <context>

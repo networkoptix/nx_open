@@ -7543,8 +7543,8 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation type="unfinished">Channel Partner users have access to this site</translation>
     </message>
     <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation>Kanal Ortağı kullanıcılarının&apos; erişimi Kuruluş düzeyinde yönetilir ve site kullanıcı yönetiminde görünmezler.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Daha fazla bilgi edinin&lt;/a&gt;</translation>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
+      <translation>Kanal Ortağı kullanıcılarının&apos; erişimi Kuruluş düzeyinde yönetilir ve site kullanıcı yönetiminde görünmezler.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Daha fazla bilgi edinin&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
