@@ -266,7 +266,7 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
         auto beingProcessedScopedGuard =
             nx::utils::makeScopeGuard([&handlingData]() { --handlingData->beingProcessed; });
 
-        if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0) //socket has been removed from watch
+        if (handlingData->markedForRemoval.load() > 0) //< Socket has been removed from watch.
             continue;
 
         //eventTriggered is allowed to call stopMonitoring which can remove socket from pollset
@@ -302,7 +302,7 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
         auto beingProcessedScopedGuard =
             nx::utils::makeScopeGuard([&handlingData]() { --handlingData->beingProcessed; });
 
-        if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0) //task has been removed from watch
+        if (handlingData->markedForRemoval.load() > 0) //< Task has been removed from watch.
             continue;
 
         if (handlingData->updatedPeriodicTaskClock > 0)
