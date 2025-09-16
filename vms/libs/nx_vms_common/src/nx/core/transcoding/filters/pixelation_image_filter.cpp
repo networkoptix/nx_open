@@ -37,18 +37,22 @@ PixelationImageFilter::~PixelationImageFilter()
     executeInThread(m_pixelation->thread(), [pixelation = m_pixelation]() {});
 }
 
+void PixelationImageFilter::setMetadata(const QnAbstractCompressedMetadataPtr& metadata)
+{
+    m_metadata = metadata;
+}
+
 CLVideoDecoderOutputPtr PixelationImageFilter::updateImage(
-    const CLVideoDecoderOutputPtr& frame,
-    const QnAbstractCompressedMetadataPtr& metadata)
+    const CLVideoDecoderOutputPtr& frame)
 {
     // Creating in the thread it is used.
     if (!m_pixelation)
         m_pixelation = std::make_shared<nx::vms::common::pixelation::Pixelation>();
 
-    if (!metadata || (m_settings.objectTypeIds.empty() && !m_settings.isAllObjectTypes))
+    if (!m_metadata || (m_settings.objectTypeIds.empty() && !m_settings.isAllObjectTypes))
         return frame;
 
-    if (const auto objectDataPacket = objectDataPacketFromMetadata(metadata))
+    if (const auto objectDataPacket = objectDataPacketFromMetadata(m_metadata))
     {
         QVector<QRectF> boundingBoxes;
         for (const auto& objectMetadata: objectDataPacket->objectMetadataList)
@@ -61,7 +65,7 @@ CLVideoDecoderOutputPtr PixelationImageFilter::updateImage(
         }
 
         setImage(m_pixelation->pixelate(frame->toImage(), boundingBoxes, m_settings.intensity));
-        return PaintImageFilter::updateImage(frame, /*metadata*/ {});
+        return PaintImageFilter::updateImage(frame);
     }
 
     return frame;

@@ -4,8 +4,9 @@
 
 #include <analytics/common/object_metadata.h>
 #include <core/resource/camera_resource.h>
-#include <nx/media/caching_metadata_consumer.h>
 #include <nx/fusion/serialization/ubjson.h>
+#include <nx/analytics/caching_metadata_consumer.h>
+#include <nx/media/ini.h>
 
 namespace nx::vms::client::core {
 
@@ -15,9 +16,9 @@ using namespace nx::common::metadata;
 class ConsumingAnalyticsMetadataProvider::Private
 {
 public:
-    QSharedPointer<media::CachingMetadataConsumer<ObjectMetadataPacketPtr>> metadataConsumer{
-        new media::CachingMetadataConsumer<ObjectMetadataPacketPtr>(
-            MetadataType::ObjectDetection)};
+    QSharedPointer<nx::analytics::CachingMetadataConsumer<ObjectMetadataPacketPtr>> metadataConsumer{
+        new nx::analytics::CachingMetadataConsumer<ObjectMetadataPacketPtr>(
+            MetadataType::ObjectDetection, nx::media::ini().metadataCacheSize)};
 };
 
 ConsumingAnalyticsMetadataProvider::ConsumingAnalyticsMetadataProvider():
@@ -45,11 +46,11 @@ QList<ObjectMetadataPacketPtr> ConsumingAnalyticsMetadataProvider::metadataRange
         startTimestamp,
         endTimestamp,
         channel,
-        media::CachingMetadataConsumer<ObjectMetadataPacketPtr>::PickingPolicy::TakeFirst,
+        nx::analytics::CachingMetadataConsumer<ObjectMetadataPacketPtr>::PickingPolicy::TakeFirst,
         maximumCount);
 }
 
-QSharedPointer<media::AbstractMetadataConsumer>
+QSharedPointer<nx::analytics::AbstractMetadataConsumer>
     ConsumingAnalyticsMetadataProvider::metadataConsumer() const
 {
     return d->metadataConsumer;

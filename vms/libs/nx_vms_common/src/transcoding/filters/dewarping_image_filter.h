@@ -23,9 +23,7 @@ public:
         const nx::vms::api::dewarping::MediaData& mediaDewarping,
         const nx::vms::api::dewarping::ViewData& itemDewarping);
 
-    virtual CLVideoDecoderOutputPtr updateImage(
-        const CLVideoDecoderOutputPtr& frame,
-        const QnAbstractCompressedMetadataPtr& metadata) override;
+    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
 
     virtual QSize updatedResolution(const QSize& srcSize) override;
 

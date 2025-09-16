@@ -60,7 +60,7 @@ QString getCameraName(const QnLegacyTranscodingSettings& settings)
 
 } // namespace
 
-nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
+nx::core::transcoding::FilterChainPtr QnImageFilterHelper::createFilterChain(
     const nx::core::transcoding::LegacyTranscodingSettings& legacy)
 {
     nx::core::transcoding::Settings settings;
@@ -77,7 +77,7 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
         settings.dewarping.enabled = true;
     }
 
-    nx::core::transcoding::FilterChain result(
+    auto result = std::make_unique<nx::core::transcoding::FilterChain>(
         settings, dewarpingMedia, legacy.resource->getVideoLayout());
 
     using nx::core::transcoding::TextImageFilter;
@@ -111,7 +111,7 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
                 legacy.resource->getVideoLayout(),
                 legacy.timestampParams.filterParams.corner,
                 textGetter);
-            result.addLegacyFilter(filter);
+            result->addLegacyFilter(filter);
             return result;
         }
 
@@ -135,7 +135,7 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
             legacy.timestampParams.filterParams.corner,
             textGetter,
             factor);
-        result.addLegacyFilter(filter);
+        result->addLegacyFilter(filter);
     }
 
     if (legacy.cameraNameParams.enabled)
@@ -152,7 +152,7 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
             legacy.cameraNameParams.corner,
             textGetter,
             factor);
-        result.addLegacyFilter(filter);
+        result->addLegacyFilter(filter);
     }
 
     return result;

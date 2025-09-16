@@ -17,9 +17,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/log/log.h>
 
-#include <nx/media/ini.h>
-
-namespace nx::media {
+namespace nx::analytics {
 
 using namespace std::chrono;
 
@@ -212,6 +210,27 @@ bool MetadataCache<ObjectMetadataPacketPtr>::containsTime(
     return (t->timestampUs <= timestampUs) && (timestampUs < (t->timestampUs + t->durationUs));
 }
 
+
+template<>
+QnAbstractCompressedMetadataPtr MetadataCache<QnAbstractCompressedMetadataPtr>::uncompress(
+    const QnAbstractCompressedMetadataPtr& metadata)
+{
+    return std::dynamic_pointer_cast<QnMetaDataV1>(metadata);
+}
+
+template<>
+qint64 MetadataCache<QnAbstractCompressedMetadataPtr>::timestampUs(const QnAbstractCompressedMetadataPtr& t)
+{
+    return t->timestamp;
+}
+
+template<>
+bool MetadataCache<QnAbstractCompressedMetadataPtr>::containsTime(
+    const QnAbstractCompressedMetadataPtr& t, const qint64 timestampUs)
+{
+    return t->containTime(timestampUs);
+}
+
 } // namespace
 
 template<typename T>
@@ -223,11 +242,11 @@ public:
 };
 
 template<typename T>
-CachingMetadataConsumer<T>::CachingMetadataConsumer(MetadataType metadataType):
+CachingMetadataConsumer<T>::CachingMetadataConsumer(MetadataType metadataType, int cashSize):
     base_type(metadataType),
     d(new Private())
 {
-    d->cacheSize = static_cast<size_t>(std::max(1, ini().metadataCacheSize));
+    d->cacheSize = static_cast<size_t>(std::max(1, cashSize));
 }
 
 template<typename T>
@@ -322,5 +341,6 @@ void CachingMetadataConsumer<T>::processMetadata(const QnAbstractCompressedMetad
 
 template class CachingMetadataConsumer<QnMetaDataV1Ptr>;
 template class CachingMetadataConsumer<nx::common::metadata::ObjectMetadataPacketPtr>;
+template class CachingMetadataConsumer<QnAbstractCompressedMetadataPtr>;
 
-} // namespace nx::media
+} // namespace nx::analytics

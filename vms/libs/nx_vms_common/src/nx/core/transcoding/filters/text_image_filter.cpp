@@ -248,9 +248,7 @@ TextImageFilter::~TextImageFilter()
 {
 }
 
-CLVideoDecoderOutputPtr TextImageFilter::updateImage(
-    const CLVideoDecoderOutputPtr& frame,
-    const QnAbstractCompressedMetadataPtr&)
+CLVideoDecoderOutputPtr TextImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
     if (!frame)
         return frame;

@@ -99,9 +99,7 @@ TimestampFilter::~TimestampFilter()
 {
 }
 
-CLVideoDecoderOutputPtr TimestampFilter::updateImage(
-    const CLVideoDecoderOutputPtr& frame,
-    const QnAbstractCompressedMetadataPtr&)
+CLVideoDecoderOutputPtr TimestampFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
     d->updateTimestamp(frame);
     d->painter().drawTo(frame);

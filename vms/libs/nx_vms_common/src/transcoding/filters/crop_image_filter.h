@@ -19,9 +19,7 @@ public:
      */
     QnCropImageFilter(const QRectF& rect, bool alignSize = true, bool deepCopy = true);
 
-    virtual CLVideoDecoderOutputPtr updateImage(
-        const CLVideoDecoderOutputPtr& frame,
-        const QnAbstractCompressedMetadataPtr& metadata) override;
+    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
 
     virtual QSize updatedResolution(const QSize& srcSize) override;
 

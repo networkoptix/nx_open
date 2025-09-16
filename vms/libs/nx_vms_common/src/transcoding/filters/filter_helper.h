@@ -12,6 +12,6 @@ public:
     /**
      * Create filters for source image processing
      */
-    static nx::core::transcoding::FilterChain createFilterChain(
+    static nx::core::transcoding::FilterChainPtr createFilterChain(
         const nx::core::transcoding::LegacyTranscodingSettings& settings);
 };

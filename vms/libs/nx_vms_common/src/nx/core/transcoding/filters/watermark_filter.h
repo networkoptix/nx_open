@@ -15,9 +15,7 @@ class WatermarkImageFilter: public PaintImageFilter
 public:
     WatermarkImageFilter(const Watermark& watermark);
 
-    virtual CLVideoDecoderOutputPtr updateImage(
-        const CLVideoDecoderOutputPtr& frame,
-        const QnAbstractCompressedMetadataPtr& metadata) override;
+    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
 
 private:
     Watermark m_watermark;

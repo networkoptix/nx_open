@@ -18,14 +18,16 @@ public:
     ~PixelationImageFilter();
 
     virtual CLVideoDecoderOutputPtr updateImage(
-        const CLVideoDecoderOutputPtr& frame,
-        const QnAbstractCompressedMetadataPtr& metadata) override;
+        const CLVideoDecoderOutputPtr& frame) override;
 
     virtual QSize updatedResolution(const QSize& sourceSize) { return sourceSize; };
+
+    void setMetadata(const QnAbstractCompressedMetadataPtr& metadata);
 
 private:
     std::shared_ptr<nx::vms::common::pixelation::Pixelation> m_pixelation;
     nx::vms::api::PixelationSettings m_settings;
+    QnAbstractCompressedMetadataPtr m_metadata;
 };
 
 } // nx::core::transcoding

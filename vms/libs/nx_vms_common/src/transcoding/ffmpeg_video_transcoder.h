@@ -53,7 +53,7 @@ public:
     QnFfmpegVideoTranscoder& operator=(const QnFfmpegVideoTranscoder&) = delete;
 
     // Should call before open
-    void setFilterChain(const nx::core::transcoding::FilterChain& filters);
+    void setFilterChain(nx::core::transcoding::FilterChainPtr filters);
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
     virtual bool open(const QnConstCompressedVideoDataPtr& video);
@@ -74,7 +74,7 @@ private:
     const Config m_config;
     uint32_t m_lastFlushedDecoder = 0;
     std::map<uint32_t, std::unique_ptr<QnFfmpegVideoDecoder>> m_videoDecoders;
-    nx::core::transcoding::FilterChain m_filters;
+    nx::core::transcoding::FilterChainPtr m_filters;
     QSize m_outputResolutionLimit;
     QSize m_targetResolution;
     QSize m_sourceResolution;

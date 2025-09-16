@@ -29,7 +29,7 @@ public:
         int channel,
         int maximumCount) const override;
 
-    virtual QSharedPointer<media::AbstractMetadataConsumer> metadataConsumer() const override;
+    virtual QSharedPointer<nx::analytics::AbstractMetadataConsumer> metadataConsumer() const override;
 
 private:
     class Private;

@@ -8,15 +8,15 @@
 
 #include "abstract_metadata_consumer.h"
 
-namespace nx::media {
+namespace nx::analytics {
 
 template<typename T>
-class NX_MEDIA_API CachingMetadataConsumer: public AbstractMetadataConsumer
+class NX_VMS_COMMON_API CachingMetadataConsumer: public AbstractMetadataConsumer
 {
     using base_type = AbstractMetadataConsumer;
 
 public:
-    CachingMetadataConsumer(MetadataType metadataType);
+    CachingMetadataConsumer(MetadataType metadataType, int cashSize);
     virtual ~CachingMetadataConsumer() override;
 
     size_t cacheSize() const;
@@ -37,12 +37,11 @@ public:
         PickingPolicy pickingPolicy,
         int maximumCount) const;
 
-protected:
-    virtual void processMetadata(const QnAbstractCompressedMetadataPtr& metadata) override;
+    void processMetadata(const QnAbstractCompressedMetadataPtr& metadata) override;
 
 private:
     class Private;
     const QScopedPointer<Private> d;
 };
 
-} // namespace nx::media
+} // namespace nx::analytics

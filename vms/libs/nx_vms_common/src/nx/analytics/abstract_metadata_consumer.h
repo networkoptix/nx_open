@@ -6,10 +6,9 @@
 
 #include <nx/media/meta_data_packet.h>
 
-namespace nx {
-namespace media {
+namespace nx::analytics {
 
-class NX_MEDIA_API AbstractMetadataConsumer
+class NX_VMS_COMMON_API AbstractMetadataConsumer
 {
 public:
     virtual ~AbstractMetadataConsumer();
@@ -26,5 +25,4 @@ private:
 
 using AbstractMetadataConsumerPtr = QSharedPointer<AbstractMetadataConsumer>;
 
-} // namespace media
-} // namespace nx
+} // namespace nx::analytics

@@ -14,10 +14,11 @@ QnScaleImageFilter::QnScaleImageFilter(
 {
 }
 
-CLVideoDecoderOutputPtr QnScaleImageFilter::updateImage(
-    const CLVideoDecoderOutputPtr& frame,
-    const QnAbstractCompressedMetadataPtr&)
+CLVideoDecoderOutputPtr QnScaleImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
+    //if (frame->size() == m_size && (frame->format == m_format || m_format == AV_PIX_FMT_NONE))
+      //  return frame;
+
     auto result = frame->scaled(m_size, m_format);
     if (!result)
     {

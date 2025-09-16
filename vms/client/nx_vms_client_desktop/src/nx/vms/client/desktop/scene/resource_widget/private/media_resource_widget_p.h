@@ -85,8 +85,8 @@ public:
 
     nx::vms::license::UsageStatus licenseStatus() const;
 
-    QSharedPointer<nx::media::AbstractMetadataConsumer> motionMetadataConsumer() const;
-    QSharedPointer<nx::media::AbstractMetadataConsumer> analyticsMetadataConsumer() const;
+    QSharedPointer<nx::analytics::AbstractMetadataConsumer> motionMetadataConsumer() const;
+    QSharedPointer<nx::analytics::AbstractMetadataConsumer> analyticsMetadataConsumer() const;
 
     void setMotionEnabled(bool enabled);
 

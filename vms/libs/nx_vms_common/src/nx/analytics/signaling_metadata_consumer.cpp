@@ -2,8 +2,7 @@
 
 #include "signaling_metadata_consumer.h"
 
-namespace nx {
-namespace media {
+namespace nx::analytics {
 
 SignalingMetadataConsumer::SignalingMetadataConsumer(MetadataType metadataType, QObject* parent):
     QObject(parent),
@@ -20,5 +19,4 @@ void SignalingMetadataConsumer::processMetadata(const QnAbstractCompressedMetada
     emit metadataReceived(metadata);
 }
 
-} // namespace media
-} // namespace nx
+} // namespace nx::analytics

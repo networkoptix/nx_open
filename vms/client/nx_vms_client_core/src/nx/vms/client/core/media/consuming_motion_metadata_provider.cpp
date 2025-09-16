@@ -2,7 +2,8 @@
 
 #include "consuming_motion_metadata_provider.h"
 
-#include <nx/media/caching_metadata_consumer.h>
+#include <nx/analytics/caching_metadata_consumer.h>
+#include <nx/media/ini.h>
 
 namespace nx::vms::client::core {
 
@@ -11,11 +12,12 @@ class ConsumingMotionMetadataProvider::Private
 public:
     Private();
 
-    QSharedPointer<media::CachingMetadataConsumer<MetaDataV1Ptr>> metadataConsumer;
+    QSharedPointer<nx::analytics::CachingMetadataConsumer<MetaDataV1Ptr>> metadataConsumer;
 };
 
 ConsumingMotionMetadataProvider::Private::Private():
-    metadataConsumer(new media::CachingMetadataConsumer<MetaDataV1Ptr>(MetadataType::Motion))
+    metadataConsumer(new nx::analytics::CachingMetadataConsumer<MetaDataV1Ptr>(
+        MetadataType::Motion, nx::media::ini().metadataCacheSize))
 {
 }
 
@@ -34,7 +36,7 @@ MetaDataV1Ptr ConsumingMotionMetadataProvider::metadata(
     return d->metadataConsumer->metadata(timestamp, channel);
 }
 
-QSharedPointer<media::AbstractMetadataConsumer>
+QSharedPointer<nx::analytics::AbstractMetadataConsumer>
     ConsumingMotionMetadataProvider::metadataConsumer() const
 {
     return d->metadataConsumer;

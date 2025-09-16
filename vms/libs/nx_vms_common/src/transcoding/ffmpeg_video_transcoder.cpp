@@ -98,7 +98,12 @@ void QnFfmpegVideoTranscoder::close()
 bool QnFfmpegVideoTranscoder::prepareFilters(
     AVCodecID dstCodec, const QnConstCompressedVideoDataPtr& video)
 {
-    if (m_filters.isReady())
+    if (!m_filters)
+    {
+        m_filters = std::make_unique<nx::core::transcoding::FilterChain>(
+            nx::core::transcoding::Settings(), nx::vms::api::dewarping::MediaData(), nullptr);
+    }
+    if (m_filters->isReady())
         return true;
 
     m_sourceResolution = m_config.sourceResolution;
@@ -131,8 +136,9 @@ bool QnFfmpegVideoTranscoder::prepareFilters(
         if (m_outputResolutionLimit.height() < m_sourceResolution.height())
             m_sourceResolution = m_outputResolutionLimit;
     }
-    m_filters.prepare(m_sourceResolution, nx::transcoding::maxResolution(dstCodec));
-    m_targetResolution = m_filters.apply(m_sourceResolution);
+
+    m_filters->prepare(m_sourceResolution, nx::transcoding::maxResolution(dstCodec));
+    m_targetResolution = m_filters->apply(m_sourceResolution);
     NX_DEBUG(this, "Prepare transcoding, output resolution: %1, source resolution: %2",
         m_targetResolution, m_sourceResolution);
     return true;
@@ -334,8 +340,9 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
             return 0;
         }
     }
+    if (m_filters)
+        decodedFrame = m_filters->apply(decodedFrame);
 
-    decodedFrame = m_filters.apply(decodedFrame, /*metadata*/ {});
     if (!decodedFrame)
     {
         NX_ERROR(this, "Failed to process filter chain for video frame");
@@ -436,7 +443,7 @@ QSize QnFfmpegVideoTranscoder::getOutputResolution() const
     return m_targetResolution;
 }
 
-void QnFfmpegVideoTranscoder::setFilterChain(const nx::core::transcoding::FilterChain& filters)
+void QnFfmpegVideoTranscoder::setFilterChain(nx::core::transcoding::FilterChainPtr filters)
 {
-    m_filters = filters;
+    m_filters = std::move(filters);
 }

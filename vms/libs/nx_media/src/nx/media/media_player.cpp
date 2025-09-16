@@ -245,7 +245,7 @@ public:
 
     bool isAudioOnlyMode = false;
 
-    using MetadataConsumerList = QList<QWeakPointer<AbstractMetadataConsumer>>;
+    using MetadataConsumerList = QList<QWeakPointer<nx::analytics::AbstractMetadataConsumer>>;
     QHash<MetadataType, MetadataConsumerList> m_metadataConsumerByType;
 
     // Hardware decoding has been used for the last presented frame.
@@ -1555,7 +1555,7 @@ void Player::testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader)
     d->archiveReader.reset(archiveReader);
 }
 
-bool Player::addMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer)
+bool Player::addMetadataConsumer(const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer)
 {
     if (!metadataConsumer)
         return false;
@@ -1569,7 +1569,7 @@ bool Player::addMetadataConsumer(const AbstractMetadataConsumerPtr& metadataCons
     return true;
 }
 
-bool Player::removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer)
+bool Player::removeMetadataConsumer(const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer)
 {
     if (!metadataConsumer)
         return false;

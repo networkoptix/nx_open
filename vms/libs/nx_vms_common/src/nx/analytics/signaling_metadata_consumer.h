@@ -6,10 +6,9 @@
 
 #include "abstract_metadata_consumer.h"
 
-namespace nx {
-namespace media {
+namespace nx::analytics {
 
-class NX_MEDIA_API SignalingMetadataConsumer:
+class NX_VMS_COMMON_API SignalingMetadataConsumer:
     public QObject,
     public AbstractMetadataConsumer
 {
@@ -26,5 +25,4 @@ protected:
     virtual void processMetadata(const QnAbstractCompressedMetadataPtr& metadata) override;
 };
 
-} // namespace media
-} // namespace nx
+} // namespace bx::analytics

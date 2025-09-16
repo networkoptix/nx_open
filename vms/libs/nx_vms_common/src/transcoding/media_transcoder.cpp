@@ -48,7 +48,7 @@ bool MediaTranscoder::setVideoCodec(
 {
     m_vTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(config, m_metrics);
     auto filterChain = QnImageFilterHelper::createFilterChain(transcodingSettings);
-    m_vTranscoder->setFilterChain(filterChain);
+    m_vTranscoder->setFilterChain(std::move(filterChain));
     return true;
 }
 

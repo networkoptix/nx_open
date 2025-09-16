@@ -25,7 +25,7 @@ public:
         const QnResourcePtr& dev, QnAbstractStreamDataProvider* mediaProvider);
     virtual ~ExportStorageStreamRecorder() override;
 
-    void setTranscodeFilters(const nx::core::transcoding::FilterChain& filters);
+    void setTranscodeFilters(nx::core::transcoding::FilterChainPtr filters);
     void setServerTimeZone(QTimeZone value);
     void setTranscoderFixedFrameRate(int value);
     void setTranscoderQuality(Qn::StreamQuality quality);
@@ -50,7 +50,7 @@ private:
     QnAbstractStreamDataProvider* m_mediaProvider;
     bool m_isLayoutsInitialised = false;
     int64_t m_preciseStartTimeUs = 0;
-    std::optional<nx::core::transcoding::FilterChain> m_transcodeFilters;
+    nx::core::transcoding::FilterChainPtr m_transcodeFilters;
     QTimeZone m_timeZone{QTimeZone::LocalTime};
     AVCodecID m_dstVideoCodec = AV_CODEC_ID_NONE;
     std::unique_ptr<QnFfmpegVideoTranscoder> m_videoTranscoder;

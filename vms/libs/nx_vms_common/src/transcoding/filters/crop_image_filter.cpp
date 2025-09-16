@@ -41,9 +41,7 @@ QnCropImageFilter::QnCropImageFilter(const QRect& rect, bool alignSize, bool dee
 {
 }
 
-CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(
-    const CLVideoDecoderOutputPtr& frame,
-    const QnAbstractCompressedMetadataPtr&)
+CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
     if (m_rect.isEmpty() && m_rectF.isEmpty())
         return frame;

@@ -2,8 +2,7 @@
 
 #include "abstract_metadata_consumer.h"
 
-namespace nx {
-namespace media {
+namespace nx::analytics {
 
 AbstractMetadataConsumer::~AbstractMetadataConsumer()
 {
@@ -19,5 +18,4 @@ AbstractMetadataConsumer::AbstractMetadataConsumer(MetadataType metadataType):
 {
 }
 
-} // namespace media
-} // namespace nx
+} // namespace nx::analytics

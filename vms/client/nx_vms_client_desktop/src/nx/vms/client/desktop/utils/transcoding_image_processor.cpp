@@ -12,9 +12,9 @@ namespace nx::vms::client::desktop {
 class TranscodingImageProcessor::Private
 {
 public:
-    const nx::core::transcoding::FilterChain& filters() const
+    const nx::core::transcoding::FilterChain* filters() const
     {
-        return m_filters;
+        return m_filters.get();
     }
 
     void setSettings(const nx::core::transcoding::Settings& settings,
@@ -27,31 +27,32 @@ public:
             return;
         }
 
-        m_filters = nx::core::transcoding::FilterChain(
+        m_filters = std::make_unique<nx::core::transcoding::FilterChain>(
             settings, resource->getDewarpingParams(), resource->getVideoLayout());
         m_sourceSize = QSize();
     }
 
-    nx::core::transcoding::FilterChain ensureFilters(const QSize& sourceSize)
+    void ensureFilters(const QSize& sourceSize)
     {
+        if (!m_filters)
+            return;
+
         if (m_sourceSize != sourceSize)
         {
             // Additional check if the new state is less 'empty'.
             // Sometimes we change sizes from (-1;-1) to (0;0).
             if (!sourceSize.isEmpty())
             {
-                m_filters.reset();
+                m_filters->reset();
                 // Image is already combined, so video layout must be ignored.
-                m_filters.prepareForImage(sourceSize);
+                m_filters->prepareForImage(sourceSize);
                 m_sourceSize = sourceSize;
             }
         }
-
-        return m_filters;
     }
 
 private:
-    nx::core::transcoding::FilterChain m_filters;
+    nx::core::transcoding::FilterChainPtr m_filters;
 
     QSize m_sourceSize;
 };
@@ -76,11 +77,11 @@ void TranscodingImageProcessor::setTranscodingSettings(
 
 QSize TranscodingImageProcessor::process(const QSize& sourceSize) const
 {
-    if (!d->filters().isImageTranscodingRequired(sourceSize))
+    if (!d->filters() || !d->filters()->isImageTranscodingRequired(sourceSize))
         return sourceSize;
 
-    const auto filters = d->ensureFilters(sourceSize);
-    return filters.apply(sourceSize);
+    d->ensureFilters(sourceSize);
+    return d->filters()->apply(sourceSize);
 }
 
 QImage TranscodingImageProcessor::process(const QImage& sourceImage) const
@@ -88,16 +89,19 @@ QImage TranscodingImageProcessor::process(const QImage& sourceImage) const
     if (sourceImage.isNull())
         return QImage();
 
-    const auto imageSize = sourceImage.size();
-    if (!d->filters().isImageTranscodingRequired(imageSize))
+    if (!d->filters())
         return sourceImage;
 
-    const auto filters = d->ensureFilters(imageSize);
-    if (!filters.isReady())
+    const auto imageSize = sourceImage.size();
+    if (!d->filters()->isImageTranscodingRequired(imageSize))
+        return sourceImage;
+
+    d->ensureFilters(imageSize);
+    if (!d->filters()->isReady())
         return sourceImage;
 
     QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(sourceImage));
-    frame = filters.apply(frame, /*metadata*/ {});
+    frame = d->filters()->apply(frame);
     return frame ? frame->toImage() : QImage();
 }
 

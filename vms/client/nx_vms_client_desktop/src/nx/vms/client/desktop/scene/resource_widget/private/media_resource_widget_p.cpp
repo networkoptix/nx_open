@@ -36,14 +36,14 @@ namespace nx::vms::client::desktop {
 namespace {
 
 template<typename T>
-nx::media::AbstractMetadataConsumerPtr getMetadataConsumer(T* provider)
+nx::analytics::AbstractMetadataConsumerPtr getMetadataConsumer(T* provider)
 {
     const auto consumingProvider =
         dynamic_cast<nx::vms::client::core::AbstractMetadataConsumerOwner*>(provider);
 
     return consumingProvider
         ? consumingProvider->metadataConsumer()
-        : nx::media::AbstractMetadataConsumerPtr();
+        : nx::analytics::AbstractMetadataConsumerPtr();
 }
 
 }  // namespace
@@ -347,13 +347,13 @@ nx::vms::license::UsageStatus MediaResourceWidgetPrivate::licenseStatus() const
     return m_licenseStatusHelper->status();
 }
 
-QSharedPointer<media::AbstractMetadataConsumer>
+QSharedPointer<nx::analytics::AbstractMetadataConsumer>
     MediaResourceWidgetPrivate::motionMetadataConsumer() const
 {
     return getMetadataConsumer(motionMetadataProvider.data());
 }
 
-QSharedPointer<media::AbstractMetadataConsumer>
+QSharedPointer<nx::analytics::AbstractMetadataConsumer>
     MediaResourceWidgetPrivate::analyticsMetadataConsumer() const
 {
     return getMetadataConsumer(analyticsMetadataProvider.data());

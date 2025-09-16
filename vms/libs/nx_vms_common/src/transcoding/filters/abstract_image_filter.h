@@ -38,9 +38,7 @@ public:
      * @param frame Frame image to update.
      * @param metadata Frame metadata.
      */
-    virtual CLVideoDecoderOutputPtr updateImage(
-        const CLVideoDecoderOutputPtr& frame,
-        const QnAbstractCompressedMetadataPtr& metadata) = 0;
+    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) = 0;
 
     /**
      * Update video size.
@@ -51,4 +49,3 @@ public:
 };
 
 using QnAbstractImageFilterPtr = QSharedPointer<QnAbstractImageFilter>;
-using QnAbstractImageFilterList = QList<QnAbstractImageFilterPtr>;

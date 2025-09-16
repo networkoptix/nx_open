@@ -196,14 +196,14 @@ void QnResourceDisplay::removeRenderer(QnResourceWidgetRenderer* renderer)
 }
 
 void QnResourceDisplay::addMetadataConsumer(
-    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
+    const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer)
 {
     if (m_camDisplay)
         m_camDisplay->addMetadataConsumer(metadataConsumer);
 }
 
 void QnResourceDisplay::removeMetadataConsumer(
-    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
+    const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer)
 {
     if (m_camDisplay)
         m_camDisplay->removeMetadataConsumer(metadataConsumer);

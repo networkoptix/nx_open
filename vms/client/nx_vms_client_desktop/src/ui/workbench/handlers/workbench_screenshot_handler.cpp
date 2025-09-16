@@ -630,15 +630,14 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
             transcodeParams);
 
         // Thumbnail from loader is already merged for panoramic cameras.
-        const QSize noDownscale(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
-        filters.prepareForImage(result.size(), noDownscale);
+        filters->prepareForImage(result.size());
 
-        if (!filters.isEmpty())
+        if (!filters->empty())
         {
             QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
             // TODO: #sivanov Looks like pts is not needed actually as kLatestThumbnail is handled.
             frame->pts = parameters.sharedParameters.timestampParams.timestamp.count() * 1000;
-            frame = filters.apply(frame, /*metadata*/ {});
+            frame = filters->apply(frame);
             result = frame ? frame->toImage() : QImage();
         }
     }

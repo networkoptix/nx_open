@@ -12,9 +12,7 @@ class NX_VMS_COMMON_API QnTiledImageFilter: public QnAbstractImageFilter
 {
 public:
     explicit QnTiledImageFilter(const QnConstResourceVideoLayoutPtr& videoLayout);
-    virtual CLVideoDecoderOutputPtr updateImage(
-        const CLVideoDecoderOutputPtr& frame,
-        const QnAbstractCompressedMetadataPtr& metadata) override;
+    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
 
     virtual QSize updatedResolution(const QSize& srcSize) override;
 

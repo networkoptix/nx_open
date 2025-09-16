@@ -177,9 +177,7 @@ void QnDewarpingImageFilter::setParameters(
     m_lastImageFormat = -1;
 }
 
-CLVideoDecoderOutputPtr QnDewarpingImageFilter::updateImage(
-    const CLVideoDecoderOutputPtr& srcFrame,
-    const QnAbstractCompressedMetadataPtr&)
+CLVideoDecoderOutputPtr QnDewarpingImageFilter::updateImage(const CLVideoDecoderOutputPtr& srcFrame)
 {
     if (!m_itemParams.enabled || !m_mediaParams.enabled)
         return srcFrame;

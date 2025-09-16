@@ -138,9 +138,7 @@ QnRotateImageFilter::QnRotateImageFilter(int angle): m_angle(angle)
     m_angle = m_angle % 360;
 }
 
-CLVideoDecoderOutputPtr QnRotateImageFilter::updateImage(
-    const CLVideoDecoderOutputPtr& frame,
-    const QnAbstractCompressedMetadataPtr&)
+CLVideoDecoderOutputPtr QnRotateImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
     if (m_angle == 0)
         return frame;

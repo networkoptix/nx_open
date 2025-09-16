@@ -53,8 +53,8 @@ public:
     void removeVideoRenderer(QnResourceWidgetRenderer* vw);
     int channelsCount() const;
 
-    void addMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
-    void removeMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
+    void addMetadataConsumer(const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer);
+    void removeMetadataConsumer(const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer);
 
     virtual bool processData(const QnAbstractDataPacketPtr& data) override ;
 
@@ -312,7 +312,7 @@ protected:
     nx::utils::ElapsedTimer m_lastMediaEventTimeout;
 
     mutable nx::Mutex m_metadataConsumersHashMutex;
-    QMultiMap<MetadataType, QWeakPointer<nx::media::AbstractMetadataConsumer>>
+    QMultiMap<MetadataType, QWeakPointer<nx::analytics::AbstractMetadataConsumer>>
         m_metadataConsumerByType;
     QVector<bool> m_gotKeyDataInfo;
     std::function<void()> m_streamsChangedCallback;

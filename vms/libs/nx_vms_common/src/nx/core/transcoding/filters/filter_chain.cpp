@@ -20,6 +20,7 @@ namespace {
 
 static constexpr float kMinStepChangeCoeff = 0.95f;
 static constexpr float kAspectRatioComparisionPrecision = 0.01f;
+static constexpr int kMetadataCashSize = 1000;
 
 } // namespace
 
@@ -35,7 +36,8 @@ FilterChain::FilterChain(const Settings& settings,
     :
     m_settings(settings),
     m_dewarpingParams(dewarpingParams),
-    m_layout(layout)
+    m_layout(layout),
+    m_metadataCache(MetadataType::ObjectDetection, kMetadataCashSize)
 {
 }
 
@@ -47,7 +49,7 @@ void FilterChain::prepare(const QSize& srcFrameResolution, const QSize& resoluti
 
     const auto isPanoramicCamera = m_layout && m_layout->channelCount() > 1;
     if (isPanoramicCamera)
-        push_back(QnAbstractImageFilterPtr(new QnTiledImageFilter(m_layout)));
+        m_filters.push_back(QnAbstractImageFilterPtr(new QnTiledImageFilter(m_layout)));
 
     createPixelationImageFilter();
     prepareZoomWindowFilter();
@@ -61,11 +63,11 @@ void FilterChain::prepare(const QSize& srcFrameResolution, const QSize& resoluti
     m_ready = true;
 }
 
-void FilterChain::prepareForImage(const QSize& fullImageResolution, const QSize& resolutionLimit)
+void FilterChain::prepareForImage(const QSize& fullImageResolution)
 {
     NX_ASSERT(!isReady(), "Double initialization");
 
-    if (!isImageTranscodingRequired(fullImageResolution, resolutionLimit))
+    if (!isImageTranscodingRequired(fullImageResolution, kDefaultResolutionLimit))
         return;
 
     createPixelationImageFilter();
@@ -74,11 +76,11 @@ void FilterChain::prepareForImage(const QSize& fullImageResolution, const QSize&
     prepareDewarpingFilter();
     prepareImageEnhancementFilter();
     prepareRotationFilter();
-    prepareDownscaleFilter(fullImageResolution, resolutionLimit);
+    prepareDownscaleFilter(fullImageResolution, kDefaultResolutionLimit);
     prepareOverlaysFilters();
     prepareWatermarkFilter();
 
-    NX_ASSERT(!isEmpty());
+    NX_ASSERT(!m_filters.empty());
 
     m_ready = true;
 }
@@ -140,23 +142,26 @@ bool FilterChain::isReady() const
 
 void FilterChain::reset()
 {
-    clear();
+    m_filters.clear();
     m_ready = false;
+}
+
+void FilterChain::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
+{
+    m_metadataCache.processMetadata(metadata);
 }
 
 QSize FilterChain::apply(const QSize& resolution) const
 {
     auto result = resolution;
-    for (auto filter: *this)
+    for (auto filter: m_filters)
         result = filter->updatedResolution(result);
     return result;
 }
 
-CLVideoDecoderOutputPtr FilterChain::apply(
-    const CLVideoDecoderOutputPtr& source,
-    const QnAbstractCompressedMetadataPtr& metadata) const
+CLVideoDecoderOutputPtr FilterChain::apply(const CLVideoDecoderOutputPtr& source) const
 {
-    if (empty() || !source)
+    if (m_filters.empty() || !source)
         return source;
 
     // Make a deep copy of the source frame since modifying a frame received from a decoder can
@@ -164,15 +169,28 @@ CLVideoDecoderOutputPtr FilterChain::apply(
     CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput());
     result->copyFrom(source.get());
 
-    for (auto filter: *this)
-        result = filter->updateImage(result, metadata);
+    for (auto filter: m_filters)
+    {
+        auto pixelationFilter = filter.dynamicCast<PixelationImageFilter>();
+        if (pixelationFilter)
+        {
+            pixelationFilter->setMetadata(
+                m_metadataCache.metadata(std::chrono::microseconds(source->pkt_dts), source->channel));
+        }
+        result = filter->updateImage(result);
+    }
 
     return result;
 }
 
 void FilterChain::addLegacyFilter(QnAbstractImageFilterPtr filter)
 {
-    m_legacyFilters.append(filter);
+    m_legacyFilters.push_back(filter);
+}
+
+bool FilterChain::empty()
+{
+    return m_filters.empty() && m_legacyFilters.empty();
 }
 
 void FilterChain::prepareVideoArFilter(const QSize& srcFrameResolution)
@@ -184,7 +202,7 @@ void FilterChain::prepareVideoArFilter(const QSize& srcFrameResolution)
         newSize.setWidth(srcFrameResolution.height() * m_settings.aspectRatio.toFloat() + 0.5);
         if (newSize != srcFrameResolution)
         {
-            push_back(QnAbstractImageFilterPtr(new QnScaleImageFilter(
+            m_filters.push_back(QnAbstractImageFilterPtr(new QnScaleImageFilter(
                 nx::transcoding::roundSize(newSize))));
         }
     }
@@ -205,7 +223,7 @@ void FilterChain::prepareImageArFilter(const QSize& fullImageResolution)
 
         if (newSize != fullImageResolution)
         {
-            push_back(QnAbstractImageFilterPtr(new QnScaleImageFilter(
+            m_filters.push_back(QnAbstractImageFilterPtr(new QnScaleImageFilter(
                 nx::transcoding::roundSize(newSize))));
         }
     }
@@ -215,7 +233,7 @@ void FilterChain::prepareDewarpingFilter()
 {
     if (m_settings.dewarping.enabled)
     {
-        push_back(QnAbstractImageFilterPtr(new QnDewarpingImageFilter(
+        m_filters.push_back(QnAbstractImageFilterPtr(new QnDewarpingImageFilter(
             m_dewarpingParams, m_settings.dewarping)));
     }
 }
@@ -223,19 +241,19 @@ void FilterChain::prepareDewarpingFilter()
 void FilterChain::prepareZoomWindowFilter()
 {
     if (!m_settings.zoomWindow.isEmpty() && !m_settings.dewarping.enabled)
-        push_back(QnAbstractImageFilterPtr(new QnCropImageFilter(m_settings.zoomWindow)));
+        m_filters.push_back(QnAbstractImageFilterPtr(new QnCropImageFilter(m_settings.zoomWindow)));
 }
 
 void FilterChain::prepareImageEnhancementFilter()
 {
     if (m_settings.enhancement.enabled)
-        push_back(QnAbstractImageFilterPtr(new QnContrastImageFilter(m_settings.enhancement)));
+        m_filters.push_back(QnAbstractImageFilterPtr(new QnContrastImageFilter(m_settings.enhancement)));
 }
 
 void FilterChain::prepareRotationFilter()
 {
     if (m_settings.rotation != 0)
-        push_back(QnAbstractImageFilterPtr(new QnRotateImageFilter(m_settings.rotation)));
+        m_filters.push_back(QnAbstractImageFilterPtr(new QnRotateImageFilter(m_settings.rotation)));
 }
 
 void FilterChain::prepareOverlaysFilters()
@@ -250,36 +268,36 @@ void FilterChain::prepareOverlaysFilters()
                 imageFilterSetting->offset,
                 imageFilterSetting->alignment);
 
-            push_back(QnAbstractImageFilterPtr(paintFilter));
+            m_filters.push_back(QnAbstractImageFilterPtr(paintFilter));
         }
         else if (const auto timestampFilterSettings = dynamic_cast<TimestampOverlaySettings*>(
             overlaySettings.data()))
         {
-            push_back(QnAbstractImageFilterPtr(new TimestampFilter(*timestampFilterSettings)));
+            m_filters.push_back(QnAbstractImageFilterPtr(new TimestampFilter(*timestampFilterSettings)));
         }
     }
 
     for (const auto& legacyFilter: m_legacyFilters)
-        push_back(legacyFilter);
+        m_filters.push_back(legacyFilter);
 }
 
 void FilterChain::prepareWatermarkFilter()
 {
     if (m_settings.watermark.visible())
-        push_back(QnAbstractImageFilterPtr(new WatermarkImageFilter(m_settings.watermark)));
+        m_filters.push_back(QnAbstractImageFilterPtr(new WatermarkImageFilter(m_settings.watermark)));
 }
 
 void FilterChain::createScaleImageFilter(const QSize& dstSize)
 {
-    auto scaleFilter = !empty()
-        ? front().dynamicCast<QnScaleImageFilter>()
+    auto scaleFilter = !m_filters.empty()
+        ? m_filters.front().dynamicCast<QnScaleImageFilter>()
         : QSharedPointer<QnScaleImageFilter>();
 
     if (!scaleFilter)
     {
         // Adding scale filter.
         scaleFilter.reset(new QnScaleImageFilter(dstSize));
-        push_front(scaleFilter);
+        m_filters.push_front(scaleFilter);
     }
     else
     {
@@ -291,7 +309,7 @@ void FilterChain::createPixelationImageFilter()
 {
     if (m_settings.pixelationSettings)
     {
-        push_front(QnAbstractImageFilterPtr(
+        m_filters.push_front(QnAbstractImageFilterPtr(
             new PixelationImageFilter(*m_settings.pixelationSettings)));
     }
 }
@@ -307,7 +325,7 @@ void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,
         if (resultResolution.width() <= resolutionLimit.width() &&
             resultResolution.height() <= resolutionLimit.height())
         {
-            if (resultResolution != srcFrameResolution && empty())
+            if (resultResolution != srcFrameResolution && m_filters.empty())
                 createScaleImageFilter(resultResolution);
             return;  //resolution is OK
         }

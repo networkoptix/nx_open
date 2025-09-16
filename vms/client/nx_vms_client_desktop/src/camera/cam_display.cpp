@@ -296,14 +296,14 @@ void QnCamDisplay::removeVideoRenderer(QnResourceWidgetRenderer* vw)
 }
 
 void QnCamDisplay::addMetadataConsumer(
-    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
+    const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer)
 {
     NX_MUTEX_LOCKER lock(&m_metadataConsumersHashMutex);
     m_metadataConsumerByType.insert(metadataConsumer->metadataType(), metadataConsumer);
 }
 
 void QnCamDisplay::removeMetadataConsumer(
-    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
+    const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer)
 {
     NX_MUTEX_LOCKER lock(&m_metadataConsumersHashMutex);
     m_metadataConsumerByType.remove(metadataConsumer->metadataType(), metadataConsumer);
@@ -322,14 +322,14 @@ QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProce
             if (!frame)
                 continue;
 
-            if (!filters.isTranscodingRequired())
+            if (!filters->isTranscodingRequired())
                 return frame->toImage();
 
-            if (!filters.isReady())
+            if (!filters->isReady())
             {
-                filters.prepare(QSize(frame->width, frame->height));
+                filters->prepare(QSize(frame->width, frame->height));
             }
-            frame = filters.apply(frame, /*metadata*/ {});
+            frame = filters->apply(frame);
         }
     }
     return frame ? frame->toImage() : QImage();

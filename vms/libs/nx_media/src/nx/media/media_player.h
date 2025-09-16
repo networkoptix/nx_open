@@ -10,7 +10,7 @@
 #include <QtMultimedia/QVideoSink>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/media/abstract_metadata_consumer.h>
+#include <nx/analytics/abstract_metadata_consumer.h>
 #include <nx/media/media_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/impl_ptr.h>
@@ -278,13 +278,13 @@ public:
      * Add new metadata consumer.
      * @return True if success, false if specified consumer already exists.
      */
-    bool addMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer);
+    bool addMetadataConsumer(const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer);
 
     /**
      * Remove metadata consumer.
      * @return True if success, false if specified consumer is not found.
      */
-    bool removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer);
+    bool removeMetadataConsumer(const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer);
 
     Error error() const;
 

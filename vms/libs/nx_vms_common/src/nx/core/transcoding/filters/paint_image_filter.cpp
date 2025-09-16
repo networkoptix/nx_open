@@ -18,9 +18,7 @@ PaintImageFilter::~PaintImageFilter()
 {
 }
 
-CLVideoDecoderOutputPtr PaintImageFilter::updateImage(
-    const CLVideoDecoderOutputPtr& frame,
-    const QnAbstractCompressedMetadataPtr&)
+CLVideoDecoderOutputPtr PaintImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
     return m_painter->drawTo(frame);
 }

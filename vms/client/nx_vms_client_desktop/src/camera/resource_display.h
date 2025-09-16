@@ -7,7 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
-#include <nx/media/abstract_metadata_consumer.h>
+#include <nx/analytics/abstract_metadata_consumer.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 
 class QnAbstractArchiveStreamReader;
@@ -106,8 +106,8 @@ public:
     void addRenderer(QnResourceWidgetRenderer *renderer);
     void removeRenderer(QnResourceWidgetRenderer *renderer);
 
-    void addMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
-    void removeMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
+    void addMetadataConsumer(const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer);
+    void removeMetadataConsumer(const nx::analytics::AbstractMetadataConsumerPtr& metadataConsumer);
 
     QString codecName() const;
 

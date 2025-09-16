@@ -14,9 +14,7 @@ public:
     QnScaleImageFilter(const QSize& size, AVPixelFormat format = AV_PIX_FMT_NONE);
 
     /** Returns the original frame if scaling has failed. */
-    virtual CLVideoDecoderOutputPtr updateImage(
-        const CLVideoDecoderOutputPtr& frame,
-        const QnAbstractCompressedMetadataPtr& metadata) override;
+    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
 
     virtual QSize updatedResolution(const QSize& srcSize) override;
 
