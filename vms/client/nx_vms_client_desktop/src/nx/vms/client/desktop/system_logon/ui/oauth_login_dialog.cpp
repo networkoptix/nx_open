@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <utils/common/delayed.h>
 
@@ -115,6 +116,23 @@ nx::vms::client::core::CloudAuthData OauthLoginDialog::login(
         timer->start(kCloseCheckIntervalMs);
     }
 
+    if (!ini().modalOAuthDialog)
+    {
+        nx::vms::client::core::CloudAuthData authData;
+        dialog->show();
+        QEventLoop loop;
+
+        connect(dialog.get(), &QDialog::finished, parent,
+            [&](int result)
+            {
+                if (result == QDialog::Accepted)
+                    authData = dialog->authData();
+                loop.quit();
+            });
+        loop.exec();
+        return authData;
+    }
+
     if (dialog->exec() == QDialog::Accepted)
         return dialog->authData();
 
@@ -136,6 +154,22 @@ bool OauthLoginDialog::validateToken(
         &OauthLoginDialog::authDataReady,
         dialog.get(),
         &OauthLoginDialog::accept);
+
+    if (!ini().modalOAuthDialog)
+    {
+        bool success = false;
+        dialog->show();
+        QEventLoop loop;
+
+        connect(dialog.get(), &QDialog::finished, parent,
+            [&](int result)
+            {
+                success = (result == QDialog::Accepted);
+                loop.quit();
+            });
+        loop.exec();
+        return success;
+    }
 
     return (dialog->exec() == QDialog::Accepted);
 }
