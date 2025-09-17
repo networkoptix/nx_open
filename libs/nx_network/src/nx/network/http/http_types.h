@@ -249,25 +249,15 @@ public:
     bool operator<(const std::string_view& right) const;
 
     bool operator==(const Method& right) const;
-    bool operator!=(const Method& right) const;
 
     inline bool operator==(const char* right) const
     { return nx::utils::stricmp(m_value, right) == 0; }
 
-    inline bool operator!=(const char* right) const
-    { return nx::utils::stricmp(m_value, right) != 0; }
-
     inline bool operator==(const std::string& right) const
     { return nx::utils::stricmp(m_value, right) == 0; }
 
-    inline bool operator!=(const std::string& right) const
-    { return nx::utils::stricmp(m_value, right) != 0; }
-
     inline bool operator==(const std::string_view& right) const
     { return nx::utils::stricmp(m_value, right) == 0; }
-
-    inline bool operator!=(const std::string_view& right) const
-    { return nx::utils::stricmp(m_value, right) != 0; }
 
     const std::string& toString() const;
 
@@ -286,12 +276,6 @@ public:
 private:
     std::string m_value;
 };
-
-inline bool operator==(const std::string_view& left, const Method& right)
-{ return right == left; }
-
-inline bool operator!=(const std::string_view& left, const Method& right)
-{ return right != left; }
 
 inline std::ostream& operator<<(std::ostream& os, const Method& method)
 { return os << method.toString(); }
@@ -312,16 +296,7 @@ public:
     /** Appends serialized data to dstBuffer. */
     void serialize(nx::Buffer* const dstBuffer) const;
 
-    bool operator==(const MimeProtoVersion& right) const
-    {
-        return protocol == right.protocol
-            && version == right.version;
-    }
-
-    bool operator!=(const MimeProtoVersion& right) const
-    {
-        return !(*this == right);
-    }
+    bool operator==(const MimeProtoVersion& right) const = default;
 
     friend bool operator < (const MimeProtoVersion& lhs, const MimeProtoVersion& rhs)
     {
@@ -990,8 +965,7 @@ struct NX_NETWORK_API ContentType
 
     std::string toString() const;
 
-    bool operator==(const ContentType& rhs) const;
-    bool operator!=(const ContentType& rhs) const { return !(*this == rhs); }
+    bool operator==(const ContentType& rhs) const = default;
     bool operator==(const std::string& rhs) const;
 
     operator std::string() const { return toString(); }

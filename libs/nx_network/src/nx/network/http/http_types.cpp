@@ -242,11 +242,6 @@ bool Method::operator==(const Method& right) const
     return nx::utils::stricmp(m_value, right.m_value) == 0;
 }
 
-bool Method::operator!=(const Method& right) const
-{
-    return nx::utils::stricmp(m_value, right.m_value) != 0;
-}
-
 const std::string& Method::toString() const
 {
     return m_value;
@@ -1989,20 +1984,6 @@ std::string ContentType::toString() const
         value,
         !charset.empty() ? "; charset=" : "", charset,
         !boundary.empty() ? "; boundary=" : "", boundary);
-}
-
-bool ContentType::operator==(const ContentType& rhs) const
-{
-    if (value != rhs.value)
-        return false;
-
-    if (charset != rhs.charset)
-        return false;
-
-    if (boundary != rhs.boundary)
-        return false;
-
-    return true;
 }
 
 bool ContentType::operator==(const std::string& rhs) const

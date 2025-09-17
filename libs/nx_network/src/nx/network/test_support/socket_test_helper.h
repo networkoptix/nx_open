@@ -141,25 +141,20 @@ private:
     void verifyDataReceived(const nx::Buffer& buf, size_t bytesRead);
 
     TestConnection(const TestConnection&);
-    TestConnection& operator=(const TestConnection&);
+    TestConnection& operator=(const TestConnection&) = delete;
 };
 
-struct ConnectionTestStatistics
+struct NX_NETWORK_API ConnectionTestStatistics
 {
     uint64_t bytesReceived;
     uint64_t bytesSent;
     size_t totalConnections;
     size_t onlineConnections;
+    bool operator==(const ConnectionTestStatistics&) const = default;
 };
 
 NX_NETWORK_API std::string toString(const ConnectionTestStatistics& data);
 
-NX_NETWORK_API bool operator==(
-    const ConnectionTestStatistics& left,
-    const ConnectionTestStatistics& right);
-NX_NETWORK_API bool operator!=(
-    const ConnectionTestStatistics& left,
-    const ConnectionTestStatistics& right);
 /** Subtracts field by field */
 NX_NETWORK_API ConnectionTestStatistics operator-(
     const ConnectionTestStatistics& left,

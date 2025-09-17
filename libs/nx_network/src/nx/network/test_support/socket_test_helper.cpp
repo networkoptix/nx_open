@@ -514,24 +514,6 @@ std::string toString(const ConnectionTestStatistics& data)
         .arg(nx::utils::bytesToString(data.bytesSent)).toStdString();
 }
 
-bool operator==(
-    const ConnectionTestStatistics& left,
-    const ConnectionTestStatistics& right)
-{
-    return
-        left.bytesReceived == right.bytesReceived &&
-        left.bytesSent == right.bytesSent &&
-        left.totalConnections == right.totalConnections &&
-        left.onlineConnections == right.onlineConnections;
-}
-
-bool operator!=(
-    const ConnectionTestStatistics& left,
-    const ConnectionTestStatistics& right)
-{
-    return !(left == right);
-}
-
 ConnectionTestStatistics operator-(
     const ConnectionTestStatistics& left,
     const ConnectionTestStatistics& right)
