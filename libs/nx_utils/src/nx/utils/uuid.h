@@ -55,10 +55,8 @@ public:
 
     std::optional<std::chrono::milliseconds> timeSinceEpoch() const;
 
-    bool operator<(const Uuid& other) const;
-    bool operator>(const Uuid& other) const;
-
-    constexpr bool operator==(const Uuid& other) const = default;
+    std::strong_ordering operator<=>(const Uuid& other) const;
+    bool operator==(const Uuid& other) const = default;
 
     Uuid& operator=(const Uuid&) = default;
     Uuid& operator=(Uuid&&) = default;

@@ -8,6 +8,7 @@
 #include <QtCore/QCryptographicHash>
 
 #include <nx/reflect/json/deserializer.h>
+#include <nx/utils/log/log_main.h>
 #include <nx/utils/log/assert.h>
 
 namespace {
@@ -183,14 +184,26 @@ std::optional<std::chrono::milliseconds> Uuid::timeSinceEpoch() const
     return std::chrono::milliseconds(msNumber);
 }
 
-bool Uuid::operator<(const Uuid& other) const
+std::strong_ordering Uuid::operator<=>(const Uuid& other) const
 {
-    return compare(m_uuid, other.m_uuid) == Qt::strong_ordering::less;
-}
-
-bool Uuid::operator>(const Uuid& other) const
-{
-    return compare(m_uuid, other.m_uuid) == Qt::strong_ordering::greater;
+    const Qt::strong_ordering ord = compare(m_uuid, other.m_uuid);
+    #if defined(ANDROID) || defined(__ANDROID__)
+        // Android does not support conversions between Qt and std orderings.
+        std::strong_ordering result = std::strong_ordering::equivalent;
+        if (ord == Qt::strong_ordering::less)
+            result = std::strong_ordering::less;
+        else if (ord == Qt::strong_ordering::equivalent)
+            result = std::strong_ordering::equivalent;
+        else if (ord == Qt::strong_ordering::equal)
+            result = std::strong_ordering::equal;
+        else if (ord == Qt::strong_ordering::greater)
+            result = std::strong_ordering::greater;
+        else
+            NX_ERROR(this, "Impossible Qt::strong_ordering value");
+    #else
+        std::strong_ordering result = static_cast<std::strong_ordering>(ord);
+    #endif
+    return result;
 }
 
 Uuid Uuid::fromRfc4122(const QByteArray& bytes)
