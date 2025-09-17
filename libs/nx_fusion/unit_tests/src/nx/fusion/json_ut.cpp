@@ -33,12 +33,7 @@ struct IntMockData
 
     IntMockData(int a, int b, int c): a(a), b(b), c(c) {}
 
-    bool operator==(const IntMockData& other) const
-    {
-        return a == other.a && b == other.b && c == other.c;
-    }
-
-    bool operator!=(const IntMockData& other) const { return !(*this == other); }
+    bool operator==(const IntMockData& other) const = default;
 
     std::string toJsonString() const { return QJson::serialized(*this).toStdString(); }
 
@@ -62,15 +57,7 @@ struct MockDataWithVectorOfSameStruct
 {
     std::vector<MockDataWithVectorOfSameStruct> items;
 
-    bool operator==(const MockDataWithVectorOfSameStruct& other) const
-    {
-        return items == other.items;
-    }
-
-    bool operator!=(const MockDataWithVectorOfSameStruct& other) const
-    {
-        return !(*this == other);
-    }
+    bool operator==(const MockDataWithVectorOfSameStruct& other) const = default;
 };
 #define MockDataWithVectorOfSameStruct_Fields (items)
 
@@ -79,12 +66,7 @@ struct MockDataWithMaps
     std::map<IntMockData, int> intItems;
     std::map<MockDataWithMaps, int> nestedItems;
 
-    bool operator==(const MockDataWithMaps& other) const
-    {
-        return intItems == other.intItems && nestedItems == other.nestedItems;
-    }
-
-    bool operator!=(const MockDataWithMaps& other) const { return !(*this == other); }
+    bool operator==(const MockDataWithMaps& other) const = default;
 };
 #define MockDataWithMaps_Fields (intItems)(nestedItems)
 
@@ -97,12 +79,7 @@ struct MockDataWithStringMaps
 {
     std::map<QString, MockDataWithStringMaps> items;
 
-    bool operator==(const MockDataWithStringMaps& other) const
-    {
-        return items == other.items;
-    }
-
-    bool operator!=(const MockDataWithStringMaps& other) const { return !(*this == other); }
+    bool operator==(const MockDataWithStringMaps& other) const = default;
 };
 #define MockDataWithStringMaps_Fields (items)
 
@@ -118,13 +95,7 @@ struct BriefMockData
     BriefMockData() = default;
     BriefMockData(const nx::Uuid& id, const QString& str): id(id), str(str) {}
 
-    bool operator==(const BriefMockData& other) const
-    {
-        return id == other.id && str == other.str;
-    }
-
-    bool operator!=(const BriefMockData& other) const { return !(*this == other); }
-
+    bool operator==(const BriefMockData& other) const = default;
 };
 #define BriefMockData_Fields (id)(str)
 
@@ -132,12 +103,7 @@ struct BriefMockDataWithVector
 {
     std::vector<QString> items;
 
-    bool operator==(const BriefMockDataWithVector& other) const
-    {
-        return items == other.items;
-    }
-
-    bool operator!=(const BriefMockDataWithVector& other) const { return !(*this == other); }
+    bool operator==(const BriefMockDataWithVector& other) const = default;
 };
 #define BriefMockDataWithVector_Fields (items)
 
@@ -145,12 +111,7 @@ struct BriefMockDataWithQList
 {
     QList<QString> items;
 
-    bool operator==(const BriefMockDataWithQList& other) const
-    {
-        return items == other.items;
-    }
-
-    bool operator!=(const BriefMockDataWithQList& other) const { return !(*this == other); }
+    bool operator==(const BriefMockDataWithQList& other) const = default;
 };
 #define BriefMockDataWithQList_Fields (items)
 
@@ -168,20 +129,7 @@ struct BriefMockDataWithQJsonValue
     QJsonValue sVal;
     int post = 999;
 
-    bool operator==(const BriefMockDataWithQJsonValue& other) const
-    {
-        return pre == other.pre
-            && nullVal == other.nullVal
-            && t == other.t
-            && tVal == other.tVal
-            && f == other.f
-            && fVal == other.fVal
-            && d == other.d
-            && dVal == other.dVal
-            && s == other.s
-            && sVal == other.sVal
-            && post == other.post;
-    }
+    bool operator==(const BriefMockDataWithQJsonValue& other) const = default;
 };
 #define BriefMockDataWithQJsonValue_Fields (pre)(nullVal)(t)(tVal)(f)(fVal)(d)(dVal)(s)(sVal)(post)
 
@@ -193,16 +141,7 @@ struct BriefMockWithDefaults
     nx::TestFlag flag = nx::Flag1;
     std::vector<QString> vector = {"v0"};
 
-    bool operator==(const BriefMockWithDefaults& other) const
-    {
-        return boolean == other.boolean
-            && integer == other.integer
-            && string == other.string
-            && flag == other.flag
-            && vector == other.vector;
-    }
-
-    bool operator!=(const BriefMockWithDefaults& other) const { return !(*this == other); }
+    bool operator==(const BriefMockWithDefaults& other) const = default;
 };
 #define BriefMockWithDefaults_Fields (boolean)(integer)(string)(flag)(vector)
 
@@ -222,29 +161,9 @@ struct MapKey
     nx::Uuid uuidField;
     int integerField = 0;
     QString stringField;
+    auto operator<=>(const MapKey& other) const = default;
 };
 #define MapKey_Fields (uuidField)(integerField)(stringField)
-
-static bool operator<(const MapKey& first, const MapKey& second)
-{
-    if (first.uuidField != second.uuidField)
-        return first.uuidField < second.uuidField;
-
-    if (first.integerField != second.integerField)
-        return first.integerField < second.integerField;
-
-    if (first.stringField != second.stringField)
-        return first.stringField < second.stringField;
-
-    return false;
-}
-
-static bool operator==(const MapKey& first, const MapKey& second)
-{
-    return first.uuidField == second.uuidField
-        && first.integerField == second.integerField
-        && first.stringField == second.stringField;
-}
 
 static const std::map<MapKey, IntMockData> kMapWithCustomStructAsKey = {
     {{kFirstUuid, 1, "someString"}, {1, 2, 3}},
