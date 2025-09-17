@@ -3,6 +3,7 @@
 #include <future>
 #include <memory>
 #include <optional>
+#include <thread>
 
 #include <gtest/gtest.h>
 
