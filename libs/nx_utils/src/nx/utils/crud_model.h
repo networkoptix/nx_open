@@ -4,7 +4,6 @@
 
 #include <type_traits>
 
-#include <nx/utils/member_detector.h>
 #include <nx/utils/std/ranges.h>
 #include <nx/utils/type_traits.h>
 #include <nx/utils/uuid.h>
@@ -12,12 +11,6 @@
 namespace nx::utils::model {
 
 namespace detail {
-
-#define MEMBER_CHECKER(MEMBER) \
-    NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(DoesMemberExist_##MEMBER, MEMBER)
-    MEMBER_CHECKER(getId);
-    MEMBER_CHECKER(id);
-#undef MEMBER_CHECKER
 
 template<typename T, typename Arg, typename = void>
 struct CanSetIdWithArg: std::false_type {};
@@ -60,20 +53,15 @@ struct CanAssignIdField<T,
  * }
  * ```
  */
-template<typename T,
-    typename = std::enable_if_t<detail::DoesMemberExist_getId<T>::value
-        || detail::DoesMemberExist_id<T>::value
-        || ranges::PairLikeRange<T>>>
+template<typename T>
+requires requires {&T::getId;}
+    || requires {&T::id;}
 decltype(auto) getId(const T& t)
 {
-    if constexpr (detail::DoesMemberExist_getId<T>::value)
+    if constexpr (requires {&T::getId;})
         return t.getId();
-    else if constexpr (detail::DoesMemberExist_id<T>::value)
-        return t.id;
     else
-    {
-        static_assert(!sizeof(T), "Failed to determine the id: no `id` or `getId` members");
-    }
+        return t.id;
 }
 
 /**
@@ -172,14 +160,15 @@ constexpr bool isIdGenerationEnabled = decltype(enableIdGeneration(std::declval<
  *    nx::Uuid id;
  * };
  *
- * // This will disable the id check in `executeDelete`. This function will never be invoked at runtime.
- * std::false_type enableIdGeneration(UserDefinedModel);
+ * // This will disable the id check in `executeDelete`. This function will never be invoked at
+ * runtime. std::false_type enableIdGeneration(UserDefinedModel);
  *
  * } // namespace nx::vms::api
  * ```
  */
-template <typename Model>
-constexpr auto adHocEnableIdCheckOnDelete(const Model&) -> detail::DoesMemberExist_getId<Model>;
+template<typename Model>
+constexpr auto adHocEnableIdCheckOnDelete(const Model&)
+    -> std::bool_constant<requires { &Model::getId; }>;
 
 template <typename Model>
 constexpr bool adHocIsIdCheckOnDeleteEnabled =

@@ -13,7 +13,6 @@
 #include <nx/reflect/json/filter.h>
 #include <nx/reflect/merge.h>
 #include <nx/utils/crud_model.h>
-#include <nx/utils/member_detector.h>
 #include <nx/utils/std/ranges.h>
 #include <nx/utils/type_traits.h>
 #include <nx/utils/void.h>
@@ -25,18 +24,13 @@ namespace nx::network::rest {
 
 namespace detail {
 
-#define MEMBER_CHECKER(MEMBER) \
-    NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(DoesMemberExist_##MEMBER, MEMBER)
-    MEMBER_CHECKER(front);
-#undef MEMBER_CHECKER
-
 template<typename Container>
 auto front(Container&& c)
 {
     NX_ASSERT(c.size() != 0);
     if constexpr (nx::ranges::PairLikeRange<std::decay_t<Container>>)
         return std::move(c.begin()->second);
-    else if constexpr (DoesMemberExist_front<std::decay_t<Container>>::value)
+    else if constexpr (requires { c.front(); })
         return std::move(c.front());
     else
         return std::move(*c.begin());
@@ -122,7 +116,7 @@ public:
 protected:
     virtual void modifyPathRouteResultOrThrow(PathRouter::Result* result) const override
     {
-        if constexpr (DoesMethodExist_flexibleIdToId<Derived>::value)
+        if constexpr (requires { &Derived::flexibleIdToId; })
         {
             const auto it = result->pathParams.findValue(m_idParamName);
             if (!it || (nx::Uuid::isUuidString(*it) && !nx::Uuid(*it).isNull()))
@@ -139,20 +133,6 @@ protected:
         auto it = result->pathParams.findValue(m_idParamName);
         return it && *it != NX_FMT("*");
     }
-
-    #define METHOD_CHECKER(METHOD) \
-        NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(DoesMethodExist_##METHOD, METHOD)
-    METHOD_CHECKER(size);
-    METHOD_CHECKER(getDeprecatedFieldNames);
-    METHOD_CHECKER(create);
-    METHOD_CHECKER(read);
-    METHOD_CHECKER(delete_);
-    METHOD_CHECKER(update);
-    METHOD_CHECKER(addSubscription);
-    METHOD_CHECKER(getSubscriptionId);
-    METHOD_CHECKER(flexibleIdToId);
-    METHOD_CHECKER(fillMissingParams);
-    #undef METHOD_CHECKER
 
     virtual Response executeGet(const Request& request) override;
     virtual Response executePatch(const Request& request) override;
@@ -350,7 +330,7 @@ protected:
                 for (auto [key, value]: filtered.keyValueRange())
                     params.remove(key);
             }
-            if constexpr (DoesMethodExist_getDeprecatedFieldNames<Filter>::value)
+            if constexpr (requires { Filter::getDeprecatedFieldNames(); })
             {
                 auto names = Filter::getDeprecatedFieldNames();
                 for (auto it = names->begin(); it != names->end(); ++it)
@@ -449,7 +429,7 @@ protected:
 template<typename Derived>
 Response CrudHandler<Derived>::executeGet(const Request& request)
 {
-    if constexpr (DoesMethodExist_read<Derived>::value)
+    if constexpr (requires { &Derived::read; })
     {
         auto [filter, params, defaultValueAction] =
             processGetRequest<traits::FunctionArgumentType<&Derived::read, 0>>(request);
@@ -507,7 +487,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
 {
     using namespace nx::utils::model;
 
-    if constexpr (DoesMethodExist_create<Derived>::value)
+    if constexpr (requires { &Derived::create; })
     {
         using Model = traits::FunctionArgumentType<&Derived::create, 0>;
         const auto derived = static_cast<Derived*>(this);
@@ -518,7 +498,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
                     m_idParamName));
         }
         Model model{request.parseContentOrThrow<Model>()};
-        if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)
+        if constexpr (requires { &Derived::fillMissingParams; })
             derived->fillMissingParams(&model, request);
 
         if constexpr (isIdGenerationEnabled<Model>)
@@ -529,7 +509,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
             {
                 setId(model, nx::Uuid::createUuid());
             }
-            else if constexpr (DoesMethodExist_read<Derived>::value)
+            else if constexpr (requires { &Derived::read; })
             {
                 ResponseAttributes responseAttributes;
                 // This is pretty wasteful, since the idea here is just to check for existence.
@@ -546,7 +526,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
             auto result = call(&Derived::create, std::move(model), request, &responseAttributes);
             return response(std::move(result), request, std::move(responseAttributes));
         }
-        else if constexpr (DoesMethodExist_read<Derived>::value
+        else if constexpr (requires { &Derived::read; }
             && HasGetId<Model>::value)
         {
             auto id = getId(model);
@@ -570,7 +550,7 @@ Response CrudHandler<Derived>::executeDelete(const Request& request)
 {
     using nx::utils::model::getId;
 
-    if constexpr (DoesMethodExist_delete_<Derived>::value)
+    if constexpr (requires { &Derived::delete_; })
     {
         ResponseAttributes responseAttributes;
         using Id = traits::FunctionArgumentType<&Derived::delete_, 0>;
@@ -601,13 +581,13 @@ Response CrudHandler<Derived>::executePut(const Request& request)
 {
     using namespace nx::utils::model;
 
-    if constexpr (DoesMethodExist_update<Derived>::value)
+    if constexpr (requires { &Derived::update; })
     {
         const auto d = static_cast<Derived*>(this);
         using Model = traits::FunctionArgumentType<&Derived::update, 0>;
         using Result = typename nx::traits::FunctionTraits<&Derived::update>::ReturnType;
         Model model{request.parseContentOrThrow<Model>()};
-        if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)
+        if constexpr (requires { &Derived::fillMissingParams; })
             d->fillMissingParams(&model, request);
         ResponseAttributes responseAttributes;
         if (idParam(request).value || m_idParamName.isEmpty())
@@ -616,7 +596,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
             {
                 auto result =
                     call(&Derived::update, std::move(model), request, &responseAttributes);
-                if constexpr (DoesMethodExist_size<Result>::value)
+                if constexpr (requires { &Result::size; })
                 {
                     if (NX_ASSERT(result.size() == 1, "Expected 1 result, got %1", result.size()))
                     {
@@ -632,7 +612,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
             }
             else
             {
-                if constexpr (DoesMethodExist_read<Derived>::value)
+                if constexpr (requires { &Derived::read; })
                 {
                     using IdType = std::conditional_t<
                         HasGetId<Model>::value,
@@ -672,7 +652,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
         else
         {
             call(&Derived::update, std::move(model), request, &responseAttributes);
-            if constexpr (DoesMethodExist_read<Derived>::value)
+            if constexpr (requires { &Derived::read; })
             {
                 if (!m_features.testFlag(CrudFeature::fastUpdate))
                 {
@@ -696,14 +676,15 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
 {
     using namespace nx::utils::model;
 
-    if constexpr (DoesMethodExist_read<Derived>::value && DoesMethodExist_update<Derived>::value)
+    if constexpr (requires { &Derived::read; }
+        && requires { &Derived::update; })
     {
         const auto d = static_cast<Derived*>(this);
         using Model = traits::FunctionArgumentType<&Derived::update, 0>;
         using Result = typename nx::traits::FunctionTraits<&Derived::update>::ReturnType;
         const bool useId = idParam(request).value || m_idParamName.isEmpty();
         Model model = mergedModel<Model>(useId, request);
-        if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)
+        if constexpr (requires { &Derived::fillMissingParams; })
             d->fillMissingParams(&model, request);
         ResponseAttributes responseAttributes;
         if constexpr (!std::is_same_v<Result, void>)
@@ -746,7 +727,7 @@ nx::utils::Guard CrudHandler<Derived>::subscribe(Request request, SubscriptionCa
 {
     NX_ASSERT(!request.jsonRpcContext()->subscriptionId.isEmpty(),
         "Id must be filled by setJsonRpcSubscriptionId()");
-    if constexpr (DoesMethodExist_addSubscription<Derived>::value)
+    if constexpr (requires { &Derived::addSubscription; })
     {
         return static_cast<Derived*>(this)->addSubscription(std::move(request), std::move(callback));
     }
@@ -761,7 +742,7 @@ nx::utils::Guard CrudHandler<Derived>::subscribe(Request request, SubscriptionCa
 template<typename Derived>
 QString CrudHandler<Derived>::subscriptionId(const Request& request)
 {
-    if constexpr (DoesMethodExist_getSubscriptionId<Derived>::value)
+    if constexpr (requires { &Derived::getSubscriptionId; })
         return static_cast<Derived*>(this)->getSubscriptionId(request);
     else
         return {};

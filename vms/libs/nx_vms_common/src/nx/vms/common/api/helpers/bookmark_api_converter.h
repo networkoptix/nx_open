@@ -5,21 +5,17 @@
 #include <utility>
 
 #include <core/resource/camera_bookmark.h>
-#include <nx/utils/member_detector.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std_helpers.h>
 #include <nx/vms/api/data/bookmark_models.h>
 
 namespace nx::vms::common {
 
-NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasShare, share);
-NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasShareFilter, shareFilter);
-
 template<typename BookmarkWithRule>
 common::BookmarkShareableParams shareableParams(
     const BookmarkWithRule& data, bool digestPassword = true)
 {
-    if constexpr (hasShare<BookmarkWithRule>::value)
+    if constexpr (requires { data.share; })
     {
         if (data.share && std::holds_alternative<api::BookmarkSharingSettings>(data.share.value()))
         {
@@ -63,7 +59,7 @@ Bookmark bookmarkToApi(T&& oldBookmark, nx::Uuid serverId, bool includeDigest = 
 
     result.setIds(std::forward<T>(oldBookmark).guid, serverId);
 
-    if constexpr (hasShare<Bookmark>::value)
+    if constexpr (requires { &Bookmark::share; })
     {
         if (std::forward<T>(oldBookmark).shareable())
         {

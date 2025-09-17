@@ -96,7 +96,7 @@ public:
             };
 
         std::vector<Model> result;
-        if constexpr (fromDbTypesExists<Model>::value)
+        if constexpr (requires { &Model::fromDbTypes; })
         {
             const auto logGuard = logTime("Query and Convert from DB types");
 
@@ -170,7 +170,7 @@ public:
     void update(Model data, const nx::network::rest::Request& request)
     {
         using namespace details;
-        if constexpr (toDbTypesExists<Model>::value)
+        if constexpr (requires { &Model::toDbTypes; })
         {
             updateDbTypes(std::move(data).toDbTypes(), request);
         }
