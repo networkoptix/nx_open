@@ -18,7 +18,6 @@
 #include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 #include <nx/reflect/type_utils.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/member_detector.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -116,7 +115,7 @@ public:
         }
 
         auto connectionPtr = connection.get();
-        if constexpr (registerCloseHandlerExists<ConnectionType>::value)
+        if constexpr (requires { &ConnectionType::registerCloseHandler; })
         {
             connection->registerCloseHandler(
                 [this, connectionPtr](auto closeReason, auto /*connectionDestroyed*/)
@@ -166,7 +165,6 @@ public:
     }
 
 private:
-    NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(registerCloseHandlerExists, registerCloseHandler);
 
     mutable nx::Mutex m_mutex;
     nx::WaitCondition m_cond;

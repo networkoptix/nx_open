@@ -9,7 +9,6 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/compound_visitor.h>
 #include <nx/utils/crud_model.h>
-#include <nx/utils/member_detector.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/data/resource_property_key.h>
 
@@ -31,8 +30,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelForSearch, (json), DeviceModelForSea
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceTypeModel, (json), DeviceTypeModel_Fields)
 
 namespace {
-
-NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasBackupQuality, backupQuality);
 
 struct DefaultDeserialize
 {
@@ -504,10 +501,9 @@ std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
                 m.name = a->cameraName;
 
             m.logicalId = a->logicalId;
-            if constexpr (hasBackupQuality<Model>::value)
-            {
+            if constexpr (requires { m.backupQuality; })
                 m.backupQuality = a->backupQuality;
-            }
+
             m.isLicenseUsed = a->scheduleEnabled;
             if (!a->userDefinedGroupName.isEmpty())
             {

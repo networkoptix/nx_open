@@ -3,18 +3,10 @@
 #pragma once
 
 #include <nx/utils/crud_model.h>
-#include <nx/utils/member_detector.h>
 #include <nx/utils/type_traits.h>
 #include <nx/vms/api/data/data_fwd.h>
 
 namespace ec2::details {
-
-#define MEMBER_CHECKER(MEMBER) NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(MEMBER##Exists, MEMBER)
-MEMBER_CHECKER(fromDbTypes);
-MEMBER_CHECKER(toDbTypes);
-MEMBER_CHECKER(kResourceTypeId);
-MEMBER_CHECKER(id);
-#undef MEMBER_CHECKER
 
 template<typename F, typename... Args, size_t... Is>
 Result applyFuncImpl(std::tuple<Args...>&& t, F&& f, std::index_sequence<Is...>)
@@ -59,7 +51,7 @@ enum ApplyType
 template<ApplyType type, typename Model, typename Functor>
 void invokeOnDbTypes(Functor&& functor)
 {
-    if constexpr (toDbTypesExists<Model>::value)
+    if constexpr (requires { &Model::toDbTypes; })
     {
         const auto invoke =
             [&functor](auto&& data)
@@ -312,7 +304,7 @@ std::vector<ApiCommand::Value> commands(ApiCommand::Value deleteCommand)
 template<typename T>
 Result validateResourceTypeId(const T& data)
 {
-    if constexpr (kResourceTypeIdExists<T>::value)
+    if constexpr (requires { T::kResourceTypeId; })
     {
         if (data.typeId != T::kResourceTypeId)
         {
