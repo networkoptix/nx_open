@@ -20,7 +20,6 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/sync_call.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/type_utils.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/database_dump_data.h>
 #include <nx/vms/api/data/media_server_data.h>
@@ -198,7 +197,7 @@ protected:
             Output...
         )> completionHandler)
     {
-        using ActualOutputType = nx::utils::tuple_first_element_t<std::tuple<Output...>>;
+        using ActualOutputType = std::tuple_element_t<0, std::tuple<Output..., void>>;
 
         const nx::Url requestUrl = nx::network::url::Builder(m_baseRequestUrl)
             .appendPath("/").appendPath(requestPath).toUrl();
@@ -265,7 +264,7 @@ protected:
             nx::network::http::StatusCode::Value statusCode,
             Output...)> completionHandler)
     {
-        using ActualOutputType = nx::utils::tuple_first_element_t<std::tuple<Output...>>;
+        using ActualOutputType = std::tuple_element_t<0, std::tuple<Output..., void>>;
 
         performRequest(
             httpMethod,
@@ -288,7 +287,7 @@ protected:
             nx::network::http::StatusCode::Value statusCode,
             Output...)> completionHandler)
     {
-        using ActualOutputType = nx::utils::tuple_first_element_t<std::tuple<Output...>>;
+        using ActualOutputType = std::tuple_element_t<0, std::tuple<Output..., void>>;
 
         performRequest(
             httpMethod,

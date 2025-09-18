@@ -9,6 +9,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cppnx.h>
 
 #include "context.h"
 
@@ -163,7 +164,7 @@ SSL* Pipeline::ssl()
 
 void Pipeline::initSslBio(std::shared_ptr<SSL_CTX> context)
 {
-    m_bioMethods = utils::wrapUnique(BIO_meth_new(BIO_TYPE_SOCKET, typeid(*this).name()), &BIO_meth_free);
+    m_bioMethods = nx::wrapUnique(BIO_meth_new(BIO_TYPE_SOCKET, typeid(*this).name()), &BIO_meth_free);
     BIO_meth_set_write(m_bioMethods.get(), &Pipeline::bioWrite);
     BIO_meth_set_read(m_bioMethods.get(), &Pipeline::bioRead);
     BIO_meth_set_puts(m_bioMethods.get(), &Pipeline::bioPuts);

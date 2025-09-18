@@ -15,9 +15,9 @@
 
 #include <nx/reflect/instrument.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/type_traits.h>
 
 #include "base64.h"
-#include "type_utils.h"
 
 #define NX_BUFFER_IMPL
 
@@ -1288,11 +1288,6 @@ class ConstBufferRefType:
 public:
     ConstBufferRefType() noexcept = default;
 
-    ConstBufferRefType(const std::string_view& str):
-        base_type(str)
-    {
-    }
-
     ConstBufferRefType(const char* str, std::size_t count):
         base_type(str, count)
     {
@@ -1307,12 +1302,8 @@ public:
      * NOTE: This constructor works with any type that has "const char* data()" and "size()".
      * E.g., QByteArray.
      */
-    template<typename T>
-    ConstBufferRefType(
-        const T& str,
-        std::enable_if_t<
-            nx::utils::IsConvertibleToStringViewV<T> &&
-            !std::is_same_v<std::decay_t<T>, std::string_view>>* = nullptr)
+    template<traits::ToStringViewConvertible T>
+    ConstBufferRefType(const T& str)
         :
         base_type(str.data(), (std::size_t) str.size())
     {

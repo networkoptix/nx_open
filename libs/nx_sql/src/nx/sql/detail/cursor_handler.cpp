@@ -2,8 +2,6 @@
 
 #include "cursor_handler.h"
 
-#include <nx/utils/type_utils.h>
-
 namespace nx::sql::detail {
 
 void CursorHandlerPool::add(

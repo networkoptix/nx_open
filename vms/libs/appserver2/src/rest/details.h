@@ -34,7 +34,7 @@ Result applyFunc(std::tuple<Args...>&& t, F&& f)
 template<typename Data, typename Functor>
 auto invokeOnVector(Data&& data, Functor&& functor)
 {
-    if constexpr (nx::utils::Is<std::vector, std::decay_t<decltype(data)>>())
+    if constexpr (nx::traits::is<std::vector, std::decay_t<decltype(data)>>())
         return functor(std::decay_t<decltype(data[0])>());
     else
         return functor(std::forward<Data>(data));
@@ -43,7 +43,7 @@ auto invokeOnVector(Data&& data, Functor&& functor)
 template<typename Data, typename Functor>
 auto invokeOnOptional(Data&& data, Functor&& functor)
 {
-    if constexpr (nx::utils::Is<std::optional, std::decay_t<decltype(data)>>())
+    if constexpr (nx::traits::is<std::optional, std::decay_t<decltype(data)>>())
         return invokeOnVector(std::decay_t<decltype(*data)>(), std::forward<Functor>(functor));
     else
         return invokeOnVector(std::forward<Data>(data), std::forward<Functor>(functor));
@@ -120,7 +120,7 @@ void assertModelToDbTypesProducedValidResult(const DbType& value, const Id& id)
     if constexpr (!std::is_same_v<DbType, IgnoredDbType>
         && !std::is_same_v<DbType, nx::vms::api::ResourceStatusData>)
     {
-        if constexpr (nx::utils::Is<std::vector, DbType>())
+        if constexpr (nx::traits::is<std::vector, DbType>())
         {
             NX_ASSERT(std::find_if(value.begin(),
                           value.end(),

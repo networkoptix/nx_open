@@ -11,20 +11,15 @@
 #include <string>
 #include <vector>
 
-#include <QtCore/QDateTime>
-
+#include <nx/network/http/http_status.h>
 #include <nx/network/socket_common.h>
-#include <nx/reflect/instrument.h>
 #include <nx/utils/buffer.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/software_version.h>
 #include <nx/utils/std/cpp20.h>
 #include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/utils/string.h>
-#include <nx/utils/type_utils.h>
 #include <nx/utils/url.h>
-
-#include "http_status.h"
 
 /**
  * Holds HTTP implementation suitable for async/sync i/o.
@@ -979,10 +974,8 @@ struct NX_NETWORK_API ContentType
      * NOTE: This constructor works with any type that has "const char* data()" and "size()".
      * E.g., QByteArray.
      */
-    template<typename String>
-    ContentType(
-        const String& str,
-        std::enable_if_t<nx::utils::IsConvertibleToStringViewV<String>>* = nullptr)
+    template<traits::ToStringViewConvertible String>
+    ContentType(const String& str)
         :
         ContentType(std::string_view(str.data(), (std::size_t) str.size()))
     {

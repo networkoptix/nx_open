@@ -2,10 +2,11 @@
 
 #include "helpers.h"
 
+#include <nx/utils/std/cppnx.h>
 #include <nx/utils/uuid.h>
 
-#include "../socket_factory.h"
 #include "../nx_network_ini.h"
+#include "../socket_factory.h"
 #include "context.h"
 #include "ssl_stream_socket.h"
 
@@ -15,7 +16,7 @@ namespace {
 template<typename Chain>
 auto toOpenSSL(const Chain& chain)
 {
-    auto result = nx::utils::wrapUnique(sk_X509_new(NULL), &sk_X509_free);
+    auto result = nx::wrapUnique(sk_X509_new(NULL), &sk_X509_free);
 
     for (const auto& cert: chain)
         sk_X509_push(result.get(), cert.x509());

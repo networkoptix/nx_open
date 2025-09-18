@@ -13,7 +13,7 @@ namespace nx::network::http::server::handler {
  */
 template<typename ResultType>
 class GetHandler:
-    public nx::network::http::AbstractApiRequestHandler<>
+    public nx::network::http::AbstractApiRequestHandler<void>
 {
 public:
     using FunctorType = nx::MoveOnlyFunc<ResultType()>;
@@ -45,7 +45,7 @@ private:
  */
 template<typename ResultType>
 class GetAsyncHandler:
-    public nx::network::http::AbstractApiRequestHandler<>
+    public nx::network::http::AbstractApiRequestHandler<void>
 {
 public:
     using CompletionHandler = nx::MoveOnlyFunc<void(ResultType)>;

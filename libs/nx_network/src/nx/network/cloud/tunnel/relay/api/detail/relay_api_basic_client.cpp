@@ -9,7 +9,6 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/string.h>
-#include <nx/utils/type_utils.h>
 
 #include "../relay_api_http_paths.h"
 

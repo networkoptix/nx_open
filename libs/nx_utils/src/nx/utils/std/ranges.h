@@ -134,6 +134,13 @@ concept ViewOf =
     std::ranges::view<Range>
     && std::same_as<std::ranges::range_value_t<Range>, Element>;
 
+template<typename R>
+concept PairLikeRange = std::ranges::range<R>
+    && requires(R& r) {
+    { std::get<0>(*std::ranges::begin(r)) };
+    { std::get<1>(*std::ranges::begin(r)) };
+};
+
 }
 
 namespace views {

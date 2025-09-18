@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <future>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -37,6 +39,32 @@ auto make_vector(Elements&&... e)
     result.reserve(sizeof...(Elements));
     (result.emplace_back(std::forward<Elements>(e)), ...);
     return result;
+}
+
+/**
+ * Converts unique_ptr of one type to another using static_cast.
+ * Consumes original unique_ptr. Actually moves memory to a new unique_ptr.
+ */
+template<typename ResultType, typename InitialType, typename DeleterType>
+std::unique_ptr<ResultType, DeleterType>
+    static_unique_ptr_cast(std::unique_ptr<InitialType, DeleterType>&& sourcePtr)
+{
+    return std::unique_ptr<ResultType, DeleterType>(
+        static_cast<ResultType>(sourcePtr.release()),
+        sourcePtr.get_deleter());
+}
+
+template<typename ResultType, typename InitialType>
+std::unique_ptr<ResultType> static_unique_ptr_cast(std::unique_ptr<InitialType>&& sourcePtr)
+{
+    return std::unique_ptr<ResultType>(
+        static_cast<ResultType*>(sourcePtr.release()));
+}
+
+template<typename Object, typename Deleter>
+std::unique_ptr<Object, Deleter> wrapUnique(Object* ptr, Deleter deleter)
+{
+    return std::unique_ptr<Object, Deleter>(ptr, std::move(deleter));
 }
 
 }   //namespace nx::utils

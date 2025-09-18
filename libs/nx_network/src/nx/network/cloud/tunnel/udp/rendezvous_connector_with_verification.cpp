@@ -5,7 +5,7 @@
 #include <nx/network/cloud/data/tunnel_connection_chosen_data.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/type_utils.h>
+#include <nx/utils/std/cppnx.h>
 
 namespace nx::network::cloud::udp {
 
@@ -89,7 +89,7 @@ std::unique_ptr<nx::network::UdtStreamSocket>
         return nullptr;
 
     auto udtConnection =
-        nx::utils::static_unique_ptr_cast<UdtStreamSocket>(
+        nx::static_unique_ptr_cast<UdtStreamSocket>(
             m_requestPipeline->takeSocket());
     m_requestPipeline.reset();
 

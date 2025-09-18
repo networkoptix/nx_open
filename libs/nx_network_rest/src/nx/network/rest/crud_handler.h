@@ -14,6 +14,7 @@
 #include <nx/reflect/merge.h>
 #include <nx/utils/crud_model.h>
 #include <nx/utils/member_detector.h>
+#include <nx/utils/std/ranges.h>
 #include <nx/utils/type_traits.h>
 #include <nx/utils/void.h>
 
@@ -33,7 +34,7 @@ template<typename Container>
 auto front(Container&& c)
 {
     NX_ASSERT(c.size() != 0);
-    if constexpr (nx::utils::IsKeyValueContainer<std::decay_t<Container>>::value)
+    if constexpr (nx::ranges::PairLikeRange<std::decay_t<Container>>)
         return std::move(c.begin()->second);
     else if constexpr (DoesMemberExist_front<std::decay_t<Container>>::value)
         return std::move(c.front());
@@ -77,16 +78,10 @@ constexpr bool StaticAssertAll()
     return (T::value && ...);
 }
 
-// Consider moving to `type_traits.h`. `FunctionArgumentType` is already declared in
-// `signature_extractor.h`, but this one has a simpler interface: it allows to pass a pointer to
-// the function directly.
-template <auto FunctionPtr, size_t I>
-using FunctionArgumentType = typename nx::utils::FunctionTraits<FunctionPtr>::template ArgumentType<I>;
-
 template<typename List>
 constexpr bool isStdArrayOfSingleElement(const List&)
 {
-    if constexpr (!nx::utils::Is<std::array, List>())
+    if constexpr (!nx::traits::is<std::array, List>())
         return false;
     else
         return std::tuple_size_v<List> == 1;
@@ -419,7 +414,7 @@ protected:
             if (!useReflect && useId && !std::get<Request::NxFusionContent>(parseInfo))
                 return model;
 
-            using ReadType = typename nx::utils::FunctionTraits<&Derived::read>::ReturnType;
+            using ReadType = typename nx::traits::FunctionTraits<&Derived::read>::ReturnType;
             using ReadItemType = decltype(detail::front(ReadType{}));
             auto* d = static_cast<Derived*>(this);
             if constexpr (std::is_base_of_v<Model, ReadType>)
@@ -457,7 +452,7 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
     if constexpr (DoesMethodExist_read<Derived>::value)
     {
         auto [filter, params, defaultValueAction] =
-            processGetRequest<detail::FunctionArgumentType<&Derived::read, 0>>(request);
+            processGetRequest<traits::FunctionArgumentType<&Derived::read, 0>>(request);
         ResponseAttributes responseAttributes;
         auto list = call(&Derived::read, std::move(filter), request, &responseAttributes);
 
@@ -514,7 +509,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
 
     if constexpr (DoesMethodExist_create<Derived>::value)
     {
-        using Model = detail::FunctionArgumentType<&Derived::create, 0>;
+        using Model = traits::FunctionArgumentType<&Derived::create, 0>;
         const auto derived = static_cast<Derived*>(this);
         if (!m_features.testFlag(CrudFeature::idInPost) && idParam(request).value)
         {
@@ -545,7 +540,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
         }
 
         ResponseAttributes responseAttributes;
-        using Result = typename nx::utils::FunctionTraits<&Derived::create>::ReturnType;
+        using Result = typename nx::traits::FunctionTraits<&Derived::create>::ReturnType;
         if constexpr (!std::is_same<Result, void>::value)
         {
             auto result = call(&Derived::create, std::move(model), request, &responseAttributes);
@@ -578,7 +573,7 @@ Response CrudHandler<Derived>::executeDelete(const Request& request)
     if constexpr (DoesMethodExist_delete_<Derived>::value)
     {
         ResponseAttributes responseAttributes;
-        using Id = detail::FunctionArgumentType<&Derived::delete_, 0>;
+        using Id = traits::FunctionArgumentType<&Derived::delete_, 0>;
         if constexpr (std::is_same<Id, Void>::value)
         {
             call(&Derived::delete_, Void(), request, &responseAttributes);
@@ -609,8 +604,8 @@ Response CrudHandler<Derived>::executePut(const Request& request)
     if constexpr (DoesMethodExist_update<Derived>::value)
     {
         const auto d = static_cast<Derived*>(this);
-        using Model = detail::FunctionArgumentType<&Derived::update, 0>;
-        using Result = typename nx::utils::FunctionTraits<&Derived::update>::ReturnType;
+        using Model = traits::FunctionArgumentType<&Derived::update, 0>;
+        using Result = typename nx::traits::FunctionTraits<&Derived::update>::ReturnType;
         Model model{request.parseContentOrThrow<Model>()};
         if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)
             d->fillMissingParams(&model, request);
@@ -681,7 +676,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
             {
                 if (!m_features.testFlag(CrudFeature::fastUpdate))
                 {
-                    auto emptyFilter = detail::FunctionArgumentType<&Derived::read, 0>{};
+                    auto emptyFilter = traits::FunctionArgumentType<&Derived::read, 0>{};
                     auto result =
                         call(&Derived::read, std::move(emptyFilter), request, &responseAttributes);
                     return response(std::move(result), request, std::move(responseAttributes));
@@ -704,8 +699,8 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
     if constexpr (DoesMethodExist_read<Derived>::value && DoesMethodExist_update<Derived>::value)
     {
         const auto d = static_cast<Derived*>(this);
-        using Model = detail::FunctionArgumentType<&Derived::update, 0>;
-        using Result = typename nx::utils::FunctionTraits<&Derived::update>::ReturnType;
+        using Model = traits::FunctionArgumentType<&Derived::update, 0>;
+        using Result = typename nx::traits::FunctionTraits<&Derived::update>::ReturnType;
         const bool useId = idParam(request).value || m_idParamName.isEmpty();
         Model model = mergedModel<Model>(useId, request);
         if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)

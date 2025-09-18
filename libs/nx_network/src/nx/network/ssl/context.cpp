@@ -13,8 +13,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/std/cppnx.h>
 #include <nx/utils/string.h>
-#include <nx/utils/type_utils.h>
 
 namespace nx::network::ssl {
 
@@ -94,7 +94,7 @@ Context::Context():
         SSL_CTX_new(SSLv23_client_method()),
         &SSL_CTX_free);
     SSL_CTX_set_options(m_clientContext.get(), 0);
-    auto verifyParam = nx::utils::wrapUnique(X509_VERIFY_PARAM_new(), &X509_VERIFY_PARAM_free);
+    auto verifyParam = nx::wrapUnique(X509_VERIFY_PARAM_new(), &X509_VERIFY_PARAM_free);
     X509_VERIFY_PARAM_set_flags(verifyParam.get(), X509_V_FLAG_PARTIAL_CHAIN);
     SSL_CTX_set1_param(m_clientContext.get(), verifyParam.get());
     SSL_CTX_set_keylog_callback(m_clientContext.get(), sslKeyLogFileCallback);
@@ -365,7 +365,7 @@ bool Context::x509load(
 
 bool Context::pKeyLoad(SSL_CTX* sslContext, const std::string& certBytes)
 {
-    auto bio = utils::wrapUnique(
+    auto bio = nx::wrapUnique(
         BIO_new_mem_buf(const_cast<void*>((const void*)certBytes.data()), certBytes.size()),
         &BIO_free);
 

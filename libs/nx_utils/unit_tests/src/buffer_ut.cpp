@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/buffer.h>
-#include <nx/utils/type_utils.h>
 
 namespace nx {
 

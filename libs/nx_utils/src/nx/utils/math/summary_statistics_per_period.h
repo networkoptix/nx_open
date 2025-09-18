@@ -24,7 +24,7 @@ struct SummaryStatistics
         max(std::numeric_limits<Value>::min()),
         average(Value{})
     {
-        if constexpr (nx::utils::Is<std::chrono::duration, Value>())
+        if constexpr (nx::traits::is<std::chrono::duration, Value>())
         {
             min = Value::max();
             max = Value::min();

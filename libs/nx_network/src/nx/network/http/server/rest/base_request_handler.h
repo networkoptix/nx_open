@@ -311,7 +311,7 @@ void RequestHandler<Result, Input, Output, RestArgFetchers...>::processResponseI
 
 template<typename Result, typename Output, typename... RestArgFetchers>
 class RequestHandler<Result, void, Output, RestArgFetchers...>:
-    public network::http::AbstractApiRequestHandler<>
+    public network::http::AbstractApiRequestHandler<void>
 {
 public:
     using CompletionHandler = typename CompletionHandlerDeclarator<Result, Output>::Func;

@@ -5,8 +5,6 @@
 #include <stdexcept>
 #include <tuple>
 
-#include <nx/utils/type_utils.h>
-
 /** Creates gmock checker that verifies argument type with dynamic_cast. */
 #define GMOCK_DYNAMIC_TYPE_MATCHER(T) ::testing::WhenDynamicCastTo<T>(::testing::An<T>())
 

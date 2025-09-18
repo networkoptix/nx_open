@@ -11,7 +11,6 @@
 #include <nx/utils/random.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/string.h>
-#include <nx/utils/type_utils.h>
 
 #include "message_parser.h"
 #include "message_serializer.h"

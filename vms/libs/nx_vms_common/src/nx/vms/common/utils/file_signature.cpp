@@ -12,7 +12,7 @@
 #include <QtCore/QRegularExpression>
 
 #include <nx/utils/log/assert.h>
-#include <nx/utils/type_utils.h>
+#include <nx/utils/std/cppnx.h>
 
 namespace nx::vms::common {
 
@@ -105,14 +105,14 @@ std::variant<QByteArray, FileSignature::Result> FileSignature::sign(
         return FileSignature::Result::failed;
 
     BIO* bio = BIO_new_mem_buf(privateKey.constData(), privateKey.size());
-    auto rsa = utils::wrapUnique(PEM_read_bio_RSAPrivateKey(bio, 0, 0, 0), &RSA_free);
+    auto rsa = nx::wrapUnique(PEM_read_bio_RSAPrivateKey(bio, 0, 0, 0), &RSA_free);
     BIO_free(bio);
 
     if (!rsa)
         return FileSignature::Result::failed;
 
-    auto ctx = utils::wrapUnique(EVP_MD_CTX_new(), &EVP_MD_CTX_free);
-    auto pkey = utils::wrapUnique(EVP_PKEY_new(), &EVP_PKEY_free);
+    auto ctx = nx::wrapUnique(EVP_MD_CTX_new(), &EVP_MD_CTX_free);
+    auto pkey = nx::wrapUnique(EVP_PKEY_new(), &EVP_PKEY_free);
     EVP_PKEY_assign_RSA(pkey.get(), rsa.release());
 
     if (EVP_DigestSignInit(ctx.get(), nullptr, EVP_sha256(), nullptr, pkey.get()) <= 0)
@@ -194,14 +194,14 @@ FileSignature::Result FileSignature::verify(
         return FileSignature::Result::failed;
 
     BIO* bio = BIO_new_mem_buf(publicKey.constData(), publicKey.size());
-    auto rsa = utils::wrapUnique(PEM_read_bio_RSA_PUBKEY(bio, 0, 0, 0), &RSA_free);
+    auto rsa = nx::wrapUnique(PEM_read_bio_RSA_PUBKEY(bio, 0, 0, 0), &RSA_free);
     BIO_free(bio);
 
     if (!rsa)
         return FileSignature::Result::failed;
 
-    auto ctx = utils::wrapUnique(EVP_MD_CTX_new(), &EVP_MD_CTX_free);
-    auto pkey = utils::wrapUnique(EVP_PKEY_new(), &EVP_PKEY_free);
+    auto ctx = nx::wrapUnique(EVP_MD_CTX_new(), &EVP_MD_CTX_free);
+    auto pkey = nx::wrapUnique(EVP_PKEY_new(), &EVP_PKEY_free);
     EVP_PKEY_assign_RSA(pkey.get(), rsa.release());
 
     if (EVP_DigestVerifyInit(ctx.get(), nullptr, EVP_sha256(), nullptr, pkey.get()) <= 0)

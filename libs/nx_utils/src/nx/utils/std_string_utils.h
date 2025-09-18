@@ -9,17 +9,15 @@
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <type_traits>
 
-#include "buffer.h"
-#include "std/charconv.h"
-#include "type_traits.h"
-#include "type_utils.h"
+#include <nx/utils/buffer.h>
+#include <nx/utils/std/charconv.h>
+#include <nx/utils/type_traits.h>
 
 namespace nx::utils {
 
 template<template<typename...> class String, typename CharType>
-// requires Random_access_iterator<typename String<CharType>::iterator>
+    requires std::random_access_iterator<std::ranges::iterator_t<String<CharType>>>
 String<CharType> maxCommonPrefix(const String<CharType>& one, const String<CharType>& two)
 {
     auto oneIter = one.begin();
@@ -36,12 +34,8 @@ String<CharType> maxCommonPrefix(const String<CharType>& one, const String<CharT
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename CharType, typename IsSpaceFunc>
-// requires std::is_invocable_v<IsSpaceFunc, char>
-void trim(
-    std::basic_string_view<CharType>* str,
-    IsSpaceFunc f,
-    std::enable_if_t<std::is_invocable_v<IsSpaceFunc, CharType>>* = nullptr)
+template<typename CharType, std::invocable<CharType> IsSpaceFunc>
+void trim(std::basic_string_view<CharType>* str, IsSpaceFunc f)
 {
     while (!str->empty() && f(str->front()))
         str->remove_prefix(1);
@@ -49,16 +43,12 @@ void trim(
         str->remove_suffix(1);
 }
 
-template<typename CharType, typename IsSpaceFunc>
-// requires std::is_invocable_v<IsSpaceFunc, char>
-void trim(
-    std::basic_string<CharType>* str,
-    IsSpaceFunc f,
-    std::enable_if_t<std::is_invocable_v<IsSpaceFunc, CharType>>* = nullptr)
+template<typename CharType, std::invocable<CharType> IsSpaceFunc>
+void trim(std::basic_string<CharType>* str, IsSpaceFunc f)
 {
-    auto strView = (std::basic_string_view<CharType>) (*str);
+    std::basic_string_view strView = *str;
     trim(&strView, std::move(f));
-    *str = std::basic_string<CharType>(strView);
+    *str = std::basic_string(strView);
 }
 
 /**
@@ -75,11 +65,10 @@ void trim(String<CharType>* str)
  * Removes from start and end of the string all characters for which isspace(...) returns non-zero.
  */
 template<template<typename...> class String, typename CharType, typename CharArray>
-// requires std::is_array_v<CharArray>
+    requires std::is_array_v<CharArray>
 void trim(
     String<CharType>* str,
-    const CharArray& charArray,
-    std::enable_if_t<std::is_array_v<CharArray>>* = nullptr)
+    const CharArray& charArray)
 {
     trim(str, [&charArray](CharType ch) {
         return std::find(std::begin(charArray), std::end(charArray), ch) != std::end(charArray);
@@ -88,7 +77,7 @@ void trim(
 
 template<typename CharType, typename... Args>
 std::basic_string_view<CharType> trim(
-    const std::basic_string_view<CharType>& str,
+    std::basic_string_view<CharType> str,
     Args&&... args)
 {
     auto result = str;
@@ -101,9 +90,9 @@ std::basic_string<CharType> trim(
     const std::basic_string<CharType>& str,
     Args&& ... args)
 {
-    auto view = (std::basic_string_view<CharType>) str;
+    std::basic_string_view view = str;
     trim(&view, std::forward<Args>(args)...);
-    return std::basic_string<CharType>(view);
+    return std::basic_string(view);
 }
 
 /**
@@ -115,7 +104,7 @@ std::string_view trim(
     CharType (&str)[N],
     Args&& ... args)
 {
-    return trim(std::string_view(str), std::forward<Args>(args)...);
+    return trim(std::basic_string_view(str), std::forward<Args>(args)...);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -138,7 +127,9 @@ private:
 };
 
 template<typename Str>
-class IsAnyOf<Str, std::enable_if_t<std::is_same_v<Str, const char*> || std::is_array_v<Str>>>
+    requires std::same_as<const char*, Str>
+    || std::is_array_v<Str>
+class IsAnyOf<Str>
 {
 public:
     IsAnyOf(const char* str): m_str(str) {}
@@ -269,7 +260,7 @@ public:
         if (m_tokenStart != String<CharType>::npos &&
             (m_pos > m_tokenStart || ((m_flags & SplitterFlag::skipEmpty) == 0)))
         {
-            m_token = std::basic_string_view<CharType>(
+            m_token = std::basic_string_view(
                 m_str.data() + m_tokenStart, m_pos - m_tokenStart);
             m_tokenStart = String<CharType>::npos;
             ++m_pos;
@@ -345,7 +336,7 @@ void saveToken(
     if constexpr (std::is_assignable_v<decltype(*outIter), std::basic_string_view<CharType>>)
         *outIter++ = token;
     else if constexpr (std::is_assignable_v<decltype(*outIter), std::basic_string<CharType>>)
-        *outIter++ = std::basic_string<CharType>(token);
+        *outIter++ = std::basic_string(token);
     else
         *outIter++ = token;
 }
@@ -375,16 +366,14 @@ void saveToken(
 template<
     template<typename...> class String, typename CharType,
     typename Separator,
-    typename UnaryFunction
+    std::invocable<std::basic_string_view<CharType>> UnaryFunction
 >
-// requires std::is_invocable_v<UnaryFunction, std::basic_string_view<CharType>>
 void split(
     const String<CharType>& str,
     Separator sep,
     UnaryFunction f,
     int groupToken = GroupToken::none,
-    int flags = SplitterFlag::skipEmpty,
-    decltype(f(std::basic_string_view<CharType>()))* = nullptr)
+    int flags = SplitterFlag::skipEmpty)
 {
     auto splitter = makeSplitter(str, sep, groupToken, flags);
     while (splitter.next())
@@ -450,7 +439,7 @@ split_n(
     if (pos > 0)
     {
         // adding the string remainder to the last token found.
-        tokens[pos - 1] = std::basic_string_view<CharType>(
+        tokens[pos - 1] = std::basic_string_view(
             tokens[pos - 1].data(),
             str.data() + str.size() - tokens[pos - 1].data());
     }
@@ -482,7 +471,7 @@ namespace detail {
  * Introducing this function as a work around notorious msvc bug with "else if constexpr"
  * inside lambda inside a template function.
  */
-template <typename InsertIterator, typename CharType>
+template <typename CharType, typename InsertIterator>
 void saveNameValuePair(
     InsertIterator& outIter,
     const std::basic_string_view<CharType>& name,
@@ -494,7 +483,7 @@ void saveNameValuePair(
     if constexpr (std::is_assignable_v<decltype(*outIter), ViewPair>)
         *outIter++ = {name, value};
     else if constexpr (std::is_assignable_v<decltype(*outIter), StringPair>)
-        *outIter++ = {std::basic_string<CharType>(name), std::basic_string<CharType>(value)};
+        *outIter++ = {std::basic_string(name), std::basic_string(value)};
     else
         *outIter++ = {name, value};
 }
@@ -526,15 +515,15 @@ template<
     typename NameValueSeparator,
     typename Function
 >
-// requires std::is_invocable_v<Function, std::basic_string_view<CharType>, std::basic_string_view<CharType>>
+    requires std::invocable<Function,
+        std::basic_string_view<CharType>,
+        std::basic_string_view<CharType>>
 std::size_t splitNameValuePairs(
     const String<CharType>& str,
     PairSeparator pairSeparator,
     NameValueSeparator nameValueSeparator,
     Function f,
-    int groupTokens = GroupToken::doubleQuotes,
-    std::enable_if_t<std::is_invocable_v<Function,
-        std::basic_string_view<CharType>, std::basic_string_view<CharType>>>* = nullptr)
+    int groupTokens = GroupToken::doubleQuotes)
 {
     std::size_t pairCount = 0;
 
@@ -581,15 +570,16 @@ template<
     typename NameValueSeparator,
     typename OutputIt
 >
+    requires (!std::invocable<OutputIt,
+        std::basic_string_view<CharType>,
+        std::basic_string_view<CharType>>)
 // requires Iterator<OutputIt>
 std::size_t splitNameValuePairs(
     const String<CharType>& str,
     PairSeparator pairSeparator,
     NameValueSeparator nameValueSeparator,
     OutputIt outIter,
-    int groupTokens = GroupToken::doubleQuotes,
-    std::enable_if_t<!std::is_invocable_v<OutputIt,
-        std::basic_string_view<CharType>, std::basic_string_view<CharType>>>* = nullptr)
+    int groupTokens = GroupToken::doubleQuotes)
 {
     return splitNameValuePairs(
         str, std::move(pairSeparator), std::move(nameValueSeparator),
@@ -606,45 +596,24 @@ std::size_t splitNameValuePairs(
 
 namespace detail {
 
-inline std::size_t calculateLength(const std::string& str)
-{
-    return str.size();
-}
+constexpr std::size_t calculateLength(std::string_view str) { return str.size(); }
+constexpr std::size_t calculateLength(char) { return sizeof(char); }
 
-inline std::size_t calculateLength(const std::string_view& str)
-{
-    return str.size();
-}
-
-inline std::size_t calculateLength(const char* str)
-{
-    return std::strlen(str);
-}
-
-inline std::size_t calculateLength(char ch)
-{
-    return sizeof(ch);
-}
-
-template<typename T>
-// requires std::is_integral_v<T>
-std::size_t calculateLength(
-    const T& /*val*/,
-    std::enable_if_t<std::is_integral_v<T>>* = nullptr)
+template<std::integral T>
+constexpr std::size_t calculateLength(const T&)
 {
     return sizeof(T) * 3;
 }
 
 template<typename T>
-std::size_t calculateLength(const std::optional<T>& val)
+constexpr std::size_t calculateLength(const std::optional<T>& val)
 {
     return val ? calculateLength(*val) : 0;
 }
 
-template<typename T,
-    typename X = std::enable_if_t<std::is_member_function_pointer_v<decltype(&T::size)>>
->
-std::size_t calculateLength(const T& val)
+template<typename T>
+    requires requires(const T& t){ t.size(); }
+constexpr std::size_t calculateLength(const T& val)
 {
     return val.size();
 }
@@ -652,21 +621,7 @@ std::size_t calculateLength(const T& val)
 //-------------------------------------------------------------------------------------------------
 
 template<typename String>
-void append(String* str, const std::string& val)
-{
-    *str += val;
-}
-
-template<typename String>
 void append(String* str, const std::string_view& val)
-{
-    *str += val;
-}
-
-template<typename String, typename T>
-void append(
-    String* str, const T* val,
-    std::enable_if_t<std::is_same_v<T, char>>* = nullptr)
 {
     *str += val;
 }
@@ -677,11 +632,8 @@ void append(String* str, const char val)
     *str += val;
 }
 
-template<typename String, typename T>
-// requires std::is_integral_v<T>
-void append(
-    String* str, T val,
-    std::enable_if_t<std::is_integral_v<T>>* = nullptr)
+template<typename String, std::integral T>
+void append(String* str, T val)
 {
     char buf[sizeof(val) * 3];
     const auto result = charconv::to_chars(buf, buf + sizeof(buf), val);
@@ -689,16 +641,20 @@ void append(
         str->append(buf, result.ptr - buf);
 }
 
-template<typename String, typename T>
-void append(String* str, const T& val,
-    std::enable_if_t<
-        IsConvertibleToStringView<T>::value ||
-        HasToString<T>::value>* = nullptr)
+template<typename String, traits::ToStringViewConvertible T>
+    requires (!requires(String& s, const T& t) { s += t.toString(); })
+void append(String * str, const T& val)
 {
-    if constexpr (IsConvertibleToStringView<T>::value)
-        append(str, std::string_view(val.data(), val.size()));
-    else if constexpr (HasToString<T>::value)
-        *str += val.toString();
+    append(str, std::string_view(val.data(), val.size()));
+}
+
+template<typename String, typename T>
+    requires requires(String& s, const T& t) {
+        { s += t.toString() } -> std::convertible_to<String>;
+    }
+void append(String* str, const T& val)
+{
+    *str += val.toString();
 }
 
 template<typename String, typename T>
@@ -727,15 +683,12 @@ void buildString(
     String* out,
     const Tokens& ... tokens)
 {
-    // Calculating resulting string length.
-    std::initializer_list<std::size_t> tokenLengths{ detail::calculateLength(tokens) ... };
-    const auto length = std::accumulate(tokenLengths.begin(), tokenLengths.end(), (std::size_t) 0);
+    const auto length = (detail::calculateLength(tokens) + ...);
 
     if (out->capacity() - out->size() < length + 1)
         out->reserve(out->size() + length + 1);
 
-    auto f = [out](const auto& token) { detail::append(out, token); };
-    (void)std::initializer_list<int>{(f(tokens), 1) ...};
+    (detail::append(out, tokens), ...);
 }
 
 } // namespace detail
@@ -860,7 +813,7 @@ void stringize(
 
 template<
     typename String,
-    typename InputIter,
+    std::input_iterator InputIter,
     typename RecordSeparator,
     typename AppendFunc
 >
@@ -871,9 +824,7 @@ void joinInternal(
     AppendFunc&& appendFunc)
 {
     // Preallocating output string if possible.
-    if constexpr (std::is_same_v<
-        typename std::iterator_traits<InputIter>::iterator_category,
-        std::random_access_iterator_tag>)
+    if constexpr (std::random_access_iterator<InputIter>)
     {
         static constexpr std::size_t kPreallocatedCharsPerValue = 16;
         out->reserve(out->size() + std::distance(begin, end) * kPreallocatedCharsPerValue);
@@ -895,7 +846,7 @@ void joinInternal(
 
 template<
     typename String,
-    typename InputIter,
+    std::input_iterator InputIter,
     typename RecordSeparator,
     typename... RecordStringizers
 >
@@ -923,7 +874,7 @@ void join(
 
 template<
     typename String,
-    typename InputIter,
+    std::input_iterator InputIter,
     typename RecordSeparator,
     typename AppendFunc
 >
@@ -999,10 +950,9 @@ void join(
  * with a single allocation.
  */
 template<
-    typename InputIter,
+    std::input_iterator InputIter,
     typename RecordSeparator,
-    typename ValueStringizer,
-    typename = std::enable_if_t<IsIteratorV<InputIter>>
+    typename ValueStringizer
 >
 void join(
     std::string* out,
@@ -1014,10 +964,9 @@ void join(
 }
 
 template<
-    typename Container,
+    std::ranges::range Container,
     typename RecordSeparator,
-    typename ValueStringizer,
-    typename = std::enable_if_t<IsIterableV<Container>>
+    typename ValueStringizer
 >
 void join(
     std::string* out,
@@ -1033,9 +982,8 @@ void join(
 }
 
 template<
-    typename InputIter,
-    typename RecordSeparator,
-    typename = std::enable_if_t<IsIteratorV<InputIter>>
+    std::input_iterator InputIter,
+    typename RecordSeparator
 >
 void join(
     std::string* out,
@@ -1045,11 +993,7 @@ void join(
     detail::join(out, begin, end, recordSeparator);
 }
 
-template<
-    typename Container,
-    typename RecordSeparator,
-    typename = std::enable_if_t<IsIterableV<Container>>
->
+template<std::ranges::range Container, typename RecordSeparator>
 void join(
     std::string* out,
     const Container& container,
@@ -1062,10 +1006,9 @@ void join(
  * Joins a sequence of values and appends the result to BasicBuffer<char>.
  */
 template<
-    typename InputIter,
+    std::input_iterator InputIter,
     typename RecordSeparator,
-    typename ValueStringizer,
-    typename = std::enable_if_t<IsIteratorV<InputIter>>
+    typename ValueStringizer
 >
 void join(
     BasicBuffer<char>* out,
@@ -1077,10 +1020,9 @@ void join(
 }
 
 template<
-    typename Container,
+    std::ranges::range Container,
     typename RecordSeparator,
-    typename ValueStringizer,
-    typename = std::enable_if_t<IsIterableV<Container>>
+    typename ValueStringizer
 >
 void join(
     BasicBuffer<char>* out,
@@ -1095,11 +1037,7 @@ void join(
         valueStringizer);
 }
 
-template<
-    typename InputIter,
-    typename RecordSeparator,
-    typename = std::enable_if_t<IsIteratorV<InputIter>>
->
+template<std::input_iterator InputIter, typename RecordSeparator>
 void join(
     BasicBuffer<char>* out,
     InputIter begin, InputIter end,
@@ -1108,11 +1046,7 @@ void join(
     detail::join(out, begin, end, recordSeparator);
 }
 
-template<
-    typename Container,
-    typename RecordSeparator,
-    typename = std::enable_if_t<IsIterableV<Container>>
->
+template<std::ranges::range Container, typename RecordSeparator>
 void join(
     BasicBuffer<char>* out,
     const Container& container,
@@ -1125,10 +1059,9 @@ void join(
  * Joins a sequence of values and returns the resulting string.
  */
 template<
-    typename InputIter,
+    std::input_iterator InputIter,
     typename RecordSeparator,
-    typename ValueStringizer,
-    typename = std::enable_if_t<IsIteratorV<InputIter>>
+    typename ValueStringizer
 >
 std::string join(
     InputIter begin, InputIter end,
@@ -1145,10 +1078,9 @@ std::string join(
 }
 
 template<
-    typename Container,
+    std::ranges::range Container,
     typename RecordSeparator,
-    typename ValueStringizer,
-    typename = std::enable_if_t<IsIterableV<Container>>
+    typename ValueStringizer
 >
 std::string join(
     const Container& container,
@@ -1164,11 +1096,7 @@ std::string join(
     return result;
 }
 
-template<
-    typename InputIter,
-    typename RecordSeparator,
-    typename = std::enable_if_t<IsIteratorV<InputIter>>
->
+template<std::input_iterator InputIter, typename RecordSeparator>
 std::string join(
     InputIter begin, InputIter end,
     const RecordSeparator& recordSeparator)
@@ -1181,11 +1109,7 @@ std::string join(
     return result;
 }
 
-template<
-    typename Container,
-    typename RecordSeparator,
-    typename = std::enable_if_t<IsIterableV<Container>>
->
+template<std::ranges::range Container, typename RecordSeparator>
 std::string join(
     const Container& container,
     const RecordSeparator& recordSeparator)
@@ -1251,7 +1175,7 @@ template<
 >
 std::basic_string<CharType> reverseWords(String<CharType> str, Separator separator)
 {
-    std::basic_string<CharType> reversed(std::move(str));
+    std::basic_string reversed(std::move(str));
     reverseWordsInplace(reversed, separator);
     return reversed;
 }
@@ -1315,7 +1239,7 @@ template<
 >
 std::basic_string<CharType> removeExcessSeparators(String<CharType> str, Separator separator)
 {
-    std::basic_string<CharType> result(std::move(str));
+    std::basic_string result(std::move(str));
     removeExcessSeparatorsInplace(result, separator);
     return result;
 }
@@ -1545,7 +1469,7 @@ inline double stod(
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename T, typename X = std::enable_if_t<std::is_integral_v<T>>>
+template<std::integral T>
 std::string to_string(T value, int base = 10)
 {
     std::string str(sizeof(value) * 3, '\0');
@@ -1554,7 +1478,7 @@ std::string to_string(T value, int base = 10)
     return str;
 }
 
-template<typename T, typename X = std::enable_if_t<std::is_floating_point_v<T>>>
+template<std::floating_point T>
 std::string to_string(T value)
 {
     return std::to_string(value);
@@ -1594,10 +1518,8 @@ inline BasicBuffer<char> toHex(const BasicBuffer<char>& str)
     return BasicBuffer<char>(toHex(std::string_view(str.data(), str.size())));
 }
 
-template <typename String>
-std::decay_t<String> toHex(
-    const String& str,
-    std::enable_if_t<IsConvertibleToStringViewV<std::decay_t<String>>>* = nullptr)
+template <traits::ToStringViewConvertible String>
+std::decay_t<String> toHex(const String& str)
 {
     return detail::toHex<String>(std::string_view(str.data(), (std::size_t) str.size()));
 }
@@ -1610,11 +1532,8 @@ inline std::string fromHex(const std::string_view& str)
         .toStdString();
 }
 
-template<typename Value>
-// requires std::is_unsigned_v<Value>
-std::string toHex(
-    Value value,
-    std::enable_if_t<std::is_unsigned_v<Value>>* = nullptr)
+template<std::unsigned_integral Value>
+std::string toHex(Value value)
 {
     static constexpr char kDigits[] = "0123456789abcdef";
     static constexpr std::size_t kMaxHexLen = sizeof(value) * 2;
@@ -1634,22 +1553,18 @@ std::string toHex(
  * Converts ASCII string to low case. Does not support UTF-8.
  */
 template<typename StringType>
+    requires std::is_class_v<StringType>
 // requires String<StringType>
-void toLower(
-    StringType* str,
-    std::enable_if_t<std::is_class_v<std::decay_t<StringType>>>* = nullptr)
+void toLower(StringType* str)
 {
     std::transform(str->begin(), str->end(), str->begin(), &tolower);
 }
 
 template<typename StringType>
+    requires (!std::same_as<std::string_view, StringType>)
+        && std::is_class_v<StringType>
 // requires String<RealStringType>
-auto toLower(
-    StringType&& str,
-    std::enable_if_t<
-        !std::is_same_v<std::decay_t<StringType>, std::string_view> &&
-        std::is_class_v<std::decay_t<StringType>>
-    >* = nullptr)
+auto toLower(StringType&& str)
 {
     using RealStringType = std::remove_cv_t<std::remove_reference_t<StringType>>;
 
@@ -1676,10 +1591,9 @@ void toUpper(StringType* str)
 }
 
 template<typename StringType>
+    requires (!std::same_as<std::string_view, StringType>)
 // requires String<RealStringType>
-auto toUpper(
-    StringType&& str,
-    std::enable_if_t<!std::is_same_v<std::decay_t<StringType>, std::string_view>>* = nullptr)
+auto toUpper(StringType&& str)
 {
     using RealStringType = std::remove_cv_t<std::remove_reference_t<StringType>>;
 
@@ -1748,50 +1662,6 @@ std::string replace(
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Comparator for case-sensitive comparison in STL associative containers.
- * Supports both std::string and std::string_view. Allows specifying std::string_view to find()
- * when dictionary uses std::string as a key type.
- */
-struct StringLessTransparentComp
-{
-    using is_transparent = std::true_type;
-
-    /** Case-independent (ci) compare_less binary function. */
-    bool operator() (const std::string& c1, const std::string& c2) const
-    {
-        return nx::utils::stricmp(c1, c2) < 0;
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // std::string_view support for lookup.
-
-    bool operator() (const std::string& c1, const std::string_view& c2) const
-    {
-        return nx::utils::stricmp(c1, c2) < 0;
-    }
-
-    bool operator() (const std::string_view& c1, const std::string& c2) const
-    {
-        return nx::utils::stricmp(c1, c2) < 0;
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // const char* support for lookup.
-
-    bool operator() (const std::string& c1, const char* c2) const
-    {
-        return nx::utils::stricmp(c1, c2) < 0;
-    }
-
-    bool operator() (const char* c1, const std::string& c2) const
-    {
-        return nx::utils::stricmp(c1, c2) < 0;
-    }
-};
-
-//-------------------------------------------------------------------------------------------------
-
-/**
  * Hash for std::unordered_*<std::string, ...> containers that enables find(const std::string_view&).
  */
 struct StringHashTransparent
@@ -1799,19 +1669,7 @@ struct StringHashTransparent
     using hash_type = std::hash<std::string_view>;
     using is_transparent = void;
 
-    size_t operator()(const char* str) const { return hash_type{}(str); }
     size_t operator()(std::string_view str) const { return hash_type{}(str); }
-    size_t operator()(std::string const& str) const { return hash_type{}(str); }
-};
-
-struct StringEqualToTransparent
-{
-    using is_transparent = void;
-
-    constexpr bool operator()(const std::string_view& lhs, const std::string_view& rhs) const
-    {
-        return lhs == rhs;
-    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -1826,33 +1684,7 @@ struct ci_less
     using is_transparent = std::true_type;
 
     /** Case-independent (ci) compare_less binary function. */
-    bool operator() (const std::string& c1, const std::string& c2) const
-    {
-        return nx::utils::stricmp(c1, c2) < 0;
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // std::string_view support for lookup.
-
-    bool operator() (const std::string& c1, const std::string_view& c2) const
-    {
-        return nx::utils::stricmp(c1, c2) < 0;
-    }
-
-    bool operator() (const std::string_view& c1, const std::string& c2) const
-    {
-        return nx::utils::stricmp(c1, c2) < 0;
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // const char* support for lookup.
-
-    bool operator() (const std::string& c1, const char* c2) const
-    {
-        return nx::utils::stricmp(c1, c2) < 0;
-    }
-
-    bool operator() (const char* c1, const std::string& c2) const
+    bool operator() (std::string_view c1, std::string_view c2) const
     {
         return nx::utils::stricmp(c1, c2) < 0;
     }

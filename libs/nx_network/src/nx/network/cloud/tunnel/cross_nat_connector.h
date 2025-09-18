@@ -17,7 +17,6 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/result_counter.h>
 #include <nx/utils/system_error.h>
-#include <nx/utils/type_utils.h>
 #include <nx/utils/elapsed_timer.h>
 
 #include "abstract_cross_nat_connector.h"

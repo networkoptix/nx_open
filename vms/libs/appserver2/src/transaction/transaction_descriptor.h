@@ -17,7 +17,6 @@
 #include <boost/multi_index_container.hpp>
 
 #include <nx/network/rest/user_access_data.h>
-#include <nx/utils/type_utils.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/camera_data.h>

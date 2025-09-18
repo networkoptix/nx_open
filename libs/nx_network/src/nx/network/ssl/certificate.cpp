@@ -20,9 +20,9 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
-#include <nx/utils/std_string_utils.h>
-#include <nx/utils/type_utils.h>
+#include <nx/utils/std/cppnx.h>
 
+#include <nx/utils/std_string_utils.h>
 #include "context.h"
 
 #if defined(Q_OS_IOS)
@@ -36,7 +36,7 @@ class CaStore
 public:
     CaStore()
     {
-        m_x509Store = nx::utils::wrapUnique(X509_STORE_new(), &X509_STORE_free);
+        m_x509Store = nx::wrapUnique(X509_STORE_new(), &X509_STORE_free);
 
         if (!NX_ASSERT(m_x509Store, "Unable to create certificate store"))
             return;
@@ -140,7 +140,7 @@ static std::string bioToString(BIO* bio)
 
 static QByteArray pemByteArray(X509* x509)
 {
-    const auto bio = nx::utils::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
+    const auto bio = nx::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
     if (NX_ASSERT(PEM_write_bio_X509(bio.get(), x509) == 1))
     {
         if (auto mem = bioBuffer(bio.get()))
@@ -154,7 +154,7 @@ static std::chrono::system_clock::time_point timePoint(const ASN1_TIME* asn1Time
     static const auto kZeroTime =
         []()
         {
-            auto zeroTime = nx::utils::wrapUnique(ASN1_TIME_new(), &ASN1_TIME_free);
+            auto zeroTime = nx::wrapUnique(ASN1_TIME_new(), &ASN1_TIME_free);
             ASN1_TIME_set(zeroTime.get(), 0);
             return zeroTime;
         }();
@@ -209,7 +209,7 @@ static Certificate::KeyInformation fillPublicKeyInformation(EVP_PKEY* pkey)
 template<typename Func>
 static void forEachSubjectAlternativeName(const X509* x509, Func&& f)
 {
-    const auto names = nx::utils::wrapUnique(
+    const auto names = nx::wrapUnique(
         (GENERAL_NAMES*) X509_get_ext_d2i(x509, NID_subject_alt_name, 0, 0),
         &GENERAL_NAMES_free);
     for (int i = 0; i < sk_GENERAL_NAME_num(names.get()); ++i)
@@ -254,7 +254,7 @@ static void fillHostsFromLastSubjectCommonName(const X509* x509, std::set<std::s
 static bool getSubjectAltNamesText(const X509* x509, std::string* result)
 {
     bool isOk = true;
-    const auto bio = nx::utils::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
+    const auto bio = nx::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
     forEachSubjectAlternativeName(x509, [&bio, &isOk](GENERAL_NAME* name)
         {
             if (!isOk)
@@ -369,7 +369,7 @@ std::vector<CertificateView::Extension> CertificateView::extensions() const
     {
         X509_EXTENSION* extention = X509_get_ext(x509(), i);
         const X509V3_EXT_METHOD* method = X509V3_EXT_get(extention);
-        const auto bio = nx::utils::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
+        const auto bio = nx::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
         X509V3_EXT_print(bio.get(), extention, /*flag*/ 0, /*indent*/ 0);
         const int critical = X509_EXTENSION_get_critical(extention);
         result.push_back({method ? method->ext_nid : NID_undef, bioToString(bio.get()), critical != 0});
@@ -399,7 +399,7 @@ std::string CertificateView::publicKey() const
     EVP_PKEY* pubKey = nullptr;
     if (!NX_ASSERT(pubKey = X509_get0_pubkey(x509())))
         return {};
-    const auto bio = nx::utils::wrapUnique(BIO_new(BIO_s_mem()), BIO_free);
+    const auto bio = nx::wrapUnique(BIO_new(BIO_s_mem()), BIO_free);
     if (!NX_ASSERT(PEM_write_bio_PUBKEY(bio.get(), pubKey) == 1))
         return {};
     return bioToString(bio.get());
@@ -431,7 +431,7 @@ std::vector<unsigned char> CertificateView::sha256() const
 
 std::string CertificateView::printedText() const
 {
-    auto output = nx::utils::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
+    auto output = nx::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
     X509_print_ex(output.get(), x509(), XN_FLAG_COMPAT, X509_FLAG_COMPAT);
     return bioToString(output.get());
 }
@@ -449,13 +449,13 @@ bool CertificateView::KeyInformation::operator==(const CertificateView::KeyInfor
 
 bool CertificateView::KeyInformation::parsePem(const std::string& str)
 {
-    auto bio = utils::wrapUnique(
+    auto bio = nx::wrapUnique(
         BIO_new_mem_buf(const_cast<void*>(static_cast<const void*>(str.c_str())), str.size()),
         BIO_free);
     if (!NX_ASSERT(!!bio))
         return false;
 
-    auto pkey = utils::wrapUnique(
+    auto pkey = nx::wrapUnique(
         PEM_read_bio_PUBKEY(bio.get(), nullptr, nullptr, nullptr),
         EVP_PKEY_free);
     if (!pkey)
@@ -523,11 +523,11 @@ X509Certificate& X509Certificate::operator=(const X509Certificate& certificate)
 bool X509Certificate::parsePem(
     const std::string& pem, std::optional<int> maxChainLength, std::string* errorMessage)
 {
-    auto bio = utils::wrapUnique(
+    auto bio = nx::wrapUnique(
         BIO_new_mem_buf(const_cast<void*>((const void*)pem.data()), pem.size()),
         &BIO_free);
 
-    auto x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+    auto x509 = nx::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
     auto certSize = i2d_X509(x509.get(), 0);
     if (!x509 || certSize <= 0)
     {
@@ -543,7 +543,7 @@ bool X509Certificate::parsePem(
     m_extraChainCerts.clear();
     for (int i = 1; ; ++i)
     {
-        x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+        x509 = nx::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
         certSize = i2d_X509(x509.get(), 0);
         if (!x509 || certSize <= 0)
             return true;
@@ -667,7 +667,7 @@ std::string X509Certificate::toString(const X509* x509)
     if (!x509)
         return "null";
 
-    auto subject = utils::wrapUnique(X509_NAME_oneline(
+    auto subject = nx::wrapUnique(X509_NAME_oneline(
         X509_get_subject_name(x509), NULL, 0), [](char* ptr) { free(ptr); });
 
     if (!subject || !subject.get())
@@ -679,7 +679,7 @@ std::string X509Certificate::toString(const X509* x509)
 
 std::string X509Certificate::toString(const ASN1_TIME* time)
 {
-    const auto bio = nx::utils::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
+    const auto bio = nx::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
     if (!NX_ASSERT(ASN1_TIME_print(bio.get(), time) == 1))
         return {};
     return bioToString(bio.get());
@@ -688,13 +688,13 @@ std::string X509Certificate::toString(const ASN1_TIME* time)
 std::string X509Certificate::pemString() const
 {
     std::string result;
-    const auto bio = nx::utils::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
+    const auto bio = nx::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
     if (!NX_ASSERT(PEM_write_bio_X509(bio.get(), m_x509.get()) == 1))
         return result;
     result = bioToString(bio.get());
     for (const auto& x509: m_extraChainCerts)
     {
-        const auto bio = nx::utils::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
+        const auto bio = nx::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
         if (!NX_ASSERT(PEM_write_bio_X509(bio.get(), x509.get()) == 1))
             break;
         result += bioToString(bio.get());
@@ -796,7 +796,7 @@ const X509Certificate& Pem::certificate() const
 
 bool Pem::loadPrivateKey(const std::string& pem, std::string* errorMessage, bool allowEcdsaCertificates)
 {
-    auto bio = utils::wrapUnique(
+    auto bio = nx::wrapUnique(
         BIO_new_mem_buf(pem.data(), (int) pem.size()),
         &BIO_free);
     if (!bio)
@@ -805,7 +805,7 @@ bool Pem::loadPrivateKey(const std::string& pem, std::string* errorMessage, bool
         return false;
     }
 
-    auto pkey = utils::wrapUnique(
+    auto pkey = nx::wrapUnique(
         PEM_read_bio_PrivateKey(bio.get(), nullptr, nullptr, nullptr),
         &EVP_PKEY_free);
     if (!pkey)
@@ -826,7 +826,7 @@ bool Pem::loadPrivateKey(const std::string& pem, std::string* errorMessage, bool
 
 static bool setIssuerOrSubject(X509* x509, const X509Name& issuerAndSubject, bool isIssuer)
 {
-    const auto name = utils::wrapUnique(X509_NAME_new(), &X509_NAME_free);
+    const auto name = nx::wrapUnique(X509_NAME_new(), &X509_NAME_free);
     if (!NX_ASSERT(name, "Failed to create new X509_NAME"))
         return false;
 
@@ -868,7 +868,7 @@ static bool setIssuerOrSubject(X509* x509, const X509Name& issuerAndSubject, boo
 
 static bool setDnsName(X509* x509, const std::string& dnsName)
 {
-    auto names = utils::wrapUnique(sk_GENERAL_NAME_new_null(), &GENERAL_NAMES_free);
+    auto names = nx::wrapUnique(sk_GENERAL_NAME_new_null(), &GENERAL_NAMES_free);
     if (!NX_ASSERT(names, "Failed to create new GENERAL_NAMES"))
         return false;
 
@@ -898,13 +898,13 @@ static bool setDnsName(X509* x509, const std::string& dnsName)
         std::string oneName(begin, end);
         auto [type, nameEntry] = parseEntry(oneName);
 
-        auto name = utils::wrapUnique(GENERAL_NAME_new(), &GENERAL_NAME_free);
+        auto name = nx::wrapUnique(GENERAL_NAME_new(), &GENERAL_NAME_free);
         if (!NX_ASSERT(name, "Failed to create new GENERAL_NAME"))
             return false;
 
         if (type == EntryType::dns)
         {
-            auto ia5String = utils::wrapUnique(ASN1_IA5STRING_new(), &ASN1_STRING_free);
+            auto ia5String = nx::wrapUnique(ASN1_IA5STRING_new(), &ASN1_STRING_free);
             if (!NX_ASSERT(ia5String, "Failed to create new ASN1_IA5STRING"))
                 return false;
 
@@ -915,7 +915,7 @@ static bool setDnsName(X509* x509, const std::string& dnsName)
         }
         else
         {
-            auto octetString = utils::wrapUnique(
+            auto octetString = nx::wrapUnique(
                 ASN1_OCTET_STRING_new(),
                 &ASN1_OCTET_STRING_free);
             if (!NX_ASSERT(octetString, "Failed to create new ASN1_OCTET_STRING"))
@@ -967,21 +967,21 @@ PKeyPtr generateKey(int length /*= kRsaLength*/)
 {
     PKeyPtr nullValue = PKeyPtr(nullptr, [](EVP_PKEY*) {});
 
-    auto number = utils::wrapUnique(BN_new(), &BN_free);
+    auto number = nx::wrapUnique(BN_new(), &BN_free);
     if (!number || !BN_set_word(number.get(), RSA_F4))
     {
         NX_WARNING(typeid(Certificate), "Unable to generate big number");
         return nullValue;
     }
 
-    auto rsa = utils::wrapUnique(RSA_new(), &RSA_free);
+    auto rsa = nx::wrapUnique(RSA_new(), &RSA_free);
     if (!rsa || !RSA_generate_key_ex(rsa.get(), length, number.get(), NULL))
     {
         NX_WARNING(typeid(Certificate), "Unable to generate RSA");
         return nullValue;
     }
 
-    auto pkey = utils::wrapUnique(EVP_PKEY_new(), &EVP_PKEY_free);
+    auto pkey = nx::wrapUnique(EVP_PKEY_new(), &EVP_PKEY_free);
     if (!pkey || !EVP_PKEY_assign_RSA(pkey.get(), rsa.release()))
     {
         NX_WARNING(typeid(Certificate), "Unable to generate PKEY");
@@ -1135,7 +1135,7 @@ std::string makeCertificate(
         serialNumber = nx::utils::random::number<long>();
 
     const time_t now = time(nullptr);
-    auto x509 = utils::wrapUnique(X509_new(), &X509_free);
+    auto x509 = nx::wrapUnique(X509_new(), &X509_free);
     if (!x509
         || !X509_set_version(x509.get(), 2) //< x509.v3
         || !ASN1_INTEGER_set(X509_get_serialNumber(x509.get()), *serialNumber)
@@ -1167,7 +1167,7 @@ std::string makeCertificate(
     const auto addExt =
         [&ctx, &x509](int nid, const char* value) -> bool
     {
-        auto ex = utils::wrapUnique(
+        auto ex = nx::wrapUnique(
             X509V3_EXT_conf_nid(nullptr, &ctx, nid, const_cast<char*>(value)),
             &X509_EXTENSION_free);
         if (ex && X509_add_ext(x509.get(), ex.get(), -1))
@@ -1228,7 +1228,7 @@ std::string makeCertificate(
     }
 
     std::string result;
-    const auto bio = utils::wrapUnique(BIO_new(BIO_s_mem()), BIO_free);
+    const auto bio = nx::wrapUnique(BIO_new(BIO_s_mem()), BIO_free);
     if (!bio
         || !PEM_write_bio_X509(bio.get(), x509.get())
         || !PEM_write_bio_PrivateKey(bio.get(), keyPair.get(), 0, 0, 0, 0, 0)
@@ -1429,7 +1429,7 @@ std::vector<Certificate> completeCertificateChain(STACK_OF(X509)* chain, bool* o
         return converted(chain);
     }
 
-    auto context = nx::utils::wrapUnique(X509_STORE_CTX_new(), &X509_STORE_CTX_free);
+    auto context = nx::wrapUnique(X509_STORE_CTX_new(), &X509_STORE_CTX_free);
     if (!NX_ASSERT(context))
     {
         NX_WARNING(NX_SCOPE_TAG,

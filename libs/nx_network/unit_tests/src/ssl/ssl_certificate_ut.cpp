@@ -2,9 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/uuid.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/network/ssl/context.h>
+#include <nx/utils/std/cppnx.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::network::ssl::test {
 
@@ -319,14 +320,14 @@ TEST(SslCertificate, CertificatesSignedBySamePrivateKeyHaveSamePublicKey)
 
 TEST(SslCertificate, VerifyBySystemCertificatesGood)
 {
-    auto bio = utils::wrapUnique(
+    auto bio = nx::wrapUnique(
         BIO_new_mem_buf((void*) kPublicPem.data(), kPublicPem.size()), &BIO_free);
-    auto chain = utils::wrapUnique(
+    auto chain = nx::wrapUnique(
         sk_X509_new(nullptr),
         [](STACK_OF(X509) * chain) { sk_X509_pop_free(chain, &X509_free); });
     for (int i = 0;; ++i)
     {
-        auto x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+        auto x509 = nx::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
         const int x509Size = i2d_X509(x509.get(), 0);
         if (!x509 || x509Size <= 0)
             break;
@@ -358,9 +359,9 @@ TEST(SslCertificate, VerifyBySystemCertificatesBad)
     Pem pem;
     ASSERT_TRUE(pem.parse(makeCertificateAndKey(kCertificateNameA)));
     const auto pemString = pem.certificate().pemString();
-    auto bio = utils::wrapUnique(BIO_new_mem_buf(pemString.data(), pemString.size()), &BIO_free);
-    auto x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
-    auto chain = utils::wrapUnique(
+    auto bio = nx::wrapUnique(BIO_new_mem_buf(pemString.data(), pemString.size()), &BIO_free);
+    auto x509 = nx::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+    auto chain = nx::wrapUnique(
         sk_X509_new(nullptr),
         [](STACK_OF(X509) * chain) { sk_X509_pop_free(chain, &X509_free); });
     sk_X509_insert(chain.get(), x509.release(), 0);

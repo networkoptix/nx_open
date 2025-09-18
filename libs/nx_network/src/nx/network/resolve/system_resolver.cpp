@@ -11,9 +11,9 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std/cppnx.h>
 #include <nx/utils/string.h>
 #include <nx/utils/system_error.h>
-#include <nx/utils/type_utils.h>
 
 namespace nx::network {
 
@@ -125,7 +125,7 @@ SystemError::ErrorCode SystemResolver::resolve(
     // it is unsafe to call it for unsuccessful `getaddrinfo` calls
     // however Valgrind shows that some unsuccessful calls may also fill `addrinfo`
     // so we use a special unique_ptr deleter for all cases
-    auto addressInfoGuard = nx::utils::wrapUnique(&addressInfo,
+    auto addressInfoGuard = nx::wrapUnique(&addressInfo,
         [](addrinfo** ppAddressInfo)
         {
             if (*ppAddressInfo)
