@@ -1353,28 +1353,6 @@ bool operator==(const nx::BasicBuffer<CharType>& left, const Other& right)
     return left.compare(right) == 0;
 }
 
-template<typename CharType, typename Other,
-    typename X = std::enable_if_t<!std::is_same_v<Other, nx::BasicBuffer<CharType>>>
->
-bool operator==(const Other& left, const nx::BasicBuffer<CharType>& right)
-{
-    return right.compare(left) == 0;
-}
-
-template<typename CharType, typename Other>
-bool operator!=(const nx::BasicBuffer<CharType>& left, const Other& right)
-{
-    return left.compare(right) != 0;
-}
-
-template<typename CharType, typename Other,
-    typename X = std::enable_if_t<!std::is_same_v<Other, nx::BasicBuffer<CharType>>>
->
-bool operator!=(const Other& left, const nx::BasicBuffer<CharType>& right)
-{
-    return right.compare(left) != 0;
-}
-
 template<typename CharType, typename Other>
 bool operator<(const nx::BasicBuffer<CharType>& left, const Other& right)
 {

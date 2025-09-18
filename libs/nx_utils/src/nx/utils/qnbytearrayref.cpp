@@ -217,40 +217,10 @@ bool operator==(const QnByteArrayConstRef& left, const QByteArray& right)
     return memcmp(left.constData(), right.constData(), left.size()) == 0;
 }
 
-bool operator==(const QByteArray& left, const QnByteArrayConstRef& right)
-{
-    return right == left;
-}
-
-bool operator!=(const QnByteArrayConstRef& left, const QByteArray& right)
-{
-    return !(left == right);
-}
-
-bool operator!=(const QByteArray& left, const QnByteArrayConstRef& right)
-{
-    return !(left == right);
-}
-
 bool operator==(const QnByteArrayConstRef::const_pointer& left, const QnByteArrayConstRef& right)
 {
     const size_t leftLen = strlen(left);
     if (leftLen != right.size())
         return false;
     return memcmp(left, right.constData(), leftLen) == 0;
-}
-
-bool operator!=(const QnByteArrayConstRef::const_pointer& left, const QnByteArrayConstRef& right)
-{
-    return !(left == right);
-}
-
-bool operator==(const QnByteArrayConstRef& left, const QnByteArrayConstRef::const_pointer& right)
-{
-    return right == left;
-}
-
-bool operator!=(const QnByteArrayConstRef& left, const QnByteArrayConstRef::const_pointer& right)
-{
-    return right != left;
 }

@@ -1868,56 +1868,14 @@ struct ci_less
 inline bool operator==(const QByteArray& left, const std::string_view& right)
 { return left == QByteArray::fromRawData(right.data(), (int)right.size()); }
 
-inline bool operator==(const std::string_view& left, const QByteArray& right)
-{ return right == left; }
-
-inline bool operator!=(const QByteArray& left, const std::string_view& right)
-{ return !(left == right); }
-
-inline bool operator!=(const std::string_view& left, const QByteArray& right)
-{ return !(left == right); }
-
 inline bool operator==(const QByteArray& left, const std::string& right)
 { return left == QByteArray::fromRawData(right.data(), (int)right.size()); }
-
-inline bool operator==(const std::string& left, const QByteArray& right)
-{ return right == left; }
-
-inline bool operator!=(const QByteArray& left, const std::string& right)
-{ return !(left == right); }
-
-inline bool operator!=(const std::string& left, const QByteArray& right)
-{ return !(left == right); }
-
-//-------------------------------------------------------------------------------------------------
-// QString vs std::string
 
 inline bool operator==(const QString& left, const std::string& right)
 { return left == right.c_str(); }
 
-inline bool operator==(const std::string& left, const QString& right)
-{ return right == left; }
-
-inline bool operator!=(const QString& left, const std::string& right)
-{ return !(left == right); }
-
-inline bool operator!=(const std::string& left, const QString& right)
-{ return !(left == right); }
-
-//-------------------------------------------------------------------------------------------------
-// QString vs std::string_view
-
 inline bool operator==(const QString& left, const std::string_view& right)
 { return left == QByteArray::fromRawData(right.data(), (int) right.size()); }
-
-inline bool operator==(const std::string_view& left, const QString& right)
-{ return right == left; }
-
-inline bool operator!=(const QString& left, const std::string_view& right)
-{ return !(left == right); }
-
-inline bool operator!=(const std::string_view& left, const QString& right)
-{ return !(left == right); }
 
 //-------------------------------------------------------------------------------------------------
 // std::string_view vs const char*. Needed since previous introducing "QString == std::string_view"
@@ -1925,14 +1883,5 @@ inline bool operator!=(const std::string_view& left, const QString& right)
 
 inline bool operator==(const std::string_view& left, const char* right)
 { return left == std::string_view(right); }
-
-inline bool operator==(const char* left, const std::string_view& right)
-{ return right == left; }
-
-inline bool operator!=(const char* left, const std::string_view& right)
-{ return !(left == right); }
-
-inline bool operator!=(const std::string_view& left, const char* right)
-{ return !(left == right); }
 
 #endif // #if defined(QT_CORE_LIB)

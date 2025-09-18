@@ -105,11 +105,6 @@ public:
         return static_cast<const base_type&>(*this) == nullptr;
     }
 
-    bool operator!=(std::nullptr_t) const
-    {
-        return !(*this == nullptr);
-    }
-
     void swap(MoveOnlyFunc& other)
     {
         base_type::swap(static_cast<base_type&>(other));

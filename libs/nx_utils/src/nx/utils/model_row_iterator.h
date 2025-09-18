@@ -56,7 +56,6 @@ public:
     ModelRowIterator operator--(int);
 
     bool operator==(const ModelRowIterator& other) const;
-    bool operator!=(const ModelRowIterator& other) const { return !operator==(other); }
 
     int row() const { return m_row; }
     QModelIndex index() const;

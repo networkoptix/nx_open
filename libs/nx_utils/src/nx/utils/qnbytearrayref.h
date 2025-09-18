@@ -68,9 +68,6 @@ private:
 };
 
 bool NX_UTILS_API operator==(const QnByteArrayConstRef& left, const QByteArray& right);
-bool NX_UTILS_API operator!=(const QnByteArrayConstRef& left, const QByteArray& right);
-bool NX_UTILS_API operator==(const QByteArray& left, const QnByteArrayConstRef& right);
-bool NX_UTILS_API operator!=(const QByteArray& left, const QnByteArrayConstRef& right);
 
 /**
  * @param left 0-terminated string.
@@ -78,15 +75,3 @@ bool NX_UTILS_API operator!=(const QByteArray& left, const QnByteArrayConstRef& 
 bool NX_UTILS_API operator==(
     const QnByteArrayConstRef::const_pointer& left,
     const QnByteArrayConstRef& right);
-
-bool NX_UTILS_API operator!=(
-    const QnByteArrayConstRef::const_pointer& left,
-    const QnByteArrayConstRef& right);
-
-bool NX_UTILS_API operator==(
-    const QnByteArrayConstRef& left,
-    const QnByteArrayConstRef::const_pointer& right);
-
-bool NX_UTILS_API operator!=(
-    const QnByteArrayConstRef& left,
-    const QnByteArrayConstRef::const_pointer& right);
