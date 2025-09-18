@@ -12,12 +12,12 @@ public:
     /**
      * Construct crop filter with fixed size
      */
-    QnCropImageFilter(const QRect& rect, bool alignSize = true);
+    QnCropImageFilter(const QRect& rect, bool alignSize = true, bool deepCopy = true);
 
     /**
      * Construct crop filter with dynamic size, measured in parts [0..1] of a source frame size
      */
-    QnCropImageFilter(const QRectF& rect, bool alignSize = true);
+    QnCropImageFilter(const QRectF& rect, bool alignSize = true, bool deepCopy = true);
 
     virtual CLVideoDecoderOutputPtr updateImage(
         const CLVideoDecoderOutputPtr& frame,
@@ -26,6 +26,7 @@ public:
     virtual QSize updatedResolution(const QSize& srcSize) override;
 
 private:
+    const bool m_deepCopy;
     bool m_alignSize;
     QRectF m_rectF;
     QRect m_rect;

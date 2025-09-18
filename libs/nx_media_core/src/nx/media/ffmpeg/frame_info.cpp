@@ -274,9 +274,8 @@ bool CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     height = newHeight;
     format = newFormat;
 
-    int status = av_image_alloc(
-        data, linesize, newWidth, newHeight, (AVPixelFormat)newFormat, CL_MEDIA_ALIGNMENT);
-    if (status <= 0)
+    int status = av_frame_get_buffer(this, 0);
+    if (status < 0)
     {
         NX_WARNING(this, "Failed to allocate frame: %1x%2, format: %3", width, height, format);
         return false;
@@ -391,18 +390,25 @@ QImage CLVideoDecoderOutput::toImage() const
     if (width == 0 || height == 0)
         return {};
 
-    CLVideoDecoderOutput target(width, height, AV_PIX_FMT_RGB32);
+    uint8_t* imageData[4];
+    int imageLinesize[4];
+    int status = av_image_alloc(
+        imageData, imageLinesize, width, height, AV_PIX_FMT_RGB32, CL_MEDIA_ALIGNMENT);
+
+    if (status <= 0)
+    {
+         NX_WARNING(this, "Failed to allocate frame: %1x%2, format: %3", width, height, format);
+         return {};
+    }
 
     if (!convertImageFormat(width, height, data, linesize, static_cast<AVPixelFormat>(format),
-        target.data, target.linesize, AV_PIX_FMT_RGB32, /*logTag*/ this))
+        imageData, imageLinesize, AV_PIX_FMT_RGB32, /*logTag*/ this))
     {
         return {};
     }
 
-    QImage result(target.data[0], width, height, target.linesize[0], QImage::Format_RGB32,
-        av_free, target.data[0]);
-
-    target.data[0] = nullptr;
+    QImage result(imageData[0], width, height, imageLinesize[0], QImage::Format_RGB32,
+        av_free, imageData[0]);
 
     return result;
 }
