@@ -180,6 +180,15 @@ bool MediaResourceHelper::crossSystemOnline() const
     return d->crossSystem->systemDescription() && d->crossSystem->systemDescription()->isOnline();
 }
 
+bool MediaResourceHelper::is2FaEnabled() const
+{
+    if (!d->crossSystem)
+        return false;
+
+    return d->crossSystem->systemDescription()
+        && d->crossSystem->systemDescription()->is2FaEnabled();
+}
+
 QString MediaResourceHelper::qualifiedResourceName() const
 {
     return crossSystemName().isEmpty()
@@ -308,6 +317,10 @@ void MediaResourceHelper::Private::handleResourceChanged()
                 connect(crossSystem->systemDescription().get(),
                     &SystemDescription::onlineStateChanged,
                     q, &MediaResourceHelper::crossSystemOnlineChanged);
+
+                connect(crossSystem->systemDescription().get(),
+                    &SystemDescription::system2faEnabledChanged,
+                    q, &MediaResourceHelper::is2FaEnabledChanged);
             }
         }
     }
@@ -323,6 +336,7 @@ void MediaResourceHelper::Private::handleResourceChanged()
     emit q->livePreviewVideoQualityChanged();
     emit q->needsCloudAuthorizationChanged();
     emit q->crossSystemNameChanged();
+    emit q->is2FaEnabledChanged();
 }
 
 } // namespace nx::vms::client::core

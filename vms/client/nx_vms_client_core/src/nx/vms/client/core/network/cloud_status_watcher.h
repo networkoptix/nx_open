@@ -35,6 +35,7 @@ class NX_VMS_CLIENT_CORE_API CloudStatusWatcher:
     Q_PROPERTY(ErrorCode error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool isCloudEnabled READ isCloudEnabled NOTIFY isCloudEnabledChanged)
     Q_PROPERTY(QString cloudLogin READ cloudLogin NOTIFY cloudLoginChanged)
+    Q_PROPERTY(bool is2FaEnabledForUser READ is2FaEnabledForUser NOTIFY is2FaEnabledForUserChanged)
 
 public:
     enum ErrorCode

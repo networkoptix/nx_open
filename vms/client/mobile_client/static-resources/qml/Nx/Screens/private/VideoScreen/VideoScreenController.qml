@@ -53,6 +53,8 @@ NxObject
             && (resource?.flags & ResourceFlag.fake))
     readonly property bool mediaLoading:
         mediaPlayer.mediaStatus === MediaPlayer.MediaStatus.Loading
+    readonly property bool is2FaDisabled: !appContext.cloudStatusWatcher.is2FaEnabledForUser
+        && resourceHelper.is2FaEnabled
 
     readonly property string dummyState:
     {
@@ -64,6 +66,8 @@ NxObject
             return "oldFirmwareAlert"
         if (needsCloudAuthorization && !systemConnecting)
             return "needsCloudAuthorization"
+        if (is2FaDisabled)
+            return "is2FaDisabled"
         if (systemConnecting)
             return "systemConnecting"
         if (cameraOffline)
