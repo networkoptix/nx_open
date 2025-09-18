@@ -2,8 +2,6 @@
 
 #include "bookmark_models.h"
 
-#include <QStringRef>
-
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/cryptographic_hash.h>
 
@@ -77,7 +75,7 @@ std::chrono::milliseconds BookmarkProtection::getSyncTime(const QString& protect
     if (!p)
         return {};
 
-    return std::chrono::milliseconds(QStringRef(&protection, 0, *p).toLongLong());
+    return std::chrono::milliseconds(QStringView(protection.data(), *p).toLongLong());
 }
 
 QString BookmarkProtection::getProtection(
