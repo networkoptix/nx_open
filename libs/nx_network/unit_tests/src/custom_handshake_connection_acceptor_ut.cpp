@@ -10,6 +10,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/cppnx.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/timer_manager.h>
 
@@ -340,7 +341,7 @@ private:
 
         m_acceptedConnections.push(AcceptResult{
             systemErrorCode,
-            nx::utils::static_unique_ptr_cast<TestSocket>(std::move(streamSocket))});
+            nx::static_unique_ptr_cast<TestSocket>(std::move(streamSocket))});
 
         m_acceptor->acceptAsync(
             std::bind(&CustomHandshakeConnectionAcceptor::saveAcceptedConnection, this, _1, _2));

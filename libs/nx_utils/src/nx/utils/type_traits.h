@@ -3,9 +3,10 @@
 #pragma once
 
 #include <functional>
+#include <string_view>
 #include <type_traits>
 
-namespace nx::utils {
+namespace nx::traits {
 
 namespace detail {
 
@@ -29,58 +30,24 @@ struct Is_template_type_size_t<T, T<F, S>>: std::true_type
 {
 };
 
-// using nx::utils::model::getId;
-// using nx::utils::model::setId;
-
 } // namespace detail
-
-template<typename T, typename = void>
-struct isIterable: std::false_type {};
-
-template<typename T>
-struct isIterable<
-    T,
-    std::void_t<
-        decltype(std::begin(std::declval<T>())),
-        decltype(std::end(std::declval<T>()))
-    >
->: std::true_type {};
-
-template<typename... U> inline constexpr bool IsIterableV = isIterable<U...>::value;
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename T, typename = void>
-struct IsIterator: std::false_type {};
-
-template<typename T>
-struct IsIterator<T, std::void_t<typename std::iterator_traits<T>::value_type>>: std::true_type {};
-
-template<typename... U> inline constexpr bool IsIteratorV = IsIterator<U...>::value;
-
 template<template<typename...> class Template, typename T>
-constexpr bool Is()
+constexpr bool is()
 {
     return detail::Is_template<Template, T>{};
 }
 
 template<template<typename, size_t> class Template, typename T>
-constexpr bool Is()
+constexpr bool is()
 {
     return detail::Is_template_type_size_t<Template, T>{};
 }
 
-template<typename T, typename = void>
-struct IsKeyValueContainer: std::false_type
-{
-};
-
-template<typename T>
-struct IsKeyValueContainer<T,
-    std::void_t<decltype(std::declval<T>().begin()->first),
-        decltype(std::declval<T>().begin()->second)>>: std::true_type
-{
-};
+template <typename T, template <typename...> class Template>
+concept TemplateLike = is<Template, T>();
 
 template<auto>
 struct FunctionTraits;
@@ -107,4 +74,10 @@ struct FunctionTraits<MemberPtr>
     using ArgumentType = std::tuple_element_t<I, ArgumentsList>;
 };
 
-} // namespace nx::utils
+template <auto FunctionPtr, size_t I>
+using FunctionArgumentType = typename FunctionTraits<FunctionPtr>::template ArgumentType<I>;
+
+template<typename T>
+concept ToStringViewConvertible = requires(const T& t) { std::string_view(t.data(), t.size()); };
+
+} // namespace nx::traits

@@ -3,11 +3,12 @@
 #include "scrypt.h"
 
 #include "log/log.h"
-#include "type_utils.h"
 #include "string.h"
 
 #include <openssl/evp.h>
 #include <openssl/kdf.h>
+
+#include <nx/utils/std/cppnx.h>
 
 namespace nx::scrypt {
 
@@ -18,7 +19,7 @@ bool Options::operator==(const Options& rhs) const
 
 static auto makeContext(const Options& options)
 {
-    auto context = nx::utils::wrapUnique(
+    auto context = nx::wrapUnique(
         EVP_PKEY_CTX_new_id(EVP_PKEY_SCRYPT, NULL),
         &EVP_PKEY_CTX_free);
 

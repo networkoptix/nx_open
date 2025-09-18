@@ -77,7 +77,7 @@ public:
             [this, &request, id, &processor](const auto& readType)
             {
                 using Arg = std::decay_t<decltype(readType)>;
-                using Output = std::conditional_t<nx::utils::Is<std::vector, Arg>(), Arg, std::vector<Arg>>;
+                using Output = std::conditional_t<nx::traits::is<std::vector, Arg>(), Arg, std::vector<Arg>>;
                 return processor.template processQueryAsync<decltype(id), Output>(
                     getReadCommand<Output>(),
                     std::move(id),
@@ -355,7 +355,7 @@ protected:
                 using DbType = std::decay_t<decltype(x)>;
                 Result result;
                 assertModelToDbTypesProducedValidResult<IgnoredDbType, DbType, Model>(x, id);
-                if constexpr (nx::utils::Is<std::vector, DbType>())
+                if constexpr (nx::traits::is<std::vector, DbType>())
                 {
                     const auto command = getUpdateCommand<std::decay_t<decltype(x[0])>>();
                     result = copy.template processMultiUpdateSync<DbType>(
@@ -384,7 +384,7 @@ protected:
                     std::move(items),
                     [update = std::move(update), &copy, list](auto&& item)
                     {
-                        if constexpr (nx::utils::Is<std::optional, std::decay_t<decltype(item)>>())
+                        if constexpr (nx::traits::is<std::optional, std::decay_t<decltype(item)>>())
                             return item ? update(std::move(*item), copy, list) : Result();
                         else
                             return update(std::move(item), copy, list);
@@ -419,7 +419,7 @@ protected:
         switch (notifyType)
         {
             case NotifyType::update:
-                using List = typename nx::utils::FunctionTraits<&Derived::read>::ReturnType;
+                using List = typename nx::traits::FunctionTraits<&Derived::read>::ReturnType;
                 using Data = typename List::value_type;
                 SubscriptionHandler::notifyWithPayload<Data>(id, notifyType, std::move(user),
                     [this, id, noEtag](const auto& user)

@@ -9,8 +9,6 @@
 
 #include <QtCore/QByteArray>
 
-#include <nx/utils/type_utils.h>
-
 namespace nx::utils::auth {
 
 /**

@@ -10,7 +10,7 @@
 
 #include <QtCore/QString>
 
-#include <nx/utils/type_utils.h>
+#include <nx/utils/std/cppnx.h>
 #include <nx/utils/std_string_utils.h>
 
 #if defined(ENABLE_SSL)
@@ -21,7 +21,7 @@ namespace {
 
 static SecCertificateRef x509ToSecCertificate(X509* x509)
 {
-    const auto bio = nx::utils::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
+    const auto bio = nx::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
     if (i2d_X509_bio(bio.get(), x509) == 0)
         return nullptr;
 

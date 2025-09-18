@@ -4,7 +4,7 @@
 
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/type_utils.h>
+#include <nx/utils/std/cppnx.h>
 
 #include "buffer_source.h"
 
@@ -151,7 +151,7 @@ bool HttpClient::doPatch(
         {
             client->doPatch(
                 url,
-                nx::utils::static_unique_ptr_cast<AbstractMsgBodySource>(std::move(body)));
+                nx::static_unique_ptr_cast<AbstractMsgBodySource>(std::move(body)));
         });
 }
 

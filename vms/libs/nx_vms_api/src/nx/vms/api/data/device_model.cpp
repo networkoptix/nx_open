@@ -59,7 +59,7 @@ struct ExtractParameterToField
         auto* toField =
             [](Field& value)
             {
-                if constexpr (nx::utils::Is<std::optional, Field>())
+                if constexpr (nx::traits::is<std::optional, Field>())
                     return std::addressof(value.emplace());
                 else
                     return std::addressof(value);
@@ -90,7 +90,7 @@ struct MapFieldToParameter
         std::mem_fn(memPtr)(from);
         const auto& fieldValue = std::mem_fn(memPtr)(&from);
 
-        if constexpr (nx::utils::Is<std::optional, std::decay_t<Field>>())
+        if constexpr (nx::traits::is<std::optional, std::decay_t<Field>>())
         {
             if (!fieldValue)
                 return;

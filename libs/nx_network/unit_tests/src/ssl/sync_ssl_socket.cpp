@@ -5,7 +5,7 @@
 #include <openssl/err.h>
 
 #include <nx/network/ssl/context.h>
-#include <nx/utils/type_utils.h>
+#include <nx/utils/std/cppnx.h>
 
 namespace nx::network::ssl::test {
 
@@ -108,7 +108,7 @@ static int sock_free(BIO *bio)
 
 static std::unique_ptr<BIO_METHOD, decltype(&BIO_meth_free)> createBioMethod()
 {
-    auto bioMethod = utils::wrapUnique(
+    auto bioMethod = nx::wrapUnique(
         BIO_meth_new(BIO_TYPE_SOCKET, "SyncSslSocket"),
         &BIO_meth_free);
     BIO_meth_set_write(bioMethod.get(), &sock_write);
@@ -145,7 +145,7 @@ SyncSslSocket::SyncSslSocket(
     BIO_set_app_data(writeBio, this);
     BIO_set_nbio(writeBio, 1);
 
-    m_ssl = utils::wrapUnique(
+    m_ssl = nx::wrapUnique(
         SSL_new(m_isServerSide
             ? Context::instance()->defaultServerContext().get()
             : Context::instance()->clientContext().get()),

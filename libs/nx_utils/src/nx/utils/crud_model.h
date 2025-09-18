@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <map>
 #include <type_traits>
 
 #include <nx/utils/member_detector.h>
+#include <nx/utils/std/ranges.h>
 #include <nx/utils/type_traits.h>
 #include <nx/utils/uuid.h>
 
@@ -62,7 +62,8 @@ struct CanAssignIdField<T,
  */
 template<typename T,
     typename = std::enable_if_t<detail::DoesMemberExist_getId<T>::value
-        || detail::DoesMemberExist_id<T>::value || utils::IsKeyValueContainer<T>()>>
+        || detail::DoesMemberExist_id<T>::value
+        || ranges::PairLikeRange<T>>>
 decltype(auto) getId(const T& t)
 {
     if constexpr (detail::DoesMemberExist_getId<T>::value)

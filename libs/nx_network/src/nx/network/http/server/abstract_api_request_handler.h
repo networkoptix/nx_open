@@ -4,11 +4,10 @@
 
 #include <type_traits>
 
-#include <nx/utils/type_utils.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/http/server/http_message_dispatcher.h>
 
-#include "../http_types.h"
 #include "detail/abstract_api_request_handler_detail.h"
-#include "http_message_dispatcher.h"
 
 namespace nx::network::http {
 
@@ -21,16 +20,11 @@ namespace nx::network::http {
  * NOTE: GET request input data is always deserialized from url query.
  * NOTE: POST request output data is ignored.
  */
-template<typename... Input>
-// requires sizeof...(Input) <= 1
+template<typename Input>
 class AbstractApiRequestHandler:
-    public detail::BaseApiRequestHandler<
-        nx::utils::tuple_first_element_t<std::tuple<Input...>, void>,
-        AbstractApiRequestHandler<Input...>>
+    public detail::BaseApiRequestHandler<Input, AbstractApiRequestHandler<Input>>
 {
-    using base_type = detail::BaseApiRequestHandler<
-        nx::utils::tuple_first_element_t<std::tuple<Input...>, void>,
-        AbstractApiRequestHandler<Input...>>;
+    using base_type = typename AbstractApiRequestHandler::BaseApiRequestHandler;
 
 public:
     using base_type::processRequest;
@@ -43,26 +37,16 @@ public:
      */
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
-        Input... inputData) = 0;
-
-    /**
-     * Call this method when processed request. outputData argument is missing when Output is void.
-     * This method is here just for information purpose. Defined in a base class.
-     */
-    //void requestCompleted(
-    //    ApiRequestResult result,
-    //    Output... output);
+        Input inputData) = 0;
 };
 
+// NX_NETWORK_API export/import macro is needed to avoid Multiple Definitions errors, since this is
+// a full template specialization (an actual class, not a template).
 template<>
-class AbstractApiRequestHandler<void>:
-    public detail::BaseApiRequestHandler<
-        void,
-        AbstractApiRequestHandler<void>>
+class NX_NETWORK_API AbstractApiRequestHandler<void>:
+    public detail::BaseApiRequestHandler<void, AbstractApiRequestHandler<void>>
 {
-    using base_type = detail::BaseApiRequestHandler<
-        void,
-        AbstractApiRequestHandler<void>>;
+    using base_type = BaseApiRequestHandler;
 
 public:
     using base_type::processRequest;
@@ -74,13 +58,11 @@ public:
     virtual void processRequest(http::RequestContext requestContext) = 0;
 };
 
-//class NX_NETWORK_API NoInputApiRequestHandler: public AbstractApiRequestHandler<void> {};
-
 //-------------------------------------------------------------------------------------------------
 
 template<typename Func>
 class CustomApiRequestHandler:
-    public AbstractApiRequestHandler<>
+    public AbstractApiRequestHandler<void>
 {
 public:
     CustomApiRequestHandler() = default;

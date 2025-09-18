@@ -410,7 +410,7 @@ namespace QJsonDetail {
         std::variant<Args...>* target)
     {
         ctx->resetFailedKeyValue();
-        static_assert(!nx::utils::Is<std::optional, T>());
+        static_assert(!nx::traits::is<std::optional, T>());
         if constexpr (std::is_same<std::nullptr_t, T>::value)
         {
             if (value.isNull())

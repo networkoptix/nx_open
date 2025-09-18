@@ -5,7 +5,6 @@
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/type_utils.h>
 
 #include "../relay_api_client.h"
 
@@ -135,7 +134,7 @@ void BasicClient::issueUpgradeRequest(
     std::initializer_list<RequestPathArgument> requestPathArguments,
     CompletionHandler completionHandler)
 {
-    using ResponseOrVoid = nx::utils::tuple_first_element_t<std::tuple<Response...>>;
+    using ResponseOrVoid = std::tuple_element_t<0, std::tuple<Response..., void>>;
 
     auto httpClient = prepareHttpRequest<Request, ResponseOrVoid>(
         std::move(request),

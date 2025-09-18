@@ -11,7 +11,6 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/type_utils.h>
 #include <nx/utils/url.h>
 #include <nx/utils/url_query.h>
 
@@ -403,12 +402,12 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRe
     auto httpClient = acquireClient();
 
     auto request = std::apply(
-        [this, &requestPath, &urlQuery, &httpClient](auto&&... inputArgs)
+        [this, &requestPath, &urlQuery, &httpClient]<typename... T>(T&&... inputArgs)
         {
             return this->template createHttpClient<Output, SerializationLibWrapper>(
                 std::move(httpClient),
                 network::url::Builder(m_baseApiUrl).appendPath(requestPath).setQuery(urlQuery),
-                std::forward<decltype(inputArgs)>(inputArgs)...);
+                std::forward<T>(inputArgs)...);
         },
         argsTuple);
 
@@ -529,7 +528,7 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::createHttpClient(
     const Url& url,
     Args&&... args)
 {
-    using InputParamType = nx::utils::tuple_first_element_t<std::tuple<std::decay_t<Args>...>>;
+    using InputParamType = std::tuple_element_t<0, std::tuple<std::decay_t<Args>..., void>>;
 
     auto httpClient = std::make_unique<
         network::http::FusionDataHttpClient<InputParamType, Output, SerializationLibWrapper>>(

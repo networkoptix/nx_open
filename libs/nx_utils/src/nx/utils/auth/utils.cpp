@@ -2,10 +2,11 @@
 
 #include "utils.h"
 
-#include <openssl/hmac.h>
 #include <QCryptographicHash>
 
-#include <nx/utils/type_utils.h>
+#include <openssl/hmac.h>
+
+#include <nx/utils/std/cppnx.h>
 
 namespace nx::utils::auth {
 
@@ -142,7 +143,7 @@ Buffer hmacSha1(
     unsigned int len = 0;
     Buffer result(20, 0);
 
-    auto ctx = utils::wrapUnique(HMAC_CTX_new(), &HMAC_CTX_free);
+    auto ctx = nx::wrapUnique(HMAC_CTX_new(), &HMAC_CTX_free);
     HMAC_Init_ex(ctx.get(), key.data(), key.size(), EVP_sha1(), nullptr);
     for (const auto& part: messageParts)
         HMAC_Update(ctx.get(), (const unsigned char*) part.data(), part.size());
@@ -157,7 +158,7 @@ Buffer hmacSha256(const std::string_view& key, const std::string_view& baseStrin
     unsigned int len;
     Buffer result(32, 0);
 
-    auto ctx = utils::wrapUnique(HMAC_CTX_new(), &HMAC_CTX_free);
+    auto ctx = nx::wrapUnique(HMAC_CTX_new(), &HMAC_CTX_free);
     HMAC_Init_ex(ctx.get(), key.data(), key.size(), EVP_sha256(), nullptr);
     HMAC_Update(ctx.get(), (const unsigned char*) baseString.data(), baseString.size());
     HMAC_Final(ctx.get(), (unsigned char*) &*result.begin(), &len);

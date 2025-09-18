@@ -12,7 +12,7 @@
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/tags.h>
 #include <nx/utils/system_error.h>
-#include <nx/utils/type_utils.h>
+#include <nx/utils/type_traits.h>
 
 // TODO: #skolesnik Move all related conversion functions to separate header.
 // very error prone
@@ -100,10 +100,8 @@ public:
      * NOTE: This constructor works with any type that has "const char* data()" and "size()".
      * E.g., QByteArray.
      */
-    template<typename String>
-    HostAddress(
-        const String& str,
-        std::enable_if_t<nx::utils::IsConvertibleToStringViewV<String>>* = nullptr)
+    template<nx::traits::ToStringViewConvertible String>
+    HostAddress(const String& str)
         :
         HostAddress(std::string_view(str.data(), (std::size_t) str.size()))
     {
@@ -247,10 +245,8 @@ public:
      * NOTE: This constructor works with any type that has "const char* data()" and "size()".
      * E.g., QByteArray.
      */
-    template<typename String>
-    SocketAddress(
-        const String& endpointStr,
-        std::enable_if_t<nx::utils::IsConvertibleToStringViewV<String>>* = nullptr)
+    template<nx::traits::ToStringViewConvertible String>
+    SocketAddress(const String& endpointStr)
         :
         SocketAddress(std::string_view(endpointStr.data(), (std::size_t) endpointStr.size()))
     {

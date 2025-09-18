@@ -267,26 +267,6 @@ constexpr bool IsStdChronoTimePointV = IsStdChronoTimePoint<Args...>::value;
 
 //-------------------------------------------------------------------------------------------------
 
-namespace detail {
-
-template<typename Func>
-struct EachFieldVisitor
-{
-    template<typename F>
-    EachFieldVisitor(F&& f): m_f(std::forward<F>(f)) {}
-
-    template<typename... Fields>
-    constexpr void operator()(Fields... fields)
-    {
-        (m_f(fields), ...);
-    }
-
-private:
-    Func m_f;
-};
-
-} // namespace detail
-
 /**
  * Invokes f on each field of an instrumented type T.
  * Field is passed as either nx::reflect::WrappedMemberVariableField or nx::reflect::WrappedProperty.
@@ -296,7 +276,10 @@ requires IsInstrumentedV<T>
 void forEachField(Func&& f)
 {
     nx::reflect::visitAllFields<T>(
-        detail::EachFieldVisitor<std::decay_t<Func>>(std::forward<Func>(f)));
+        [f = std::forward<Func>(f)]<typename... Fields>(Fields&&... fields) mutable
+        {
+            (f(std::forward<Fields>(fields)), ...);
+        });
 }
 
 template<typename C, typename T>

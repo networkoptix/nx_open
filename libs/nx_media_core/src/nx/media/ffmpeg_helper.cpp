@@ -16,7 +16,6 @@
 #include <nx/media/video_data_packet.h>
 #include <nx/utils/bit_stream.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/type_utils.h>
 
 extern "C" {
 #include <libavutil/error.h>
