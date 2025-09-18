@@ -691,8 +691,8 @@ distrib_copyServerBins() # additional_bins_to_copy...
         install -m 640 "${system_commands_conf}" "${stage_bin}/"
 
         # Fix root-tool rpath.
-        local -r install_root="${INSTALL_ROOT-}"
-        chrpath --replace "${install_root}/${LIB_INSTALL_PATH}" "${stage_bin}/root-tool"
+        local -r lib_path="${INSTALL_ROOT-}/${LIB_INSTALL_PATH}"
+        chrpath --replace "${lib_path}:${lib_path}/stdcpp" "${stage_bin}/root-tool"
     fi
 
     echo "Copying nx_log_viewer.html"
