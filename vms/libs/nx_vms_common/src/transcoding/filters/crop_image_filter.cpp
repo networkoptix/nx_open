@@ -2,7 +2,9 @@
 
 #include "crop_image_filter.h"
 
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg/frame_info.h>
+#include <nx/utils/log/log.h>
 #include <transcoding/transcoding_utils.h>
 
 extern "C" {
@@ -25,13 +27,15 @@ static QRectF cwiseMul(const QRectF &l, const QSizeF &r)
         );
 }
 
-QnCropImageFilter::QnCropImageFilter(const QRectF& rect, bool alignSize):
+QnCropImageFilter::QnCropImageFilter(const QRectF& rect, bool alignSize, bool deepCopy):
+    m_deepCopy(deepCopy),
     m_alignSize(alignSize),
     m_rectF(rect)
 {
 }
 
-QnCropImageFilter::QnCropImageFilter(const QRect& rect, bool alignSize):
+QnCropImageFilter::QnCropImageFilter(const QRect& rect, bool alignSize, bool deepCopy):
+    m_deepCopy(deepCopy),
     m_alignSize(alignSize),
     m_rect(rect)
 {
@@ -43,9 +47,6 @@ CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(
 {
     if (m_rect.isEmpty() && m_rectF.isEmpty())
         return frame;
-    m_tmpRef = frame; // keep object undeleted
-    CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput());
-    result->setUseExternalData(true);
 
     if (!m_rectF.isNull() && (m_rect.isNull() || frame->size() != m_size))
     {
@@ -59,23 +60,42 @@ CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(
             return frame;
     }
 
-    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
-    for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+    CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput());
+    if (m_deepCopy)
     {
-        int w = m_rect.left();
-        int h = m_rect.top();
-        if (i > 0) {
-            w >>= descr->log2_chroma_w;
-            h >>= descr->log2_chroma_h;
+        result->copyFrom(frame.get());
+        result->crop_left = m_rect.left();
+        result->crop_top = m_rect.top();
+        result->crop_right = frame->width - m_rect.right();
+        result->crop_bottom = frame->height - m_rect.bottom();
+        if (const auto status = av_frame_apply_cropping(result.get(), 0); status < 0)
+        {
+            NX_WARNING(this, "Failed to crop frame, Ffmpeg error %1",
+                nx::media::ffmpeg::avErrorToString(status));
         }
-        result->data[i] = frame->data[i] + w + h * frame->linesize[i];
-        result->linesize[i] = frame->linesize[i];
     }
-    result->format = frame->format;
-    result->width = m_rect.width();
-    result->height = m_rect.height();
-
-    result->assignMiscData(frame.data());
+    else
+    {
+        result.reset(new CLVideoDecoderOutput());
+        result->setUseExternalData(true);
+        m_tmpRef = frame; // keep object undeleted
+        const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
+        for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+        {
+            int w = m_rect.left();
+            int h = m_rect.top();
+            if (i > 0) {
+                w >>= descr->log2_chroma_w;
+                h >>= descr->log2_chroma_h;
+            }
+            result->data[i] = frame->data[i] + w + h * frame->linesize[i];
+            result->linesize[i] = frame->linesize[i];
+        }
+        result->format = frame->format;
+        result->width = m_rect.width();
+        result->height = m_rect.height();
+        result->assignMiscData(frame.data());
+    }
     return result;
 }
 
