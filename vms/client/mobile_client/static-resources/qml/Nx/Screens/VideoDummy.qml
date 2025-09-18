@@ -47,6 +47,16 @@ DummyMessage
         },
         State
         {
+            name: "is2FaDisabled"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("2FA Disabled")
+                image: lp("/images/alert_camera_offline.png")
+            }
+        },
+        State
+        {
             name: "cameraUnauthorized"
             PropertyChanges
             {
