@@ -683,11 +683,11 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>W tym układzie nie ma dostępnych kamer</translation>
+      <translation type="unfinished">No cameras available on this layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Pokaż wszystkie kamery</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1100,19 +1100,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>Wytnij</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Skopiuj</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Wklej</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Zaznacz wszystko</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

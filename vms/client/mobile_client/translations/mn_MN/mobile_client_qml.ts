@@ -685,7 +685,7 @@
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Бүх камеруудыг харах</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1098,19 +1098,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>Таслах</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Хуулах</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Буулгах</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Бүгдийг сонгох</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

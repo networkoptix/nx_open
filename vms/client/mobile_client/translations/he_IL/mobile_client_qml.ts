@@ -683,11 +683,11 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>אין מצלמות זמינות בפריסה זו</translation>
+      <translation type="unfinished">No cameras available on this layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>הצג את כל המצלמות</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1100,19 +1100,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>גזור</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>העתק</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>הדבק</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>בחר הכל</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

@@ -680,11 +680,11 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>กล้องไม่พร้อมใช้งานบนเค้าโครงนี้</translation>
+      <translation type="unfinished">No cameras available on this layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>แสดงกล้องทั้งหมด</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1097,19 +1097,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>ตัด</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>คัดลอก</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>วาง</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>เลือกทั้งหมด</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

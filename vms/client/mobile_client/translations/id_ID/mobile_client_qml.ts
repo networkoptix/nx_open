@@ -680,11 +680,11 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>Tidak ada kamera yang tersedia pada layout ini</translation>
+      <translation type="unfinished">No cameras available on this layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Tampilkan semua kamera</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1097,19 +1097,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>Potong</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Salin</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Tempel</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Pilih Semua</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

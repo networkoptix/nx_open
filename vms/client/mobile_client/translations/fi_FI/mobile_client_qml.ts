@@ -681,11 +681,11 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>Tässä asettelussa ei ole kameroita</translation>
+      <translation type="unfinished">No cameras available on this layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Näytä kaikki kamerat</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1098,19 +1098,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>Leikkaa</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Kopioi</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Liitä</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Valitse kaikki</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

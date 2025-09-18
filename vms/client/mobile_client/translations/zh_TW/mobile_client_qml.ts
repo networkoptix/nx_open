@@ -680,11 +680,11 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>佈局上無可用的攝影機</translation>
+      <translation type="unfinished">No cameras available on this layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>顯示所有的攝影機</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1097,19 +1097,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>剪下</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>複製</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>貼上</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>全部選擇</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

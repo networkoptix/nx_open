@@ -681,11 +681,11 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>Ingen kameraer tilgjengelig i denne visningen</translation>
+      <translation type="unfinished">No cameras available on this layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Vis alle kameraer</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1098,19 +1098,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>Klipp ut</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Kopier</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Lim inn</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Velg alle</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

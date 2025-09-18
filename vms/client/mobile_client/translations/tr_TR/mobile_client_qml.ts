@@ -681,11 +681,11 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>Bu düzende erişilebilir kamera yok</translation>
+      <translation type="unfinished">No cameras available on this layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Tüm kameralar göster</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1098,19 +1098,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>Kes</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Kopyala</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Yapıştır</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Tümünü Seç</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

@@ -680,11 +680,11 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>Không có camera nào trên bố cục này</translation>
+      <translation type="unfinished">No cameras available on this layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Hiển thị tất cả camera</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1097,19 +1097,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>Cắt</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Bản sao</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Dán</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Chọn tất cả</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

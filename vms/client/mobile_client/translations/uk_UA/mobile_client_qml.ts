@@ -683,11 +683,11 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>Немає камер на розкладці</translation>
+      <translation type="unfinished">No cameras available on this layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Показати всі камери</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1100,19 +1100,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>Вирізати</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Копіювати</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Вставити</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Вибрати все</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

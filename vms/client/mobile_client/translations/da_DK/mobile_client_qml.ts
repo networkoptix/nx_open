@@ -41,7 +41,7 @@
     </message>
     <message>
       <source>Video Download</source>
-      <translation>Video download</translation>
+      <translation>Videodownload</translation>
     </message>
     <message>
       <source>Ability to download video</source>
@@ -61,7 +61,7 @@
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Forbedr video afkodnings ydelsen ved hjælp af maksimalt antal hardwaredekodere</translation>
+      <translation>Optimer video afkodnings ydelsen ved hjælp af maksimalt antal hardwaredekodere</translation>
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>
@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation>Følg trinnene i guiden</translation>
+      <translation>Følg guidens trin</translation>
     </message>
     <message>
       <source>OK</source>
@@ -242,7 +242,7 @@
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation>Kopiér log-ID</translation>
+      <translation>Kopiér log ID</translation>
     </message>
   </context>
   <context>
@@ -644,7 +644,7 @@
     </message>
     <message>
       <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
-      <translation>Transkodning understøttes ikke for servere med en version ældre end 3.0.</translation>
+      <translation>Transkodning understøttes ikke for servere med en version ældre end 3,0.</translation>
     </message>
   </context>
   <context>
@@ -681,11 +681,11 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>Ingen tilgængelige kameraer på dette layout</translation>
+      <translation type="unfinished">No cameras available on this layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Vis alle kameraer</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1098,19 +1098,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>Klip</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Kopier</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Indsæt</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Vælg alt</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>

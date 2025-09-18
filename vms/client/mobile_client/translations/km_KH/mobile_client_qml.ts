@@ -1101,15 +1101,15 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation>Copy</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Paste</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Select All</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>
