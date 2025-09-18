@@ -28,7 +28,7 @@ class NX_UTILS_API UrlQuery
 {
 public:
     UrlQuery(const QString& query = QString());
-    UrlQuery(const std::string_view& str);
+    UrlQuery(std::string_view str);
     UrlQuery(const char* str);
     explicit UrlQuery(const QUrlQuery& query): m_query(query){};
 
@@ -59,7 +59,7 @@ public:
 
     bool hasQueryItem(const QString& key) const;
 
-    bool contains(const std::string_view& key) const;
+    bool contains(std::string_view key) const;
 
     template<
         typename T, typename String,

@@ -39,7 +39,7 @@ void SqlQuery::setForwardOnly(bool val)
     m_sqlQuery.setForwardOnly(val);
 }
 
-void SqlQuery::prepare(const std::string_view& query)
+void SqlQuery::prepare(std::string_view query)
 {
     m_unpreparedQuery.reset();
 
@@ -61,7 +61,7 @@ void SqlQuery::addBindValue(const QVariant& value) noexcept
     m_sqlQuery.addBindValue(value);
 }
 
-void SqlQuery::addBindValue(const std::string_view& value) noexcept
+void SqlQuery::addBindValue(std::string_view value) noexcept
 {
     m_sqlQuery.addBindValue(QString::fromUtf8(value.data(), value.size()));
 }
@@ -77,15 +77,15 @@ void SqlQuery::bindValue(int pos, const QVariant& value) noexcept
 }
 
 void SqlQuery::bindValue(
-    const std::string_view& placeholder,
-    const std::string_view& value) noexcept
+    std::string_view placeholder,
+    std::string_view value) noexcept
 {
     bindValue(
         QString::fromUtf8(placeholder.data(), placeholder.size()),
         QString::fromUtf8(value.data(), value.size()));
 }
 
-void SqlQuery::bindValue(int pos, const std::string_view& value) noexcept
+void SqlQuery::bindValue(int pos, std::string_view value) noexcept
 {
     bindValue(pos, QString::fromUtf8(value.data(), value.size()));
 }
@@ -95,7 +95,7 @@ void SqlQuery::exec()
     exec(std::nullopt);
 }
 
-void SqlQuery::exec(const std::string_view& query)
+void SqlQuery::exec(std::string_view query)
 {
     exec(std::optional<std::string_view>(query));
 }
@@ -139,7 +139,7 @@ void SqlQuery::exec(const std::optional<std::string_view>& query)
     }
 }
 
-bool SqlQuery::shouldPrepare(const std::string_view& query)
+bool SqlQuery::shouldPrepare(std::string_view query)
 {
     auto stmt = QString::fromUtf8(query);
     return !stmt.startsWith("ALTER", Qt::CaseInsensitive)

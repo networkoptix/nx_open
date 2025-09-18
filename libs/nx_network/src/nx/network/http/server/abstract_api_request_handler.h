@@ -87,7 +87,7 @@ void registerApiRequestHandler(
     HttpMessageDispatcher* dispatcher,
     const char* path,
     Func func,
-    const std::string_view& method = kAnyMethod)
+    std::string_view method = kAnyMethod)
 {
     using Handler = CustomApiRequestHandler<Func>;
 

@@ -39,7 +39,7 @@ void BasicFixture::initializeDatabase()
     ASSERT_TRUE(initializeQueryExecutor(m_connectionOptions));
 }
 
-DBResult BasicFixture::executeUpdate(const std::string_view& queryText)
+DBResult BasicFixture::executeUpdate(std::string_view queryText)
 {
     return executeQuery(
         [queryText](nx::sql::QueryContext* queryContext)

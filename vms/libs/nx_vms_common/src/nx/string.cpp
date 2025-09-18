@@ -11,7 +11,7 @@ String::String(const std::string& str):
 {
 }
 
-String::String(const std::string_view& str):
+String::String(std::string_view str):
     QByteArray(str.data(), str.size())
 {
 }
@@ -52,7 +52,7 @@ String& String::operator=(const std::string& str)
     return *this;
 }
 
-String& String::operator=(const std::string_view& str)
+String& String::operator=(std::string_view str)
 {
     *this = QByteArray(str.data(), str.size());
     return *this;
@@ -102,7 +102,7 @@ String::operator std::string_view() const
     return std::string_view(constData(), size());
 }
 
-nx::String& String::append(const std::string_view& str)
+nx::String& String::append(std::string_view str)
 {
     base_type::append(str.data(), (int) str.size());
     return *this;

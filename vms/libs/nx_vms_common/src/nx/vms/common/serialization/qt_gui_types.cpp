@@ -13,7 +13,7 @@ std::string toString(const QColor& value)
     return value.name(format).toStdString();
 }
 
-bool fromString(const std::string_view& str, QColor* value)
+bool fromString(std::string_view str, QColor* value)
 {
     QColor result(QLatin1String(str.data(), str.length()));
     if (!result.isValid())

@@ -86,13 +86,13 @@ NX_UTILS_API QDateTime fromOffsetSinceEpoch(const std::chrono::nanoseconds& offs
  * @return parsed time duration, std::nullopt in case of malformed string.
  * NOTE: microseconds and nanoseconds are truncated to milliseconds.
  */
-NX_UTILS_API std::optional<std::chrono::milliseconds> parseDuration(const std::string_view& str);
+NX_UTILS_API std::optional<std::chrono::milliseconds> parseDuration(std::string_view str);
 
 /**
  * Invokes parseDuration(str) and returns its result or defaultValue.
  */
 NX_UTILS_API std::chrono::milliseconds parseDurationOr(
-    const std::string_view& str,
+    std::string_view str,
     std::chrono::milliseconds defaultValue);
 
 namespace detail {

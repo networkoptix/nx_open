@@ -15,7 +15,7 @@ void SequenceNode::get(const AbstractAttributeReader& in, AbstractAttributeWrite
         it->second->get(in, out);
 }
 
-bool SequenceNode::addChild(const std::string_view& value, std::unique_ptr<AbstractNode> child)
+bool SequenceNode::addChild(std::string_view value, std::unique_ptr<AbstractNode> child)
 {
     m_children.emplace(nx::utils::stoi(value), std::move(child));
     return true;
@@ -46,7 +46,7 @@ void AttrPresenceNode::get(const AbstractAttributeReader& in, AbstractAttributeW
     m_children[intVal]->get(in, out);
 }
 
-bool AttrPresenceNode::addChild(const std::string_view& str, std::unique_ptr<AbstractNode> child)
+bool AttrPresenceNode::addChild(std::string_view str, std::unique_ptr<AbstractNode> child)
 {
     int intVal = -1;
 
@@ -80,7 +80,7 @@ void SetNode::get(const AbstractAttributeReader& /*in*/, AbstractAttributeWriter
     out->put(m_name, m_value);
 }
 
-bool SetNode::addChild(const std::string_view& /*value*/, std::unique_ptr<AbstractNode> child)
+bool SetNode::addChild(std::string_view /*value*/, std::unique_ptr<AbstractNode> child)
 {
     if (m_child)
         return false;

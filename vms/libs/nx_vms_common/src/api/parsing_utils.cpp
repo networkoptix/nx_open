@@ -28,7 +28,7 @@ bool isSessionExpiredError(const nx::json_rpc::Response& response)
 }
 
 nx::reflect::DeserializationResult deserializeResponse(
-    const std::string_view& json,
+    std::string_view json,
     rest::JsonRpcResultType* data,
     [[maybe_unused]] nx::reflect::json::DeserializationFlag skipErrors)
 {

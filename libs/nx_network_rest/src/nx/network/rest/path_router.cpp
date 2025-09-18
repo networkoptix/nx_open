@@ -432,7 +432,7 @@ void PathRouter::Item::addHandler(std::string_view path, std::unique_ptr<Handler
     m_handler = std::move(handler);
 }
 
-QString PathRouter::replaceVersionWithRegex(const std::string_view& path)
+QString PathRouter::replaceVersionWithRegex(std::string_view path)
 {
     constexpr std::string_view prefix = "rest/v{";
     if (!path.starts_with(prefix))

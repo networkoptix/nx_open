@@ -38,7 +38,7 @@ static constexpr char kSecureUrlSchemeName[] = "https";
 
 NX_NETWORK_API const char* urlScheme(bool isSecure);
 
-NX_NETWORK_API bool isUrlScheme(const std::string_view& scheme);
+NX_NETWORK_API bool isUrlScheme(std::string_view scheme);
 
 // Emulating explicit isUrlScheme(const QString&).
 template<typename S, typename = std::enable_if_t<std::is_same_v<S, QString>>>
@@ -47,7 +47,7 @@ bool isUrlScheme(const S& s)
     return isUrlScheme(s.toStdString());
 }
 
-NX_NETWORK_API int defaultPortForScheme(const std::string_view& scheme);
+NX_NETWORK_API int defaultPortForScheme(std::string_view scheme);
 NX_NETWORK_API int defaultPort(bool isSecure);
 
 /** HTTP header container.
@@ -79,14 +79,14 @@ public:
  * @return Value of header headerName (if found), empty string otherwise.
 */
 NX_NETWORK_API std::string getHeaderValue(
-    const HttpHeaders& headers, const std::string_view& headerName);
+    const HttpHeaders& headers, std::string_view headerName);
 
 /**
  * @return false if requested header was not found.
  */
 NX_NETWORK_API bool readHeader(
     const HttpHeaders& headers,
-    const std::string_view& headerName,
+    std::string_view headerName,
     int* value);
 
 /**
@@ -229,19 +229,19 @@ public:
     Method(const Method&) = default;
     Method(Method&&) = default;
 
-    Method(const std::string_view& str);
+    Method(std::string_view str);
     Method(const char* str);
     Method(std::string str);
 
     Method& operator=(const Method&) = default;
     Method& operator=(Method&&) = default;
 
-    Method& operator=(const std::string_view& str);
+    Method& operator=(std::string_view str);
     Method& operator=(const char* str);
     Method& operator=(std::string str);
 
     bool operator<(const Method& right) const;
-    bool operator<(const std::string_view& right) const;
+    bool operator<(std::string_view right) const;
 
     bool operator==(const Method& right) const;
 
@@ -251,12 +251,12 @@ public:
     inline bool operator==(const std::string& right) const
     { return nx::utils::stricmp(m_value, right) == 0; }
 
-    inline bool operator==(const std::string_view& right) const
+    inline bool operator==(std::string_view right) const
     { return nx::utils::stricmp(m_value, right) == 0; }
 
     const std::string& toString() const;
 
-    static bool isKnown(const std::string_view& str);
+    static bool isKnown(std::string_view str);
 
     static bool isMessageBodyAllowed(const Method& method);
     bool isMessageBodyAllowed() const
@@ -362,7 +362,7 @@ inline bool operator==(const StatusLine& left, const StatusLine& right)
 NX_NETWORK_API void serializeHeaders(const HttpHeaders& headers, nx::Buffer* dstBuffer);
 
 static constexpr char kDeletedCookieValue[] = "_DELETED_COOKIE_VALUE_";
-NX_NETWORK_API std::string getCookieValue(const std::string_view& name, const HttpHeaders& headers);
+NX_NETWORK_API std::string getCookieValue(std::string_view name, const HttpHeaders& headers);
 
 class NX_NETWORK_API Request
 {
@@ -385,7 +385,7 @@ public:
     /**
      * @param Case-sensitive cookie name.
      */
-    std::string getCookieValue(const std::string_view& name) const
+    std::string getCookieValue(std::string_view name) const
     {
         return http::getCookieValue(name, headers);
     }
@@ -393,7 +393,7 @@ public:
     /**
      * @param Case-sensitive cookie name.
      */
-    void removeCookie(const std::string_view& name);
+    void removeCookie(std::string_view name);
 };
 
 inline bool operator==(const Request& left, const Request& right)
@@ -555,7 +555,7 @@ enum Value
 };
 
 NX_NETWORK_API std::string_view toString(Value val);
-NX_NETWORK_API Value fromString(const std::string_view& str);
+NX_NETWORK_API Value fromString(std::string_view str);
 
 } // namespace AuthScheme
 
@@ -576,7 +576,7 @@ class NX_NETWORK_API BasicCredentials:
     public UserCredentials
 {
 public:
-    bool parse(const std::string_view& str);
+    bool parse(std::string_view str);
     void serialize(nx::Buffer* dest) const;
 };
 
@@ -587,7 +587,7 @@ class NX_NETWORK_API DigestCredentials:
 public:
     std::map<std::string, std::string> params;
 
-    bool parse(const std::string_view& str, char separator = ',');
+    bool parse(std::string_view str, char separator = ',');
     void serialize(nx::Buffer* dest) const;
 };
 
@@ -598,7 +598,7 @@ class NX_NETWORK_API BearerCredentials:
 public:
     std::string token;
 
-    bool parse(const std::string_view& str);
+    bool parse(std::string_view str);
     void serialize(nx::Buffer* const dstBuffer) const;
 };
 
@@ -625,7 +625,7 @@ public:
 
     Authorization& operator=(Authorization&& right);
 
-    bool parse(const std::string_view& str);
+    bool parse(std::string_view str);
     void serialize(nx::Buffer* const dest) const;
     nx::Buffer serialized() const;
     std::string toString() const;
@@ -682,7 +682,7 @@ public:
     WWWAuthenticate(AuthScheme::Value authScheme = AuthScheme::none);
 
     std::string getParam(const std::string& key) const;
-    bool parse(const std::string_view& str);
+    bool parse(std::string_view str);
     void serialize(nx::Buffer* dest) const;
     nx::Buffer serialized() const;
     std::string toString() const;
@@ -699,9 +699,9 @@ static constexpr char kProxyAuthenticate[] = "Proxy-Authenticate";
 class NX_NETWORK_API AcceptEncodingHeader
 {
 public:
-    AcceptEncodingHeader(const std::string_view& str);
+    AcceptEncodingHeader(std::string_view str);
 
-    void parse(const std::string_view& str);
+    void parse(std::string_view str);
 
     /**
      * @return true if encodingName is present in header and
@@ -740,7 +740,7 @@ public:
     /**
      * NOTE: In case of parse error, contents of this object are undefined.
      */
-    bool parse(const std::string_view& str);
+    bool parse(std::string_view str);
 
     /**
      * @return true if range is satisfiable for content of size contentSize.
@@ -800,7 +800,7 @@ public:
     /**
      * NOTE: In case of parse error, contents of this object are undefined.
      */
-    bool parse(const std::string_view& str);
+    bool parse(std::string_view str);
     std::string toString() const;
 };
 
@@ -815,7 +815,7 @@ public:
         std::chrono::seconds _timeout,
         std::optional<int> _max = std::nullopt);
 
-    bool parse(const std::string_view& str);
+    bool parse(std::string_view str);
     std::string toString() const;
 };
 
@@ -838,7 +838,7 @@ public:
          * product-version = token
          * comment = "(" TEXT ")"
          */
-        static Product fromString(const std::string_view& str);
+        static Product fromString(std::string_view str);
     };
 
     static constexpr char NAME[] = "Server";
@@ -849,7 +849,7 @@ public:
 
     bool operator==(const Server&) const;
 
-    bool parse(const std::string_view& strValue);
+    bool parse(std::string_view strValue);
     std::string toString() const;
 };
 
@@ -866,7 +866,7 @@ public:
     bool preload = false;
 
     bool operator==(const StrictTransportSecurity&) const;
-    bool parse(const std::string_view& strValue);
+    bool parse(std::string_view strValue);
     std::string toString() const;
 };
 
@@ -878,7 +878,7 @@ public:
     std::string client;
     std::vector<std::string> proxies;
 
-    bool parse(const std::string_view& str);
+    bool parse(std::string_view str);
     std::string toString() const;
 };
 
@@ -898,13 +898,13 @@ struct NX_NETWORK_API ForwardedElement
     std::string host;
     std::string proto;
 
-    bool parse(const std::string_view& str);
+    bool parse(std::string_view str);
     std::string toString() const;
 
     bool operator==(const ForwardedElement& right) const;
 
 private:
-    std::string quoteIfNeeded(const std::string_view& str) const;
+    std::string quoteIfNeeded(std::string_view str) const;
 };
 
 class NX_NETWORK_API Forwarded
@@ -917,7 +917,7 @@ public:
     Forwarded() = default;
     Forwarded(std::vector<ForwardedElement> elements);
 
-    bool parse(const std::string_view& str);
+    bool parse(std::string_view str);
     std::string toString() const;
 
     bool operator==(const Forwarded& right) const;
@@ -942,7 +942,7 @@ struct NX_NETWORK_API ContentType
     std::string charset;
     std::string boundary;
 
-    ContentType(const std::string_view& str = kPlain.toString());
+    ContentType(std::string_view str = kPlain.toString());
     ContentType(const char* str);
 
     /**

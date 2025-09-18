@@ -8,7 +8,7 @@
 
 namespace nx::reflect::urlencoded::detail {
 
-std::tuple<std::string, DeserializationResult> decode(const std::string_view& str)
+std::tuple<std::string, DeserializationResult> decode(std::string_view str)
 {
     std::string result;
 
@@ -44,14 +44,14 @@ std::tuple<std::string, DeserializationResult> decode(const std::string_view& st
     return {std::move(result), true};
 }
 
-std::string toLower(const std::string_view& value)
+std::string toLower(std::string_view value)
 {
     std::string result{value};
     boost::algorithm::to_lower(result);
     return result;
 }
 
-std::tuple<std::string_view, DeserializationResult> trimBrackets(const std::string_view& str)
+std::tuple<std::string_view, DeserializationResult> trimBrackets(std::string_view str)
 {
     static constexpr std::pair<char, char> kBrackets[] = {
         {'{', '}'}, {'(', ')'}, {'[', ']'}
@@ -74,7 +74,7 @@ std::tuple<std::string_view, DeserializationResult> trimBrackets(const std::stri
 }
 
 std::tuple<std::vector<std::string_view>, DeserializationResult> tokenizeRequest(
-    const std::string_view& request, char delimiter)
+    std::string_view request, char delimiter)
 {
     std::vector<std::string_view> requestTokenized;
 

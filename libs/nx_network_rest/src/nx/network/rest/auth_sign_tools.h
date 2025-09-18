@@ -19,12 +19,12 @@ struct NX_NETWORK_REST_API AuthSessionSignHeader
 
 NX_NETWORK_REST_API std::string generateAuthSessionSign(
     const std::string& username,
-    const std::string_view& password,
-    const std::string_view& nonce);
+    std::string_view password,
+    std::string_view nonce);
 
 NX_NETWORK_REST_API std::optional<std::string> generateAuthSessionHeader(
     const nx::network::http::Credentials& credentials,
-    const std::string_view& nonce);
+    std::string_view nonce);
 
 NX_NETWORK_REST_API std::optional<AuthSessionSignHeader> parseAuthSessionHeader(
     const std::string& headerValue);

@@ -344,7 +344,7 @@ void saveToken(
 } // namespace detail
 
 /**
- * Invokes f(const std::string_view&) for each entry of str as separated by the separator.
+ * Invokes f(std::string_view) for each entry of str as separated by the separator.
  * Uses nx::utils::Splitter class inside.
  * @param str The string to split.
  * @param groupToken Specifies symbols that are used to create tokens with a separator inside.
@@ -499,7 +499,7 @@ void saveNameValuePair(
  * std::vector<std::string, std::string> params;
  * splitNameValuePairs(
  *     std::string("a=b,c=\"d,\""), ',', '=',
- *     [&params](const std::string_view& name, const std::string_view& value)
+ *     [&params](std::string_view name, std::string_view value)
  *     {
  *         params.emplace(name, value);
  *     });
@@ -621,7 +621,7 @@ constexpr std::size_t calculateLength(const T& val)
 //-------------------------------------------------------------------------------------------------
 
 template<typename String>
-void append(String* str, const std::string_view& val)
+void append(String* str, std::string_view val)
 {
     *str += val;
 }
@@ -1250,7 +1250,7 @@ std::basic_string<CharType> removeExcessSeparators(String<CharType> str, Separat
  * Compares two strings case-insensitive.
  * @return 0 if strings are equal, negative value if left < right, positive if left > right.
  */
-NX_UTILS_API int stricmp(const std::string_view& left, const std::string_view& right);
+NX_UTILS_API int stricmp(std::string_view left, std::string_view right);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -1268,7 +1268,7 @@ template<typename StringType>
 // requires String<StringType>
 bool endsWith(
     const StringType& str,
-    const std::string_view& suffix,
+    std::string_view suffix,
     CaseSensitivity caseSensitivity = CaseSensitivity::on)
 {
     const auto size = str.size();
@@ -1336,7 +1336,7 @@ template<typename StringType>
 // requires String<StringType>
 bool startsWith(
     const StringType& str,
-    const std::string_view& prefix,
+    std::string_view prefix,
     CaseSensitivity caseSensitivity = CaseSensitivity::on)
 {
     const auto size = str.size();
@@ -1397,7 +1397,7 @@ bool startsWith(
 
 template<typename Value, typename Arg>
 // requires Numeric<Value>
-Value ston(const std::string_view& str, std::size_t* pos, Arg arg)
+Value ston(std::string_view str, std::size_t* pos, Arg arg)
 {
     auto value = Value();
     const auto result = charconv::from_chars(str.data(), str.data() + str.size(), value, arg);
@@ -1416,38 +1416,38 @@ Value ston(const std::string_view& str, std::size_t* pos, Arg arg)
  * - Accepts std::string_view
  * - Does not throw. The error is reported by setting *pos to 0.
  */
-inline int stoi(const std::string_view& str, std::size_t* pos = nullptr, int base = 10)
+inline int stoi(std::string_view str, std::size_t* pos = nullptr, int base = 10)
 {
     return ston<int>(str, pos, base);
 }
 
 /** See nx::utils::stoi. */
-inline long stol(const std::string_view& str, std::size_t* pos = nullptr, int base = 10)
+inline long stol(std::string_view str, std::size_t* pos = nullptr, int base = 10)
 {
     return ston<long>(str, pos, base);
 }
 
 /** See nx::utils::stoi. */
-inline long long stoll(const std::string_view& str, std::size_t* pos = nullptr, int base = 10)
+inline long long stoll(std::string_view str, std::size_t* pos = nullptr, int base = 10)
 {
     return ston<long long>(str, pos, base);
 }
 
 /** See nx::utils::stoi. */
-inline unsigned long stoul(const std::string_view& str, std::size_t* pos = nullptr, int base = 10)
+inline unsigned long stoul(std::string_view str, std::size_t* pos = nullptr, int base = 10)
 {
     return ston<unsigned long>(str, pos, base);
 }
 
 /** See nx::utils::stoi. */
-inline unsigned long long stoull(const std::string_view& str, std::size_t* pos = nullptr, int base = 10)
+inline unsigned long long stoull(std::string_view str, std::size_t* pos = nullptr, int base = 10)
 {
     return ston<unsigned long long>(str, pos, base);
 }
 
 /** See nx::utils::stoi. */
 inline double stod(
-    const std::string_view& str,
+    std::string_view str,
     std::size_t* pos = nullptr)
 {
     // NOTE: GCC 8.1 does not provide the corresponding charconv::from_chars.
@@ -1489,7 +1489,7 @@ std::string to_string(T value)
 namespace detail {
 
 template <typename OutputString>
-OutputString toHex(const std::string_view& str)
+OutputString toHex(std::string_view str)
 {
     static constexpr char kDigits[] = "0123456789abcdef";
 
@@ -1508,7 +1508,7 @@ OutputString toHex(const std::string_view& str)
 
 } // namespace detail
 
-inline std::string toHex(const std::string_view& str)
+inline std::string toHex(std::string_view str)
 {
     return detail::toHex<std::string>(str);
 }
@@ -1525,7 +1525,7 @@ std::decay_t<String> toHex(const String& str)
 }
 
 // TODO: #akolesnikov Introduced other overloads after introducing local implementation.
-inline std::string fromHex(const std::string_view& str)
+inline std::string fromHex(std::string_view str)
 {
     // TODO: #akolesnikov Get rid of QByteArray. It will save 2 allocations in this function.
     return QByteArray::fromHex(QByteArray::fromRawData(str.data(), (int) str.size()))
@@ -1573,7 +1573,7 @@ auto toLower(StringType&& str)
     return result;
 }
 
-inline std::string toLower(const std::string_view& str)
+inline std::string toLower(std::string_view str)
 {
     std::string result(str);
     toLower(&result);
@@ -1602,7 +1602,7 @@ auto toUpper(StringType&& str)
     return result;
 }
 
-inline std::string toUpper(const std::string_view& str)
+inline std::string toUpper(std::string_view str)
 {
     std::string result(str);
     toUpper(&result);
@@ -1645,11 +1645,11 @@ std::string replace(
     struct Helper
     {
         static const std::string& toStdString(const std::string& s) { return s; }
-        static std::string toStdString(const std::string_view& s) { return std::string(s); }
+        static std::string toStdString(std::string_view s) { return std::string(s); }
         static const char* toStdString(const char* s) { return s; }
 
         static std::regex buildRegex(const std::string& s) { return std::regex(s); }
-        static std::regex buildRegex(const std::string_view& s) { return std::regex(s.data(), s.size()); }
+        static std::regex buildRegex(std::string_view s) { return std::regex(s.data(), s.size()); }
         static std::regex buildRegex(const char* s) { return std::regex(s); }
     };
 
@@ -1662,7 +1662,7 @@ std::string replace(
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Hash for std::unordered_*<std::string, ...> containers that enables find(const std::string_view&).
+ * Hash for std::unordered_*<std::string, ...> containers that enables find(std::string_view).
  */
 struct StringHashTransparent
 {
@@ -1697,7 +1697,7 @@ struct ci_less
 
 #if defined(QT_CORE_LIB)
 
-inline bool operator==(const QByteArray& left, const std::string_view& right)
+inline bool operator==(const QByteArray& left, std::string_view right)
 { return left == QByteArray::fromRawData(right.data(), (int)right.size()); }
 
 inline bool operator==(const QByteArray& left, const std::string& right)
@@ -1706,14 +1706,14 @@ inline bool operator==(const QByteArray& left, const std::string& right)
 inline bool operator==(const QString& left, const std::string& right)
 { return left == right.c_str(); }
 
-inline bool operator==(const QString& left, const std::string_view& right)
+inline bool operator==(const QString& left, std::string_view right)
 { return left == QByteArray::fromRawData(right.data(), (int) right.size()); }
 
 //-------------------------------------------------------------------------------------------------
 // std::string_view vs const char*. Needed since previous introducing "QString == std::string_view"
 // makes "std::string_view == const char*" ambiguous.
 
-inline bool operator==(const std::string_view& left, const char* right)
+inline bool operator==(std::string_view left, const char* right)
 { return left == std::string_view(right); }
 
 #endif // #if defined(QT_CORE_LIB)

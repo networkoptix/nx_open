@@ -245,7 +245,7 @@ struct Stringizable
 
     std::string toString() const { return text; }
 
-    static Stringizable fromString(const std::string_view& str)
+    static Stringizable fromString(std::string_view str)
     {
         return Stringizable{std::string(str)};
     }

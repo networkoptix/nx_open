@@ -42,7 +42,7 @@ QString AspectRatioData::toString() const
     return QString::fromStdString(toStdString());
 }
 
-bool fromString(const std::string_view& str, AspectRatioData* target)
+bool fromString(std::string_view str, AspectRatioData* target)
 {
     if (str == "")
     {

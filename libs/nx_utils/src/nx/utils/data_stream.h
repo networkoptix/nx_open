@@ -20,7 +20,7 @@ public:
      * Creates a read-only data stream that reads from buf.
      * NOTE: The contents of buf are not copied.
      */
-    DataStream(const std::string_view& buf);
+    DataStream(std::string_view buf);
 };
 
 } // namespace nx::utils

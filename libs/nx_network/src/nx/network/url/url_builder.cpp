@@ -79,7 +79,7 @@ Builder& Builder::setEndpoint(const SocketAddress& endpoint)
     return *this;
 }
 
-Builder& Builder::setPath(const std::string_view& path, QUrl::ParsingMode mode)
+Builder& Builder::setPath(std::string_view path, QUrl::ParsingMode mode)
 {
     // QUrl does not like several slashes at the beginning, as well as no slash at all.
     auto actualPath = normalizePath(path);
@@ -106,7 +106,7 @@ Builder& Builder::setPath(const QString& path, QUrl::ParsingMode mode)
     return setPath((std::string_view) path.toStdString(), mode);
 }
 
-Builder& Builder::appendPath(const std::string_view& path, QUrl::ParsingMode mode)
+Builder& Builder::appendPath(std::string_view path, QUrl::ParsingMode mode)
 {
     if (path.empty())
         return *this;

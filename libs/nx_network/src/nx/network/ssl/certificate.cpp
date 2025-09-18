@@ -877,7 +877,7 @@ static bool setDnsName(X509* x509, const std::string& dnsName)
         dns,
         ip
     };
-    auto parseEntry = [](const std::string_view& str) -> std::tuple<EntryType, std::string_view>
+    auto parseEntry = [](std::string_view str) -> std::tuple<EntryType, std::string_view>
     {
         auto pos = str.find(':');
         if (pos == std::string_view::npos)

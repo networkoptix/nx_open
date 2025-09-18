@@ -50,7 +50,7 @@ NX_UTILS_API int fromBase64Url(
 
 NX_UTILS_API int estimateBase64DecodedLen(const char* encoded, int size);
 
-inline std::string toBase64(const std::string_view& str)
+inline std::string toBase64(std::string_view str)
 {
     std::string result;
     result.resize((std::size_t) toBase64(str.data(), (int) str.size(), nullptr, 0));
@@ -58,7 +58,7 @@ inline std::string toBase64(const std::string_view& str)
     return result;
 }
 
-inline std::string toBase64Url(const std::string_view& str)
+inline std::string toBase64Url(std::string_view str)
 {
     std::string result;
     result.resize((std::size_t) toBase64Url(str.data(), (int) str.size(), nullptr, 0));
@@ -67,7 +67,7 @@ inline std::string toBase64Url(const std::string_view& str)
 }
 
 // Appends base64Url(str) to out.
-inline void toBase64Url(const std::string_view& str, std::string* out)
+inline void toBase64Url(std::string_view str, std::string* out)
 {
     const auto len = (std::size_t) toBase64Url(str.data(), (int) str.size(), nullptr, 0);
     const auto pos = out->size();
@@ -78,7 +78,7 @@ inline void toBase64Url(const std::string_view& str, std::string* out)
         out->resize(out->size() - (len - actualLen));
 }
 
-inline std::string fromBase64(const std::string_view& str)
+inline std::string fromBase64(std::string_view str)
 {
     std::string result;
     result.resize((std::size_t) fromBase64(str.data(), (int) str.size(), nullptr, 0));
@@ -86,7 +86,7 @@ inline std::string fromBase64(const std::string_view& str)
     return result;
 }
 
-inline std::string fromBase64Url(const std::string_view& str)
+inline std::string fromBase64Url(std::string_view str)
 {
     std::string result;
     result.resize((std::size_t) fromBase64Url(str.data(), (int) str.size(), nullptr, 0));

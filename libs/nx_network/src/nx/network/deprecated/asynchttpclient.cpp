@@ -453,7 +453,7 @@ void downloadFileAsyncEx(
     const nx::Url& url,
     DownloadCompletionHandlerEx completionHandlerEx,
     nx::network::http::AsyncHttpClientPtr httpClientCaptured,
-    const std::string_view& method)
+    std::string_view method)
 {
     auto requestCompletionFunc = [httpClientCaptured, completionHandlerEx]
         (nx::network::http::AsyncHttpClientPtr httpClient) mutable
@@ -524,7 +524,7 @@ void downloadFileAsyncEx(
     const http::HttpHeaders& extraHeaders,
     AuthType authType,
     AsyncHttpClient::Timeouts timeouts,
-    const std::string_view& method)
+    std::string_view method)
 {
     auto httpClient = AsyncHttpClient::create(std::move(adapterFunc));
     httpClient->setAdditionalHeaders(extraHeaders);
@@ -573,7 +573,7 @@ void uploadDataAsync(
     const AuthType authType,
     const std::string& user,
     const std::string& password,
-    const std::string_view& method,
+    std::string_view method,
     std::optional<AsyncHttpClient::Timeouts> timeouts)
 {
     auto httpClientHolder = AsyncHttpClient::create(std::move(adapterFunc));

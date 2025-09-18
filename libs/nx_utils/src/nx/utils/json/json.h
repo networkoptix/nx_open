@@ -38,17 +38,17 @@ public:
     }
 
     virtual void writeNull() override { m_value.Null(); }
-    virtual void writeString(const std::string_view& value) override
+    virtual void writeString(std::string_view value) override
     {
         m_value.String(value.data(), value.size(), /*copy*/ true);
     }
 
-    virtual void writeAttributeName(const std::string_view& name) override
+    virtual void writeAttributeName(std::string_view name) override
     {
         m_value.Key(name.data(), name.size(), /*copy*/ true);
     }
 
-    virtual void writeRawString(const std::string_view&) override
+    virtual void writeRawString(std::string_view) override
     {
         NX_ASSERT(false, "Should not get here");
     }
@@ -78,9 +78,9 @@ public:
     virtual void writeBool(bool value) override;
     virtual void writeInt(const std::int64_t& value) override;
     virtual void writeFloat(const double& value) override;
-    virtual void writeString(const std::string_view& value) override;
+    virtual void writeString(std::string_view value) override;
     virtual void writeNull() override;
-    virtual void writeAttributeName(const std::string_view& name) override;
+    virtual void writeAttributeName(std::string_view name) override;
 
 private:
     struct Structured //< Array or object.

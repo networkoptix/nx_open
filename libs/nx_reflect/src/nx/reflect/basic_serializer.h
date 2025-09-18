@@ -35,8 +35,8 @@ public:
     virtual void writeBool(bool val) = 0;
     virtual void writeInt(const std::int64_t& val) = 0;
     virtual void writeFloat(const double& val) = 0;
-    virtual void writeString(const std::string_view& val) = 0;
-    virtual void writeRawString(const std::string_view& val) = 0;
+    virtual void writeString(std::string_view val) = 0;
+    virtual void writeRawString(std::string_view val) = 0;
 
     virtual void writeNull() = 0;
 
@@ -71,7 +71,7 @@ public:
         writeValue(floor<milliseconds>(val.time_since_epoch()));
     }
 
-    virtual void writeAttributeName(const std::string_view& name) = 0;
+    virtual void writeAttributeName(std::string_view name) = 0;
 
     virtual Result take() = 0;
 

@@ -34,7 +34,7 @@ public:
 
     using base_type::base_type;
 
-    virtual void prepare(const std::string_view& query) override
+    virtual void prepare(std::string_view query) override
     {
         m_query = query;
 

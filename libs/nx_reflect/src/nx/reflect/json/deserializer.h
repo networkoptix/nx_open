@@ -673,7 +673,7 @@ DeserializationResult deserialize(const DeserializationContext& ctx, T* data)
  */
 template<typename Data>
 DeserializationResult deserialize(
-    const std::string_view& json,
+    std::string_view json,
     Data* data,
     json::DeserializationFlag skipErrors = json::DeserializationFlag::none)
 {
@@ -695,7 +695,7 @@ DeserializationResult deserialize(
  */
 template<typename Data>
 std::tuple<Data, DeserializationResult> deserialize(
-    const std::string_view& json,
+    std::string_view json,
     json::DeserializationFlag skipErrors = json::DeserializationFlag::none)
 {
     Data data = createDefault<Data>();

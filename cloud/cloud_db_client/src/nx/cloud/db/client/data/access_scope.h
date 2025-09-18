@@ -86,7 +86,7 @@ public:
         const std::optional<std::string>& defaultHost);
 
 private:
-    static std::string cutUrlScheme(const std::string_view& url);
+    static std::string cutUrlScheme(std::string_view url);
 
 private:
     std::vector<std::string> m_urls;

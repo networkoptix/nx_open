@@ -73,7 +73,7 @@ static void convertAddrInfo(
 static constexpr auto kMaxCachePeriod = std::chrono::minutes(1);
 
 SystemError::ErrorCode SystemResolver::resolve(
-    const std::string_view& hostNameOriginal,
+    std::string_view hostNameOriginal,
     int ipVersion,
     ResolveResult* resolveResult)
 {

@@ -24,12 +24,12 @@ Span::Span()
 {
 }
 
-Span::Span(const std::string_view& name, Kind kind):
+Span::Span(std::string_view name, Kind kind):
     Span(name, activeSpan(), kind)
 {
 }
 
-Span::Span(const std::string_view& name, const Span& parent, Kind kind):
+Span::Span(std::string_view name, const Span& parent, Kind kind):
     m_data(new SpanData())
 {
     auto parentContext = trace::SpanContext::GetInvalid();
@@ -69,7 +69,7 @@ std::string Span::traceId() const
     return helpers::traceIdString(m_data->span->GetContext().trace_id());
 }
 
-void Span::updateName(const std::string_view& newName)
+void Span::updateName(std::string_view newName)
 {
     if (!isValid())
         return;
@@ -77,7 +77,7 @@ void Span::updateName(const std::string_view& newName)
     m_data->span->UpdateName(helpers::toStringView(newName));
 }
 
-void Span::setAttribute(const std::string_view& name, const std::string_view& value)
+void Span::setAttribute(std::string_view name, std::string_view value)
 {
     if (!isValid())
         return;
@@ -85,7 +85,7 @@ void Span::setAttribute(const std::string_view& name, const std::string_view& va
     m_data->span->SetAttribute(helpers::toStringView(name), helpers::toStringView(value));
 }
 
-void Span::setAttribute(const std::string_view& name, int value)
+void Span::setAttribute(std::string_view name, int value)
 {
     if (!isValid())
         return;
@@ -93,7 +93,7 @@ void Span::setAttribute(const std::string_view& name, int value)
     m_data->span->SetAttribute(helpers::toStringView(name), value);
 }
 
-void Span::setStatus(Status status, const std::string_view& description)
+void Span::setStatus(Status status, std::string_view description)
 {
     if (!isValid())
         return;

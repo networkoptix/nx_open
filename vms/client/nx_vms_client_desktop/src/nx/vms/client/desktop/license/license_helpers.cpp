@@ -73,7 +73,7 @@ ErrorCode toErrorCode(const QString& text)
     return nx::reflect::fromString<ErrorCode>(text.toStdString(), ErrorCode::unknownError);
 }
 
-LicenseErrorMap extractErrors(const std::string_view& messageBody)
+LicenseErrorMap extractErrors(std::string_view messageBody)
 {
     const auto[errorReply, ok] = nx::reflect::json::deserialize<detail::ErrorReply>(messageBody);
     auto& errors = errorReply.errors.licenseErrors;

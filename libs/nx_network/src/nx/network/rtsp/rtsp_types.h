@@ -80,7 +80,7 @@ static constexpr char kSecureUrlSchemeName[] = "rtsps";
 
 NX_NETWORK_API std::string urlScheme(bool isSecure);
 
-NX_NETWORK_API bool isUrlScheme(const std::string_view& scheme);
+NX_NETWORK_API bool isUrlScheme(std::string_view scheme);
 
 // Emulating explicit isUrlScheme(const QString&).
 template<typename S, typename = std::enable_if_t<std::is_same_v<S, QString>>>

@@ -109,7 +109,7 @@ public:
     /** If true, then parseBytes skips invalid HTTP headers instead of failing. */
     void setParseHeadersStrict(bool enabled);
 
-    static bool isEncodingSupported(const std::string_view& encoding);
+    static bool isEncodingSupported(std::string_view encoding);
 
 private:
     ReadState m_state = ReadState::waitingMessageStart;

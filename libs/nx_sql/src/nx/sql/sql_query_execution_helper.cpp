@@ -150,7 +150,7 @@ bool SqlQueryExecutionHelper::execSQLFile(
 
 void SqlQueryExecutionHelper::execSQLScript(
     nx::sql::QueryContext* queryContext,
-    const std::string_view& script)
+    std::string_view script)
 {
     nx::utils::split(
         script,

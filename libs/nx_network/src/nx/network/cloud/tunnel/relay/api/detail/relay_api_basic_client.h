@@ -57,7 +57,7 @@ protected:
         typename ... Response
     >
         void issueUpgradeRequest(
-            const std::string_view& httpMethod,
+            std::string_view httpMethod,
             const std::string& protocolToUpgradeTo,
             Request request,
             const char* requestPathTemplate,
@@ -103,7 +103,7 @@ private:
 
     template<typename HttpClient, typename CompletionHandler, typename ... Response>
     void executeUpgradeRequest(
-        const std::string_view& httpMethod,
+        std::string_view httpMethod,
         const std::string& protocolToUpgradeTo,
         HttpClient httpClient,
         CompletionHandler completionHandler);
@@ -127,7 +127,7 @@ template<
     typename ... Response
 >
 void BasicClient::issueUpgradeRequest(
-    const std::string_view& httpMethod,
+    std::string_view httpMethod,
     const std::string& protocolToUpgradeTo,
     Request request,
     const char* requestPathTemplate,
@@ -207,7 +207,7 @@ BasicClient::prepareHttpRequest(
 
 template<typename HttpClient, typename CompletionHandler, typename ... Response>
 void BasicClient::executeUpgradeRequest(
-    const std::string_view& httpMethod,
+    std::string_view httpMethod,
     const std::string& protocolToUpgradeTo,
     HttpClient httpClient,
     CompletionHandler completionHandler)

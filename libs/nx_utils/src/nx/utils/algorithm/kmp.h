@@ -23,7 +23,7 @@ public:
      * NOTE: Processing is stopped with any occurrence. So, KmpSearcher::process has to be invoked
      * again with unprocessed text (textPart.substr(textPart.size() + str.size() - result)).
      */
-    std::string::size_type process(const std::string_view& textPart);
+    std::string::size_type process(std::string_view textPart);
 
     /**
      * @return E.g., if string to find is "bcd" and text "198nrabc" has been provided, then 2 is
@@ -36,7 +36,7 @@ private:
     const std::vector<int> m_prefixTable;
     std::size_t m_matchedPrefixLength = 0;
 
-    std::vector<int> computePrefixTable(const std::string_view& str);
+    std::vector<int> computePrefixTable(std::string_view str);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -62,13 +62,13 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 NX_UTILS_API std::string::size_type kmpFindNext(
-    const std::string_view& text,
-    const std::string_view& str,
+    std::string_view text,
+    std::string_view str,
     std::string::size_type pos = 0);
 
 NX_UTILS_API std::vector<std::string::size_type> kmpFindAll(
-    const std::string_view& text,
-    const std::string_view& str);
+    std::string_view text,
+    std::string_view str);
 
 NX_UTILS_API void kmpReplace(
     std::string* text,

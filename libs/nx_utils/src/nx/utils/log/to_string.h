@@ -162,9 +162,9 @@ NX_UTILS_API QString toString(wchar_t value);
 NX_UTILS_API QString toString(const char* value);
 NX_UTILS_API QString toString(const wchar_t* value);
 NX_UTILS_API QString toString(const std::string& value);
-NX_UTILS_API QString toString(const std::string_view& value);
+NX_UTILS_API QString toString(std::string_view value);
 NX_UTILS_API QString toString(const std::wstring& value);
-NX_UTILS_API QString toString(const std::string_view& value);
+NX_UTILS_API QString toString(std::string_view value);
 
 #if defined(__clang__) && defined(_MSC_VER)
 NX_UTILS_API QString toString(const _bstr_t& value);
@@ -363,7 +363,7 @@ inline QString toQString(const std::string& str)
     return QString::fromUtf8(str.data(), (int) str.size());
 }
 
-inline QString toQString(const std::string_view& str)
+inline QString toQString(std::string_view str)
 {
     return QString::fromUtf8(str.data(), (int) str.size());
 }

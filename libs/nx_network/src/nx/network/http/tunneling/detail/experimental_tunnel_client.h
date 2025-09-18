@@ -60,7 +60,7 @@ private:
 
     void initiateChannel(
         AsyncClient* httpClient,
-        const std::string_view& httpMethod,
+        std::string_view httpMethod,
         const std::string& requestPath,
         std::function<void()> requestHandler);
 

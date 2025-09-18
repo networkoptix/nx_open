@@ -21,7 +21,7 @@ SoftwareVersion::SoftwareVersion(const QByteArray& versionString):
 {
 }
 
-SoftwareVersion::SoftwareVersion(const std::string_view& versionString):
+SoftwareVersion::SoftwareVersion(std::string_view versionString):
     SoftwareVersion(QString::fromUtf8(versionString.data(), versionString.size()))
 {
 }

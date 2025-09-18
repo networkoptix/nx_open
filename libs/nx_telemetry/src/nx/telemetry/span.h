@@ -40,19 +40,19 @@ public:
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(Status, empty, ok, error)
 
     Span();
-    Span(const std::string_view& name, Kind kind = Kind::internal);
-    Span(const std::string_view& name, const Span& parent, Kind kind = Kind::internal);
+    Span(std::string_view name, Kind kind = Kind::internal);
+    Span(std::string_view name, const Span& parent, Kind kind = Kind::internal);
     virtual ~Span();
 
     bool isValid() const;
     std::string traceId() const;
 
-    void updateName(const std::string_view& newName);
+    void updateName(std::string_view newName);
 
-    void setAttribute(const std::string_view& name, const std::string_view& value);
-    void setAttribute(const std::string_view& name, int value);
+    void setAttribute(std::string_view name, std::string_view value);
+    void setAttribute(std::string_view name, int value);
 
-    void setStatus(Status status, const std::string_view& description = {});
+    void setStatus(Status status, std::string_view description = {});
 
     void end();
 

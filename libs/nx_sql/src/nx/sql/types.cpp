@@ -81,7 +81,7 @@ const char* toString(RdbmsDriverType value)
     }
 }
 
-RdbmsDriverType rdbmsDriverTypeFromString(const std::string_view& str)
+RdbmsDriverType rdbmsDriverTypeFromString(std::string_view str)
 {
     if (str == "QSQLITE")
         return RdbmsDriverType::sqlite;

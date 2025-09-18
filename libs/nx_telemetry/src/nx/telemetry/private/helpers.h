@@ -47,7 +47,7 @@ inline opentelemetry::trace::StatusCode toStatusCode(Span::Status status)
     return StatusCode::kUnset;
 }
 
-inline opentelemetry::nostd::string_view toStringView(const std::string_view& str)
+inline opentelemetry::nostd::string_view toStringView(std::string_view str)
 {
     return opentelemetry::nostd::string_view(str.data(), str.length());
 }

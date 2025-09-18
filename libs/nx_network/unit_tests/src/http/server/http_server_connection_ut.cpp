@@ -470,7 +470,7 @@ private:
     }
 
     void sendRequestAndCloseConnectionJustAfterSending(
-        const std::string_view& path,
+        std::string_view path,
         int bodySize,
         std::optional<int> contentLength = std::nullopt)
     {

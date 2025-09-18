@@ -50,7 +50,7 @@ QString ResolutionData::toString() const
     return QString::fromStdString(toStdString());
 }
 
-bool fromString(const std::string_view& str, ResolutionData* target)
+bool fromString(std::string_view str, ResolutionData* target)
 {
     std::match_results<std::string_view::const_iterator> match;
     if (!std::regex_search(str.begin(), str.end(), match, kResolutionRegexp))

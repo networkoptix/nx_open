@@ -9,7 +9,7 @@ std::string_view urlScheme(bool isSecure)
     return isSecure ? kSecureUrlSchemeName : kUrlSchemeName;
 }
 
-bool isUrlScheme(const std::string_view& scheme)
+bool isUrlScheme(std::string_view scheme)
 {
     return scheme == kUrlSchemeName || scheme == kSecureUrlSchemeName;
 }

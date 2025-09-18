@@ -37,11 +37,11 @@ std::time_t timegmCrossPlatform(struct tm* tm)
 }
 
 // Forward declarations for lock-free parsing functions
-std::int64_t parseRfc1123DateLockFree(const std::string_view& str);
-std::int64_t parseRfc850DateLockFree(const std::string_view& str);
-std::int64_t parseAnsiCDateLockFree(const std::string_view& str);
+std::int64_t parseRfc1123DateLockFree(std::string_view str);
+std::int64_t parseRfc850DateLockFree(std::string_view str);
+std::int64_t parseAnsiCDateLockFree(std::string_view str);
 
-QDateTime parseRfc1123Date(const std::string_view& str)
+QDateTime parseRfc1123Date(std::string_view str)
 {
     static constexpr const char* kTemplate = "%3s, %d %3s %d %d:%d:%d";
     char weekday[4], monthStr[4];
@@ -58,7 +58,7 @@ QDateTime parseRfc1123Date(const std::string_view& str)
 }
 
 // Sunday, 06-Nov-94 08:49:37 GMT (RFC 850, obsoleted by RFC 1036)
-QDateTime parseRfc850Date(const std::string_view& str)
+QDateTime parseRfc850Date(std::string_view str)
 {
     static constexpr char kRfc850Template[] = "dddd, dd-MMM-yy hh:mm:ss";
     return QLocale(QLocale::C).toDateTime(
@@ -66,7 +66,7 @@ QDateTime parseRfc850Date(const std::string_view& str)
 }
 
 // Sun Nov  6 08:49:37 1994  (ANSI C's asctime() format)
-QDateTime parseAnsiCDate(const std::string_view& str)
+QDateTime parseAnsiCDate(std::string_view str)
 {
     // QDateTime::fromString() requires exact format match, so two templates are required:
     // Non padded if the day of the month is >= 10, and padded if day of the month is < 10
@@ -82,7 +82,7 @@ QDateTime parseAnsiCDate(const std::string_view& str)
 }
 
 // Lock-free parsing helper functions
-std::int64_t parseRfc1123DateLockFree(const std::string_view& str)
+std::int64_t parseRfc1123DateLockFree(std::string_view str)
 {
     // Format: "Sun, 06 Nov 1994 08:49:37"
     // Expected length: 25 characters
@@ -130,7 +130,7 @@ std::int64_t parseRfc1123DateLockFree(const std::string_view& str)
     return static_cast<std::int64_t>(timeT) * 1000;
 }
 
-std::int64_t parseRfc850DateLockFree(const std::string_view& str)
+std::int64_t parseRfc850DateLockFree(std::string_view str)
 {
     // Format: "Sunday, 06-Nov-94 08:49:37"
     // Expected length: 28 characters
@@ -183,7 +183,7 @@ std::int64_t parseRfc850DateLockFree(const std::string_view& str)
     return static_cast<std::int64_t>(timeT) * 1000;
 }
 
-std::int64_t parseAnsiCDateLockFree(const std::string_view& str)
+std::int64_t parseAnsiCDateLockFree(std::string_view str)
 {
     // Format: "Sun Nov  6 08:49:37 1994" or "Sun Nov 16 08:49:37 1994"
     // Expected length: 24 or 25 characters
@@ -323,7 +323,7 @@ std::string formatDateTime(const QDateTime& value)
     return std::string(strDateBuf);
 }
 
-QDateTime parseDateToQDateTime(const std::string_view& str)
+QDateTime parseDateToQDateTime(std::string_view str)
 {
     auto date = nx::utils::trim(str);
 
@@ -358,7 +358,7 @@ QDateTime parseDateToQDateTime(const std::string_view& str)
     return parseAnsiCDate(date);
 }
 
-std::int64_t parseDateToMillisSinceEpoch(const std::string_view& str)
+std::int64_t parseDateToMillisSinceEpoch(std::string_view str)
 {
     auto date = nx::utils::trim(str);
 

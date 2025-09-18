@@ -41,7 +41,7 @@ public:
 
     std::shared_ptr<SSL_CTX> clientContext();
 
-    const std::string_view& sslSessionId();
+    std::string_view sslSessionId();
 
     /**
      * Set default certificate for connections where a custom certificate was not specified

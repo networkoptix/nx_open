@@ -6,7 +6,7 @@
 
 namespace nx::utils {
 
-int stricmp(const std::string_view& left, const std::string_view& right)
+int stricmp(std::string_view left, std::string_view right)
 {
     if (left.size() == right.size())
         return qstrnicmp(left.data(), right.data(), (int) left.size());

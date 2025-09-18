@@ -114,7 +114,7 @@ ConstBufferRefType LineSplitter::flush()
 
 //-------------------------------------------------------------------------------------------------
 
-StringLineIterator::StringLineIterator(const std::string_view& str):
+StringLineIterator::StringLineIterator(std::string_view str):
     m_sourceData(str)
 {
 }

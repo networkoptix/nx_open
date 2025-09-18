@@ -33,7 +33,7 @@ struct NX_VMS_API AspectRatioData
 bool NX_VMS_API deserialize(QnJsonContext* ctx, const QJsonValue& value, AspectRatioData* target);
 void NX_VMS_API serialize(QnJsonContext* ctx, const AspectRatioData& value, QJsonValue* target);
 
-bool NX_VMS_API fromString(const std::string_view& str, AspectRatioData* target);
+bool NX_VMS_API fromString(std::string_view str, AspectRatioData* target);
 
 NX_REFLECTION_TAG_TYPE(AspectRatioData, useStringConversionForSerialization)
 

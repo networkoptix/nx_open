@@ -167,7 +167,7 @@ bool AddressResolver::isRequestIdKnown(void* requestId) const
     return m_requests.count(requestId);
 }
 
-bool AddressResolver::isCloudHostname(const std::string_view& hostname) const
+bool AddressResolver::isCloudHostname(std::string_view hostname) const
 {
     return m_cloudAddressResolver->isCloudHostname(hostname);
 }

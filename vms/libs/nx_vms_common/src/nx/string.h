@@ -36,7 +36,7 @@ public:
     String& operator=(String&&) = default;
 
     String(const std::string&);
-    String(const std::string_view&);
+    String(std::string_view);
     String(const QString&);
     String(const char*);
 
@@ -47,7 +47,7 @@ public:
     String(nx::Buffer&&);
 
     String& operator=(const std::string&);
-    String& operator=(const std::string_view&);
+    String& operator=(std::string_view);
     String& operator=(const QString&);
     String& operator=(const char*);
 
@@ -73,7 +73,7 @@ public:
 
     using base_type::append;
 
-    nx::String& append(const std::string_view& str);
+    nx::String& append(std::string_view str);
     nx::String& append(const nx::Buffer& buf);
 
     static nx::String number(std::size_t n, int base = 10)

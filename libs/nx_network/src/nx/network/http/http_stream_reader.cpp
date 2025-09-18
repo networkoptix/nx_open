@@ -227,7 +227,7 @@ void HttpStreamReader::setParseHeadersStrict(bool enabled)
     m_parseHeadersStrict = enabled;
 }
 
-bool HttpStreamReader::isEncodingSupported(const std::string_view& encoding)
+bool HttpStreamReader::isEncodingSupported(std::string_view encoding)
 {
     return encoding == "gzip"
         || encoding == "deflate"

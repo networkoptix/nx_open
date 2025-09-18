@@ -35,7 +35,7 @@ public:
 
     virtual RdbmsDriverType driverType() const = 0;
 
-    virtual bool tableExist(const std::string_view& tableName) = 0;
+    virtual bool tableExist(std::string_view tableName) = 0;
 
     // TODO: #akolesnikov Remove this method. This requires switching every SqlQuery usage to createQuery().
     virtual QSqlDatabase* qtSqlConnection() = 0;

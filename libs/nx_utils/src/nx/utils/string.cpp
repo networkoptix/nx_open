@@ -488,7 +488,7 @@ std::string bytesToString(uint64_t bytes, int precision)
     return nx::format("%1%2").arg(number, 0, 'g', precision).arg(kByteSuffexes[suffix - 1]).toStdString();
 }
 
-uint64_t stringToBytes(const std::string_view& str, bool* isOk)
+uint64_t stringToBytes(std::string_view str, bool* isOk)
 {
     if (str.empty())
     {
@@ -497,7 +497,7 @@ uint64_t stringToBytes(const std::string_view& str, bool* isOk)
         return 0;
     }
 
-    const auto subDouble = [isOk](const std::string_view& str, const auto& multi)
+    const auto subDouble = [isOk](std::string_view str, const auto& multi)
     {
         std::size_t endPos = 0;
         const auto result = static_cast<uint64_t>(stod(str, &endPos) * multi);
@@ -524,7 +524,7 @@ uint64_t stringToBytes(const std::string_view& str, bool* isOk)
     return result;
 }
 
-uint64_t stringToBytes(const std::string_view& str, uint64_t defaultValue)
+uint64_t stringToBytes(std::string_view str, uint64_t defaultValue)
 {
     bool isOk = false;
     uint64_t value = stringToBytes(str, &isOk);

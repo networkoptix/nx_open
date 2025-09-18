@@ -35,7 +35,7 @@ public:
 
 protected:
     std::tuple<StatusCode::Value, std::string> composeFilePath(
-        const std::string_view& requestPath);
+        std::string_view requestPath);
 
 private:
     const std::string m_requestPathPrefix;

@@ -374,7 +374,7 @@ private:
     }
 
     SystemError::ErrorCode saveHostNameWithoutResolving(
-        const std::string_view& hostName,
+        std::string_view hostName,
         int /*ipVersion*/,
         ResolveResult* /*resolved*/)
     {
@@ -551,7 +551,7 @@ protected:
         m_fixedEntries.erase(m_fixedEntries.begin() + endpointIndexToRemove);
     }
 
-    void whenResolveDomain(const std::string_view& domainName)
+    void whenResolveDomain(std::string_view domainName)
     {
         using namespace std::placeholders;
 
@@ -618,7 +618,7 @@ private:
     std::vector<SocketAddress> m_fixedEntries;
 
     SystemError::ErrorCode dnsResolveStub(
-        const std::string_view& /*hostName*/,
+        std::string_view /*hostName*/,
         int /*ipVersion*/,
         ResolveResult* resolved)
     {

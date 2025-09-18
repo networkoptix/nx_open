@@ -123,7 +123,7 @@ private:
     }
 
     SystemError::ErrorCode testResolve(
-        const std::string_view& hostName,
+        std::string_view hostName,
         int /*ipVersion*/,
         ResolveResult* resolved)
     {

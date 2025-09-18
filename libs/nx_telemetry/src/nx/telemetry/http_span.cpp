@@ -64,7 +64,7 @@ void HttpSpan::setStatusCode(int httpStatusCode)
     setStatus(httpStatusCode < 400 ? Status::ok : Status::error);
 }
 
-void HttpSpan::setRoute(const std::string_view& route)
+void HttpSpan::setRoute(std::string_view route)
 {
     if (!isValid())
         return;
@@ -74,7 +74,7 @@ void HttpSpan::setRoute(const std::string_view& route)
 }
 
 HttpSpan HttpSpan::clientSpan(
-    const std::string_view& method, const std::string_view& url, HttpHeaders& headers)
+    std::string_view method, std::string_view url, HttpHeaders& headers)
 {
     HttpSpan span(url, Kind::client);
     if (!NX_ASSERT(span.isValid()))
@@ -93,9 +93,9 @@ HttpSpan HttpSpan::clientSpan(
 }
 
 HttpSpan HttpSpan::serverSpan(
-    const std::string_view& method,
-    const std::string_view& route,
-    const std::string_view& url,
+    std::string_view method,
+    std::string_view route,
+    std::string_view url,
     const HttpHeaders& headers)
 {
     const Span parentSpan = extractSpanFromHeaders(headers);

@@ -32,16 +32,16 @@ public:
      * @param saasDataJson nx::vms::api::SaasData structure in JSON representation, expected to be
      *     as response from the licensing server.
      */
-    void loadSaasData(const std::string_view& saasDataJson);
-    void loadSaasDataAsync(const std::string_view& saasDataJson);
+    void loadSaasData(std::string_view saasDataJson);
+    void loadSaasDataAsync(std::string_view saasDataJson);
 
     /**
      * Sets and stores services available to the system from Channel Partners.
      * @param servicesJson Array of nx::vms::api::SaasService structures in JSON representation,
      *     expected to be as response from the licensing server
      */
-    void loadServiceData(const std::string_view& servicesJson);
-    void loadServiceDataAsync(const std::string_view& servicesJson);
+    void loadServiceData(std::string_view servicesJson);
+    void loadServiceDataAsync(std::string_view servicesJson);
 
     /**
      * @return Detailed structure describing whole aspects of SaaS licensing state of the system.

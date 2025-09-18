@@ -23,13 +23,13 @@ const char* urlScheme(bool isSecure)
     return isSecure ? kSecureUrlSchemeName : kUrlSchemeName;
 }
 
-bool isUrlScheme(const std::string_view& scheme)
+bool isUrlScheme(std::string_view scheme)
 {
     return nx::utils::stricmp(scheme, kUrlSchemeName) == 0
         || nx::utils::stricmp(scheme, kSecureUrlSchemeName) == 0;
 }
 
-int defaultPortForScheme(const std::string_view& scheme)
+int defaultPortForScheme(std::string_view scheme)
 {
     if (nx::utils::stricmp(scheme, kUrlSchemeName) == 0)
         return DEFAULT_HTTP_PORT;
@@ -45,7 +45,7 @@ int defaultPort(bool isSecure)
 
 std::string getHeaderValue(
     const HttpHeaders& headers,
-    const std::string_view& headerName)
+    std::string_view headerName)
 {
     auto it = headers.lower_bound(headerName);
     return it == headers.end() || nx::utils::stricmp(it->first, headerName) != 0
@@ -55,7 +55,7 @@ std::string getHeaderValue(
 
 bool readHeader(
     const HttpHeaders& headers,
-    const std::string_view& headerName,
+    std::string_view headerName,
     int* value)
 {
     auto it = headers.lower_bound(headerName);
@@ -194,7 +194,7 @@ HttpHeader parseHeader(const ConstBufferRefType& data)
 //-------------------------------------------------------------------------------------------------
 // class Method.
 
-Method::Method(const std::string_view& str):
+Method::Method(std::string_view str):
     m_value(nx::utils::toUpper(str))
 {
 }
@@ -209,7 +209,7 @@ Method::Method(std::string str):
 {
 }
 
-Method& Method::operator=(const std::string_view& str)
+Method& Method::operator=(std::string_view str)
 {
     m_value = nx::utils::toUpper(str);
     return *this;
@@ -232,7 +232,7 @@ bool Method::operator<(const Method& right) const
     return nx::utils::stricmp(m_value, right.m_value) < 0;
 }
 
-bool Method::operator<(const std::string_view& right) const
+bool Method::operator<(std::string_view right) const
 {
     return nx::utils::stricmp(m_value, right) < 0;
 }
@@ -247,7 +247,7 @@ const std::string& Method::toString() const
     return m_value;
 }
 
-bool Method::isKnown(const std::string_view& str)
+bool Method::isKnown(std::string_view str)
 {
     return nx::utils::switch_(str,
         get, []() { return true; },
@@ -534,7 +534,7 @@ std::string Request::toString() const
     return toStdString(serialized());
 }
 
-std::string getCookieValue(const std::string_view& name, const HttpHeaders& headers)
+std::string getCookieValue(std::string_view name, const HttpHeaders& headers)
 {
     auto cookieIter = headers.find("cookie");
     if (cookieIter == headers.end())
@@ -553,7 +553,7 @@ std::string getCookieValue(const std::string_view& name, const HttpHeaders& head
     return std::string();
 }
 
-void Request::removeCookie(const std::string_view& name)
+void Request::removeCookie(std::string_view name)
 {
     static constexpr auto kCookieHeader = "Cookie";
 
@@ -874,7 +874,7 @@ std::string_view toString(Value val)
     return "InvalidValue";
 }
 
-Value fromString(const std::string_view& str)
+Value fromString(std::string_view str)
 {
     if (str == "Basic")
         return basic;
@@ -890,7 +890,7 @@ Value fromString(const std::string_view& str)
 //-------------------------------------------------------------------------------------------------
 // Authorization.
 
-bool BasicCredentials::parse(const std::string_view& base64Str)
+bool BasicCredentials::parse(std::string_view base64Str)
 {
     const auto str = nx::utils::fromBase64(base64Str);
 
@@ -909,7 +909,7 @@ void BasicCredentials::serialize(nx::Buffer* dest) const
     *dest += nx::utils::toBase64(nx::utils::buildString(userid, ':', password));
 }
 
-bool DigestCredentials::parse(const std::string_view& str, char separator)
+bool DigestCredentials::parse(std::string_view str, char separator)
 {
     nx::utils::splitNameValuePairs(
         str, separator, '=', std::inserter(params, params.end()));
@@ -968,7 +968,7 @@ void DigestCredentials::serialize(nx::Buffer* dest) const
         serializeParam(itr->first, itr->second, needQuoteForParam(itr->first));
 }
 
-bool BearerCredentials::parse(const std::string_view& str)
+bool BearerCredentials::parse(std::string_view str)
 {
     token = str;
     return !token.empty();
@@ -1061,7 +1061,7 @@ Authorization& Authorization::operator=(Authorization&& right)
     return *this;
 }
 
-bool Authorization::parse(const std::string_view& str)
+bool Authorization::parse(std::string_view str)
 {
     clear();
 
@@ -1235,7 +1235,7 @@ std::string WWWAuthenticate::getParam(const std::string& key) const
     return it != params.end() ? it->second : std::string();
 }
 
-bool WWWAuthenticate::parse(const std::string_view& str)
+bool WWWAuthenticate::parse(std::string_view str)
 {
     const auto authSchemeEndPos = str.find(' ');
     authScheme = AuthScheme::fromString(str.substr(0, authSchemeEndPos));
@@ -1279,18 +1279,18 @@ std::string WWWAuthenticate::toString() const
 //-------------------------------------------------------------------------------------------------
 // Accept-Encoding.
 
-AcceptEncodingHeader::AcceptEncodingHeader(const std::string_view& str)
+AcceptEncodingHeader::AcceptEncodingHeader(std::string_view str)
 {
     parse(str);
 }
 
-void AcceptEncodingHeader::parse(const std::string_view& str)
+void AcceptEncodingHeader::parse(std::string_view str)
 {
     m_anyCodingQValue.reset();
 
     nx::utils::split(
         str, ',',
-        [this](const std::string_view& contentCodingStr)
+        [this](std::string_view contentCodingStr)
         {
             const auto [tokens, count] = nx::utils::split_n<2>(contentCodingStr, ';');
             if (count == 0)
@@ -1346,11 +1346,11 @@ const std::map<std::string, double>& AcceptEncodingHeader::allEncodings() const
 
 Range::Range() = default;
 
-bool Range::parse(const std::string_view& str)
+bool Range::parse(std::string_view str)
 {
     nx::utils::split(
         str, ',',
-        [this](const std::string_view& simpleRangeStr)
+        [this](std::string_view simpleRangeStr)
         {
             RangeSpec rangeSpec;
             const auto [tokens, count] = nx::utils::split_n<2>(
@@ -1492,7 +1492,7 @@ std::string ContentRange::toString() const
 //-------------------------------------------------------------------------------------------------
 // Via.
 
-bool Via::parse(const std::string_view& strValue)
+bool Via::parse(std::string_view strValue)
 {
     if (strValue.empty())
         return true;
@@ -1581,7 +1581,7 @@ KeepAlive::KeepAlive(
 {
 }
 
-bool KeepAlive::parse(const std::string_view& str)
+bool KeepAlive::parse(std::string_view str)
 {
     max.reset();
 
@@ -1671,7 +1671,7 @@ bool Server::Product::operator==(const Server::Product& right) const
         && comment == right.comment;
 }
 
-Server::Product Server::Product::fromString(const std::string_view& str)
+Server::Product Server::Product::fromString(std::string_view str)
 {
     Product product;
 
@@ -1709,7 +1709,7 @@ bool Server::operator==(const Server& right) const
     return products == right.products;
 }
 
-bool Server::parse(const std::string_view& serverString)
+bool Server::parse(std::string_view serverString)
 {
     // "Nx/1.0 Mozilla/5.0 (Windows NT 6.1; WOW64)"
 
@@ -1718,7 +1718,7 @@ bool Server::parse(const std::string_view& serverString)
     bool ok = true;
     nx::utils::split(
         serverString, ' ',
-        [this, &ok](const std::string_view& token)
+        [this, &ok](std::string_view token)
         {
             if (token.starts_with('(') && token.ends_with(')')) // comment?
             {
@@ -1757,14 +1757,14 @@ bool StrictTransportSecurity::operator==(const StrictTransportSecurity& rhs) con
         && preload == rhs.preload;
 }
 
-bool StrictTransportSecurity::parse(const std::string_view& str)
+bool StrictTransportSecurity::parse(std::string_view str)
 {
     includeSubDomains = false;
     preload = false;
 
     nx::utils::splitNameValuePairs(
         str, ';', '=',
-        [this](const std::string_view& name, const std::string_view& value)
+        [this](std::string_view name, std::string_view value)
         {
             if (name == "max-age")
                 maxAge = std::chrono::seconds(nx::utils::stoi(value));
@@ -1787,12 +1787,12 @@ std::string StrictTransportSecurity::toString() const
 
 //-------------------------------------------------------------------------------------------------
 
-bool XForwardedFor::parse(const std::string_view& str)
+bool XForwardedFor::parse(std::string_view str)
 {
     std::size_t count = 0;
     nx::utils::split(
         str, ',',
-        [this, &count](const std::string_view& token)
+        [this, &count](std::string_view token)
         {
 
             const auto trimmedToken = nx::utils::trim(token);
@@ -1816,12 +1816,12 @@ std::string XForwardedFor::toString() const
 
 //-------------------------------------------------------------------------------------------------
 
-bool ForwardedElement::parse(const std::string_view& str)
+bool ForwardedElement::parse(std::string_view str)
 {
     int count = 0;
     nx::utils::splitNameValuePairs(
         str, ';', '=',
-        [this, &count](const std::string_view& name, const std::string_view& value)
+        [this, &count](std::string_view name, std::string_view value)
         {
             ++count;
 
@@ -1890,7 +1890,7 @@ bool ForwardedElement::operator==(const ForwardedElement& right) const
         && proto == right.proto;
 }
 
-std::string ForwardedElement::quoteIfNeeded(const std::string_view& str) const
+std::string ForwardedElement::quoteIfNeeded(std::string_view str) const
 {
     if (str.find(':') != std::string::npos)
         return nx::utils::buildString('\"', str, '\"');
@@ -1903,11 +1903,11 @@ Forwarded::Forwarded(std::vector<ForwardedElement> elements):
 {
 }
 
-bool Forwarded::parse(const std::string_view& str)
+bool Forwarded::parse(std::string_view str)
 {
     nx::utils::split(
         str, ',',
-        [this](const std::string_view& token)
+        [this](std::string_view token)
         {
             const auto trimmedToken = nx::utils::trim(token);
             if (trimmedToken.empty())
@@ -1943,7 +1943,7 @@ const ContentType ContentType::kJson("application/json");
 const ContentType ContentType::kUbjson("application/ubjson");
 const ContentType ContentType::kBinary("application/octet-stream");
 
-ContentType::ContentType(const std::string_view& str)
+ContentType::ContentType(std::string_view str)
 {
     const auto [records, recordCount] = nx::utils::split_n<2>(str, ';');
     if (recordCount == 0)

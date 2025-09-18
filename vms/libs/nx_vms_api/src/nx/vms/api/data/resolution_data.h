@@ -47,7 +47,7 @@ struct NX_VMS_API ResolutionData
 bool NX_VMS_API deserialize(QnJsonContext* ctx, const QJsonValue& value, ResolutionData* target);
 void NX_VMS_API serialize(QnJsonContext* ctx, const ResolutionData& value, QJsonValue* target);
 
-bool NX_VMS_API fromString(const std::string_view& str, ResolutionData* target);
+bool NX_VMS_API fromString(std::string_view str, ResolutionData* target);
 
 NX_REFLECTION_TAG_TYPE(ResolutionData, useStringConversionForSerialization)
 

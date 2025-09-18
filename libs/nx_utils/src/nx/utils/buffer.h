@@ -210,7 +210,7 @@ public:
     QByteArray takeByteArray();
 
     std::string toBase64() const;
-    static BasicBuffer fromBase64(const std::string_view& str);
+    static BasicBuffer fromBase64(std::string_view str);
 
 private:
     /** Enough to store a text representation of a guid. */
@@ -236,7 +236,7 @@ inline std::string toBase64(const BasicBuffer<char>& buf)
     return buf.toBase64();
 }
 
-inline BasicBuffer<char> fromBase64(const std::string_view& str)
+inline BasicBuffer<char> fromBase64(std::string_view str)
 {
     return BasicBuffer<char>::fromBase64(str);
 }
@@ -1225,7 +1225,7 @@ std::string BasicBuffer<CharType>::toBase64() const
 }
 
 template<typename CharType>
-BasicBuffer<CharType> BasicBuffer<CharType>::fromBase64(const std::string_view& str)
+BasicBuffer<CharType> BasicBuffer<CharType>::fromBase64(std::string_view str)
 {
     BasicBuffer<char> result;
 

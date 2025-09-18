@@ -56,7 +56,7 @@ public:
     void addHandler(const QString& path, std::unique_ptr<Handler> handler);
 
     std::vector<std::pair<QString, QString>> findOverlaps(const Request& request) const;
-    static QString replaceVersionWithRegex(const std::string_view& path);
+    static QString replaceVersionWithRegex(std::string_view path);
 
 private:
     class Item;

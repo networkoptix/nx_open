@@ -175,7 +175,7 @@ private:
  * If no suffix is found value considered to be seconds.
  */
 std::chrono::milliseconds NX_UTILS_API parseTimerDuration(
-    const std::string_view& duration,
+    std::string_view duration,
     std::chrono::milliseconds defaultValue = std::chrono::milliseconds::zero());
 
 std::chrono::milliseconds NX_UTILS_API parseTimerDuration(

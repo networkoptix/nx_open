@@ -33,7 +33,7 @@ const char* serializationFormatToHttpContentType(SerializationFormat format)
 }
 
 SerializationFormat serializationFormatFromHttpContentType(
-    const std::string_view& httpContentType)
+    std::string_view httpContentType)
 {
     if (nx::utils::contains(httpContentType, "application/json") || nx::utils::contains(httpContentType, "*/*"))
         return SerializationFormat::json;

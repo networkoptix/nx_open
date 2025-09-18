@@ -8,7 +8,7 @@
 
 namespace nx::network::url {
 
-std::uint16_t getDefaultPortForScheme(const std::string_view& scheme)
+std::uint16_t getDefaultPortForScheme(std::string_view scheme)
 {
     if (nx::utils::stricmp(scheme, nx::network::http::kUrlSchemeName) == 0)
         return 80;
@@ -32,7 +32,7 @@ SocketAddress getEndpoint(const nx::Url& url)
     return getEndpoint(url, getDefaultPortForScheme(url.scheme().toStdString()));
 }
 
-std::string normalizePath(const std::string_view& path)
+std::string normalizePath(std::string_view path)
 {
     std::vector<std::string_view> tokens;
     tokens.reserve(std::count(path.begin(), path.end(), '/') + 1);
@@ -43,7 +43,7 @@ std::string normalizePath(const std::string_view& path)
     nx::utils::split(
         path, '/',
         [&tokens, tokenCountBak = tokens.size()](
-            const std::string_view& token)
+            std::string_view token)
         {
             if (token == ".")
                 return;
@@ -80,7 +80,7 @@ QString normalizedPath(const QString& path, const QString& pathIgnorePrefix)
 
 namespace detail {
 
-std::string joinPath(const std::string_view& left, const std::string_view& right)
+std::string joinPath(std::string_view left, std::string_view right)
 {
     return normalizePath(nx::utils::buildString(left, "/", right));
 }

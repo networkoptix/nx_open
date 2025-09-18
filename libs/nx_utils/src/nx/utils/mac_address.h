@@ -21,7 +21,7 @@ public:
     explicit MacAddress(const QStringView& mac);
     explicit MacAddress(const QLatin1String& mac);
     explicit MacAddress(const QByteArray& mac);
-    MacAddress(const std::string_view& mac);
+    MacAddress(std::string_view mac);
 
     static MacAddress fromRawData(const unsigned char* mac);
     static MacAddress random();

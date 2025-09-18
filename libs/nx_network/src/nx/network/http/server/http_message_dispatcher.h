@@ -63,7 +63,7 @@ public:
      * @return false if some handler is already registered for path.
      */
     virtual bool registerRequestProcessor(
-        const std::string_view& path,
+        std::string_view path,
         HandlerFactoryFunc factoryFunc,
         const Method& method = kAnyMethod) = 0;
 
@@ -243,10 +243,10 @@ template<typename Mapped>
 class AbstractPathMatcher
 {
 public:
-    virtual bool add(const std::string_view& path, Mapped mapped) = 0;
+    virtual bool add(std::string_view path, Mapped mapped) = 0;
 
     virtual std::optional<std::reference_wrapper<const Mapped>> match(
-        const std::string_view& path,
+        std::string_view path,
         RequestPathParams* /*pathParams*/,
         std::string* /*pathTemplate*/) const = 0;
 };
@@ -264,7 +264,7 @@ public:
     virtual ~BasicMessageDispatcher() = default;
 
     virtual bool registerRequestProcessor(
-        const std::string_view& path,
+        std::string_view path,
         HandlerFactoryFunc factoryFunc,
         const Method& method = kAnyMethod) override
     {
@@ -285,7 +285,7 @@ public:
 
     template<typename RequestHandlerType>
     bool registerRequestProcessor(
-        const std::string_view& path = kAnyPath,
+        std::string_view path = kAnyPath,
         const Method& method = kAnyMethod)
     {
         return registerRequestProcessor(

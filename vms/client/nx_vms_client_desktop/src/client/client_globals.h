@@ -415,7 +415,7 @@ namespace Qn
     };
 
     std::string toString(ItemDataRole value);
-    bool fromString(const std::string_view& str, ItemDataRole* value);
+    bool fromString(std::string_view str, ItemDataRole* value);
 
     /**
      * Flags describing how viewport margins affect viewport geometry.

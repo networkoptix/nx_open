@@ -39,7 +39,7 @@ private:
 
 bool ReverseProxyHandler::add(
     const Method& method,
-    const std::string_view& pathRegex,
+    std::string_view pathRegex,
     const nx::Url& targetUrl)
 {
     TargetHost proxyTarget;

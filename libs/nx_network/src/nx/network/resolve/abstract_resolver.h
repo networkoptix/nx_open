@@ -28,7 +28,7 @@ public:
      * @param resolveResult Not empty in case if SystemError::noError is returned.
      */
     virtual SystemError::ErrorCode resolve(
-        const std::string_view& hostName,
+        std::string_view hostName,
         int ipVersion,
         ResolveResult* resolveResult) = 0;
 };

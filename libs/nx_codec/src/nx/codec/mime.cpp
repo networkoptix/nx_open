@@ -131,7 +131,7 @@ std::string getMimeType(const AVCodecParameters* codecpar)
     return result;
 }
 
-std::string getFormatMimeType(const std::string_view& format)
+std::string getFormatMimeType(std::string_view format)
 {
     if (format == "mkv")
         return "video/x-matroska";

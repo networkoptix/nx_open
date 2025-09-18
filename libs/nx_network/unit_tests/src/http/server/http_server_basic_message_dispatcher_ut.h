@@ -69,7 +69,7 @@ protected:
         m_messageDispatcher = std::make_unique<MessageDispatcherType>();
     }
 
-    void registerHandler(const std::string& path, const std::string_view& method = kAnyMethod)
+    void registerHandler(const std::string& path, std::string_view method = kAnyMethod)
     {
         m_messageDispatcher->registerRequestProcessor(
             path,

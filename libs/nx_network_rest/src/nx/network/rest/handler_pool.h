@@ -91,7 +91,7 @@ public:
     auto createRegisterHandlerFunctor()
     {
         return
-            [this](const std::string_view& path, auto&&... args)
+            [this](std::string_view path, auto&&... args)
             {
                 registerHandler(
                     PathRouter::replaceVersionWithRegex(path),

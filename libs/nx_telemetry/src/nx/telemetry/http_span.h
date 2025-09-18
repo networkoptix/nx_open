@@ -18,17 +18,17 @@ public:
     HttpSpan(const Span& span);
 
     void setStatusCode(int httpStatusCode);
-    void setRoute(const std::string_view& route);
+    void setRoute(std::string_view route);
 
     static HttpSpan clientSpan(
-        const std::string_view& method,
-        const std::string_view& url,
+        std::string_view method,
+        std::string_view url,
         HttpHeaders& headers);
 
     static HttpSpan serverSpan(
-        const std::string_view& method,
-        const std::string_view& route,
-        const std::string_view& url,
+        std::string_view method,
+        std::string_view route,
+        std::string_view url,
         const HttpHeaders& headers);
 
     static Span extractSpanFromHeaders(const HttpHeaders& headers);

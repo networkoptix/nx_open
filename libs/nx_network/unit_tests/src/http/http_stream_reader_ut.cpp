@@ -36,7 +36,7 @@ public:
     Method method;
 
     TestRequestData(
-        const std::string_view& method,
+        std::string_view method,
         nx::Buffer headers,
         nx::Buffer msgBody)
         :

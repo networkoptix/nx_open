@@ -48,7 +48,7 @@ void StripDefaultComposer::writeFloat(const double& value)
     Composer::writeFloat(value);
 }
 
-void StripDefaultComposer::writeString(const std::string_view& value)
+void StripDefaultComposer::writeString(std::string_view value)
 {
     onWriteValue();
     Composer::writeString(value);
@@ -60,7 +60,7 @@ void StripDefaultComposer::writeNull()
     Composer::writeNull();
 }
 
-void StripDefaultComposer::writeAttributeName(const std::string_view& name)
+void StripDefaultComposer::writeAttributeName(std::string_view name)
 {
     if (m_structured.back().writtenCount != 0)
         Composer::writeAttributeName(name);

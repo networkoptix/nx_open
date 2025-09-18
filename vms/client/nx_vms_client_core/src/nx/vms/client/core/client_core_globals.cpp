@@ -106,7 +106,7 @@ std::string toString(CoreItemDataRole value)
     return nx::reflect::enumeration::toString(value);
 }
 
-bool fromString(const std::string_view& str, CoreItemDataRole* value)
+bool fromString(std::string_view str, CoreItemDataRole* value)
 {
     return nx::reflect::enumeration::fromString(str, value);
 }

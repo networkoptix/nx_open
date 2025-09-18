@@ -10,8 +10,8 @@ namespace nx::network::rest {
 
 NX_NETWORK_REST_API std::string generateAuthSessionSign(
     const std::string& username,
-    const std::string_view& password,
-    const std::string_view& nonce)
+    std::string_view password,
+    std::string_view nonce)
 {
     nx::utils::QnCryptographicHash hashCalc((nx::utils::QnCryptographicHash::Sha256));
     hashCalc.addData(username);
@@ -25,7 +25,7 @@ NX_NETWORK_REST_API std::string generateAuthSessionSign(
 
 std::optional<std::string> generateAuthSessionHeader(
     const nx::network::http::Credentials& credentials,
-    const std::string_view& nonce)
+    std::string_view nonce)
 {
     if (credentials.username.empty() || !credentials.authToken.isPassword())
         return {};

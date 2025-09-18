@@ -31,7 +31,7 @@ class NX_NETWORK_API PredefinedHostResolver:
 {
 public:
     virtual SystemError::ErrorCode resolve(
-        const std::string_view& name,
+        std::string_view name,
         int ipVersion,
         ResolveResult* resolveResult) override;
 

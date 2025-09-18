@@ -16,7 +16,7 @@ namespace {
 constexpr std::string_view kNullUuid = "00000000-0000-0000-0000-000000000000";
 constexpr std::string_view kNullUuidWithBraces = "{00000000-0000-0000-0000-000000000000}";
 
-bool isValidNullUuidString(const std::string_view& data)
+bool isValidNullUuidString(std::string_view data)
 {
     return data == kNullUuid || data == kNullUuidWithBraces;
 }
@@ -90,7 +90,7 @@ bool Uuid::isUuidString(const std::string& data)
         || data.size() == 38; //< {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
 }
 
-bool Uuid::isUuidString(const std::string_view& data)
+bool Uuid::isUuidString(std::string_view data)
 {
     return data.empty()
         || data.size() == 36 //< xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -120,7 +120,7 @@ bool Uuid::isValidUuidString(const std::string& data)
     return validateUuid(data);
 }
 
-bool Uuid::isValidUuidString(const std::string_view& data)
+bool Uuid::isValidUuidString(std::string_view data)
 {
     return validateUuid(std::string(data));
 }
@@ -245,7 +245,7 @@ Uuid Uuid::fromStringSafe(const char* uuid)
     return Uuid(QUuid(uuid));
 }
 
-Uuid Uuid::fromStringSafe(const std::string_view& uuid)
+Uuid Uuid::fromStringSafe(std::string_view uuid)
 {
     return fromStringSafe(QByteArray::fromRawData(uuid.data(), (int) uuid.size()));
 }
@@ -290,12 +290,12 @@ Uuid Uuid::createUuidV7(std::chrono::milliseconds timeSinceEpoch)
     return result;
 }
 
-Uuid Uuid::fromString(const std::string_view& value)
+Uuid Uuid::fromString(std::string_view value)
 {
     return Uuid::fromStringSafe(value);
 }
 
-Uuid Uuid::fromStringWithCheck(const std::string_view& str, bool* ok)
+Uuid Uuid::fromStringWithCheck(std::string_view str, bool* ok)
 {
     Uuid result = Uuid::fromStringSafe(str);
     if (ok)

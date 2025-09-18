@@ -69,7 +69,7 @@ public:
     virtual std::multimap<QString, QString> allArgs() const override;
 
     QVariant value(
-        const std::string_view& key,
+        std::string_view key,
         const QVariant& defaultValue = QVariant()) const;
 
     QVariant value(

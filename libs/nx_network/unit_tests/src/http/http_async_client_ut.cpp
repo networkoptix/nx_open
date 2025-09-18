@@ -338,7 +338,7 @@ protected:
             [this]() { saveResponse(); });
     }
 
-    void whenSendRequestWithoutMessageBody(const std::string_view& method)
+    void whenSendRequestWithoutMessageBody(std::string_view method)
     {
         m_client->doRequest(
             method,
@@ -1355,7 +1355,7 @@ protected:
             [this]() { saveResponse(); });
     }
 
-    nx::Url getUrl(const std::string_view&)
+    nx::Url getUrl(std::string_view)
     {
         return url::Builder().setScheme(kUrlSchemeName)
             .setEndpoint(m_resourceServer.serverAddress())

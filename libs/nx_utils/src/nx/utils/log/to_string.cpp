@@ -145,7 +145,7 @@ QString toString(const std::string& value)
     return QString::fromStdString(value);
 }
 
-QString toString(const std::string_view& value)
+QString toString(std::string_view value)
 {
     return QString::fromUtf8(value.data(), (int) value.size());
 }

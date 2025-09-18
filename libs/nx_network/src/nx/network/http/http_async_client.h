@@ -514,7 +514,7 @@ private:
         server::Role serverRole,
         const Credentials& credentials,
         const header::WWWAuthenticate& authenticateHeader,
-        const std::string_view& authorizationHeaderName);
+        std::string_view authorizationHeaderName);
 
     void addBasicAuthorizationToRequest();
 

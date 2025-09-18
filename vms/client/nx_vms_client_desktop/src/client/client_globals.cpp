@@ -235,7 +235,7 @@ std::string toString(ItemDataRole value)
     return nx::reflect::enumeration::toString(value);
 }
 
-bool fromString(const std::string_view& str, ItemDataRole* value)
+bool fromString(std::string_view str, ItemDataRole* value)
 {
     return nx::reflect::enumeration::fromString(str, value);
 }

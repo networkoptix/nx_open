@@ -10,19 +10,19 @@ class HttpWildcardPathMatcher:
     public ::testing::Test
 {
 protected:
-    void add(const std::string_view& expr)
+    void add(std::string_view expr)
     {
         ASSERT_TRUE(m_matcher.add(expr, std::string(expr)));
     }
 
-    void assertMatch(const std::string_view& path, const std::string& expected)
+    void assertMatch(std::string_view path, const std::string& expected)
     {
         const auto matchResult = m_matcher.match(path);
         ASSERT_TRUE(matchResult);
         ASSERT_EQ(expected, matchResult->value);
     }
 
-    void assertNoMatch(const std::string_view& path)
+    void assertNoMatch(std::string_view path)
     {
         const auto matchResult = m_matcher.match(path);
         ASSERT_FALSE(matchResult);

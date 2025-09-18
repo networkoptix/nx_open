@@ -37,11 +37,11 @@ public:
     std::string value;
     AuthTokenType type = AuthTokenType::none;
 
-    void setPassword(const std::string_view& password);
+    void setPassword(std::string_view password);
     bool isPassword() const;
-    void setHa1(const std::string_view& ha1);
+    void setHa1(std::string_view ha1);
     bool isHa1() const;
-    void setBearerToken(const std::string_view& bearer);
+    void setBearerToken(std::string_view bearer);
     bool isBearerToken() const;
     bool empty() const;
 
@@ -52,21 +52,21 @@ class NX_NETWORK_API PasswordAuthToken:
     public AuthToken
 {
 public:
-    PasswordAuthToken(const std::string_view& password);
+    PasswordAuthToken(std::string_view password);
 };
 
 class NX_NETWORK_API Ha1AuthToken:
     public AuthToken
 {
 public:
-    Ha1AuthToken(const std::string_view& ha1);
+    Ha1AuthToken(std::string_view ha1);
 };
 
 class NX_NETWORK_API BearerAuthToken:
     public AuthToken
 {
 public:
-    BearerAuthToken(const std::string_view& token);
+    BearerAuthToken(std::string_view token);
 };
 
 class NX_NETWORK_API VideoWallAuthToken:
@@ -85,7 +85,7 @@ public:
     AuthToken authToken;
 
     Credentials() = default;
-    Credentials(const std::string_view& username, const AuthToken& authToken);
+    Credentials(std::string_view username, const AuthToken& authToken);
     Credentials(const BearerAuthToken& authToken);
 
     // TODO: #akolesnikov get rid of this constructor. Credentials can be used instead of QAuthenticator
@@ -101,7 +101,7 @@ NX_NETWORK_API void PrintTo(const Credentials& val, ::std::ostream* os);
 class NX_NETWORK_API PasswordCredentials: public Credentials
 {
 public:
-    PasswordCredentials(const std::string_view& username, const std::string_view& password):
+    PasswordCredentials(std::string_view username, std::string_view password):
         Credentials(username, PasswordAuthToken(password))
     {
     }
@@ -155,49 +155,49 @@ NX_NETWORK_API std::optional<header::Authorization> generateDigestAuthorization(
     int nonceCount);
 
 NX_NETWORK_API std::string calcHa1(
-    const std::string_view& userName,
-    const std::string_view& realm,
-    const std::string_view& userPassword,
-    const std::string_view& algorithm = {});
+    std::string_view userName,
+    std::string_view realm,
+    std::string_view userPassword,
+    std::string_view algorithm = {});
 
 NX_NETWORK_API std::string calcHa2(
     const Method& method,
-    const std::string_view& uri,
-    const std::string_view& algorithm = {});
+    std::string_view uri,
+    std::string_view algorithm = {});
 
 NX_NETWORK_API std::string calcResponse(
-    const std::string_view& ha1,
-    const std::string_view& nonce,
-    const std::string_view& ha2,
-    const std::string_view& algorithm = {});
+    std::string_view ha1,
+    std::string_view nonce,
+    std::string_view ha2,
+    std::string_view algorithm = {});
 
 NX_NETWORK_API std::string calcResponseAuthInt(
-    const std::string_view& ha1,
-    const std::string_view& nonce,
-    const std::string_view& nonceCount,
-    const std::string_view& clientNonce,
-    const std::string_view& qop,
-    const std::string_view& ha2,
-    const std::string_view& algorithm = {});
+    std::string_view ha1,
+    std::string_view nonce,
+    std::string_view nonceCount,
+    std::string_view clientNonce,
+    std::string_view qop,
+    std::string_view ha2,
+    std::string_view algorithm = {});
 
 /**
  * NOTE: If predefinedHa1 is present, then it is used. Otherwise, HA1 is calculated based on userPassword.
  */
 NX_NETWORK_API bool calcDigestResponse(
     const Method& method,
-    const std::string_view& userName,
+    std::string_view userName,
     const std::optional<std::string_view>& userPassword,
     const std::optional<std::string_view>& predefinedHa1,
-    const std::string_view& uri,
+    std::string_view uri,
     const std::map<std::string, std::string>& inputParams,
     std::map<std::string, std::string>* outputParams);
 
 NX_NETWORK_API bool calcDigestResponse(
     const Method& method,
-    const std::string_view& userName,
+    std::string_view userName,
     const std::optional<std::string_view>& userPassword,
     const std::optional<std::string_view>& predefinedHa1,
-    const std::string_view& uri,
+    std::string_view uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
     header::DigestAuthorization* const digestAuthorizationHeader,
     int nonceCount = 1);
@@ -205,7 +205,7 @@ NX_NETWORK_API bool calcDigestResponse(
 bool NX_NETWORK_API calcDigestResponse(
     const Method& method,
     const Credentials& credentials,
-    const std::string_view& uri,
+    std::string_view uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
     header::DigestAuthorization* const digestAuthorizationHeader,
     int nonceCount = 1);
@@ -215,14 +215,14 @@ bool NX_NETWORK_API calcDigestResponse(
  */
 NX_NETWORK_API bool validateAuthorization(
     const Method& method,
-    const std::string_view& userName,
+    std::string_view userName,
     const std::optional<std::string_view>& userPassword,
     const std::optional<std::string_view>& predefinedHa1,
     const header::DigestAuthorization& digestAuthorizationHeader);
 
 NX_NETWORK_API bool validateAuthorization(
     const Method& method,
-    const std::string_view& userName,
+    std::string_view userName,
     const std::optional<std::string_view>& userPassword,
     const std::optional<std::string_view>& predefinedHa1,
     const header::DigestCredentials& digestAuthorizationHeader);
@@ -239,8 +239,8 @@ NX_NETWORK_API bool validateAuthorization(
 
 NX_NETWORK_API bool validateAuthorizationByIntemerdiateResponse(
     const Method& method,
-    const std::string_view& intermediateResponse,
-    const std::string_view& baseNonce,
+    std::string_view intermediateResponse,
+    std::string_view baseNonce,
     const header::DigestCredentials& digestAuthorizationHeader);
 
 /**
@@ -249,8 +249,8 @@ NX_NETWORK_API bool validateAuthorizationByIntemerdiateResponse(
  *   This is requirement of MD5 algorithm.
  */
 NX_NETWORK_API std::string calcIntermediateResponse(
-    const std::string_view& ha1,
-    const std::string_view& nonce);
+    std::string_view ha1,
+    std::string_view nonce);
 
 /**
  * Calculates MD5(ha1:nonce:ha2).
@@ -260,10 +260,10 @@ NX_NETWORK_API std::string calcIntermediateResponse(
  * @param intermediateResponseNonceLen Length of nonce (bytes) used to generate intermediateResponse.
  */
 NX_NETWORK_API std::string calcResponseFromIntermediate(
-    const std::string_view& intermediateResponse,
+    std::string_view intermediateResponse,
     size_t intermediateResponseNonceLen,
-    const std::string_view& nonceTrailer,
-    const std::string_view& ha2);
+    std::string_view nonceTrailer,
+    std::string_view ha2);
 
 /**
  * Generates nonce according to rfc7616.

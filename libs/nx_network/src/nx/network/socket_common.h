@@ -84,7 +84,7 @@ public:
     HostAddress();
     HostAddress(const in_addr& v4Address);
     HostAddress(const in6_addr& v6Address, std::optional<uint32_t> scopeId = std::nullopt);
-    HostAddress(const std::string_view& addrStr);
+    HostAddress(std::string_view addrStr);
 
     // Construct from string literal
     template<size_t N>
@@ -167,13 +167,13 @@ public:
         std::optional<uint32_t> scopeId);
 
     static in_addr ipV4from(const uint32_t& ip);
-    static std::optional<in_addr> ipV4from(const std::string_view& ip);
-    static IpV6WithScope ipV6from(const std::string_view& ip);
+    static std::optional<in_addr> ipV4from(std::string_view ip);
+    static IpV6WithScope ipV6from(std::string_view ip);
 
     static std::optional<in_addr> ipV4from(const in6_addr& addr);
     static IpV6WithScope ipV6from(const in_addr& addr);
 
-    static HostAddress fromString(const std::string_view& host);
+    static HostAddress fromString(std::string_view host);
 
     void swap(HostAddress& other);
 
@@ -269,9 +269,9 @@ public:
     static const SocketAddress anyPrivateAddressV4;
     static const SocketAddress anyPrivateAddressV6;
 
-    static std::string_view trimIpV6(const std::string_view& str);
+    static std::string_view trimIpV6(std::string_view str);
 
-    static SocketAddress fromString(const std::string_view& str);
+    static SocketAddress fromString(std::string_view str);
     static SocketAddress fromUrl(const nx::Url& url, bool useDefaultPortFromScheme = false);
 
     /**
@@ -281,7 +281,7 @@ public:
      * E.g., [ipv6]:port.
      * @return pair<host, port (if present)>.
      */
-    static std::pair<std::string_view, std::optional<int>> split(const std::string_view& str);
+    static std::pair<std::string_view, std::optional<int>> split(std::string_view str);
     static std::pair<std::string_view, std::optional<int>> split(std::string_view&& str) = delete;
 
     static std::pair<std::string_view, std::optional<int>> split(const std::string& str);

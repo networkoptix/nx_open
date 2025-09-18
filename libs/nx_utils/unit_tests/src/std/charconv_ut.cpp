@@ -15,7 +15,7 @@ class CharconvFromChars:
 {
 protected:
     template<typename T, typename... Args>
-    void assertConverted(const std::string_view& str, T expected, Args... args)
+    void assertConverted(std::string_view str, T expected, Args... args)
     {
         T val = 0;
         const auto result = from_chars(str.data(), str.data() + str.size(), val, args...);
@@ -25,7 +25,7 @@ protected:
     }
 
     template<typename T, typename... Args>
-    void assertInvalidString(const std::string_view& str, Args... args)
+    void assertInvalidString(std::string_view str, Args... args)
     {
         T val = 0;
         const auto result = from_chars(str.data(), str.data() + str.size(), val, args...);
@@ -74,7 +74,7 @@ class CharconvToChars:
 {
 protected:
     template<typename T, typename... Args>
-    void assertConverted(const std::string_view& str, T value, Args... args)
+    void assertConverted(std::string_view str, T value, Args... args)
     {
         char buf[32];
         const auto result = to_chars(buf, buf + sizeof(buf), value, args...);

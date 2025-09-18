@@ -6,7 +6,7 @@
 
 namespace nx::utils {
 
-DataStream::DataStream(const std::string_view& buf):
+DataStream::DataStream(std::string_view buf):
     base_type(QByteArray::fromRawData(buf.data(), (int) buf.size()))
 {
 }

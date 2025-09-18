@@ -91,7 +91,7 @@ constexpr std::string_view toStdStringView(const nx::reflect::detail::string_vie
     return std::string_view(str.data(), (std::string_view::size_type) str.length());
 }
 
-constexpr nx::reflect::detail::string_view fromStdStringView(const std::string_view& str)
+constexpr nx::reflect::detail::string_view fromStdStringView(std::string_view str)
 {
     return nx::reflect::detail::string_view(str.data(), (int) str.length());
 }
@@ -149,7 +149,7 @@ bool isValidEnumValue(Enum value)
 }
 
 template<typename Enum>
-bool fromString(const std::string_view& str, Enum* value)
+bool fromString(std::string_view str, Enum* value)
 {
     static constexpr auto caseInsensitiveLess =
         [](const nx::reflect::detail::string_view& a, const nx::reflect::detail::string_view& b)

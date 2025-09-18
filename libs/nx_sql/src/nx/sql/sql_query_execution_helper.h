@@ -38,7 +38,7 @@ public:
      */
     static void execSQLScript(
         nx::sql::QueryContext* queryContext,
-        const std::string_view& script);
+        std::string_view script);
 
     /** Bind uuid to a query parameter. By default, null id is bound as NULL (param: optional). */
     static void bindId(QSqlQuery* query,

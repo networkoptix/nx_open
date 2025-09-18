@@ -22,12 +22,12 @@ void logInvalidFlagValue(const std::type_info& type, int value, int unrecognized
         QString::number(value, 16), QString::number(unrecognizedFlags, 16));
 }
 
-void logInvalidFlagRepresentation(const std::type_info& type, const std::string_view& flag)
+void logInvalidFlagRepresentation(const std::type_info& type, std::string_view flag)
 {
     NX_DEBUG(type, "fromString(): Invalid flag representation: %1", flag);
 }
 
-std::string_view trim(const std::string_view& str)
+std::string_view trim(std::string_view str)
 {
     return nx::utils::trim(str);
 }

@@ -17,7 +17,7 @@
 
 namespace nx::network::http {
 
-void AuthToken::setPassword(const std::string_view& password)
+void AuthToken::setPassword(std::string_view password)
 {
     type = AuthTokenType::password;
     value = password;
@@ -28,7 +28,7 @@ bool AuthToken::isPassword() const
     return type == AuthTokenType::password;
 }
 
-void AuthToken::setHa1(const std::string_view& ha1)
+void AuthToken::setHa1(std::string_view ha1)
 {
     type = AuthTokenType::ha1;
     value = ha1;
@@ -39,7 +39,7 @@ bool AuthToken::isHa1() const
     return type == AuthTokenType::ha1;
 }
 
-void AuthToken::setBearerToken(const std::string_view& token)
+void AuthToken::setBearerToken(std::string_view token)
 {
     type = AuthTokenType::bearer;
     value = token;
@@ -55,17 +55,17 @@ bool AuthToken::empty() const
     return type == AuthTokenType::none || value.empty();
 }
 
-PasswordAuthToken::PasswordAuthToken(const std::string_view& password)
+PasswordAuthToken::PasswordAuthToken(std::string_view password)
 {
     setPassword(password);
 }
 
-Ha1AuthToken::Ha1AuthToken(const std::string_view& ha1)
+Ha1AuthToken::Ha1AuthToken(std::string_view ha1)
 {
     setHa1(ha1);
 }
 
-BearerAuthToken::BearerAuthToken(const std::string_view& token)
+BearerAuthToken::BearerAuthToken(std::string_view token)
 {
     setBearerToken(token);
 }
@@ -76,7 +76,7 @@ VideoWallAuthToken::VideoWallAuthToken(const nx::Uuid& videoWallId)
 }
 
 Credentials::Credentials(
-    const std::string_view& username,
+    std::string_view username,
     const AuthToken& authToken)
     :
     username(username),
@@ -213,7 +213,7 @@ NX_NETWORK_API std::optional<header::Authorization> generateDigestAuthorization(
 }
 
 std::optional<nx::utils::QnCryptographicHash::Algorithm> parseAlgorithm(
-    const std::string_view& algorithm)
+    std::string_view algorithm)
 {
     // TODO: #muskov Perhaps we should support some other algorithms?
     if (nx::utils::stricmp(algorithm, "MD5") == 0)
@@ -229,10 +229,10 @@ std::optional<nx::utils::QnCryptographicHash::Algorithm> parseAlgorithm(
 }
 
 std::string calcHa1(
-    const std::string_view& userName,
-    const std::string_view& realm,
-    const std::string_view& userPassword,
-    const std::string_view& algorithm)
+    std::string_view userName,
+    std::string_view realm,
+    std::string_view userPassword,
+    std::string_view algorithm)
 {
     nx::utils::QnCryptographicHash md5HashCalc(*parseAlgorithm(algorithm));
     md5HashCalc.addData(userName);
@@ -246,8 +246,8 @@ std::string calcHa1(
 
 std::string calcHa2(
     const Method& method,
-    const std::string_view& uri,
-    const std::string_view& algorithm)
+    std::string_view uri,
+    std::string_view algorithm)
 {
     // TODO: #akolesnikov Use openssl directly.
 
@@ -260,10 +260,10 @@ std::string calcHa2(
 }
 
 std::string calcResponse(
-    const std::string_view& ha1,
-    const std::string_view& nonce,
-    const std::string_view& ha2,
-    const std::string_view& algorithm)
+    std::string_view ha1,
+    std::string_view nonce,
+    std::string_view ha2,
+    std::string_view algorithm)
 {
     nx::utils::QnCryptographicHash md5HashCalc(*parseAlgorithm(algorithm));
     md5HashCalc.addData(ha1);
@@ -276,13 +276,13 @@ std::string calcResponse(
 }
 
 std::string calcResponseAuthInt(
-    const std::string_view& ha1,
-    const std::string_view& nonce,
-    const std::string_view& nonceCount,
-    const std::string_view& clientNonce,
-    const std::string_view& qop,
-    const std::string_view& ha2,
-    const std::string_view& algorithm)
+    std::string_view ha1,
+    std::string_view nonce,
+    std::string_view nonceCount,
+    std::string_view clientNonce,
+    std::string_view qop,
+    std::string_view ha2,
+    std::string_view algorithm)
 {
     nx::utils::QnCryptographicHash md5HashCalc(*parseAlgorithm(algorithm));
     md5HashCalc.addData(ha1);
@@ -331,10 +331,10 @@ static std::optional<std::string> chooseQop(const std::string& qopAttributeValue
 
 bool calcDigestResponse(
     const Method& method,
-    const std::string_view& userName,
+    std::string_view userName,
     const std::optional<std::string_view>& userPassword,
     const std::optional<std::string_view>& predefinedHa1,
-    const std::string_view& uri,
+    std::string_view uri,
     const std::map<std::string, std::string>& inputParams,
     std::map<std::string, std::string>* const outputParams)
 {
@@ -393,10 +393,10 @@ bool calcDigestResponse(
 
 bool calcDigestResponse(
     const Method& method,
-    const std::string_view& userName,
+    std::string_view userName,
     const std::optional<std::string_view>& userPassword,
     const std::optional<std::string_view>& predefinedHa1,
-    const std::string_view& uri,
+    std::string_view uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
     header::DigestAuthorization* const digestAuthorizationHeader,
     int nonceCount)
@@ -425,7 +425,7 @@ bool calcDigestResponse(
 bool calcDigestResponse(
     const Method& method,
     const Credentials& credentials,
-    const std::string_view& uri,
+    std::string_view uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
     header::DigestAuthorization* const digestAuthorizationHeader,
     int nonceCount)
@@ -447,7 +447,7 @@ bool calcDigestResponse(
 
 bool validateAuthorization(
     const Method& method,
-    const std::string_view& userName,
+    std::string_view userName,
     const std::optional<std::string_view>& userPassword,
     const std::optional<std::string_view>& predefinedHa1,
     const header::DigestAuthorization& digestAuthorizationHeader)
@@ -462,7 +462,7 @@ bool validateAuthorization(
 
 bool validateAuthorization(
     const Method& method,
-    const std::string_view& userName,
+    std::string_view userName,
     const std::optional<std::string_view>& userPassword,
     const std::optional<std::string_view>& predefinedHa1,
     const header::DigestCredentials& digestAuthorizationHeader)
@@ -520,8 +520,8 @@ bool validateAuthorization(
 
 bool validateAuthorizationByIntemerdiateResponse(
     const Method& method,
-    const std::string_view& intermediateResponse,
-    const std::string_view& baseNonce,
+    std::string_view intermediateResponse,
+    std::string_view baseNonce,
     const header::DigestCredentials& digestAuthorizationHeader)
 {
     std::string uri = fieldOrDefault(digestAuthorizationHeader.params, "uri");
@@ -537,8 +537,8 @@ bool validateAuthorizationByIntemerdiateResponse(
 static const size_t MD5_CHUNK_LEN = 64;
 
 std::string calcIntermediateResponse(
-    const std::string_view& ha1,
-    const std::string_view& nonce)
+    std::string_view ha1,
+    std::string_view nonce)
 {
     NX_ASSERT((ha1.size() + 1 + nonce.size()) % MD5_CHUNK_LEN == 0,
         nx::format("ha1.size() = %1, nonce.size() = %2").args(ha1.size(), nonce.size()));
@@ -555,10 +555,10 @@ std::string calcIntermediateResponse(
 }
 
 std::string calcResponseFromIntermediate(
-    const std::string_view& intermediateResponse,
+    std::string_view intermediateResponse,
     size_t intermediateResponseNonceLen,
-    const std::string_view& nonceTrailer,
-    const std::string_view& ha2)
+    std::string_view nonceTrailer,
+    std::string_view ha2)
 {
     NX_ASSERT((MD5_DIGEST_LENGTH * 2 + 1 + intermediateResponseNonceLen) % MD5_CHUNK_LEN == 0);
 

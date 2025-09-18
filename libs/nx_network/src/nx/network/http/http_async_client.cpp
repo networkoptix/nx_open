@@ -1699,7 +1699,7 @@ bool AsyncClient::addDigestAuthorizationToRequest(
     server::Role serverRole,
     const Credentials& credentials,
     const header::WWWAuthenticate& authenticateHeader,
-    const std::string_view& authorizationHeaderName)
+    std::string_view authorizationHeaderName)
 {
     int nonceCount = 1;
     if (const auto nonceIter = authenticateHeader.params.find("nonce");

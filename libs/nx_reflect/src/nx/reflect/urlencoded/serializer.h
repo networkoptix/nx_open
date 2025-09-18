@@ -29,14 +29,14 @@ public:
     virtual void writeBool(bool val) override;
     virtual void writeInt(const std::int64_t& val) override;
     virtual void writeFloat(const double& val) override;
-    virtual void writeString(const std::string_view& val) override;
-    virtual void writeRawString(const std::string_view& val) override;
+    virtual void writeString(std::string_view val) override;
+    virtual void writeRawString(std::string_view val) override;
     virtual void writeNull() override;
-    virtual void writeAttributeName(const std::string_view& name) override;
+    virtual void writeAttributeName(std::string_view name) override;
 
     virtual std::string take() override;
 
-    static std::string encode(const std::string_view& str);
+    static std::string encode(std::string_view str);
 
 private:
     std::string m_resultStr;

@@ -49,7 +49,7 @@ public:
     >
     bool registerRestHandler(
         const Method& method,
-        const std::string_view& path,
+        std::string_view path,
         Func func)
     {
         using Handler = RequestHandler<Result, Input, Output, RestArgFetchers...>;

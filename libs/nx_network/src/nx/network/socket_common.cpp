@@ -71,7 +71,7 @@ HostAddress::HostAddress(const in6_addr& addr, std::optional<uint32_t> scopeId):
 {
 }
 
-HostAddress::HostAddress(const std::string_view& host): m_string(host)
+HostAddress::HostAddress(std::string_view host): m_string(host)
 {
     if (!host.empty())
     {
@@ -338,7 +338,7 @@ in_addr HostAddress::ipV4from(const uint32_t& ip)
     return v4;
 }
 
-std::optional<in_addr> HostAddress::ipV4from(const std::string_view& str)
+std::optional<in_addr> HostAddress::ipV4from(std::string_view str)
 {
     static constexpr auto maxIpv4StrSize = sizeof("ddd.ddd.ddd.ddd") - 1;
 
@@ -358,7 +358,7 @@ std::optional<in_addr> HostAddress::ipV4from(const std::string_view& str)
     return std::nullopt;
 }
 
-IpV6WithScope HostAddress::ipV6from(const std::string_view& str)
+IpV6WithScope HostAddress::ipV6from(std::string_view str)
 {
     static constexpr auto maxIpv6AddressStrSize = 16 * 2 + 7;
 
@@ -439,7 +439,7 @@ void HostAddress::swap(HostAddress& other)
     m_ipV6.swap(other.m_ipV6);
 }
 
-HostAddress HostAddress::fromString(const std::string_view& host)
+HostAddress HostAddress::fromString(std::string_view host)
 {
     std::optional<std::string_view> addressString;
     std::optional<in6_addr> ipV6;
@@ -542,7 +542,7 @@ const SocketAddress SocketAddress::anyPrivateAddressV4(
 const SocketAddress SocketAddress::anyPrivateAddressV6(
     HostAddress::localhost.toPureIpAddress(AF_INET6), 0);
 
-std::string_view SocketAddress::trimIpV6(const std::string_view& ip)
+std::string_view SocketAddress::trimIpV6(std::string_view ip)
 {
     if (nx::utils::startsWith(ip, '[') && nx::utils::endsWith(ip, ']'))
         return ip.substr(1, ip.length() - 2);
@@ -550,7 +550,7 @@ std::string_view SocketAddress::trimIpV6(const std::string_view& ip)
     return ip;
 }
 
-SocketAddress SocketAddress::fromString(const std::string_view& str)
+SocketAddress SocketAddress::fromString(std::string_view str)
 {
     return SocketAddress(str);
 }
@@ -567,7 +567,7 @@ SocketAddress SocketAddress::fromUrl(const nx::Url& url, bool useDefaultPortFrom
 }
 
 std::pair<std::string_view, std::optional<int>> SocketAddress::split(
-    const std::string_view& str)
+    std::string_view str)
 {
     const auto [tokens, count] = nx::utils::split_n<3>(
         str, ':',

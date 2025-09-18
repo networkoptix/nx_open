@@ -87,7 +87,7 @@ std::multimap<QString, QString> QnSettings::allArgs() const
 }
 
 QVariant QnSettings::value(
-    const std::string_view& key,
+    std::string_view key,
     const QVariant& defaultValue) const
 {
     return value(QString::fromUtf8(key.data(), key.size()), defaultValue);

@@ -79,7 +79,7 @@ struct Stringizable
 
     std::string toString() const { return s; }
 
-    static Stringizable fromString(const std::string_view& s) { return {std::string(s)}; }
+    static Stringizable fromString(std::string_view s) { return {std::string(s)}; }
 
     bool operator==(const Stringizable& right) const { return s == right.s; }
     bool operator<(const Stringizable& right) const { return s < right.s; }
@@ -93,7 +93,7 @@ struct StringizablePrime
 
     Stringizable toString() const { return Stringizable{s}; }
 
-    static StringizablePrime fromString(const std::string_view& s) { return { std::string(s) }; }
+    static StringizablePrime fromString(std::string_view s) { return { std::string(s) }; }
 
     bool operator==(const StringizablePrime& right) const { return s == right.s; }
 };
@@ -296,7 +296,7 @@ TEST_F(Json, stringizable_type_is_supported)
 struct NotTaggedStringizable
 {
     std::string toString() const { return "test"; }
-    static NotTaggedStringizable fromString(const std::string_view&) { return {}; }
+    static NotTaggedStringizable fromString(std::string_view) { return {}; }
 };
 
 using FooNotTaggedStringizable = Foo<NotTaggedStringizable>;
@@ -558,7 +558,7 @@ struct StringizableNonTemplateContainer: std::vector<std::string>
         return res;
     }
 
-    static StringizableNonTemplateContainer fromString(const std::string_view& str)
+    static StringizableNonTemplateContainer fromString(std::string_view str)
     {
         StringizableNonTemplateContainer result;
         std::size_t tokenStart = 0;

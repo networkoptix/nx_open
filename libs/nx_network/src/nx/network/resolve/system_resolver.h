@@ -22,7 +22,7 @@ public:
     static void setResolveLocalhost() { s_resolveLocalhost = true; }
 
     virtual SystemError::ErrorCode resolve(
-        const std::string_view& hostName,
+        std::string_view hostName,
         int ipVersion,
         ResolveResult* resolveResult) override;
 

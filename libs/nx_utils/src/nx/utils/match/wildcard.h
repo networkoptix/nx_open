@@ -124,8 +124,8 @@ bool wildcardMatch(
 }
 
 inline bool wildcardMatch(
-    const std::string_view& mask,
-    const std::string_view& str,
+    std::string_view mask,
+    std::string_view str,
     MatchMode mode = MatchMode::caseSensitive)
 {
     return wildcardMatch(

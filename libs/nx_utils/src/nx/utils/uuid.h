@@ -80,7 +80,7 @@ public:
     static Uuid fromStringSafe(const QString& uuid);
     static Uuid fromStringSafe(const QByteArray& uuid);
     static Uuid fromStringSafe(const char* uuid);
-    static Uuid fromStringSafe(const std::string_view& uuid);
+    static Uuid fromStringSafe(std::string_view uuid);
 
     /**
      * Creates a fixed Uuid from any data. As a value of uuid the MD5 hash is taken so created uuids
@@ -99,16 +99,16 @@ public:
     static bool isUuidString(const QByteArray& data);
     static bool isUuidString(const QString& data);
     static bool isUuidString(const std::string& data);
-    static bool isUuidString(const std::string_view& data);
+    static bool isUuidString(std::string_view data);
 
     static bool isValidUuidString(const QByteArray& data);
     static bool isValidUuidString(const QString& data);
     static bool isValidUuidString(const std::string& data);
-    static bool isValidUuidString(const std::string_view& data);
+    static bool isValidUuidString(std::string_view data);
 
-    static Uuid fromString(const std::string_view& str);
+    static Uuid fromString(std::string_view str);
 
-    static Uuid fromStringWithCheck(const std::string_view& str, bool* ok);
+    static Uuid fromStringWithCheck(std::string_view str, bool* ok);
 
 private:
     QUuid m_uuid;

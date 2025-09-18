@@ -32,7 +32,7 @@ public:
      * enclosed into {}. E.g., {name}. A path template may contain zero or more REST parameters.
      * @return true if path registered. false if a duplicate or an invalid path template.
      */
-    bool add(const std::string_view& pathTemplate, Mapped mapped)
+    bool add(std::string_view pathTemplate, Mapped mapped)
     {
         MatchContext matchContext;
         matchContext.regex = convertToRegex(pathTemplate);
@@ -59,7 +59,7 @@ public:
      * Matches registered paths. Path templates are tested in the order
      * they were registered using PathMatcher::add.
      */
-    std::optional<MatchResult> match(const std::string_view& path) const
+    std::optional<MatchResult> match(std::string_view path) const
     {
         for (const auto& [pathTemplateStr, matchContext]: m_restPathToMatchContext)
         {
@@ -108,7 +108,7 @@ private:
     /** REST path template, context */
     std::vector<std::pair<std::string, MatchContext>> m_restPathToMatchContext;
 
-    std::regex convertToRegex(const std::string_view& pathTemplate)
+    std::regex convertToRegex(std::string_view pathTemplate)
     {
         const std::regex replaceRestParams(
             "{[0-9a-zA-Z_-]*}", std::regex_constants::basic);
@@ -128,7 +128,7 @@ private:
             std::regex::icase | std::regex_constants::basic);
     }
 
-    bool fetchParamNames(const std::string_view& pathTemplateView, std::vector<std::string>* names)
+    bool fetchParamNames(std::string_view pathTemplateView, std::vector<std::string>* names)
     {
         std::string pathTemplate(pathTemplateView);
         std::set<std::string> uniqueNames;

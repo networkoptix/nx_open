@@ -45,7 +45,7 @@ constexpr std::array<SaasTierLimitName, 5> checkedTiers =
 void setJsonToDictionaryAsync(
     QnResourcePropertyDictionary* dictionary,
     const QString& propertyKey,
-    const std::string_view& json)
+    std::string_view json)
 {
     if (dictionary->setValue(nx::Uuid(), propertyKey, QString::fromUtf8(json)))
         dictionary->saveParamsAsync(nx::Uuid());
@@ -53,7 +53,7 @@ void setJsonToDictionaryAsync(
 
 void setJsonToDictionarySync(QnResourcePropertyDictionary* dictionary,
     const QString& propertyKey,
-    const std::string_view& json)
+    std::string_view json)
 {
     if (dictionary->setValue(nx::Uuid(), propertyKey, QString::fromUtf8(json)))
         dictionary->saveParams(nx::Uuid());
@@ -156,7 +156,7 @@ void ServiceManager::resetGracePeriodCache()
     m_tierGracePeriodExpirationTime.reset();
 }
 
-void ServiceManager::loadSaasDataAsync(const std::string_view& saasDataJson)
+void ServiceManager::loadSaasDataAsync(std::string_view saasDataJson)
 {
     setJsonToDictionaryAsync(
         resourcePropertyDictionary(),
@@ -164,7 +164,7 @@ void ServiceManager::loadSaasDataAsync(const std::string_view& saasDataJson)
         saasDataJson);
 }
 
-void ServiceManager::loadSaasData(const std::string_view& saasDataJson)
+void ServiceManager::loadSaasData(std::string_view saasDataJson)
 {
     setJsonToDictionarySync(
         resourcePropertyDictionary(),
@@ -178,7 +178,7 @@ QByteArray ServiceManager::rawData() const
         nx::Uuid(), kSaasDataPropertyKey).toUtf8();
 }
 
-void ServiceManager::loadServiceData(const std::string_view& servicesJson)
+void ServiceManager::loadServiceData(std::string_view servicesJson)
 {
     setJsonToDictionarySync(
         resourcePropertyDictionary(),
@@ -186,7 +186,7 @@ void ServiceManager::loadServiceData(const std::string_view& servicesJson)
         servicesJson);
 }
 
-void ServiceManager::loadServiceDataAsync(const std::string_view& servicesJson)
+void ServiceManager::loadServiceDataAsync(std::string_view servicesJson)
 {
     setJsonToDictionaryAsync(
         resourcePropertyDictionary(),

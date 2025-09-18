@@ -17,11 +17,11 @@ public:
     CloudAddressResolver();
 
     virtual SystemError::ErrorCode resolve(
-        const std::string_view& hostname,
+        std::string_view hostname,
         int ipVersion,
         ResolveResult* resolveResult) override;
 
-    bool isCloudHostname(const std::string_view& hostname) const;
+    bool isCloudHostname(std::string_view hostname) const;
 
 private:
     const std::regex m_cloudAddressRegex;

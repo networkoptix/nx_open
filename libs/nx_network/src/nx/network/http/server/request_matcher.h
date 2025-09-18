@@ -36,7 +36,7 @@ public:
     template<typename MappedRef>
     bool add(
         const Method& method,
-        const std::string_view& path,
+        std::string_view path,
         MappedRef&& mapped)
     {
         PathMatchContext& ctx = m_methodToPath[method];
@@ -56,7 +56,7 @@ public:
      */
     std::optional<MatchResult> match(
         const Method& method,
-        const std::string_view& path) const
+        std::string_view path) const
     {
         if (auto res = matchInternal(method, path); res)
             return res;
@@ -85,7 +85,7 @@ private:
 
     std::optional<MatchResult> matchInternal(
         const Method& method,
-        const std::string_view& path) const
+        std::string_view path) const
     {
         if (auto ctxIter = m_methodToPath.find(method); ctxIter != m_methodToPath.end())
             return matchPath(ctxIter->second, path);
@@ -95,7 +95,7 @@ private:
 
     std::optional<MatchResult> matchPath(
         const PathMatchContext& pathMatchContext,
-        const std::string_view& path) const
+        std::string_view path) const
     {
         if (auto result = pathMatchContext.pathToItem.match(path); result)
             return result;

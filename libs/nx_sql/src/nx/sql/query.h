@@ -23,20 +23,20 @@ public:
     virtual ~AbstractSqlQuery() = default;
 
     virtual void setForwardOnly(bool val) = 0;
-    virtual void prepare(const std::string_view& query) = 0;
+    virtual void prepare(std::string_view query) = 0;
 
     template<typename... Params>
-    void prepareWithValues(const std::string_view& query, Params&&... params);
+    void prepareWithValues(std::string_view query, Params&&... params);
 
     virtual void addBindValue(const QVariant& value) noexcept = 0;
-    virtual void addBindValue(const std::string_view& value) noexcept = 0;
+    virtual void addBindValue(std::string_view value) noexcept = 0;
     virtual void bindValue(const QString& placeholder, const QVariant& value) noexcept = 0;
     virtual void bindValue(int pos, const QVariant& value) noexcept = 0;
-    virtual void bindValue(const std::string_view& placeholder, const std::string_view& value) noexcept = 0;
-    virtual void bindValue(int pos, const std::string_view& value) noexcept = 0;
+    virtual void bindValue(std::string_view placeholder, std::string_view value) noexcept = 0;
+    virtual void bindValue(int pos, std::string_view value) noexcept = 0;
 
     virtual void exec() = 0;
-    virtual void exec(const std::string_view& query) = 0;
+    virtual void exec(std::string_view query) = 0;
 
     virtual bool next() = 0;
 
@@ -77,7 +77,7 @@ template<> inline std::string AbstractSqlQuery::value<std::string>(const char* n
 }
 
 template<typename... Params>
-inline void AbstractSqlQuery::prepareWithValues(const std::string_view& query, Params&&... params)
+inline void AbstractSqlQuery::prepareWithValues(std::string_view query, Params&&... params)
 {
     prepare(query);
     (addBindValue(std::forward<Params>(params)), ...);
@@ -93,17 +93,17 @@ public:
     SqlQuery(QSqlDatabase connection, StatisticsCollector* statisticsCollector);
 
     virtual void setForwardOnly(bool val) override;
-    virtual void prepare(const std::string_view& query) override;
+    virtual void prepare(std::string_view query) override;
 
     virtual void addBindValue(const QVariant& value) noexcept override;
-    virtual void addBindValue(const std::string_view& value) noexcept override;
+    virtual void addBindValue(std::string_view value) noexcept override;
     virtual void bindValue(const QString& placeholder, const QVariant& value) noexcept override;
     virtual void bindValue(int pos, const QVariant& value) noexcept override;
-    virtual void bindValue(const std::string_view& placeholder, const std::string_view& value) noexcept override;
-    virtual void bindValue(int pos, const std::string_view& value) noexcept override;
+    virtual void bindValue(std::string_view placeholder, std::string_view value) noexcept override;
+    virtual void bindValue(int pos, std::string_view value) noexcept override;
 
     virtual void exec() override;
-    virtual void exec(const std::string_view& query) override;
+    virtual void exec(std::string_view query) override;
 
     virtual bool next() override;
     virtual QVariant value(int index) const override;
@@ -130,7 +130,7 @@ private:
 private:
     void exec(const std::optional<std::string_view>& query);
 
-    bool shouldPrepare(const std::string_view& query);
+    bool shouldPrepare(std::string_view query);
 
     DBResult getLastError();
 };

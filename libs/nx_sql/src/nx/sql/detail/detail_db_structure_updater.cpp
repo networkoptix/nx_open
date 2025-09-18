@@ -240,8 +240,8 @@ namespace {
 template<typename... FutherStrs>
 std::string substituteArgs(
     const std::string& text,
-    const std::string_view& token,
-    const std::string_view& str,
+    std::string_view token,
+    std::string_view str,
     const FutherStrs&... futherStrs)
 {
     auto pos = text.find(token);

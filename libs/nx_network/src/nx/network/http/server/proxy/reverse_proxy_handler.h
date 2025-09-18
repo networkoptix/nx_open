@@ -22,7 +22,7 @@ public:
      */
     bool add(
         const Method& method,
-        const std::string_view& pathRegex,
+        std::string_view pathRegex,
         const nx::Url& target);
 
     virtual void serve(

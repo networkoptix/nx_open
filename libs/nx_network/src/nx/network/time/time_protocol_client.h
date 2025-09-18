@@ -18,7 +18,7 @@ static constexpr unsigned short kTimeProtocolDefaultPort = 37;     //time protoc
 /**
  * Converts time from Time protocol format (rfc868) to millis from epoch (1970-01-01) UTC.
  */
-NX_NETWORK_API std::optional<qint64> rfc868TimestampToTimeToUtcMillis(const std::string_view& timeStr);
+NX_NETWORK_API std::optional<qint64> rfc868TimestampToTimeToUtcMillis(std::string_view timeStr);
 
 /**
  * Fetches time using Time (rfc868) protocol.

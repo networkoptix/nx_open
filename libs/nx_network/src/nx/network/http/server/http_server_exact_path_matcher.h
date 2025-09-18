@@ -20,12 +20,12 @@ class ExactPathMatcher
 public:
     using MatchResult = RequestMatchResult<Mapped>;
 
-    bool add(const std::string_view& path, Mapped mapped)
+    bool add(std::string_view path, Mapped mapped)
     {
         return m_pathToMapped.emplace(std::string(path), std::move(mapped)).second;
     }
 
-    std::optional<MatchResult> match(const std::string_view& path) const
+    std::optional<MatchResult> match(std::string_view path) const
     {
         if (auto it = m_pathToMapped.find(path); it != m_pathToMapped.end())
         {

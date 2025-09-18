@@ -41,7 +41,7 @@ public:
     void addData(const char *data, int length);
     void addData(const QByteArray& data);
     void addData(const nx::Buffer& data);
-    void addData(const std::string_view& data);
+    void addData(std::string_view data);
     void addData(const std::string& data);
     void addData(const char* data);
     bool addData(QIODevice* device);
@@ -61,20 +61,20 @@ inline QByteArray md5(const QByteArray& data)
     return QnCryptographicHash::hash(data, QnCryptographicHash::Md5);
 }
 
-NX_UTILS_API std::string md5(const std::string_view& data);
+NX_UTILS_API std::string md5(std::string_view data);
 
 inline QByteArray sha1(const QByteArray& data)
 {
     return QnCryptographicHash::hash(data, QnCryptographicHash::Sha1);
 }
 
-NX_UTILS_API std::string sha1(const std::string_view& data);
+NX_UTILS_API std::string sha1(std::string_view data);
 
 NX_UTILS_API QByteArray sha3_256(const QByteArray& data);
-NX_UTILS_API std::string sha3_256(const std::string_view& data);
+NX_UTILS_API std::string sha3_256(std::string_view data);
 
 NX_UTILS_API QByteArray sha3_512(const QByteArray& data);
-NX_UTILS_API std::string sha3_512(const std::string_view& data);
+NX_UTILS_API std::string sha3_512(std::string_view data);
 
 } // namespace nx::utils
 

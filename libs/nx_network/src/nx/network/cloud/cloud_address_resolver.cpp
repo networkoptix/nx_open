@@ -12,7 +12,7 @@ CloudAddressResolver::CloudAddressResolver():
 }
 
 SystemError::ErrorCode CloudAddressResolver::resolve(
-    const std::string_view& hostname,
+    std::string_view hostname,
     int /*ipVersion*/,
     ResolveResult* resolveResult)
 {
@@ -25,7 +25,7 @@ SystemError::ErrorCode CloudAddressResolver::resolve(
     return SystemError::noError;
 }
 
-bool CloudAddressResolver::isCloudHostname(const std::string_view& hostname) const
+bool CloudAddressResolver::isCloudHostname(std::string_view hostname) const
 {
     return std::regex_match(
         hostname.data(), hostname.data() + hostname.size(),

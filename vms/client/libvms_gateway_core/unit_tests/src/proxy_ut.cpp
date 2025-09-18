@@ -477,7 +477,7 @@ protected:
         }
     }
 
-    void andNoHeaderPresent(const std::string_view& name)
+    void andNoHeaderPresent(std::string_view name)
     {
         ASSERT_EQ(0, m_lastProxiedRequest.headers.count(name));
     }

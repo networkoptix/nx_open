@@ -298,7 +298,7 @@ NX_UTILS_API QDateTime fromOffsetSinceEpoch(const nanoseconds& offset)
         duration_cast<milliseconds>(offset).count());
 }
 
-std::optional<std::chrono::milliseconds> parseDuration(const std::string_view& str)
+std::optional<std::chrono::milliseconds> parseDuration(std::string_view str)
 {
     using namespace std::chrono;
 
@@ -331,7 +331,7 @@ std::optional<std::chrono::milliseconds> parseDuration(const std::string_view& s
 }
 
 std::chrono::milliseconds parseDurationOr(
-    const std::string_view& str,
+    std::string_view str,
     std::chrono::milliseconds defaultValue)
 {
     auto val = parseDuration(str);

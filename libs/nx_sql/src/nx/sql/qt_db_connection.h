@@ -33,7 +33,7 @@ public:
 
     virtual QSqlDatabase* qtSqlConnection() override;
 
-    virtual bool tableExist(const std::string_view& tableName) override;
+    virtual bool tableExist(std::string_view tableName) override;
 
 private:
     RdbmsDriverType m_driverType;

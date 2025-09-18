@@ -90,7 +90,7 @@ MacAddress::MacAddress(const QStringView& mac)
     m_data = data;
 }
 
-MacAddress::MacAddress(const std::string_view& mac):
+MacAddress::MacAddress(std::string_view mac):
     MacAddress(QString::fromUtf8(mac.data(), (int) mac.size()))
 {
     // TODO: #akolesnikov Move implementation to this constructor since it will be more efficient.

@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::core {
 
-CloudService fromString(const std::string_view& string)
+CloudService fromString(std::string_view string)
 {
     return nx::reflect::fromString<CloudService>(string, CloudService::none);
 }
@@ -22,7 +22,7 @@ struct CloudServiceChecker::Private
         nx::utils::split(
             serviceString,
             nx::utils::separator::isAnyOf(" ,;"),
-            [this](const std::string_view& serviceName)
+            [this](std::string_view serviceName)
             {
                 if (const auto service = fromString(serviceName); service != CloudService::none)
                     unsupportedCloudServices.setFlag(service);

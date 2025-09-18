@@ -20,7 +20,7 @@ Client::~Client()
     pleaseStopSync();
 }
 
-void Client::getListeningPeers(const std::string_view& systemId,
+void Client::getListeningPeers(std::string_view systemId,
     nx::MoveOnlyFunc<void(ResultCode, SystemPeers)> completionHandler)
 {
     base_type::template makeAsyncCall<SystemPeers>(nx::network::http::Method::get,
@@ -30,7 +30,7 @@ void Client::getListeningPeers(const std::string_view& systemId,
 }
 
 std::tuple<Client::ResultCode, SystemPeers> Client::getListeningPeers(
-    const std::string_view& systemId)
+    std::string_view systemId)
 {
     return base_type::template makeSyncCall<SystemPeers>(nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kStatisticsSystemPeersPath, {systemId}),
@@ -60,7 +60,7 @@ void Client::reportUplinkSpeed(const PeerConnectionSpeed& connectionSpeed,
 }
 
 void Client::resetConnections(
-    const std::string_view& systemId,
+    std::string_view systemId,
     nx::MoveOnlyFunc<void(ResultCode, std::vector<std::string>)> completionHandler)
 {
     base_type::template makeAsyncCall<std::vector<std::string>>(
@@ -70,7 +70,7 @@ void Client::resetConnections(
         std::move(completionHandler));
 }
 
-std::tuple<api::ResultCode, std::vector<std::string>> Client::resetConnections(const std::string_view& systemId)
+std::tuple<api::ResultCode, std::vector<std::string>> Client::resetConnections(std::string_view systemId)
 {
     return base_type::template makeSyncCall<std::vector<std::string>>(
         nx::network::http::Method::post,

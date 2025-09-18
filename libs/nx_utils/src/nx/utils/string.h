@@ -106,8 +106,8 @@ NX_UTILS_API std::string bytesToString(uint64_t bytes, int precision = 4);
  * K, M, G suffix are supported.
  * @return On failure returns 0 and (if not null) sets *ok to false.
 */
-NX_UTILS_API uint64_t stringToBytes(const std::string_view& str, bool* ok = nullptr);
-NX_UTILS_API uint64_t stringToBytes(const std::string_view& str, uint64_t defaultValue);
+NX_UTILS_API uint64_t stringToBytes(std::string_view str, bool* ok = nullptr);
+NX_UTILS_API uint64_t stringToBytes(std::string_view str, uint64_t defaultValue);
 
 /**
  * Removes all ampersands that are not concatenated with others

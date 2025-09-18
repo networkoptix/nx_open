@@ -113,7 +113,7 @@ std::shared_ptr<SSL_CTX> Context::clientContext()
     return m_clientContext;
 }
 
-const std::string_view& Context::sslSessionId()
+std::string_view Context::sslSessionId()
 {
     return kSslSessionId;
 }

@@ -10,7 +10,7 @@ namespace nx {
 namespace network {
 
 SystemError::ErrorCode TextIpAddressResolver::resolve(
-    const std::string_view& hostName,
+    std::string_view hostName,
     int ipVersion,
     ResolveResult* resolveResult)
 {

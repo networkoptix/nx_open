@@ -93,7 +93,7 @@ public:
 
     bool isRequestIdKnown(void* requestId) const;
 
-    bool isCloudHostname(const std::string_view& hostname) const;
+    bool isCloudHostname(std::string_view hostname) const;
     bool isCloudHostname(const QString& hostname) const;
     bool isCloudHostname(const char* hostname) const;
 

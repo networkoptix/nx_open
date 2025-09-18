@@ -33,7 +33,7 @@ public:
      * Implementation is allowed to reject adding child. In this case it must return false.
      * If node added, true is returned and ownership of child object is taken.
      */
-    virtual bool addChild(const std::string_view& value, std::unique_ptr<AbstractNode> child) = 0;
+    virtual bool addChild(std::string_view value, std::unique_ptr<AbstractNode> child) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ public:
         AbstractAttributeWriter* const out) const override;
 
     virtual bool addChild(
-        const std::string_view& value,
+        std::string_view value,
         std::unique_ptr<AbstractNode> child) override;
 
 private:
@@ -71,7 +71,7 @@ public:
     using KeyType = Key;
     using SearchValueType = Key;
 
-    static Key convertToKey(const std::string_view& str)
+    static Key convertToKey(std::string_view str)
     {
         Key key;
         if (!nx::reflect::fromString(str, &key))
@@ -79,7 +79,7 @@ public:
         return key;
     }
 
-    static Key convertToSearchValue(const std::string_view& value)
+    static Key convertToSearchValue(std::string_view value)
     {
         return convertToKey(value);
     }
@@ -137,7 +137,7 @@ public:
     }
 
     virtual bool addChild(
-        const std::string_view& value,
+        std::string_view value,
         std::unique_ptr<AbstractNode> child) override
     {
         return m_children.emplace(
@@ -163,7 +163,7 @@ public:
     AttrPresenceNode(std::string attrToMatchName);
 
     virtual void get(const AbstractAttributeReader& in, AbstractAttributeWriter* const out) const override;
-    virtual bool addChild(const std::string_view& value, std::unique_ptr<AbstractNode> child) override;
+    virtual bool addChild(std::string_view value, std::unique_ptr<AbstractNode> child) override;
 
 private:
     /** [0] - for false. [1] - for true. */
@@ -186,7 +186,7 @@ public:
      * Adds to out attribute and then calls m_child->get() (if child exists).
      */
     virtual void get(const AbstractAttributeReader& in, AbstractAttributeWriter* const out) const override;
-    virtual bool addChild(const std::string_view& value, std::unique_ptr<AbstractNode> child) override;
+    virtual bool addChild(std::string_view value, std::unique_ptr<AbstractNode> child) override;
 
 private:
     std::unique_ptr<AbstractNode> m_child;

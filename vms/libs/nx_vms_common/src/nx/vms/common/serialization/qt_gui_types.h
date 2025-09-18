@@ -12,7 +12,7 @@ class QColor;
 class QRegion;
 
 NX_VMS_COMMON_API std::string toString(const QColor& value);
-NX_VMS_COMMON_API bool fromString(const std::string_view& str, QColor* value);
+NX_VMS_COMMON_API bool fromString(std::string_view str, QColor* value);
 
 NX_REFLECTION_TAG_TYPE(QColor, useStringConversionForSerialization)
 

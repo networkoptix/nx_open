@@ -17,7 +17,7 @@ const std::string& KmpSearcher::str() const
     return m_str;
 }
 
-std::string::size_type KmpSearcher::process(const std::string_view& textPart)
+std::string::size_type KmpSearcher::process(std::string_view textPart)
 {
     for (std::size_t pos = 0; pos < textPart.size();)
     {
@@ -53,7 +53,7 @@ std::size_t KmpSearcher::potentialOccurrenceLag() const
     return m_matchedPrefixLength;
 }
 
-std::vector<int> KmpSearcher::computePrefixTable(const std::string_view& str)
+std::vector<int> KmpSearcher::computePrefixTable(std::string_view str)
 {
     const auto len = str.length();
     std::vector<int> t(len + 1);
@@ -134,8 +134,8 @@ std::string KmpReplacer::process(std::string textPart)
 //-------------------------------------------------------------------------------------------------
 
 std::string::size_type kmpFindNext(
-    const std::string_view& text,
-    const std::string_view& str,
+    std::string_view text,
+    std::string_view str,
     std::string::size_type pos)
 {
     KmpSearcher searcher(std::string(str.data(), str.size()));
@@ -147,8 +147,8 @@ std::string::size_type kmpFindNext(
 }
 
 std::vector<std::string::size_type> kmpFindAll(
-    const std::string_view& text,
-    const std::string_view& before)
+    std::string_view text,
+    std::string_view before)
 {
     std::vector<std::string::size_type> result;
 

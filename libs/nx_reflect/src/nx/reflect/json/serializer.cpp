@@ -44,12 +44,12 @@ void JsonComposer::writeFloat(const double& val)
     m_writer.Double(val);
 }
 
-void JsonComposer::writeString(const std::string_view& val)
+void JsonComposer::writeString(std::string_view val)
 {
     m_writer.String(val.data(), (rapidjson::SizeType) val.size());
 }
 
-void JsonComposer::writeRawString(const std::string_view& val)
+void JsonComposer::writeRawString(std::string_view val)
 {
     m_writer.RawValue(val.data(), (rapidjson::SizeType) val.size(), (rapidjson::Type::kStringType));
 }
@@ -59,7 +59,7 @@ void JsonComposer::writeNull()
     m_writer.Null();
 }
 
-void JsonComposer::writeAttributeName(const std::string_view& name)
+void JsonComposer::writeAttributeName(std::string_view name)
 {
     m_writer.Key(name.data(), (rapidjson::SizeType) name.size());
 }

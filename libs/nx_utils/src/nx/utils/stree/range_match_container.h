@@ -140,7 +140,7 @@ public:
     using KeyType = Key;
     using SearchValueType = Key;
 
-    static Range convertToKey(const std::string_view& valueStr)
+    static Range convertToKey(std::string_view valueStr)
     {
         const auto [values, valueCount] = split_n<2>(valueStr, '-');
         if (valueCount == 0)
@@ -163,7 +163,7 @@ public:
         return range;
     }
 
-    static Key convertToSearchValue(const std::string_view& str)
+    static Key convertToSearchValue(std::string_view str)
     {
         Key key;
         if (!nx::reflect::fromString(str, &key))

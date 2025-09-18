@@ -2440,7 +2440,7 @@ std::string toString(IDType id)
         : std::to_string(id);
 }
 
-bool fromString(const std::string_view& str, IDType* id)
+bool fromString(std::string_view str, IDType* id)
 {
     bool ok = false;
     *id = (IDType) QMetaEnum::fromType<IDType>().keyToValue(str.data(), &ok);

@@ -292,7 +292,7 @@ AccessScope AccessScope::applyAnotherScopeRestrictions(
     return intersectScopes(*scope);
 }
 
-std::string AccessScope::cutUrlScheme(const std::string_view& url)
+std::string AccessScope::cutUrlScheme(std::string_view url)
 {
     static std::regex urlSchemeRegexp("http[s]?:\\/\\/");
 

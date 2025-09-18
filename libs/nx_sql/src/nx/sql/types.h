@@ -66,7 +66,7 @@ NX_REFLECTION_ENUM_CLASS(RdbmsDriverType,
 );
 
 NX_SQL_API const char* toString(RdbmsDriverType value);
-NX_SQL_API RdbmsDriverType rdbmsDriverTypeFromString(const std::string_view& str);
+NX_SQL_API RdbmsDriverType rdbmsDriverTypeFromString(std::string_view str);
 
 class NX_SQL_API ConnectionOptions
 {

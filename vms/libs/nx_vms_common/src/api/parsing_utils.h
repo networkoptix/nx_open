@@ -119,7 +119,7 @@ using JsonRpcResultType =
     std::variant<nx::json_rpc::Response, std::vector<nx::json_rpc::Response>>;
 
 nx::reflect::DeserializationResult deserializeResponse(
-    const std::string_view& json,
+    std::string_view json,
     rest::JsonRpcResultType* data,
     nx::reflect::json::DeserializationFlag skipErrors = nx::reflect::json::DeserializationFlag::none);
 

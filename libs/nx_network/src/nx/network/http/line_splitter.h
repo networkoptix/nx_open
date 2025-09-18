@@ -68,7 +68,7 @@ public:
     /**
      * NOTE: Does not copy str data. Stores std::string_view inside.
      */
-    StringLineIterator(const std::string_view& str);
+    StringLineIterator(std::string_view str);
 
     std::optional<std::string_view> next();
 

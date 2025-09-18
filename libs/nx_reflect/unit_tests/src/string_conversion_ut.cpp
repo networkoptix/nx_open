@@ -42,7 +42,7 @@ struct CustomStringizable
 
     std::string toString() const { return text; }
 
-    static CustomStringizable fromString(const std::string_view& s)
+    static CustomStringizable fromString(std::string_view s)
     {
         CustomStringizable result;
         result.text = (std::string) s;

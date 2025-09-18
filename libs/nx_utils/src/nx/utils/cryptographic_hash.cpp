@@ -224,7 +224,7 @@ void QnCryptographicHash::addData(const nx::Buffer& data)
     d->update(data.data(), (int) data.size());
 }
 
-void QnCryptographicHash::addData(const std::string_view& data)
+void QnCryptographicHash::addData(std::string_view data)
 {
     d->update(data.data(), (int) data.size());
 }
@@ -294,12 +294,12 @@ Output calculateHash(const Input& data)
     return hash;
 }
 
-std::string md5(const std::string_view& data)
+std::string md5(std::string_view data)
 {
     return calculateHash<QnMd5CryptographicHashPrivate, QByteArray>(data).toHex().toStdString();
 }
 
-std::string sha1(const std::string_view& data)
+std::string sha1(std::string_view data)
 {
     return calculateHash<QnSha1CryptographicHashPrivate, std::string>(data);
 }
@@ -309,7 +309,7 @@ QByteArray sha3_256(const QByteArray& data)
     return calculateHash<QnSha3256CryptographicHashPrivate, QByteArray>(data);
 }
 
-std::string sha3_256(const std::string_view& data)
+std::string sha3_256(std::string_view data)
 {
     return calculateHash<QnSha3256CryptographicHashPrivate, std::string>(data);
 }
@@ -319,7 +319,7 @@ QByteArray sha3_512(const QByteArray& data)
     return calculateHash<QnSha3512CryptographicHashPrivate, QByteArray>(data);
 }
 
-std::string sha3_512(const std::string_view& data)
+std::string sha3_512(std::string_view data)
 {
     return calculateHash<QnSha3512CryptographicHashPrivate, std::string>(data);
 }

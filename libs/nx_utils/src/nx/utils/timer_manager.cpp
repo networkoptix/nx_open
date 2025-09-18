@@ -392,7 +392,7 @@ TimerManager::TaskContext::TaskContext(
 }
 
 std::chrono::milliseconds NX_UTILS_API parseTimerDuration(
-    const std::string_view& duration,
+    std::string_view duration,
     std::chrono::milliseconds defaultValue)
 {
     // TODO: #akolesnikov Move implementation to this overload and optimize.

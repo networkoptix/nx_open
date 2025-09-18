@@ -168,7 +168,7 @@ std::vector<SocketAddress> EndpointList::get() const
     std::vector<SocketAddress> endpoints;
     nx::utils::split(
         value, ',',
-        [&endpoints](const std::string_view& token)
+        [&endpoints](std::string_view token)
         {
             endpoints.push_back(SocketAddress(token));
         });
@@ -187,7 +187,7 @@ std::vector<std::string> StringList::get() const
     std::vector<std::string> tokens;
     nx::utils::split(
         value, ',',
-        [&tokens](const std::string_view& token) { tokens.push_back(std::string(token)); });
+        [&tokens](std::string_view token) { tokens.push_back(std::string(token)); });
     return tokens;
 }
 

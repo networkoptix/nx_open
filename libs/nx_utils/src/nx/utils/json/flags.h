@@ -15,14 +15,14 @@ namespace nx::utils::flags_detail {
 
 // These functions are needed to avoid inclusion of heavy nx/utils headers.
 
-NX_UTILS_API std::string_view trim(const std::string_view& str);
+NX_UTILS_API std::string_view trim(std::string_view str);
 
 NX_UTILS_API void assertInvalidFlagValue(
     const std::type_info& type, int value, int unrecognizedFlags);
 NX_UTILS_API void logInvalidFlagValue(
     const std::type_info& type, int value, int unrecognizedFlags);
 NX_UTILS_API void logInvalidFlagRepresentation(
-    const std::type_info& type, const std::string_view& flag);
+    const std::type_info& type, std::string_view flag);
 
 template<typename T, typename Visitor>
 void processBits(const QFlags<T>& value, const Visitor& visitor)
@@ -79,7 +79,7 @@ std::string toString(const QFlags<T>& value)
 }
 
 template<typename T, typename = std::enable_if_t<nx::reflect::IsInstrumentedEnumV<T>>>
-bool fromString(const std::string_view& str, QFlags<T>* result)
+bool fromString(std::string_view str, QFlags<T>* result)
 {
     *result = {};
 

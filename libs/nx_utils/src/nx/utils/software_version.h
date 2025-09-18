@@ -38,7 +38,7 @@ public:
     explicit SoftwareVersion(const QString& versionString);
     explicit SoftwareVersion(const char* versionString);
     explicit SoftwareVersion(const QByteArray& versionString);
-    explicit SoftwareVersion(const std::string_view& versionString);
+    explicit SoftwareVersion(std::string_view versionString);
 
     enum class Format { minor, bugfix, full };
     Q_INVOKABLE QString toString(Format format = Format::full) const;

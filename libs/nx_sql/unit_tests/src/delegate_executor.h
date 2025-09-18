@@ -21,7 +21,7 @@ public:
         return m_delegate->setForwardOnly(val);
     }
 
-    virtual void prepare(const std::string_view& query) override
+    virtual void prepare(std::string_view query) override
     {
         return m_delegate->prepare(query);
     }
@@ -31,7 +31,7 @@ public:
         return m_delegate->addBindValue(value);
     }
 
-    virtual void addBindValue(const std::string_view& value) noexcept override
+    virtual void addBindValue(std::string_view value) noexcept override
     {
         return m_delegate->addBindValue(value);
     }
@@ -46,12 +46,12 @@ public:
         return m_delegate->bindValue(pos, value);
     }
 
-    virtual void bindValue(const std::string_view& placeholder, const std::string_view& value) noexcept override
+    virtual void bindValue(std::string_view placeholder, std::string_view value) noexcept override
     {
         return m_delegate->bindValue(placeholder, value);
     }
 
-    virtual void bindValue(int pos, const std::string_view& value) noexcept override
+    virtual void bindValue(int pos, std::string_view value) noexcept override
     {
         return m_delegate->bindValue(pos, value);
     }
@@ -101,7 +101,7 @@ public:
         return m_delegate->impl();
     }
 
-    virtual void exec(const std::string_view& query) override
+    virtual void exec(std::string_view query) override
     {
         m_delegate->exec(query);
     }
@@ -166,7 +166,7 @@ public:
         return m_delegate->qtSqlConnection();
     }
 
-    virtual bool tableExist(const std::string_view& tableName) override
+    virtual bool tableExist(std::string_view tableName) override
     {
         return m_delegate->tableExist(tableName);
     }

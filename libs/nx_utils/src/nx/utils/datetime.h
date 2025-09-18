@@ -97,7 +97,7 @@ std::string formatDateTimeLockFree(const std::chrono::duration<Rep, Period>& dur
  * 2. Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850
  * 3. Sun Nov  6 08:49:37 1994       ; ANSI C's asctime() format
  */
-NX_UTILS_API QDateTime parseDateToQDateTime(const std::string_view& str);
+NX_UTILS_API QDateTime parseDateToQDateTime(std::string_view str);
 
 /**
  * Parses the http Date according to RFC 2616#3.3 Date/Time Formats and returns milliseconds since
@@ -110,7 +110,7 @@ NX_UTILS_API QDateTime parseDateToQDateTime(const std::string_view& str);
  *
  * @return milliseconds since epoch, or -1 if parsing fails
  */
-NX_UTILS_API std::int64_t parseDateToMillisSinceEpoch(const std::string_view& str);
+NX_UTILS_API std::int64_t parseDateToMillisSinceEpoch(std::string_view str);
 
 NX_UTILS_API std::string formatDateTime(std::chrono::system_clock::time_point tp);
 

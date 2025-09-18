@@ -25,8 +25,8 @@ public:
     Url(const QString& url);
     Url& operator=(const QString& url);
 
-    Url(const std::string_view& url);
-    Url& operator=(const std::string_view& url);
+    Url(std::string_view url);
+    Url& operator=(std::string_view url);
 
     Url(const std::string& url);
     Url& operator=(const std::string& url);
@@ -95,7 +95,7 @@ public:
     bool empty() const { return isEmpty(); }
     void clear();
 
-    void setScheme(const std::string_view& scheme);
+    void setScheme(std::string_view scheme);
 
     // Emulating explicit setScheme(const QString&).
     template<typename S, typename = std::enable_if_t<std::is_same_v<S, QString>>>
@@ -110,12 +110,12 @@ public:
     Q_INVOKABLE QString userInfo(QUrl::ComponentFormattingOptions options = QUrl::PrettyDecoded) const;
 
     void setUserName(const QString& userName, QUrl::ParsingMode mode = QUrl::DecodedMode);
-    void setUserName(const std::string_view& userName, QUrl::ParsingMode mode = QUrl::DecodedMode);
+    void setUserName(std::string_view userName, QUrl::ParsingMode mode = QUrl::DecodedMode);
     void setUserName(const char* userName, QUrl::ParsingMode mode = QUrl::DecodedMode);
     Q_INVOKABLE QString userName(QUrl::ComponentFormattingOptions options = QUrl::FullyDecoded) const;
 
     void setPassword(const QString& password, QUrl::ParsingMode mode = QUrl::DecodedMode);
-    void setPassword(const std::string_view& password, QUrl::ParsingMode mode = QUrl::DecodedMode);
+    void setPassword(std::string_view password, QUrl::ParsingMode mode = QUrl::DecodedMode);
     void setPassword(const char* password, QUrl::ParsingMode mode = QUrl::DecodedMode);
     Q_INVOKABLE QString password(QUrl::ComponentFormattingOptions = QUrl::FullyDecoded) const;
 
@@ -134,7 +134,7 @@ public:
         QUrl::ComponentFormattingOptions = QUrl::FullyDecoded) const;
 
     void setPath(const QString& path, QUrl::ParsingMode mode = QUrl::DecodedMode);
-    void setPath(const std::string_view& path, QUrl::ParsingMode mode = QUrl::DecodedMode);
+    void setPath(std::string_view path, QUrl::ParsingMode mode = QUrl::DecodedMode);
     void setPath(const char* path, QUrl::ParsingMode mode = QUrl::DecodedMode);
 
     Q_INVOKABLE QString path(QUrl::ComponentFormattingOptions options = QUrl::FullyDecoded) const;
@@ -172,7 +172,7 @@ public:
     Q_INVOKABLE bool matches(const Url &url, QUrl::FormattingOptions options) const;
 
     static QString fromPercentEncoding(const QByteArray& url);
-    static QString fromPercentEncoding(const std::string_view& url);
+    static QString fromPercentEncoding(std::string_view url);
     static QString fromPercentEncoding(const char* url);
 
     static QByteArray toPercentEncoding(
@@ -181,11 +181,11 @@ public:
         const QByteArray &include = QByteArray());
 
     static std::string toPercentEncoding(
-        const std::string_view& str,
-        const std::string_view& exclude = std::string_view(),
-        const std::string_view& include = std::string_view());
+        std::string_view str,
+        std::string_view exclude = std::string_view(),
+        std::string_view include = std::string_view());
 
-    static bool isValidHost(const std::string_view& host);
+    static bool isValidHost(std::string_view host);
 
 private:
     QUrl m_url;

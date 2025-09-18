@@ -13,8 +13,8 @@ namespace nx::network::url {
 namespace detail {
 
 NX_NETWORK_API std::string joinPath(
-    const std::string_view& left,
-    const std::string_view& right);
+    std::string_view left,
+    std::string_view right);
 
 } // namespace detail
 
@@ -22,11 +22,11 @@ NX_NETWORK_API std::string joinPath(
  * @param scheme Comparison is done in low-case.
  * @return 0 for unknown scheme
  */
-NX_NETWORK_API std::uint16_t getDefaultPortForScheme(const std::string_view& scheme);
+NX_NETWORK_API std::uint16_t getDefaultPortForScheme(std::string_view scheme);
 NX_NETWORK_API SocketAddress getEndpoint(const nx::Url& url, int defaultPort);
 NX_NETWORK_API SocketAddress getEndpoint(const nx::Url& url);
 
-NX_NETWORK_API std::string normalizePath(const std::string_view&);
+NX_NETWORK_API std::string normalizePath(std::string_view);
 
 // TODO: #akolesnikov Merge this function with the previous one.
 NX_NETWORK_API QString normalizedPath(
@@ -34,8 +34,8 @@ NX_NETWORK_API QString normalizedPath(
 
 template<typename... Path>
 std::string joinPath(
-    const std::string_view& first,
-    const std::string_view& second,
+    std::string_view first,
+    std::string_view second,
     const Path&... other)
 {
     if constexpr (sizeof...(other) == 0)

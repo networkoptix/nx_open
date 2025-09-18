@@ -28,7 +28,7 @@ public:
      * Complexity: linear.
      */
     template<typename MappedRef>
-    bool add(const std::string_view& pathMask, MappedRef&& mapped)
+    bool add(std::string_view pathMask, MappedRef&& mapped)
     {
         auto existingMaskIter = std::find_if(m_masks.begin(), m_masks.end(),
             [&pathMask](const Context& ctx) { return ctx.mask == pathMask; });
@@ -51,7 +51,7 @@ public:
      * Note: Aho-Corasick algorithm can be used to speed it up if performance issues will arise
      * (which is unlikely since number of path masks is usually low).
      */
-    std::optional<MatchResult> match(const std::string_view& path) const
+    std::optional<MatchResult> match(std::string_view path) const
     {
         for (const auto& val: m_masks)
         {

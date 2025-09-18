@@ -27,12 +27,12 @@ Url& Url::operator=(const QString& url)
     return *this;
 }
 
-Url::Url(const std::string_view& url):
+Url::Url(std::string_view url):
     Url(QString::fromUtf8(url.data(), url.size()))
 {
 }
 
-Url& Url::operator=(const std::string_view& url)
+Url& Url::operator=(std::string_view url)
 {
     return (*this = QString::fromUtf8(url.data(), url.size()));
 }
@@ -151,7 +151,7 @@ bool Url::isValid() const
     return m_url.isValid();
 }
 
-bool Url::isValidHost(const std::string_view& host)
+bool Url::isValidHost(std::string_view host)
 {
     if (host.empty())
         return false;
@@ -176,7 +176,7 @@ void Url::clear()
     m_url.clear();
 }
 
-void Url::setScheme(const std::string_view& scheme)
+void Url::setScheme(std::string_view scheme)
 {
     m_url.setScheme(QString::fromUtf8(scheme.data(), scheme.size()));
 }
@@ -213,7 +213,7 @@ void Url::setUserName(const QString& userName, QUrl::ParsingMode mode)
     m_url.setUserName(userName.isEmpty() ? QString() : userName, mode);
 }
 
-void Url::setUserName(const std::string_view& userName, QUrl::ParsingMode mode)
+void Url::setUserName(std::string_view userName, QUrl::ParsingMode mode)
 {
     setUserName(QString::fromUtf8(userName.data(), (int) userName.size()), mode);
 }
@@ -234,7 +234,7 @@ void Url::setPassword(const QString &password, QUrl::ParsingMode mode)
     m_url.setPassword(password.isEmpty() ? QString() : password, mode);
 }
 
-void Url::setPassword(const std::string_view& password, QUrl::ParsingMode mode)
+void Url::setPassword(std::string_view password, QUrl::ParsingMode mode)
 {
     setPassword(QString::fromUtf8(password.data(), (int) password.size()), mode);
 }
@@ -296,7 +296,7 @@ void Url::setPath(const QString& path, QUrl::ParsingMode mode)
     m_url.setPath(path, mode);
 }
 
-void Url::setPath(const std::string_view& path, QUrl::ParsingMode mode)
+void Url::setPath(std::string_view path, QUrl::ParsingMode mode)
 {
     setPath(QString::fromUtf8(path.data(), (int) path.size()), mode);
 }
@@ -452,7 +452,7 @@ QString Url::fromPercentEncoding(const QByteArray& url)
     return QUrl::fromPercentEncoding(url);
 }
 
-QString Url::fromPercentEncoding(const std::string_view& url)
+QString Url::fromPercentEncoding(std::string_view url)
 {
     return fromPercentEncoding(QByteArray::fromRawData(url.data(), url.size()));
 }
@@ -471,9 +471,9 @@ QByteArray Url::toPercentEncoding(
 }
 
 std::string Url::toPercentEncoding(
-    const std::string_view& str,
-    const std::string_view& exclude,
-    const std::string_view& include)
+    std::string_view str,
+    std::string_view exclude,
+    std::string_view include)
 {
     // TODO: #akolesnikov This function can be optimized to contain 1 allocation instead of at least 4.
 

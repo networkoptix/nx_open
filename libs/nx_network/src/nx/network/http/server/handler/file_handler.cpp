@@ -55,7 +55,7 @@ void FileDownloader::processRequest(
 }
 
 std::tuple<StatusCode::Value, std::string> FileDownloader::composeFilePath(
-    const std::string_view& requestPath)
+    std::string_view requestPath)
 {
     if (!nx::utils::startsWith(requestPath, m_requestPathPrefix))
         return std::make_tuple(StatusCode::internalServerError, std::string());

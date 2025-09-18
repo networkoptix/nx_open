@@ -32,10 +32,10 @@ protected:
     ConnectionOptions& connectionOptions();
     const ConnectionOptions& connectionOptions() const;
     void initializeDatabase();
-    DBResult executeUpdate(const std::string_view& queryText);
+    DBResult executeUpdate(std::string_view queryText);
 
     template<typename RecordStructure>
-    std::vector<RecordStructure> executeSelect(const std::string_view& queryText)
+    std::vector<RecordStructure> executeSelect(std::string_view queryText)
     {
         std::promise<nx::sql::DBResult> queryCompletedPromise;
         auto future = queryCompletedPromise.get_future();

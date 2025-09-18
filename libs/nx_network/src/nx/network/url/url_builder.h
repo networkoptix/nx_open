@@ -30,10 +30,10 @@ public:
     Builder& setPort(int port);
     Builder& setEndpoint(const SocketAddress& endpoint);
 
-    Builder& setPath(const std::string_view& path, QUrl::ParsingMode mode = QUrl::DecodedMode);
+    Builder& setPath(std::string_view path, QUrl::ParsingMode mode = QUrl::DecodedMode);
     Builder& setPath(const QString& path, QUrl::ParsingMode mode = QUrl::DecodedMode);
 
-    Builder& appendPath(const std::string_view& path, QUrl::ParsingMode mode = QUrl::DecodedMode);
+    Builder& appendPath(std::string_view path, QUrl::ParsingMode mode = QUrl::DecodedMode);
     Builder& appendPath(const QString& path, QUrl::ParsingMode mode = QUrl::DecodedMode);
 
     template<typename T, typename... Ts>

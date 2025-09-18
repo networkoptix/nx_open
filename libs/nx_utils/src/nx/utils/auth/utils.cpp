@@ -131,13 +131,13 @@ std::tuple<bool, std::string> decodeBase32(const std::string& str)
     return {true, result};
 }
 
-Buffer hmacSha1(const std::string_view& key, const std::string_view& baseString)
+Buffer hmacSha1(std::string_view key, std::string_view baseString)
 {
     return hmacSha1(key, std::vector<std::string_view>{baseString});
 }
 
 Buffer hmacSha1(
-    const std::string_view& key,
+    std::string_view key,
     const std::vector<std::string_view>& messageParts)
 {
     unsigned int len = 0;
@@ -153,7 +153,7 @@ Buffer hmacSha1(
     return result;
 }
 
-Buffer hmacSha256(const std::string_view& key, const std::string_view& baseString)
+Buffer hmacSha256(std::string_view key, std::string_view baseString)
 {
     unsigned int len;
     Buffer result(32, 0);

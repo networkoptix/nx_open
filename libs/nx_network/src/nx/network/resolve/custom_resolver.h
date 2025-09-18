@@ -20,7 +20,7 @@ public:
     }
 
     virtual SystemError::ErrorCode resolve(
-        const std::string_view& hostName,
+        std::string_view hostName,
         int ipVersion,
         ResolveResult* resolved) override
     {

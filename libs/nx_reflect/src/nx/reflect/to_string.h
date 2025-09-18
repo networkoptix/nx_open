@@ -67,7 +67,7 @@ inline std::string toStringSfinae(const char* value)
     return std::string(value);
 }
 
-inline std::string toStringSfinae(const std::string_view& value)
+inline std::string toStringSfinae(std::string_view value)
 {
     return std::string(value);
 }

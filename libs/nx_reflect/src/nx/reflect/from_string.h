@@ -82,7 +82,7 @@ bool fromString(const String& str, T* result)
     }
     else if constexpr (detail::HasFromStringV<T>)
     {
-        // TODO: #akolesnikov Invoke T::fromString(const std::string_view&) if present.
+        // TODO: #akolesnikov Invoke T::fromString(std::string_view) if present.
         *result = T::fromString(std::string(str));
         return true;
     }
@@ -107,19 +107,19 @@ bool fromString(const String& str, T* result)
 
 /**
  * Converts str to T using the following methods (if present):
- * bool fromString(const std::string_view&, T*);
+ * bool fromString(std::string_view, T*);
  * T T::fromBase64(const Stringizable&);
  * T T::fromString(const std::string&);
  * T T::fromStdString(const std::string&);
  * bool fromString(const std::string&, T*);
  */
 template<typename T>
-bool fromStringSfinae(const std::string_view& str, T* result)
+bool fromStringSfinae(std::string_view str, T* result)
 {
     return fromString(str, result);
 }
 
-inline bool fromStringSfinae(const std::string_view& str, std::string* result)
+inline bool fromStringSfinae(std::string_view str, std::string* result)
 {
     *result = std::string(str);
     return true;
@@ -130,7 +130,7 @@ inline bool fromStringSfinae(const std::string_view& str, std::string* result)
 //-------------------------------------------------------------------------------------------------
 
 template<typename T>
-T fromString(const std::string_view& str, bool* ok = nullptr)
+T fromString(std::string_view str, bool* ok = nullptr)
 {
     T val;
     const auto res = detail::fromStringSfinae(str, &val);
@@ -140,7 +140,7 @@ T fromString(const std::string_view& str, bool* ok = nullptr)
 }
 
 template<typename T>
-T fromString(const std::string_view& str, T defaultValue, bool* ok = nullptr)
+T fromString(std::string_view str, T defaultValue, bool* ok = nullptr)
 {
     T val;
     const auto res = detail::fromStringSfinae(str, &val);
@@ -160,7 +160,7 @@ T fromString(const std::string_view& str, T defaultValue, bool* ok = nullptr)
  * provides result.
  */
 template<typename T>
-bool fromString(const std::string_view& str, T* result)
+bool fromString(std::string_view str, T* result)
 {
     return detail::fromStringSfinae(str, result);
 }

@@ -19,7 +19,7 @@ constexpr int kMillisPerSec = 1000;
 
 namespace nx::network {
 
-std::optional<qint64> rfc868TimestampToTimeToUtcMillis(const std::string_view& timeStr)
+std::optional<qint64> rfc868TimestampToTimeToUtcMillis(std::string_view timeStr)
 {
     quint32 utcTimeSeconds = 0;
     if ((size_t)timeStr.size() < sizeof(utcTimeSeconds))

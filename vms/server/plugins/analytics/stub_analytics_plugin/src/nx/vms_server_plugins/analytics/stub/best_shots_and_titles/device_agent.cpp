@@ -26,7 +26,7 @@ namespace fs = std::filesystem;
 
 namespace {
 
-bool ends_with(const std::string& value, const std::string_view& ending)
+bool ends_with(const std::string& value, std::string_view ending)
 {
     if (ending.size() > value.size())
         return false;

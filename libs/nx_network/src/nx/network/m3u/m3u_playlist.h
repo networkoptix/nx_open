@@ -37,7 +37,7 @@ class NX_NETWORK_API Playlist
 public:
     std::vector<Entry> entries;
 
-    bool parse(const std::string_view& str);
+    bool parse(std::string_view str);
     std::string toString() const;
 
     bool operator==(const Playlist& right) const;

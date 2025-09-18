@@ -113,7 +113,7 @@ QSqlDatabase* QtDbConnection::qtSqlConnection()
     return &m_connection;
 }
 
-bool QtDbConnection::tableExist(const std::string_view& tableName)
+bool QtDbConnection::tableExist(std::string_view tableName)
 {
     return m_connection.tables().contains(QString::fromUtf8(tableName), Qt::CaseInsensitive);
 }

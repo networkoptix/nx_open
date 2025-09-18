@@ -76,14 +76,14 @@ void UrlencodedComposer::writeFloat(const double& val)
     addFieldSuffix();
 }
 
-void UrlencodedComposer::writeString(const std::string_view& val)
+void UrlencodedComposer::writeString(std::string_view val)
 {
     addFieldPrefix();
     m_resultStr += encode(val.data());
     addFieldSuffix();
 }
 
-void UrlencodedComposer::writeRawString(const std::string_view& val)
+void UrlencodedComposer::writeRawString(std::string_view val)
 {
     addFieldPrefix();
     m_resultStr += val.data();
@@ -94,12 +94,12 @@ void UrlencodedComposer::writeNull()
 {
 }
 
-void UrlencodedComposer::writeAttributeName(const std::string_view& name)
+void UrlencodedComposer::writeAttributeName(std::string_view name)
 {
     m_curKey = encode(name);
 }
 
-std::string UrlencodedComposer::encode(const std::string_view& str)
+std::string UrlencodedComposer::encode(std::string_view str)
 {
     std::ostringstream result;
     result.fill('0');

@@ -78,7 +78,7 @@ enum CoreItemDataRole
 NX_VMS_CLIENT_CORE_API QHash<int, QByteArray> clientCoreRoleNames();
 
 std::string toString(CoreItemDataRole value);
-bool fromString(const std::string_view& str, CoreItemDataRole* value);
+bool fromString(std::string_view str, CoreItemDataRole* value);
 
 NX_REFLECTION_ENUM_CLASS(ThumbnailStatus,
     Invalid,
