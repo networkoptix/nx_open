@@ -45,8 +45,6 @@ public:
         typedef QnAlignedAllocator<T2, N> other;
     };
 
-    bool operator!=(const QnAlignedAllocator<T, N> &other) const { return !(*this == other); }
-
     /**
      * \param other
      * \returns True if and only if storage allocated from \a this can be deallocated from \a other.

@@ -219,11 +219,6 @@ struct AuthInfo
     {
         return records == right.records;
     }
-
-    bool operator!=(const AuthInfo& right) const
-    {
-        return records != right.records;
-    }
 };
 
 struct SystemNonce

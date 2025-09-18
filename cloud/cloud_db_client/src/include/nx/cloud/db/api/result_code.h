@@ -101,18 +101,11 @@ struct Result
         description = api::toString(code);
         return *this;
     }
+
+    bool operator==(ResultCode right) const
+    {
+        return code == right;
+    }
 };
-
-inline bool operator==(const Result& left, ResultCode right)
-{ return left.code == right; }
-
-inline bool operator!=(const Result& left, ResultCode right)
-{ return !(left == right); }
-
-inline bool operator==(ResultCode left, const Result& right)
-{ return left == right.code; }
-
-inline bool operator!=(ResultCode left, const Result& right)
-{ return !(left == right); }
 
 } // namespace nx::cloud::db::api
