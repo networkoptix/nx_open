@@ -18,7 +18,7 @@ public:
 
     MacAddress() = default;
     explicit MacAddress(const Data& bytes);
-    explicit MacAddress(const QStringView& mac);
+    explicit MacAddress(QStringView mac);
     explicit MacAddress(const QLatin1String& mac);
     explicit MacAddress(const QByteArray& mac);
     MacAddress(std::string_view mac);

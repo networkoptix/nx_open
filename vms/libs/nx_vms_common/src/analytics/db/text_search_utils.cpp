@@ -55,7 +55,7 @@ void UserTextSearchExpressionParser::saveToken(QStringView token)
         .isQuoted = isQuoted});
 }
 
-QString UserTextSearchExpressionParser::unescape(const QStringView& str)
+QString UserTextSearchExpressionParser::unescape(QStringView str)
 {
     QString result = str.toString();
     for (int i = 0; i < result.size(); ++i)
@@ -67,7 +67,7 @@ QString UserTextSearchExpressionParser::unescape(const QStringView& str)
     return result;
 }
 
-QString UserTextSearchExpressionParser::unescapeName(const QStringView& str)
+QString UserTextSearchExpressionParser::unescapeName(QStringView str)
 {
     QStringView result = str;
     if (result.startsWith('!'))

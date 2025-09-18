@@ -84,8 +84,8 @@ public:
     virtual bool endDocument() { return true; }
 
     virtual bool startElement(
-        const QStringView& /*namespaceUri*/,
-        const QStringView& localName,
+        QStringView /*namespaceUri*/,
+        QStringView localName,
         const QXmlStreamAttributes& /*attrs*/)
     {
         if (isIgnoredElement(localName))
@@ -96,14 +96,14 @@ public:
     }
 
     virtual bool endElement(
-        const QStringView& /*namespaceUri*/,
-        const QStringView& /*localName*/)
+        QStringView /*namespaceUri*/,
+        QStringView /*localName*/)
     {
         m_awaitedValue = nullptr;
         return true;
     }
 
-    virtual bool characters(const QStringView& ch)
+    virtual bool characters(QStringView ch)
     {
         if (m_awaitedValue)
             *m_awaitedValue = ch.toString();
@@ -136,8 +136,8 @@ class UpnpSuccessHandler:
 
 public:
     virtual bool startElement(
-        const QStringView& namespaceUri,
-        const QStringView& localName,
+        QStringView namespaceUri,
+        QStringView localName,
         const QXmlStreamAttributes& attrs) override
     {
         static constexpr QStringView kResponseSuffix = u"Response";

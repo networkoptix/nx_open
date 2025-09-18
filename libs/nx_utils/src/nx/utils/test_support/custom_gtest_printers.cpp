@@ -15,7 +15,7 @@ void PrintTo(const QString& val, ::std::ostream* os)
     *os << val.toStdString();
 }
 
-void PrintTo(const QStringView& val, ::std::ostream* os)
+void PrintTo(QStringView val, ::std::ostream* os)
 {
     *os << QString(val).toStdString();
 }

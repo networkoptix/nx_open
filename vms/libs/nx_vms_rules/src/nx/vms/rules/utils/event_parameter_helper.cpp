@@ -655,7 +655,7 @@ QChar EventParameterHelper::endCharOfEventParameter()
     return kEndOfSubstitutionSymbol;
 }
 
-int EventParameterHelper::getLatestEventParameterPos(const QStringView& text, int stopPosition)
+int EventParameterHelper::getLatestEventParameterPos(QStringView text, int stopPosition)
 {
     if (stopPosition >= text.size())
         return -1;

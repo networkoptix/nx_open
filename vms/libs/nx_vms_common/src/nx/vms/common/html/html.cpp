@@ -293,7 +293,7 @@ QString toHtmlEscaped(const QString& text, EscapeMethod escapeMethod)
     static const QString kNbsp("&nbsp;");
 
     auto indexOfAny =
-        [escapeMethod](const QStringView& s, int pos, const QString** replacement)
+        [escapeMethod](QStringView s, int pos, const QString** replacement)
         {
             const auto view = s.mid(pos);
             for (const QChar& c: view)

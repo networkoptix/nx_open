@@ -36,7 +36,7 @@ MacAddress::MacAddress(const QByteArray& mac):
 {
 }
 
-MacAddress::MacAddress(const QStringView& mac)
+MacAddress::MacAddress(QStringView mac)
 {
     // Check string format.
     const bool hasDelimiters = mac.length() == kMacAddressLength * 3 - 1;

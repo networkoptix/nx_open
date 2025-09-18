@@ -44,8 +44,8 @@ bool DeviceDescriptionHandler::endDocument()
 }
 
 bool DeviceDescriptionHandler::startElement(
-    const QStringView& /*namespaceUri*/,
-    const QStringView& localName,
+    QStringView /*namespaceUri*/,
+    QStringView localName,
     const QXmlStreamAttributes& /*atts*/)
 {
     if (localName == QLatin1String("device"))
@@ -78,8 +78,8 @@ bool DeviceDescriptionHandler::startElement(
 }
 
 bool DeviceDescriptionHandler::endElement(
-    const QStringView& /*namespaceURI*/,
-    const QStringView& localName)
+    QStringView /*namespaceURI*/,
+    QStringView localName)
 {
     if (localName == QLatin1String("device"))
         m_deviceStack.pop_back();
@@ -91,7 +91,7 @@ bool DeviceDescriptionHandler::endElement(
     return true;
 }
 
-bool DeviceDescriptionHandler::characters(const QStringView& ch)
+bool DeviceDescriptionHandler::characters(QStringView ch)
 {
     if (m_lastService && charactersInService(ch.toString()))
         return true;

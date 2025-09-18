@@ -29,7 +29,7 @@ public:
     static bool isStartOfEventParameter(const QChar& symbol);
     static bool isIncompleteEventParameter(const QString& word);
     static bool isEndOfEventParameter(const QChar& symbol);
-    static int getLatestEventParameterPos(const QStringView& text, int stopPosition);
+    static int getLatestEventParameterPos(QStringView text, int stopPosition);
     static bool containsSubgroups(const QString& eventParameter);
     static QChar startCharOfEventParameter();
     static QChar endCharOfEventParameter();

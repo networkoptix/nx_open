@@ -13,7 +13,7 @@
 namespace nx::analytics::db {
 
 inline bool isKeyValueDelimiterChar(QChar ch) { return ch == ':' || ch == '=' || ch == '>' || ch == '<'; }
-inline bool isKeyValueDelimiter(const QStringView& value, int* outSize = nullptr)
+inline bool isKeyValueDelimiter(QStringView value, int* outSize = nullptr)
 {
     if (outSize)
         *outSize = 0;
@@ -155,9 +155,9 @@ private:
     /**
      * Replaces \CHAR with CHAR. Does NOT replace \n with LF or similar.
      */
-    QString unescape(const QStringView& str);
+    QString unescape(QStringView str);
 
-    QString unescapeName(const QStringView& str);
+    QString unescapeName(QStringView str);
 
 private:
     std::vector<TokenData> m_tokens;
@@ -294,7 +294,7 @@ template<typename Handler>
 void UserTextSearchExpressionParser::processTokens(Handler& handler)
 {
     auto isNegative =
-        [](const QStringView& token)
+        [](QStringView token)
         { return token.startsWith('!'); };
 
     int lastProcessedTokenIndex = -1;

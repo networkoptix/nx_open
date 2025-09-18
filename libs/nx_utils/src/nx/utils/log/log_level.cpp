@@ -256,7 +256,7 @@ static bool isTokenPart(const QChar& c)
     return !isSeparator(c) && !isOpenBracket(c) && !isCloseBracket(c);
 }
 
-static QString readToken(const QStringView& s, int* position)
+static QString readToken(QStringView s, int* position)
 {
     int start = *position;
     while (*position < s.size() && isTokenPart(s[*position]))

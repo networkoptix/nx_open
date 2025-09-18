@@ -25,8 +25,8 @@ bool SaxHandler::startDocument()
 }
 
 bool SaxHandler::startElement(
-    const QStringView& /*namespaceUri*/,
-    const QStringView& name,
+    QStringView /*namespaceUri*/,
+    QStringView name,
     const QXmlStreamAttributes& attrs)
 {
     if (m_state == skippingNode)
@@ -62,8 +62,8 @@ bool SaxHandler::endDocument()
 }
 
 bool SaxHandler::endElement(
-    const QStringView& /*namespaceUri*/,
-    const QStringView& /*localName*/)
+    QStringView /*namespaceUri*/,
+    QStringView /*localName*/)
 {
     if (m_state == skippingNode)
     {
@@ -78,7 +78,7 @@ bool SaxHandler::endElement(
     return true;
 }
 
-bool SaxHandler::characters(const QStringView&)
+bool SaxHandler::characters(QStringView)
 {
     return true;
 }

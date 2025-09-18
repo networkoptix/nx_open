@@ -9,7 +9,7 @@
 
 namespace {
 
-QString removeProtocolPrefix(const QStringView& url)
+QString removeProtocolPrefix(QStringView url)
 {
     const int prefixPos = url.indexOf(QLatin1String("://"));
     if (prefixPos == -1)

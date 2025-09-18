@@ -103,17 +103,17 @@ public:
     bool startDocument();
 
     bool startElement(
-        const QStringView& namespaceUri,
-        const QStringView& name,
+        QStringView namespaceUri,
+        QStringView name,
         const QXmlStreamAttributes& atts);
 
     bool endDocument();
 
     bool endElement(
-        const QStringView& namespaceUri,
-        const QStringView& localName);
+        QStringView namespaceUri,
+        QStringView localName);
 
-    bool characters(const QStringView&);
+    bool characters(QStringView);
 
     QString errorString() const;
 

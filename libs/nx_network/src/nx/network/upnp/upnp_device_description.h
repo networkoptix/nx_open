@@ -49,15 +49,15 @@ public:
     virtual bool endDocument();
 
     virtual bool startElement(
-        const QStringView& namespaceUri,
-        const QStringView& localName,
+        QStringView namespaceUri,
+        QStringView localName,
         const QXmlStreamAttributes& atts);
 
     virtual bool endElement(
-        const QStringView& namespaceURI,
-        const QStringView& localName);
+        QStringView namespaceURI,
+        QStringView localName);
 
-    virtual bool characters(const QStringView& ch);
+    virtual bool characters(QStringView ch);
 
     const DeviceInfo& deviceInfo() const { return m_deviceInfo; }
 
