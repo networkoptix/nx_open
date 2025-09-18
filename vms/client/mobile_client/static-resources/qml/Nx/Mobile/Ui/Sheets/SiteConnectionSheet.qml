@@ -14,7 +14,6 @@ BottomSheet
 {
     id: sheet
 
-    property alias authDataModel: authDataModel
     property alias hostsModel: hostsModel
 
     title: d.systemName && d.systemName.length
@@ -27,7 +26,7 @@ BottomSheet
         systemName, systemId, localSystemId)
     {
         addressField.text = ""
-        userComboBox.editText = ""
+        userInput.text = ""
         passwordInput.text = ""
 
         d.resetErrors()
@@ -41,8 +40,11 @@ BottomSheet
             ? NxGlobals.modelData(hostsModel.index(0, 0), "url-internal").toString()
             : NxGlobals.emptyUrl().toString()).trim()
 
-        if (userComboBox.count)
-            userComboBox.currentIndex = 0
+        if (authDataModel.rowCount())
+        {
+            authDataModel.currentUser = authDataModel.data(authDataModel.index(0, 0))
+            userInput.text = authDataModel.currentUser
+        }
 
         passwordInput.resetState(authDataModel.hasSavedCredentials)
 
@@ -52,8 +54,8 @@ BottomSheet
 
         if (!addressField.text.length)
             addressField.forceActiveFocus()
-        else if (!userComboBox.editText.length)
-            userComboBox.forceActiveFocus()
+        else if (!userInput.text.length)
+            userInput.forceActiveFocus()
         else
             passwordInput.forceActiveFocus()
     }
@@ -72,23 +74,21 @@ BottomSheet
         enabled: !d.connectingNow
     }
 
-    ComboBox
+    TextInput
     {
-        id: userComboBox
+        id: userInput
 
-        backgroundMode: FieldBackground.Mode.Light
-
-        model: authDataModel
-
-        editable: true
         width: parent.width
-        popupTitle: qsTr("Log in as")
+        backgroundMode: FieldBackground.Mode.Light
         labelText: qsTr("Login")
-
-        inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
-
         enabled: !d.connectingNow
-        onCurrentIndexChanged: d.resetErrors()
+        text: authDataModel.currentUser
+        onTextEdited:
+        {
+            passwordInput.resetState(text.trim() === authDataModel.currentUser
+                ? authDataModel.hasSavedCredentials
+                : false)
+        }
     }
 
     PasswordInput
@@ -156,9 +156,6 @@ BottomSheet
     AuthenticationDataModel
     {
         id: authDataModel
-
-        currentUser: d.login
-        onHasSavedCredentialsChanged: passwordInput.resetState(hasSavedCredentials)
     }
 
     NxObject
@@ -166,20 +163,20 @@ BottomSheet
         id: d
 
         property bool connectingNow: false
-        readonly property string login: userComboBox.editText.trim()
+        readonly property string login: userInput.text.trim()
         property string systemName
 
         function resetErrors()
         {
             addressField.errorText = ""
-            userComboBox.errorText = ""
+            userInput.errorText = ""
             passwordInput.errorText = ""
         }
 
         function resetFocus()
         {
             addressField.focus = false
-            userComboBox.focus = false
+            userInput.focus = false
             passwordInput.focus = false
         }
 
@@ -195,10 +192,10 @@ BottomSheet
                 return false
             }
 
-            if (!userComboBox.editText.trim().length)
+            if (!userInput.text.trim())
             {
-                userComboBox.errorText = qsTr("Login field cannot be empty")
-                userComboBox.forceActiveFocus()
+                userInput.errorText = qsTr("Login field cannot be empty")
+                userInput.forceActiveFocus()
                 return false
             }
 
@@ -251,8 +248,8 @@ BottomSheet
                                     }
                                     else
                                     {
-                                        userComboBox.errorText = errorMessage
-                                        userComboBox.forceActiveFocus()
+                                        userInput.errorText = errorMessage
+                                        userInput.forceActiveFocus()
                                     }
                                     break
 
@@ -265,7 +262,9 @@ BottomSheet
                         }
 
                     const url = NxGlobals.urlFromUserInput(addressField.text)
-                    if (authDataModel.hasSavedCredentials && passwordInput.hasSecretValue)
+                    if (d.login === authDataModel.currentUser
+                        && authDataModel.hasSavedCredentials
+                        && passwordInput.hasSecretValue)
                     {
                         windowContext.sessionManager.startSessionWithStoredCredentials(
                             url,
