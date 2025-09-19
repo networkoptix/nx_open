@@ -91,7 +91,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
 
 SystemContext::~SystemContext()
 {
-    d->resourcePool->threadPool()->waitForDone();
 }
 
 const nx::Uuid& SystemContext::peerId() const

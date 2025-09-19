@@ -20,7 +20,6 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 
-class QThreadPool;
 namespace nx::vms::common { class SystemContext; }
 
 /**
@@ -371,8 +370,6 @@ public:
     /** Check if there is at least one I/O Module in the system. */
     bool containsIoModules() const;
 
-    QThreadPool* threadPool() const;
-
 signals:
     /**
      * Emitted whenever any new resource is added to the pool. In case of batch additions is called
@@ -438,5 +435,4 @@ private:
     QnResourceList m_tmpResources;
     QHash<nx::Uuid, QnResourcePtr> m_resources;
     mutable QnUserResourcePtr m_adminResource;
-    std::unique_ptr<QThreadPool> m_threadPool;
 };

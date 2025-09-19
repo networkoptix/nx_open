@@ -2,8 +2,6 @@
 
 #include "resource_pool.h"
 
-#include <QtCore/QThreadPool>
-
 #include <api/helpers/camera_id_helper.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -46,7 +44,6 @@ QnResourcePool::QnResourcePool(nx::vms::common::SystemContext* systemContext, QO
     m_resourcesMutex(nx::ReadWriteLock::Recursive),
     m_tranInProgress(false)
 {
-    m_threadPool.reset(new QThreadPool());
     NX_DEBUG(this, "Created");
 }
 
@@ -59,11 +56,6 @@ QnResourcePool::~QnResourcePool()
 nx::vms::common::SystemContext* QnResourcePool::systemContext() const
 {
     return d->systemContext;
-}
-
- QThreadPool* QnResourcePool::threadPool() const
-{
-    return m_threadPool.get();
 }
 
 void QnResourcePool::beginTran()
