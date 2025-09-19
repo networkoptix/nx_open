@@ -163,16 +163,16 @@ struct NX_VMS_COMMON_API QnTimePeriod
     void setDuration(std::chrono::milliseconds value);
     std::chrono::milliseconds duration() const;
 
-    constexpr bool operator==(const QnTimePeriod&) const = default;
+    bool operator==(const QnTimePeriod&) const = default;
 
-    constexpr bool operator<(const QnTimePeriod& other) const
+    constexpr std::weak_ordering operator<=>(const QnTimePeriod& other) const
     {
-        return startTimeMs < other.startTimeMs;
+        return startTimeMs <=> other.startTimeMs;
     }
 
-    constexpr bool operator<(qint64 timeMs) const
+    constexpr std::weak_ordering operator<=>(qint64 timeMs) const
     {
-        return this->startTimeMs < timeMs;
+        return startTimeMs <=> timeMs;
     }
 
     /** Start time in milliseconds. */
@@ -184,11 +184,6 @@ struct NX_VMS_COMMON_API QnTimePeriod
      * represents a video chunk that is being recorded at the moment.
      */
     qint64 durationMs = 0;
-};
-
-constexpr bool operator<(qint64 timeMs, const QnTimePeriod& other)
-{
-    return timeMs < other.startTimeMs;
 };
 
 using OptionalTimePeriod = std::optional<QnTimePeriod>;
