@@ -135,8 +135,30 @@ function(add_android_apk target)
             FILE_CONTENTS "${FILE_CONTENTS}")
     endif()
 
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(DO_NOT_STRIP
+            "androidComponents {\n
+                onVariants(selector().withBuildType(\"debug\")) {\n
+                    packaging.jniLibs.keepDebugSymbols.add(\"**/*.so\")\n
+                }\n
+            }\n")
+
+        string(REGEX REPLACE
+            "(\ndependencies {\n)"
+            "${DO_NOT_STRIP}\\1\n"
+            FILE_CONTENTS "${FILE_CONTENTS}")
+    endif()
+
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/build.gradle "${FILE_CONTENTS}")
     nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/build.gradle)
+
+    if("hwaddress" IN_LIST enabledSanitizers)
+        set(wrapsh_path "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/wrap.sh")
+        set(copy_wrapsh_command
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${wrapsh_path} ${apk_dir}/resources/lib/${CMAKE_ANDROID_ARCH_ABI}/wrap.sh)
+    else()
+        set(copy_wrapsh_command)
+    endif()
 
     if(APK_EXTRA_JAVA_LIBS)
         set(copy_java_libs_command COMMAND ${CMAKE_COMMAND} -E copy ${APK_EXTRA_JAVA_LIBS} ${libs_dir})
@@ -151,7 +173,9 @@ function(add_android_apk target)
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${APK_TEMPLATE} ${PACKAGE_SOURCE}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/build.gradle ${PACKAGE_SOURCE}/build.gradle
         COMMAND ${CMAKE_COMMAND} -E make_directory "${libs_dir}/${CMAKE_ANDROID_ARCH_ABI}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${apk_dir}/resources/lib/${CMAKE_ANDROID_ARCH_ABI}"
         ${copy_java_libs_command}
+        ${copy_wrapsh_command}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${APK_TARGET}>"
             "${apk_dir}/libs/${CMAKE_ANDROID_ARCH_ABI}/lib${APK_TARGET}_${CMAKE_ANDROID_ARCH_ABI}.so"
         COMMAND ${CMAKE_COMMAND} -E env
