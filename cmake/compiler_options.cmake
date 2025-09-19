@@ -204,8 +204,7 @@ foreach(sanitizer ${enabledSanitizers})
         endif()
     else()
         add_compile_options(-fsanitize=${sanitizer})
-        string(APPEND CMAKE_SHARED_LINKER_FLAGS " -fsanitize=${sanitizer}")
-        string(APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=${sanitizer}")
+        add_link_options(-fsanitize=${sanitizer})
 
         if(sanitizer STREQUAL "address")
             add_compile_options(-fno-omit-frame-pointer)
@@ -220,6 +219,13 @@ foreach(sanitizer ${enabledSanitizers})
 
                 nx_copy("${asan_library_path}" DESTINATION "${PROJECT_BINARY_DIR}/lib")
             endif()
+            if(ANDROID)
+                message(FATAL_ERROR "ASan is unsupported on Android, use HWAsan instead (-DenabledSanitizers=hwaddress)")
+            endif()
+        endif()
+
+        if(sanitizer STREQUAL "hwaddress")
+            add_compile_options(-fno-omit-frame-pointer)
         endif()
 
         if(sanitizer STREQUAL "undefined")
