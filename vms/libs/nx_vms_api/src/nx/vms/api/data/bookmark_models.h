@@ -305,7 +305,6 @@ struct NX_VMS_API BookmarkBase
     (tags) \
     (creatorUserId) \
     (creationTimeMs)
-QN_FUSION_DECLARE_FUNCTIONS(BookmarkBase, (json), NX_VMS_API)
 
 /**%apidoc
  * %param[readonly] id

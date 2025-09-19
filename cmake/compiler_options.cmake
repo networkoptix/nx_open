@@ -260,6 +260,10 @@ if(compilerMsvc)
         # Enable most warnings by default.
         /W4
 
+        # -----------------------------------------------------------------------------------------
+        # Supress the following warnigns due to a lot of false positives or big amount of refactor
+        # needed to eliminate them.
+
         # Unreferenced formal parameter.
         # Suppressed as it produces a lot of false positives in variadic template functions.
         /wd4100
@@ -267,6 +271,31 @@ if(compilerMsvc)
         # Unreachable code.
         # Suppressed as it produces a lot of false positives in template functions.
         /wd4702
+
+        # Conversion from 'size_t' to 'int', possible loss of data.
+        /wd4267
+
+        # 'type': class 'type1' needs to have dll-interface to be used by clients of class 'type2'.
+        /wd4251
+
+        # non - DLL-interface class 'class_1' used as base for DLL-interface class 'class_2'.
+        /wd4275
+
+        # operator '|': deprecated between enumerations of different types.
+        # Suppressed as it is used in rapidjson headers and thus generates tons of warnings.
+        /wd5054
+
+        # Declaration of 'id' hides previous local declaration.
+        /wd4456
+        # Declaration of 'id' hides function parameter.
+        /wd4457
+        # Declaration of 'id' hides class member.
+        /wd4458
+        # Declaration of 'id' hides global declaration.
+        /wd4459
+
+        # -----------------------------------------------------------------------------------------
+        # Treat the following warnigns as errors.
 
         # Function is recursive on all control paths, will cause runtime stack overflow.
         /we4717
@@ -293,27 +322,8 @@ if(compilerMsvc)
         # Wrong initialization order.
         /we5038
 
-        # Conversion from 'size_t' to 'int', possible loss of data.
-        /wd4267
-
-        # 'type': class 'type1' needs to have dll-interface to be used by clients of class 'type2'.
-        /wd4251
-
-        # non - DLL-interface class 'class_1' used as base for DLL-interface class 'class_2'
-        /wd4275
-
-        # operator '|': deprecated between enumerations of different types
-        # Suppressed as it is used in rapidjson headers and thus generates tons of warnings.
-        /wd5054
-
-        # Declaration of 'id' hides previous local declaration.
-        /wd4456
-        # Declaration of 'id' hides function parameter.
-        /wd4457
-        # Declaration of 'id' hides class member.
-        /wd4458
-        # Declaration of 'id' hides global declaration.
-        /wd4459
+        # Inconsistent dll linkage. Most often caused by the double function implementation.
+        /we4273
     )
     add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
     add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)

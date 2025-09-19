@@ -210,12 +210,6 @@ nx::vms::api::StreamIndex analyzedStreamIndexInternal(
 
 } // namespace
 
-namespace nx::vms::api::analytics {
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    DeviceAgentManifest, (json), DeviceAgentManifest_Fields, (brief, true))
-
-} // namespace nx::vms::api::analytics
-
 const QString QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty(
     "compatibleAnalyticsEngines");
 
