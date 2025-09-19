@@ -331,6 +331,7 @@ if(ANDROID)
         EXTRA_LIBS ${extra_libs}
         EXTRA_JAVA_LIBS ${android_push_dependencies}
         GRADLE_DEPENDENCIES ${gradle_dep_lines}
+        MIN_SDK_VERSION ${ANDROID_NATIVE_API_LEVEL}
         ${code_signing_parameters}
     )
 
