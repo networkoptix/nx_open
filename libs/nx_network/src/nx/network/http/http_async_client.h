@@ -105,6 +105,7 @@ public:
     void setMessageBodyReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
 
     void setTimeouts(const Timeouts& timeouts);
+    void setAllTimeouts(std::chrono::milliseconds timeout);
     Timeouts timeouts() const;
 
     void addAdditionalHeader(const std::string& key, const std::string& value);

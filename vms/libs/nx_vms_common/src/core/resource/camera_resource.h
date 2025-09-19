@@ -172,9 +172,8 @@ public:
     QDateTime getLastDiscoveredTime() const;
     void setLastDiscoveredTime(const QDateTime &time);
 
-    // All data readers and any sockets will use this number as timeout value in ms.
-    void setNetworkTimeout(unsigned int timeout);
-    virtual unsigned int getNetworkTimeout() const;
+    // All data readers and any sockets will use this number as timeout value.
+    virtual std::chrono::milliseconds getNetworkTimeout() const;
 
     // In some cases it is necessary to update only a couple of field from just discovered resource.
     virtual bool mergeResourcesIfNeeded(const QnVirtualCameraResourcePtr& source);
@@ -947,15 +946,13 @@ private:
     nx::utils::MacAddress m_macAddress;
     QString m_physicalId;
 
-    unsigned int m_networkTimeout = 1000 * 10;
-
     // Initialized in cpp to avoid transitional includes.
     std::uint16_t m_httpPort;
 
     QDateTime m_lastDiscoveredTime;
 
     nx::utils::CachedValue<nx::network::HostAddress> m_cachedHostAddress;
-private:
+
     /** Identifier of the type of this Device. */
     nx::Uuid m_typeId;
 

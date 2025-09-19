@@ -60,6 +60,8 @@ namespace api = nx::vms::api;
 
 using namespace nx::vms::common;
 
+constexpr std::chrono::milliseconds kDefaultNetworkTimeout = std::chrono::seconds(10);
+
 using StreamFpsSharingMethod = QnVirtualCameraResource::StreamFpsSharingMethod;
 static const QString kRelayHost("relay.vmsproxy.com");
 
@@ -795,16 +797,9 @@ void QnVirtualCameraResource::setLastDiscoveredTime(const QDateTime& time)
     m_lastDiscoveredTime = time;
 }
 
-void QnVirtualCameraResource::setNetworkTimeout(unsigned int timeout)
+std::chrono::milliseconds QnVirtualCameraResource::getNetworkTimeout() const
 {
-    NX_MUTEX_LOCKER mutexLocker( &m_mutex );
-    m_networkTimeout = timeout;
-}
-
-unsigned int QnVirtualCameraResource::getNetworkTimeout() const
-{
-    NX_MUTEX_LOCKER mutexLocker( &m_mutex );
-    return m_networkTimeout;
+    return kDefaultNetworkTimeout;
 }
 
 int QnVirtualCameraResource::getChannel() const
@@ -816,8 +811,9 @@ bool QnVirtualCameraResource::ping()
 {
     auto sock =
         nx::network::SocketFactory::createStreamSocket(nx::network::ssl::kAcceptAnyCertificate);
-    return sock->connect({getHostAddress(), nx::network::http::DEFAULT_HTTP_PORT},
-        nx::network::deprecated::kDefaultConnectTimeout);
+    return sock->connect(
+        {getHostAddress(), nx::network::http::DEFAULT_HTTP_PORT},
+        getNetworkTimeout());
 }
 
 void QnVirtualCameraResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )

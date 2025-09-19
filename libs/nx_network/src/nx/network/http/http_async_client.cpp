@@ -185,6 +185,11 @@ void ClientOptions::setTimeouts(const Timeouts& timeouts)
     m_timeouts = timeouts;
 }
 
+void ClientOptions::setAllTimeouts(std::chrono::milliseconds timeout)
+{
+    setTimeouts({ timeout, timeout, timeout });
+}
+
 ClientOptions::Timeouts ClientOptions::timeouts() const
 {
     NX_READ_LOCKER lock(&m_mutex);
