@@ -158,8 +158,9 @@ void Engine::startAsyncTasks(const char* lastSequenceId)
 
                 // Real-life implementation should manage its free space by itself and
                 // report data removal along with the newly added time periods here.
-                const auto currentSequenceId =
-                    std::to_string(duration_cast<milliseconds>(scanStartTime->time_since_epoch()).count());
+                const auto currentSequenceId = scanStartTime ?
+                    std::to_string(duration_cast<milliseconds>(scanStartTime->time_since_epoch()).count()):
+                    "0";
                 m_handler->onArchiveUpdated(
                     m_integrationId.data(), currentSequenceId.data(), nx::sdk::ErrorCode::noError, &result);
 
