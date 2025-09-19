@@ -13,10 +13,12 @@
 #include <nx/reflect/json/deserializer.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 #include <nx/vms/client/core/analytics/analytics_filter_model.h>
 #include <nx/vms/client/core/analytics/taxonomy/object_type.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/core/utils/video_cache.h>
@@ -452,9 +454,13 @@ void AnalyticsSearchSynchronizer::updateAttributeFiltersFromSettings()
 
 void AnalyticsSearchSynchronizer::updateTextSearchScopeFromSettings()
 {
-    m_analyticsSetup->setTextSearchScope(
-        nx::reflect::fromString<nx::analytics::db::TextScope>(
-        system()->userSettings()->textSearchScope().toStdString()));
+    static const auto kDefaultValue = nx::analytics::db::TextScope::attributes;
+    auto searchScope = nx::vms::client::core::ini().vectorizationSearchEnabled
+        ? nx::reflect::fromString(
+            nx::utils::trimAndUnquote(system()->userSettings()->textSearchScope()).toStdString(),
+            kDefaultValue)
+        : kDefaultValue;
+    m_analyticsSetup->setTextSearchScope(searchScope);
 }
 
 void AnalyticsSearchSynchronizer::updateReferenceTrackIdFromSettings()
