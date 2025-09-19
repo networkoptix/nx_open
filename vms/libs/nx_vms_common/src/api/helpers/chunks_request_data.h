@@ -14,8 +14,6 @@
 #include <nx/utils/serialization/format.h>
 #include <nx/vms/api/types/storage_location.h>
 
-class QnCommonModule;
-
 struct NX_VMS_COMMON_API QnChunksRequestData
 {
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(GroupBy,

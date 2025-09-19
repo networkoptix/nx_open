@@ -12,8 +12,6 @@
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
 #include <recording/time_period.h>
 
-class QnCommonModule;
-
 namespace nx::vms::client::core {
 
 class AbstractSearchListModel;

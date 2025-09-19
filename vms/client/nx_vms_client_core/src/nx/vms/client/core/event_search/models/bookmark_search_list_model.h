@@ -6,8 +6,6 @@
 
 #include "abstract_async_search_list_model.h"
 
-class QnCommonModule;
-
 namespace nx::vms::client::core {
 
 class NX_VMS_CLIENT_CORE_API BookmarkSearchListModel: public AbstractAsyncSearchListModel

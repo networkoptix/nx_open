@@ -3,7 +3,6 @@
 #include "stream_recorder.h"
 
 #include <analytics/common/object_metadata.h>
-#include <common/common_module.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>

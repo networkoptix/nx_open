@@ -2,7 +2,6 @@
 
 #include "single_shot_file_reader.h"
 
-#include <common/common_module.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/storage_resource.h>
 #include <nx/media/config.h>

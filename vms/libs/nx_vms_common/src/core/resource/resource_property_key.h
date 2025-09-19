@@ -51,7 +51,7 @@ NX_VMS_COMMON_API extern const QString kCloudStorageCapabilities;
  * information of a Resource, that is taken from "resource_data.json". Different specific data
  * pieces have different types. Usually the data is received like this:
  * ```
- *     QnResourceData resData = commonModule->resourceDataPool()->data(manufacturer, model);
+ *     QnResourceData resData = resourceDataPool()->data(manufacturer, model);
  *     auto maxFps = resourceData.value<float>(ResourceDataKey::kMaxFps, 0.0);
  * ```
  * Sometimes (seldom) the keys are absent in "resource_data.json", but are used in the code; this

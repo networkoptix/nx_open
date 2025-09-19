@@ -2,8 +2,6 @@
 
 #include "state_watcher.h"
 
-#include <common/common_module.h>
-
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/analytics/taxonomy/state_compiler.h>
 #include <nx/analytics/taxonomy/resource_support_proxy.h>

@@ -4,19 +4,18 @@
 
 #include <QtCore/QCryptographicHash>
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <nx/network/app_info.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/common/system_context.h>
 
 using namespace nx::network::rest;
 
-GenericUserDataProvider::GenericUserDataProvider(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+GenericUserDataProvider::GenericUserDataProvider(nx::vms::common::SystemContext* systemContext):
+    SystemContextAware(systemContext)
 {
 }
 

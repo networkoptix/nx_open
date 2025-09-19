@@ -9,7 +9,6 @@
 
 #include "resource/resource_pool_test_helper.h"
 
-class QnCommonModule;
 
 namespace nx::vms::common::test {
 
@@ -49,7 +48,6 @@ public:
     Context();
     virtual ~Context();
 
-    QnCommonModule* commonModule() const;
     SystemContext* systemContext() const;
 
 private:

@@ -7,8 +7,6 @@
 #include <core/resource/resource.h>
 #include <utils/common/delayed.h>
 
-class QnCommonModule;
-
 namespace nx::core::resource {
 
 template<typename BaseResource>

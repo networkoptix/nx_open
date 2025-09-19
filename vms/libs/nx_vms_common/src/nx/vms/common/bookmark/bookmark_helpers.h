@@ -7,8 +7,6 @@
 #include <nx/vms/event/event_fwd.h>
 #include <recording/time_period.h>
 
-class QnCommonModule;
-
 namespace nx::vms::common {
 
 NX_VMS_COMMON_API QnCameraBookmarkList bookmarksAtPosition(

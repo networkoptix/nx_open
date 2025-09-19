@@ -96,7 +96,7 @@ TEST(TcpConnectionProcessor, sendAsyncData)
 {
     nx::vms::common::test::Context context;
 
-    // QnTcpListener uses commonModule()->moduleGuid().
+    // QnTcpListener uses systemContext()->moduleGuid().
     TestTcpListener tcpListener(
         context.systemContext(), kMaxTcpRequestSize, QHostAddress::Any, /*port*/ 0);
     tcpListener.start();

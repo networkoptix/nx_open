@@ -10,7 +10,6 @@
 #include <QtCore/QMap>
 #include <QtNetwork/QNetworkInterface>
 
-#include <common/common_module.h>
 #include <nx/network/nettools.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>

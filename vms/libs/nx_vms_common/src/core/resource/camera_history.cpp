@@ -6,7 +6,6 @@
 #include <api/helpers/camera_id_helper.h>
 #include <api/helpers/chunks_request_data.h>
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>

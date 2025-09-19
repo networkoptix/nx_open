@@ -2,7 +2,6 @@
 
 #include "test_context.h"
 
-#include <common/common_module.h>
 #include <nx/vms/common/api/message_processor_mock.h>
 #include <nx/vms/common/system_context.h>
 
@@ -11,7 +10,6 @@ namespace nx::vms::common::test {
 struct Context::Private
 {
     std::unique_ptr<SystemContext> systemContext;
-    std::unique_ptr<QnCommonModule> commonModule;
 };
 
 Context::Context():
@@ -20,16 +18,10 @@ Context::Context():
     d->systemContext = std::make_unique<SystemContext>(
         SystemContext::Mode::unitTests,
         /*peerId*/ nx::Uuid::createUuid());
-    d->commonModule = std::make_unique<QnCommonModule>(d->systemContext.get());
 }
 
 Context::~Context()
 {
-}
-
-QnCommonModule* Context::commonModule() const
-{
-    return d->commonModule.get();
 }
 
 SystemContext* Context::systemContext() const

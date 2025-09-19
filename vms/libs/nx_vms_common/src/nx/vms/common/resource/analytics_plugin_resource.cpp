@@ -2,16 +2,13 @@
 
 #include "analytics_plugin_resource.h"
 
-#include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
-#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <nx/vms/api/analytics/integration_manifest.h>
-
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/api/analytics/integration_manifest.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 namespace nx::vms::common {
 

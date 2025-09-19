@@ -22,4 +22,4 @@ protected:
 };
 
 #define qnDesktopClientMessageProcessor \
-    static_cast<QnDesktopClientMessageProcessor*>(commonModule()->messageProcessor())
+    static_cast<QnDesktopClientMessageProcessor*>(systemContext()->messageProcessor())

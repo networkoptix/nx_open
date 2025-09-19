@@ -143,7 +143,7 @@ void CompatibilityVersionInstallationDialog::processUpdateContents(const UpdateC
     auto systemContext = m_private->clientUpdateTool->systemContext();
     auto verifiedContents = contents;
     // We need to supply non-zero Uuid for the client to make verification work.
-    // commonModule->globalSettings()->localSystemId() is zero right now.
+    // systemSettings()->localSystemId() is zero right now.
     ClientVerificationData clientData;
     clientData.clientId = nx::Uuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
     clientData.fillDefault();

@@ -4,7 +4,6 @@
 
 #include <QtCore/QThread>
 
-#include <common/common_module.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>

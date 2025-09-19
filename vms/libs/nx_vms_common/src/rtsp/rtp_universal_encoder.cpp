@@ -11,8 +11,6 @@
 #include <nx/utils/log/log_main.h>
 #include <transcoding/transcoding_utils.h>
 
-#include "common/common_module.h"
-
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>

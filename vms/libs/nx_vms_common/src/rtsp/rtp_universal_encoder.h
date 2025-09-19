@@ -10,8 +10,6 @@
 #include "srtp_encryptor.h"
 #include <transcoding/ffmpeg_transcoder.h>
 
-class QnCommonModule;
-
 class NX_VMS_COMMON_API QnUniversalRtpEncoder: public AbstractRtspEncoder
 {
 public:

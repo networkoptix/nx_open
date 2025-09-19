@@ -8,7 +8,6 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <api/model/api_ioport_data.h>
-#include <common/common_module.h>
 #include <core/ptz/ptz_preset.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/motion_window.h>

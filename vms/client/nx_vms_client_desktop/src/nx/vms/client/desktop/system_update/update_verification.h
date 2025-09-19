@@ -28,7 +28,7 @@ public:
 
 /**
  * Checks if cloud host is compatible with our system
- * @param commonModule
+ * @param systemContext
  * @param targetVersion - target version of system update.
  * @param cloudUrl - url to cloud from updateContents. We check it against our system.
  * @param peers - a set of peers to be checked.

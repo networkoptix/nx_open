@@ -4,7 +4,6 @@
 
 #include <QtCore/QDateTime>
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/core/event_search/utils/event_search_utils.h>
 #include <nx/vms/client/core/skin/color_theme.h>

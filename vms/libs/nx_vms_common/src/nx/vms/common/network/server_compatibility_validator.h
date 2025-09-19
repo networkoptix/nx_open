@@ -10,8 +10,6 @@
 #include <nx/vms/api/types/connection_types.h>
 #include <nx_ec/ec_api_fwd.h>
 
-class QnCommonModule;
-
 namespace nx::vms::api {
 
 struct ModuleInformation;

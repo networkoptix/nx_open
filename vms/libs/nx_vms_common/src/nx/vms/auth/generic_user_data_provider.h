@@ -4,21 +4,21 @@
 
 #include <QtCore/QObject>
 
-#include <common/common_module_aware.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/auth/abstract_user_data_provider.h>
+#include <nx/vms/common/system_context_aware.h>
 
 class NX_VMS_COMMON_API GenericUserDataProvider:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware,
+    public /*mixin*/ nx::vms::common::SystemContextAware,
     public nx::vms::auth::AbstractUserDataProvider,
     public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 
 public:
-    GenericUserDataProvider(QnCommonModule* commonModule);
+    GenericUserDataProvider(nx::vms::common::SystemContext* systemContext);
     ~GenericUserDataProvider();
 
     virtual std::pair<QnResourcePtr, bool /*hasClash*/> findResByName(

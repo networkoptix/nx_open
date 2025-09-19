@@ -7,7 +7,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 
-#include <common/common_module.h>
 #include <core/resource/dummy_resource.h>
 #include <nx/utils/fs/file.h>
 #include <nx/utils/random.h>
