@@ -1187,6 +1187,10 @@
       <source>Log In</source>
       <translation>ログイン</translation>
     </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation type="unfinished">2FA Disabled</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
