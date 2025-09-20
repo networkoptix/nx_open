@@ -375,9 +375,6 @@ if(IOS)
     )
 
     if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-        # Put dSYM files into a different directory to avoid signing issues.
-        nx_process_macos_target_debug_symbols(mobile_client OUTPUT_DIR "${CMAKE_BINARY_DIR}")
-
         set(distribution_config_file "${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf")
         nx_configure_file(
             ${CMAKE_CURRENT_SOURCE_DIR}/ios/build_distribution.conf.in

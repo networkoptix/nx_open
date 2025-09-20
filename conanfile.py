@@ -149,6 +149,7 @@ class NxOpenConan(ConanFile):
         self.build_requires("apidoctool/3.0" "#483c5073667ee722756e0ca31e18972a")
         self.build_requires("qt-host/6.9.0" "#3995869eb604dd7c10d91e6869ca2a9f")
         self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
+        self.build_requires("breakpad-tools/2024.02.16" "#7217d5e71eeff4069d20dd5da605f276")
 
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
@@ -194,6 +195,7 @@ class NxOpenConan(ConanFile):
         self.requires("rapidjson/cci.20230929" "#751fc0dfc70af706c708706450fc2ab7")
         self.requires("zlib/1.3.1" "#99d6f9ea0a1dd63d973392c24ce0aa9b")
         self.requires("perfetto/47.0" "#fefcb910df242e7dca2a309cac9396cb")
+        self.requires("crashpad/cci.20250729" "#9bf9bb5a8bdca7e87a19ff92f5c3bb90")
 
         if self.settings.os not in ("Android", "iOS"):
             # Qt dependency.

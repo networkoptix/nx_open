@@ -14,6 +14,7 @@ endfunction()
 
 macro(build_client_for_abi abi)
     _prepare_cmake_flags(_cmake_args
+        CMAKE_BUILD_TYPE
         buildNumber
         customization
         cloudGroup
@@ -24,6 +25,7 @@ macro(build_client_for_abi abi)
         pushNotificationProvider
         enablePrecompiledHeaders
         customMobileClientVersion
+        breakpadSymbolsOutputDir
     )
 
     # If CMake configuration of the root project was cleared, we need to clear the child

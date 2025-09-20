@@ -39,9 +39,7 @@ target_link_libraries(push_notification_extension PRIVATE
 add_subdirectory(utils)
 
 if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    nx_process_macos_target_debug_symbols(
-        push_notification_extension
-        OUTPUT_DIR "${CMAKE_BINARY_DIR}")
+    nx_process_macos_target_debug_symbols(push_notification_extension)
 endif()
 
 nx_prepare_ios_signing(push_notification_extension

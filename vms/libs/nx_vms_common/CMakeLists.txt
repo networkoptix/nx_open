@@ -2,6 +2,7 @@
 
 find_package(Qt6 COMPONENTS ShaderTools)
 find_package(libsrtp REQUIRED)
+find_package(crashpad REQUIRED)
 
 set(date_time_formatter_root "${open_source_root}/artifacts/date_time_formatter")
 file(GLOB_RECURSE date_time_formatter_sources
@@ -44,6 +45,8 @@ nx_add_target(nx_vms_common LIBRARY
         nx_media_core
         nx_codec
         libsrtp::libsrtp
+    PRIVATE_LIBS
+        crashpad::crashpad
     FOLDER common/libs
 )
 nx_make_target_translatable(nx_vms_common COMPONENTS "client" "server" "mobile")
