@@ -55,6 +55,7 @@ extern "C" {
 #include <nx/vms/client/mobile/push_notification/push_notification_image_provider.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/window_context.h>
+#include <nx/vms/statistics/crashpad.h>
 #include <ui/window_utils.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 #include <utils/intent_listener_android.h>
@@ -317,6 +318,13 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
 
 int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 {
+    // Set up application parameters so that QSettings know where to look for settings.
+    // Also QStandardPaths uses these parameters to determine writable locations.
+    QGuiApplication::setOrganizationName(nx::branding::company());
+    QGuiApplication::setApplicationName(nx::branding::mobileClientInternalName());
+    QGuiApplication::setApplicationDisplayName(nx::branding::mobileClientDisplayName());
+    QGuiApplication::setApplicationVersion(nx::build_info::mobileClientVersion());
+
     Q_INIT_RESOURCE(mobile_client);
 
     QQuickStyle::setStyle("Basic");
@@ -343,6 +351,8 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     QtWebView::initialize();
     QGuiApplication application(argc, argv);
 
+    nx::vms::statistics::initCrashpad();
+
     if (nx::build_info::isAndroid())
     {
         // Clear the clipboard to avoid warning in Android 12. Despite some issues were fixed in
@@ -350,12 +360,6 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
         // contain any clipboard access operations. This code workarounds it. Also see QTBUG-98412.
         qApp->clipboard()->clear();
     }
-
-    // Set up application parameters so that QSettings know where to look for settings.
-    QGuiApplication::setOrganizationName(nx::branding::company());
-    QGuiApplication::setApplicationName(nx::branding::mobileClientInternalName());
-    QGuiApplication::setApplicationDisplayName(nx::branding::mobileClientDisplayName());
-    QGuiApplication::setApplicationVersion(nx::build_info::mobileClientVersion());
 
     auto settings = std::make_unique<QnMobileClientSettings>();
 

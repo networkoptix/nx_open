@@ -151,6 +151,7 @@ class NxOpenConan(ConanFile):
         if not self.isEmscripten:
             self.build_requires("apidoctool/3.0" "#483c5073667ee722756e0ca31e18972a")
             self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
+            self.build_requires("breakpad-tools/2024.02.16" "#7217d5e71eeff4069d20dd5da605f276")
 
         if self.isLinux or self.isWindows:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
@@ -201,6 +202,7 @@ class NxOpenConan(ConanFile):
             self.requires("libmp3lame/3.100" "#da13ecbaf0d06421ae586b7226d985ad")
             self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
             self.requires("perfetto/47.0" "#fefcb910df242e7dca2a309cac9396cb")
+            self.requires("crashpad/cci.20250729" "#9bf9bb5a8bdca7e87a19ff92f5c3bb90")
 
         if self.settings.os not in ("Android", "iOS", "Emscripten"):
             # Qt dependency.

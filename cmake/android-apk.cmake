@@ -94,7 +94,7 @@ function(add_android_apk target)
     file(GENERATE OUTPUT "${settings_file}" CONTENT "${settings}")
     nx_store_known_file(${settings_file})
 
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo" AND NOT developerBuild)
         set(build_type "release")
         set(build_type_arg "--release")
         set(apk_suffix "release")
@@ -160,6 +160,9 @@ function(add_android_apk target)
         set(copy_wrapsh_command)
     endif()
 
+    set(copy_crashpad_handler_command
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CRASHPAD_HANDLER_PATH} ${apk_dir}/resources/lib/${CMAKE_ANDROID_ARCH_ABI})
+
     if(APK_EXTRA_JAVA_LIBS)
         set(copy_java_libs_command COMMAND ${CMAKE_COMMAND} -E copy ${APK_EXTRA_JAVA_LIBS} ${libs_dir})
     else()
@@ -176,6 +179,7 @@ function(add_android_apk target)
         COMMAND ${CMAKE_COMMAND} -E make_directory "${apk_dir}/resources/lib/${CMAKE_ANDROID_ARCH_ABI}"
         ${copy_java_libs_command}
         ${copy_wrapsh_command}
+        ${copy_crashpad_handler_command}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${APK_TARGET}>"
             "${apk_dir}/libs/${CMAKE_ANDROID_ARCH_ABI}/lib${APK_TARGET}_${CMAKE_ANDROID_ARCH_ABI}.so"
         COMMAND ${CMAKE_COMMAND} -E env

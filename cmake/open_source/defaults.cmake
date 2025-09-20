@@ -18,6 +18,8 @@ set(withDesktopClient ON CACHE STRING "Enable desktop client")
 set(statisticsServerUrl "" CACHE STRING "Default statistics server URL")
 set(statisticsServerUser "" CACHE STRING "Default statistics server user")
 set(statisticsServerPassword "" CACHE STRING "Default statistics server password")
+set(breakpadSymbolsOutputDir "${CMAKE_BINARY_DIR}/breakpad_symbols" CACHE PATH
+    "Output directory for Breakpad symbols")
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     set(signtoolConfig "" CACHE PATH
