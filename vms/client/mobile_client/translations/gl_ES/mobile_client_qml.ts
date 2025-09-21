@@ -965,10 +965,6 @@
       <translation>Conectar ao sitio</translation>
     </message>
     <message>
-      <source>Log in as</source>
-      <translation>Iniciar sesión como</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Acceder</translation>
     </message>

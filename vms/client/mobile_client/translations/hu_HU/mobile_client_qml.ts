@@ -965,10 +965,6 @@
       <translation type="unfinished">Connect to Site</translation>
     </message>
     <message>
-      <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Felhasználónév</translation>
     </message>

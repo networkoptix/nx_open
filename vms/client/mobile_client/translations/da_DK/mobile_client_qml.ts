@@ -965,10 +965,6 @@
       <translation>Opret forbindelse til Site</translation>
     </message>
     <message>
-      <source>Log in as</source>
-      <translation>Log ind som</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Log på</translation>
     </message>
@@ -1190,7 +1186,7 @@
     </message>
     <message>
       <source>2FA Disabled</source>
-      <translation type="unfinished">2FA Disabled</translation>
+      <translation>2FA Deaktiveret</translation>
     </message>
   </context>
   <context>

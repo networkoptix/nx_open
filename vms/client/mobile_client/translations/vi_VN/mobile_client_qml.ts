@@ -964,10 +964,6 @@
       <translation>Kết nối với Chi nhánh</translation>
     </message>
     <message>
-      <source>Log in as</source>
-      <translation>Đăng nhập với tên</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Đăng nhập</translation>
     </message>

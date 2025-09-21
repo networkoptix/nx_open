@@ -964,10 +964,6 @@
       <translation>連線到站點</translation>
     </message>
     <message>
-      <source>Log in as</source>
-      <translation>登入身份</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>使用者帳號</translation>
     </message>

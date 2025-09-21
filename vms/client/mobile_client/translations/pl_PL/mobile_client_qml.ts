@@ -967,10 +967,6 @@
       <translation>Połącz z witryną</translation>
     </message>
     <message>
-      <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Login</translation>
     </message>

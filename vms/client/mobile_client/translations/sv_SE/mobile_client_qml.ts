@@ -965,10 +965,6 @@
       <translation>Anslut till sajten</translation>
     </message>
     <message>
-      <source>Log in as</source>
-      <translation>Logga in som</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Logga in</translation>
     </message>

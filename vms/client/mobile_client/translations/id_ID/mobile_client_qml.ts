@@ -964,10 +964,6 @@
       <translation>Koneksikan ke Site</translation>
     </message>
     <message>
-      <source>Log in as</source>
-      <translation>Masuk sebagai</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Masuk</translation>
     </message>

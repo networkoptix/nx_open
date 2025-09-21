@@ -967,10 +967,6 @@
       <translation>Подключиться к cайту</translation>
     </message>
     <message>
-      <source>Log in as</source>
-      <translation>Войти как</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Имя пользователя</translation>
     </message>

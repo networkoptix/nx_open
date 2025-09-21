@@ -964,10 +964,6 @@
       <translation>サイトに接続</translation>
     </message>
     <message>
-      <source>Log in as</source>
-      <translation>ログイン名:</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>ログイン</translation>
     </message>
