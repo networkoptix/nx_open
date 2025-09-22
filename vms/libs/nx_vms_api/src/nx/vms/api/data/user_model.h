@@ -156,7 +156,7 @@ struct NX_VMS_API TemporaryToken
 
     /**%apidoc[readonly]
      * Authentication token. It is filled by the Server in the response. This token may be
-     * further used in the `rest/v{3-}/login/temporaryToken` request.
+     * further used in the `/rest/v{3-}/login/temporaryToken` request.
      */
     std::string token;
 
