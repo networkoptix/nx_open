@@ -55,7 +55,7 @@ typedef std::vector<QnBounds> QnBoundsList;
 
 struct UnauthorizedTimeoutLimits
 {
-    std::chrono::seconds min = std::chrono::minutes(1);
+    std::chrono::seconds min = std::chrono::seconds(2);
     // For many vendors, the unblocking period lasts 5 minutes, so the default value is set slightly higher.
     std::chrono::seconds max = std::chrono::minutes(6);
 };
