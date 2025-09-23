@@ -6,10 +6,9 @@
 
 namespace nx::vms::statistics {
 
-// Hardcoded credentials (because of no way to keep it better)
-const QString kDefaultStatisticsServer = NX_STATISTICS_SERVER_URL"";
-const QString kDefaultUser = NX_STATISTICS_SERVER_USER"";
-const QString kDefaultPassword = NX_STATISTICS_SERVER_PASSWORD"";
-const QString kDefaultCrashReportApiUrl = NX_CRASH_REPORT_API_URL"";
+NX_VMS_COMMON_API QString defaultStatisticsServer();
+NX_VMS_COMMON_API const std::string& defaultUser();
+NX_VMS_COMMON_API const std::string& defaultPassword();
+NX_VMS_COMMON_API QString defaultCrashReportApiUrl();
 
 } // namespace nx::vms::statistics

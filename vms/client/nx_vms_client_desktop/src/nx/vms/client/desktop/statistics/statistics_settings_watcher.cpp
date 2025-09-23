@@ -48,10 +48,10 @@ struct StatisticsSettingsWatcher::Private
         if (localSettingsUrl.isValid())
             return localSettingsUrl;
 
-        if (nx::vms::statistics::kDefaultStatisticsServer.isEmpty())
+        if (nx::vms::statistics::defaultStatisticsServer().isEmpty())
             return {};
 
-        return nx::vms::statistics::kDefaultStatisticsServer + "/config/client_stats_v2.json";
+        return nx::vms::statistics::defaultStatisticsServer() + "/config/client_stats_v2.json";
     }
 
     void updateSettings()
