@@ -12,40 +12,109 @@
 
 get_glibcxx_version()
 {
-    local FILE="$1"
+    local file="$1"
 
     # `nm` allows us to certainly know the library version, so trying it first.
     if command -v nm > /dev/null; then
         # `sed` searches for something like `0000000000000000 A GLIBCXX_3.4.25` and prints `3.4.25`.
-        nm -D "${FILE}" | sed -n 's/.* GLIBCXX_//p' | sort -uV | tail -n 1
+        nm -D "${file}" | sed -n 's/.* GLIBCXX_//p' | sort -uV | tail -n 1
     else
         # If `nm` is not present, guess the version by the library file name.
         # `sed` cuts everything but version part.
-        realpath "${FILE}" | sed 's/.*\.so\.//'
+        realpath "${file}" | sed 's/.*\.so\.//'
     fi
 }
 
-LOCAL_STDCPP_DIR="$1"
-if [ -z "${LOCAL_STDCPP_DIR}" ]; then
-    echo "Please specify local libstdc++ directory." >&2
-    exit 1
-fi
+find_system_libstdcpp()
+{
+    if command -v ldconfig >/dev/null 2>&1; then
+        ldconfig -p | grep libstdc++.so.6 | head -n 1 | sed 's/.*=> //'
+        return
+    fi
 
-LOCAL_STDCPP="$LOCAL_STDCPP_DIR/libstdc++.so.6"
-if [ ! -f "${LOCAL_STDCPP}" ]; then
-    echo "File not found: ${LOCAL_STDCPP}" >&2
-    exit 1
-fi
+    # Fallback: try to find libstdc++.so.6 in standard library paths.
+    for dir in /lib64 /lib /usr/lib64 /usr/lib; do
+        if [ -f "${dir}/libstdc++.so.6" ]; then
+            echo "${dir}/libstdc++.so.6"
+            return
+        fi
+    done
+}
 
-SYSTEM_STDCPP="$(/sbin/ldconfig -p | grep libstdc++.so.6 | head -n 1 | sed 's/.*=> //')"
-if [ -z "${SYSTEM_STDCPP}" ]; then
-    echo "${LOCAL_STDCPP}"
-    exit 0
-fi
+get_newest_libstdcpp()
+{
+    local localStdcppDir="$1"
+    if [ -z "${localStdcppDir}" ]; then
+        echo "Please specify local libstdc++ directory." >&2
+        exit 1
+    fi
 
-LOCAL_VERSION=$(get_glibcxx_version "${LOCAL_STDCPP}")
-SYSTEM_VERSION=$(get_glibcxx_version "${SYSTEM_STDCPP}")
+    local localStdcpp="$localStdcppDir/libstdc++.so.6"
+    if [ ! -f "${localStdcpp}" ]; then
+        echo "File not found: ${localStdcpp}" >&2
+        exit 1
+    fi
 
-if [ "${LOCAL_VERSION}" \> "${SYSTEM_VERSION}" ]; then
-    echo "${LOCAL_STDCPP_DIR}"
+    local systemStdcpp="$(find_system_libstdcpp)"
+    if [ -z "${systemStdcpp}" ]; then
+        echo "${localStdcpp}"
+        return
+    fi
+
+    localVersion=$(get_glibcxx_version "${localStdcpp}")
+    systemVersion=$(get_glibcxx_version "${systemStdcpp}")
+
+    if [ "${localVersion}" \> "${systemVersion}" ]; then
+        echo "${localStdcppDir}"
+    fi
+}
+
+create_symlinks_for_files_in_dir()
+{
+    local srcDir="$1"
+    local dstDir="$2"
+
+    for lib in "${srcDir}"/*; do
+        libName=$(basename "${lib}")
+        echo "Making symlink "${dstDir}/${libName}" for "${lib}""
+        ln -sf "${lib}" "${dstDir}/${libName}"
+    done
+}
+
+remove_symlinks_for_files_in_dir()
+{
+    local srcDir="$1"
+    local dstDir="$2"
+
+    for lib in "${srcDir}"/*; do
+        libName=$(basename "${lib}")
+        symlink="${dstDir}/${libName}"
+        [ -e "${symlink}" ] || continue
+
+        if [ -L "${symlink}" ]; then
+            echo "Remove symlink: ${symlink}"
+            rm -f "${symlink}"
+        else
+            echo "Skip: ${symlink}, as it is not a symbolic link"
+        fi
+    done
+}
+
+ensure_newest_libstdcpp()
+{
+    local libDir="$(dirname "$0")/../lib"
+    local stdcppDir="$(get_newest_libstdcpp "${libDir}/stdcpp")"
+    if [ -n "${stdcppDir}" ]; then
+        echo "Using bundled libstdc++."
+        create_symlinks_for_files_in_dir "${stdcppDir}" "${libDir}"
+    else
+        echo "Using system libstdc++."
+        remove_symlinks_for_files_in_dir "${stdcppDir}" "${libDir}"
+    fi
+}
+
+if [ "$1" = "ensure_newest_libstdcpp" ]; then
+    ensure_newest_libstdcpp
+else
+    get_newest_libstdcpp "$@"
 fi
