@@ -1188,7 +1188,7 @@
     </message>
     <message>
       <source>2FA Disabled</source>
-      <translation type="unfinished">2FA Disabled</translation>
+      <translation>Двухфакторная аутентификация отключена</translation>
     </message>
   </context>
   <context>

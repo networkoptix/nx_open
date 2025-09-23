@@ -1185,7 +1185,7 @@
     </message>
     <message>
       <source>2FA Disabled</source>
-      <translation type="unfinished">2FA Disabled</translation>
+      <translation>2FA Dinonaktifkan</translation>
     </message>
   </context>
   <context>

@@ -1188,7 +1188,7 @@
     </message>
     <message>
       <source>2FA Disabled</source>
-      <translation type="unfinished">2FA Disabled</translation>
+      <translation>Weryfikacja 2FA wyłączona</translation>
     </message>
   </context>
   <context>
