@@ -83,7 +83,7 @@
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
-      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+      <translation>No se proporcionaron credenciales cuando el punto de acceso lo solicitó.</translation>
     </message>
   </context>
   <context>
@@ -235,7 +235,7 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</translation>
+      <translation>Los miembros de este grupo tienen privilegios ilimitados del Sistema. Los administradores pueden crear y modificar usuarios potenciales, y fusionar sistemas y vincular o desvincular cuentas de %1.</translation>
     </message>
   </context>
   <context>
@@ -458,11 +458,11 @@
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+      <translation>Se recibieron datos inválidos del dispositivo. Detalles: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>Se recibieron datos inválidos del Módulo I/O. Detalles: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -1183,7 +1183,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>Grupos múltiples</translation>
     </message>
   </context>
   <context>
@@ -1194,17 +1194,17 @@
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>No se pudo procesar la solicitud.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Prohibido.</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Conflicto.</translation>
     </message>
     <message>
       <source>Bad request.</source>
@@ -1214,7 +1214,7 @@
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>No implementado.</translation>
     </message>
     <message>
       <source>Not found.</source>
@@ -1227,11 +1227,11 @@
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>Tipo de medio no soportado.</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>Servicio No Disponible.</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
@@ -1239,21 +1239,21 @@
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>Sesión expirada.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2.</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+      <translation>Parámetro no válido `%1`: %2.</translation>
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Se requiere autorización de sesión.</translation>
     </message>
     <message>
       <source>Not allowed.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not allowed.</translation>
+      <translation>No permitido.</translation>
     </message>
   </context>
   <context>
@@ -1293,34 +1293,34 @@
     <name>TimeFormat</name>
     <message>
       <source>just now</source>
-      <translation type="unfinished">just now</translation>
+      <translation>justo ahora</translation>
     </message>
     <message>
       <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
+      <translation>ayer</translation>
     </message>
     <message>
       <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
+      <translation>hace una semana</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
+      <translation>
+        <numerusform>Hace %n minutos</numerusform>
+        <numerusform>Hace %n minutos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours ago</source>
       <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
+        <numerusform>Hace %n horas</numerusform>
         <numerusform>%n hours ago</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days ago</source>
       <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
+        <numerusform>Hace %n días</numerusform>
         <numerusform>%n days ago</numerusform>
       </translation>
     </message>
@@ -1373,7 +1373,7 @@
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Desbloquee esta parte del archivo para exportar su contenido.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
@@ -1392,43 +1392,43 @@
     <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
+      <translation>Informe de estadísticas anónimas permitido</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
+      <translation>Reporte anónimo de estadísticas la última vez</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
+      <translation>Informe de estadísticas anónimas última versión</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
+      <translation>Informe de estadísticas anónimas último número</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
+      <translation>Ciclo de tiempo de estadísticas anónimas</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
+      <translation>Retraso del informe de estadísticas anónimas después de la actualización</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
+      <translation>Reporte de estadísticas anónimas Servidor URL</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
+      <translation>Informe de estadísticas anónimas Configuración del cliente</translation>
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
+      <translation>Intervalo de actualización del sistema activo (segundos, 1 s-1 h)</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
+      <translation>Tiempo de espera de conexión del proxy (segundos, 1s-1h)</translation>
     </message>
     <message>
       <source>Time synchronization enabled</source>
@@ -1436,11 +1436,11 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>ID del servidor de sincronización de hora primaria</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+      <translation>Diferencia máxima entre la hora local y la hora de origen (milisegundos)</translation>
     </message>
     <message>
       <source>OS time change check period</source>
@@ -1460,11 +1460,11 @@
     </message>
     <message>
       <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
+      <translation>ID del sistema en la nube</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
+      <translation>Clave de autorización en la nube</translation>
     </message>
     <message>
       <source>System name</source>
@@ -1472,11 +1472,11 @@
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
+      <translation>Último ID de fusión del sistema maestro</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
+      <translation>ID de fusión del último sistema esclavo</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
