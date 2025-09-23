@@ -145,6 +145,9 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "[Dev] Overrides the current Client's Cloud Host. Allows to connect to the Server that \n"
         "uses the specified Cloud Host. Use 'auto' to allow client switch cloud host on the fly.");
 
+    NX_INI_FLAG(true, enableKeychain,
+        "[Dev] Control using keychain to simplify development of modules which call the keychain"
+        " each time after rebuilding.");
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();

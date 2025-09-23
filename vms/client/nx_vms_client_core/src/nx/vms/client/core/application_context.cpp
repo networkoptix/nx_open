@@ -102,8 +102,9 @@ struct ApplicationContext::Private
         NX_ASSERT(!QCoreApplication::organizationName().isEmpty());
 
         // Disable secure settings in unit tests.
+        const bool useKeychain = mode != Mode::unitTests && ini().enableKeychain;
         settings = std::make_unique<Settings>(
-            Settings::InitializationOptions{.useKeychain = (mode != Mode::unitTests)});
+            Settings::InitializationOptions{.useKeychain = useKeychain});
 
         common::appContext()->setLocale(settings->locale());
     }
