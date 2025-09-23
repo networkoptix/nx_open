@@ -76,7 +76,7 @@
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
-      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+      <translation>No se proporcionaron credenciales cuando el punto de acceso lo solicitó.</translation>
     </message>
   </context>
   <context>
@@ -87,17 +87,17 @@
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>No se pudo procesar la solicitud.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Prohibido.</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Conflicto.</translation>
     </message>
     <message>
       <source>Bad request.</source>
@@ -107,7 +107,7 @@
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>No implementado.</translation>
     </message>
     <message>
       <source>Not found.</source>
@@ -120,11 +120,11 @@
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>Tipo de medio no soportado.</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>Servicio No Disponible.</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
@@ -132,11 +132,11 @@
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>Sesión expirada.</translation>
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Se requiere autorización de sesión.</translation>
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
@@ -149,12 +149,12 @@
     <message>
       <source>Not allowed.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not allowed.</translation>
+      <translation>No permitido.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2</translation>
+      <translation>Parámetro no válido `%1`: %2</translation>
     </message>
     <message>
       <source>Service unauthorized.</source>
