@@ -147,7 +147,7 @@ bool CrashReporter::scanAndReport()
 
     const QString configApi = globalSettings->crashReportServerApi();
     const QString apiUrl = configApi.isEmpty()
-        ? nx::vms::statistics::kDefaultCrashReportApiUrl
+        ? nx::vms::statistics::defaultCrashReportApiUrl()
         : configApi;
 
     if (apiUrl.isEmpty())
@@ -231,8 +231,8 @@ bool CrashReporter::send(const nx::Url& serverApi, const QFileInfo& crash)
                     report, &ReportData::finishReport, Qt::DirectConnection);
 
     httpClient->setCredentials(nx::network::http::PasswordCredentials(
-        nx::vms::statistics::kDefaultUser.toStdString(),
-        nx::vms::statistics::kDefaultPassword.toStdString()));
+        nx::vms::statistics::defaultUser(),
+        nx::vms::statistics::defaultPassword()));
     httpClient->setAdditionalHeaders(report->makeHttpHeaders());
 
     NX_MUTEX_LOCKER lock(&m_mutex);

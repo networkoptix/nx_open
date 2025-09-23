@@ -49,14 +49,23 @@ nx_add_target(nx_vms_common LIBRARY
 nx_make_target_translatable(nx_vms_common COMPONENTS "client" "server" "mobile")
 
 target_compile_definitions(nx_vms_common
-    PRIVATE NX_VMS_COMMON_API=${API_EXPORT_MACRO}
+    PRIVATE
+        NX_VMS_COMMON_API=${API_EXPORT_MACRO}
     INTERFACE
         NX_VMS_COMMON_API=${API_IMPORT_MACRO}
+)
+
+set_property(
+    SOURCE
+        src/nx/vms/statistics/settings.cpp
+    APPEND
+    PROPERTY COMPILE_DEFINITIONS
         NX_STATISTICS_SERVER_URL="${statisticsServerUrl}"
         NX_STATISTICS_SERVER_USER="${statisticsServerUser}"
         NX_STATISTICS_SERVER_PASSWORD="${statisticsServerPassword}"
         NX_CRASH_REPORT_API_URL="${crashReportApiUrl}"
 )
+
 if(LINUX)
     add_dependencies(nx_vms_common libgl_stub libegl_stub libglx_stub libx11_stub libva-x11_stub)
 endif()
