@@ -66,6 +66,7 @@ void WindowContext::Private::initializeMainWindow()
     {
         mainWindow->setWidth(380);
         mainWindow->setHeight(650);
+        mainWindow->raise();
     }
 
     if (!mainComponent.errors().isEmpty())

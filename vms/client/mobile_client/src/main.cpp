@@ -53,6 +53,7 @@ extern "C" {
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <ui/window_utils.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 #include <utils/intent_listener_android.h>
@@ -304,6 +305,12 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
         core::appContext()->cloudStatusWatcher()->setAuthData(
             authData,
             core::CloudStatusWatcher::AuthMode::initial);
+    }
+
+    if (!startupParameters.windowGeometry.isNull())
+    {
+        nx::vms::client::mobile::appContext()->mainWindowContext()->mainWindow()->setGeometry(
+            startupParameters.windowGeometry);
     }
 }
 

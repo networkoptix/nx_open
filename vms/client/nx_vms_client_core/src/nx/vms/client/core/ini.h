@@ -136,6 +136,10 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         " * \"push_notifications\" - disables UI for push notifications service.\n"
         " * \"docdb\" - disables UI for Document Database service.\n"
         "Services can be combined using space, comma or semicolon.");
+
+    NX_INI_FLAG(true, enableKeychain,
+        "[Dev] Control using keychain to simplify development of modules which call the keychain"
+        " each time after rebuilding.");
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();

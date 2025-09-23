@@ -2,8 +2,27 @@
 
 #include "mobile_client_startup_parameters.h"
 
-#include <QtCore/QCoreApplication>
 #include <QtCore/QCommandLineParser>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+
+namespace {
+
+QRect fromString(const QString& str)
+{
+    const QJsonObject& obj = QJsonDocument::fromJson(str.toLatin1()).object();
+    if (obj.isEmpty())
+        return {};
+
+    return QRect{
+        obj.value("x").toInt(),
+        obj.value("y").toInt(),
+        obj.value("width").toInt(),
+        obj.value("height").toInt()};
+}
+
+} // namespace
 
 QnMobileClientStartupParameters::QnMobileClientStartupParameters()
 {}
@@ -51,6 +70,13 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
     testOption.setFlags(QCommandLineOption::HiddenFromHelp);
     parser.addOption(testOption);
 
+    auto windowGeometryOption = QCommandLineOption(
+        "window-geometry",
+        "Set window geometry.",
+        "windowGeometry");
+    windowGeometryOption.setFlags(QCommandLineOption::HiddenFromHelp);
+    parser.addOption(windowGeometryOption);
+
     parser.parse(application.arguments());
 
     if (parser.isSet(qmlRootOption))
@@ -64,4 +90,7 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
 
     if (parser.isSet(urlOption))
         url = parser.value(urlOption);
+
+    if (parser.isSet(windowGeometryOption))
+        windowGeometry = fromString(parser.value(windowGeometryOption));
 }

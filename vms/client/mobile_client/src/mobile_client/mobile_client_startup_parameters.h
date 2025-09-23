@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QRect>
 #include <QtCore/QUrl>
 
 #include <nx/utils/url.h>
@@ -19,6 +20,7 @@ struct QnMobileClientStartupParameters
     QStringList qmlImportPaths;
     nx::Url url;
     QString logLevel;
+    QRect windowGeometry;
 };
 
 Q_DECLARE_METATYPE(QnMobileClientStartupParameters)
