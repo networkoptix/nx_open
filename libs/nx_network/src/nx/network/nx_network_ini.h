@@ -36,6 +36,10 @@ struct NX_NETWORK_API Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(false, traceIoObjectsLifetime,
         "Enables reporting creation stack traces of dangling HTTP clients during server shutdown");
+
+    NX_INI_FLAG(false, useRandomAioThreadForNewSockets,
+        "Enables random selection of an AIO thread for newly created sockets. If disabled, the "
+        "least used thread is selected.");
 };
 
 NX_NETWORK_API Ini& ini();

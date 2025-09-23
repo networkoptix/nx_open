@@ -27,24 +27,25 @@
 #include "aio/async_socket_helper.h"
 #include "common_socket_impl.h"
 #include "compat_poll.h"
+#include "nx_network_ini.h"
 
 #ifdef _WIN32
-    /* Check that the typedef in AbstractSocket is correct. */
-    static_assert(
-        std::is_same_v<nx::network::AbstractSocket::SOCKET_HANDLE, SOCKET>,
-        "Invalid socket type is used in AbstractSocket.");
-    typedef char raw_type;       // Type used for raw data on this platform
+/* Check that the typedef in AbstractSocket is correct. */
+static_assert(
+    std::is_same_v<nx::network::AbstractSocket::SOCKET_HANDLE, SOCKET>,
+    "Invalid socket type is used in AbstractSocket.");
+typedef char raw_type; // Type used for raw data on this platform
 #else
     #include <fcntl.h>
-    #include <netdb.h>           // For getaddrinfo()
-    #include <sys/socket.h>      // For socket(), connect(), send(), and recv()
-    #include <sys/types.h>       // For data types
-    #include <unistd.h>          // For close()
+    #include <netdb.h> // For getaddrinfo()
+    #include <sys/socket.h> // For socket(), connect(), send(), and recv()
+    #include <sys/types.h> // For data types
+    #include <unistd.h> // For close()
 
-    #include <arpa/inet.h>       // For inet_addr()
-    #include <netinet/in.h>      // For sockaddr_in
-    #include <netinet/tcp.h>      // For TCP_NODELAY
-    typedef void raw_type;       // Type used for raw data on this platform
+    #include <arpa/inet.h> // For inet_addr()
+    #include <netinet/in.h> // For sockaddr_in
+    #include <netinet/tcp.h> // For TCP_NODELAY
+typedef void raw_type; // Type used for raw data on this platform
 #endif
 
 #ifndef SOCKET_ERROR
@@ -1069,7 +1070,9 @@ public:
 
 TCPSocket::TCPSocket(int ipVersion):
     base_type(
-        SocketGlobals::instance().aioService().findLeastUsedAioThread(),
+        ini().useRandomAioThreadForNewSockets
+            ? SocketGlobals::aioService().getRandomAioThread()
+            : SocketGlobals::aioService().findLeastUsedAioThread(),
         SOCK_STREAM,
         IPPROTO_TCP,
         ipVersion
@@ -1485,7 +1488,9 @@ public:
 
 TCPServerSocket::TCPServerSocket(int ipVersion):
     base_type(
-        SocketGlobals::instance().aioService().findLeastUsedAioThread(),
+        ini().useRandomAioThreadForNewSockets
+            ? SocketGlobals::aioService().getRandomAioThread()
+            : SocketGlobals::aioService().findLeastUsedAioThread(),
         SOCK_STREAM,
         IPPROTO_TCP,
         ipVersion,
@@ -1649,7 +1654,9 @@ void TCPServerSocket::stopWhileInAioThread()
 
 UDPSocket::UDPSocket(int ipVersion):
     base_type(
-        SocketGlobals::instance().aioService().findLeastUsedAioThread(),
+        ini().useRandomAioThreadForNewSockets
+            ? SocketGlobals::aioService().getRandomAioThread()
+            : SocketGlobals::aioService().findLeastUsedAioThread(),
         SOCK_DGRAM,
         IPPROTO_UDP,
         ipVersion)
