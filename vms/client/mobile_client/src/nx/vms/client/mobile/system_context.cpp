@@ -73,9 +73,11 @@ void initializeConnectionUserInteractionDelegate(SystemContext* systemContext)
 
             const auto& info = certificatesInfo.first();
 
-            const auto url = QUrl("Nx/Web/SslCertificateDialog.qml");
+            const auto url = QUrl(reason == CertificateWarning::Reason::unknownServer
+                ? "Nx/Web/UnknownSslCertificateDialog.qml"
+                : "Nx/Web/InvalidOrChangedCertificateDialog.qml");
             QVariantMap props;
-            props["headerText"] = CertificateWarning::header(
+            props["title"] = CertificateWarning::header(
                 reason, info.target, certificatesInfo.size());
             props["messageText"] = CertificateWarning::details(reason, certificatesInfo.size());
             props["adviceText"] = CertificateWarning::advice(

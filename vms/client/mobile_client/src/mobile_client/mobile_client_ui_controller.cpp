@@ -117,7 +117,7 @@ QnMobileClientUiController::QnMobileClientUiController(
                     UiMessages::getConnectionErrorText(errorCode, moduleInformation);
 
                 uiController()->showConnectionErrorMessage(
-                    moduleInformation.systemName, errorText);
+                    errorCode, moduleInformation.systemName, errorText);
             }
         };
     connect(sessionManager(), &SessionManager::sessionFinishedWithError, this, handleSessionError);

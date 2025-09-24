@@ -7,15 +7,26 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/mobile/application_context.h>
-#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
+#include <nx/vms/client/mobile/window_context.h>
 
 #include "detail/measurements.h"
 #include "detail/screens.h"
 #include "detail/window_helpers.h"
 
 namespace nx::vms::client::mobile {
+
+namespace {
+
+QString titleForConnectionError(const QString& systemName)
+{
+    return systemName.isEmpty()
+        ? UiController::tr("Cannot connect to the Server")
+        : UiController::tr("Cannot connect to the Site \"%1\"", "%1 is a site name").arg(systemName);
+}
+
+} // namespace
 
 struct UiController::Private
 {
@@ -66,6 +77,29 @@ detail::Screens* UiController::screens() const
     return d->screens.get();
 }
 
+void UiController::showConnectionErrorMessage(
+    core::RemoteConnectionErrorCode errorCode,
+    const QString& systemName,
+    const QString& errorText) const
+{
+    const bool is2faError =
+        errorCode == core::RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa ||
+        errorCode == core::RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled;
+    if (!is2faError)
+    {
+        showConnectionErrorMessage(systemName, errorText);
+        return;
+    }
+
+    QmlWrapperHelper::showPopup(
+        windowContext(),
+        QUrl("Nx/Web/TwoFactorAuthenticationErrorDialog.qml"),
+        QVariantMap {
+            {"title", titleForConnectionError(systemName)},
+            {"messages", QStringList{errorText}}
+        });
+}
+
 bool UiController::tryRestoreLastUsedConnection()
 {
     // TODO: 5.1+ Make startup parameters handling and using of last(used)Connection the same both
@@ -108,21 +142,18 @@ bool UiController::tryRestoreLastUsedConnection()
 
 void UiController::showMessage(const QString& title, const QString& message) const
 {
-    QmlWrapperHelper::showPopup(windowContext(), QUrl("Nx/Dialogs/StandardDialog.qml"),
+    QmlWrapperHelper::showPopup(windowContext(), QUrl("Nx/Mobile/Popups/StandardPopup.qml"),
         QVariantMap {
             {"title", title},
-            {"message", message}
+            {"messages", QStringList{message}}
         });
 }
 
 void UiController::showConnectionErrorMessage(
     const QString& systemName,
-    const QString& errorText)
+    const QString& errorText) const
 {
-    const auto title = systemName.isEmpty()
-        ? tr("Cannot connect to the Server")
-        : tr("Cannot connect to the Site \"%1\"", "%1 is a site name").arg(systemName);
-    showMessage(title, errorText);
+    showMessage(titleForConnectionError(systemName), errorText);
 }
 
 } // namespace nx::vms::client::mobile

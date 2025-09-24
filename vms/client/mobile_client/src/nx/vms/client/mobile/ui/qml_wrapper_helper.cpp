@@ -26,8 +26,6 @@ QString QmlWrapperHelper::showPopup(
     properties.insert("parent", QVariant::fromValue(parentItem));
 
     const auto popup = component.createWithInitialProperties(properties);
-    QMetaObject::invokeMethod(popup, "open");
-
     if (!popup)
         return {};
 

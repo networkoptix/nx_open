@@ -1,0 +1,5 @@
+module Nx.Mobile.Popups
+
+PopupBase 1.0 PopupBase.qml
+PopupButton 1.0 PopupButton.qml
+StandardPopup 1.0 StandardPopup.qml

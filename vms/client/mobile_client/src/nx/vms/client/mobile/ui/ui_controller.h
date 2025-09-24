@@ -51,6 +51,11 @@ public:
 
     detail::Screens* screens() const;
 
+    void showConnectionErrorMessage(
+        core::RemoteConnectionErrorCode errorCode,
+        const QString& systemName,
+        const QString& errorText) const;
+
     // Invokables
 
     /** Check saved properties and try to restore last used connection. */
@@ -60,7 +65,7 @@ public:
 
     Q_INVOKABLE void showConnectionErrorMessage(
         const QString& systemName,
-        const QString& errorText);
+        const QString& errorText) const;
 
 private:
     struct Private;
