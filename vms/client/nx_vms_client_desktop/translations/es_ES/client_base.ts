@@ -8921,7 +8921,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Desbloquee esta parte del archivo para exportar su contenido.</translation>
     </message>
     <message>
       <source>Audio transcoding required.</source>
