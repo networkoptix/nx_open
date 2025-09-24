@@ -34,7 +34,8 @@ copyBins()
     install -m 755 "bin/client" "$STAGE_BIN/client"
     # Create a symlink for backwards compatibility to old applaunchers.
     ln -s "client" "$STAGE_BIN/client-bin"
-    install -m 755 "$OPEN_SOURCE_DIR/build_utils/linux/choose_newer_stdcpp.sh" "$STAGE_BIN/"
+    mkdir -p "$STAGE_LIB/stdcpp"
+    install -m 755 "$OPEN_SOURCE_DIR/build_utils/linux/choose_newer_stdcpp.sh" "$STAGE_LIB/stdcpp/"
     install -m 644 "$BUILD_DIR/bin/$LAUNCHER_VERSION_FILE" "$STAGE_BIN/"
     install -m 755 "bin/applauncher" "$STAGE_BIN/"
     install -m 644 "$OPEN_SOURCE_DIR/nx_log_viewer.html" "$STAGE_BIN/"
@@ -194,7 +195,7 @@ copyLibs()
     then
         echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
         local -r STDCPP_LIBS_PATH="$STAGE_LIB/stdcpp"
-        mkdir "$STDCPP_LIBS_PATH"
+        mkdir -p "$STDCPP_LIBS_PATH"
         distrib_copySystemLibs "$STDCPP_LIBS_PATH" "${CPP_RUNTIME_LIBS[@]}"
     fi
 
@@ -432,7 +433,8 @@ buildDistribution()
     find "$STAGE" -type f -print0 |xargs -0 chmod 644
 
     # Restore permissions for executables.
-    chmod 755 "$STAGE_BIN"/{applauncher*,*client*,*.sh}
+    chmod 755 "$STAGE_BIN"/{applauncher*,*client*}
+    chmod 755 "$STAGE_LIB"/*/*.sh
     chmod 755 "$STAGE_LIBEXEC/QtWebEngineProcess"
 
     createDebianDir

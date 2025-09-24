@@ -277,6 +277,7 @@ distrib_copySystemLibs() # dest_dir libs_to_copy...
 #
 # [in] STAGE
 # [in] CPP_RUNTIME_LIBS
+# [in] OPEN_SOURCE_DIR
 #
 distrib_copyServerSystemLibs() # destination_path
 {
@@ -289,8 +290,11 @@ distrib_copyServerSystemLibs() # destination_path
     echo "Copying system libs"
 
     echo "  Copying cpp runtime libs: ${CPP_RUNTIME_LIBS[@]}"
-    mkdir "${destination_path}/stdcpp"
-    distrib_copySystemLibs "${destination_path}/stdcpp" "${CPP_RUNTIME_LIBS[@]}"
+    local -r bundled_stdcpp_lib_path="${destination_path}/stdcpp"
+    mkdir -p "${bundled_stdcpp_lib_path}"
+    distrib_copySystemLibs "${bundled_stdcpp_lib_path}" "${CPP_RUNTIME_LIBS[@]}"
+    install -m 755 \
+        "${OPEN_SOURCE_DIR}/build_utils/linux/choose_newer_stdcpp.sh" "${bundled_stdcpp_lib_path}/"
 
     if (( ${#additional_runtime_libs} > 0 )); then
         echo "  Copying additional runtime libs: ${additional_runtime_libs[@]}"
@@ -727,9 +731,6 @@ distrib_copyServerBins() # additional_bins_to_copy...
     install -m 755 "${SCRIPTS_DIR}/config_helper.sh" "${stage_bin}/"
     install -m 755 "${SCRIPTS_DIR}/upgrade_config.sh" "${stage_bin}/"
 
-    # Copy script to select c++ runtime version.
-    install -m 755 "$OPEN_SOURCE_DIR/build_utils/linux/choose_newer_stdcpp.sh" "${stage_bin}/"
-
     echo "Copying ffmpeg-gpl"
     install -D -m 755 "${BUILD_DIR}/bin/ffmpeg/ffmpeg-gpl" "${stage_bin}/ffmpeg/ffmpeg-gpl"
 }
@@ -861,6 +862,10 @@ distrib_setPermissionsInStageDir()
 
     if [[ -f "${STAGE}/${LIB_INSTALL_PATH}/fallback/manage_fallback_libs.sh" ]]; then
         chmod 755 "${STAGE}/${LIB_INSTALL_PATH}/fallback/manage_fallback_libs.sh"
+    fi
+
+    if [[ -f "${STAGE}/${LIB_INSTALL_PATH}/stdcpp/choose_newer_stdcpp.sh" ]]; then
+        chmod 755 "${STAGE}/${LIB_INSTALL_PATH}/stdcpp/choose_newer_stdcpp.sh"
     fi
 }
 
