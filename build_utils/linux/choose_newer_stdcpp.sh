@@ -102,7 +102,7 @@ remove_symlinks_for_files_in_dir()
 
 ensure_newest_libstdcpp()
 {
-    local libDir="$(dirname "$0")/../lib"
+    local libDir="$(dirname "$0")/.."
     local stdcppDir="$(get_newest_libstdcpp "${libDir}/stdcpp")"
     if [ -n "${stdcppDir}" ]; then
         echo "Using bundled libstdc++."
@@ -113,8 +113,17 @@ ensure_newest_libstdcpp()
     fi
 }
 
+remove_bundled_symlinks()
+{
+    local libDir="$(dirname "$0")/.."
+    local stdcppDir="$(get_newest_libstdcpp "${libDir}/stdcpp")"
+    remove_symlinks_for_files_in_dir "${stdcppDir}" "${libDir}"
+}
+
 if [ "$1" = "ensure_newest_libstdcpp" ]; then
     ensure_newest_libstdcpp
+elif [ "$1" = "remove_bundled_symlinks" ]; then
+    remove_bundled_symlinks
 else
     get_newest_libstdcpp "$@"
 fi

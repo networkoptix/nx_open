@@ -3,10 +3,11 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIB_DIR="$(realpath "$DIR/../lib")"
 
 export QT_IM_MODULE=ibus
 
-STDCPP_DIR="$("$DIR/choose_newer_stdcpp.sh" "$DIR/../lib/stdcpp")"
+STDCPP_DIR="$("$LIB_DIR/stdcpp/choose_newer_stdcpp.sh" "$LIB_DIR/stdcpp")"
 if [ -n "$STDCPP_DIR" ]
 then
     echo "Using bundled libstdc++."
