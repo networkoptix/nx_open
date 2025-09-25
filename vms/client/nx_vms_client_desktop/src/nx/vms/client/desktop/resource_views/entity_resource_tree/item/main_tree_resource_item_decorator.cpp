@@ -143,5 +143,15 @@ Qt::ItemFlags MainTreeResourceItemDecorator::flags() const
     return result;
 }
 
+nx::utils::ScopedConnections& MainTreeResourceItemDecorator::connections()
+{
+    return m_connections;
+}
+
+void MainTreeResourceItemDecorator::setPermissions(Permissions permissions)
+{
+    m_permissions = permissions;
+}
+
 } // namespace entity_resource_tree
 } // namespace nx::vms::client::desktop
