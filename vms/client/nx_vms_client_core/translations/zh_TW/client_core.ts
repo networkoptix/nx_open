@@ -379,7 +379,7 @@
     <name>nx::vms::client::core::OrganizationsModel</name>
     <message>
       <source>Organizations</source>
-      <translation>組織</translation>
+      <translation>組織用戶</translation>
     </message>
     <message>
       <source>Folders</source>

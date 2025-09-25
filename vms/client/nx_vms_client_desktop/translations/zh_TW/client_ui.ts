@@ -2088,7 +2088,7 @@
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
-      <translation>違反組織限制</translation>
+      <translation>違反組織用戶限制</translation>
     </message>
     <message>
       <source>Service Allocation</source>

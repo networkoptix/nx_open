@@ -83,7 +83,7 @@
     <message>
       <source>Removal of the User with Groups in an Organization is controlled by the %1</source>
       <comment>%1 is the short Cloud name</comment>
-      <translation>移除組織中具有群組的使用者由 %1所控制</translation>
+      <translation>移除組織用戶中具有群組的使用者由 %1所控制</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; is not permitted to remove %2.</source>
@@ -157,7 +157,7 @@
     <message>
       <source>User Groups in an Organization are controlled by by the %1</source>
       <comment>%1 is the short Cloud name</comment>
-      <translation>組織中的使用者群組由 %1 所控制</translation>
+      <translation>組織用戶中的使用者群組由 %1 所控制</translation>
     </message>
     <message>
       <source>Expected Device id %1 is not equal to actual id %2 (`physicalId` %3).</source>
