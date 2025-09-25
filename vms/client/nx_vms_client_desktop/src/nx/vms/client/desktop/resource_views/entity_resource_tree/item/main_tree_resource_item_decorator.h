@@ -5,6 +5,7 @@
 #include <optional>
 
 #include <common/common_globals.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
@@ -34,11 +35,17 @@ public:
     virtual QVariant data(int role) const override;
     virtual Qt::ItemFlags flags() const override;
 
+    // Helper functions. Used to update the cached permissions without inheriting the class from
+    // QObject. See the usage in ResourceTreeEntityBuilder for details.
+    nx::utils::ScopedConnections& connections();
+    void setPermissions(Permissions permissions);
+
 private:
     entity_item_model::AbstractItemPtr m_sourceItem;
     Permissions m_permissions;
     ResourceTree::NodeType m_nodeType;
     std::optional<nx::Uuid> m_itemUuid;
+    nx::utils::ScopedConnections m_connections;
 };
 
 } // namespace entity_resource_tree

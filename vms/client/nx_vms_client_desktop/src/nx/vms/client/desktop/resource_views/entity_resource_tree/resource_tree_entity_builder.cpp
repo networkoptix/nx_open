@@ -128,10 +128,26 @@ ResourceItemCreator resourceItemCreator(
     return
         [=](const QnResourcePtr& resource)
         {
-            return std::make_unique<MainTreeResourceItemDecorator>(
+            auto result = std::make_unique<MainTreeResourceItemDecorator>(
                 createDecoratedResourceItem(factory, resource, hasPowerUserPermissions),
                 permissionsSummary(user, resource),
                 NodeType::resource);
+
+            if (auto layout = resource.dynamicCast<QnLayoutResource>().get())
+            {
+                // Currently, we decide if the Layout item is editable using the WriteNamePermission
+                // value, which is updated dynamically when the Layout is locked/unlocked. Until
+                // this approach is refactored, it's necessary to explicitly update the item's
+                // cached permissions.
+                result->connections() << QObject::connect(
+                    layout, &QnLayoutResource::lockedChanged,
+                    [ptr=result.get(), user, resource]
+                    {
+                        ptr->setPermissions(permissionsSummary(user, resource));
+                    });
+            }
+
+            return result;
         };
 }
 
