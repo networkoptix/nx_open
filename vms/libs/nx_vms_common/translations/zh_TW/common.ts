@@ -1734,7 +1734,7 @@
     </message>
     <message>
       <source>Organization Id</source>
-      <translation>組織 Id</translation>
+      <translation>組織用戶 Id</translation>
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
