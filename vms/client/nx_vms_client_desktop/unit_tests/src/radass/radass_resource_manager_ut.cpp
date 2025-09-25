@@ -8,6 +8,8 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
@@ -38,8 +40,19 @@ void PrintTo(const RadassMode& val, ::std::ostream* os)
     *os << mode.toStdString();
 }
 
+struct WithCrossSiteFeatures
+{
+    static ApplicationContext::Features features()
+    {
+        auto result = ApplicationContext::Features::none();
+        result.core.base.flags.setFlag(common::ApplicationContext::FeatureFlag::networking);
+        result.core.flags.setFlag(core::ApplicationContext::FeatureFlag::cross_site);
+        return result;
+    }
+};
+
 class RadassResourceManagerTest:
-    public nx::vms::client::desktop::test::ContextBasedTest,
+    public test::AppContextBasedTest<WithCrossSiteFeatures>,
     public nx::utils::test::TestWithTemporaryDirectory
 {
 protected:
@@ -59,9 +72,17 @@ protected:
     virtual void TearDown()
     {
         m_layout.reset();
+        m_cloudLayout.reset();
         m_manager.reset();
 
         QDir(testDataDir()).removeRecursively();
+    }
+
+    void initCrossSytemLayout()
+    {
+        m_cloudLayout.reset(new core::CrossSystemLayoutResource());
+        m_cloudLayout->setIdUnsafe(nx::Uuid::createUuid());
+        nx::vms::client::core::appContext()->cloudLayoutsPool()->addResource(m_cloudLayout);
     }
 
     LayoutItemIndex addCamera(bool hasDualStreaming = true)
@@ -76,6 +97,21 @@ protected:
 
         m_layout->addItem(item);
         return LayoutItemIndex(m_layout, item.uuid);
+    }
+
+    LayoutItemIndex addCloudCamera()
+    {
+        auto camera = new CameraResourceStub();
+        systemContext()->resourcePool()->addResource(QnResourcePtr(camera));
+
+        common::LayoutItemData item;
+        item.uuid = nx::Uuid::createUuid();
+        item.resource.id = camera->getId();
+        item.resource.path = "VALUE SHOULDN'T BE EMPTY";
+
+        NX_ASSERT(m_cloudLayout);
+        m_cloudLayout->addItem(item);
+        return LayoutItemIndex(m_cloudLayout, item.uuid);
     }
 
     LayoutItemIndex addUnsupportedCamera()
@@ -100,9 +136,11 @@ protected:
 
     RadassResourceManager* manager() const { return m_manager.data(); }
     core::LayoutResourcePtr layout() const { return m_layout; }
+    core::CrossSystemLayoutResourcePtr cloudLayout() const { return m_cloudLayout; }
 
     QScopedPointer<RadassResourceManager> m_manager;
     core::LayoutResourcePtr m_layout;
+    core::CrossSystemLayoutResourcePtr m_cloudLayout;
 };
 
 TEST_F(RadassResourceManagerTest, initNull)
@@ -289,14 +327,19 @@ TEST_F(RadassResourceManagerTest, switchLocalId)
 
 TEST_F(RadassResourceManagerTest, saveAndLoadPersistentData)
 {
+    initCrossSytemLayout();
     manager()->switchLocalSystemId(kSystemId1);
     addCamera();
+    addCloudCamera();
     manager()->setMode(layout(), RadassMode::High);
+    manager()->setMode(cloudLayout(), RadassMode::High);
     manager()->saveData(kSystemId1, systemContext()->resourcePool());
     manager()->switchLocalSystemId(kSystemId2);
     ASSERT_EQ(RadassMode::Auto, manager()->mode(layout()));
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(cloudLayout()));
     manager()->switchLocalSystemId(kSystemId1);
     ASSERT_EQ(RadassMode::High, manager()->mode(layout()));
+    ASSERT_EQ(RadassMode::High, manager()->mode(cloudLayout()));
 }
 
 } // namespace nx::vms::client::desktop
