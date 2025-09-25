@@ -670,8 +670,8 @@ void WorkbenchUi::updateViewportMargins(bool animate)
         : true);
 
     const auto& widgets = display()->widgets();
-    const bool timelineCanBeVisible = m_timeline && allowedByLayout && std::any_of(
-        widgets.begin(), widgets.end(),
+    const bool timelineCanBeVisible = m_timeline && allowedByLayout && std::ranges::any_of(
+        widgets,
         [this](QnResourceWidget* widget)
         {
             return calculateTimelineVisible(widget);

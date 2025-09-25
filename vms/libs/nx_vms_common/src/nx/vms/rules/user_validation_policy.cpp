@@ -299,7 +299,7 @@ bool QnRequiredAccessRightPolicy::isSubjectValid(
     {
         return allSelectedCamerasRequired
             ? std::all_of(m_cameras.begin(), m_cameras.end(), hasPermissionForCamera)
-            : std::any_of(m_cameras.begin(), m_cameras.end(), hasPermissionForCamera);
+            : std::ranges::any_of(m_cameras, hasPermissionForCamera);
     }
 
     if (resourceAccessManager()->hasAccessRights(
@@ -309,7 +309,7 @@ bool QnRequiredAccessRightPolicy::isSubjectValid(
     }
 
     const auto& cameras = resourcePool()->getAllCameras();
-    return std::any_of(cameras.begin(), cameras.end(), hasPermissionForCamera);
+    return std::ranges::any_of(cameras, hasPermissionForCamera);
 }
 
 QString QnRequiredAccessRightPolicy::calculateAlert(bool allUsers,
@@ -411,7 +411,8 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const nx::Uuid& r
             const auto groupUsers =
                 systemContext()->accessSubjectHierarchy()->usersInGroups({roleId});
 
-            if (std::any_of(groupUsers.cbegin(), groupUsers.cend(),
+            if (std::ranges::any_of(
+                groupUsers,
                 [this](const auto& user) { return user->isEnabled() && userValidity(user); }))
             {
                 // The group does not have read permissions, but some of the users in the group have.

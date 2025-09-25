@@ -65,7 +65,8 @@ public:
 
         for (const auto& id: directConnectionByServerId.keys())
         {
-            if (!std::any_of(result.begin(), result.end(),
+            if (!std::ranges::any_of(
+                result,
                 [&id](const PeerInformation& info) { return info.id == id; }))
             {
                 result.append(PeerInformation{id, {}});

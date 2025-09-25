@@ -1043,7 +1043,7 @@ coro::Task<bool> OrganizationsModel::Private::loadOrgListAsync(OrganizationList 
         loadTasks.push_back(loadOrgAsync(org));
 
     auto results = co_await nx::coro::runAll(std::move(loadTasks), kMaxConcurrentRequests);
-    if (std::any_of(results.begin(), results.end(), [](auto result) { return !result; }))
+    if (std::ranges::any_of(results, [](auto result) { return !result; }))
     {
         NX_WARNING(this, "Organizations are not fully loaded");
         co_return false;

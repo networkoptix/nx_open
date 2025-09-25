@@ -38,7 +38,8 @@ QVariant InvalidResourceDecoratorModel::data(const QModelIndex& index, int role)
 
 bool InvalidResourceDecoratorModel::hasInvalidResources(const QSet<QnResourcePtr>& resources) const
 {
-    return m_resourceValidator && std::any_of(std::cbegin(resources), std::cend(resources),
+    return m_resourceValidator && std::ranges::any_of(
+        resources,
         [this](const QnResourcePtr& resource) { return !m_resourceValidator(resource); });
 }
 

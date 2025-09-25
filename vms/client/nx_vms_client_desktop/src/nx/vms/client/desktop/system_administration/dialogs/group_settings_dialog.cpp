@@ -110,7 +110,8 @@ struct GroupSettingsDialog::Private
         if (allParents.contains(state.groupId))
             return true;
 
-        return std::any_of(state.groups.begin(), state.groups.end(),
+        return std::ranges::any_of(
+            state.groups,
             [&allParents](const auto& id){ return allParents.contains(id); });
     }
 };

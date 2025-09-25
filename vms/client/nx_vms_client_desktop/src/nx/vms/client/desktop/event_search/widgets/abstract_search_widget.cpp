@@ -41,7 +41,7 @@ AbstractSearchWidget::AbstractSearchWidget(
                 [this](const QnResourceList& resources)
                 {
                     if (resources.empty()
-                        || std::any_of(resources.cbegin(), resources.cend(), isCamera))
+                        || std::ranges::any_of(resources, isCamera))
                     {
                         updateAllowance();
                     }

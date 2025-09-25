@@ -1000,13 +1000,11 @@ QSet<nx::Uuid> RulesTableModel::targetIds(
 bool RulesTableModel::hasAnyOf(int row, const QList<nx::Uuid>& resourceIds) const
 {
     return
-        std::any_of(
-            resourceIds.cbegin(),
-            resourceIds.cend(),
-            [ids = this->resourceIds(row, SourceColumn)](nx::Uuid id) { return ids.contains(id); }) ||
-        std::any_of(
-            resourceIds.cbegin(),
-            resourceIds.cend(),
+        std::ranges::any_of(
+            resourceIds,
+            [ids = this->resourceIds(row, SourceColumn)](nx::Uuid id) { return ids.contains(id); })
+        || std::ranges::any_of(
+            resourceIds,
             [ids = this->resourceIds(row, TargetColumn)](nx::Uuid id) { return ids.contains(id); });
 }
 

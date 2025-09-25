@@ -187,7 +187,8 @@ bool AccessController::isDeviceAccessRelevant(AccessRights requiredAccessRights)
     const auto devices = systemContext()->resourcePool()->getAllCameras(
         /*parentId*/ nx::Uuid{}, /*ignoreDesktopCameras*/ true);
 
-    return std::any_of(devices.begin(), devices.end(),
+    return std::ranges::any_of(
+        devices,
         [this, accessManager, requiredAccessRights](const QnVirtualCameraResourcePtr& device)
         {
             return accessManager->hasAccessRights(d->user, device, requiredAccessRights);

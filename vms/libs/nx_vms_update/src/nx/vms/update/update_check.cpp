@@ -140,7 +140,8 @@ FetchPublicationInfoResult fetchPublicationInfo(
 
             for (Package package: pubInfo->packages)
             {
-                if (!std::any_of(info->packages.begin(), info->packages.end(),
+                if (!std::ranges::any_of(
+                    info->packages,
                     [package](const Package& p) { return package.isSameTarget(p); }))
                 {
                     if (!package.url.isValid())

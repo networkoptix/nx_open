@@ -177,7 +177,8 @@ void GroupedTaskQueue::setPriority(const QString& group, int priority)
 
 bool GroupedTaskQueue::hasTasks(const QString& group) const
 {
-    return std::any_of(d->queue.begin(), d->queue.end(),
+    return std::ranges::any_of(
+        d->queue,
         [group](const QueueItem& item) { return item.group == group; });
 }
 

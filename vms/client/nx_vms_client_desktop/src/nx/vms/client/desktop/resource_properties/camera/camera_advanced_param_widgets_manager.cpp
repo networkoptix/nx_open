@@ -218,13 +218,13 @@ void CameraAdvancedParamWidgetsManager::updateParametersVisibility(ParameterVisi
 bool CameraAdvancedParamWidgetsManager::hasValidValues(
     const QnCameraAdvancedParamGroup& group) const
 {
-    bool hasValidParameter = std::any_of(
-        group.params.begin(), group.params.end(),
+    bool hasValidParameter = std::ranges::any_of(
+        group.params,
         [](const QnCameraAdvancedParameter &param) { return param.isValid(); });
     if (hasValidParameter)
         return true;
-    return std::any_of(
-        group.groups.begin(), group.groups.end(),
+    return std::ranges::any_of(
+        group.groups,
         [this](const QnCameraAdvancedParamGroup &group) { return hasValidValues(group); });
 }
 

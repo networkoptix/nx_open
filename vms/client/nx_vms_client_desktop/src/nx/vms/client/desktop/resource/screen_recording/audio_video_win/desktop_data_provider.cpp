@@ -421,7 +421,8 @@ DesktopDataProvider::DesktopDataProvider(
     const auto stopOnDeviceDisappeared =
         [this](const QString& deviceName)
         {
-            const bool deviceInUse = std::any_of(std::cbegin(d->audioInfo), std::cend(d->audioInfo),
+            const bool deviceInUse = std::ranges::any_of(
+                d->audioInfo,
                 [&deviceName](const auto& audioInfo)
                 {
                     return audioInfo->m_audioDevice.name() == deviceName;}

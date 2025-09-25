@@ -53,7 +53,8 @@ bool serverHasActiveObjectEngines(const QnMediaServerResourcePtr& server)
         return false;
 
     auto cameras = server->resourcePool()->getAllCameras(server);
-    return std::any_of(cameras.cbegin(), cameras.cend(),
+    return std::ranges::any_of(
+        cameras,
         [](const auto& camera) { return !camera->supportedObjectTypes().empty(); });
 }
 
@@ -65,7 +66,8 @@ nx::vms::common::AnalyticsEngineResourcePtr findEngineByIntegrationActionId(
         [&integrationAction](const auto& e)
         {
             auto manifest = e->manifest();
-            return std::any_of(manifest.objectActions.begin(), manifest.objectActions.end(),
+            return std::ranges::any_of(
+                manifest.objectActions,
                 [&integrationAction](const auto& oa) { return oa.id == integrationAction; });
         });
 

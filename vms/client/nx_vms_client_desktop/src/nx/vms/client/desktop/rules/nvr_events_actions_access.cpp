@@ -11,7 +11,8 @@ namespace {
 
 bool serversHaveServerFlag(const QnMediaServerResourceList& servers, ServerFlag serverFlag)
 {
-    return std::any_of(servers.cbegin(), servers.cend(),
+    return std::ranges::any_of(
+        servers,
         [serverFlag](const QnMediaServerResourcePtr& server)
         {
             return server->getServerFlags().testFlag(serverFlag);

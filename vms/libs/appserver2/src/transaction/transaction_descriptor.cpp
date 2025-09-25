@@ -1122,8 +1122,8 @@ struct ModifyStorageAccess
                     return url.isValid() ? url.toDisplayString(QUrl::RemoveUserInfo) : s;
                 };
 
-            const bool hasStorageWithSameUrl = std::any_of(
-                existingStorages.cbegin(), existingStorages.cend(),
+            const bool hasStorageWithSameUrl = std::ranges::any_of(
+                existingStorages,
                 [&param, &toNoCredUrl](const auto& s)
                 {
                     return toNoCredUrl(param.url) == toNoCredUrl(s->getUrl());
@@ -1242,7 +1242,6 @@ struct SaveUserAccess
         const nx::vms::api::UserData& param)
     {
         NX_CRITICAL(systemContext);
-
 
         if (hasSystemAccess(accessData))
             return ModifyResourceAccess()(systemContext, accessData, param);

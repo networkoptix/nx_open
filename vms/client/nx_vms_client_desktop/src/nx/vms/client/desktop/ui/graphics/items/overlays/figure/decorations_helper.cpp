@@ -72,11 +72,12 @@ QVector<IntersectionWithLine> getSegmentsIntersections(
         if (segment.intersects(edge, &intersectionPoint) == QLineF::BoundedIntersection)
         {
             const bool pointAlreadyFound =
-                std::any_of(intersections.begin(), intersections.end(),
-                [intersectionPoint](const IntersectionWithLine& intersection)
-                {
-                    return isSamePoint(intersectionPoint, intersection.point);
-                });
+                std::ranges::any_of(
+                    intersections,
+                    [intersectionPoint](const IntersectionWithLine& intersection)
+                    {
+                        return isSamePoint(intersectionPoint, intersection.point);
+                    });
 
             if (!pointAlreadyFound)
                 intersections.append({intersectionPoint, segment});

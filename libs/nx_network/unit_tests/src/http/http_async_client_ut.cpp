@@ -483,7 +483,7 @@ protected:
     void andRequestContainsHeader(const HttpHeader& header)
     {
         const auto [b, e] = lastRequestCtx().request.headers.equal_range(header.first);
-        ASSERT_TRUE(std::any_of(b, e, [&header](const auto& val) { return val == header; }));
+        ASSERT_TRUE(std::ranges::any_of(b, e, [&header](const auto& val) { return val == header; }));
     }
 
     const RequestContext& thenRequestIsReceived()

@@ -288,9 +288,8 @@ bool QnFullscreenCameraPolicy::isResourceValid(
     for (const auto& layout: m_layouts)
     {
         const auto layoutItem = layout->getItems();
-        bool isCameraOnLayout = std::any_of(
-            layoutItem.cbegin(),
-            layoutItem.cend(),
+        bool isCameraOnLayout = std::ranges::any_of(
+            layoutItem,
             [&camera, context](const nx::vms::common::LayoutItemData& item)
             {
                 return context->resourcePool()->getResourceByDescriptor(item.resource) == camera;

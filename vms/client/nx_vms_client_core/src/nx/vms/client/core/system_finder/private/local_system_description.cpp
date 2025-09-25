@@ -82,7 +82,8 @@ void LocalSystemDescription::updateNewSystemState()
         this, &SystemDescription::onlineStateChanged);
 
     const auto currentServers = servers();
-    const bool newSystemState = std::any_of(currentServers.begin(), currentServers.end(),
+    const bool newSystemState = std::ranges::any_of(
+        currentServers,
         [](const nx::vms::api::ModuleInformationWithAddresses& info) { return helpers::isNewSystem(info); });
 
     if (newSystemState == m_isNewSystem)

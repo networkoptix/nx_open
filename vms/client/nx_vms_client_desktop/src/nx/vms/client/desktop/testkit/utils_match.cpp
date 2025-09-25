@@ -26,7 +26,8 @@ bool sidesWithAny(QVariant object, QVariantList sideWidgets, Qt::Alignment side)
         return false;
 
     const auto objectRect = globalRect(object);
-    return std::any_of(sideWidgets.cbegin(), sideWidgets.cend(),
+    return std::ranges::any_of(
+        sideWidgets,
         [objectRect, side](QVariant sideWidget)
         {
             return sideIntersect(objectRect, globalRect(sideWidget), side) > 0;

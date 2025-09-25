@@ -390,9 +390,8 @@ bool RtspStreamProvider::processData(
 
 bool RtspStreamProvider::isCodecSupportedByCustomParserFactories(const QString& codecName) const
 {
-    return std::any_of(
-        m_customParserFactories.begin(),
-        m_customParserFactories.end(),
+    return std::ranges::any_of(
+        m_customParserFactories,
         [&codecName](const auto& factory) { return factory->supportsCodec(codecName); });
 }
 

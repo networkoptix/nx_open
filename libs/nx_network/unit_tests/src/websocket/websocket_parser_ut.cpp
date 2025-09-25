@@ -95,8 +95,8 @@ protected:
                 break;
         }
 
-        ASSERT_TRUE(std::any_of(
-            m_frameTypes.cbegin(), m_frameTypes.cend(),
+        ASSERT_TRUE(std::ranges::any_of(
+            m_frameTypes,
             [type](auto t) {return t == type; }));
         ASSERT_EQ(m_defaultPayload, m_payload);
 

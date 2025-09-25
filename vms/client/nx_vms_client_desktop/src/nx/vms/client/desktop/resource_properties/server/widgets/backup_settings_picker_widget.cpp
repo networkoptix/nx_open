@@ -152,7 +152,8 @@ void BackupSettingsPickerWidget::setupFromSelection(const QModelIndexList& index
     }
 
     const auto selectionHasDualStreamingDevices =
-        std::any_of(camerasIndexes.cbegin(), camerasIndexes.cend(),
+        std::ranges::any_of(
+            camerasIndexes,
             [](const QModelIndex& cameraIndex)
             {
                 const auto camera = cameraIndex.data(core::ResourceRole).value<QnResourcePtr>()

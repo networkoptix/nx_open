@@ -225,11 +225,11 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track,
             if constexpr (std::is_same<decltype(track), const ObjectTrackEx&>::value)
             {
                 // Checking the track attributes.
-                if (!std::any_of(track.objectPositionSequence.cbegin(),
-                        track.objectPositionSequence.cend(),
-                        [&textMatcher](const ObjectPosition& position) {
-                            return textMatcher->matchAttributes(position.attributes);
-                        }))
+                if (!std::ranges::any_of(
+                    track.objectPositionSequence,
+                    [&textMatcher](const ObjectPosition& position) {
+                        return textMatcher->matchAttributes(position.attributes);
+                    }))
                 {
                     return false;
                 }

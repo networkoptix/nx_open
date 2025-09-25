@@ -963,7 +963,8 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
     QnResourceList resources = parameters.resources();
     if (!layout->hasFlags(Qn::cross_system)
-        && std::any_of(resources.cbegin(), resources.cend(),
+        && std::ranges::any_of(
+            resources,
             [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); }))
     {
         NX_ASSERT(parameters.widgets().empty());
@@ -1065,7 +1066,8 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
         addParams.displayRoi = appContext()->localSettings()->showRoiByDefault();
 
-        const bool canViewFootage = std::any_of(resources.begin(), resources.end(),
+        const bool canViewFootage = std::ranges::any_of(
+            resources,
             [](auto resource)
             {
                 return ResourceAccessManager::hasPermissions(resource,
@@ -1082,7 +1084,8 @@ void ActionHandler::at_openInLayoutAction_triggered()
             }
             else if (parameters.hasArgument(Qn::LayoutSyncStateRole))
             {
-                const bool canViewLive = std::any_of(resources.begin(), resources.end(),
+                const bool canViewLive = std::ranges::any_of(
+                    resources,
                     [](auto resource)
                     {
                         return ResourceAccessManager::hasPermissions(resource,
@@ -1227,7 +1230,8 @@ void ActionHandler::cameraAuthenticationActionTriggered()
         return;
 
     std::optional<QString> displayedLogin = cameras.first()->getAuth().user();
-    const auto multipleLoginValues = std::any_of(cameras.begin(), cameras.end(),
+    const auto multipleLoginValues = std::ranges::any_of(
+        cameras,
         [login = displayedLogin.value()](const auto& camera)
         {
             return camera->getAuth().user() != login;

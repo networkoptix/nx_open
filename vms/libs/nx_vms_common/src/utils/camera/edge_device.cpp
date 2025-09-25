@@ -37,7 +37,8 @@ bool isCoupledEdgeCamera(
     const auto cameraHostAddress = HostAddress(cameraHostAddressString);
     const auto serverAddressList = edgeServer->getNetAddrList();
 
-    return std::any_of(std::cbegin(serverAddressList), std::cend(serverAddressList),
+    return std::ranges::any_of(
+        serverAddressList,
         [&cameraHostAddress](const auto& serverAddress)
         {
             return serverAddress.address == cameraHostAddress;

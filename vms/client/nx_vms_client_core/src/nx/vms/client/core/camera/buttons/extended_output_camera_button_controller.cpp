@@ -144,7 +144,8 @@ void ExtendedOutputCameraButtonController::Private::updateSupportAutoTrackingHan
         ? camera->ioPortDescriptions()
         : QnIOPortDataList{};
 
-    const bool supportAutoTracking = std::any_of(ports.cbegin(), ports.cend(),
+    const bool supportAutoTracking = std::ranges::any_of(
+        ports,
         [](const auto& port)
         {
             return port.outputName == kAutoTrackingPortName;

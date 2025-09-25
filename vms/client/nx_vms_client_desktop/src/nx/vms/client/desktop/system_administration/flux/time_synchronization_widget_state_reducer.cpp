@@ -13,9 +13,8 @@ namespace {
 
 bool hasInternet(const State& state)
 {
-    return std::any_of(
-        state.servers.cbegin(),
-        state.servers.cend(),
+    return std::ranges::any_of(
+        state.servers,
         [](const auto& info) { return info.online && info.hasInternet; });
 }
 
@@ -138,7 +137,6 @@ Result TimeSynchronizationWidgetReducer::selectServer(State state, const nx::Uui
     state.hasChanges = true;
     return {true, std::move(state)};
 }
-
 
 Result TimeSynchronizationWidgetReducer::addServer(State state, const State::ServerInfo& serverInfo)
 {

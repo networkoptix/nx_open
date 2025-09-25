@@ -371,9 +371,8 @@ bool QnRoutingManagementWidget::hasChanges() const
     if (isReadOnly())
         return false;
 
-    return std::any_of(
-        m_changes->changes.cbegin(),
-        m_changes->changes.cend(),
+    return std::ranges::any_of(
+        m_changes->changes,
         [](const auto& change) { return !change.isEmpty(); });
 }
 

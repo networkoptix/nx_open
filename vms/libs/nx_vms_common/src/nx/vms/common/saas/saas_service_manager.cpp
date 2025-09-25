@@ -658,8 +658,8 @@ std::optional<int> ServiceManager::tierGracePeriodDaysLeft() const
 bool ServiceManager::hasTierOveruse() const
 {
     const auto saas = systemContext()->saasServiceManager();
-    return std::any_of(checkedTiers.begin(),
-        checkedTiers.end(),
+    return std::ranges::any_of(
+        checkedTiers,
         [saas](const auto limit) { return saas->tierLimitReached(limit); });
 }
 

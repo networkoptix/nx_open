@@ -910,7 +910,8 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
             if (state)
                 objectTypes = state->rootObjectTypes();
 
-            return std::any_of(objectTypes.cbegin(), objectTypes.cend(),
+            return std::ranges::any_of(
+                objectTypes,
                 [](nx::analytics::taxonomy::ObjectType* objectType)
                 {
                     return objectType->isReachable();

@@ -18,7 +18,7 @@ struct Matcher
     static bool matches(const T& data, const std::vector<std::string>& possibleValues)
     {
         const auto json{serialize(data)};
-        return std::any_of(possibleValues.begin(), possibleValues.end(),
+        return std::ranges::any_of(possibleValues,
             [&json, isDataJsonString = isJsonString(json)](const auto& v)
             {
                 return isDataJsonString && !isJsonString(v)
@@ -29,7 +29,8 @@ struct Matcher
 
     static bool matches(const std::string& value, const std::vector<std::string>& possibleValues)
     {
-        return std::any_of(possibleValues.begin(), possibleValues.end(),
+        return std::ranges::any_of(
+            possibleValues,
             [&value](const auto& v) { return value == v; });
     }
 };

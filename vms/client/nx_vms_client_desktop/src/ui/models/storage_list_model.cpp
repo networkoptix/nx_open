@@ -696,7 +696,7 @@ bool QnStorageListModel::canChangeStoragePool(const QnStorageModelInfo& data) co
         return status.state == nx::vms::api::RebuildState::full;
     };
 
-    if (std::any_of(m_rebuildStatus.begin(), m_rebuildStatus.end(), isFullScan))
+    if (std::ranges::any_of(m_rebuildStatus, isFullScan))
         return false;
 
     if (!data.isWritable)
@@ -728,7 +728,7 @@ bool QnStorageListModel::canChangeStoragePool(const QnStorageModelInfo& data) co
     };
 
     /* Check that at least one writable storage left in the main pool. */
-    return std::any_of(m_storages.begin(), m_storages.end(), isWritable);
+    return std::ranges::any_of(m_storages, isWritable);
 }
 
 bool QnStorageListModel::canChangeStorageArchiveMode(const QnStorageModelInfo& data) const

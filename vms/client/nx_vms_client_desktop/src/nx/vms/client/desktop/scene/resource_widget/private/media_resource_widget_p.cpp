@@ -495,7 +495,8 @@ bool MediaResourceWidgetPrivate::calculateIsAnalyticsSupported() const
     // supports objects.
     const auto taxonomy = taxonomyManager->currentTaxonomy();
     const auto compatibleEngines = camera->compatibleAnalyticsEngines();
-    return std::any_of(compatibleEngines.cbegin(), compatibleEngines.cend(),
+    return std::ranges::any_of(
+        compatibleEngines,
         [&](const nx::Uuid& engineId)
         {
             const auto engine = taxonomy->engineById(engineId.toString(QUuid::WithBraces));

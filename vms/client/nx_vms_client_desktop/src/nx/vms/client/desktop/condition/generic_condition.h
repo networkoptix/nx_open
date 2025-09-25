@@ -20,7 +20,7 @@ public:
         switch (match)
         {
             case MatchMode::any:
-                return std::any_of(sequence.cbegin(), sequence.cend(), checkOne);
+                return std::ranges::any_of(sequence, checkOne);
             case MatchMode::all:
                 return std::all_of(sequence.cbegin(), sequence.cend(), checkOne);
             case MatchMode::exactlyOne:

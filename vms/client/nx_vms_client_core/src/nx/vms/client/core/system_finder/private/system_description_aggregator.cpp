@@ -20,7 +20,8 @@ SystemDescription::ServersList subtractLists(
     const auto newEnd = std::remove_if(minuend.begin(), minuend.end(),
         [subtrahend](const nx::vms::api::ModuleInformationWithAddresses& current)
         {
-            return std::any_of(subtrahend.begin(), subtrahend.end(),
+            return std::ranges::any_of(
+                subtrahend,
                 [currentId = current.id](const nx::vms::api::ModuleInformationWithAddresses& other)
                 {
                     return other.id == currentId;
@@ -277,7 +278,8 @@ bool SystemDescriptionAggregator::isNewSystem() const
     if (isEmptyAggregator())
         return false;
 
-    return std::any_of(m_systems.begin(), m_systems.end(),
+    return std::ranges::any_of(
+        m_systems,
         [](const SystemDescriptionPtr& system) { return system->isNewSystem(); });
 }
 
@@ -308,7 +310,8 @@ bool SystemDescriptionAggregator::isReachableServer(const nx::Uuid& serverId) co
     if (isEmptyAggregator())
         return false;
 
-    return std::any_of(m_systems.begin(), m_systems.end(),
+    return std::ranges::any_of(
+        m_systems,
         [serverId](const SystemDescriptionPtr& system)
         {
             return system->isReachableServer(serverId);
@@ -320,7 +323,8 @@ bool SystemDescriptionAggregator::isOnline() const
     if (isEmptyAggregator())
         return false;
 
-    return std::any_of(m_systems.begin(), m_systems.end(),
+    return std::ranges::any_of(
+        m_systems,
         [](const SystemDescriptionPtr& system)
         {
             return system->isOnline();
@@ -332,7 +336,8 @@ bool SystemDescriptionAggregator::isPending() const
     if (isEmptyAggregator())
         return false;
 
-    return std::any_of(m_systems.begin(), m_systems.end(),
+    return std::ranges::any_of(
+        m_systems,
         [](const SystemDescriptionPtr& system)
         {
             return system->isPending();
@@ -344,7 +349,8 @@ bool SystemDescriptionAggregator::isReachable() const
     if (isEmptyAggregator())
         return false;
 
-    return std::any_of(m_systems.begin(), m_systems.end(),
+    return std::ranges::any_of(
+        m_systems,
         [](const SystemDescriptionPtr& system)
         {
             return system->isReachable();
@@ -450,7 +456,8 @@ bool SystemDescriptionAggregator::hasLocalServer() const
     if (isEmptyAggregator())
         return false;
 
-    return std::any_of(m_systems.begin(), m_systems.end(),
+    return std::ranges::any_of(
+        m_systems,
         [](const SystemDescriptionPtr& system)
         {
             return system->hasLocalServer();

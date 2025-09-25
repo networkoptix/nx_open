@@ -40,9 +40,8 @@ bool matches(const QString& pattern, const UuidSet& ids)
     const auto resources = appContext()->currentSystemContext()->resourcePool()
         ->getResourcesByIds<QnVirtualCameraResource>(ids);
 
-    return std::any_of(
-        resources.cbegin(),
-        resources.cend(),
+    return std::ranges::any_of(
+        resources,
         [&pattern](const QnResourcePtr& resource)
         {
             return resources::search_helper::matches(pattern, resource);

@@ -3133,7 +3133,8 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         [this](const QnTimelineBookmarkItem& timelineBookmark) -> bool
         {
             const auto displayedBookmarks = m_bookmarksViewer->getDisplayedBookmarks();
-            return std::any_of(displayedBookmarks.cbegin(), displayedBookmarks.cend(),
+            return std::ranges::any_of(
+                displayedBookmarks,
                 [timelineBookmark](const auto& displayedBookmark)
                 {
                     if (timelineBookmark.isCluster())

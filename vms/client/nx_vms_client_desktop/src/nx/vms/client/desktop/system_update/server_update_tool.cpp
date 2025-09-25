@@ -659,7 +659,8 @@ void ServerUpdateTool::markUploadCompleted(const QString& uploadId)
 
 bool ServerUpdateTool::hasActiveUploadsTo(const nx::Uuid& id) const
 {
-    return std::any_of(m_uploadStateById.begin(), m_uploadStateById.end(),
+    return std::ranges::any_of(
+        m_uploadStateById,
         [id](const std::pair<QString, nx::vms::client::desktop::UploadState>& pair)
         {
             return pair.second.uuid == id;

@@ -1055,9 +1055,8 @@ QString UserSettingsDialog::warningForTemporaryUser(
     const auto hasAccessRightAboveView =
         [&sharedResources]
         {
-            return std::any_of(
-                sharedResources.begin(),
-                sharedResources.end(),
+            return std::ranges::any_of(
+                sharedResources,
                 [](const AccessRights& accessRights)
                 {
                     return accessRights & ~kTemporaryUserViewAccessRights;

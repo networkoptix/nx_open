@@ -159,8 +159,8 @@ void QnSystemHostsModel::HostsModel::forceResort()
         auto serverDataIter = std::find_if(m_serversUrlData.begin(), m_serversUrlData.end(),
             [recentUrl](const ServerUrlData& serverData)
             {
-                return std::any_of(
-                    serverData.additionalUrls.begin(), serverData.additionalUrls.end(),
+                return std::ranges::any_of(
+                    serverData.additionalUrls,
                     [recentUrl](const nx::Url& url)
                     {
                         return recentUrl.host() == url.host();

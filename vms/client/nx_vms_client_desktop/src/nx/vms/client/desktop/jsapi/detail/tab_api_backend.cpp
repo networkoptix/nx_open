@@ -551,7 +551,8 @@ bool TabApiBackend::Private::isFocusedWidget(const QnResourceWidget* widget) con
             // We suppose item is focused in the inactive state only if
             // there is no other active and focused item.
             const auto widgets = context->workbenchContext()->display()->widgets();
-            return !std::any_of(widgets.cbegin(), widgets.cend(),
+            return !std::ranges::any_of(
+                widgets,
                 [](const QnResourceWidget* widget)
                 {
                     return widget->selectionState() == QnResourceWidget::SelectionState::focused;

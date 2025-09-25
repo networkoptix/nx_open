@@ -60,7 +60,7 @@ bool isMatchFilters(const QString& fullAlias, const QnStringsSet& filters)
             return rx.match(fullAlias).hasMatch();
         };
 
-    return std::any_of(filters.cbegin(), filters.cend(), matchFilter);
+    return std::ranges::any_of(filters, matchFilter);
 }
 
 QnStatisticValuesHash filteredMetrics(

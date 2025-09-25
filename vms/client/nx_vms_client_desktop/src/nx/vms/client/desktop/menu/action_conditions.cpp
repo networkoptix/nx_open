@@ -328,9 +328,8 @@ bool canExportPeriods(
     const QnTimePeriod& period,
     bool ignoreLoadedChunks = false)
 {
-    return std::any_of(
-        resources.cbegin(),
-        resources.cend(),
+    return std::ranges::any_of(
+        resources,
         [&](const QnResourcePtr& resource)
         {
             const auto media = resource.dynamicCast<QnMediaResource>();
@@ -614,7 +613,8 @@ ActionVisibility SmartSearchCondition::check(
 ActionVisibility DisplayInfoCondition::check(
     const QnResourceWidgetList& widgets, WindowContext* /*context*/)
 {
-    const bool enabled = std::any_of(widgets.begin(), widgets.end(),
+    const bool enabled = std::ranges::any_of(
+        widgets,
         [](auto widget) { return widget->visibleButtons() & Qn::InfoButton; });
     return enabled ? EnabledAction : InvisibleAction;
 }
@@ -716,7 +716,7 @@ ActionVisibility ResourceRemovalCondition::check(
         };
 
     auto resources = parameters.resources();
-    return std::any_of(resources.cbegin(), resources.cend(), canBeDeleted)
+    return std::ranges::any_of(resources, canBeDeleted)
         ? EnabledAction
         : InvisibleAction;
 }
@@ -1179,7 +1179,8 @@ bool OpenInLayoutCondition::canOpen(
 
     if (!layout)
     {
-        return std::any_of(resources.cbegin(), resources.cend(),
+        return std::ranges::any_of(
+            resources,
             [getAccessController](const QnResourcePtr& resource)
             {
                 if (resource->hasFlags(Qn::layout))
@@ -1812,7 +1813,6 @@ ActionVisibility ItemMuteActionCondition::check(const Parameters& parameters, Wi
     }
 }
 
-
 //-------------------------------------------------------------------------------------------------
 // Definitions of resource grouping related actions conditions.
 //-------------------------------------------------------------------------------------------------
@@ -1855,7 +1855,7 @@ ActionVisibility CreateNewResourceTreeGroupCondition::check(
         };
 
     // None of selected resources can be placed into a group.
-    if (!std::any_of(std::cbegin(resources), std::cend(resources), resourceCanBeInCustomGroup))
+    if (!std::ranges::any_of(resources, resourceCanBeInCustomGroup))
         return InvisibleAction;
 
     // Selection contains type of resource that cannot be placed into a group.
@@ -2191,7 +2191,6 @@ ConditionWrapper canExportLayout()
         });
 }
 
-
 ConditionWrapper canExportBookmark()
 {
     return new CustomBoolCondition(
@@ -2216,7 +2215,8 @@ ConditionWrapper canExportBookmarks()
             const auto bookmarks =
                 parameters.argument<QnCameraBookmarkList>(Qn::CameraBookmarkListRole);
 
-            return std::any_of(bookmarks.cbegin(), bookmarks.cend(),
+            return std::ranges::any_of(
+                bookmarks,
                 [context](const QnCameraBookmark& bookmark)
                 {
                     return canExportBookmarkInternal(bookmark, context);
@@ -2248,7 +2248,8 @@ ConditionWrapper canCopyBookmarksToClipboard()
             const auto bookmarks =
                 parameters.argument<QnCameraBookmarkList>(Qn::CameraBookmarkListRole);
 
-            return std::any_of(bookmarks.cbegin(), bookmarks.cend(),
+            return std::ranges::any_of(
+                bookmarks,
                 [context](const QnCameraBookmark& bookmark)
                 {
                     return canCopyBookmarkToClipboardInternal(bookmark, context);
@@ -2486,7 +2487,8 @@ ConditionWrapper userHasCamerasWithEditableSettings()
             const auto& cameras = context->system()->resourcePool()->getAllCameras();
             const auto& accessController = context->system()->accessController();
 
-            return std::any_of(cameras.begin(), cameras.end(),
+            return std::ranges::any_of(
+                cameras,
                 [accessController](auto camera)
                 {
                     return accessController->hasPermissions(camera,

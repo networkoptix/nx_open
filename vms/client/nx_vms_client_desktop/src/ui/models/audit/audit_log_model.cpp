@@ -127,7 +127,6 @@ public:
         return m_data.size();
     }
 
-
     inline QnLegacyAuditRecord* at(int row)
     {
         return m_sortOrder == Qt::AscendingOrder ? m_data[row] : m_data[m_data.size() - 1 - row];
@@ -619,7 +618,8 @@ bool QnAuditLogModel::matches(const QnLegacyAuditRecord* record, const QStringLi
     // Every keyword must be present at least in one of the columns.
     for (const auto& keyword: keywords)
     {
-        if (!std::any_of(kColumnsToFilter.begin(), kColumnsToFilter.end(),
+        if (!std::ranges::any_of(
+            kColumnsToFilter,
             [&] (auto column) { return matches(column, record, keyword); }))
         {
             return false;

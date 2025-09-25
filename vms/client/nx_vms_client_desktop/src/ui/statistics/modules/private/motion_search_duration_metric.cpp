@@ -68,7 +68,8 @@ void MotionSearchDurationMetric::removeWidget(QnResourceWidget *resourceWidget)
 
 void MotionSearchDurationMetric::updateCounterState()
 {
-    const bool activate = std::any_of(m_widgets.begin(), m_widgets.end(),
+    const bool activate = std::ranges::any_of(
+        m_widgets,
         [this](const QnMediaResourceWidgetPtr &mediaWidget)
         {
             return (mediaWidget && isFromCurrentLayout(mediaWidget)

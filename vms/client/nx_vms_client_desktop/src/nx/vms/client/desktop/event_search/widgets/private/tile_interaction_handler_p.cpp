@@ -636,7 +636,8 @@ void TileInteractionHandler::showContextMenu(
             if (timeUs >= 0 && timeUs != DATETIME_NOW)
                 requiredPermissions = Qn::ViewFootagePermission;
         }
-        if (!resourceList.empty() && std::any_of(resourceList.cbegin(), resourceList.cend(),
+        if (!resourceList.empty() && std::ranges::any_of(
+            resourceList,
             [requiredPermissions, accessController = system()->accessController()]
             (const auto& resource)
             {

@@ -54,7 +54,8 @@ bool Videowall::checkLocalFiles(QWidget* parent,
     if (itemBelongsToThisPc)
         return true;
 
-    bool hasLocalFiles = std::any_of(resources.begin(), resources.end(),
+    bool hasLocalFiles = std::ranges::any_of(
+        resources,
         [](const QnResourcePtr& resource)
         {
             return resource->hasFlags(Qn::local_media);

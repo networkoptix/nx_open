@@ -1029,7 +1029,8 @@ void ConnectActionsHandler::showWarnMessagesOnce()
 
     // Ask user for analytics storage locations (e.g. in the case of migration).
     const auto& servers = system()->resourcePool()->servers();
-    if (std::any_of(servers.begin(), servers.end(),
+    if (std::ranges::any_of(
+        servers,
         [](const auto& server)
         {
             return server->metadataStorageId().isNull()

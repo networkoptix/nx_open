@@ -156,7 +156,8 @@ bool ServicesUsageModel::Private::hasCloudBackupStorage() const
 {
     const auto systemContext = serviceManager->systemContext();
     const auto storages  = systemContext->resourcePool()->storages();
-    return std::any_of(storages.begin(), storages.end(),
+    return std::ranges::any_of(
+        storages,
         [](const auto& storage)
         {
             return storage->isBackup() && storage->isCloudStorage();

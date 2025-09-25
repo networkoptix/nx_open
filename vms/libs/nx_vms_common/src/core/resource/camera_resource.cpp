@@ -357,8 +357,8 @@ QnVirtualCameraResource::QnVirtualCameraResource():
             const auto [portDescriptions, _] =
                 nx::reflect::json::deserialize<QnIOPortDataList>(ioSettings);
 
-            return std::any_of(portDescriptions.begin(),
-                portDescriptions.end(),
+            return std::ranges::any_of(
+                portDescriptions,
                 [](const auto& portData)
                 {
                     return portData.outputName == intercomSpecificPortName();

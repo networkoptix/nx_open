@@ -174,7 +174,8 @@ QVector3D applyRotation(const QVector3D& speed, qreal rotation)
 bool cameraSupportsAutoTracking(nx::vms::client::core::CameraResourcePtr camera)
 {
     const QnIOPortDataList ports = camera->ioPortDescriptions();
-    return std::any_of(ports.cbegin(), ports.cend(),
+    return std::ranges::any_of(
+        ports,
         [](const auto& port)
         {
             return port.outputName == kAutoTrackingPortName;

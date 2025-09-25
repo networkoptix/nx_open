@@ -1695,7 +1695,8 @@ void QnStorageConfigWidget::updateRebuildUi(
         isServerOnline()
         && reply.state == nx::vms::api::RebuildState::none
         && !hasStoragesChanges(m_model->storages())
-        && std::any_of(modelStorages.cbegin(), modelStorages.cend(),
+        && std::ranges::any_of(
+            modelStorages,
             [this, isMainPool](const QnStorageModelInfo& info)
             {
                 return info.isWritable

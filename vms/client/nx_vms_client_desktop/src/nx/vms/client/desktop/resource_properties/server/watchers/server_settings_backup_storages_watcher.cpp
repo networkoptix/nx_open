@@ -22,7 +22,8 @@ bool hasActiveBackupStorage(const QnMediaServerResourcePtr& server)
         return false;
 
     const auto serverStorages = server->getStorages();
-    return std::any_of(std::cbegin(serverStorages), std::cend(serverStorages),
+    return std::ranges::any_of(
+        serverStorages,
         [](const auto& storageResource)
         {
             const auto statusFlags = storageResource->runtimeStatusFlags();
@@ -41,7 +42,8 @@ bool usesCloudBackupStorage(const QnMediaServerResourcePtr& server)
         && nx::vms::client::desktop::ini().emulateCloudBackupSettingsOnNonCloudStorage;
 
     const auto serverStorages = server->getStorages();
-    return std::any_of(std::cbegin(serverStorages), std::cend(serverStorages),
+    return std::ranges::any_of(
+        serverStorages,
         [emulateCloudStorage](const auto& storageResource)
         {
             const auto statusFlags = storageResource->runtimeStatusFlags();

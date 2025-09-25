@@ -313,13 +313,15 @@ bool QnStorageUrlDialog::storageAlreadyUsed(const QString& path) const
         system()->resourcePool()->getResources<QnMediaServerResource>();
     servers.removeOne(m_server);
 
-    bool usedOnOtherServers = std::any_of(servers.begin(), servers.end(),
+    bool usedOnOtherServers = std::ranges::any_of(
+        servers,
         [path](const QnMediaServerResourcePtr& server)
         {
             return !server->getStorageByUrl(path).isNull();
         });
 
-    bool usedOnCurrentServer = std::any_of(m_currentServerStorages.begin(), m_currentServerStorages.end(),
+    bool usedOnCurrentServer = std::ranges::any_of(
+        m_currentServerStorages,
         [path](const QnStorageModelInfo& info)
         {
             return QUrl(info.url).matches({path}, QUrl::RemoveUserInfo);

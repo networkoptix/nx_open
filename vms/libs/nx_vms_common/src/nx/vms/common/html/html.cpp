@@ -217,8 +217,8 @@ bool mightBeHtml(const QString& text)
 
 bool mightBeHtml(const QStringList& lines)
 {
-    return std::any_of(
-        lines.cbegin(), lines.cend(), [](const QString& line) { return mightBeHtml(line); });
+    return std::ranges::any_of(
+        lines, [](const QString& line) { return mightBeHtml(line); });
 }
 
 QString toHtml(const QString& source, Qt::WhiteSpaceMode whitespaceMode)

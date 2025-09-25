@@ -68,7 +68,8 @@ AlertTextProvider initAlertTextProvider(const CameraSettingsDialogState& setting
                     "Always\"."));
             }
 
-            const bool dtsCamPresent = std::any_of(cameras.cbegin(), cameras.cend(),
+            const bool dtsCamPresent = std::ranges::any_of(
+                cameras,
                 [](const QnVirtualCameraResourcePtr& camera) { return camera->isDtsBased(); });
             if (dtsCamPresent)
             {
@@ -77,7 +78,8 @@ AlertTextProvider initAlertTextProvider(const CameraSettingsDialogState& setting
             }
 
             // If source camera has no video, allow to copy only to cameras without video.
-            const bool videoOk = hasVideo || !std::any_of(cameras.cbegin(), cameras.cend(),
+            const bool videoOk = hasVideo || !std::ranges::any_of(
+                cameras,
                 [](const QnVirtualCameraResourcePtr& camera) { return camera->hasVideo(); });
             if (!videoOk)
             {

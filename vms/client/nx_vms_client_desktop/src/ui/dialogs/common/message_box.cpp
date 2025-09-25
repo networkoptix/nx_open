@@ -65,7 +65,6 @@ private:
         QVector<QDialogButtonBox::ButtonRole> acceptedRoles);
 };
 
-
 QnMessageBoxPrivate::QnMessageBoxPrivate(QnMessageBox* parent) :
     QObject(parent),
     q_ptr(parent),
@@ -710,8 +709,8 @@ void QnMessageBox::removeCustomWidget(QWidget* widget)
     NX_ASSERT(d->customWidgets.contains(widget));
     d->customWidgets.removeOne(widget);
 
-    bool showSecondaryLine = std::any_of(
-        d->customWidgets.cbegin(), d->customWidgets.cend(),
+    bool showSecondaryLine = std::ranges::any_of(
+        d->customWidgets,
         [this](QWidget* w)
         {
             return ui->mainLayout->indexOf(w) >= 0;

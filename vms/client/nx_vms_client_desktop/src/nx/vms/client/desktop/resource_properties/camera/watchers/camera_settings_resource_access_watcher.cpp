@@ -56,7 +56,8 @@ CameraSettingsResourceAccessWatcher::CameraSettingsResourceAccessWatcher(
         this,
         [this](const QnResourceList& resourcesHint)
         {
-            if (resourcesHint.empty() || std::any_of(resourcesHint.cbegin(), resourcesHint.cend(),
+            if (resourcesHint.empty() || std::ranges::any_of(
+                resourcesHint,
                 [this](const QnResourcePtr& resource)
                 {
                     const auto camera = resource.objectCast<QnVirtualCameraResource>();

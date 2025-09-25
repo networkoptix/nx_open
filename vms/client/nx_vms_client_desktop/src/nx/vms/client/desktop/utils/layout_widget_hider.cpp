@@ -51,8 +51,8 @@ LayoutWidgetHider::LayoutWidgetHider(
 
 void LayoutWidgetHider::setVisible(QWidget* widget, bool visible)
 {
-    const bool contains = std::any_of(
-        m_widgets.cbegin(), m_widgets.cend(),
+    const bool contains = std::ranges::any_of(
+        m_widgets,
         [widget](const QWidget* mapWidget) { return widget == mapWidget; });
     if (!NX_ASSERT(contains))
         return;

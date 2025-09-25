@@ -468,7 +468,8 @@ void AnalyticsSettingsStore::activeElementChanged(
 void AnalyticsSettingsStore::updateHasChanges()
 {
     m_hasChanges =
-        std::any_of(m_settingsValuesByEngineId.begin(), m_settingsValuesByEngineId.end(),
+        std::ranges::any_of(
+            m_settingsValuesByEngineId,
             [](const SettingsValues& values) { return values.changed; })
         || m_isNewRequestsEnabled != systemSettings()->isAllowRegisteringIntegrationsEnabled();
 

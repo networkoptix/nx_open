@@ -255,8 +255,8 @@ protected:
             std::back_inserter(threadsWithUsageFlag),
             [](auto* aioThread) { return std::make_tuple(aioThread, false); });
 
-        while (std::any_of(
-            threadsWithUsageFlag.begin(), threadsWithUsageFlag.end(),
+        while (std::ranges::any_of(
+            threadsWithUsageFlag,
             [](const auto& val) { return !std::get<1>(val); }))
         {
             auto acceptResult = m_acceptedConnections.pop();

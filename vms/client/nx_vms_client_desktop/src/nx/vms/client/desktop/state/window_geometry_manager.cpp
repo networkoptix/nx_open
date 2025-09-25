@@ -284,9 +284,8 @@ void WindowGeometryManager::setWindowGeometry(const WindowGeometryState& value)
 bool WindowGeometryManager::isValid(const WindowGeometryState& value) const
 {
     const auto surface = d->control->suitableSurface();
-    return std::any_of(
-        surface.begin(),
-        surface.end(),
+    return std::ranges::any_of(
+        surface,
         [value](const QRect& s)
         {
             return s.intersects(value.geometry);

@@ -145,7 +145,8 @@ bool hasCrossSystemItems(const core::LayoutResourcePtr& layout)
         ->cloudSystemId();
 
     auto items = layout->getItems();
-    return std::any_of(items.cbegin(), items.cend(),
+    return std::ranges::any_of(
+        items,
         [currentCloudSystemId](const common::LayoutItemData& item)
         {
             return core::isCrossSystemResource(item.resource)
@@ -1204,8 +1205,8 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
     if (openable.empty())
         return;
 
-    const bool hasCrossSystemResources = std::any_of(
-        openable.cbegin(), openable.cend(),
+    const bool hasCrossSystemResources = std::ranges::any_of(
+        openable,
         [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); });
 
     auto layout = hasCrossSystemResources

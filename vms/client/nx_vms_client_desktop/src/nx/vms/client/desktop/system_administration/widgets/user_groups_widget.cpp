@@ -686,7 +686,8 @@ void UserGroupsWidget::Private::handleSelectionChanged()
         header->setCheckState(Qt::PartiallyChecked);
 
     const bool canDelete = !checkedGroupIds.empty()
-        && std::any_of(checkedGroupIds.cbegin(), checkedGroupIds.cend(),
+        && std::ranges::any_of(
+            checkedGroupIds,
             [this](const nx::Uuid& groupId) { return groupsModel->canDeleteGroup(groupId); });
 
     deleteSelectedButton->setVisible(canDelete);

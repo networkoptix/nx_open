@@ -448,8 +448,8 @@ bool AioTaskQueue::taskExists(
     aio::EventType eventType,
     TaskType taskType) const
 {
-    return std::any_of(
-        m_pollSetModificationQueue.begin(), m_pollSetModificationQueue.end(),
+    return std::ranges::any_of(
+        m_pollSetModificationQueue,
         [sock, eventType, taskType](const auto& task)
         {
             return task.socket == sock && task.eventType == eventType && task.type == taskType;

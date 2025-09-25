@@ -16,7 +16,8 @@ static const QList<QnResourceAccessFilter::Filter> kAllFilters {
 
 bool QnResourceAccessFilter::isShareable(const QnResourcePtr& resource)
 {
-    return std::any_of(kAllFilters.cbegin(), kAllFilters.cend(),
+    return std::ranges::any_of(
+        kAllFilters,
         [resource](Filter filter)
         {
             return isShareable(filter, resource);

@@ -64,9 +64,8 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
 
         const auto eventDescriptor = parentParamsWidget()->eventDescriptor();
 
-        const auto displayStateField = std::any_of(
-            eventDescriptor->fields.cbegin(),
-            eventDescriptor->fields.cend(),
+        const auto displayStateField = std::ranges::any_of(
+            eventDescriptor->fields,
             [](const auto& fieldDescriptor)
             {
                 return fieldDescriptor.fieldName == vms::rules::utils::kStateFieldName

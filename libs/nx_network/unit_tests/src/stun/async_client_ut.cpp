@@ -419,8 +419,8 @@ protected:
             closedUsers.emplace(closedUser);
 
             ASSERT_TRUE(
-                std::any_of(
-                    m_users.begin(), m_users.end(),
+                std::ranges::any_of(
+                    m_users,
                     [closedUser](const auto& user) { return user.get() == closedUser; }));
         }
 

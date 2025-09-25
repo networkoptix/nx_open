@@ -15,7 +15,8 @@ namespace {
 
 bool haveInternetAccess(const QnMediaServerResourceList& servers)
 {
-    return std::any_of(servers.cbegin(), servers.cend(),
+    return std::ranges::any_of(
+        servers,
         [](const QnMediaServerResourcePtr& server) { return server->hasInternetAccess(); });
 }
 

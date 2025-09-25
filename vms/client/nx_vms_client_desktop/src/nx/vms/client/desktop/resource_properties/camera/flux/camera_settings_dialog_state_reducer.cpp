@@ -170,7 +170,8 @@ bool hasMotion(const Camera& camera)
 
 bool calculateRecordingParametersAvailable(const Cameras& cameras)
 {
-    return std::any_of(cameras.cbegin(), cameras.cend(),
+    return std::ranges::any_of(
+        cameras,
         [](const Camera& camera) { return camera->isVideoQualityAdjustable(); });
 }
 
@@ -731,7 +732,8 @@ bool canForcePanTiltCapabilities(const Camera& camera)
 bool analyticsEngineIsPresentInList(const nx::Uuid& id, const State& state)
 {
     const auto& engines = state.analytics.engines;
-    return std::any_of(engines.cbegin(), engines.cend(),
+    return std::ranges::any_of(
+        engines,
         [&id](const auto& info) { return info.id == id; });
 }
 
@@ -1236,7 +1238,8 @@ nx::vms::api::DeviceProfiles intersectProfiles(
     nx::vms::api::DeviceProfiles result;
     for (const auto& p: left)
     {
-        if (std::any_of(right.begin(), right.end(),
+        if (std::ranges::any_of(
+            right,
             [token = p.token](const auto& p)
             {
                 return p.token == token;
@@ -1269,18 +1272,20 @@ State CameraSettingsDialogStateReducer::loadCameras(
             QnResourcePtr(), /*ignoreDesktopCameras*/ true);
 
         state.systemHasDevicesWithAudioInput =
-            std::any_of(std::cbegin(allCameras), std::cend(allCameras),
-            [](const auto& camera)
-            {
-                return camera->isAudioSupported();
-            });
+            std::ranges::any_of(
+                allCameras,
+                [](const auto& camera)
+                {
+                    return camera->isAudioSupported();
+                });
 
         state.systemHasDevicesWithAudioOutput =
-            std::any_of(std::cbegin(allCameras), std::cend(allCameras),
-            [](const auto& camera)
-            {
-                return camera->hasTwoWayAudio();
-            });
+            std::ranges::any_of(
+                allCameras,
+                [](const auto& camera)
+                {
+                    return camera->hasTwoWayAudio();
+                });
     }
 
     // TODO: #vkutin #sivanov Separate camera-dependent state from camera-independent state.
@@ -1430,7 +1435,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
     fetchFromCameras<bool>(state.expert.useBitratePerGOP, cameras,
         [](const Camera& camera) { return camera->useBitratePerGop(); });
 
-    state.expert.areOnvifSettingsApplicable = std::any_of(cameras.cbegin(), cameras.cend(),
+    state.expert.areOnvifSettingsApplicable = std::ranges::any_of(
+        cameras,
         [](const Camera& camera) { return camera->isOnvifDevice(); });
 
     fetchFromCameras<UsingOnvifMedia2Type>(state.expert.useMedia2ToFetchProfiles, cameras,
@@ -3013,9 +3019,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
     const QJsonObject& values,
     const QJsonObject& paramValues)
 {
-    if (!std::any_of(
-        state.analytics.engines.begin(),
-        state.analytics.engines.end(),
+    if (!std::ranges::any_of(
+        state.analytics.engines,
         [engineId](const auto& engine) { return engine.id == engineId; }))
     {
         return {false, std::move(state)};

@@ -140,7 +140,8 @@ bool VideoWallShortcutHelper::canStartVideoWall(const QnVideoWallResourcePtr& vi
     }
 
     const auto videowallItems = videowall->items()->getItems();
-    return std::any_of(videowallItems.cbegin(), videowallItems.cend(),
+    return std::ranges::any_of(
+        videowallItems,
         [&pcUuid](const QnVideoWallItem& item)
         {
             return item.pcUuid == pcUuid && !item.runtimeStatus.online;

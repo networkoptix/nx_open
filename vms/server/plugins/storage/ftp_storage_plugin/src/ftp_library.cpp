@@ -996,7 +996,6 @@ const char* FtpStorageFactory::lastErrorMessage(int ecode) const
 #undef PRINT_ERROR
 #undef ERROR_LIST
 
-
 // Ftp IO Device
 FtpIODevice::FtpIODevice(FtpImplPtr ftpImplPtr, const char *uri, int mode):
     m_impl(ftpImplPtr),

@@ -82,7 +82,8 @@ bool AuthenticationDataModel::hasSavedCredentials() const
 
 void AuthenticationDataModel::updateHasSavedCredentials()
 {
-    const auto value = std::any_of(m_credentialsList.begin(), m_credentialsList.end(),
+    const auto value = std::ranges::any_of(
+        m_credentialsList,
         [this](const CredentialsTileModel& value)
         {
             return value.user == m_currentUser && value.isPasswordSaved;

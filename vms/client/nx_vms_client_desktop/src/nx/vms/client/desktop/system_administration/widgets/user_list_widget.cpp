@@ -745,8 +745,8 @@ void UserListWidget::Private::updateSelection()
             : Qt::PartiallyChecked;
     }
 
-    const auto hasChannelPartnerUser = std::any_of(selectedUsers.begin(),
-        selectedUsers.end(),
+    const auto hasChannelPartnerUser = std::ranges::any_of(
+        selectedUsers,
         [](const auto& user) { return user->isChannelPartner(); });
 
     deleteButton->setVisible(!m_visibleUsers.selectedDeletable().isEmpty());
@@ -974,7 +974,8 @@ void UserListWidget::Private::visibleAboutToBeRemoved(int first, int last)
 
 bool UserListWidget::Private::canDelete(const QSet<QnUserResourcePtr>& users) const
 {
-    return !users.empty() && std::any_of(users.cbegin(), users.cend(),
+    return !users.empty() && std::ranges::any_of(
+        users,
         [this](const QnUserResourcePtr& user) { return usersModel->canDelete(user); });
 }
 

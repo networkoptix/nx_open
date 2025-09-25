@@ -68,7 +68,8 @@ void CloudCrossSystemRequestScheduler::add(
 bool CloudCrossSystemRequestScheduler::hasTasks(const QString& cloudSystemId) const
 {
     return d->queue->hasTasks(/*group*/ cloudSystemId) ||
-        std::any_of(d->parallelQueues.begin(), d->parallelQueues.end(),
+        std::ranges::any_of(
+            d->parallelQueues,
             [cloudSystemId](auto queue) { return queue->hasTasks(/*group*/ cloudSystemId); });
 }
 

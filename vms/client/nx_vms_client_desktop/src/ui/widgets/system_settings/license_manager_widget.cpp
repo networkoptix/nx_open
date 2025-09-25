@@ -580,9 +580,8 @@ void LicenseManagerWidget::updateButtons()
             selected.cend(),
             [this](const QnLicensePtr& license) { return canRemoveLicense(license); });
     const bool canDeactivateAny = selected.size() > 0
-        && std::any_of(
-            selected.cbegin(),
-            selected.cend(),
+        && std::ranges::any_of(
+            selected,
             [this](const QnLicensePtr& license) { return canDeactivateLicense(license); });
 
     m_isRemoveTakeAwayOperation = canRemoveAll || !canDeactivateAny;

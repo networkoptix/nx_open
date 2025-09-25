@@ -337,9 +337,8 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintResizeAnchors(
 
 bool QnVideowallManageWidgetPrivate::BaseModelItem::isPartOfScreen() const
 {
-    return std::any_of(
-        snaps.values.cbegin(),
-        snaps.values.cend(),
+    return std::ranges::any_of(
+        snaps.values,
         [](const QnScreenSnap& snap) { return snap.snapIndex > 0; });
 }
 

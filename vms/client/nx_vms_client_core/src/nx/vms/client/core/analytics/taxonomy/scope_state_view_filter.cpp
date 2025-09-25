@@ -72,7 +72,8 @@ bool ScopeStateViewFilter::matches(
     if (d->devices.empty())
         return attribute->isSupported(engine, /*deviceId*/ {});
 
-    return std::any_of(d->devices.begin(), d->devices.end(),
+    return std::ranges::any_of(
+        d->devices,
         [&](const nx::Uuid& device) { return attribute->isSupported(engine, device); });
 }
 

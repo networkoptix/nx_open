@@ -350,7 +350,8 @@ bool UserListModel::isIndirectlyChecked(const QModelIndex& index) const
 
     const auto groups = nx::vms::common::userGroupsWithParents(user);
 
-    return std::any_of(groups.begin(), groups.end(),
+    return std::ranges::any_of(
+        groups,
         [this](const nx::Uuid& groupId) { return m_rolesModel->checkedRoles().contains(groupId); });
 }
 

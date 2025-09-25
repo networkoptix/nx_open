@@ -103,7 +103,8 @@ public:
             {
                 const auto sourceIndex = model->index(sourceRow, 0, sourceParent);
                 const auto text = sourceIndex.data(Qt::DisplayRole).toString();
-                return std::any_of(charsToStartWith.cbegin(), charsToStartWith.cend(),
+                return std::ranges::any_of(
+                    charsToStartWith,
                     [text](char c) { return text.startsWith(c); });
             });
     }
@@ -124,7 +125,8 @@ public:
 
                 const auto sourceIndex = model->index(sourceRow, 0, sourceParent);
                 const auto text = sourceIndex.data(Qt::DisplayRole).toString();
-                return std::any_of(charsToStartWith.cbegin(), charsToStartWith.cend(),
+                return std::ranges::any_of(
+                    charsToStartWith,
                     [text](char c) { return text.startsWith(c); });
             });
     }

@@ -120,9 +120,8 @@ VmsEventSearchWidget::Private::Private(VmsEventSearchWidget* q):
     const auto updateServerEventsMenuIfNeeded =
         [this](const QnResourceList& resources)
         {
-            if (std::any_of(
-                resources.begin(),
-                resources.end(),
+            if (std::ranges::any_of(
+                resources,
                 [](const QnResourcePtr& resource)
                 {
                     return resource->hasFlags(Qn::server);

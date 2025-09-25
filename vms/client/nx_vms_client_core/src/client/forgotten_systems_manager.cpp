@@ -27,7 +27,8 @@ QnForgottenSystemsManager::QnForgottenSystemsManager()
                 [this, id = system->id(), localId = system->localId(),
                     rawSystem = system.data(), servers = system->servers()]()
                 {
-                    const bool isCompatible = std::any_of(servers.cbegin(), servers.cend(),
+                    const bool isCompatible = std::ranges::any_of(
+                        servers,
                         [](const auto& serverInfo)
                         {
                              return ServerCompatibilityValidator::isCompatibleCustomization(

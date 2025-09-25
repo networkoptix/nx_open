@@ -104,7 +104,8 @@ bool RecorderItemDataHelper::hasPermissions(
 
     const auto& camerasSet = m_camerasByRecorderGroupId.value(recorderGroupId);
 
-    return std::any_of(camerasSet.begin(), camerasSet.end(),
+    return std::ranges::any_of(
+        camerasSet,
         [user, &permissions](auto camera)
         {
             const auto accessManager = user->systemContext()->resourceAccessManager();

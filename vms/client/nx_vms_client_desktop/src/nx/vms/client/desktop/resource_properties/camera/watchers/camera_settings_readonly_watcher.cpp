@@ -62,7 +62,8 @@ void CameraSettingsReadOnlyWatcher::updateReadOnly()
 
 bool CameraSettingsReadOnlyWatcher::calculateReadOnly() const
 {
-    return std::any_of(m_cameras.cbegin(), m_cameras.cend(),
+    return std::ranges::any_of(
+        m_cameras,
         [](const QnVirtualCameraResourcePtr& camera)
         {
             return !ResourceAccessManager::hasPermissions(camera, Qn::WritePermission);

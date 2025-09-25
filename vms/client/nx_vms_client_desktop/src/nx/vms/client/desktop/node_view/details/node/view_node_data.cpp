@@ -179,7 +179,8 @@ bool ViewNodeData::hasDataForColumn(Column column) const
     if (valueHash.isEmpty())
         return false;
 
-    const bool result = std::any_of(valueHash.begin(), valueHash.end(),
+    const bool result = std::ranges::any_of(
+        valueHash,
         [](const QVariant& value) { return !value.isNull(); });
 
     return result;

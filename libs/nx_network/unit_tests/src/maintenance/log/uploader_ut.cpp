@@ -80,9 +80,12 @@ protected:
                 m_generatedLogs.begin(), m_generatedLogs.end(),
                 [&uploadedLogs](const std::string& str)
                 {
-                    return std::any_of(
-                        uploadedLogs.begin(), uploadedLogs.end(),
-                        [&str](const std::string& uploaded) { return uploaded.find(str) != std::string::npos; });
+                    return std::ranges::any_of(
+                        uploadedLogs,
+                        [&str](const std::string& uploaded)
+                        {
+                            return uploaded.find(str) != std::string::npos;
+                        });
                 });
 
             if (found)
@@ -115,9 +118,10 @@ protected:
             uploadedLogs.begin(), uploadedLogs.end(),
             [this](const std::string& uploaded)
             {
-                return std::any_of(
-                    m_generatedLogs.begin(), m_generatedLogs.end(),
-                    [&uploaded](const std::string& generated) {
+                return std::ranges::any_of(
+                    m_generatedLogs,
+                    [&uploaded](const std::string& generated)
+                    {
                         return uploaded.find(generated) != std::string::npos;
                     });
             });

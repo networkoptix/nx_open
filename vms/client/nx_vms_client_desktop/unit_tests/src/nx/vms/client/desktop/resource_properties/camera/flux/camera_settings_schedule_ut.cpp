@@ -120,7 +120,8 @@ protected:
                     || camera->canApplySchedule(camera->getScheduleTasks());
             };
 
-        const bool informerIsShown = std::any_of(cameras.cbegin(), cameras.cend(),
+        const bool informerIsShown = std::ranges::any_of(
+            cameras,
             [isScheduleValid](const auto& camera)
             {
                 return !isScheduleValid(camera);

@@ -98,7 +98,8 @@ void TextMatcher::parse(const QString& text)
 
 bool TextMatcher::hasShortTokens() const
 {
-    return std::any_of(m_conditions.begin(), m_conditions.end(),
+    return std::ranges::any_of(
+        m_conditions,
         [](const auto& condition)
         {
             switch (condition.type)
@@ -198,7 +199,7 @@ uint64_t TextMatcher::matchExactAttributes(
 
         const bool isMatched = condition.isNegative
             ? std::none_of(attributes.begin(), attributes.end(), comparator)
-            : std::any_of(attributes.begin(), attributes.end(), comparator);
+            : std::ranges::any_of(attributes, comparator);
         if (isMatched)
             result |= (1ull << i);
     }
@@ -222,7 +223,7 @@ uint64_t TextMatcher::checkAttributesPresence(
             };
         const bool isMatched = condition.isNegative
             ? std::none_of(attributes.begin(), attributes.end(), comparator)
-            : std::any_of(attributes.begin(), attributes.end(), comparator);
+            : std::ranges::any_of(attributes, comparator);
         if (isMatched)
             result |= (1ull << i);
     }
@@ -266,13 +267,13 @@ bool TextMatcher::wordMatchAnyOfAttributes(
     const QString& token,
     const nx::common::metadata::Attributes& attributes) const
 {
-    return std::any_of(
-        attributes.cbegin(), attributes.cend(),
+    return std::ranges::any_of(
+        attributes,
         [&token](const nx::common::metadata::Attribute& attribute)
         {
             const auto words = QStringView(attribute.value).split(' ', Qt::SkipEmptyParts);
-            return std::any_of(
-                words.cbegin(), words.cend(),
+            return std::ranges::any_of(
+                words,
                 [&token](auto& word) { return word.contains(token, Qt::CaseInsensitive); });
         });
 }
@@ -282,8 +283,8 @@ bool TextMatcher::rangeMatchAttributes(
     const QString& paramName,
     const nx::common::metadata::Attributes& attributes) const
 {
-    return std::any_of(
-        attributes.cbegin(), attributes.cend(),
+    return std::ranges::any_of(
+        attributes,
         [&range, &paramName](const nx::common::metadata::Attribute& attribute)
         {
             nx::common::metadata::AttributeEx attributeEx(attribute);

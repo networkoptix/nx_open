@@ -443,7 +443,8 @@ bool CloudStorageServiceUsageHelper::isOverflow() const
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
         updateCacheUnsafe();
-    return std::any_of(m_cache->begin(), m_cache->end(),
+    return std::ranges::any_of(
+        *m_cache,
         [](const auto& value)
         {
             return value.second.inUse > value.second.available;

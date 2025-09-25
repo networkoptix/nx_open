@@ -923,8 +923,8 @@ bool SelfUpdater::updateMinilauncherIconsOnWindowsInDir(const QDir& dir)
         NX_VERBOSE(this, "Shortcut parameters received");
 
         // Check if the shortcut points to some minilauncher binary.
-        const bool shortcutToLauncher = std::any_of(shortcutSourcePrefixes.begin(),
-            shortcutSourcePrefixes.end(),
+        const bool shortcutToLauncher = std::ranges::any_of(
+            shortcutSourcePrefixes,
             [filePath = info.sourceFile](auto& prefix)
             {
                 return filePath.startsWith(prefix, Qt::CaseInsensitive);

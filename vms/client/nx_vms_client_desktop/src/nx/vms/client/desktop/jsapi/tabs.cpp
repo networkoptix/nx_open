@@ -122,7 +122,8 @@ Tab* Tabs::Private::add(const QString& name)
         return nullptr;
 
     const QList<std::shared_ptr<Tab>> tabList = tabs.values();
-    const bool exists = std::any_of(tabList.begin(), tabList.end(),
+    const bool exists = std::ranges::any_of(
+        tabList,
         [name](std::shared_ptr<Tab> tab) { return tab->name() == name; });
 
     if (exists)

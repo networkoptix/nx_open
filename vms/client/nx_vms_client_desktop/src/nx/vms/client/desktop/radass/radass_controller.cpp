@@ -442,7 +442,8 @@ struct RadassController::Private
 
     bool existsBufferingDisplay() const
     {
-        return std::any_of(consumers.cbegin(), consumers.cend(),
+        return std::ranges::any_of(
+            consumers,
             [](const ConsumerInfo& info) { return info.display->isBuffering(); });
     }
 
@@ -729,7 +730,8 @@ struct RadassController::Private
             return;
 
         // Do not rearrange items if any item is in FF/REW mode right now.
-        if (std::any_of(consumers.cbegin(), consumers.cend(),
+        if (std::ranges::any_of(
+            consumers,
             [](const ConsumerInfo& consumer) { return isFastForwardOrRevMode(consumer.display); }))
         {
             return;
@@ -944,7 +946,8 @@ void RadassController::onTimer()
             (!d->lastSystemRtspDrop->hasExpiredOrInvalid(kPerformanceLossCheckInterval))
             || d->isValid(d->slowConsumer());
 
-        const auto hasHq = std::any_of(d->consumers.cbegin(), d->consumers.cend(),
+        const auto hasHq = std::ranges::any_of(
+            d->consumers,
             [](const ConsumerInfo& info) { return info.mode == RadassMode::High; });
 
         if (hasHq && performanceLoss && !d->existsBufferingDisplay())

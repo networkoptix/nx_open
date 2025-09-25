@@ -41,8 +41,8 @@ public:
 
         matchContext.mapped = std::move(mapped);
 
-        if (std::any_of(
-            m_restPathToMatchContext.begin(), m_restPathToMatchContext.end(),
+        if (std::ranges::any_of(
+            m_restPathToMatchContext,
             [&pathTemplate](const auto& elem) { return elem.first == pathTemplate; }))
         {
             // Duplicate entry.

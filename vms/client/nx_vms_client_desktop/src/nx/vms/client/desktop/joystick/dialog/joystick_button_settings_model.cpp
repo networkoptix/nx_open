@@ -512,7 +512,8 @@ void JoystickButtonSettingsModel::setZoomSensitivity(double value)
 
 bool JoystickButtonSettingsModel::openLayoutActionIsSet() const
 {
-    return std::any_of(d->description.buttons.begin(), d->description.buttons.end(),
+    return std::ranges::any_of(
+        d->description.buttons,
         [](const ButtonDescriptor& buttonDescription)
         {
             if (buttonDescription.actions.isEmpty())

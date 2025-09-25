@@ -343,7 +343,7 @@ AnalyticsEventsSearchTreeBuilder::AnalyticsEventsSearchTreeBuilder(
     auto notifyAboutResourceListChanges =
         [this](const QnResourceList& resources)
         {
-            if (std::any_of(resources.cbegin(), resources.cend(), &isManageableResource))
+            if (std::ranges::any_of(resources, &isManageableResource))
                 updateEventTypesTree();
         };
 
@@ -456,7 +456,7 @@ AnalyticsObjectsSearchTreeBuilder::AnalyticsObjectsSearchTreeBuilder(
     auto notifyAboutResourceListChanges =
         [this](const QnResourceList& resources)
         {
-            if (std::any_of(resources.cbegin(), resources.cend(), &isManageableResource))
+            if (std::ranges::any_of(resources, &isManageableResource))
                 emit objectTypesTreeChanged();
         };
 

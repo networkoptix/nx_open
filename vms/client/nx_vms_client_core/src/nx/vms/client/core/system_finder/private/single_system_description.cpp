@@ -225,7 +225,8 @@ bool SingleSystemDescription::isReachable() const
 bool SingleSystemDescription::hasLocalServer() const
 {
     const auto systemServers = servers();
-    return std::any_of(systemServers.cbegin(), systemServers.cend(),
+    return std::ranges::any_of(
+        systemServers,
         [this](const auto& moduleInformation)
         {
             const auto host = getServerHost(moduleInformation.id).host();

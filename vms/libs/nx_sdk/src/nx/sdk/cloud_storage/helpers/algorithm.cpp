@@ -220,7 +220,7 @@ bool bookmarkMatches(const Bookmark& bookmark, const BookmarkFilter& filter)
     if (!filter.deviceIds.empty())
     {
         const bool deviceMatches = std::any_of(
-            filter.deviceIds.cbegin(), filter.deviceIds.cend(),
+            filter.deviceIds.cbegin(),filter.deviceIds.cend(),
             [&bookmark](const auto& id) { return id == bookmark.deviceId; });
 
         if (!deviceMatches)
@@ -257,8 +257,8 @@ bool bookmarkMatches(const Bookmark& bookmark, const BookmarkFilter& filter)
             if (bookmark.tags.empty())
                 return false;
 
-            const bool hasMatchingTag = std::any_of(bookmark.tags.cbegin(),
-                bookmark.tags.cend(),
+            const bool hasMatchingTag = std::any_of(
+                bookmark.tags.cbegin(),bookmark.tags.cend(),
                 [&filter](const auto& tag)
                 { return tag.find(*filter.text) != std::string::npos; });
 
@@ -318,7 +318,7 @@ bool motionMaches(const Motion& motion, const MotionFilter& filter)
     if (!filter.deviceIds.empty())
     {
         const bool deviceMatches = std::any_of(
-            filter.deviceIds.cbegin(), filter.deviceIds.cend(),
+            filter.deviceIds.cbegin(),filter.deviceIds.cend(),
             [&motion](const auto& id) { return id == motion.deviceId; });
 
         if (!deviceMatches)
@@ -358,7 +358,7 @@ bool objectTrackMatches(const ObjectTrack& objectTrack, const AnalyticsFilter& f
     if (!filter.deviceIds.empty())
     {
         const bool deviceIdMatches = std::any_of(
-            filter.deviceIds.cbegin(), filter.deviceIds.cend(),
+            filter.deviceIds.cbegin(),filter.deviceIds.cend(),
             [&objectTrack](const auto& id) { return id == objectTrack.deviceId; });
 
         if (!deviceIdMatches)
@@ -368,7 +368,7 @@ bool objectTrackMatches(const ObjectTrack& objectTrack, const AnalyticsFilter& f
     if (!filter.objectTypeIds.empty())
     {
         const bool objectTypeIdMatches = std::any_of(
-            filter.objectTypeIds.cbegin(), filter.objectTypeIds.cend(),
+            filter.objectTypeIds.cbegin(),filter.objectTypeIds.cend(),
             [&objectTrack](const auto& filterTypeId)
             {
                 return objectTrack.objectTypeId.find(filterTypeId) != std::string::npos;

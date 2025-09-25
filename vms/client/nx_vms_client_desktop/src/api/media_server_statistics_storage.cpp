@@ -199,7 +199,7 @@ void QnMediaServerStatisticsStorage::handleStatisticsReply(
 
         const auto isValid = [](qreal value) { return value != kNoDataValue; };
 
-        if (std::any_of(stats.values.cbegin(), stats.values.cend(), isValid))
+        if (std::ranges::any_of(stats.values, isValid))
             stats.values.enqueue(kNoDataValue);
         else
             m_history.remove(id);

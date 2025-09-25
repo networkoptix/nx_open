@@ -766,7 +766,7 @@ bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr
         return false;
 
     const auto& values = videowall->items()->getItems().values();
-    return std::any_of(values.begin(), values.end(), offlineItemOnThisPc());
+    return std::ranges::any_of(values, offlineItemOnThisPc());
 }
 
 void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourcePtr& videoWall)
@@ -2207,13 +2207,15 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     };
     Action dropAction = Action::NoAction;
 
-    bool hasDesktopCamera = std::any_of(targetResources.begin(), targetResources.end(),
+    bool hasDesktopCamera = std::ranges::any_of(
+        targetResources,
         [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::desktop_camera); });
 
     if (currentLayout)
     {
         const auto& values = currentLayout->getItems().values();
-        hasDesktopCamera |= std::any_of(values.begin(), values.end(),
+        hasDesktopCamera |= std::ranges::any_of(
+            values,
             [this](const LayoutItemData &item)
             {
                 QnResourcePtr childResource = resourcePool()->getResourceById(item.resource.id);

@@ -61,11 +61,12 @@ void toggleSelectedRows(
             }
 
             const bool anyUnchecked =
-                std::any_of(applicableCheckboxIndexes.cbegin(), applicableCheckboxIndexes.cend(),
-                [](const QModelIndex& index)
-                {
-                    return index.data(Qt::CheckStateRole).toInt() != Qt::Checked;
-                });
+                std::ranges::any_of(
+                    applicableCheckboxIndexes,
+                    [](const QModelIndex& index)
+                    {
+                        return index.data(Qt::CheckStateRole).toInt() != Qt::Checked;
+                    });
 
             const int newValue = anyUnchecked ? Qt::Checked : Qt::Unchecked;
 

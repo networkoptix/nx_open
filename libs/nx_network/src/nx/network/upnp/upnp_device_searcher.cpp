@@ -297,7 +297,8 @@ void DeviceSearcher::dispatchDiscoverPackets()
         NX_ASSERT(lock);
         for( const auto& handler : m_handlers )
         {
-            if (std::any_of(handler.second.begin(), handler.second.end(),
+            if (std::ranges::any_of(
+                handler.second,
                 [](const std::pair<SearchHandler*, uintptr_t>& value)
                 {
                     return value.first->isEnabled();

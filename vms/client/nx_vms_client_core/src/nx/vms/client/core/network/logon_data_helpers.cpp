@@ -51,7 +51,8 @@ std::optional<LogonData> cloudLogonData(const SystemDescriptionPtr& system, bool
     const auto servers = system->servers();
 
     // Cloud systems are initialized with a dummy server with null id.
-    const bool systemHasInitialServer = std::any_of(servers.cbegin(), servers.cend(),
+    const bool systemHasInitialServer = std::ranges::any_of(
+        servers,
         [system](const nx::vms::api::ModuleInformationWithAddresses& server)
         {
             return server.id.isNull() && isCloudUrl(system->getServerHost(nx::Uuid()));

@@ -78,7 +78,8 @@ void SimpleSelectionTableView::setupHeader()
             const QModelIndex& /*bottomRight*/,
             QVector<int> roles)
         {
-            const bool containsCheckedRole = std::any_of(roles.begin(), roles.end(),
+            const bool containsCheckedRole = std::ranges::any_of(
+                roles,
                 [](int role) { return role == Qt::CheckStateRole; });
             if (!containsCheckedRole)
                 return;

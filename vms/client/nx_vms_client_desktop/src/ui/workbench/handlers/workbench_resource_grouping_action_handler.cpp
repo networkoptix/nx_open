@@ -167,13 +167,13 @@ void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
         };
 
     QnResourceList resourcesWithinTopLevelNode;
-    if (std::any_of(resources.begin(), resources.end(), isCamera))
+    if (std::ranges::any_of(resources, isCamera))
     {
         const bool serversShownInTree = context()->resourceTreeSettings()->showServersInTree();
         resourcesWithinTopLevelNode = context()->system()->resourcePool()->getAllCameras(
             serversShownInTree ? resources[0]->getParentResource() : QnResourcePtr());
     }
-    else if (std::any_of(resources.begin(), resources.end(), isLayout))
+    else if (std::ranges::any_of(resources, isLayout))
     {
         resourcesWithinTopLevelNode = context()->system()->resourcePool()->getResources<core::LayoutResource>();
     }
