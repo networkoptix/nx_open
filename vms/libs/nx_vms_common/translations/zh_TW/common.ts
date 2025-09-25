@@ -1524,7 +1524,7 @@
     </message>
     <message>
       <source>Organization Id.</source>
-      <translation>組織 Id.</translation>
+      <translation>組織用戶 Id。</translation>
     </message>
     <message>
       <source>Cloud Site ID.</source>

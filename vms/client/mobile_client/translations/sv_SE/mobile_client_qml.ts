@@ -1062,19 +1062,19 @@
     <name>SslCertificateDialog</name>
     <message>
       <source>Common name</source>
-      <translation>Vanligt namn</translation>
+      <translation type="unfinished">Common name</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation>Utfärdad av</translation>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>Förfaller</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>Fingeravtryck</translation>
+      <translation type="unfinished">Fingerprints</translation>
     </message>
   </context>
   <context>

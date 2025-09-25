@@ -1062,19 +1062,19 @@
     <name>SslCertificateDialog</name>
     <message>
       <source>Common name</source>
-      <translation>Algemene naam</translation>
+      <translation type="unfinished">Common name</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation>Uitgegeven door</translation>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>Verloopt</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>Vingerafdruk</translation>
+      <translation type="unfinished">Fingerprints</translation>
     </message>
   </context>
   <context>

@@ -1068,15 +1068,15 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation>Выдан</translation>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>Срок действия</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>Отпечатки пальцев</translation>
+      <translation type="unfinished">Fingerprints</translation>
     </message>
   </context>
   <context>

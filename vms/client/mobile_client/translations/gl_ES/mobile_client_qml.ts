@@ -1062,19 +1062,19 @@
     <name>SslCertificateDialog</name>
     <message>
       <source>Common name</source>
-      <translation>Nome común</translation>
+      <translation type="unfinished">Common name</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation>Emitido por</translation>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>Caduca</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>Pegadas</translation>
+      <translation type="unfinished">Fingerprints</translation>
     </message>
   </context>
   <context>

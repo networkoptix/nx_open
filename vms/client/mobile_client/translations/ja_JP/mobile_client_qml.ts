@@ -1061,19 +1061,19 @@
     <name>SslCertificateDialog</name>
     <message>
       <source>Common name</source>
-      <translation>一般名</translation>
+      <translation type="unfinished">Common name</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation>発行者</translation>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>有効期限</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>フィンガープリント</translation>
+      <translation type="unfinished">Fingerprints</translation>
     </message>
   </context>
   <context>
