@@ -118,11 +118,6 @@
       <translation>請先啟用雙重驗證。</translation>
     </message>
     <message>
-      <source>You can enable two-factor authentication in your %1.</source>
-      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>您可以在 %1中啟用雙重驗證功能。</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>連接失敗</translation>
     </message>
@@ -167,11 +162,6 @@
       <translation>請聯絡站點管理員以重新取得存取權限。</translation>
     </message>
     <message>
-      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>若要登入此站點，請在 %2中停用 &quot;每次使用 %1 帳號登入時皆要求輸入驗證碼&quot;。</translation>
-    </message>
-    <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>此使用者已被站點管理員停用。</translation>
     </message>
@@ -182,6 +172,15 @@
     <message>
       <source>Failed to access site.</source>
       <translation>未能連接站點.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your account settings.</source>
+      <translation type="unfinished">You can enable two-factor authentication in your account settings.</translation>
     </message>
   </context>
   <context>
@@ -378,7 +377,7 @@
     <name>nx::vms::client::core::OrganizationsModel</name>
     <message>
       <source>Organizations</source>
-      <translation>組織</translation>
+      <translation>組織用戶</translation>
     </message>
     <message>
       <source>Folders</source>

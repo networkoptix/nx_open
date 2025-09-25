@@ -455,6 +455,17 @@
     </message>
   </context>
   <context>
+    <name>InvalidOrChangedCertificateDialog</name>
+    <message>
+      <source>Connect Anyway</source>
+      <translation type="unfinished">Connect Anyway</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
@@ -784,7 +795,7 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation>組織</translation>
+      <translation>組織用戶</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -796,7 +807,7 @@
     </message>
     <message>
       <source>No Organizations</source>
-      <translation>沒有組織</translation>
+      <translation>沒有組織用戶</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -824,15 +835,15 @@
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation>在雲端入口網站中建立一個組織並從此處造訪</translation>
+      <translation>在雲端入口網站中建立一個組織用戶並從此處造訪</translation>
     </message>
     <message>
       <source>The resources in this organization are not available to your permission group</source>
-      <translation>您的權限群組無法使用此組織中的資源</translation>
+      <translation>您的權限群組無法使用此組織用戶中的資源</translation>
     </message>
     <message>
       <source>Connect a site to the organization to access it here</source>
-      <translation>將站點連接到組織以便在此處訪問</translation>
+      <translation>將站點連接到組織用戶以便在此處訪問</translation>
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
@@ -1058,22 +1069,29 @@
     </message>
   </context>
   <context>
-    <name>SslCertificateDialog</name>
+    <name>SslCertificateDialogBase</name>
     <message>
       <source>Common name</source>
-      <translation>通用名稱</translation>
+      <translation type="unfinished">Common name</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation>發行者</translation>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>到期日</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>憑證指紋</translation>
+      <translation type="unfinished">Fingerprints</translation>
+    </message>
+  </context>
+  <context>
+    <name>StandardPopup</name>
+    <message>
+      <source>OK</source>
+      <translation type="unfinished">OK</translation>
     </message>
   </context>
   <context>
@@ -1098,6 +1116,28 @@
     <message>
       <source>Period</source>
       <translation>週期</translation>
+    </message>
+  </context>
+  <context>
+    <name>TwoFactorAuthenticationErrorDialog</name>
+    <message>
+      <source>OK</source>
+      <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+      <source>Open account settings</source>
+      <translation type="unfinished">Open account settings</translation>
+    </message>
+  </context>
+  <context>
+    <name>UnknownSslCertificateDialog</name>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation type="unfinished">Continue</translation>
     </message>
   </context>
   <context>
@@ -1185,7 +1225,7 @@
     </message>
     <message>
       <source>2FA Disabled</source>
-      <translation type="unfinished">2FA Disabled</translation>
+      <translation>已停用 2FA</translation>
     </message>
   </context>
   <context>

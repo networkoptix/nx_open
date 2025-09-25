@@ -7421,7 +7421,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
-      <translation>通路夥伴使用者的存取權限是在組織層級進行管理，因此不會出現在站點的使用者管理頁面。&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;了解更多&lt;/a&gt;</translation>
+      <translation>通路夥伴使用者的存取權限是在組織用戶層級進行管理，因此不會出現在站點的使用者管理頁面。&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;了解更多&lt;/a&amp;gt；</translation>
     </message>
   </context>
   <context>
@@ -9094,11 +9094,11 @@ Site performance is degraded.</source>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation>此群組是透過組織層級分配，因此只能在組織層級中管理</translation>
+      <translation>此群組是透過組織用戶層級分配，因此只能在組織用戶層級中管理</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation>此使用者是在組織層級分配到此群組，因此只能在組織層級取消分配</translation>
+      <translation>此使用者是在組織用戶層級分配到此群組，因此只能在組織用戶層級取消分配</translation>
     </message>
   </context>
   <context>
@@ -9721,7 +9721,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>User management for organization users is available only at the organization level, not the site level</source>
-      <translation>組織使用者管理僅能在組織層級設定，無法在站點層級設定。</translation>
+      <translation>組織用戶使用者管理僅能在組織用戶層級設定，無法在站點層級設定</translation>
     </message>
   </context>
   <context>
@@ -10970,7 +10970,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-      <translation>該站點超出了組織的限制，可能很快就會無法運作。請調整您的使用量以避免服務中斷。</translation>
+      <translation>該站點超出了組織用戶的限制，可能很快就會無法運作。請調整您的使用量以避免服務中斷。</translation>
     </message>
     <message>
       <source>Open Settings</source>
@@ -11365,7 +11365,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Organization user</source>
-      <translation>組織使用者</translation>
+      <translation>組織用戶使用者</translation>
     </message>
     <message>
       <source>Channel Partner user</source>

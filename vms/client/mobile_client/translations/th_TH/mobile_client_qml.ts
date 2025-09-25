@@ -455,6 +455,17 @@
     </message>
   </context>
   <context>
+    <name>InvalidOrChangedCertificateDialog</name>
+    <message>
+      <source>Connect Anyway</source>
+      <translation type="unfinished">Connect Anyway</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
@@ -1058,22 +1069,29 @@
     </message>
   </context>
   <context>
-    <name>SslCertificateDialog</name>
+    <name>SslCertificateDialogBase</name>
     <message>
       <source>Common name</source>
-      <translation>ชื่อทั่วไป:</translation>
+      <translation type="unfinished">Common name</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation>ออกโดย</translation>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>หมดอายุแล้ว</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>ลายนิ้วมือ</translation>
+      <translation type="unfinished">Fingerprints</translation>
+    </message>
+  </context>
+  <context>
+    <name>StandardPopup</name>
+    <message>
+      <source>OK</source>
+      <translation type="unfinished">OK</translation>
     </message>
   </context>
   <context>
@@ -1098,6 +1116,28 @@
     <message>
       <source>Period</source>
       <translation type="unfinished">Period</translation>
+    </message>
+  </context>
+  <context>
+    <name>TwoFactorAuthenticationErrorDialog</name>
+    <message>
+      <source>OK</source>
+      <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+      <source>Open account settings</source>
+      <translation type="unfinished">Open account settings</translation>
+    </message>
+  </context>
+  <context>
+    <name>UnknownSslCertificateDialog</name>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation type="unfinished">Continue</translation>
     </message>
   </context>
   <context>

@@ -118,11 +118,6 @@
       <translation>Wymagane jest uwierzytelnianie dwuskładnikowe.</translation>
     </message>
     <message>
-      <source>You can enable two-factor authentication in your %1.</source>
-      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Możesz włączyć uwierzytelnianie dwuskładnikowe w swoim %1.</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>Błąd połączenia</translation>
     </message>
@@ -167,11 +162,6 @@
       <translation>Skontaktuj się z administratorem witryny, aby odzyskać dostęp.</translation>
     </message>
     <message>
-      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Aby zalogować się do tej witryny, wyłącz opcję &quot;Żądaj kodu weryfikacyjnego przy każdym logowaniu na swoje konto %1&quot; w %2.</translation>
-    </message>
-    <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>Ten użytkownik został wyłączony przez administratora witryny.</translation>
     </message>
@@ -182,6 +172,15 @@
     <message>
       <source>Failed to access site.</source>
       <translation>Nie udało się uzyskać dostępu do witryny.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your account settings.</source>
+      <translation type="unfinished">You can enable two-factor authentication in your account settings.</translation>
     </message>
   </context>
   <context>
