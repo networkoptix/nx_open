@@ -129,6 +129,7 @@ BaseCameraButtonController::~BaseCameraButtonController()
 void BaseCameraButtonController::setResourceInternal(const QnResourcePtr& resource)
 {
     base_type::setResourceInternal(resource);
+
     d->setupCamera();
 }
 
