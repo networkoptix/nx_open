@@ -15,6 +15,7 @@ inline QString shortVendorByName(const QString& vendor)
         {"ipnc", "dw"},
         {"acti corporation", "acti"},
         {"innovative security designs", "isd"},
+        {"vista_", "vista"},
         {"norbain_", "vista"},
         {"norbain", "vista"},
         {"flir systems", "flir"},
