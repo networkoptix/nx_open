@@ -10112,7 +10112,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
     <message>
       <source>User management for organization users is available only at the organization level, not the system level</source>
-      <translation>組織使用者管理僅能在組織層級設定，無法在系統層級設定。</translation>
+      <translation>組織用戶使用者管理僅能在組織用戶層級設定，無法在系統層級設定</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this user</source>
