@@ -245,7 +245,7 @@ void SoftwareTriggerCameraButtonController::Private::updateButtons()
         }();
 
     const auto handleRule =
-        [this, &removedIds](auto rule)
+        [this, &removedIds](const auto& rule)
         {
             /**
              * We should not remove any processed rule since the button for it either has been
@@ -255,15 +255,18 @@ void SoftwareTriggerCameraButtonController::Private::updateButtons()
             removedIds.remove(rule->id());
         };
 
-    if (isVmsRulesSupported(q->systemContext()))
+    if (q->resource())
     {
-        for (const auto& [_, rule]: q->systemContext()->vmsRulesEngine()->rules())
-            handleRule(rule.get());
-    }
-    else
-    {
-        for (const auto& rule: q->systemContext()->eventRuleManager()->rules())
-            handleRule(rule);
+        if (isVmsRulesSupported(q->systemContext()))
+        {
+            for (const auto& [_, rule]: q->systemContext()->vmsRulesEngine()->rules())
+                handleRule(rule.get());
+        }
+        else
+        {
+            for (const auto& rule: q->systemContext()->eventRuleManager()->rules())
+                handleRule(rule);
+        }
     }
 
     for (const auto& id: removedIds)
