@@ -456,6 +456,17 @@
     </message>
 </context>
 <context>
+    <name>InvalidOrChangedCertificateDialog</name>
+    <message>
+        <source>Connect Anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LayoutSheet</name>
     <message>
         <source>Layouts</source>
@@ -1059,22 +1070,29 @@
     </message>
 </context>
 <context>
-    <name>SslCertificateDialog</name>
+    <name>SslCertificateDialogBase</name>
     <message>
         <source>Common name</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Issued by</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Expires</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Fingerprints</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StandardPopup</name>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1099,6 +1117,28 @@
     <message>
         <source>Period</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>TwoFactorAuthenticationErrorDialog</name>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open account settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UnknownSslCertificateDialog</name>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
