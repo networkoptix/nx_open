@@ -12,6 +12,8 @@
 #include <nx/utils/algorithm/same.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
@@ -34,6 +36,12 @@ ModeByIdHash filtered(ModeByIdHash source, QnResourcePool* resourcePool)
     QSet<nx::Uuid> existingItems;
     for (const auto& layout: resourcePool->getResources<QnLayoutResource>())
         existingItems.unite(nx::utils::toQSet(layout->getItems().keys()));
+
+    for (const auto& cloudLayout: nx::vms::client::core::appContext()
+        ->cloudLayoutsPool()->getResources<core::CrossSystemLayoutResource>())
+    {
+        existingItems.unite(nx::utils::toQSet(cloudLayout->getItems().keys()));
+    }
 
     const auto storedItems = nx::utils::toQSet(source.keys());
 
