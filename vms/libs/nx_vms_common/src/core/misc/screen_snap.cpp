@@ -43,7 +43,8 @@ int QnScreenSnap::snapsPerScreen()
 
 bool QnScreenSnaps::isValid() const
 {
-    return std::all_of(values.cbegin(), values.cend(),
+    return std::ranges::all_of(
+        values,
         [](const QnScreenSnap &snap)
         {
             return snap.isValid();

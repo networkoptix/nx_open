@@ -137,8 +137,8 @@ Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallItem& item)
             emit r->itemRemoved(r, item);
 
             const auto& items = r->items()->getItems();
-            const bool lastItemFromThisPc = std::all_of(
-                items.begin(), items.end(),
+            const bool lastItemFromThisPc = std::ranges::all_of(
+                items,
                 [pcUuid = item.pcUuid](const QnVideoWallItem& item)
                 {
                     return item.pcUuid != pcUuid;

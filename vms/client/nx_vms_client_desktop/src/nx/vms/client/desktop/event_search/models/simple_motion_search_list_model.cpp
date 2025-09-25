@@ -166,7 +166,8 @@ void SimpleMotionSearchListModel::setFilterRegions(const MotionSelection& value)
 
 bool SimpleMotionSearchListModel::isFilterEmpty() const
 {
-    return std::all_of(d->filterRegions.cbegin(), d->filterRegions.cend(),
+    return std::ranges::all_of(
+        d->filterRegions,
         [](const QRegion& region)
         {
             return region.isEmpty();

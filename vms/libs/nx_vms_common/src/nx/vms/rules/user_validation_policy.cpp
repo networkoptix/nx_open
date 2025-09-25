@@ -298,7 +298,7 @@ bool QnRequiredAccessRightPolicy::isSubjectValid(
     if (!m_cameras.isEmpty())
     {
         return allSelectedCamerasRequired
-            ? std::all_of(m_cameras.begin(), m_cameras.end(), hasPermissionForCamera)
+            ? std::ranges::all_of(m_cameras, hasPermissionForCamera)
             : std::ranges::any_of(m_cameras, hasPermissionForCamera);
     }
 

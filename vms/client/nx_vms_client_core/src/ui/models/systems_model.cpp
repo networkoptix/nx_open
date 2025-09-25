@@ -699,7 +699,8 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
     const SystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();
-    return std::all_of(servers.cbegin(), servers.cend(),
+    return std::ranges::all_of(
+        servers,
         [systemDescription](const nx::vms::api::ModuleInformation& serverInfo)
         {
             if (!systemDescription->isReachableServer(serverInfo.id))
@@ -717,7 +718,8 @@ bool QnSystemsModelPrivate::isCompatibleCustomization(
     const SystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();
-    return std::all_of(servers.cbegin(), servers.cend(),
+    return std::ranges::all_of(
+        servers,
         [systemDescription](const nx::vms::api::ModuleInformation& serverInfo)
         {
             if (!systemDescription->isReachableServer(serverInfo.id))

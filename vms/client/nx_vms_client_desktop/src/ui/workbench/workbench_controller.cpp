@@ -681,9 +681,8 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos)
                 return;
 
             menu->installEventFilter(new menu::MenuEventFilter());
-            const bool isWebWidget = std::all_of(
-                materializedItems.cbegin(),
-                materializedItems.cend(),
+            const bool isWebWidget = std::ranges::all_of(
+                materializedItems,
                 [](WeakGraphicsItemPointer p)
                 {
                     return dynamic_cast<QnWebResourceWidget*>(p.data());

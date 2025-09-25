@@ -308,7 +308,7 @@ int UsageHelper::calculateOverflowLicenses(
 bool UsageHelper::isValid() const
 {
     const auto& types = licenseTypes();
-    return std::all_of(types.begin(), types.end(), [this](Qn::LicenseType lt) { return isValid(lt); });
+    return std::ranges::all_of(types, [this](Qn::LicenseType lt) { return isValid(lt); });
 }
 
 bool UsageHelper::isValid(Qn::LicenseType licenseType) const
@@ -474,7 +474,8 @@ bool CamLicenseUsageHelper::canEnableRecording(
     }
     invalidate();
 
-    const bool result = std::all_of(allLicenseTypes.cbegin(), allLicenseTypes.cend(),
+    const bool result = std::ranges::all_of(
+        allLicenseTypes,
         [&](Qn::LicenseType licenseType)
         {
             if (camerasLicenses.contains(licenseType))

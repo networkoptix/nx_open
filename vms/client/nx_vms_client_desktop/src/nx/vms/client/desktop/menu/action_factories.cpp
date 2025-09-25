@@ -374,7 +374,8 @@ QAction* ShowOnItemsFactory::initInfoAction(const Parameters& parameters, QObjec
         action->setShortcuts({QKeySequence("I"), QKeySequence("Alt+I")});
     action->setShortcutVisibleInContextMenu(true);
     action->setCheckable(true);
-    action->setChecked(std::all_of(actualWidgets.begin(), actualWidgets.end(),
+    action->setChecked(std::ranges::all_of(
+        actualWidgets,
         [](QnResourceWidget* widget) { return widget->isInfoVisible(); }));
 
     connect(action, &QAction::triggered, this,
@@ -402,7 +403,8 @@ QAction* ShowOnItemsFactory::initObjectsAction(const Parameters& parameters, QOb
 
     const auto action = new QAction(tr("Objects"), parent);
     action->setCheckable(true);
-    action->setChecked(std::all_of(actualWidgets.begin(), actualWidgets.end(),
+    action->setChecked(std::ranges::all_of(
+        actualWidgets,
         [](QnMediaResourceWidget* widget)
         {
             return widget->isAnalyticsObjectsVisible()
@@ -444,7 +446,8 @@ QAction* ShowOnItemsFactory::initRoiAction(const Parameters& parameters, QObject
 
     const auto action = new QAction(tr("Regions of Interest"), parent);
     action->setCheckable(true);
-    action->setChecked(std::all_of(actualWidgets.begin(), actualWidgets.end(),
+    action->setChecked(std::ranges::all_of(
+        actualWidgets,
         [](QnMediaResourceWidget* widget)
         {
             return widget->isRoiVisible();
@@ -487,7 +490,8 @@ QAction* ShowOnItemsFactory::initHotspotsAction(const Parameters& parameters, QO
     action->setShortcuts({QKeySequence("H"), QKeySequence("Alt+H")});
     action->setShortcutVisibleInContextMenu(true);
     action->setCheckable(true);
-    action->setChecked(std::all_of(widgetsWithHotspots.begin(), widgetsWithHotspots.end(),
+    action->setChecked(std::ranges::all_of(
+        widgetsWithHotspots,
         [](QnMediaResourceWidget* widget) { return widget->hotspotsVisible(); }));
 
     connect(action, &QAction::triggered, this,
@@ -520,8 +524,8 @@ QAction* ShowOnItemsFactory::initToolbarAction(const Parameters& parameters, QOb
     const auto action = new QAction(tr("Toolbar"), parent);
     action->setCheckable(true);
 
-    const bool allToolbarsAreVisible = std::all_of(
-        webResourceWidgets.begin(), webResourceWidgets.end(),
+    const bool allToolbarsAreVisible = std::ranges::all_of(
+        webResourceWidgets,
         [](QnWebResourceWidget* widget) { return widget->overlayIsVisible(); });
     action->setChecked(allToolbarsAreVisible);
 

@@ -105,7 +105,8 @@ bool allUserGroupsExist(SystemContext* systemContext, const IdList& groupIds)
         return false;
 
     const auto manager = systemContext->userGroupManager();
-    return std::all_of(groupIds.begin(), groupIds.end(),
+    return std::ranges::all_of(
+        groupIds,
         [manager](const auto& id) { return manager->contains(id); });
 }
 

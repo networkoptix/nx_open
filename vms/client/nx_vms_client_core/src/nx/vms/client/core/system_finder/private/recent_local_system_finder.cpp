@@ -42,7 +42,8 @@ void RecentLocalSystemFinder::updateSystems()
         if (id.isNull() || connection.urls.isEmpty())
             continue;
 
-        const bool hasOnlyCloudUrls = std::all_of(connection.urls.cbegin(), connection.urls.cend(),
+        const bool hasOnlyCloudUrls = std::ranges::all_of(
+            connection.urls,
             [](const nx::Url& url)
             {
                 return nx::network::SocketGlobals::addressResolver().isCloudHostname(url.host());

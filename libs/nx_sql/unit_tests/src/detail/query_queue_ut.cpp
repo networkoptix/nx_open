@@ -292,8 +292,8 @@ protected:
                 [expectedQueryType](QueryType type) { return type == expectedQueryType; });
 
         ASSERT_EQ(expectedQueryCount, m_executedQueries.size());
-        ASSERT_TRUE(std::all_of(
-            m_executedQueries.begin(), m_executedQueries.end(),
+        ASSERT_TRUE(std::ranges::all_of(
+            m_executedQueries,
             [expectedQueryType](QueryType type) { return type == expectedQueryType; }));
     }
 

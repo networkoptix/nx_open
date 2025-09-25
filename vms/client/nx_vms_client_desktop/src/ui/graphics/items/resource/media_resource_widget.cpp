@@ -945,8 +945,6 @@ void QnMediaResourceWidget::updateIoModuleComponents()
     }
 }
 
-
-
 QnMediaResourceWidget::AreaType QnMediaResourceWidget::areaSelectionType() const
 {
     return m_areaSelectionType;
@@ -1678,9 +1676,8 @@ const MotionSelection& QnMediaResourceWidget::motionSelection() const
 
 bool QnMediaResourceWidget::isMotionSelectionEmpty() const
 {
-    return std::all_of(
-        m_motionSelection.cbegin(),
-        m_motionSelection.cend(),
+    return std::ranges::all_of(
+        m_motionSelection,
          [](const QRegion& r) { return r.isEmpty(); });
 }
 

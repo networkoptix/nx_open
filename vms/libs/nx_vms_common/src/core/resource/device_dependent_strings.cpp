@@ -111,8 +111,8 @@ bool QnCameraDeviceStringSet::isValid() const
     const auto stringIsValid =
         [](const QString& value) { return !value.isEmpty(); };
 
-    return std::all_of(m_singularStrings.cbegin(), m_singularStrings.cend(), stringIsValid)
-        && std::all_of(m_pluralStrings.cbegin(), m_pluralStrings.cend(), stringIsValid);
+    return std::ranges::all_of(m_singularStrings, stringIsValid)
+        && std::ranges::all_of(m_pluralStrings, stringIsValid);
 }
 
 //-------------------------------------------------------------------------------------------------

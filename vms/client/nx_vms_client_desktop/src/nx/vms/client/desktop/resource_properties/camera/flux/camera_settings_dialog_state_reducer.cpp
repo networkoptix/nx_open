@@ -312,11 +312,13 @@ State loadNetworkInfo(State state, const Camera& camera)
 State::ImageControlSettings calculateImageControlSettings(
     const Cameras& cameras)
 {
-    const bool hasVideo = std::all_of(cameras.cbegin(), cameras.cend(),
+    const bool hasVideo = std::ranges::all_of(
+        cameras,
         [](const auto& camera) { return camera->hasVideo(); });
 
     State::ImageControlSettings result;
-    result.aspectRatioAvailable = hasVideo && std::all_of(cameras.cbegin(), cameras.cend(),
+    result.aspectRatioAvailable = hasVideo && std::ranges::all_of(
+        cameras,
         [](const auto& camera) { return !camera->hasFlags(Qn::virtual_camera); });
 
     if (result.aspectRatioAvailable)
@@ -2241,7 +2243,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setRecordingEnabled(
     {
         const auto schedule = state.recording.schedule.valueOr({});
         const bool scheduleIsEmpty = schedule.empty()
-            || std::all_of(schedule.cbegin(), schedule.cend(),
+            || std::ranges::all_of(
+                schedule,
                 [](const QnScheduleTask& task)
                 {
                     return task.recordingType == RecordingType::never;

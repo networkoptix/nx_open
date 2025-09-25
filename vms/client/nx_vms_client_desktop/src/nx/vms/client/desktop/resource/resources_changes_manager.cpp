@@ -203,7 +203,8 @@ void ResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList
     if (!NX_ASSERT(systemContext))
         return;
 
-    NX_ASSERT(std::all_of(cameras.cbegin(), cameras.cend(),
+    NX_ASSERT(std::ranges::all_of(
+        cameras,
         [systemContext](const auto& camera)
         {
             return SystemContext::fromResource(camera) == systemContext;
@@ -264,7 +265,8 @@ void ResourcesChangesManager::saveCamerasCore(
     if (!NX_ASSERT(systemContext))
         return;
 
-    NX_ASSERT(std::all_of(cameras.cbegin(), cameras.cend(),
+    NX_ASSERT(std::ranges::all_of(
+        cameras,
         [systemContext](const auto& camera)
         {
             return SystemContext::fromResource(camera) == systemContext;

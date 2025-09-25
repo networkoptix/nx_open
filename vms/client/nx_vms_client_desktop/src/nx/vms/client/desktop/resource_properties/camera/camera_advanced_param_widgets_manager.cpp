@@ -471,8 +471,8 @@ CameraAdvancedParamWidgetsManager::DependencyHandler
             if (!widget)
                 return false;
 
-            bool allConditionsSatisfied = std::all_of(
-                dependency.conditions.cbegin(), dependency.conditions.cend(),
+            bool allConditionsSatisfied = std::ranges::all_of(
+                dependency.conditions,
                 [this](const QnCameraAdvancedParameterCondition& condition)
             {
                 using ConditionType =

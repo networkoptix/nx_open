@@ -130,7 +130,8 @@ bool filter(T* data, const Filter& filter_)
 
         if constexpr (IsArrayV<T>)
         {
-            return std::all_of(data->begin(), data->end(),
+            return std::ranges::all_of(
+                *data,
                 [&filter_](auto& v) { return filter<Matcher>(&v, filter_); });
         }
         else if constexpr (IsSequenceContainerV<T> || IsSetContainerV<T> || IsUnorderedSetContainerV<T>)

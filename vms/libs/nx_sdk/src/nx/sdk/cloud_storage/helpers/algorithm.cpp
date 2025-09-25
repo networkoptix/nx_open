@@ -329,7 +329,8 @@ bool motionMaches(const Motion& motion, const MotionFilter& filter)
         return false;
 
     const bool isEmptyFilter = std::all_of(
-        filter.regions.begin(), filter.regions.end(),
+        filter.regions.cbegin(),
+        filter.regions.cend(),
         [](const auto& rect)
         {
             return rect.isEmpty();

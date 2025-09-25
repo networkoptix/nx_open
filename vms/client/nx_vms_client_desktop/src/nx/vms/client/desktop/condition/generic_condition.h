@@ -22,7 +22,7 @@ public:
             case MatchMode::any:
                 return std::ranges::any_of(sequence, checkOne);
             case MatchMode::all:
-                return std::all_of(sequence.cbegin(), sequence.cend(), checkOne);
+                return std::ranges::all_of(sequence, checkOne);
             case MatchMode::exactlyOne:
                 return (std::count_if(sequence.cbegin(), sequence.cend(), checkOne) == 1);
             case MatchMode::none:

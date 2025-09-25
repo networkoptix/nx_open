@@ -484,7 +484,8 @@ bool SystemDescriptionAggregator::isOauthSupported() const
     if (isEmptyAggregator())
         return true;
 
-    return std::all_of(m_systems.begin(), m_systems.end(),
+    return std::ranges::all_of(
+        m_systems,
         [](const SystemDescriptionPtr& system)
         {
             return system->isOauthSupported();

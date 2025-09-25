@@ -740,7 +740,7 @@ QString UserSettingsDialog::validateLogin(const QString& login)
             if (text.trimmed().isEmpty())
                 return ValidationResult(tr("Login cannot be empty"));
 
-            if (!std::all_of(text.cbegin(), text.cend(), &isAcceptedLoginCharacter))
+            if (!std::ranges::all_of(text, &isAcceptedLoginCharacter))
             {
                 return ValidationResult(
                     tr("Only letters, numbers and symbols %1 are allowed")

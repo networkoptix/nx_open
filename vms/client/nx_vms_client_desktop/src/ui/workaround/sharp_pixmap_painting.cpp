@@ -45,13 +45,11 @@ QMatrix4x4 sharpMatrix(const QMatrix4x4& matrix, bool* corrected)
     const auto data = matrix.data();
 
     // Check for XY-only translation matrix, using lower precision than Qt.
-    if (std::all_of(
-            kZeroIndices.begin(),
-            kZeroIndices.end(),
+    if (std::ranges::all_of(
+            kZeroIndices,
             [data](auto i) { return qAbs(data[i]) < kSharpnessEps; })
-        && std::all_of(
-            kOneIndices.begin(),
-            kOneIndices.end(),
+        && std::ranges::all_of(
+            kOneIndices,
             [data](auto i) { return qAbs(data[i] - 1.0) < kSharpnessEps; }))
     {
         if (corrected)

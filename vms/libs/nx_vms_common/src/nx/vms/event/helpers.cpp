@@ -58,7 +58,8 @@ QList<EventType> allEvents(const EventTypePredicateList& predicates)
     QList<EventType> result;
     for (const auto eventType: kAllEvents)
     {
-        if (std::all_of(predicates.cbegin(), predicates.cend(),
+        if (std::ranges::all_of(
+            predicates,
             [eventType](const auto& predicate){ return predicate(eventType); }))
         {
             result.push_back(eventType);

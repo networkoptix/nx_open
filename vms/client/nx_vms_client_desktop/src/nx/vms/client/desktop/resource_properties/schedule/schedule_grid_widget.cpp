@@ -359,11 +359,11 @@ void ScheduleGridWidget::setCellData(Qt::DayOfWeek day, int hour, const QVariant
 
 bool ScheduleGridWidget::empty() const
 {
-    return std::all_of(
-        d->gridData.begin(), d->gridData.end(),
+    return std::ranges::all_of(
+        d->gridData,
         [](const Private::ColumnData& col)
         {
-            return std::all_of(col.begin(), col.end(), [](const QVariant& v){ return !v.toBool(); });
+            return std::ranges::all_of(col, [](const QVariant& v){ return !v.toBool(); });
         });
 }
 

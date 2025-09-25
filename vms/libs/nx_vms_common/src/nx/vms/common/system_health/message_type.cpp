@@ -125,7 +125,8 @@ std::set<MessageType> allMessageTypes(const MessageTypePredicateList& predicates
     for (int i = 0; i < (int) MessageType::count; ++i)
     {
         const auto messageType = static_cast<MessageType>(i);
-        if (std::all_of(predicates.cbegin(), predicates.cend(),
+        if (std::ranges::all_of(
+            predicates,
             [messageType](const auto& predicate){ return predicate(messageType); }))
         {
             result.insert(messageType);

@@ -124,7 +124,8 @@ bool QnWorkbenchLayoutsChangeValidator::confirmDeleteVideoWallMatrices(
     const QnVideoWallMatrixIndexList& matrixIndexes) const
 {
     if (!NX_ASSERT(accessController()->user())
-        || !NX_ASSERT(std::all_of(matrixIndexes.cbegin(), matrixIndexes.cend(),
+        || !NX_ASSERT(std::ranges::all_of(
+            matrixIndexes,
             [this](const QnVideoWallMatrixIndex& index)
             {
                 return index.isValid() && index.videowall()->systemContext() == systemContext();

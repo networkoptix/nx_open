@@ -240,9 +240,8 @@ bool CachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
 
         case Qn::MotionContent:
         {
-            const bool isMotionSelectionEmpty = std::all_of(
-                m_motionSelection.cbegin(),
-                m_motionSelection.cend(),
+            const bool isMotionSelectionEmpty = std::ranges::all_of(
+                m_motionSelection,
                 [](const QRegion& region) { return region.isEmpty(); });
 
             const auto filter = isMotionSelectionEmpty

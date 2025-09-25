@@ -3140,7 +3140,8 @@ bool QnVirtualCameraResource::canApplySchedule(
     bool motionDetectionAllowed,
     bool objectDetectionAllowed)
 {
-    return std::all_of(schedule.cbegin(), schedule.cend(),
+    return std::ranges::all_of(
+        schedule,
         [&](const QnScheduleTask& task)
         {
             return canApplyScheduleTask(

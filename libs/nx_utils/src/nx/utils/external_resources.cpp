@@ -79,7 +79,8 @@ bool registerExternalResourceDirectory(const QString& directory)
     const auto filenames = assetsDirectory.entryList(QDir::Filter::Files);
     g_registeredAssets[directory] = filenames;
 
-    return std::all_of(filenames.cbegin(), filenames.cend(),
+    return std::ranges::all_of(
+        filenames,
         [&assetsDirectory](const auto& filename)
         {
             const auto r = assetsDirectory.absoluteFilePath(filename);
@@ -109,7 +110,8 @@ bool unregisterExternalResourceDirectory(const QString& directory)
         "Asset list has been changed in directory: %1. Old value: %2, new value: %3",
         directory, g_registeredAssets[directory], filenames);
 
-    bool result = std::all_of(filenames.cbegin(), filenames.cend(),
+    bool result = std::ranges::all_of(
+        filenames,
         [&assetsDirectory](const auto& filename)
         {
             const auto r = assetsDirectory.absoluteFilePath(filename);

@@ -32,13 +32,15 @@ QString CompositeFilter::name() const
 
 bool CompositeFilter::matches(const nx::analytics::taxonomy::ObjectType* objectType) const
 {
-    return std::all_of(m_filters.begin(), m_filters.end(),
+    return std::ranges::all_of(
+        m_filters,
         [&](AbstractStateViewFilter* filter) { return filter->matches(objectType); });
 }
 
 bool CompositeFilter::matches(const nx::analytics::taxonomy::AbstractAttribute* attribute) const
 {
-    return std::all_of(m_filters.begin(), m_filters.end(),
+    return std::ranges::all_of(
+        m_filters,
         [&](AbstractStateViewFilter* filter) { return filter->matches(attribute); });
 }
 

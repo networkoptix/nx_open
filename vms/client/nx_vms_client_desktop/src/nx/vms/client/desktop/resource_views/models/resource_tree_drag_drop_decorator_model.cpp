@@ -99,7 +99,7 @@ bool mimeDataResourcesMatches(
     std::function<bool(const QnResourcePtr&)> predicate)
 {
     const auto resources = mimeData.resources();
-    return std::all_of(resources.begin(), resources.end(), predicate);
+    return std::ranges::all_of(resources, predicate);
 }
 
 QnMediaServerResourcePtr parentServer(const QModelIndex& index)

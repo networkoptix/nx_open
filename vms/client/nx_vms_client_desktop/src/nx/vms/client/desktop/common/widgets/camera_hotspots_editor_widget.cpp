@@ -281,7 +281,8 @@ QPoint CameraHotspotsEditorWidget::Private::resolveHotspotsCollision(
     auto isAcceptablePosition =
         [hotspotsOrigins](const QPointF& pos)
         {
-            return std::all_of(hotspotsOrigins.begin(), hotspotsOrigins.end(),
+            return std::ranges::all_of(
+                hotspotsOrigins,
                 [pos](const auto& origin)
                 {
                     static constexpr auto kTolerance = 0.01;

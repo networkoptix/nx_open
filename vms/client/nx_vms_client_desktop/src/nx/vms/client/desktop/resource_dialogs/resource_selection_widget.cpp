@@ -153,7 +153,7 @@ bool ResourceSelectionWidget::selectionHasInvalidResources() const
         return false;
 
     const auto resources = selectedResources();
-    return !std::all_of(resources.cbegin(), resources.cend(), d->resourceValidator);
+    return !std::ranges::all_of(resources, d->resourceValidator);
 }
 
 //-------------------------------------------------------------------------------------------------

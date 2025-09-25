@@ -47,7 +47,7 @@ bool isValidMotionRect(const QRect& rect)
 bool isValidMotionRegion(const QRegion& region)
 {
     return region.isNull()
-        || std::all_of(region.cbegin(), region.cend(), isValidMotionRect);
+        || std::ranges::all_of(region, isValidMotionRect);
 };
 
 bool isNullRegion(const QRegion& region)
@@ -157,7 +157,7 @@ bool QnChunksRequestData::isValid() const
         const auto motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
         if (!std::ranges::any_of(motionRegions, isValidMotionRegion))
             return false;
-        if (std::all_of(motionRegions.cbegin(), motionRegions.cend(), isNullRegion))
+        if (std::ranges::all_of(motionRegions, isNullRegion))
             return false;
     }
 

@@ -49,7 +49,8 @@ MacAddress::MacAddress(QStringView mac)
         // Check variant with delimiters. Only '-' or ':' are allowed.
         for (const QChar& c: kAllowedDelimiters)
         {
-            if (std::all_of(kDelimiterIndices.cbegin(), kDelimiterIndices.cend(),
+            if (std::ranges::all_of(
+                kDelimiterIndices,
                 [mac, c](int index) { return mac[index] == c; }))
             {
                 delimiter = c;
@@ -113,7 +114,7 @@ MacAddress MacAddress::random()
 
 bool MacAddress::isNull() const
 {
-    return std::all_of(m_data.cbegin(), m_data.cend(), [](auto byte) { return byte == 0; });
+    return std::ranges::all_of(m_data, [](auto byte) { return byte == 0; });
 }
 
 const std::array<quint8, MacAddress::kMacAddressLength>& MacAddress::bytes() const

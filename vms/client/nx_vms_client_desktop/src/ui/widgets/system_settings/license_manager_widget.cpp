@@ -575,9 +575,8 @@ void LicenseManagerWidget::updateButtons()
     ui->detailsButton->setVisible(selected.size() == 1 && !selected[0].isNull());
 
     const bool canRemoveAll = selected.size() > 0
-        && std::all_of(
-            selected.cbegin(),
-            selected.cend(),
+        && std::ranges::all_of(
+            selected,
             [this](const QnLicensePtr& license) { return canRemoveLicense(license); });
     const bool canDeactivateAny = selected.size() > 0
         && std::ranges::any_of(

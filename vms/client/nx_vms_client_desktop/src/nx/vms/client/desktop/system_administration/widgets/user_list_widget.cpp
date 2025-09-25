@@ -981,13 +981,15 @@ bool UserListWidget::Private::canDelete(const QSet<QnUserResourcePtr>& users) co
 
 bool UserListWidget::Private::canEnableDisable(const QSet<QnUserResourcePtr>& users) const
 {
-    return !users.empty() && std::all_of(users.cbegin(), users.cend(),
+    return !users.empty() && std::ranges::all_of(
+        users,
         [this](const QnUserResourcePtr& user) { return usersModel->canEnableDisable(user); });
 }
 
 bool UserListWidget::Private::canChangeAuthentication(const QSet<QnUserResourcePtr>& users) const
 {
-    return !users.empty() && std::all_of(users.cbegin(), users.cend(),
+    return !users.empty() && std::ranges::all_of(
+        users,
         [this](const QnUserResourcePtr& user)
         {
             return usersModel->canChangeAuthentication(user);

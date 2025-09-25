@@ -444,9 +444,8 @@ QnVideowallManageWidgetPrivate::ModelScreen::ModelScreen(
 
 bool QnVideowallManageWidgetPrivate::ModelScreen::free() const
 {
-    return std::all_of(
-        parts.cbegin(),
-        parts.cend(),
+    return std::ranges::all_of(
+        parts,
         [](const ModelScreenPart& part) { return part.free(); });
 }
 

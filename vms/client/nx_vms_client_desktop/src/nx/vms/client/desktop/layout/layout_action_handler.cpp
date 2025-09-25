@@ -826,7 +826,8 @@ bool LayoutActionHandler::confirmChangeVideoWallLayout(const LayoutChange& chang
 
 bool LayoutActionHandler::canRemoveLayouts(const core::LayoutResourceList &layouts)
 {
-    return std::all_of(layouts.cbegin(), layouts.cend(),
+    return std::ranges::all_of(
+        layouts,
         [](const core::LayoutResourcePtr& layout)
         {
             return ResourceAccessManager::hasPermissions(layout, Qn::RemovePermission);
@@ -1063,7 +1064,8 @@ void LayoutActionHandler::onNewUserLayoutNameChoosen(
 
     if (!existing.isEmpty())
     {
-        bool allAreLocal = std::all_of(existing.cbegin(), existing.cend(),
+        bool allAreLocal = std::ranges::all_of(
+            existing,
             [](const core::LayoutResourcePtr& layout)
             {
                 return layout->hasFlags(Qn::local);

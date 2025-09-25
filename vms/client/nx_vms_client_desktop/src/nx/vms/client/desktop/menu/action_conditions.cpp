@@ -1658,7 +1658,8 @@ ActionVisibility ItemsCountCondition::check(const Parameters& /*parameters*/, Wi
 
 ActionVisibility IoModuleCondition::check(const QnResourceList& resources, WindowContext* /*context*/)
 {
-    bool pureIoModules = std::all_of(resources.cbegin(), resources.cend(),
+    bool pureIoModules = std::ranges::all_of(
+        resources,
         [](const QnResourcePtr& resource)
         {
             if (!resource->hasFlags(Qn::io_module))
@@ -1860,7 +1861,7 @@ ActionVisibility CreateNewResourceTreeGroupCondition::check(
         return InvisibleAction;
 
     // Selection contains type of resource that cannot be placed into a group.
-    if (!std::all_of(std::cbegin(resources), std::cend(resources), resourceCanBeInCustomGroup))
+    if (!std::ranges::all_of(resources, resourceCanBeInCustomGroup))
         return DisabledAction;
 
     if (!parameters.argument(Qn::OnlyResourceTreeSiblingsRole).toBool())
@@ -2504,7 +2505,8 @@ ConditionWrapper hasPermissionsForResources(Qn::Permissions permissions)
     return new ResourcesCondition(
         [permissions](const QnResourceList& resources, WindowContext* context)
         {
-            return std::all_of(resources.begin(), resources.end(),
+            return std::ranges::all_of(
+                resources,
                 [permissions](auto resource)
                 {
                     return ResourceAccessManager::hasPermissions(resource, permissions);

@@ -312,7 +312,8 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
             if (resources.isEmpty() && required > 0)
                 return InvisibleAction;
 
-            const bool hasPermissions = std::all_of(resources.cbegin(), resources.cend(),
+            const bool hasPermissions = std::ranges::all_of(
+                resources,
                 [required](const QnResourcePtr& resource)
                 {
                     return ResourceAccessManager::hasPermissions(resource, required);
@@ -375,7 +376,8 @@ bool Action::event(QEvent* event)
         }
 
         NX_ASSERT(actions.size() > 1 && !hasRawActions
-            && std::all_of(actions.cbegin(), actions.cend(),
+            && std::ranges::all_of(
+                actions,
                 [](Action* action) { return action->flags().testFlag(IntentionallyAmbiguous); }),
             "Ambiguous shortcut overload: %1.", e->key().toString());
     }

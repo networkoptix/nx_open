@@ -1733,7 +1733,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
 
             if (m_currentWidget->resource()->hasFlags(Qn::virtual_camera))
             {
-                bool onlyVirtualCameras = std::all_of(m_syncedWidgets.begin(), m_syncedWidgets.end(),
+                bool onlyVirtualCameras = std::ranges::all_of(
+                    m_syncedWidgets,
                     [](QnMediaResourceWidget* widget)
                     {
                         return widget->resource()->hasFlags(Qn::virtual_camera);

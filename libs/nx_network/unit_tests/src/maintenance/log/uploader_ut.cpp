@@ -76,8 +76,8 @@ protected:
 
         for (;;)
         {
-            const auto found = std::all_of(
-                m_generatedLogs.begin(), m_generatedLogs.end(),
+            const auto found = std::ranges::all_of(
+                m_generatedLogs,
                 [&uploadedLogs](const std::string& str)
                 {
                     return std::ranges::any_of(
@@ -114,8 +114,8 @@ protected:
 
         auto& uploadedLogs = m_uploadedLogs[m_sessionId];
 
-        const auto found = std::all_of(
-            uploadedLogs.begin(), uploadedLogs.end(),
+        const auto found = std::ranges::all_of(
+            uploadedLogs,
             [this](const std::string& uploaded)
             {
                 return std::ranges::any_of(

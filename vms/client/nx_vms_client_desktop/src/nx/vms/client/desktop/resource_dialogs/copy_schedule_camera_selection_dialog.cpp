@@ -54,7 +54,8 @@ AlertTextProvider initAlertTextProvider(const CameraSettingsDialogState& setting
                 }
             }
 
-            const bool canApplySchedule = std::all_of(cameras.cbegin(), cameras.cend(),
+            const bool canApplySchedule = std::ranges::all_of(
+                cameras,
                 [schedule = settings.recording.schedule()]
                     (const QnVirtualCameraResourcePtr& camera)
                 {
