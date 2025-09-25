@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/utils/pending_operation.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
 
@@ -23,14 +24,15 @@ public:
 private:
     inline bool notificationHasBeenClosed() const;
     inline bool userCanSeeNotification() const;
-    inline bool systemHasChannelPartner() const;
+    inline bool systemHasHiddenUsers() const;
 
     void updateNotificationState();
 
 private:
     nx::utils::ScopedConnections m_connections;
     nx::Uuid m_notificationId;
-    bool m_hasChannelPartner = false; //< Cached value.
+    std::unique_ptr<nx::utils::PendingOperation> m_checkUsersOperation;
+    bool m_hasHiddenUsers = false; //< Cached value.
 };
 
 } // namespace nx::vms::client::desktop

@@ -23,12 +23,17 @@ bool userIsChannelPartner(const QnUserResourcePtr& user)
     return user && user->attributes().testFlag(nx::vms::api::UserAttribute::channelPartner);
 }
 
-bool systemContainsChannelPartnerUser(nx::vms::client::desktop::SystemContext* system)
+bool userIsHidden(const QnUserResourcePtr& user)
+{
+    return user && user->attributes().testFlag(nx::vms::api::UserAttribute::hidden);
+}
+
+bool systemContainsHiddenUsers(nx::vms::client::desktop::SystemContext* system)
 {
     return system->resourcePool()->contains<nx::vms::client::core::UserResource>(
         [](const nx::vms::client::core::UserResourcePtr& user)
         {
-            return userIsChannelPartner(user);
+            return userIsHidden(user);
         });
 }
 
@@ -97,21 +102,43 @@ void ChannelPartnerUserNotificationManager::handleConnect()
                 updateNotificationState();
         });
 
-    m_hasChannelPartner = systemContainsChannelPartnerUser(system());
-    updateNotificationState();
+    // A minor preliminary optimization: usage of PendingOperation prevents O(n^2) accesses
+    // to user list attributes in the case of batch user processing.
+    m_checkUsersOperation.reset(new nx::utils::PendingOperation(
+        [this]
+        {
+            m_hasHiddenUsers = systemContainsHiddenUsers(system());
+            updateNotificationState();
+        },
+        100));
+
+    // Process existing users and update the notification state.
+    handleUserAdded(system()->resourcePool()->getResources<nx::vms::client::core::UserResource>());
 }
 
 void ChannelPartnerUserNotificationManager::handleDisconnect()
 {
     m_connections.reset();
-    m_hasChannelPartner = false;
+    m_hasHiddenUsers = false;
     updateNotificationState();
 }
 
 void ChannelPartnerUserNotificationManager::handleUserAdded(const QnResourceList& resources)
 {
     for (const auto& user: resources.filtered<nx::vms::client::core::UserResource>())
-        m_hasChannelPartner |= userIsChannelPartner(user);
+    {
+        m_hasHiddenUsers |= userIsHidden(user);
+
+        // We could omit those users who don't have a `channelPartner` attribute, but it's possible
+        // theoretically that someone will change the user type on the fly (e.g., org <-> CP).
+        // Therefore, it's safer to watch over all cloud users.
+        if (user && user->userType() == api::UserType::cloud)
+        {
+            connect(
+                user.get(), &QnUserResource::attributesChanged,
+                m_checkUsersOperation.get(), &nx::utils::PendingOperation::requestOperation);
+        }
+    }
 
     updateNotificationState();
 }
@@ -120,11 +147,17 @@ void ChannelPartnerUserNotificationManager::handleUserRemoved(const QnResourceLi
 {
     bool update = false;
     for (const auto& user: resources.filtered<nx::vms::client::core::UserResource>())
-        update |= userIsChannelPartner(user);
+    {
+        update |= userIsHidden(user);
+
+        // Match the condition with the one in handleUserAdded().
+        if (user && user->userType() == api::UserType::cloud)
+            user->disconnect(this);
+    }
 
     if (update)
     {
-        m_hasChannelPartner = systemContainsChannelPartnerUser(system());
+        m_hasHiddenUsers = systemContainsHiddenUsers(system());
         updateNotificationState();
     }
 }
@@ -141,16 +174,16 @@ bool ChannelPartnerUserNotificationManager::userCanSeeNotification() const
     return !isChannelPartnerUser && isPowerUser;
 }
 
-bool ChannelPartnerUserNotificationManager::systemHasChannelPartner() const
+bool ChannelPartnerUserNotificationManager::systemHasHiddenUsers() const
 {
-    return m_hasChannelPartner;
+    return m_hasHiddenUsers;
 }
 
 void ChannelPartnerUserNotificationManager::updateNotificationState()
 {
     const bool show =
         userCanSeeNotification() && !notificationHasBeenClosed()
-            && systemHasChannelPartner();
+            && systemHasHiddenUsers();
 
     if (show)
     {
