@@ -254,6 +254,7 @@ void VisibleItemDataDecoratorModel::Private::updatePreviewProvider(int row)
     request.streamSelectionMode = index.data(PreviewStreamSelectionRole)
                                       .value<nx::api::ImageRequest::StreamSelectionMode>();
     request.objectTrackId = objectTrackId;
+    request.tolerant = true;
 
     calculatePreviewRectsInternal(request.resource, highlightRect, request.crop,
         previews[row].highlightRect);
