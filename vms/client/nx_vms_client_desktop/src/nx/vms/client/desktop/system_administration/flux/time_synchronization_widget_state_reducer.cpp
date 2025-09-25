@@ -250,9 +250,8 @@ State::Status TimeSynchronizationWidgetReducer::actualStatus(const State& state)
     }
 
     // Primary server is set but missing (e.g. during disconnect).
-    if (std::none_of(
-        state.servers.cbegin(),
-        state.servers.cend(),
+    if (std::ranges::none_of(
+        state.servers,
         [id = state.primaryServer](const auto& info) { return info.id == id; }))
     {
         return State::Status::notSynchronized;

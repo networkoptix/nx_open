@@ -1321,7 +1321,7 @@ bool RightPanelModelsAdapter::Private::isHighlighted(const QModelIndex& index) c
         [this](const QnResourcePtr& res) { return m_highlightedResources.contains(res); };
 
     const auto resources = index.data(core::ResourceListRole).value<QnResourceList>();
-    if (std::none_of(resources.cbegin(), resources.cend(), isHighlightedResource))
+    if (std::ranges::none_of(resources, isHighlightedResource))
         return false;
 
     return m_highlightedTimestamp >= timestamp

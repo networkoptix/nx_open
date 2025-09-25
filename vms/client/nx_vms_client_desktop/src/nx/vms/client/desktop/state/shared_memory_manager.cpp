@@ -457,7 +457,8 @@ int SharedMemoryManager::currentInstanceIndex() const
 bool SharedMemoryManager::isSingleInstance() const
 {
     const SharedMemoryData data = d->readData();
-    return std::none_of(data.processes.cbegin(), data.processes.cend(),
+    return std::ranges::none_of(
+        data.processes,
         [this](const auto& block) { return block.pid != 0 && block.pid != d->currentProcessPid; });
 }
 

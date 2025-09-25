@@ -1063,7 +1063,8 @@ ActionVisibility NoArchiveCondition::check(
     const QnResourceList& resources,
     WindowContext* /*context*/)
 {
-    const bool noResouceWithArchiveAccess = std::none_of(resources.begin(), resources.end(),
+    const bool noResouceWithArchiveAccess = std::ranges::none_of(
+        resources,
         [](auto resource)
         {
             return ResourceAccessManager::hasPermissions(resource,

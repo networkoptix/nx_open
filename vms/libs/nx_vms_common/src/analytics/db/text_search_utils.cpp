@@ -198,7 +198,7 @@ uint64_t TextMatcher::matchExactAttributes(
         };
 
         const bool isMatched = condition.isNegative
-            ? std::none_of(attributes.begin(), attributes.end(), comparator)
+            ? std::ranges::none_of(attributes, comparator)
             : std::ranges::any_of(attributes, comparator);
         if (isMatched)
             result |= (1ull << i);
@@ -222,7 +222,7 @@ uint64_t TextMatcher::checkAttributesPresence(
                 return isAttributeNameMatching(attr.name, condition.name);
             };
         const bool isMatched = condition.isNegative
-            ? std::none_of(attributes.begin(), attributes.end(), comparator)
+            ? std::ranges::none_of(attributes, comparator)
             : std::ranges::any_of(attributes, comparator);
         if (isMatched)
             result |= (1ull << i);

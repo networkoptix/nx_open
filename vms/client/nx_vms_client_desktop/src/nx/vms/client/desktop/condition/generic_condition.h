@@ -26,7 +26,7 @@ public:
             case MatchMode::exactlyOne:
                 return (std::count_if(sequence.cbegin(), sequence.cend(), checkOne) == 1);
             case MatchMode::none:
-                return std::none_of(sequence.cbegin(), sequence.cend(), checkOne);
+                return std::ranges::none_of(sequence, checkOne);
             default:
                 break;
         }

@@ -1363,8 +1363,9 @@ void AnalyticsSearchListModel::setLiveProcessingMode(LiveProcessingMode value)
 bool AnalyticsSearchListModel::hasOnlyLiveCameras() const
 {
     const QnVirtualCameraResourceSet& cameras = cameraSet().cameras();
-    return !cameras.empty() && std::none_of(cameras.begin(), cameras.end(),
-               [this](const QnVirtualCameraResourcePtr& camera) { return d->canViewArchive(camera); });
+    return !cameras.empty() && std::ranges::none_of(
+        cameras,
+        [this](const QnVirtualCameraResourcePtr& camera) { return d->canViewArchive(camera); });
 }
 
 int AnalyticsSearchListModel::availableNewTracks() const

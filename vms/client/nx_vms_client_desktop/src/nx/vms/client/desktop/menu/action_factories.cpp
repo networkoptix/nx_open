@@ -408,7 +408,8 @@ QAction* ShowOnItemsFactory::initObjectsAction(const Parameters& parameters, QOb
             return widget->isAnalyticsObjectsVisible()
                 || widget->isAnalyticsObjectsVisibleForcefully();
         }));
-    action->setEnabled(std::none_of(actualWidgets.begin(), actualWidgets.end(),
+    action->setEnabled(std::ranges::none_of(
+        actualWidgets,
         [](QnMediaResourceWidget* widget)
         {
             return widget->isAnalyticsObjectsVisibleForcefully();

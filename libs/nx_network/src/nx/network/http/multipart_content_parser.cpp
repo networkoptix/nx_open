@@ -129,7 +129,8 @@ bool MultipartContentParser::setContentType(const std::string& str)
                 tokens.push_back(trimmed);
         });
 
-    if (std::none_of(tokens.begin(), tokens.end(),
+    if (std::ranges::none_of(
+        tokens,
         [](auto token){ return nx::utils::startsWith(token, "multipart/", nx::utils::CaseSensitivity::off); }))
     {
         return false; //< Non-multipart content type.

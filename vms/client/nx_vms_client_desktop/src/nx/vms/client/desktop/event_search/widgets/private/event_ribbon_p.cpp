@@ -1071,7 +1071,7 @@ void EventRibbon::Private::updateHighlightedTiles()
                 [this](const QnResourcePtr& res) { return m_highlightedResources.contains(res); };
 
             const auto resources = modelIndex.data(core::ResourceListRole).value<QnResourceList>();
-            if (std::none_of(resources.cbegin(), resources.cend(), isHighlightedResource))
+            if (std::ranges::none_of(resources, isHighlightedResource))
                 return false;
 
             return m_highlightedTimestamp >= timestamp
