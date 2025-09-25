@@ -4,7 +4,7 @@ add_subdirectory(client)
 
 # Important: "nx_server_plugin_sdk/" subdirectory must be added before adding the "distribution/"
 # subdirectory.
-if(withMediaServer OR openSourceBuild)
+if(withMediaServer OR openSourceBuild OR withClouds)
     add_subdirectory(server)
 endif()
 
