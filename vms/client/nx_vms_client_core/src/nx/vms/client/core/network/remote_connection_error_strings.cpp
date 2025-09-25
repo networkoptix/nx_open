@@ -257,6 +257,10 @@ public:
             }
 
             case RemoteConnectionErrorCode::genericNetworkError:
+                return {
+                    tr("Server or network unavailable. Check the address and connection."),
+                    connectionError()
+                };
             case RemoteConnectionErrorCode::internalError:
             case RemoteConnectionErrorCode::networkContentError:
             case RemoteConnectionErrorCode::unexpectedServerId:
