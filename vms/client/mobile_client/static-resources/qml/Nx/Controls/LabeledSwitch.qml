@@ -80,7 +80,7 @@ Control
         {
             id: image
 
-            y: mainTextRow.y + (mainTextRow.height - height) / 2
+            y: textItem.y + (textItem.height - height) / 2
             width: 24
             height: width
 
@@ -98,24 +98,17 @@ Control
             x: image.visible ? image.x + image.width + 8 : 0
             width: parent.width - (x + Math.max(rightControlsHolder.width, indicator.width) + 12)
 
-            Row
+            Text
             {
-                id: mainTextRow
+                id: textItem
 
                 width: parent.width
-                spacing: 6
-
-                Text
-                {
-                    id: textItem
-
-                    color: ColorTheme.colors.light1
-                    font.pixelSize: 18
-                    wrapMode: Text.Text.Wrap
-                    lineHeight: extraTextItem.visible ? font.pixelSize : 32
-                    lineHeightMode: Text.FixedHeight
-                    verticalAlignment: Text.AlignVCenter
-                }
+                color: ColorTheme.colors.light1
+                font.pixelSize: 18
+                wrapMode: Text.Text.Wrap
+                lineHeight: extraTextItem.visible ? font.pixelSize : 32
+                lineHeightMode: Text.FixedHeight
+                verticalAlignment: Text.AlignVCenter
             }
 
             Text
