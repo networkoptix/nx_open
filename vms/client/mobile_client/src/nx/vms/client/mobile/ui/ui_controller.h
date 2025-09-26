@@ -67,6 +67,8 @@ public:
         const QString& systemName,
         const QString& errorText) const;
 
+    Q_INVOKABLE void showLinkAboutToOpenMessage(const QString& link) const;
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;

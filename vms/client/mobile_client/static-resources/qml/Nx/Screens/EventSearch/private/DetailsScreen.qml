@@ -345,6 +345,11 @@ Page
                 wrapMode: Text.Wrap
                 text: d.accessor.getData(currentEventIndex, "description")
                 visible: !!text
+
+                onLinkActivated: (link) =>
+                {
+                    windowContext.ui.showLinkAboutToOpenMessage(link)
+                }
             }
 
             AnalyticsAttributeTable
