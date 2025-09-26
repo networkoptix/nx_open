@@ -14,6 +14,7 @@
 #include <client/crashpad_client.h>
 #include <client/prune_crash_reports.h>
 #include <client/settings.h>
+#include <util/misc/uuid.h>
 
 #include <nx/build_info.h>
 #include <nx/utils/app_info.h>
@@ -135,12 +136,14 @@ base::FilePath getCrashHandlerPath()
 
 } // namespace
 
-NX_VMS_COMMON_API bool initCrashpad()
+NX_VMS_COMMON_API bool initCrashpad(bool enableUploads)
 {
     // Initialize crash reports database and crash handler.
     const base::FilePath databasePath = getCrashReportDatabasePath();
 
     auto database = crashpad::CrashReportDatabase::Initialize(databasePath);
+
+    database->GetSettings()->SetUploadsEnabled(enableUploads);
 
     // On all platforms except iOS crash_handler prunes the database periodically, the first prune
     // happens 10 minutes after the application start. We may no be running for that long, so do
@@ -217,12 +220,24 @@ NX_VMS_COMMON_API bool initCrashpad()
             /*asynchronous_start*/ false);
     #endif
 
-    NX_DEBUG(NX_SCOPE_TAG, "Crashpad database: %1 Handler: %2 (%3)",
+    NX_DEBUG(NX_SCOPE_TAG, "Crashpad database: %1 Uploads: %2 Handler: %3 (%4) ",
         databasePath.value().c_str(),
+        enableUploads ? "enabled" : "disabled",
         handlerPath.value().c_str(),
         started ? "started" : "failed to start");
 
     return started;
+}
+
+NX_VMS_COMMON_API nx::Uuid getCrashpadClientId()
+{
+    const base::FilePath databasePath = getCrashReportDatabasePath();
+    crashpad::UUID id;
+    auto database = crashpad::CrashReportDatabase::Initialize(databasePath);
+    if (!NX_ASSERT(database->GetSettings()->GetClientID(&id)))
+        return {};
+
+    return nx::Uuid::fromString(id.ToString());
 }
 
 } // namespace nx::vms::statistics

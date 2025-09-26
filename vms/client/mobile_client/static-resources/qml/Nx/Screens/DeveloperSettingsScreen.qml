@@ -193,6 +193,47 @@ BaseSettingsScreen
 
         Column
         {
+            Text
+            {
+                text: "Client ID:"
+                font.pixelSize: 16
+                color: ColorTheme.colors.light16
+            }
+
+            Text
+            {
+                font.pixelSize: 16
+                text: d.crashpadClientId
+                color: ColorTheme.colors.light1
+            }
+
+            Button
+            {
+                text: qsTr("Copy Client ID")
+                onClicked: d.copyCrashpadClientIdToClipboard()
+            }
+        }
+
+        LabeledSwitch
+        {
+            id: enableCrashUploads
+
+            width: parent.width
+            text: "Upload client crashdumps"
+            checkState: appContext.settings.crashdumpUploadsEnabled ? Qt.Checked : Qt.Unchecked
+            onCheckStateChanged:
+            {
+                const value = checkState != Qt.Unchecked
+                if (value == appContext.settings.crashdumpUploadsEnabled)
+                    return
+
+                appContext.settings.crashdumpUploadsEnabled = value
+                d.openRestartDialog()
+            }
+        }
+
+        Column
+        {
             visible: !!d.logSessionId
 
             Text
@@ -243,12 +284,18 @@ BaseSettingsScreen
                 windowContext.ui.windowHelpers.copyToClipboard(d.logSessionId)
         }
 
+        function copyCrashpadClientIdToClipboard()
+        {
+            windowContext.ui.windowHelpers.copyToClipboard(d.crashpadClientId)
+        }
+
         function openRestartDialog()
         {
             Workflow.openStandardDialog("Please restart the app to apply the changes")
         }
 
         property string logSessionId: windowContext.logManager.remoteLogSessionId()
+        property string crashpadClientId: NxGlobals.getCrashpadClientId()
 
         onLogSessionIdChanged: copySessionIdToClipboard()
         Component.onCompleted: copySessionIdToClipboard()

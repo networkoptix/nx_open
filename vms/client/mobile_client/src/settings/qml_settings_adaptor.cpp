@@ -71,6 +71,9 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
                 case QnMobileClientSettings::SupportMetaOrganizations:
                     emit supportMetaOrganizationsChanged();
 
+                case QnMobileClientSettings::CrashdumpUploadsEnabled:
+                    emit crashdumpUploadsEnabledChanged();
+
                 default:
                     break;
             }
@@ -279,6 +282,17 @@ bool QmlSettingsAdaptor::enableSoftwareDecoderFallback() const
 void QmlSettingsAdaptor::setEnableSoftwareDecoderFallback(bool value)
 {
     qnSettings->setEnableSoftwareDecoderFallback(value);
+    qnSettings->save();
+}
+
+bool QmlSettingsAdaptor::crashdumpUploadsEnabled() const
+{
+    return qnSettings->crashdumpUploadsEnabled();
+}
+
+void QmlSettingsAdaptor::setCrashdumpUploadsEnabled(bool value)
+{
+    qnSettings->setCrashdumpUploadsEnabled(value);
     qnSettings->save();
 }
 

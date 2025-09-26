@@ -101,6 +101,11 @@ class QmlSettingsAdaptor: public QObject
         WRITE setEnableSoftwareDecoderFallback
         NOTIFY enableSoftwareDecoderFallbackChanged)
 
+    Q_PROPERTY(bool crashdumpUploadsEnabled
+        READ crashdumpUploadsEnabled
+        WRITE setCrashdumpUploadsEnabled
+        NOTIFY crashdumpUploadsEnabledChanged)
+
 public:
     explicit QmlSettingsAdaptor(QObject* parent = nullptr);
 
@@ -156,6 +161,9 @@ public:
     bool enableSoftwareDecoderFallback() const;
     void setEnableSoftwareDecoderFallback(bool value);
 
+    bool crashdumpUploadsEnabled() const;
+    void setCrashdumpUploadsEnabled(bool value);
+
 signals:
     void liveVideoPreviewsChanged();
     void lastUsedQualityChanged();
@@ -174,6 +182,7 @@ signals:
     void useVideoDownloadFeatureChanged();
     void useMaxHardwareDecodersCountChanged();
     void enableSoftwareDecoderFallbackChanged();
+    void crashdumpUploadsEnabledChanged();
 };
 
 } // namespace mobile

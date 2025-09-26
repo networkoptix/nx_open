@@ -63,6 +63,8 @@ public:
         EnableSoftwareDecoderFallback,
         ShowHowShareWorksNotification,
 
+        CrashdumpUploadsEnabled,
+
         VariableCount
     };
 
@@ -165,6 +167,11 @@ private:
             bool,
             enableSoftwareDecoderFallback, setEnableSoftwareDecoderFallback,
             EnableSoftwareDecoderFallback, true)
+
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            crashdumpUploadsEnabled, setCrashdumpUploadsEnabled,
+            CrashdumpUploadsEnabled, false)
 
     QN_END_PROPERTY_STORAGE()
 

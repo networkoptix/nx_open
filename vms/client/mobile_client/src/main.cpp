@@ -354,8 +354,6 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     QtWebView::initialize();
     QGuiApplication application(argc, argv);
 
-    nx::vms::statistics::initCrashpad();
-
     if (nx::build_info::isAndroid())
     {
         // Clear the clipboard to avoid warning in Android 12. Despite some issues were fixed in
@@ -363,6 +361,10 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
         // contain any clipboard access operations. This code workarounds it. Also see QTBUG-98412.
         qApp->clipboard()->clear();
     }
+
+    QnMobileClientSettings settings;
+
+    nx::vms::statistics::initCrashpad(settings.crashdumpUploadsEnabled());
 
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
@@ -372,7 +374,6 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     bool loggingIsInitialized = initializeLogging(startupParams);
     initializeNetworkLogging(); //< Should be initialized before ApplicationContext.
 
-    QnMobileClientSettings settings;
     const auto applicationContext = std::make_unique<mobile::ApplicationContext>(startupParams);
 
     if (!loggingIsInitialized)
