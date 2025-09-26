@@ -96,7 +96,7 @@ void TimeSyncManager::loadTimeFromLocalClock()
 {
     auto newValue = m_systemClock->millisSinceEpoch();
 
-    if (setSyncTime(newValue, std::chrono::milliseconds::zero()))
+    if (setSyncTime(newValue, std::chrono::milliseconds::zero(), peerId()))
     {
         NX_DEBUG(this, "Set time %1 from the local clock",
             QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate));
@@ -187,7 +187,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
         appContext()->moduleDisplayName(ownGuid),
         appContext()->moduleDisplayName(route.id),
         rtt);
-    if (!setSyncTime(newTime, rtt))
+    if (!setSyncTime(newTime, rtt, route.id))
     {
         NX_DEBUG(this, "Server %1 ignore new time %2 because of small delta.",
             appContext()->moduleDisplayName(ownGuid),
@@ -196,8 +196,13 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
     return Result::ok;
 }
 
-bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::milliseconds rtt)
+bool TimeSyncManager::setSyncTime(
+    std::chrono::milliseconds value,
+    std::chrono::milliseconds rtt,
+    const nx::Uuid& timePeerId)
 {
+    m_timeLoadFromServer = timePeerId;
+
     const auto syncTime = getSyncTime();
     const auto timeDelta = value < syncTime ? syncTime - value : value - syncTime;
     if (timeDelta <= rtt + systemSettings()->syncTimeEpsilon())
