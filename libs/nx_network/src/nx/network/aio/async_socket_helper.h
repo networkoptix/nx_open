@@ -52,7 +52,7 @@ public:
 
     void post(nx::MoveOnlyFunc<void()> handler)
     {
-        if (m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
+        if (m_socket->impl()->terminated.load() > 0)
             return;
 
         m_socket->impl()->aioThread->load()->post(m_socket, std::move(handler));
@@ -60,18 +60,10 @@ public:
 
     void dispatch(nx::MoveOnlyFunc<void()> handler)
     {
-        if (m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
+        if (m_socket->impl()->terminated.load() > 0)
             return;
 
         m_socket->impl()->aioThread->load()->dispatch(m_socket, std::move(handler));
-    }
-
-    /**
-     * This call stops async I/O on socket and it can never be resumed!
-     */
-    void terminateAsyncIO()
-    {
-        ++m_socket->impl()->terminated;
     }
 
 protected:
@@ -110,12 +102,15 @@ public:
         // is allowed to be removed from I/O completion handler.
     }
 
+    /**
+     * This call stops async I/O on socket and it can never be resumed!
+     */
     void terminate()
     {
         // This method is to cancel all asynchronous operations when called within socket's aio thread.
         // TODO: #akolesnikov What's the difference of this method from cancelAsyncIO(aio::etNone)?
 
-        this->terminateAsyncIO();
+        ++this->m_socket->impl()->terminated;
 
         // Cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered
         // is down the stack.
@@ -234,7 +229,7 @@ public:
         if (!NX_ASSERT(addr.address.isIpAddress(), addr))
             return handler(SystemError::dnsServerFailure);
 
-        if (this->m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
+        if (this->m_socket->impl()->terminated.load() > 0)
         {
             // Socket has been terminated, no async call possible.
             return;
@@ -256,7 +251,7 @@ public:
         nx::Buffer* const buf,
         IoCompletionHandler handler)
     {
-        if (this->m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
+        if (this->m_socket->impl()->terminated.load() > 0)
             return;
 
         NX_ASSERT(isNonBlockingMode());
@@ -283,7 +278,7 @@ public:
         const nx::Buffer* buf,
         IoCompletionHandler handler)
     {
-        if (this->m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
+        if (this->m_socket->impl()->terminated.load() > 0)
             return;
 
         NX_ASSERT(isNonBlockingMode());
@@ -318,7 +313,7 @@ public:
         nx::MoveOnlyFunc<void()> handler)
     {
         NX_CRITICAL(timeoutMs.count(), "Timer with timeout 0 does not make any sense");
-        if (this->m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
+        if (this->m_socket->impl()->terminated.load() > 0)
             return;
 
         m_timerHandler = std::move(handler);
