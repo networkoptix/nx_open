@@ -325,9 +325,26 @@ void QnPropertyStorage::notify(int id) const {
     m_pendingNotifications.insert(id);
 }
 
-void QnPropertyStorage::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
-    for(int id: ids)
-        updateValue(id, readValueFromSettings(settings, id, value(id)));
+void QnPropertyStorage::updateValuesFromSettings(QSettings* settings, const QList<int>& ids)
+{
+    for (int id: ids)
+    {
+        const auto defaultValue = value(id);
+        auto v = readValueFromSettings(settings, id, defaultValue);
+
+        // QSettings instance may not preserve the exact type (common for ini: writing bool value
+        // produces QString when reading it back), so convert the value into the type required
+        // by the user of this class. Do it AFTER readValueFromSettings because it's a virtual
+        // method that may perform its own convertions.
+        const auto requiredType = type(id);
+        const auto actualType = v.metaType();
+        if (actualType != requiredType)
+        {
+            if (!NX_ASSERT(v.convert(requiredType), "Convert %1 -> %2", actualType, requiredType))
+                v = defaultValue;
+        }
+        updateValue(id, v);
+    }
 }
 
 void QnPropertyStorage::submitValuesToSettings(QSettings *settings, const QList<int> &ids) const {

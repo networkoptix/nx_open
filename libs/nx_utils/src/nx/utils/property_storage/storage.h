@@ -34,6 +34,8 @@ public:
     Q_INVOKABLE QVariant value(const QString& name) const;
     Q_INVOKABLE void setValue(const QString& name, const QVariant& value);
 
+    QHash<QString, BaseProperty*> properties() const;
+
 signals:
     void changed(BaseProperty* property);
 
@@ -61,8 +63,6 @@ protected:
     void setSecurityKey(const QByteArray& value);
 
     AbstractBackend* backend() const;
-
-    QHash<QString, BaseProperty*> properties() const;
 
     void loadProperty(BaseProperty* property);
     void saveProperty(BaseProperty* property);
