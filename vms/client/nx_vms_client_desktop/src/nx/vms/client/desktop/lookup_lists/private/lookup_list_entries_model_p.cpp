@@ -313,7 +313,7 @@ bool LookupListEntriesModel::Private::isValidValue(const QString& value, const Q
 
     const auto& displayedAttributes = data->rawData().attributeNames;
 
-    if (std::ranges::find(displayedAttributes, attributeName) == displayedAttributes.end())
+    if (!std::ranges::contains(displayedAttributes, attributeName))
         return false; //< There is no such attribute name in displayed columns.
 
     if (value.isEmpty())

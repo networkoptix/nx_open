@@ -32,7 +32,8 @@ struct ValueOrArray
 
     bool contains(const T& value) const
     {
-       return std::ranges::find(valueOrArray, value) != valueOrArray.end();
+        //return std::ranges::contains(valueOrArray, value); //< build fails on CI (Android)
+        return std::ranges::any_of(valueOrArray, [value](const auto& elem){ return elem == value;});
     }
 
     bool empty() const { return valueOrArray.empty(); }
