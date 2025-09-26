@@ -425,7 +425,7 @@ Pollable* Socket<SocketInterfaceToImplement>::pollable()
 template<typename SocketInterfaceToImplement>
 void Socket<SocketInterfaceToImplement>::post(nx::MoveOnlyFunc<void()> handler)
 {
-    if (impl()->terminated.load(std::memory_order_relaxed) > 0)
+    if (impl()->terminated.load() > 0)
         return;
 
     impl()->aioThread->load()->post(this, std::move(handler));
@@ -434,7 +434,7 @@ void Socket<SocketInterfaceToImplement>::post(nx::MoveOnlyFunc<void()> handler)
 template<typename SocketInterfaceToImplement>
 void Socket<SocketInterfaceToImplement>::dispatch(nx::MoveOnlyFunc<void()> handler)
 {
-    if (impl()->terminated.load(std::memory_order_relaxed) > 0)
+    if (impl()->terminated.load() > 0)
         return;
 
     impl()->aioThread->load()->dispatch(this, std::move(handler));
