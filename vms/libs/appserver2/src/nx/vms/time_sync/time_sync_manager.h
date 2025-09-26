@@ -103,7 +103,10 @@ protected:
 
     virtual void updateTime() = 0;
     virtual AbstractStreamSocketPtr connectToRemoteHost(const QnRoute& route, bool sslRequired);
-    virtual bool setSyncTime(std::chrono::milliseconds value, std::chrono::milliseconds rtt);
+    virtual bool setSyncTime(
+        std::chrono::milliseconds value,
+        std::chrono::milliseconds rtt,
+        const nx::Uuid& timePeerId);
     void setSyncTimeInternal(std::chrono::milliseconds value);
 
 private:
@@ -113,6 +116,7 @@ protected:
     std::shared_ptr<AbstractSystemClock> m_systemClock;
     std::shared_ptr<AbstractSteadyClock> m_steadyClock;
     std::atomic<bool> m_isTimeTakenFromInternet{false};
+    nx::Uuid m_timeLoadFromServer;
 private:
     std::chrono::milliseconds m_synchronizedTime{0};
     std::chrono::milliseconds m_synchronizedOnClock{0};
