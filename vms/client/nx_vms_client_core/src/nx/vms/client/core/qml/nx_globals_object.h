@@ -121,6 +121,12 @@ public:
     /** Returns driver information (see QRhiDriverInfo) for RHI of the specified window. */
     Q_INVOKABLE QVariantMap getDriverInfo(QQuickWindow* window) const;
 
+    /**
+     * Returns the immutable identifier for the current app crash database, which is used
+     * on a server to locate all crash reports from this app installation.
+     */
+    Q_INVOKABLE QString getCrashpadClientId() const;
+
     static void registerQmlType();
 };
 

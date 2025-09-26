@@ -74,6 +74,9 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
                 case QnMobileClientSettings::VideoRenderingApi:
                     emit videoRenderingApiChanged();
 
+                case QnMobileClientSettings::CrashdumpUploadsEnabled:
+                    emit crashdumpUploadsEnabledChanged();
+
                 default:
                     break;
             }
@@ -293,6 +296,17 @@ QString QmlSettingsAdaptor::videoRenderingApi() const
 void QmlSettingsAdaptor::setVideoRenderingApi(const QString& value)
 {
     qnSettings->setVideoRenderingApi(value);
+    qnSettings->save();
+}
+
+bool QmlSettingsAdaptor::crashdumpUploadsEnabled() const
+{
+    return qnSettings->crashdumpUploadsEnabled();
+}
+
+void QmlSettingsAdaptor::setCrashdumpUploadsEnabled(bool value)
+{
+    qnSettings->setCrashdumpUploadsEnabled(value);
     qnSettings->save();
 }
 

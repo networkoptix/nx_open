@@ -59,6 +59,8 @@ public:
 
         VideoRenderingApi,
 
+        CrashdumpUploadsEnabled,
+
         VariableCount
     };
 
@@ -166,6 +168,11 @@ private:
             QString,
             videoRenderingApi, setVideoRenderingApi,
             VideoRenderingApi, "opengles") //< Only used on Android.
+
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            crashdumpUploadsEnabled, setCrashdumpUploadsEnabled,
+            CrashdumpUploadsEnabled, false)
 
     QN_END_PROPERTY_STORAGE()
 

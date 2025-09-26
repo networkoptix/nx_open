@@ -2,8 +2,11 @@
 
 #pragma once
 
+#include <nx/utils/uuid.h>
+
 namespace nx::vms::statistics {
 
-NX_VMS_COMMON_API bool initCrashpad();
+NX_VMS_COMMON_API bool initCrashpad(bool enableUploads);
+NX_VMS_COMMON_API nx::Uuid getCrashpadClientId();
 
 } // namespace nx::vms::statistics

@@ -18,6 +18,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/statistics/crashpad.h>
 #include <nx/vms/time/formatter.h>
 #include <utils/common/synctime.h>
 
@@ -443,6 +444,11 @@ QVariantMap NxGlobalsObject::getDriverInfo(QQuickWindow* window) const
     result.insert("deviceType", deviceTypeNames.value(info.deviceType, "UnknownDevice"));
 
     return result;
+}
+
+Q_INVOKABLE QString NxGlobalsObject::getCrashpadClientId() const
+{
+    return nx::vms::statistics::getCrashpadClientId().toSimpleString();
 }
 
 void NxGlobalsObject::registerQmlType()

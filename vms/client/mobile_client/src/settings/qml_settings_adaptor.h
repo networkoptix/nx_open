@@ -106,6 +106,11 @@ class QmlSettingsAdaptor: public QObject
         WRITE setVideoRenderingApi
         NOTIFY videoRenderingApiChanged)
 
+    Q_PROPERTY(bool crashdumpUploadsEnabled
+        READ crashdumpUploadsEnabled
+        WRITE setCrashdumpUploadsEnabled
+        NOTIFY crashdumpUploadsEnabledChanged)
+
 public:
     explicit QmlSettingsAdaptor(QObject* parent = nullptr);
 
@@ -164,6 +169,9 @@ public:
     QString videoRenderingApi() const;
     void setVideoRenderingApi(const QString& value);
 
+    bool crashdumpUploadsEnabled() const;
+    void setCrashdumpUploadsEnabled(bool value);
+
 signals:
     void liveVideoPreviewsChanged();
     void lastUsedQualityChanged();
@@ -183,6 +191,7 @@ signals:
     void useMaxHardwareDecodersCountChanged();
     void enableSoftwareDecoderFallbackChanged();
     void videoRenderingApiChanged();
+    void crashdumpUploadsEnabledChanged();
 };
 
 } // namespace mobile

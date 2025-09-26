@@ -351,8 +351,6 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     QtWebView::initialize();
     QGuiApplication application(argc, argv);
 
-    nx::vms::statistics::initCrashpad();
-
     if (nx::build_info::isAndroid())
     {
         // Clear the clipboard to avoid warning in Android 12. Despite some issues were fixed in
@@ -362,6 +360,8 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     }
 
     auto settings = std::make_unique<QnMobileClientSettings>();
+
+    nx::vms::statistics::initCrashpad(settings->crashdumpUploadsEnabled());
 
     // Set required graphics API for HW video decoding.
     if (nx::build_info::isAndroid())
