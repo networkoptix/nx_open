@@ -28,7 +28,7 @@
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
+#include <nx/vms/client/desktop/style/soft_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/window_context.h>

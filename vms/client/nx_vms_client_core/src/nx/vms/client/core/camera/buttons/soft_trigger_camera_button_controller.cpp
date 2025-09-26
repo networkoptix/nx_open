@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "software_trigger_camera_button_controller.h"
+#include "soft_trigger_camera_button_controller.h"
 
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
@@ -53,7 +53,7 @@ namespace {
 /**
  * Returns true if rule relates to the 5.0 simplified intercom "open door" functionality, otherwise
  * false.
- * In 5.0 intercom open door is implemented as automatically created software trigger. Since in 5.1
+ * In 5.0 intercom open door is implemented as automatically created soft trigger. Since in 5.1
  * we changed implementation using extendedOutput property - we need to filter it out.
  */
 bool filterOutOutdatedOpenDoorTrigger(const nx::vms::event::RulePtr& rule)
@@ -138,15 +138,15 @@ bool isVmsRule(const nx::vms::rules::Rule* /*rule*/)
     return true;
 }
 
-using HintStyle = SoftwareTriggerCameraButtonController::HintStyle;
+using HintStyle = SoftTriggerCameraButtonController::HintStyle;
 QString buttonHint(bool prolonged, HintStyle hintStyle)
 {
     if (!prolonged)
         return {};
 
     return hintStyle == HintStyle::mobile
-        ? SoftwareTriggerCameraButtonController::tr("Press and hold to") + ' '
-        : SoftwareTriggerCameraButtonController::tr("press and hold");
+        ? SoftTriggerCameraButtonController::tr("Press and hold to") + ' '
+        : SoftTriggerCameraButtonController::tr("press and hold");
 }
 
 CameraButtonData::Type prolongedToType(bool prolonged)
@@ -211,9 +211,9 @@ bool isVmsRulesSupported(SystemContext* context)
 
 //-------------------------------------------------------------------------------------------------
 
-struct SoftwareTriggerCameraButtonController::Private
+struct SoftTriggerCameraButtonController::Private
 {
-    SoftwareTriggerCameraButtonController * const q;
+    SoftTriggerCameraButtonController * const q;
     const HintStyle hintStyle;
 
     QSet<nx::Uuid> isVmsRuleFlags;
@@ -233,7 +233,7 @@ struct SoftwareTriggerCameraButtonController::Private
     void updateActiveTrigger(const nx::Uuid& ruleId, vms::api::EventState state, bool success);
 };
 
-void SoftwareTriggerCameraButtonController::Private::updateButtons()
+void SoftTriggerCameraButtonController::Private::updateButtons()
 {
     auto removedIds =
         [this]()
@@ -273,7 +273,7 @@ void SoftwareTriggerCameraButtonController::Private::updateButtons()
         tryRemoveButton(id);
 }
 
-void SoftwareTriggerCameraButtonController::Private::addOrUpdateButtonData(
+void SoftTriggerCameraButtonController::Private::addOrUpdateButtonData(
     const CameraButtonData& button,
     bool isVmsRule)
 {
@@ -288,14 +288,14 @@ void SoftwareTriggerCameraButtonController::Private::addOrUpdateButtonData(
     updateButtonAvailability(button);
 }
 
-void SoftwareTriggerCameraButtonController::Private::tryRemoveButton(const nx::Uuid& buttonId)
+void SoftTriggerCameraButtonController::Private::tryRemoveButton(const nx::Uuid& buttonId)
 {
     if (q->removeButton(buttonId))
         isVmsRuleFlags.remove(buttonId);
 }
 
 template<typename RulePointerType>
-void SoftwareTriggerCameraButtonController::Private::updateButtonByRule(RulePointerType rule)
+void SoftTriggerCameraButtonController::Private::updateButtonByRule(RulePointerType rule)
 {
     const auto context = q->systemContext();
     const auto currentUser = context->accessController()->user();
@@ -308,7 +308,7 @@ void SoftwareTriggerCameraButtonController::Private::updateButtonByRule(RulePoin
         tryRemoveButton(rule->id());
 }
 
-void SoftwareTriggerCameraButtonController::Private::updateButtonAvailability(CameraButtonData button)
+void SoftTriggerCameraButtonController::Private::updateButtonAvailability(CameraButtonData button)
 {
     // FIXME: #sivanov System-wide timezone should be used here when it is introduced.
 
@@ -350,7 +350,7 @@ void SoftwareTriggerCameraButtonController::Private::updateButtonAvailability(Ca
     q->addOrUpdateButton(button);
 }
 
-bool SoftwareTriggerCameraButtonController::Private::setEventTriggerState(
+bool SoftTriggerCameraButtonController::Private::setEventTriggerState(
     const nx::Uuid& ruleId,
     vms::api::EventState state)
 {
@@ -396,7 +396,7 @@ bool SoftwareTriggerCameraButtonController::Private::setEventTriggerState(
     return handle != rest::Handle{};
 }
 
-bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
+bool SoftTriggerCameraButtonController::Private::setVmsTriggerState(
     const nx::Uuid& ruleId,
     vms::api::EventState state)
 {
@@ -439,7 +439,7 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
     return true;
 }
 
-void SoftwareTriggerCameraButtonController::Private::updateActiveTrigger(
+void SoftTriggerCameraButtonController::Private::updateActiveTrigger(
     const nx::Uuid& ruleId,
     vms::api::EventState state,
     bool success)
@@ -452,7 +452,7 @@ void SoftwareTriggerCameraButtonController::Private::updateActiveTrigger(
 
 //-------------------------------------------------------------------------------------------------
 
-SoftwareTriggerCameraButtonController::SoftwareTriggerCameraButtonController(
+SoftTriggerCameraButtonController::SoftTriggerCameraButtonController(
     HintStyle hintStyle,
     CameraButtonData::Group buttonGroup,
     QObject* parent)
@@ -475,11 +475,11 @@ SoftwareTriggerCameraButtonController::SoftwareTriggerCameraButtonController(
     updateTimer->start();
 }
 
-SoftwareTriggerCameraButtonController::~SoftwareTriggerCameraButtonController()
+SoftTriggerCameraButtonController::~SoftTriggerCameraButtonController()
 {
 }
 
-void SoftwareTriggerCameraButtonController::setResourceInternal(const QnResourcePtr& resource)
+void SoftTriggerCameraButtonController::setResourceInternal(const QnResourcePtr& resource)
 {
     d->connections.reset();
     base_type::setResourceInternal(resource);
@@ -521,7 +521,7 @@ void SoftwareTriggerCameraButtonController::setResourceInternal(const QnResource
     d->updateButtons();
 }
 
-bool SoftwareTriggerCameraButtonController::setButtonActionState(
+bool SoftTriggerCameraButtonController::setButtonActionState(
     const CameraButtonData& button,
     ActionState state)
 {

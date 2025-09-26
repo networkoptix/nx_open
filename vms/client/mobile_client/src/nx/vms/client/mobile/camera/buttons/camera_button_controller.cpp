@@ -5,7 +5,7 @@
 #include <QtQml/QtQml>
 
 #include <nx/vms/client/core/camera/buttons/extended_output_camera_button_controller.h>
-#include <nx/vms/client/core/camera/buttons/software_trigger_camera_button_controller.h>
+#include <nx/vms/client/core/camera/buttons/soft_trigger_camera_button_controller.h>
 #include <nx/vms/client/core/camera/buttons/two_way_audio_camera_button_controller.h>
 #include <nx/vms/client/mobile/camera/buttons/ptz_camera_button_controller.h>
 #include <utils/common/delayed.h>
@@ -27,9 +27,9 @@ CameraButtonController::CameraButtonController(QObject* parent):
 
             addController<core::TwoWayAudioCameraButtonController>(ButtonGroup::twoWayAudio);
 
-            using HintStyle = core::SoftwareTriggerCameraButtonController::HintStyle;
-            addController<core::SoftwareTriggerCameraButtonController>(
-                ButtonGroup::softwareTriggers, HintStyle::mobile);
+            using HintStyle = core::SoftTriggerCameraButtonController::HintStyle;
+            addController<core::SoftTriggerCameraButtonController>(
+                ButtonGroup::softTriggers, HintStyle::mobile);
 
             const auto commonOutputs =
                 api::ExtendedCameraOutputs(api::ExtendedCameraOutput::heater)

@@ -7,11 +7,11 @@
 
 namespace nx::vms::client::desktop {
 
-struct SoftwareTriggerPixmaps
+struct SoftTriggerPixmaps
 {
     using MapT = QVector<QPair<QString, QPixmap>>;
 
-    /** Default software trigger pixmap, also a fallback pixmap. */
+    /** Default soft trigger pixmap, also a fallback pixmap. */
     static QString defaultPixmapName();
 
     /** Effective pixmap name with fallback to default if specified name is not available. */
@@ -23,7 +23,7 @@ struct SoftwareTriggerPixmaps
      */
     static QString effectivePixmapPath(const QString& name);
 
-    /** List of pixmap names available to users to choose for software triggers. */
+    /** List of pixmap names available to users to choose for soft triggers. */
     static const QStringList& pixmapNames();
 
     static const MapT pixmaps();

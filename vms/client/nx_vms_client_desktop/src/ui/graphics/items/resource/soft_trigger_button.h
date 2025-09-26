@@ -8,23 +8,23 @@
 
 namespace nx::vms::client::desktop {
 
-class SoftwareTriggerButtonPrivate;
+class SoftTriggerButtonPrivate;
 
-class SoftwareTriggerButton: public JumpToLiveButton
+class SoftTriggerButton: public JumpToLiveButton
 {
     Q_OBJECT
     using base_type = JumpToLiveButton;
 
 public:
-    SoftwareTriggerButton(QGraphicsItem* parent = nullptr);
-    virtual ~SoftwareTriggerButton();
+    SoftTriggerButton(QGraphicsItem* parent = nullptr);
+    virtual ~SoftTriggerButton();
 
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget) override;
 
 private:
-    Q_DECLARE_PRIVATE(SoftwareTriggerButton)
-    QScopedPointer<SoftwareTriggerButtonPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(SoftTriggerButton)
+    QScopedPointer<SoftTriggerButtonPrivate> d_ptr;
 };
 
 } // namespace nx::vms::client::desktop

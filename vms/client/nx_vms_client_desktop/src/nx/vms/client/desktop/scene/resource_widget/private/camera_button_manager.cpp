@@ -8,7 +8,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/camera/buttons/aggregated_camera_button_controller.h>
 #include <nx/vms/client/core/camera/buttons/extended_output_camera_button_controller.h>
-#include <nx/vms/client/core/camera/buttons/software_trigger_camera_button_controller.h>
+#include <nx/vms/client/core/camera/buttons/soft_trigger_camera_button_controller.h>
 #include <nx/vms/client/core/camera/buttons/two_way_audio_camera_button_controller.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
@@ -19,7 +19,7 @@
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
 #include <ui/graphics/items/overlays/scrollable_items_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/resource/software_trigger_button.h>
+#include <ui/graphics/items/resource/soft_trigger_button.h>
 #include <ui/graphics/items/resource/two_way_audio_button.h>
 
 namespace nx::vms::client::desktop {
@@ -36,7 +36,7 @@ enum ButtonGroup
 {
     objectTracking,
     twoWayAudio,
-    softwareTriggers,
+    softTriggers,
     extendedOutputs
 };
 
@@ -144,7 +144,7 @@ void updateTooltip(CameraButton* button, const QString& tooltip)
 {
     if (auto twoWayAudioButton = dynamic_cast<TwoWayAudioButton*>(button))
         twoWayAudioButton->setToolTip(tooltip);
-    else if (auto softTriggerButton = dynamic_cast<SoftwareTriggerButton*>(button))
+    else if (auto softTriggerButton = dynamic_cast<SoftTriggerButton*>(button))
         softTriggerButton->setToolTip(tooltip);
     else
         NX_ASSERT(false, "Unexpected button type");
@@ -159,9 +159,9 @@ AggregatedControllerPtr createController(QnMediaResourceWidget* mediaResourceWid
     if (mediaResourceWidget->resource()->hasFlags(Qn::cross_system))
         return result;
 
-    using HintStyle = core::SoftwareTriggerCameraButtonController::HintStyle;
-    result->addController<core::SoftwareTriggerCameraButtonController>(
-        ButtonGroup::softwareTriggers, HintStyle::desktop);
+    using HintStyle = core::SoftTriggerCameraButtonController::HintStyle;
+    result->addController<core::SoftTriggerCameraButtonController>(
+        ButtonGroup::softTriggers, HintStyle::desktop);
 
     const auto commonOutputs =
         api::ExtendedCameraOutputs(api::ExtendedCameraOutput::heater)
@@ -283,7 +283,7 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButtonData& dat
     if (isObjectTrackingButton(data))
     {
         /**
-         * TODO: #ynikitenkov: Rework object tracking button and software trigger button
+         * TODO: #ynikitenkov: Rework object tracking button and soft trigger button
          * classes, make the inherited from the same top level base class to avoid all
          * related conditions in the code.
          */
@@ -293,13 +293,13 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButtonData& dat
 
     const auto button = isTwoWayAudioButton(data)
         ? static_cast<CameraButton*>(insertButton<TwoWayAudioButton>(data, container))
-        : static_cast<CameraButton*>(insertButton<SoftwareTriggerButton>(data, container));
+        : static_cast<CameraButton*>(insertButton<SoftTriggerButton>(data, container));
     button->setIconName(data.iconName);
     button->setProlonged(data.prolonged());
     button->setEnabled(data.enabled);
     updateTooltip(button, getToolTip(data));
 
-    connect(button, &SoftwareTriggerButton::clicked, q,
+    connect(button, &SoftTriggerButton::clicked, q,
         [this, button, id = data.id]()
         {
             if (!button->isLive())
@@ -325,7 +325,7 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButtonData& dat
                 : State::Failure);
         });
 
-    connect(button, &SoftwareTriggerButton::pressed, q,
+    connect(button, &SoftTriggerButton::pressed, q,
         [this, button, id = data.id]()
         {
             if (!button->isLive())
@@ -342,7 +342,7 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButtonData& dat
             q->menu()->triggerIfPossible(SuspendCurrentShowreelAction);
         });
 
-    connect(button, &SoftwareTriggerButton::released, q,
+    connect(button, &SoftTriggerButton::released, q,
         [this, button, id = data.id]()
         {
             if (!button->isLive())

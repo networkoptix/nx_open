@@ -11,7 +11,7 @@ namespace nx::vms::client::core {
 struct IntercomHelper
 {
     /**
-     * In 5.0 open door software trigger has 6 seconds duration and it should be managed by the
+     * In 5.0 open door soft trigger has 6 seconds duration and it should be managed by the
      * client.
      * In 5.1 duration is managed (replaced) by server, and it is safe to send any value -
      * it will be ignored.

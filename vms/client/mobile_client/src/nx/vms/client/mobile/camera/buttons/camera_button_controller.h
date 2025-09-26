@@ -17,7 +17,7 @@ public:
         ptz,
         objectTracking,
         twoWayAudio,
-        softwareTriggers,
+        softTriggers,
         extendedOutputs
     };
     Q_ENUM(ButtonGroup)

@@ -8,9 +8,7 @@
 #include <nx/vms/event/rule_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
-namespace nx {
-namespace client {
-namespace mobile {
+namespace nx::client::mobile {
 
 using namespace nx::vms::event;
 
@@ -46,6 +44,4 @@ EventRulesWatcher::EventRulesWatcher(nx::vms::client::mobile::SystemContext* con
         });
 }
 
-} // namespace mobile
-} // namespace client
-} // namespace mobile
+} // namespace nx::client::mobile

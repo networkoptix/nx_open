@@ -7,9 +7,7 @@
 #include <nx/vms/client/mobile/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
 
-namespace nx {
-namespace client {
-namespace mobile {
+namespace nx::client::mobile {
 
 // Tries to manually gather event rules for mobile client from old servers
 class EventRulesWatcher:
@@ -26,6 +24,4 @@ private:
     void handleRulesReset(const nx::vms::event::RuleList& rules);
 };
 
-} // namespace mobile
-} // namespace client
-} // namespace mobile
+} // namespace nx::client::mobile

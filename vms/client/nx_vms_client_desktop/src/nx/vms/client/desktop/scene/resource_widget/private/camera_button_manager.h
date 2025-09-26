@@ -12,7 +12,7 @@ namespace nx::vms::client::desktop {
 
 class SystemContext;
 
-/** Manages camera buttons (like software triggers, extended outputs, etc.). */
+/** Manages camera buttons (like soft triggers, extended outputs, etc.). */
 class CameraButtonManager: public QObject,
     public WindowContextAware
 {

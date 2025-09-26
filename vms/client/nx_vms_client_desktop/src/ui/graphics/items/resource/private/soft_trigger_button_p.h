@@ -7,24 +7,24 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QTimer>
 
-#include "../software_trigger_button.h"
+#include "../soft_trigger_button.h"
 
 namespace nx::vms::client::desktop {
 
 class BusyIndicatorGraphicsWidget;
-class SoftwareTriggerButton;
+class SoftTriggerButton;
 
-class SoftwareTriggerButtonPrivate: public QObject
+class SoftTriggerButtonPrivate: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
-    Q_DECLARE_PUBLIC(SoftwareTriggerButton)
-    SoftwareTriggerButton* const q_ptr;
+    Q_DECLARE_PUBLIC(SoftTriggerButton)
+    SoftTriggerButton* const q_ptr;
 
 public:
-    SoftwareTriggerButtonPrivate(SoftwareTriggerButton* main);
-    virtual ~SoftwareTriggerButtonPrivate();
+    SoftTriggerButtonPrivate(SoftTriggerButton* main);
+    virtual ~SoftTriggerButtonPrivate();
 
     void updateState();
 

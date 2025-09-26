@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "software_trigger_button_p.h"
+#include "soft_trigger_button_p.h"
 
 #include <numbers>
 
@@ -12,7 +12,7 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
+#include <nx/vms/client/desktop/style/soft_trigger_pixmaps.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
@@ -43,13 +43,13 @@ namespace nx::vms::client::desktop {
 
 using State = CameraButton::State;
 
-SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton* main):
+SoftTriggerButtonPrivate::SoftTriggerButtonPrivate(SoftTriggerButton* main):
     base_type(nullptr),
     q_ptr(main)
 {
-    Q_Q(SoftwareTriggerButton);
+    Q_Q(SoftTriggerButton);
 
-    connect(main, &SoftwareTriggerButton::pressed, this,
+    connect(main, &SoftTriggerButton::pressed, this,
         [q]() { q->setState(State::Default); });
 
     installEventHandler(main, QEvent::PaletteChange, this,
@@ -63,17 +63,17 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
     connect(q, &CameraButton::stateChanged, this, [this]() { updateState(); });
 }
 
-SoftwareTriggerButtonPrivate::~SoftwareTriggerButtonPrivate()
+SoftTriggerButtonPrivate::~SoftTriggerButtonPrivate()
 {
     cancelScheduledChange();
 }
 
-void SoftwareTriggerButtonPrivate::updateState()
+void SoftTriggerButtonPrivate::updateState()
 {
     if (m_updatingState)
         return;
 
-    Q_Q(SoftwareTriggerButton);
+    Q_Q(SoftTriggerButton);
 
     const auto state = q->state();
 
@@ -111,7 +111,7 @@ void SoftwareTriggerButtonPrivate::updateState()
             const auto showBusyIndicator =
                 [this]()
                 {
-                    Q_Q(SoftwareTriggerButton);
+                    Q_Q(SoftTriggerButton);
                     m_busyIndicator.reset(new BusyIndicatorGraphicsWidget(q));
                     m_busyIndicator->setPreferredSize(q->size());
                     m_busyIndicator->dots()->setDotRadius(kBusyIndicatorDotRadius);
@@ -170,7 +170,7 @@ void SoftwareTriggerButtonPrivate::updateState()
         m_animationTime.start();
 }
 
-void SoftwareTriggerButtonPrivate::scheduleChange(std::function<void()> callback, int delayMs)
+void SoftTriggerButtonPrivate::scheduleChange(std::function<void()> callback, int delayMs)
 {
     if (m_scheduledChangeTimer)
     {
@@ -182,15 +182,15 @@ void SoftwareTriggerButtonPrivate::scheduleChange(std::function<void()> callback
         m_scheduledChangeTimer = executeDelayedParented(callback, delayMs, this);
 }
 
-void SoftwareTriggerButtonPrivate::cancelScheduledChange()
+void SoftTriggerButtonPrivate::cancelScheduledChange()
 {
     scheduleChange(std::function<void()>(), 0);
 }
 
-void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
+void SoftTriggerButtonPrivate::paint(QPainter* painter,
     const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-    Q_Q(SoftwareTriggerButton);
+    Q_Q(SoftTriggerButton);
 
     if (!q->isLive())
     {
@@ -264,14 +264,14 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
     }
 }
 
-void SoftwareTriggerButtonPrivate::ensureImages()
+void SoftTriggerButtonPrivate::ensureImages()
 {
     if (!m_imagesDirty)
         return;
 
     m_imagesDirty = false;
 
-    Q_Q(SoftwareTriggerButton);
+    Q_Q(SoftTriggerButton);
 
     static const QColor kErrorBackgroundColor = core::colorTheme()->color("red", 128);
     static const QColor kErrorFrameColor = core::colorTheme()->color("red");

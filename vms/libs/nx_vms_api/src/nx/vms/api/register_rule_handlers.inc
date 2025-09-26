@@ -142,22 +142,22 @@ void registerRuleHandlers(
         std::make_unique<GenericEventHandler>(serverModule->systemContext()));
 
     /**%apidoc GET /rest/v{4-}/events/triggers
-     * Retrieves software triggers available to the given user.
+     * Retrieves soft triggers available to the given user.
      * %jsonrpc subscribe
-     * %caption Software triggers
+     * %caption Soft triggers
      * %ingroup Events
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_with,_strict,_ticket,_local
      * %permissions Any User.
-     * %return:{SoftTriggerInfoList} Software triggers
+     * %return:{SoftTriggerInfoList} Soft triggers
      *
      **%apidoc GET /rest/v{4-}/events/triggers/{id}
-     * Retrieves software trigger available to the given user.
-     * %caption Software trigger
+     * Retrieves soft trigger available to the given user.
+     * %caption Soft trigger
      * %ingroup Events
      * %param:uuid id Trigger ID.
      * %param[ref] _format,_stripDefault,_language,_pretty,_with,_strict,_ticket,_local
      * %permissions Any User.
-     * %return:{SoftTriggerInfo} Software trigger
+     * %return:{SoftTriggerInfo} Soft trigger
      *
      **%apidoc POST /rest/v{4-}/events/triggers
      * %caption Create soft trigger event
@@ -166,7 +166,7 @@ void registerRuleHandlers(
      *     %param state
      *         %value[unused] none
      * %param[ref] _strict,_ticket,_local
-     * %permissions Software trigger permission for the given device.
+     * %permissions Soft trigger permission for the given device.
      */
     reg("rest/v{4-}/events/triggers/:id?", GlobalPermission::none,
         std::make_unique<SoftTriggerHandler>(serverModule->systemContext(), serverConnector));

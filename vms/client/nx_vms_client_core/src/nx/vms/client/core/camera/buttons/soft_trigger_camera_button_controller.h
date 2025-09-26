@@ -8,8 +8,8 @@
 
 namespace nx::vms::client::core {
 
-/** Software triggers button controller. */
-class NX_VMS_CLIENT_CORE_API SoftwareTriggerCameraButtonController:
+/** Soft triggers button controller. */
+class NX_VMS_CLIENT_CORE_API SoftTriggerCameraButtonController:
     public BaseCameraButtonController
 {
     Q_OBJECT
@@ -22,11 +22,11 @@ public:
         desktop
     };
 
-    SoftwareTriggerCameraButtonController(
+    SoftTriggerCameraButtonController(
         HintStyle hintStyle,
         CameraButtonData::Group buttonGroup,
         QObject* parent = nullptr);
-    virtual ~SoftwareTriggerCameraButtonController() override;
+    virtual ~SoftTriggerCameraButtonController() override;
 
 protected:
     virtual void setResourceInternal(const QnResourcePtr& resource) override;

@@ -14,13 +14,13 @@ namespace nx::vms::api::rules {
 
 struct NX_VMS_API SoftTriggerData
 {
-    /**%apidoc ID of the software trigger to execute. */
+    /**%apidoc ID of the soft trigger to execute. */
     nx::Uuid triggerId;
 
-    /**%apidoc ID of the Device assigned to the software trigger. */
+    /**%apidoc ID of the Device assigned to the soft trigger. */
     nx::Uuid deviceId;
 
-    /**%apidoc[opt] State of the software trigger. */
+    /**%apidoc[opt] State of the soft trigger. */
     State state = State::instant;
 };
 
@@ -30,22 +30,22 @@ NX_REFLECTION_INSTRUMENT(SoftTriggerData, SoftTriggerData_Fields)
 
 struct SoftTriggerInfo
 {
-    /**%apidoc ID of the software trigger. */
+    /**%apidoc ID of the soft trigger. */
     nx::Uuid triggerId;
 
-    /**%apidoc Flag indicating software trigger should start and stop. */
+    /**%apidoc Flag indicating soft trigger should start and stop. */
     bool prolonged = false;
 
-    /**%apidoc Devices assigned to the software trigger. */
+    /**%apidoc Devices assigned to the soft trigger. */
     UuidSelection devices;
 
-    /**%apidoc Name of the software trigger. */
+    /**%apidoc Name of the soft trigger. */
     QString name;
 
-    /**%apidoc Icon of the software trigger. */
+    /**%apidoc Icon of the soft trigger. */
     QString icon;
 
-    /**%apidoc[opt] Schedule of the software trigger rule. */
+    /**%apidoc[opt] Schedule of the soft trigger rule. */
     nx::vms::api::ScheduleTaskDataList schedule;
 };
 
@@ -55,4 +55,4 @@ using SoftTriggerInfoList = std::vector<SoftTriggerInfo>;
 QN_FUSION_DECLARE_FUNCTIONS(SoftTriggerInfo, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SoftTriggerInfo, SoftTriggerInfo_Fields)
 
-} // namespace nx::vms::rules
+} // namespace nx::vms::api::rules

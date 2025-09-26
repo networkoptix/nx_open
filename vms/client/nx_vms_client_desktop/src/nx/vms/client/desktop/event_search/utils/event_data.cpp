@@ -9,7 +9,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
+#include <nx/vms/client/desktop/style/soft_trigger_pixmaps.h>
 #include <nx/vms/rules/utils/event_details.h>
 
 namespace nx::vms::client::desktop {
@@ -55,7 +55,7 @@ QString eventIconPath(
         }
 
         case Icon::softTrigger:
-            return SoftwareTriggerPixmaps::effectivePixmapPath(custom);
+            return SoftTriggerPixmaps::effectivePixmapPath(custom);
 
         case Icon::analyticsObjectDetected:
             return core::analytics::IconManager::instance()->iconPath(custom);

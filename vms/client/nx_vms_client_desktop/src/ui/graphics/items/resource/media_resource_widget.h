@@ -51,7 +51,7 @@ class AreaSelectOverlayWidget;
 class RoiFiguresOverlayWidget;
 class AudioSpectrumOverlayWidget;
 class WatermarkPainter;
-class SoftwareTriggerButton;
+class SoftTriggerButton;
 class EncryptedArchivePasswordDialog;
 class CameraHotspotsOverlayWidget;
 class CameraButtonManager;
@@ -439,7 +439,7 @@ private:
         const QRectF& targetRect);
 
 private:
-    struct SoftwareTriggerInfo
+    struct SoftTriggerInfo
     {
         nx::Uuid ruleId;
         QString name;

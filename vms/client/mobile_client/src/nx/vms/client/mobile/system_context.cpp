@@ -13,7 +13,7 @@
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <nx/branding.h>
-#include <nx/client/mobile/software_trigger/event_rules_watcher.h>
+#include <nx/client/mobile/soft_trigger/event_rules_watcher.h>
 #include <nx/client/mobile/two_way_audio/server_audio_connection_watcher.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/access/access_controller.h>

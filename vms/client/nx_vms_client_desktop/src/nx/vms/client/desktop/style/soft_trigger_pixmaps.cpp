@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "software_trigger_pixmaps.h"
+#include "soft_trigger_pixmaps.h"
 
 #include <set>
 
@@ -89,22 +89,22 @@ QPixmap getTriggerPixmap(const QString& name)
     if (name.isEmpty())
         return QPixmap();
 
-    return qnSkin->pixmap(SoftwareTriggerPixmaps::effectivePixmapPath(name), true);
+    return qnSkin->pixmap(SoftTriggerPixmaps::effectivePixmapPath(name), true);
 }
 
 } // namespace
 
-QString SoftwareTriggerPixmaps::defaultPixmapName()
+QString SoftTriggerPixmaps::defaultPixmapName()
 {
     return "_bell_on";
 }
 
-QString SoftwareTriggerPixmaps::effectivePixmapName(const QString& name)
+QString SoftTriggerPixmaps::effectivePixmapName(const QString& name)
 {
     return hasPixmap(name) ? name : defaultPixmapName();
 }
 
-QString SoftwareTriggerPixmaps::effectivePixmapPath(const QString& name)
+QString SoftTriggerPixmaps::effectivePixmapPath(const QString& name)
 {
     if (const auto it = kIconNameMapping.find(name);
         it != kIconNameMapping.end())
@@ -116,7 +116,7 @@ QString SoftwareTriggerPixmaps::effectivePixmapPath(const QString& name)
     return effectivePixmapPath(defaultPixmapName());
 }
 
-const QStringList& SoftwareTriggerPixmaps::pixmapNames()
+const QStringList& SoftTriggerPixmaps::pixmapNames()
 {
     static const auto pixmapNames =
         []() -> QStringList
@@ -137,7 +137,7 @@ const QStringList& SoftwareTriggerPixmaps::pixmapNames()
     return pixmapNames;
 }
 
-const SoftwareTriggerPixmaps::MapT SoftwareTriggerPixmaps::pixmaps()
+const SoftTriggerPixmaps::MapT SoftTriggerPixmaps::pixmaps()
 {
     static const auto pixmaps =
         []() -> MapT
@@ -152,12 +152,12 @@ const SoftwareTriggerPixmaps::MapT SoftwareTriggerPixmaps::pixmaps()
     return pixmaps;
 }
 
-bool SoftwareTriggerPixmaps::hasPixmap(const QString& name)
+bool SoftTriggerPixmaps::hasPixmap(const QString& name)
 {
     return !getTriggerPixmap(name).isNull();
 }
 
-QPixmap SoftwareTriggerPixmaps::pixmapByName(const QString& name)
+QPixmap SoftTriggerPixmaps::pixmapByName(const QString& name)
 {
     const auto pixmap = getTriggerPixmap(name);
     return pixmap.isNull()

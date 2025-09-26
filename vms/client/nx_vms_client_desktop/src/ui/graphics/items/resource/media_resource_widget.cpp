@@ -128,7 +128,7 @@
 #include <ui/graphics/items/overlays/status_overlay_controller.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
-#include <ui/graphics/items/resource/software_trigger_button.h>
+#include <ui/graphics/items/resource/soft_trigger_button.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/gl_native_painting.h>
