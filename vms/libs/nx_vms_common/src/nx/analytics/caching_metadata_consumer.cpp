@@ -97,6 +97,7 @@ public:
         m_cacheSize = cacheSize;
     }
 
+    static T uncompress(const QnConstAbstractCompressedMetadataPtr& metadata);
     static T uncompress(const QnAbstractCompressedMetadataPtr& metadata);
     static qint64 timestampUs(const T& t);
     static bool containsTime(const T& t, const qint64 timestampUs);
@@ -136,7 +137,7 @@ private:
     size_t m_cacheSize;
 };
 
-QString metadataRepresentation(QnAbstractCompressedMetadataPtr metadata)
+QString metadataRepresentation(QnConstAbstractCompressedMetadataPtr metadata)
 {
     if (metadata->metadataType != MetadataType::ObjectDetection)
     {
@@ -144,7 +145,7 @@ QString metadataRepresentation(QnAbstractCompressedMetadataPtr metadata)
     }
 
     const auto compressedMetadata =
-            std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
+            std::dynamic_pointer_cast<const QnCompressedMetadata>(metadata);
     if (!NX_ASSERT(compressedMetadata, "Unparseable object metadata"))
         return nx::format("Unparseable object metadata");
 
@@ -171,6 +172,14 @@ QnMetaDataV1Ptr MetadataCache<QnMetaDataV1Ptr>::uncompress(
 }
 
 template<>
+QnMetaDataV1Ptr MetadataCache<QnMetaDataV1Ptr>::uncompress(
+    const QnConstAbstractCompressedMetadataPtr& )
+{
+    NX_ASSERT(false, "Should never be called");
+    return nullptr;
+}
+
+template<>
 qint64 MetadataCache<QnMetaDataV1Ptr>::timestampUs(const QnMetaDataV1Ptr& t)
 {
     return t->timestamp;
@@ -184,6 +193,14 @@ bool MetadataCache<QnMetaDataV1Ptr>::containsTime(
 }
 
 using namespace nx::common::metadata;
+
+template<>
+ObjectMetadataPacketPtr MetadataCache<ObjectMetadataPacketPtr>::uncompress(
+    const QnConstAbstractCompressedMetadataPtr& metadata)
+{
+    const auto compressedMetadata = std::dynamic_pointer_cast<const QnCompressedMetadata>(metadata);
+    return fromCompressedMetadataPacket(compressedMetadata);
+}
 
 template<>
 ObjectMetadataPacketPtr MetadataCache<ObjectMetadataPacketPtr>::uncompress(
@@ -212,21 +229,29 @@ bool MetadataCache<ObjectMetadataPacketPtr>::containsTime(
 
 
 template<>
-QnAbstractCompressedMetadataPtr MetadataCache<QnAbstractCompressedMetadataPtr>::uncompress(
-    const QnAbstractCompressedMetadataPtr& metadata)
+QnConstAbstractCompressedMetadataPtr MetadataCache<QnConstAbstractCompressedMetadataPtr>::uncompress(
+    const QnConstAbstractCompressedMetadataPtr& metadata)
 {
-    return std::dynamic_pointer_cast<QnMetaDataV1>(metadata);
+    return metadata;
 }
 
 template<>
-qint64 MetadataCache<QnAbstractCompressedMetadataPtr>::timestampUs(const QnAbstractCompressedMetadataPtr& t)
+QnConstAbstractCompressedMetadataPtr MetadataCache<QnConstAbstractCompressedMetadataPtr>::uncompress(
+    const QnAbstractCompressedMetadataPtr& metadata)
+{
+    NX_ASSERT(false, "Should never be called");
+    return nullptr;
+}
+
+template<>
+qint64 MetadataCache<QnConstAbstractCompressedMetadataPtr>::timestampUs(const QnConstAbstractCompressedMetadataPtr& t)
 {
     return t->timestamp;
 }
 
 template<>
-bool MetadataCache<QnAbstractCompressedMetadataPtr>::containsTime(
-    const QnAbstractCompressedMetadataPtr& t, const qint64 timestampUs)
+bool MetadataCache<QnConstAbstractCompressedMetadataPtr>::containsTime(
+    const QnConstAbstractCompressedMetadataPtr& t, const qint64 timestampUs)
 {
     return t->containTime(timestampUs);
 }
@@ -321,6 +346,25 @@ QList<T> CachingMetadataConsumer<T>::metadataRange(
 }
 
 template<typename T>
+void CachingMetadataConsumer<T>::processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata)
+{
+    NX_VERBOSE(this, "Metadata packet received, %1, timestamp %2",
+        metadataRepresentation(metadata),
+        metadata->timestamp);
+
+    const auto channel = static_cast<int>(metadata->channelNumber);
+    if (d->cachePerChannel.size() <= channel)
+        d->cachePerChannel.resize(channel + 1);
+
+    auto& cache = d->cachePerChannel[channel];
+    if (cache.isNull())
+        cache.reset(new MetadataCache<T>(d->cacheSize));
+
+    const auto uncompressedMetadata = MetadataCache<T>::uncompress(metadata);
+    cache->insertMetadata(uncompressedMetadata);
+}
+
+template<typename T>
 void CachingMetadataConsumer<T>::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
 {
     NX_VERBOSE(this, "Metadata packet received, %1, timestamp %2",
@@ -341,6 +385,6 @@ void CachingMetadataConsumer<T>::processMetadata(const QnAbstractCompressedMetad
 
 template class CachingMetadataConsumer<QnMetaDataV1Ptr>;
 template class CachingMetadataConsumer<nx::common::metadata::ObjectMetadataPacketPtr>;
-template class CachingMetadataConsumer<QnAbstractCompressedMetadataPtr>;
+template class CachingMetadataConsumer<QnConstAbstractCompressedMetadataPtr>;
 
 } // namespace nx::analytics

@@ -35,6 +35,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportSettingsDialogState: public AbstractFluxS
     bool rapidReviewSelected = false;
 
     nx::core::transcoding::Settings availableTranscodingSettings;
+    api::PixelationSettings uncheckedPixelationSettings = {};
 
     QSize fullFrameSize;
     qreal overlayScale = 1.0;
@@ -138,7 +139,7 @@ public:
 
     static State setBookmarks(State state, const QnCameraBookmarkList& bookmarks);
 
-    static State setMediaResourceSettings(State state, bool hasVideo, const nx::core::transcoding::Settings& settings);
+    static State setMediaResourceSettings(State state, bool hasVideo, const nx::core::transcoding::Settings& settings, bool forcePixelation);
 
     static std::pair<bool, State> setFrameSize(State state, const QSize& size);
 

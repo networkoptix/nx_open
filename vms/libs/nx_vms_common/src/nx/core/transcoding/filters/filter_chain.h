@@ -56,7 +56,7 @@ public:
     void reset();
     bool empty();
 
-    void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
+    void processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata);
     QSize apply(const QSize& resolution) const;
     CLVideoDecoderOutputPtr apply(const CLVideoDecoderOutputPtr& source) const;
 
@@ -82,7 +82,7 @@ private:
     QnConstResourceVideoLayoutPtr m_layout;
     std::list<QnAbstractImageFilterPtr> m_legacyFilters;
     std::list<QnAbstractImageFilterPtr> m_filters;
-    nx::analytics::CachingMetadataConsumer<QnAbstractCompressedMetadataPtr> m_metadataCache;
+    nx::analytics::CachingMetadataConsumer<QnConstAbstractCompressedMetadataPtr> m_metadataCache;
 };
 
 using FilterChainPtr = std::unique_ptr<FilterChain>;

@@ -111,6 +111,7 @@ void ExportSettingsDialogState::applyTranscodingSettings()
     // Fixing settings for preview transcoding
     // This settings are affecting both export and preview.
     nx::core::transcoding::Settings& settings = exportMediaSettings.transcodingSettings;
+
     if (exportMediaPersistentSettings.applyFilters)
     {
         settings.rotation = availableTranscodingSettings.rotation;
@@ -118,6 +119,7 @@ void ExportSettingsDialogState::applyTranscodingSettings()
         settings.enhancement = availableTranscodingSettings.enhancement;
         settings.dewarping = availableTranscodingSettings.dewarping;
         settings.zoomWindow = availableTranscodingSettings.zoomWindow;
+        settings.pixelationSettings = availableTranscodingSettings.pixelationSettings;
     }
     else
     {
@@ -126,6 +128,7 @@ void ExportSettingsDialogState::applyTranscodingSettings()
         settings.enhancement = {};
         settings.dewarping = {};
         settings.zoomWindow = {};
+        settings.pixelationSettings = uncheckedPixelationSettings;
     }
 }
 
@@ -306,10 +309,11 @@ State ExportSettingsDialogStateReducer::setBookmarks(State state, const QnCamera
     return state;
 }
 
-State ExportSettingsDialogStateReducer::setMediaResourceSettings(State state, bool hasVideo, const nx::core::transcoding::Settings& settings)
+State ExportSettingsDialogStateReducer::setMediaResourceSettings(State state, bool hasVideo, const nx::core::transcoding::Settings& settings, bool forcePixelation)
 {
     state.availableTranscodingSettings = settings;
     state.exportMediaPersistentSettings.hasVideo = hasVideo;
+    state.uncheckedPixelationSettings = {forcePixelation};
 
     state.applyTranscodingSettings();
 

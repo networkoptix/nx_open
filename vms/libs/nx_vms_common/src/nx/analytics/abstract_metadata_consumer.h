@@ -14,6 +14,7 @@ public:
     virtual ~AbstractMetadataConsumer();
 
     MetadataType metadataType() const;
+    virtual void processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata) = 0;
     virtual void processMetadata(const QnAbstractCompressedMetadataPtr& metadata) = 0;
 
 protected:

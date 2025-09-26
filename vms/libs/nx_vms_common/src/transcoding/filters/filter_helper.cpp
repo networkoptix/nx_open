@@ -70,6 +70,8 @@ nx::core::transcoding::FilterChainPtr QnImageFilterHelper::createFilterChain(
     settings.enhancement = legacy.contrastParams;
     settings.zoomWindow = legacy.zoomWindow;
     settings.watermark = legacy.watermark;
+    settings.pixelationSettings = {};
+
     auto dewarpingMedia = legacy.resource->getDewarpingParams();
     if (legacy.forceDewarping)
     {

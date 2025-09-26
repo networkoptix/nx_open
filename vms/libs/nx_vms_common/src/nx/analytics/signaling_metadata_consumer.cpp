@@ -14,7 +14,7 @@ SignalingMetadataConsumer::~SignalingMetadataConsumer()
 {
 }
 
-void SignalingMetadataConsumer::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
+void SignalingMetadataConsumer::processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata)
 {
     emit metadataReceived(metadata);
 }

@@ -14,9 +14,9 @@ namespace nx::core::transcoding {
 namespace {
 
 std::optional<nx::common::metadata::ObjectMetadataPacket> objectDataPacketFromMetadata(
-    const QnAbstractCompressedMetadataPtr& metadata)
+    const QnConstAbstractCompressedMetadataPtr& metadata)
 {
-    const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
+    const auto compressedMetadata = std::dynamic_pointer_cast<const QnCompressedMetadata>(metadata);
     if (!compressedMetadata)
         return {};
 
@@ -29,15 +29,19 @@ std::optional<nx::common::metadata::ObjectMetadataPacket> objectDataPacketFromMe
 PixelationImageFilter::PixelationImageFilter(const nx::vms::api::PixelationSettings& settings):
     m_settings(settings)
 {
+    m_pixelation = std::make_shared<nx::vms::common::pixelation::Pixelation>();
 }
 
 PixelationImageFilter::~PixelationImageFilter()
 {
     // Deleting in the thread it was created.
+    if (!m_pixelation)
+        return;
+
     executeInThread(m_pixelation->thread(), [pixelation = m_pixelation]() {});
 }
 
-void PixelationImageFilter::setMetadata(const QnAbstractCompressedMetadataPtr& metadata)
+void PixelationImageFilter::setMetadata(const QnConstAbstractCompressedMetadataPtr& metadata)
 {
     m_metadata = metadata;
 }

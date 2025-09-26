@@ -37,6 +37,7 @@ public:
         PickingPolicy pickingPolicy,
         int maximumCount) const;
 
+    void processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata) override;
     void processMetadata(const QnAbstractCompressedMetadataPtr& metadata) override;
 
 private:

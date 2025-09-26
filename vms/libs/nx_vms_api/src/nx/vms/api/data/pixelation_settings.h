@@ -20,6 +20,8 @@ struct NX_VMS_API PixelationSettings
 
     bool operator==(const PixelationSettings& other) const;
     QByteArray toString() const;
+
+    bool isPixelationRequiredForCamera(nx::Uuid cameraId) const;
 };
 
 #define PixelationSettings_Fields (isAllObjectTypes)(objectTypeIds)(intensity)(excludeCameraIds)

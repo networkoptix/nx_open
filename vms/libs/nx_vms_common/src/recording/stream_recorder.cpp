@@ -310,6 +310,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         NX_VERBOSE(this, "Got analytics packet, timestamp %1 us", md->timestamp);
         const auto analytics =
             std::dynamic_pointer_cast<const QnCompressedObjectMetadataPacket>(metadata);
+        writeData(metadata, getStreamIndex(md));
     }
 
     if (m_startDateTimeUs != (int64_t) AV_NOPTS_VALUE

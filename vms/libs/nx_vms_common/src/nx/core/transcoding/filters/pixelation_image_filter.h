@@ -4,6 +4,7 @@
 
 #include <nx/vms/api/data/pixelation_settings.h>
 
+#include "analytics/common/object_metadata.h"
 #include "paint_image_filter.h"
 
 namespace nx::vms::common { class PixelationSettings; }
@@ -22,12 +23,12 @@ public:
 
     virtual QSize updatedResolution(const QSize& sourceSize) { return sourceSize; };
 
-    void setMetadata(const QnAbstractCompressedMetadataPtr& metadata);
+    void setMetadata(const QnConstAbstractCompressedMetadataPtr& metadata);
 
 private:
     std::shared_ptr<nx::vms::common::pixelation::Pixelation> m_pixelation;
     nx::vms::api::PixelationSettings m_settings;
-    QnAbstractCompressedMetadataPtr m_metadata;
+    QnConstAbstractCompressedMetadataPtr m_metadata;
 };
 
 } // nx::core::transcoding

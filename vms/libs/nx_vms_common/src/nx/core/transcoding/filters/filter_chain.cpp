@@ -4,13 +4,14 @@
 
 #include <core/resource/media_resource.h>
 #include <nx/core/transcoding/filters/paint_image_filter.h>
+#include <nx/core/transcoding/filters/pixelation_image_filter.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/core/transcoding/filters/watermark_filter.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/api/data/pixelation_settings.h>
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/crop_image_filter.h>
 #include <transcoding/filters/dewarping_image_filter.h>
-#include <nx/core/transcoding/filters/pixelation_image_filter.h>
 #include <transcoding/filters/rotate_image_filter.h>
 #include <transcoding/filters/scale_image_filter.h>
 #include <transcoding/filters/tiled_image_filter.h>
@@ -67,6 +68,7 @@ void FilterChain::prepareForImage(const QSize& fullImageResolution)
 {
     NX_ASSERT(!isReady(), "Double initialization");
 
+    // TODO: here there are no settings.pixelation enabled
     if (!isImageTranscodingRequired(fullImageResolution, kDefaultResolutionLimit))
         return;
 
@@ -123,6 +125,11 @@ bool FilterChain::isTranscodingRequired(bool concernTiling) const
     if (m_settings.watermark.visible())
         return true;
 
+    if (m_settings.pixelationSettings.has_value()
+        && (m_settings.pixelationSettings.value().isAllObjectTypes
+            || !m_settings.pixelationSettings.value().objectTypeIds.empty()))
+        return true;
+
     return !m_settings.overlays.isEmpty();
 }
 
@@ -146,7 +153,7 @@ void FilterChain::reset()
     m_ready = false;
 }
 
-void FilterChain::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
+void FilterChain::processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata)
 {
     m_metadataCache.processMetadata(metadata);
 }

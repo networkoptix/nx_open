@@ -19,10 +19,10 @@ public:
     virtual ~SignalingMetadataConsumer() override;
 
 signals:
-    void metadataReceived(const QnAbstractCompressedMetadataPtr& metadata);
+    void metadataReceived(const QnConstAbstractCompressedMetadataPtr& metadata);
 
 protected:
-    virtual void processMetadata(const QnAbstractCompressedMetadataPtr& metadata) override;
+    virtual void processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata) override;
 };
 
 } // namespace bx::analytics

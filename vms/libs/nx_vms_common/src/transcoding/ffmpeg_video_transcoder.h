@@ -54,6 +54,7 @@ public:
 
     // Should call before open
     void setFilterChain(nx::core::transcoding::FilterChainPtr filters);
+    nx::core::transcoding::FilterChain* getFilterChain() const;
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
     virtual bool open(const QnConstCompressedVideoDataPtr& video);

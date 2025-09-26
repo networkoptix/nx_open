@@ -16,6 +16,7 @@
 #include <utils/common/aspect_ratio.h>
 
 #include "../timestamp_format.h"
+#include "nx/vms/common/pixelation/pixelation_settings.h"
 
 namespace nx {
 namespace core {

@@ -40,6 +40,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <utils/common/event_processors.h>
 
+#include "core/resource/user_resource.h"
+#include "nx/vms/common/system_settings.h"
 #include "private/export_settings_dialog_p.h"
 
 namespace nx::vms::client::desktop {
@@ -678,7 +680,12 @@ void ExportSettingsDialog::setMediaParams(
     settings.dewarping = itemData.dewarpingParams;
     settings.zoomWindow = itemData.zoomRect;
     settings.rotation = itemData.rotation;
-    d->dispatch(Reducer::setMediaResourceSettings, mediaResource->hasVideo(), settings);
+    settings.pixelationSettings = systemContext()->user()->isAdministrator()
+        ? systemSettings()->pixelationSettings()
+        : api::PixelationSettings({true});
+
+
+    d->dispatch(Reducer::setMediaResourceSettings, mediaResource->hasVideo(), settings, !systemContext()->user()->isAdministrator());
 
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
 

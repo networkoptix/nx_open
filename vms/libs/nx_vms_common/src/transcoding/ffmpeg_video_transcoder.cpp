@@ -446,3 +446,8 @@ void QnFfmpegVideoTranscoder::setFilterChain(nx::core::transcoding::FilterChainP
 {
     m_filters = std::move(filters);
 }
+
+nx::core::transcoding::FilterChain* QnFfmpegVideoTranscoder::getFilterChain() const
+{
+    return m_filters.get();
+}

@@ -19,4 +19,13 @@ QByteArray PixelationSettings::toString() const
     return QJson::serialized(this);
 }
 
+bool PixelationSettings::isPixelationRequiredForCamera(nx::Uuid cameraId) const
+{
+    if (excludeCameraIds.contains(cameraId))
+        return false;
+
+    return isAllObjectTypes || !objectTypeIds.empty();
+    return true;
+}
+
 } // namespace nx::vms::api
