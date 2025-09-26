@@ -149,7 +149,7 @@ public:
     virtual void subscribeForCloudTokenUpdate(ICloudTokenSubscriber* subscriber) = 0;
 };
 
-class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider5>
+class IUtilityProvider6: public Interface<IUtilityProvider6, IUtilityProvider5>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider6"); }
@@ -163,6 +163,21 @@ public:
     virtual IString* supportedVectorizationModels() const = 0;
 };
 
-using IUtilityProvider6 = IUtilityProvider;
+class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider6>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider7"); }
+
+    /** Called by dataDir */
+    protected: virtual IString* getDataDir() const = 0;
+
+    /**
+     *
+     * @return Absolute path to the Servers's Data Directory, or an empty string if it is absent.
+     */
+    public: std::string dataDir() const { return Ptr(getDataDir())->str(); }
+};
+
+using IUtilityProvider7 = IUtilityProvider;
 
 } // namespace nx::sdk
