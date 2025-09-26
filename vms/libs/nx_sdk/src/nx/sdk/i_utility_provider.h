@@ -132,7 +132,7 @@ public:
     virtual void updated(const char* token) const = 0;
 };
 
-class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider4>
+class IUtilityProvider5: public Interface<IUtilityProvider5, IUtilityProvider4>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider5"); }
@@ -149,7 +149,35 @@ public:
     virtual void subscribeForCloudTokenUpdate(ICloudTokenSubscriber* subscriber) = 0;
 };
 
+class IUtilityProvider6: public Interface<IUtilityProvider6, IUtilityProvider5>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider6"); }
 
-using IUtilityProvider5 = IUtilityProvider;
+    /**
+     * Comma-separated list of supported image/text vectorization model names.
+     * Example: "openai/clip-vit-large-patch14-336".
+     * The plugin can specify a vectorization model from this list in the EngineManifest,
+     * and use it to generate and attach a vector to the track's best shot data.
+     */
+    virtual IString* supportedVectorizationModels() const = 0;
+};
+
+class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider6>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider7"); }
+
+    /** Called by dataDir */
+    protected: virtual IString* getDataDir() const = 0;
+
+    /**
+     *
+     * @return Absolute path to the Servers's Data Directory, or an empty string if it is absent.
+     */
+    public: std::string dataDir() const { return Ptr(getDataDir())->str(); }
+};
+
+using IUtilityProvider7 = IUtilityProvider;
 
 } // namespace nx::sdk

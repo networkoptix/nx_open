@@ -295,6 +295,8 @@ public:
     virtual const char* serverId() const override { return ""; }
     virtual IString* cloudSystemId() const { return new nx::sdk::String(); }
     virtual IString* cloudAuthKey() const override { return new nx::sdk::String(); }
+    virtual IString* supportedVectorizationModels() const override { return new nx::sdk::String(); }
+    virtual IString* getDataDir() const override { return new nx::sdk::String(); }
     virtual const char* cloudToken() const override { return ""; }
     virtual void subscribeForCloudTokenUpdate(ICloudTokenSubscriber* /*subscriber*/) override {}
 
