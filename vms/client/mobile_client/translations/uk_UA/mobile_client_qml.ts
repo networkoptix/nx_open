@@ -1072,7 +1072,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation>Термін Дії Закінчується</translation>
+      <translation>Закінчується</translation>
     </message>
     <message>
       <source>Fingerprints</source>

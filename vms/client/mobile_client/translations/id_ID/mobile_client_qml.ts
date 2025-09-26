@@ -1061,19 +1061,19 @@
     <name>SslCertificateDialog</name>
     <message>
       <source>Common name</source>
-      <translation type="unfinished">Common name</translation>
+      <translation>Nama umum</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>Dikeluarkan oleh</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Kadaluarsa</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>Sidik jari</translation>
     </message>
   </context>
   <context>
