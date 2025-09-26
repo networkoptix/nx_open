@@ -125,4 +125,12 @@ void UiController::showConnectionErrorMessage(
     showMessage(title, errorText);
 }
 
+void UiController::showLinkAboutToOpenMessage(const QString& link) const
+{
+    QmlWrapperHelper::showPopup(
+        windowContext(),
+        QUrl("Nx/Web/LinkAboutToOpenDialog.qml"),
+        QVariantMap {{"link", link}});
+}
+
 } // namespace nx::vms::client::mobile
