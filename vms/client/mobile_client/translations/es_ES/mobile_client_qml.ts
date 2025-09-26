@@ -459,11 +459,11 @@
     <name>InvalidOrChangedCertificateDialog</name>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>Conéctese de todos modos</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
   </context>
   <context>
@@ -1073,26 +1073,26 @@
     <name>SslCertificateDialogBase</name>
     <message>
       <source>Common name</source>
-      <translation type="unfinished">Common name</translation>
+      <translation>Denominación general</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>Emitido por</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Expira</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>Huellas digitales</translation>
     </message>
   </context>
   <context>
     <name>StandardPopup</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Aceptar</translation>
     </message>
   </context>
   <context>
@@ -1123,22 +1123,22 @@
     <name>TwoFactorAuthenticationErrorDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Aceptar</translation>
     </message>
     <message>
       <source>Open account settings</source>
-      <translation type="unfinished">Open account settings</translation>
+      <translation>Abrir configuración de cuenta</translation>
     </message>
   </context>
   <context>
     <name>UnknownSslCertificateDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Continuar</translation>
     </message>
   </context>
   <context>

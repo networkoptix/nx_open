@@ -458,11 +458,11 @@
     <name>InvalidOrChangedCertificateDialog</name>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>그래도 연결</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>취소</translation>
     </message>
   </context>
   <context>
@@ -1072,26 +1072,26 @@
     <name>SslCertificateDialogBase</name>
     <message>
       <source>Common name</source>
-      <translation type="unfinished">Common name</translation>
+      <translation>일반 이름</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>발급자</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>만료</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>지문</translation>
     </message>
   </context>
   <context>
     <name>StandardPopup</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>확인</translation>
     </message>
   </context>
   <context>
@@ -1122,7 +1122,7 @@
     <name>TwoFactorAuthenticationErrorDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>확인</translation>
     </message>
     <message>
       <source>Open account settings</source>
@@ -1133,11 +1133,11 @@
     <name>UnknownSslCertificateDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>취소</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>계속</translation>
     </message>
   </context>
   <context>

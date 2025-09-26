@@ -458,11 +458,11 @@
     <name>InvalidOrChangedCertificateDialog</name>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>继续连线</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>撤消</translation>
     </message>
   </context>
   <context>
@@ -1076,22 +1076,22 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>发布者</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>到期</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>凭证指纹</translation>
     </message>
   </context>
   <context>
     <name>StandardPopup</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>确定</translation>
     </message>
   </context>
   <context>
@@ -1122,7 +1122,7 @@
     <name>TwoFactorAuthenticationErrorDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>确定</translation>
     </message>
     <message>
       <source>Open account settings</source>
@@ -1133,11 +1133,11 @@
     <name>UnknownSslCertificateDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>撤消</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>继续</translation>
     </message>
   </context>
   <context>

@@ -465,7 +465,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Zrušit</translation>
     </message>
   </context>
   <context>
@@ -1083,7 +1083,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Platnost vyprší</translation>
     </message>
     <message>
       <source>Fingerprints</source>
@@ -1094,7 +1094,7 @@
     <name>StandardPopup</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -1125,7 +1125,7 @@
     <name>TwoFactorAuthenticationErrorDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Open account settings</source>
@@ -1136,11 +1136,11 @@
     <name>UnknownSslCertificateDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Zrušit</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Pokračovat</translation>
     </message>
   </context>
   <context>

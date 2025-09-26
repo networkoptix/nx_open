@@ -462,7 +462,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>ยกเลิก</translation>
     </message>
   </context>
   <context>
@@ -1072,26 +1072,26 @@
     <name>SslCertificateDialogBase</name>
     <message>
       <source>Common name</source>
-      <translation type="unfinished">Common name</translation>
+      <translation>ชื่อทั่วไป:</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>ออกโดย</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>หมดอายุแล้ว</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>ลายนิ้วมือ</translation>
     </message>
   </context>
   <context>
     <name>StandardPopup</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>ตกลง</translation>
     </message>
   </context>
   <context>
@@ -1122,7 +1122,7 @@
     <name>TwoFactorAuthenticationErrorDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>ตกลง</translation>
     </message>
     <message>
       <source>Open account settings</source>
@@ -1133,11 +1133,11 @@
     <name>UnknownSslCertificateDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>ยกเลิก</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>ดำเนิน​การ</translation>
     </message>
   </context>
   <context>

@@ -176,11 +176,11 @@
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</translation>
+      <translation>For at logge ind på dette site skal du deaktivere &quot;Bed om en bekræftelseskode ved hvert login med din %1 konto&quot; i dine kontoindstillinger.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your account settings.</source>
-      <translation type="unfinished">You can enable two-factor authentication in your account settings.</translation>
+      <translation>Du kan aktivere to-faktor godkendelse i dine kontoindstillinger.</translation>
     </message>
   </context>
   <context>
