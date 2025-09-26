@@ -99,8 +99,10 @@ bool QnFfmpegVideoTranscoder::prepareFilters(
 {
     if (!m_filters)
     {
+        // This need to align the target resolution(in prepareDownscaleFilter function).
+        // #TODO make it without filters or more explicitly.
         m_filters = std::make_unique<nx::core::transcoding::FilterChain>(
-            nx::core::transcoding::Settings(), nx::vms::api::dewarping::MediaData(), nullptr);
+            nx::core::transcoding::Settings());
     }
     if (m_filters->isReady())
         return true;

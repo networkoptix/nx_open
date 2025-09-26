@@ -17,18 +17,9 @@ public:
         return m_filters.get();
     }
 
-    void setSettings(const nx::core::transcoding::Settings& settings,
-        const QnMediaResourcePtr& resource)
+    void setSettings(const nx::core::transcoding::Settings& settings)
     {
-        if (!resource)
-        {
-            m_filters.reset();
-            m_sourceSize = QSize();
-            return;
-        }
-
-        m_filters = std::make_unique<nx::core::transcoding::FilterChain>(
-            settings, resource->getDewarpingParams(), resource->getVideoLayout());
+        m_filters = std::make_unique<nx::core::transcoding::FilterChain>(settings);
         m_sourceSize = QSize();
     }
 
@@ -68,10 +59,9 @@ TranscodingImageProcessor::~TranscodingImageProcessor()
 }
 
 void TranscodingImageProcessor::setTranscodingSettings(
-    const nx::core::transcoding::Settings& settings,
-    const QnMediaResourcePtr& resource)
+    const nx::core::transcoding::Settings& settings)
 {
-    d->setSettings(settings, resource);
+    d->setSettings(settings);
     emit updateRequired();
 }
 

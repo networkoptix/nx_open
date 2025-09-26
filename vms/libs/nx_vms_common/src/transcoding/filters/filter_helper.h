@@ -3,15 +3,17 @@
 #pragma once
 
 #include <nx/core/transcoding/filters/filter_chain.h>
+#include <nx/core/transcoding/filters/timestamp_params.h>
 
-namespace nx { namespace core { namespace transcoding { struct LegacyTranscodingSettings; }}}
+namespace nx::core::transcoding {
 
-class NX_VMS_COMMON_API QnImageFilterHelper
-{
-public:
-    /**
-     * Create filters for source image processing
-     */
-    static nx::core::transcoding::FilterChainPtr createFilterChain(
-        const nx::core::transcoding::LegacyTranscodingSettings& settings);
-};
+/**
+ * Create filters for source image processing
+ */
+NX_VMS_COMMON_API FilterChainPtr createFilterChain(
+    const Settings& settings,
+    TimestampParams timestampParams,
+    FilterParams cameraNameParams,
+    QString cameraName);
+
+} // namespace nx::core::transcoding

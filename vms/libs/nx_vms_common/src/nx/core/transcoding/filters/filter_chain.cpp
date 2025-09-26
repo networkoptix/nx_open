@@ -25,19 +25,13 @@ static constexpr int kMetadataCashSize = 1000;
 
 } // namespace
 
-namespace nx {
-namespace core {
-namespace transcoding {
+namespace nx::core::transcoding {
 
 const QSize FilterChain::kDefaultResolutionLimit(8192 - 16, 8192 - 16);
 
-FilterChain::FilterChain(const Settings& settings,
-    nx::vms::api::dewarping::MediaData dewarpingParams,
-    QnConstResourceVideoLayoutPtr layout)
+FilterChain::FilterChain(const Settings& settings)
     :
     m_settings(settings),
-    m_dewarpingParams(dewarpingParams),
-    m_layout(layout),
     m_metadataCache(MetadataType::ObjectDetection, kMetadataCashSize)
 {
 }
@@ -48,9 +42,9 @@ void FilterChain::prepare(const QSize& srcFrameResolution, const QSize& resoluti
 
     prepareVideoArFilter(srcFrameResolution);
 
-    const auto isPanoramicCamera = m_layout && m_layout->channelCount() > 1;
+    const auto isPanoramicCamera = m_settings.layout && m_settings.layout->channelCount() > 1;
     if (isPanoramicCamera)
-        m_filters.push_back(QnAbstractImageFilterPtr(new QnTiledImageFilter(m_layout)));
+        m_filters.push_back(QnAbstractImageFilterPtr(new QnTiledImageFilter(m_settings.layout)));
 
     createPixelationImageFilter();
     prepareZoomWindowFilter();
@@ -90,47 +84,9 @@ void FilterChain::prepareForImage(const QSize& fullImageResolution)
 bool FilterChain::isImageTranscodingRequired(const QSize& fullImageResolution,
     const QSize& resolutionLimit) const
 {
-    return isTranscodingRequired(/*concernTiling*/ false)
+    return m_settings.isTranscodingRequired(/*concernTiling*/ false)
         || fullImageResolution.width() > resolutionLimit.width()
         || fullImageResolution.height() > resolutionLimit.height();
-}
-
-bool FilterChain::isTranscodingRequired(bool concernTiling) const
-{
-    if (concernTiling && m_layout && m_layout->channelCount() > 1)
-        return true;
-
-    //TODO: #sivanov Remove when legacy is gone.
-    if (!m_legacyFilters.empty())
-        return true;
-
-    if (m_settings.forceTranscoding)
-        return true;
-
-    if (m_settings.aspectRatio.isValid())
-        return true;
-
-    if (!m_settings.zoomWindow.isEmpty())
-        return true;
-
-    if (m_settings.dewarping.enabled)
-        return true;
-
-    if (m_settings.enhancement.enabled)
-        return true;
-
-    if (m_settings.rotation != 0)
-        return true;
-
-    if (m_settings.watermark.visible())
-        return true;
-
-    if (m_settings.pixelationSettings.has_value()
-        && (m_settings.pixelationSettings.value().isAllObjectTypes
-            || !m_settings.pixelationSettings.value().objectTypeIds.empty()))
-        return true;
-
-    return !m_settings.overlays.isEmpty();
 }
 
 bool FilterChain::isDownscaleRequired(const QSize& srcResolution) const
@@ -223,8 +179,8 @@ void FilterChain::prepareImageArFilter(const QSize& fullImageResolution)
         newSize.setHeight(fullImageResolution.height());
 
         auto aspectRatio = m_settings.aspectRatio.toFloat();
-        if (m_layout)
-            aspectRatio *= QnAspectRatio(m_layout->size()).toFloat();
+        if (m_settings.layout)
+            aspectRatio *= QnAspectRatio(m_settings.layout->size()).toFloat();
 
         newSize.setWidth(fullImageResolution.height() * aspectRatio + 0.5);
 
@@ -241,7 +197,7 @@ void FilterChain::prepareDewarpingFilter()
     if (m_settings.dewarping.enabled)
     {
         m_filters.push_back(QnAbstractImageFilterPtr(new QnDewarpingImageFilter(
-            m_dewarpingParams, m_settings.dewarping)));
+            m_settings.dewarpingMedia, m_settings.dewarping)));
     }
 }
 
@@ -374,6 +330,4 @@ void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,
     }
 }
 
-} // namespace transcoding
-} // namespace core
-} // namespace nx
+} // namespace nx::core::transcoding

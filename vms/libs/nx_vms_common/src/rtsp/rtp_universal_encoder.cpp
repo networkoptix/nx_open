@@ -290,7 +290,7 @@ bool QnUniversalRtpEncoder::open(
     MediaQuality requiredQuality,
     AVCodecID dstCodec,
     const QSize& videoSize,
-    const QnLegacyTranscodingSettings& extraTranscodeParams)
+    const nx::core::transcoding::Settings& extraTranscodeParams)
 {
     m_requiredQuality = requiredQuality;
     QnConstAbstractMediaDataPtr media =

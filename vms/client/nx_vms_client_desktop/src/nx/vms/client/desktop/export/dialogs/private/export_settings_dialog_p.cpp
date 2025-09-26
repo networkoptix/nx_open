@@ -162,14 +162,14 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
             dispatchTo(Reducer::setFrameSize));
     }
 
-    m_mediaPreviewProcessor->setTranscodingSettings(
-        state().exportMediaSettings.transcodingSettings,
-        m_mediaResource);
-
     // We can get here from ExportSettingsDialog::setMediaParams.
     if (!m_mediaResource)
         return;
 
+    auto settings = state().exportMediaSettings.transcodingSettings;
+    settings.layout = m_mediaResource->getVideoLayout();
+    settings.dewarpingMedia = m_mediaResource->getDewarpingParams();
+    m_mediaPreviewProcessor->setTranscodingSettings(settings);
     m_mediaPreviewProvider->loadAsync();
     m_mediaPreviewWidget->setImageProvider(m_mediaPreviewProvider.get());
 
@@ -249,7 +249,10 @@ void ExportSettingsDialog::Private::validateSettings(ExportMode mode)
         if (!m_mediaResource)
             return;
 
-        results = ExportMediaValidator::validateSettings(state().getExportMediaSettings(), m_mediaResource);
+        auto settings = state().getExportMediaSettings();
+        settings.transcodingSettings.layout = m_mediaResource->getVideoLayout();
+        settings.transcodingSettings.dewarpingMedia = m_mediaResource->getDewarpingParams();
+        results = ExportMediaValidator::validateSettings(settings, m_mediaResource);
         if (m_mediaValidationResults == results)
             return;
 

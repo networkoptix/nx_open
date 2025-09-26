@@ -14,18 +14,14 @@
 class CLVideoDecoderOutput;
 using CLVideoDecoderOutputPtr = QSharedPointer<CLVideoDecoderOutput>;
 
-namespace nx {
-namespace core {
-namespace transcoding {
+namespace nx::core::transcoding {
 
 class NX_VMS_COMMON_API FilterChain
 {
 public:
     const static QSize kDefaultResolutionLimit;
 
-    FilterChain(const Settings& settings,
-        nx::vms::api::dewarping::MediaData dewarpingParams, // TODO move it to settings?
-        QnConstResourceVideoLayoutPtr layout);
+    FilterChain(const Settings& settings);
 
     /**
      * Prepare set of filters to apply to video data.
@@ -39,13 +35,6 @@ public:
      * concerning video layout size.
      */
     void prepareForImage(const QSize& fullImageResolution);
-
-    /**
-     * Check if chain contains any options that require transcoding.
-     * @param concernTiling If video layout transcoding (tiling) matters - it is not applied while
-     *     transcoding images.
-     */
-    bool isTranscodingRequired(bool concernTiling = true) const;
 
     bool isImageTranscodingRequired(const QSize& fullImageResolution,
         const QSize& resolutionLimit = kDefaultResolutionLimit) const;
@@ -78,8 +67,6 @@ private:
 private:
     bool m_ready = false;
     Settings m_settings;
-    nx::vms::api::dewarping::MediaData m_dewarpingParams;
-    QnConstResourceVideoLayoutPtr m_layout;
     std::list<QnAbstractImageFilterPtr> m_legacyFilters;
     std::list<QnAbstractImageFilterPtr> m_filters;
     nx::analytics::CachingMetadataConsumer<QnConstAbstractCompressedMetadataPtr> m_metadataCache;
@@ -87,6 +74,4 @@ private:
 
 using FilterChainPtr = std::unique_ptr<FilterChain>;
 
-} // namespace transcoding
-} // namespace core
-} // namespace nx
+} // namespace nx::core::transcoding

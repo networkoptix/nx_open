@@ -84,8 +84,7 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         QnFfmpegVideoTranscoder transcoder(config, nullptr);
         nx::core::transcoding::Settings settings;
         settings.rotation = 90;
-        auto filters = std::make_unique<nx::core::transcoding::FilterChain>(
-            settings, nx::vms::api::dewarping::MediaData(), nullptr);
+        auto filters = std::make_unique<nx::core::transcoding::FilterChain>(settings);
         transcoder.setFilterChain(std::move(filters));
         ASSERT_TRUE(transcoder.open(getVideoData()));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(2160, 4096));
@@ -98,8 +97,7 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         QnFfmpegVideoTranscoder transcoder(config, nullptr);
         nx::core::transcoding::Settings settings;
         settings.rotation = 90;
-        auto filters = std::make_unique<nx::core::transcoding::FilterChain>(
-            settings, nx::vms::api::dewarping::MediaData(), nullptr);
+        auto filters = std::make_unique<nx::core::transcoding::FilterChain>(settings);
         transcoder.setFilterChain(std::move(filters));
         ASSERT_TRUE(transcoder.open(getVideoData()));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(652, 1152));

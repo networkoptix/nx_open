@@ -91,9 +91,10 @@ void ExportStorageStreamRecorder::setPreciseStartPosition(int64_t startTimeUs)
         setPreciseStartDateTime(m_preciseStartTimeUs);
 }
 
-void ExportStorageStreamRecorder::setTranscodeFilters(FilterChainPtr filters)
+void ExportStorageStreamRecorder::setTranscodeSettings(
+    const nx::core::transcoding::Settings& settings)
 {
-    m_transcodeFilters = std::move(filters);
+    m_transcodeSettings = settings;
 }
 
 void ExportStorageStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex)
@@ -151,7 +152,7 @@ void ExportStorageStreamRecorder::setServerTimeZone(QTimeZone value)
 
 bool ExportStorageStreamRecorder::isTranscodingEnabled() const
 {
-    return m_videoTranscoder || (m_transcodeFilters && m_transcodeFilters->isTranscodingRequired());
+    return m_transcodeSettings.isTranscodingRequired();
 }
 
 void ExportStorageStreamRecorder::adjustMetaData(QnAviArchiveMetadata& metaData) const
@@ -254,8 +255,8 @@ CodecParametersPtr ExportStorageStreamRecorder::getVideoCodecParameters(
         m_videoTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(
             config,
             appContext()->currentSystemContext()->metrics().get());
-        m_videoTranscoder->setFilterChain(std::move(m_transcodeFilters));
-        m_transcodeFilters.reset();
+        m_videoTranscoder->setFilterChain(
+            std::make_unique<nx::core::transcoding::FilterChain>(m_transcodeSettings));
         if (!m_videoTranscoder->open(videoData))
         {
             NX_WARNING(this, "Failed to open video transcoder");

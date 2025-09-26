@@ -195,7 +195,7 @@ int QnFfmpegTranscoder::finalize(nx::utils::ByteArray* const result)
     return 0;
 }
 
-void QnFfmpegTranscoder::setTranscodingSettings(const QnLegacyTranscodingSettings& settings)
+void QnFfmpegTranscoder::setTranscodingSettings(const nx::core::transcoding::Settings& settings)
 {
     m_mediaTranscoder.setTranscodingSettings(settings);
 }

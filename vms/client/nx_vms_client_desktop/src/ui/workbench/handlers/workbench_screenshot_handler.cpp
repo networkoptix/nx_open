@@ -19,7 +19,6 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -260,13 +259,14 @@ ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaR
 
     // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params
 
-    QnLegacyTranscodingSettings imageProcessingParams;
-    imageProcessingParams.resource = widget->resource();
+    nx::core::transcoding::Settings imageProcessingParams;
+    imageProcessingParams.layout = widget->resource()->getVideoLayout();
+    imageProcessingParams.dewarpingMedia = widget->resource()->getDewarpingParams();
     imageProcessingParams.zoomWindow = parameters.zoomRect;
-    imageProcessingParams.contrastParams = parameters.imageCorrectionParams;
-    imageProcessingParams.itemDewarpingParams = parameters.itemDewarpingParams;
+    imageProcessingParams.enhancement = parameters.imageCorrectionParams;
+    imageProcessingParams.dewarping = parameters.itemDewarpingParams;
     imageProcessingParams.rotation = parameters.rotationAngle;
-    imageProcessingParams.forcedAspectRatio = parameters.customAspectRatio;
+    imageProcessingParams.aspectRatio = parameters.customAspectRatio;
     imageProcessingParams.watermark = context()->watermark();
 
     QImage screenshot = display->camDisplay()->getScreenshot(imageProcessingParams, anyQuality);
@@ -616,18 +616,20 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
             parameters.sharedParameters.timestampParams.timeZone = parameters.timeZone;
         }
 
-        QnLegacyTranscodingSettings transcodeParams;
+        nx::core::transcoding::Settings transcodeParams;
         // Doing heavy filters only. This filters doesn't supported on server side for screenshots
-        transcodeParams.itemDewarpingParams = parameters.itemDewarpingParams;
-        transcodeParams.resource = parameters.resource;
-        transcodeParams.contrastParams = parameters.imageCorrectionParams;
-        transcodeParams.timestampParams = parameters.sharedParameters.timestampParams;
-        transcodeParams.cameraNameParams = parameters.sharedParameters.cameraNameParams;
+        transcodeParams.dewarping = parameters.itemDewarpingParams;
+        transcodeParams.layout = parameters.resource->getVideoLayout();
+        transcodeParams.dewarpingMedia = parameters.resource->getDewarpingParams();
+        transcodeParams.enhancement = parameters.imageCorrectionParams;
         transcodeParams.rotation = parameters.rotationAngle;
         transcodeParams.zoomWindow = parameters.zoomRect;
         transcodeParams.watermark = context()->watermark();
-        auto filters = QnImageFilterHelper::createFilterChain(
-            transcodeParams);
+        auto filters = nx::core::transcoding::createFilterChain(
+            transcodeParams,
+            parameters.sharedParameters.timestampParams,
+            parameters.sharedParameters.cameraNameParams,
+            parameters.resource->getName());
 
         // Thumbnail from loader is already merged for panoramic cameras.
         filters->prepareForImage(result.size());

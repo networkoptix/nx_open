@@ -144,12 +144,8 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     if (!validateLength(settings, durationMs))
         results.set(int(Result::tooLong));
 
-    nx::core::transcoding::FilterChain filters(
-        settings.transcodingSettings,
-        mediaResource->getDewarpingParams(),
-        mediaResource->getVideoLayout());
-
-    if (filters.isTranscodingRequired())
+    nx::core::transcoding::FilterChain filters(settings.transcodingSettings);
+    if (settings.transcodingSettings.isTranscodingRequired())
     {
         results.set(int(Result::transcoding));
         const auto resolution = estimatedResolution(mediaResource);

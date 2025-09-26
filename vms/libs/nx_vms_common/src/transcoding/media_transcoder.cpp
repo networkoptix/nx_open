@@ -44,11 +44,11 @@ bool MediaTranscoder::setVideoCodec(
 
 bool MediaTranscoder::setVideoCodec(
     QnFfmpegVideoTranscoder::Config config,
-    QnLegacyTranscodingSettings transcodingSettings)
+    const nx::core::transcoding::Settings& transcodingSettings)
 {
     m_vTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(config, m_metrics);
-    auto filterChain = QnImageFilterHelper::createFilterChain(transcodingSettings);
-    m_vTranscoder->setFilterChain(std::move(filterChain));
+    m_vTranscoder->setFilterChain(
+        std::make_unique<nx::core::transcoding::FilterChain>(transcodingSettings));
     return true;
 }
 
@@ -60,7 +60,7 @@ bool MediaTranscoder::setAudioCodec(AVCodecID codec)
     return true;
 }
 
-void MediaTranscoder::setTranscodingSettings(const QnLegacyTranscodingSettings& settings)
+void MediaTranscoder::setTranscodingSettings(const nx::core::transcoding::Settings& settings)
 {
     m_transcodingSettings = settings;
 }

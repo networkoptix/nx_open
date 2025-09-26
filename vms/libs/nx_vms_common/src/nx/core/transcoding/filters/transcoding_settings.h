@@ -9,6 +9,7 @@
 #include <QtGui/QColor>
 #include <QtGui/QImage>
 
+#include <core/resource/resource_media_layout.h>
 #include <nx/core/watermark/watermark.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
@@ -18,9 +19,7 @@
 #include "../timestamp_format.h"
 #include "nx/vms/common/pixelation/pixelation_settings.h"
 
-namespace nx {
-namespace core {
-namespace transcoding {
+namespace nx::core::transcoding {
 
 struct OverlaySettings
 {
@@ -29,6 +28,7 @@ struct OverlaySettings
         timestamp,
         image,
         watermark,
+        text,
     };
 
     virtual ~OverlaySettings() {}
@@ -54,6 +54,9 @@ struct Settings
     // Item dewarping, requires transcoding if enabled.
     nx::vms::api::dewarping::ViewData dewarping;
 
+    // Dewarping params.
+    nx::vms::api::dewarping::MediaData dewarpingMedia;
+
     // Image enhancement, requires transcoding if enabled.
     nx::vms::api::ImageCorrectionData enhancement;
 
@@ -64,8 +67,50 @@ struct Settings
 
     QVector<OverlaySettingsPtr> overlays;
 
+    // Video layout for tiled image filter.
+    QnConstResourceVideoLayoutPtr layout;
+
     // Force transcoding
     bool forceTranscoding = false;
+
+
+    /**
+     * Check if options require transcoding.
+     * @param concernTiling If video layout transcoding (tiling) matters - it is not applied while
+     *     transcoding images.
+     */
+    inline bool isTranscodingRequired(bool concernTiling = true) const
+    {
+        if (concernTiling && layout && layout->channelCount() > 1)
+            return true;
+
+        if (forceTranscoding)
+            return true;
+
+        if (aspectRatio.isValid())
+            return true;
+
+        if (!zoomWindow.isEmpty())
+            return true;
+
+        if (dewarping.enabled)
+            return true;
+
+        if (enhancement.enabled)
+            return true;
+
+        if (rotation != 0)
+            return true;
+
+        if (watermark.visible())
+            return true;
+
+        if (pixelationSettings.has_value()
+            && (pixelationSettings->isAllObjectTypes || !pixelationSettings->objectTypeIds.empty()))
+            return true;
+
+        return !overlays.isEmpty();
+    }
 };
 
 struct ImageOverlaySettings: OverlaySettings
@@ -84,6 +129,12 @@ struct TimestampOverlaySettings: OverlaySettings
     virtual Type type() const override { return Type::timestamp; }
 };
 
-} // namespace transcoding
-} // namespace core
-} // namespace nx
+struct TextOverlaySettings: OverlaySettings
+{
+    QString text;
+
+    virtual Type type() const override { return Type::text; }
+};
+
+
+} // namespace nx::core::transcoding

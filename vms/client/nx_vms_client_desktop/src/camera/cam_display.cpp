@@ -309,10 +309,10 @@ void QnCamDisplay::removeMetadataConsumer(
     m_metadataConsumerByType.remove(metadataConsumer->metadataType(), metadataConsumer);
 }
 
-QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams,
+QImage QnCamDisplay::getScreenshot(const nx::core::transcoding::Settings& imageProcessingParams,
     bool anyQuality)
 {
-    auto filters = QnImageFilterHelper::createFilterChain(imageProcessingParams);
+    auto filters = std::make_unique<nx::core::transcoding::FilterChain>(imageProcessingParams);
     CLVideoDecoderOutputPtr frame;
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -322,7 +322,7 @@ QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProce
             if (!frame)
                 continue;
 
-            if (!filters->isTranscodingRequired())
+            if (!imageProcessingParams.isTranscodingRequired())
                 return frame->toImage();
 
             if (!filters->isReady())

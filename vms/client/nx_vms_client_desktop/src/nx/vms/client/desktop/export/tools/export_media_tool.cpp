@@ -70,12 +70,10 @@ struct ExportMediaTool::Private
         if (settings.forceVideoTranscoding)
             transcodingSettings.forceTranscoding = true;
 
-        auto filters = std::make_unique<nx::core::transcoding::FilterChain>(
-            transcodingSettings,
-            mediaResource->getDewarpingParams(),
-            mediaResource->getVideoLayout());
+        transcodingSettings.layout = mediaResource->getVideoLayout();
+        transcodingSettings.dewarpingMedia = mediaResource->getDewarpingParams();
 
-        if (!initDataProvider(startTimeUs, endTimeUs, timelapseFrameStepUs, filters->isTranscodingRequired()))
+        if (!initDataProvider(startTimeUs, endTimeUs, timelapseFrameStepUs, transcodingSettings.isTranscodingRequired()))
         {
             setStatus(ExportProcessStatus::failure);
             return false;
@@ -105,7 +103,7 @@ struct ExportMediaTool::Private
         if (settings.forceAudioTranscoding)
             exportRecorder->forceAudioTranscoding();
 
-        exportRecorder->setTranscodeFilters(std::move(filters));
+        exportRecorder->setTranscodeSettings(transcodingSettings);
         exportRecorder->setPreciseStartPosition(startTimeUs);
 
         connect(exportRecorder.get(), &QnStreamRecorder::recordingProgress, q,

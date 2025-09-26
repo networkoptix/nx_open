@@ -3,7 +3,6 @@
 #include "filter_helper.h"
 
 #include <core/resource/media_resource.h>
-#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include <nx/core/transcoding/filters/text_image_filter.h>
 #include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/log/log.h>
@@ -53,54 +52,34 @@ QString getFrameTimestampText(
     return result;
 }
 
-QString getCameraName(const QnLegacyTranscodingSettings& settings)
-{
-    return settings.resource->getName();
-}
-
 } // namespace
 
-nx::core::transcoding::FilterChainPtr QnImageFilterHelper::createFilterChain(
-    const nx::core::transcoding::LegacyTranscodingSettings& legacy)
+namespace nx::core::transcoding {
+
+FilterChainPtr createFilterChain(
+    const Settings& settings,
+    TimestampParams timestampParams,
+    FilterParams cameraNameParams,
+    QString cameraName)
 {
-    nx::core::transcoding::Settings settings;
-    settings.aspectRatio = legacy.forcedAspectRatio;
-    settings.rotation = legacy.rotation;
-    settings.dewarping = legacy.itemDewarpingParams;
-    settings.enhancement = legacy.contrastParams;
-    settings.zoomWindow = legacy.zoomWindow;
-    settings.watermark = legacy.watermark;
-    settings.pixelationSettings = {};
-
-    auto dewarpingMedia = legacy.resource->getDewarpingParams();
-    if (legacy.forceDewarping)
-    {
-        dewarpingMedia.enabled = true;
-        settings.dewarping.enabled = true;
-    }
-
-    auto result = std::make_unique<nx::core::transcoding::FilterChain>(
-        settings, dewarpingMedia, legacy.resource->getVideoLayout());
-
-    using nx::core::transcoding::TextImageFilter;
+    auto result = std::make_unique<FilterChain>(settings);
     TextImageFilter::Factor factor(1, 1);
-
-    if (legacy.timestampParams.filterParams.enabled && legacy.cameraNameParams.enabled)
+    if (timestampParams.filterParams.enabled && cameraNameParams.enabled)
     {
-        const auto timestampCorner = legacy.timestampParams.filterParams.corner;
-        const auto cameraNameCorner = legacy.cameraNameParams.corner;
+        const auto timestampCorner = timestampParams.filterParams.corner;
+        const auto cameraNameCorner = cameraNameParams.corner;
         if (timestampCorner == cameraNameCorner)
         {
             // Both markers should be placed in the same corner, creating single filter.
             const auto textGetter =
-                [settings = legacy]
+                [timestampParams = timestampParams, text = cameraName]
                     (const CLVideoDecoderOutputPtr& frame, int cutSymbolsCount)
                 {
-                    const auto cameraName = chopWithTilda(getCameraName(settings), cutSymbolsCount);
+                    const auto cameraName = chopWithTilda(text, cutSymbolsCount);
                     if (cameraName.isEmpty())
                         cutSymbolsCount -= cameraName.length();
 
-                    const auto timestamp = getFrameTimestampText(frame, settings.timestampParams);
+                    const auto timestamp = getFrameTimestampText(frame, timestampParams);
                     if (cameraName.isEmpty())
                         return chopWithTilda(timestamp, cutSymbolsCount);
 
@@ -109,9 +88,9 @@ nx::core::transcoding::FilterChainPtr QnImageFilterHelper::createFilterChain(
                         timestamp);
                 };
 
-            const auto filter = nx::core::transcoding::TextImageFilter::create(
-                legacy.resource->getVideoLayout(),
-                legacy.timestampParams.filterParams.corner,
+            const auto filter = TextImageFilter::create(
+                settings.layout,
+                timestampParams.filterParams.corner,
                 textGetter);
             result->addLegacyFilter(filter);
             return result;
@@ -123,35 +102,35 @@ nx::core::transcoding::FilterChainPtr QnImageFilterHelper::createFilterChain(
             factor.setY(0.5);
     }
 
-    if (legacy.timestampParams.filterParams.enabled)
+    if (timestampParams.filterParams.enabled)
     {
         const auto textGetter =
-            [settings = legacy.timestampParams]
+            [timestampParams = timestampParams]
                 (const CLVideoDecoderOutputPtr& frame, int cutSymbolsCount)
             {
-                return chopWithTilda(getFrameTimestampText(frame, settings), cutSymbolsCount);
+                return chopWithTilda(getFrameTimestampText(frame, timestampParams), cutSymbolsCount);
             };
 
-        const auto filter = nx::core::transcoding::TextImageFilter::create(
-            legacy.resource->getVideoLayout(),
-            legacy.timestampParams.filterParams.corner,
+        const auto filter = TextImageFilter::create(
+            settings.layout,
+            timestampParams.filterParams.corner,
             textGetter,
             factor);
         result->addLegacyFilter(filter);
     }
 
-    if (legacy.cameraNameParams.enabled)
+    if (cameraNameParams.enabled)
     {
         const auto textGetter =
-            [settings = legacy]
+            [cameraName = cameraName]
                 (const CLVideoDecoderOutputPtr& /*frame*/, int cutSymbolsCount)
             {
-                return chopWithTilda(getCameraName(settings), cutSymbolsCount);
+                return chopWithTilda(cameraName, cutSymbolsCount);
             };
 
-        const auto filter = nx::core::transcoding::TextImageFilter::create(
-            legacy.resource->getVideoLayout(),
-            legacy.cameraNameParams.corner,
+        const auto filter = TextImageFilter::create(
+            settings.layout,
+            cameraNameParams.corner,
             textGetter,
             factor);
         result->addLegacyFilter(filter);
@@ -159,3 +138,5 @@ nx::core::transcoding::FilterChainPtr QnImageFilterHelper::createFilterChain(
 
     return result;
 }
+
+} // namespace nx::core::transcoding

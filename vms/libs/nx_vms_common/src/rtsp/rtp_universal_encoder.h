@@ -34,7 +34,7 @@ public:
         MediaQuality requiredQuality,
         AVCodecID transcodeToCodec,
         const QSize& videoSize,
-        const QnLegacyTranscodingSettings& extraTranscodeParams);
+        const nx::core::transcoding::Settings& extraTranscodeParams);
 
     bool open(const AVCodecParameters* codecParameters);
 

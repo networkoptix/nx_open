@@ -9,7 +9,6 @@ extern "C" {
 }
 
 #include <decoders/video/ffmpeg_video_decoder.h>
-#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include <nx/media/audio_data_packet.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
@@ -48,7 +47,7 @@ public:
 
     bool setVideoCodec(
         QnFfmpegVideoTranscoder::Config config,
-        QnLegacyTranscodingSettings transcodingSettings);
+        const nx::core::transcoding::Settings& transcodingSettings);
 
     /*
     * Set ffmpeg audio codec and params
@@ -79,12 +78,12 @@ public:
     void resetVideo();
     void resetAudio();
     void setAudioSampleRate(int value);
-    void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
+    void setTranscodingSettings(const nx::core::transcoding::Settings& settings);
 
 private:
     const Config m_config;
     nx::metric::Storage* m_metrics = nullptr;
     std::unique_ptr<QnFfmpegVideoTranscoder> m_vTranscoder;
     std::unique_ptr<QnFfmpegAudioTranscoder> m_aTranscoder;
-    QnLegacyTranscodingSettings m_transcodingSettings;
+    nx::core::transcoding::Settings m_transcodingSettings;
 };

@@ -18,7 +18,6 @@
 #include "video_stream_display.h"
 
 // TODO: #sivanov use forward declaration.
-#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include <nx/media/audio/format.h>
 #include <nx/media/stream_event.h>
 #include <nx/utils/elapsed_timer.h>
@@ -85,7 +84,7 @@ public:
     void setMTDecoding(bool value);
 
     QSize getFrameSize(int channel) const;
-    QImage getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams, bool anyQuality);
+    QImage getScreenshot(const nx::core::transcoding::Settings& imageProcessingParams, bool anyQuality);
     QImage getGrayscaleScreenshot(int channel);
     virtual QSize getVideoSize() const override; //< From AbstractVideoDisplay
     virtual bool isRealTimeSource() const override; //< From AbstractVideoDisplay
