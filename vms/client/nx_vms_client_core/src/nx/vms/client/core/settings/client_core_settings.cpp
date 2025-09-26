@@ -256,6 +256,30 @@ void Settings::migrateOldSettings()
 
     migrateAllSettingsFrom_v51(oldSettings.get());
     migrateSystemAuthenticationDataFrom_v42(oldSettings.get());
+    renamePreviousSettings();
+}
+
+void Settings::renamePreviousSettings()
+{
+    using namespace utils::property_storage;
+
+    AbstractBackend* backend = this->backend();
+
+    const std::vector<std::pair<QString, QString>> oldNewName{
+        {"enableHadrWareDecoding", "enableHardwareDecoding"}}; //< A typo in prev name.
+
+    // Do a low-level transfer of properties.
+    for (const auto& [oldName, newName]: oldNewName)
+    {
+        if (!backend->exists(newName) && backend->exists(oldName))
+        {
+            backend->writeValue(newName, backend->readValue(oldName));
+            backend->removeValue(oldName);
+        }
+    }
+
+    // Since we used backend functions to transfer the properties, we need to re-read them.
+    load();
 }
 
 void Settings::migrateAllSettingsFrom_v51(Settings* oldSettings)

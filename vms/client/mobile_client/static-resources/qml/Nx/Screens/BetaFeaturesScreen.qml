@@ -22,12 +22,12 @@ BaseSettingsScreen
 
         text: qsTr("Video Download")
         extraText: qsTr("Ability to download video")
-        checkState: appContext.settings.useVideoDownloadFeature
+        checkState: appContext.settings.useDownloadVideoFeature
             ? Qt.Checked
             : Qt.Unchecked
         onCheckStateChanged:
         {
-            appContext.settings.useVideoDownloadFeature =
+            appContext.settings.useDownloadVideoFeature =
                 checkState !== Qt.Unchecked
         }
     }

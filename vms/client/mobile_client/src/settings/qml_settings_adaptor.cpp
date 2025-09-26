@@ -8,308 +8,59 @@
 
 using nx::vms::client::core::appContext;
 
-namespace nx {
-namespace client {
-namespace mobile {
+namespace nx::client::mobile {
 
 QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
-    QObject(parent)
+    QQmlPropertyMap(parent)
 {
+    // Set mobile settings values.
+    const auto mobileIds = qnSettings->variables();
+    QHash<QString, int> mobileProperties;
+    for (int id: mobileIds)
+    {
+        const auto name = qnSettings->name(id);
+        mobileProperties.insert(name, id);
+        insert(name, qnSettings->value(id));
+    }
+
+    // Set core settings values.
+    const auto coreProperties = appContext()->coreSettings()->properties();
+    for (const auto&[key, value]: coreProperties.asKeyValueRange())
+    {
+        NX_ASSERT(!mobileProperties.contains(key), "Mobile and core settings conflict");
+        insert(key, value->variantValue());
+    }
+
+    // Subscribe to mobile settings changes.
     connect(qnSettings, &QnMobileClientSettings::valueChanged, this,
         [this](int id)
         {
-            switch (id)
-            {
-                case QnMobileClientSettings::LiveVideoPreviews:
-                    emit liveVideoPreviewsChanged();
-                    break;
-
-                case QnMobileClientSettings::LastUsedQuality:
-                    emit lastUsedQualityChanged();
-                    break;
-
-                case QnMobileClientSettings::SavePasswords:
-                    emit savePasswordsChanged();
-                    break;
-
-                case QnMobileClientSettings::HolePunchingOption:
-                    emit enableHolePunchingChanged();
-                    break;
-
-                case QnMobileClientSettings::ForceTrafficLogging:
-                    emit forceTrafficLoggingChanged();
-                    break;
-
-                case QnMobileClientSettings::CustomCloudHost:
-                    emit customCloudHostChanged();
-                    break;
-
-                case QnMobileClientSettings::IgnoreCustomization:
-                    emit ignoreCustomizationChanged();
-                    break;
-
-                case QnMobileClientSettings::UseDownloadVideoFeature:
-                    emit useVideoDownloadFeatureChanged();
-                    break;
-
-                case QnMobileClientSettings::UseMaxHardwareDecodersCount:
-                    emit useMaxHardwareDecodersCountChanged();
-                    break;
-
-                case QnMobileClientSettings::EnableSoftwareDecoderFallback:
-                    emit enableSoftwareDecoderFallbackChanged();
-
-                case QnMobileClientSettings::ServerTimeMode:
-                    emit serverTimeModeChanged();
-
-                case QnMobileClientSettings::ShowCameraInfo:
-                    emit showCameraInfoChanged();
-
-                case QnMobileClientSettings::ShowHowShareWorksNotification:
-                    emit showHowShareWorksNotificationChanged();
-
-                case QnMobileClientSettings::SupportMetaOrganizations:
-                    emit supportMetaOrganizationsChanged();
-
-                case QnMobileClientSettings::VideoRenderingApi:
-                    emit videoRenderingApiChanged();
-
-                case QnMobileClientSettings::CrashdumpUploadsEnabled:
-                    emit crashdumpUploadsEnabledChanged();
-
-                default:
-                    break;
-            }
+            insert(qnSettings->name(id), qnSettings->value(id));
         });
 
+    // Subscribe to core settings changes.
     connect(appContext()->coreSettings(), &vms::client::core::Settings::changed, this,
         [this](const auto property)
         {
             if (!property)
                 return;
 
-            if (property->name == appContext()->coreSettings()->locale.name)
-                emit localeChanged();
+            insert(property->name, property->variantValue());
+        });
+
+    // Subscribe to changes from QML side and map them to either core or mobile.
+    connect(this, &QQmlPropertyMap::valueChanged,
+        [mobileProperties=std::move(mobileProperties)](const QString& key, const QVariant& value)
+        {
+            if (auto it = mobileProperties.find(key); it != mobileProperties.end())
+            {
+                qnSettings->setValue(it.value(), value);
+                qnSettings->save();
+                return;
+            }
+
+            appContext()->coreSettings()->setValue(key, value);
         });
 }
 
-bool QmlSettingsAdaptor::liveVideoPreviews() const
-{
-    return qnSettings->liveVideoPreviews();
-}
-
-void QmlSettingsAdaptor::setLiveVideoPreviews(bool enable)
-{
-    qnSettings->setLiveVideoPreviews(enable);
-}
-
-int QmlSettingsAdaptor::lastUsedQuality() const
-{
-    return qnSettings->lastUsedQuality();
-}
-
-void QmlSettingsAdaptor::setLastUsedQuality(int quality)
-{
-    qnSettings->setLastUsedQuality(quality);
-}
-
-bool QmlSettingsAdaptor::savePasswords() const
-{
-    return qnSettings->savePasswords();
-}
-
-void QmlSettingsAdaptor::setSavePasswords(bool value)
-{
-    qnSettings->setSavePasswords(value);
-}
-
-QmlSettingsAdaptor::ValidationLevel QmlSettingsAdaptor::certificateValidationLevel() const
-{
-    return appContext()->coreSettings()->certificateValidationLevel();
-}
-
-void QmlSettingsAdaptor::setCertificateValidationLevel(ValidationLevel value)
-{
-    if (appContext()->coreSettings()->certificateValidationLevel() == value)
-        return;
-
-    appContext()->coreSettings()->certificateValidationLevel = value;
-
-    emit certificateValidationLevelChanged();
-}
-
-bool QmlSettingsAdaptor::enableHardwareDecoding() const
-{
-    return appContext()->coreSettings()->enableHardwareDecoding();
-}
-
-void QmlSettingsAdaptor::setEnableHardwareDecoding(bool value)
-{
-    if (appContext()->coreSettings()->enableHardwareDecoding() == value)
-        return;
-
-    appContext()->coreSettings()->enableHardwareDecoding = value;
-    emit enableHardwareDecodingChanged();
-}
-
-bool QmlSettingsAdaptor::enableHolePunching() const
-{
-    return qnSettings->enableHolePunching();
-}
-
-void QmlSettingsAdaptor::setEnableHolePunching(bool value)
-{
-    qnSettings->setEnableHolePunching(value);
-    qnSettings->save();
-}
-
-bool QmlSettingsAdaptor::forceTrafficLogging() const
-{
-    return qnSettings->forceTrafficLogging();
-}
-
-void QmlSettingsAdaptor::setForceTrafficLogging(bool value)
-{
-    qnSettings->setForceTrafficLogging(value);
-    qnSettings->save();
-}
-
-QString QmlSettingsAdaptor::customCloudHost() const
-{
-    return qnSettings->customCloudHost();
-}
-
-void QmlSettingsAdaptor::setCustomCloudHost(const QString& value)
-{
-    qnSettings->setCustomCloudHost(value);
-    qnSettings->save();
-}
-
-bool QmlSettingsAdaptor::ignoreCustomization() const
-{
-    return qnSettings->ignoreCustomization();
-}
-
-void QmlSettingsAdaptor::setIgnoreCustomization(bool value)
-{
-    qnSettings->setIgnoreCustomization(value);
-    qnSettings->save();
-}
-
-bool QmlSettingsAdaptor::supportMetaOrganizations() const
-{
-    return qnSettings->supportMetaOrganizations();
-}
-
-void QmlSettingsAdaptor::setSupportMetaOrganizations(bool value)
-{
-    qnSettings->setSupportMetaOrganizations(value);
-    qnSettings->save();
-}
-
-QString QmlSettingsAdaptor::locale() const
-{
-    return appContext()->coreSettings()->locale();
-}
-
-void QmlSettingsAdaptor::setLocale(const QString& value)
-{
-    if (locale() == value)
-        return;
-
-    appContext()->coreSettings()->locale = value;
-
-    emit localeChanged();
-}
-
-bool QmlSettingsAdaptor::serverTimeMode() const
-{
-    return qnSettings->serverTimeMode();
-}
-
-void QmlSettingsAdaptor::setServerTimeMode(bool value)
-{
-    qnSettings->setServerTimeMode(value);
-    qnSettings->save();
-}
-
-bool QmlSettingsAdaptor::showCameraInfo() const
-{
-    return qnSettings->showCameraInfo();
-}
-
-void QmlSettingsAdaptor::setShowCameraInfo(bool value)
-{
-    qnSettings->setShowCameraInfo(value);
-    qnSettings->save();
-}
-
-bool QmlSettingsAdaptor::showHowShareWorksNotification() const
-{
-    return qnSettings->showHowShareWorksNotification();
-}
-
-void QmlSettingsAdaptor::setShowHowShareWorksNotification(bool value)
-{
-    qnSettings->setShowHowShareWorksNotification(value);
-    qnSettings->save();
-}
-
-bool QmlSettingsAdaptor::useVideoDownloadFeature() const
-{
-    return qnSettings->useDownloadVideoFeature();
-}
-
-void QmlSettingsAdaptor::setUseVideoDownloadFeature(bool value)
-{
-    qnSettings->setUseDownloadVideoFeature(value);
-    qnSettings->save();
-}
-
-bool QmlSettingsAdaptor::useMaxHardwareDecodersCount() const
-{
-    return qnSettings->useMaxHardwareDecodersCount();
-}
-
-void QmlSettingsAdaptor::setUseMaxHardwareDecodersCount(bool value)
-{
-    qnSettings->setUseMaxHardwareDecodersCount(value);
-    qnSettings->save();
-}
-
-bool QmlSettingsAdaptor::enableSoftwareDecoderFallback() const
-{
-    return qnSettings->enableSoftwareDecoderFallback();
-}
-
-void QmlSettingsAdaptor::setEnableSoftwareDecoderFallback(bool value)
-{
-    qnSettings->setEnableSoftwareDecoderFallback(value);
-    qnSettings->save();
-}
-
-QString QmlSettingsAdaptor::videoRenderingApi() const
-{
-    return qnSettings->videoRenderingApi();
-}
-
-void QmlSettingsAdaptor::setVideoRenderingApi(const QString& value)
-{
-    qnSettings->setVideoRenderingApi(value);
-    qnSettings->save();
-}
-
-bool QmlSettingsAdaptor::crashdumpUploadsEnabled() const
-{
-    return qnSettings->crashdumpUploadsEnabled();
-}
-
-void QmlSettingsAdaptor::setCrashdumpUploadsEnabled(bool value)
-{
-    qnSettings->setCrashdumpUploadsEnabled(value);
-    qnSettings->save();
-}
-
-} // namespace mobile
-} // namespace client
-} // namespace nx
+} // namespace nx::client::mobile

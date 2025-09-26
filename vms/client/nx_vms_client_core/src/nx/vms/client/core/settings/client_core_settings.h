@@ -109,8 +109,7 @@ public:
             "tileVisibilityScopeFilter",
             welcome_screen::TileScopeFilter::AllSystemsTileScopeFilter};
 
-    // FIXME: #sivanov Rename `Hadrware` -> `Hardware` and implement option migration.
-    Property<bool> enableHardwareDecoding{this, "enableHadrwareDecoding", true};
+    Property<bool> enableHardwareDecoding{this, "enableHardwareDecoding", true};
 
     Property<int> maxCloudConnections{this, "maxCloudConnections", 20,
         "Maximum number of Cloud Site connections that can run simultaneously. Once this limit is "
@@ -145,6 +144,8 @@ public:
 
 private:
     void migrateOldSettings();
+
+    void renamePreviousSettings();
 
     void migrateAllSettingsFrom_v51(Settings* oldSettings);
 
