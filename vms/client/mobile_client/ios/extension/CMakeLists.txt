@@ -34,6 +34,7 @@ target_link_libraries(push_notification_extension PRIVATE
     "-framework Security"
     "-framework MobileCoreServices"
     utils
+    push_notification_storage
 )
 
 add_subdirectory(utils)

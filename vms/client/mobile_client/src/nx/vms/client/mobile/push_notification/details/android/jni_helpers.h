@@ -26,6 +26,7 @@ struct JniSignature
     static const char* kContext;
     static const char* kString;
     static const char* kLong;
+    static const char* kByteArray;
 };
 
 } // namespace nx::vms::client::mobile::details

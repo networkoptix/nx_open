@@ -2,23 +2,30 @@
 
 #include "notification_service.h"
 
-#include <UIKit/UIKit.h>
 #include <MobileCoreServices/MobileCoreServices.h>
+#include <UIKit/UIKit.h>
 #include <UserNotifications/UserNotifications.h>
 
 #include <chrono>
 
 #include <nx/vms/client/mobile/push_notification/details/push_ipc_data.h>
+#include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
 
+#include "utils/ipc_access_group.h"
 #include "utils/helpers.h"
 #include "utils/logger.h"
 
 using PushIpcData = nx::vms::client::mobile::details::PushIpcData;
+using SecureStorage = nx::vms::client::mobile::SecureStorage;
+using PushNotification = nx::vms::client::mobile::PushNotification;
+using PushNotificationStorage = nx::vms::client::mobile::PushNotificationStorage;
 
 namespace {
 
 static const auto kAccessErrorText = @"No access to this information.";
 static const int kNotFoundHttpError = 404;
+static const auto kApplicationGroup =
+    [NSString stringWithUTF8String: nx::vms::client::mobile::details::kApplicationGroup];
 
 using namespace extension::helpers;
 
@@ -267,9 +274,12 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
 @property(nonatomic) std::string password;
 @property(nonatomic) std::string cloudRefreshToken;
 @property(nonatomic) std::string cloudSystemId;
+@property(nonatomic) std::string imageUrl;
 - (bool) initialize: (NSString*) targets;
 - (void) showNotification: (NSString*) imageUrl;
 - (void) showNotificatoinWithImage: (NSString*) imageUrl withMethod: (AuthMethod) method;
+- (void) saveNotificationImage: (NSURL*) sourceUrl;
+- (void) saveNotification;
 @end
 
 @implementation NotificationService
@@ -309,6 +319,7 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
 - (void)serviceExtensionTimeWillExpire
 {
     extension::Logger::log(@"show standard notification");
+    [self saveNotification];
     self.handler(self.content);
 }
 
@@ -437,6 +448,7 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
                 return;
             }
 
+            [self saveNotificationImage: tmpFileName]; //< Save the image before creating UNNotificationAttachment.
             UNNotificationAttachment* attachment = makeAttachment(tmpFileName, kLogTag);
             if (checkError(!attachment))
                 return;
@@ -468,7 +480,50 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
     }
 
     extension::Logger::log(kLogTag, @"show custom notification.");
+    [self saveNotification];
     self.handler(self.content);
+}
+
+- (void)saveNotificationImage: (NSURL*) sourceUrl
+{
+    static const NSString* kLogTag = @"save notification image";
+
+    const auto fileManager = [NSFileManager defaultManager];
+    const auto sharedContainerUrl = [fileManager containerURLForSecurityApplicationGroupIdentifier: kApplicationGroup];
+    const auto directory = [sharedContainerUrl URLByAppendingPathComponent: @"push_notifications" isDirectory: YES];
+    const auto uniqueName = [[NSProcessInfo processInfo] globallyUniqueString];
+    const auto fileName = [NSString stringWithFormat: @"%@%@", uniqueName, @".png"];
+    const auto imageUrl = [directory URLByAppendingPathComponent: fileName];
+
+    NSError* error = nil;
+    [fileManager createDirectoryAtURL: directory withIntermediateDirectories: true attributes: nil error: &error];
+
+    if (error)
+        extension::Logger::log(kLogTag, @"Failed to save image.");
+
+    [fileManager copyItemAtURL: sourceUrl toURL: imageUrl error: &error];
+
+    if (error)
+        extension::Logger::log(kLogTag, @"Failed to save image.");
+
+    self.imageUrl = std::string([imageUrl.path UTF8String]);
+}
+
+- (void)saveNotification
+{
+    extension::Logger::log(@"Save notification");
+
+    const NSString* url = [self.content.userInfo objectForKey: @"url"];
+
+    auto secureStorage = std::make_shared<SecureStorage>();
+    PushNotificationStorage notificationStorage{secureStorage};
+    notificationStorage.addUserNotification(
+        self.user,
+        [self.content.title UTF8String],
+        [self.content.body UTF8String],
+        url ? [url UTF8String] : "",
+        self.cloudSystemId,
+        self.imageUrl);
 }
 
 - (void)URLSession:(NSURLSession*) session
