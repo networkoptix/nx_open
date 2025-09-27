@@ -182,6 +182,10 @@
         <source>You can enable two-factor authentication in your account settings.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Server or network unavailable. Check the address and connection.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>

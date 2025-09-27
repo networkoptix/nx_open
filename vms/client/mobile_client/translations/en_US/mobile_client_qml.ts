@@ -474,6 +474,25 @@
     </message>
 </context>
 <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+        <source>Open link?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External link will open in the browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Login</name>
     <message>
         <source>Cannot connect to %1</source>
