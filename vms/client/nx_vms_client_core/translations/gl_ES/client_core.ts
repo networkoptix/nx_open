@@ -182,6 +182,10 @@
       <source>You can enable two-factor authentication in your account settings.</source>
       <translation>Podes activar a autenticación en dous pasos na configuración da túa conta.</translation>
     </message>
+    <message>
+      <source>Server or network unavailable. Check the address and connection.</source>
+      <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
