@@ -42,5 +42,6 @@ std::string makeNoParamsVoidSignature()
 const char* JniSignature::kContext = "Landroid/content/Context;";
 const char* JniSignature::kString = "Ljava/lang/String;";
 const char* JniSignature::kLong = "J";
+const char* JniSignature::kByteArray = "[B";
 
 } // namespace nx::vms::client::mobile::details

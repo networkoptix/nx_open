@@ -317,10 +317,20 @@ if(ANDROID)
     endif()
 
     target_link_libraries(mobile_client PUBLIC
-        GLESv2 z log mediandk android)
+        GLESv2 z log mediandk android push_notification_storage)
+
+    # Used by PushNotificationStorage.java.
+    add_library(push_notification_storage SHARED
+        src/nx/vms/client/mobile/push_notification/details/push_notification_storage.cpp
+        src/nx/vms/client/mobile/push_notification/details/android/secure_storage_android.cpp
+        src/nx/vms/client/mobile/push_notification/details/android/push_notification_storage_android.cpp
+        src/nx/vms/client/mobile/push_notification/details/android/jni_helpers_android.cpp)
+
+    target_include_directories(push_notification_storage PRIVATE src)
+    target_link_libraries(push_notification_storage PUBLIC nx_reflect Qt6::Core)
 
     get_android_extra_libs(extra_libs)
-    list(APPEND extra_libs ${push_extra_libs})
+    list(APPEND extra_libs ${push_extra_libs} $<TARGET_FILE:push_notification_storage>)
     add_android_apk(mobile_client_apk TARGET mobile_client
         DEPENDS ${java_files}
         FILE_NAME ${apk_file_name}
@@ -404,6 +414,12 @@ if(IOS)
         ASSETS ${common_assets}
         TRANSLATIONS ${translation_files}
     )
+
+    # Used by ios/extension.
+    add_library(push_notification_storage STATIC
+        src/nx/vms/client/mobile/push_notification/details/push_notification_storage.cpp)
+
+    target_link_libraries(push_notification_storage PUBLIC nx_reflect utils)
 
     add_subdirectory("ios/extension")
 

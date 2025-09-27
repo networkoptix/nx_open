@@ -3,7 +3,8 @@
 add_library(utils STATIC
     logger.mm
     helpers.mm
-    push_ipc_data_impl.mm)
+    push_ipc_data_impl.mm
+    secure_storage.mm)
 
 set(branding_file "branding.h")
 set(target_branding_file ${CMAKE_CURRENT_BINARY_DIR}/${branding_file})

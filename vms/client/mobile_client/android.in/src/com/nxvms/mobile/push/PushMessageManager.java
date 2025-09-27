@@ -7,7 +7,11 @@ import com.nxvms.mobile.utils.Logger;
 import com.nxvms.mobile.utils.OAuthHelper;
 import com.nxvms.mobile.utils.PushIpcData;
 import com.nxvms.mobile.utils.QnWindowUtils;
+import com.nxvms.mobile.utils.PushNotificationStorage;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.Exception;
 import java.net.URL;
@@ -190,6 +194,10 @@ public class PushMessageManager
             Logger.info(kLogTag, "show notification with preview, loading content.");
             updateNotificationImage(context, localData);
         }
+        else
+        {
+            saveNotification(localData.user, context);
+        }
     }
 
     static private String kNotificationTagPrefix = "mobile_client_push_notification_";
@@ -209,6 +217,20 @@ public class PushMessageManager
         }
 
         return false;
+    }
+
+    static public void saveNotification(String user, PushContext context)
+    {
+        Logger.info("save notification", "Saving notification");
+
+        PushNotificationStorage.addUserNotification(
+            context.context,
+            user,
+            context.caption,
+            context.description,
+            context.url,
+            context.cloudSystemId,
+            context.imageUrl);
     }
 
     static public void showNotificationInternal(
@@ -384,6 +406,29 @@ public class PushMessageManager
             method = targetMethod;
         }
 
+        public String saveNotificationImage(Bitmap image)
+        {
+            final String kLogTag = "save notification image";
+
+            final String fileName = context.tag + ".png";
+            final String filePath = context.context.getFilesDir().getAbsolutePath()
+                + "/push_notifications/" + fileName;
+
+            File file = new File(filePath);
+            file.getParentFile().mkdirs();
+
+            try (FileOutputStream stream = new FileOutputStream(file))
+            {
+                image.compress(Bitmap.CompressFormat.PNG, 0, stream);
+            }
+            catch (IOException e)
+            {
+                Logger.error(kLogTag, "Failed to save image" + e);
+            }
+
+            return filePath;
+        }
+
         @Override
         protected Bitmap doInBackground(Void... dummy)
         {
@@ -461,6 +506,11 @@ public class PushMessageManager
                     Logger.info(kLogTag, result == null
                         ? "image was not decoded."
                         : "image was decoded.");
+
+                    if (result != null)
+                        context.imageUrl = saveNotificationImage(result);
+
+                    PushMessageManager.saveNotification(data.user, context);
 
                     return result;
                 }
