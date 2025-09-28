@@ -184,7 +184,7 @@
     </message>
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
-      <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+      <translation>Server eller nätverk är inte tillgängligt. Kontrollera adressen och anslutningen.</translation>
     </message>
   </context>
   <context>

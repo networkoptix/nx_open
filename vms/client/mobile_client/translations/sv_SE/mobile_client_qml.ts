@@ -477,19 +477,19 @@
     <name>LinkAboutToOpenDialog</name>
     <message>
       <source>Open link?</source>
-      <translation type="unfinished">Open link?</translation>
+      <translation>Öppna länk?</translation>
     </message>
     <message>
       <source>External link will open in the browser</source>
-      <translation type="unfinished">External link will open in the browser</translation>
+      <translation>Extern länk öppnas i webbläsaren</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Öppna</translation>
     </message>
   </context>
   <context>
