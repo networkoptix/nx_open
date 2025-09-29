@@ -344,15 +344,21 @@ void setGraphicsSettings()
             qputenv(kChromiumFlags, qgetenv(kChromiumFlags) + " --ignore-gpu-blocklist");
     }
 
-    if (nx::build_info::isLinux() && gpuInfo.name.toLower().contains("intel"))
+    if (nx::build_info::isLinux())
     {
         // Never autoselect Intel+Vulkan on Linux - vulkan video support is not reliable.
-        if (appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::autoselect)
-            graphicsApi = GraphicsApi::opengl;
+        if (gpuInfo.name.toLower().contains("intel"))
+        {
+            if (appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::autoselect)
+                graphicsApi = GraphicsApi::opengl;
+        }
 
         // Workaround for a crash within Chromium rendering due to graphic driver issue.
-        if (graphicsApi == GraphicsApi::opengl)
-            qputenv(kChromiumFlags, qgetenv(kChromiumFlags) + " --disable-gpu-compositing");
+        if (gpuInfo.name.toLower().contains("intel") || gpuInfo.name.toLower().contains("vmware"))
+        {
+            if (graphicsApi == GraphicsApi::opengl)
+                qputenv(kChromiumFlags, qgetenv(kChromiumFlags) + " --disable-gpu-compositing");
+        }
     }
 
     if (graphicsApi == GraphicsApi::vulkan && nx::build_info::isLinux())
