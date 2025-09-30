@@ -61,8 +61,11 @@ QList<QString> LookupListModel::attributeNames() const
 
 void LookupListModel::setAttributeNames(QList<QString> value)
 {
-    if (!NX_ASSERT(!value.isEmpty(), "Lookup list attribute names cannot be empty"))
+    if (!NX_ASSERT(!isGeneric() || !value.isEmpty(),
+        "Generic lookup list attribute names cannot be empty"))
+    {
         return;
+    }
 
     if (attributeNames() == value)
         return;
