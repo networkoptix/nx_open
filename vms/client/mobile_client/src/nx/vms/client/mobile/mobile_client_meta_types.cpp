@@ -32,10 +32,11 @@
 #include <nx/vms/client/mobile/maintenance/remote_log_manager.h>
 #include <nx/vms/client/mobile/push_notification/details/push_systems_selection_model.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
+#include <nx/vms/client/mobile/push_notification/push_notification_model.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/session/ui_messages.h>
-#include <nx/vms/client/mobile/utils/navigation_bar_utils.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
+#include <nx/vms/client/mobile/utils/navigation_bar_utils.h>
 #include <nx/vms/client/mobile/workaround/text_input_workaround.h>
 #include <private/qqmlvaluetype_p.h>
 #include <resources/camera_access_rights_helper.h>
@@ -122,6 +123,7 @@ void registerQmlTypes()
     MediaDownloadBackend::registerQmlType();
     UiController::registerQmlType();
     ShareBookmarkBackend::registerQmlType();
+    PushNotificationModel::registerQmlType();
 
     qmlRegisterUncreatableMetaObject(nx::vms::api::staticMetaObject, "nx.vms.api", 1, 0,
         "API", "API is a namespace");

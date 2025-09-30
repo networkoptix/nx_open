@@ -22,6 +22,9 @@
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/mobile/mobile_client_meta_types.h>
+#include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
+#include <nx/vms/client/mobile/push_notification/details/secure_storage.h>
+#include <nx/vms/client/mobile/push_notification/push_notification_image_provider.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/system_context.h>
@@ -37,6 +40,10 @@
 #include <utils/common/delayed.h>
 #include <utils/mobile_app_info.h>
 
+#if defined(Q_OS_ANDROID)
+#include <nx/vms/client/mobile/push_notification/details/android/jni_helpers.h>
+#endif
+
 namespace nx::vms::client::mobile {
 
 namespace {
@@ -46,6 +53,15 @@ core::ApplicationContext::Features makeFeatures()
     auto result = core::ApplicationContext::Features::all();
     result.ignoreCustomization = qnSettings->ignoreCustomization();
     return result;
+}
+
+std::unique_ptr<SecureStorage> createSecureStorage()
+{
+#if defined(Q_OS_ANDROID)
+    return std::make_unique<SecureStorage>(details::currentActivity());
+#else
+    return std::make_unique<SecureStorage>();
+#endif
 }
 
 } // namespace
@@ -63,6 +79,8 @@ struct ApplicationContext::Private
     std::unique_ptr<PushNotificationManager> pushManager;
     std::unique_ptr<detail::CredentialsHelper> credentialsHelper;
     QPointer<QnCameraThumbnailProvider> cameraThumbnailProvider; //< Owned by the QML engine.
+    std::shared_ptr<SecureStorage> secureStorage;
+    std::unique_ptr<PushNotificationStorage> pushNotificationStorage;
 
     void initializeHolePunching();
     void initializeTranslations();
@@ -72,6 +90,7 @@ struct ApplicationContext::Private
     void initializeMainSystemContext();
     void initializeTrafficLogginOptionHandling();
     void initOsSpecificStuff();
+    void initializePushNotificationStorage();
 };
 
 void ApplicationContext::Private::initializeHolePunching()
@@ -145,6 +164,9 @@ void ApplicationContext::Private::initializeEngine(
 
     engine->addImageProvider(core::WatermarkImageProvider::name(),
         new core::WatermarkImageProvider());
+
+    engine->addImageProvider(PushNotificationImageProvider::id,
+        new PushNotificationImageProvider());
 
     static const QString kQmlRoot = "qrc:///qml";
     auto qmlRoot = params.qmlRoot.isEmpty() ? kQmlRoot : params.qmlRoot;
@@ -229,6 +251,11 @@ void ApplicationContext::Private::initOsSpecificStuff()
     }
 }
 
+void ApplicationContext::Private::initializePushNotificationStorage()
+{
+    pushNotificationStorage = std::make_unique<PushNotificationStorage>(secureStorage);
+}
+
 //-------------------------------------------------------------------------------------------------
 
 ApplicationContext::ApplicationContext(
@@ -244,7 +271,8 @@ ApplicationContext::ApplicationContext(
         parent),
     d(new Private{
         .q = this,
-        .credentialsHelper = std::make_unique<detail::CredentialsHelper>()})
+        .credentialsHelper = std::make_unique<detail::CredentialsHelper>(),
+        .secureStorage = createSecureStorage()})
 {
     d->initializeHolePunching();
     initializeNetworkModules();
@@ -252,6 +280,7 @@ ApplicationContext::ApplicationContext(
     d->initializeTranslations();
     d->initializeEngine(startupParams);
     d->initializePushManager();
+    d->initializePushNotificationStorage();
     d->initializeMainWindowContext();
     d->initializeMainSystemContext();
     d->initializeTrafficLogginOptionHandling();
@@ -350,6 +379,16 @@ nx::client::mobile::QmlSettingsAdaptor* ApplicationContext::settings() const
 QnCameraThumbnailProvider* ApplicationContext::cameraThumbnailProvider() const
 {
     return d->cameraThumbnailProvider.get();
+}
+
+SecureStorage* ApplicationContext::secureStorage() const
+{
+    return d->secureStorage.get();
+}
+
+PushNotificationStorage* ApplicationContext::pushNotificationStorage() const
+{
+    return d->pushNotificationStorage.get();
 }
 
 } // namespace nx::vms::client::mobile

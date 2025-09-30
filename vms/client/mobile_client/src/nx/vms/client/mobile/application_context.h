@@ -19,9 +19,11 @@ namespace nx::vms::client::mobile {
 
 namespace detail { class CredentialsHelper; }
 
+class PushNotificationManager;
+class PushNotificationStorage;
+class SecureStorage;
 class SystemContext;
 class WindowContext;
-class PushNotificationManager;
 
 class ApplicationContext: public core::ApplicationContext
 {
@@ -69,6 +71,10 @@ public:
     nx::client::mobile::QmlSettingsAdaptor* settings() const;
 
     QnCameraThumbnailProvider* cameraThumbnailProvider() const;
+
+    SecureStorage* secureStorage() const;
+
+    PushNotificationStorage* pushNotificationStorage() const;
 
 private:
     struct Private;

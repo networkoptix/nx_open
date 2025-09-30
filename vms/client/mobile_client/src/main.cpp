@@ -53,6 +53,7 @@ extern "C" {
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/core/watchers/cloud_features_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
+#include <nx/vms/client/mobile/push_notification/push_notification_image_provider.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/statistics/crashpad.h>
@@ -423,6 +424,8 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     // TODO: Move all the code above in mobile application context destructor with correct
     // deinitialization order.
     context->qmlEngine()->removeImageProvider("thumbnail");
+    context->qmlEngine()->removeImageProvider(
+        mobile::PushNotificationImageProvider::id);
     context->resetEngine();
 
     const auto deinitializationStartTime = steady_clock::now();
