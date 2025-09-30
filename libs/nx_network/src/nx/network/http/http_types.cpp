@@ -1176,7 +1176,7 @@ const std::string* Authorization::token() const
     if (authScheme == AuthScheme::bearer)
         return &bearer->token;
 
-    if (AuthScheme::basic && basic->userid == TOKEN_USERID)
+    if (authScheme == AuthScheme::basic && basic->userid == TOKEN_USERID)
         return &basic->password;
 
     return nullptr;
