@@ -1,17 +1,18 @@
 module Nx.Screens
 
+AppInfoScreen 1.0 AppInfoScreen.qml
+BaseSettingsScreen 1.0 BaseSettingsScreen.qml
+BetaFeaturesScreen 1.0 BetaFeaturesScreen.qml
 CameraSettingsScreen 1.0 CameraSettingsScreen.qml
 CustomConnectionScreen 1.0 CustomConnectionScreen.qml
+DeveloperSettingsScreen 1.0 DeveloperSettingsScreen.qml
+EventSearchMenuScreen 1.0 EventSearchMenuScreen.qml
+FeedScreen 1.0 FeedScreen.qml
+InterfaceSettingsScreen 1.0 InterfaceSettingsScreen.qml
+PerformanceSettingsScreen 1.0 PerformanceSettingsScreen.qml
+ResourcesScreen 1.0 ResourcesScreen.qml
 SavedConnectionScreen 1.0 SavedConnectionScreen.qml
 SessionsScreen 1.0 SessionsScreen.qml
-ResourcesScreen 1.0 ResourcesScreen.qml
-VideoScreen 1.0 VideoScreen.qml
 SettingsScreen 1.0 SettingsScreen.qml
-DeveloperSettingsScreen 1.0 DeveloperSettingsScreen.qml
-BetaFeaturesScreen 1.0 BetaFeaturesScreen.qml
 VideoDummy 1.0 VideoDummy.qml
-EventSearchMenuScreen 1.0 EventSearchMenuScreen.qml
-PerformanceSettingsScreen 1.0 PerformanceSettingsScreen.qml
-InterfaceSettingsScreen 1.0 InterfaceSettingsScreen.qml
-BaseSettingsScreen 1.0 BaseSettingsScreen.qml
-AppInfoScreen 1.0 AppInfoScreen.qml
+VideoScreen 1.0 VideoScreen.qml

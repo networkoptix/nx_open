@@ -210,6 +210,11 @@ function openEventSearchMenuScreen()
     stackView.replace(null, Qt.resolvedUrl("../Screens/EventSearchMenuScreen.qml"))
 }
 
+function openFeedScreen()
+{
+    stackView.replace(null, Qt.resolvedUrl("../Screens/FeedScreen.qml"))
+}
+
 function openMenuScreen()
 {
     stackView.replace(null, Qt.resolvedUrl("../Screens/MenuScreen.qml"))

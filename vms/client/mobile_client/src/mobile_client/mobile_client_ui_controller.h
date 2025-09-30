@@ -41,6 +41,7 @@ public:
         DetailsScreen,
         EventSearchMenuScreen,
         EventSearchScreen,
+        FeedScreen,
         MenuScreen,
 
         // Application settings related screens.

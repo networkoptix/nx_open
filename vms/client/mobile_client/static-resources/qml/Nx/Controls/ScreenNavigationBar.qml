@@ -137,6 +137,12 @@ Rectangle
                 "openScreen": () => Workflow.openEventSearchMenuScreen()
             },
             {
+                "objectName": "switchToFeedScreenButton",
+                "iconSource": "image://skin/24x24/Outline/notification.svg",
+                "screenId": Controller.FeedScreen,
+                "openScreen": () => Workflow.openFeedScreen()
+            },
+            {
                 "objectName": "switchToMenuScreenButton",
                 "iconSource": "image://skin/navigation/menu_button.svg",
                 "screenId": Controller.MenuScreen,

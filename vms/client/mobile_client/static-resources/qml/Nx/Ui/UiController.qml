@@ -89,6 +89,8 @@ NxObject
                     return Controller.DetailsScreen
                 case "eventSearchMenuScreen":
                     return Controller.EventSearchMenuScreen
+                case "feedScreen":
+                    return Controller.FeedScreen
                 case "menuScreen":
                     return Controller.MenuScreen
                 default:
