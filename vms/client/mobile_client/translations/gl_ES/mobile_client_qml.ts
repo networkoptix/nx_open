@@ -477,11 +477,11 @@
     <name>LinkAboutToOpenDialog</name>
     <message>
       <source>Open link?</source>
-      <translation type="unfinished">Open link?</translation>
+      <translation>Abrir ligazón?</translation>
     </message>
     <message>
       <source>External link will open in the browser</source>
-      <translation type="unfinished">External link will open in the browser</translation>
+      <translation>A ligazón externa abrirase no navegador</translation>
     </message>
     <message>
       <source>Cancel</source>

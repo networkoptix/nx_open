@@ -184,7 +184,7 @@
     </message>
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
-      <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+      <translation>O servidor ou a rede non están dispoñibles. Por favor, comproba o enderezo e a conexión.</translation>
     </message>
   </context>
   <context>
@@ -477,7 +477,7 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <name>nx::vms::client::core::SoftTriggerCameraButtonController</name>
     <message>
       <source>Press and hold to</source>
       <translation>Premer e manter para</translation>

@@ -479,11 +479,11 @@
     <name>LinkAboutToOpenDialog</name>
     <message>
       <source>Open link?</source>
-      <translation type="unfinished">Open link?</translation>
+      <translation>Otworzyć link?</translation>
     </message>
     <message>
       <source>External link will open in the browser</source>
-      <translation type="unfinished">External link will open in the browser</translation>
+      <translation>Link zewnętrzny zostanie otwarty w przeglądarce</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1148,7 +1148,7 @@
     </message>
     <message>
       <source>Open account settings</source>
-      <translation type="unfinished">Open account settings</translation>
+      <translation>Otwórz ustawienia konta</translation>
     </message>
   </context>
   <context>

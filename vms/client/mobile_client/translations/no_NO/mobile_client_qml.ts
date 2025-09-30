@@ -481,7 +481,7 @@
     </message>
     <message>
       <source>External link will open in the browser</source>
-      <translation type="unfinished">External link will open in the browser</translation>
+      <translation>Ekstern link åpnes i nettleseren</translation>
     </message>
     <message>
       <source>Cancel</source>

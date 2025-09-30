@@ -475,7 +475,7 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <name>nx::vms::client::core::SoftTriggerCameraButtonController</name>
     <message>
       <source>Press and hold to</source>
       <translation>請持續按住不放</translation>

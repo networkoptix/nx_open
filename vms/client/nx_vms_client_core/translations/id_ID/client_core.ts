@@ -184,7 +184,7 @@
     </message>
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
-      <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+      <translation>Server atau jaringan tidak tersedia. Periksa alamat dan koneksi.</translation>
     </message>
   </context>
   <context>
@@ -475,14 +475,14 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <name>nx::vms::client::core::SoftTriggerCameraButtonController</name>
     <message>
       <source>Press and hold to</source>
       <translation>Tekan dan tahan</translation>
     </message>
     <message>
       <source>press and hold</source>
-      <translation>press and hold</translation>
+      <translation>tekan dan tahan</translation>
     </message>
   </context>
   <context>

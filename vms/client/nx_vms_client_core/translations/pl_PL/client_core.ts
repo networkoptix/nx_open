@@ -176,15 +176,15 @@
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</translation>
+      <translation>Aby zalogować się do tej witryny, wyłącz opcję w ustawieniach kąta &quot;Żądaj kodu weryfikacyjnego przy każdym logowaniu na konto %1&quot;.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your account settings.</source>
-      <translation type="unfinished">You can enable two-factor authentication in your account settings.</translation>
+      <translation>Możesz włączyć uwierzytelnianie dwuetapowe w ustawieniach konta.</translation>
     </message>
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
-      <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+      <translation>Serwer lub sieć niedostępne. Sprawdź adres i połączenie.</translation>
     </message>
   </context>
   <context>
@@ -481,7 +481,7 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <name>nx::vms::client::core::SoftTriggerCameraButtonController</name>
     <message>
       <source>Press and hold to</source>
       <translation>Naciśnij i przytrzymaj</translation>

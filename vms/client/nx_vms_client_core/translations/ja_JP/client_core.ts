@@ -184,7 +184,7 @@
     </message>
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
-      <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+      <translation>サーバーまたはネットワークが利用できません。アドレスと接続可否を確認してください。</translation>
     </message>
   </context>
   <context>
@@ -475,14 +475,14 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <name>nx::vms::client::core::SoftTriggerCameraButtonController</name>
     <message>
       <source>Press and hold to</source>
       <translation>長押しで</translation>
     </message>
     <message>
       <source>press and hold</source>
-      <translation>長押し</translation>
+      <translation>押したまま</translation>
     </message>
   </context>
   <context>
