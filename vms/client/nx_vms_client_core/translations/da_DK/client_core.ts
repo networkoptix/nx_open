@@ -66,11 +66,11 @@
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation>LDAP server forbindelse timeout</translation>
+      <translation>LDAP-serverforbindelse timeout</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out.</source>
-      <translation>LDAP server forbindelse timeout.</translation>
+      <translation>LDAP-serverforbindelse timeout.</translation>
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>

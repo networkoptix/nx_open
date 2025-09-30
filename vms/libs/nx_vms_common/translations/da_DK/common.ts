@@ -565,7 +565,7 @@
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation>Vælg præcis ét kamera</translation>
+      <translation>Vælg præcis et kamera</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
