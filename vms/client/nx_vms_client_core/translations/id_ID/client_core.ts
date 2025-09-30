@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>press and hold</source>
-      <translation>press and hold</translation>
+      <translation>tekan dan tahan</translation>
     </message>
   </context>
   <context>
