@@ -176,15 +176,15 @@
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</translation>
+      <translation>若要登入此站點，請在帳戶設定中停用 &quot;每次使用 %1 帳號登入時皆要求輸入驗證碼&quot;。</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your account settings.</source>
-      <translation type="unfinished">You can enable two-factor authentication in your account settings.</translation>
+      <translation>您可以在帳號設定中啟用雙重驗證功能。</translation>
     </message>
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
-      <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+      <translation>伺服器或網路無法使用，請檢查地址和連線。</translation>
     </message>
   </context>
   <context>
