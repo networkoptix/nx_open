@@ -360,6 +360,25 @@
     </message>
 </context>
 <context>
+    <name>FeedScreen</name>
+    <message>
+        <source>Feed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show more</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No push notifications were found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FiltersPanel</name>
     <message>
         <source>No filters</source>

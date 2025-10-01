@@ -65,6 +65,14 @@
     </message>
 </context>
 <context>
+    <name>nx::vms::client::mobile::PushNotificationModel</name>
+    <message>
+        <source>%1 ago</source>
+        <comment>notification time, like &apos;1 min ago&apos;</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::mobile::ShareBookmarkBackend</name>
     <message>
         <source>Camera</source>
