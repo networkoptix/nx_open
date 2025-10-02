@@ -326,7 +326,7 @@ void LicenseManagerWidget::updateLicenses()
                 {
                     messages.append(
                         tr("%1 are currently in use",
-                            "Text like '6 Professional Licenses' will be substituted",
+                            "Numerus: text like '6 Professional Licenses' will be substituted",
                             used).arg(QnLicense::displayText(type, used)));
                 }
                 else
@@ -334,7 +334,7 @@ void LicenseManagerWidget::updateLicenses()
                     const int required = helper->requiredLicenses(type);
                     messages.append(setWarningStyleHtml(
                         tr("At least %1 are required",
-                            "Text like '6 Professional Licenses' will be substituted",
+                            "Numerus: text like '6 Professional Licenses' will be substituted",
                             required).arg(QnLicense::displayText(type, required))));
                 }
             }
@@ -443,9 +443,13 @@ bool LicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
     }
 
     QnMessageBox confirmationDialog(QnMessageBoxIcon::Question,
-        tr("Deactivate licenses?", "", licenses.size()),
-        QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
+        tr("Deactivate licenses?",
+            "Numerus form depends on the amount of licenses",
+            licenses.size()),
+        /*extras*/ QString(),
+        QDialogButtonBox::Cancel,
+        QDialogButtonBox::NoButton,
+        this);
     confirmationDialog.setInformativeText(licenseDetails.join(kEmptyLine), false);
     confirmationDialog.setInformativeTextFormat(Qt::RichText);
     confirmationDialog.addButton(tr("Deactivate"),

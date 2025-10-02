@@ -120,14 +120,11 @@ QString QnVideowallScreenWidget::calculateTitleText() const
     for (int screen: screens)
         screenIndices.append(QString::number(screen + 1));
 
-    if (screenIndices.size() == 1)
-        return tr("PC %1 - Display %2").arg(pcVisualIdx).arg(screenIndices.first());
-
     return tr("PC %1 - Displays %2",
-        "%2 will be substituted by _list_ of displays",
+        "Numerus form depend on the number of displays. %2 will be substituted by a list of them",
         screens.size())
         .arg(pcVisualIdx)
-        .arg(screenIndices.join(lit(", ")));
+        .arg(screenIndices.join(", "));
 }
 
 Qn::ResourceStatusOverlay QnVideowallScreenWidget::calculateStatusOverlay() const

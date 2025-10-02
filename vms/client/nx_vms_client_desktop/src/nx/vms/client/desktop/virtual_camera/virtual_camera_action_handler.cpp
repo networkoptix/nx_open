@@ -292,7 +292,9 @@ bool VirtualCameraActionHandler::fixFileUpload(
     if (upload->allHaveStatus(VirtualCameraPayload::UnsupportedFormat))
     {
         QnMessageBox::warning(mainWindowWidget(),
-            tr("Selected file formats are not supported", "", count),
+            tr("Selected file formats are not supported",
+                "Numerus form depends on the number of files",
+                count),
             tr("Use .MKV, .AVI, .MP4 or other video files."));
         return false;
     }
@@ -300,7 +302,9 @@ bool VirtualCameraActionHandler::fixFileUpload(
     if (upload->allHaveStatus(VirtualCameraPayload::NoTimestamp))
     {
         QnMessageBox::warning(mainWindowWidget(),
-            tr("Selected files do not have timestamps", "", count),
+            tr("Selected files do not have timestamps",
+                "Numerus form depends on the number of files",
+                count),
             tr("Only video files with correct timestamp are supported."));
         return false;
     }
@@ -315,7 +319,8 @@ bool VirtualCameraActionHandler::fixFileUpload(
             maxTime = std::max(maxTime, payload.local.period.endTimeMs());
         }
 
-        QString title = tr("Selected files are too old", "", count);
+        QString title = tr(
+            "Selected files are too old", "Numerus form depends on the number of files", count);
 
         QLocale locale = QLocale::system();
 
@@ -346,16 +351,24 @@ bool VirtualCameraActionHandler::fixFileUpload(
     if (upload->allHaveStatus(VirtualCameraPayload::ChunksTakenByFileInQueue))
     {
         QnMessageBox::warning(mainWindowWidget(),
-            tr("Selected files cover periods for which videos are already being uploaded", "", count),
-            tr("You can upload these files to a different instance of a Virtual Camera.", "", count));
+            tr("Selected files cover periods for which videos are already being uploaded",
+                "Numerus form depends on the number of files",
+                count),
+            tr("You can upload these files to a different instance of a Virtual Camera.",
+                "Numerus form depends on the number of files",
+                count));
         return false;
     }
 
     if (upload->allHaveStatus(VirtualCameraPayload::ChunksTakenOnServer))
     {
         QnMessageBox::warning(mainWindowWidget(),
-            tr("Selected files cover periods for which videos have already been uploaded", "", count),
-            tr("You can upload these files to a different instance of a Virtual Camera.", "", count));
+            tr("Selected files cover periods for which videos have already been uploaded",
+                "Numerus form depends on the number of files",
+                count),
+            tr("You can upload these files to a different instance of a Virtual Camera.",
+                "Numerus form depends on the number of files",
+                count));
         return false;
     }
 
@@ -455,11 +468,15 @@ bool VirtualCameraActionHandler::fixStorageCleanupUpload(VirtualCameraUpload* up
     int n = upload->elements.size();
 
     bool fixed = QnMessageBox::warning(mainWindowWidget(),
-        tr("Some footage may be deleted after uploading these files", 0, n),
+        tr("Some footage may be deleted after uploading these files",
+            "Numerus form depends on the amount of files uploaded",
+            n),
         tr("There is not much free space left on server storage. "
             "Some old footage may be deleted to free up space. "
             "Note that if selected files happen to be the oldest on the server, "
-            "they will be deleted right after being uploaded.", 0, n)
+            "they will be deleted right after being uploaded.",
+            "Numerus form depends on the amount of files uploaded",
+            n)
         + lit("\n\n")
         + tr("To prevent this you can add additional storage. "
             "You can also control which footage will be deleted first by changing "

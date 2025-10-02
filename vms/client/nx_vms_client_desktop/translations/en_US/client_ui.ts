@@ -532,7 +532,7 @@
     </message>
     <message>
         <source>Native camera presets will not be available.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1320,7 +1320,7 @@
     </message>
     <message>
         <source>User&apos;s local layouts</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1548,7 +1548,7 @@
     </message>
     <message>
         <source>Custom Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1687,10 +1687,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
-          </source>
+        <source>Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</source>
         <translation></translation>
     </message>
 </context>
@@ -2089,7 +2087,7 @@
     </message>
     <message>
         <source>Service Allocation</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2231,7 +2229,7 @@
     </message>
     <message>
         <source>Power Users</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

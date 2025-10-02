@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/event/level.h>
 
 namespace nx::vms::client::desktop {
@@ -190,12 +191,16 @@ void ChannelPartnerUserNotificationManager::updateNotificationState()
         if (!m_notificationId.isNull())
             return;
 
+        QStringList messageLines;
+        messageLines << tr("Channel Partner users' access is managed at the Organization level, "
+                "and they are not visible in site user management.");
+        messageLines << QString();
+        messageLines << nx::vms::common::html::localLink(tr("Learn more"));
+
         const auto notificationsManager = workbench()->windowContext()->localNotificationsManager();
         m_notificationId = notificationsManager->add(
             tr("Channel Partner users have access to this site"),
-            tr("Channel Partner users' access is managed at the Organization level, "
-                "and they are not visible in site user management."
-                "<br/><br/><a href='#'>Learn more</a>"),
+            messageLines.join(nx::vms::common::html::kLineBreak),
             /*cancellable*/ true);
         notificationsManager->setIconPath(
             m_notificationId, "20x20/Outline/warning.svg");

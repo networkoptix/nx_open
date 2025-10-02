@@ -123,7 +123,7 @@ private:
 
                 const int total = helper.totalLicenses(type);
                 const auto message = tr("%1 are used",
-                    "Text like '5/10 Professional Licenses' will be substituted", used)
+                    "Numerus: text like '5/10 Professional Licenses' will be substituted", used)
                         .arg(QnLicense::displayText(type, used, total));
 
                 usedLicenses << message;
@@ -144,7 +144,7 @@ private:
                 continue;
 
             const auto message = setWarningStyleHtml(tr("%1 are required",
-                "Text like '5 Professional Licenses' will be substituted", required)
+                "Numerus: text like '5 Professional Licenses' will be substituted", required)
                     .arg(QnLicense::displayText(type, required)));
 
             requiredLicenses << message;

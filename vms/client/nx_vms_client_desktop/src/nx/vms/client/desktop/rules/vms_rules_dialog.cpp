@@ -159,12 +159,12 @@ void VmsRulesDialog::setRulesState(const UuidList& ids, bool isEnabled)
         auto messageBox = new QnSessionAware<QnMessageBox>{context()->mainWindowWidget()};
         messageBox->setIcon(QnMessageBox::Icon::Warning);
         messageBox->setText(tr("Some of the rules were not enabled",
-            "Form depends on invalid rule count",
+            "Numerus form depends on the invalid rule count",
             invalidRules));
         messageBox->setInformativeText(
             tr("Some of the selected rules can not be enabled as they have wrong parameters. "
                 "Fix them and enable the rule again.",
-                "Form depends on invalid rule count",
+                "Numerus form depends on the invalid rule count",
                 invalidRules));
         messageBox->setStandardButtons(QDialogButtonBox::Ok);
         messageBox->setDefaultButton(QDialogButtonBox::NoButton);
