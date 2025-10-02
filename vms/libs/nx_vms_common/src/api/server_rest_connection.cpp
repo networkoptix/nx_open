@@ -1566,20 +1566,21 @@ using JsonRpcResponseIdType = decltype(nx::vms::api::JsonRpcResponse::id);
 std::tuple<
     std::unordered_set<JsonRpcRequestIdType>,
     std::vector<nx::vms::api::JsonRpcResponse>>
-extractJsonRpcExpired(rest::ErrorOrData<JsonRpcResultType>& result)
+extractJsonRpcExpired(const rest::ErrorOrData<JsonRpcResultType>& result)
 {
     if (!result)
         return {};
 
-    auto responseArray = std::get_if<
+    const auto responseArray = std::get_if<
         std::vector<nx::vms::api::JsonRpcResponse>>(&*result);
 
     if (!responseArray)
         return {};
 
     std::unordered_set<JsonRpcRequestIdType> ids;
-
-    for (auto& response: *responseArray)
+    std::vector<nx::vms::api::JsonRpcResponse> responses;
+    responses.reserve(responseArray->size());
+    for (const auto& response: *responseArray)
     {
         if (isSessionExpiredError(response))
         {
@@ -1588,9 +1589,9 @@ extractJsonRpcExpired(rest::ErrorOrData<JsonRpcResultType>& result)
             else if (const auto strId = std::get_if<nx::json_rpc::StringId>(&response.id))
                 ids.insert(*strId);
         }
+        responses.push_back(response.copy());
     }
-
-    return {std::move(ids), std::move(*responseArray)};
+    return {std::move(ids), std::move(responses)};
 }
 
 bool mergeJsonRpcResults(
@@ -1645,8 +1646,6 @@ bool mergeJsonRpcResults(
         if (!std::holds_alternative<std::nullptr_t>(response.id))
             idToResponse.insert({response.id, &response});
     }
-
-    std::vector<nx::vms::api::JsonRpcResponse> updatedResponses;
 
     for (auto& response: originalResponse)
     {
