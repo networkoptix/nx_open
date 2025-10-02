@@ -363,19 +363,19 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>Alimentación</translation>
     </message>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>Amosar máis</translation>
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>Sen notificacións</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>Non se atoparon notificacións push.</translation>
     </message>
   </context>
   <context>

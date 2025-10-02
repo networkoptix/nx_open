@@ -362,19 +362,19 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>フィード</translation>
     </message>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>詳細を表示</translation>
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>通知はありません</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>プッシュ通知が見つかりませんでした。</translation>
     </message>
   </context>
   <context>

@@ -73,7 +73,7 @@
     <message>
       <source>%1 ago</source>
       <comment>notification time, like &apos;1 min ago&apos;</comment>
-      <translation type="unfinished">%1 ago</translation>
+      <translation>%1 temu</translation>
     </message>
   </context>
   <context>

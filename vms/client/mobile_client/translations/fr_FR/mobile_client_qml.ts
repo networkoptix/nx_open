@@ -367,7 +367,7 @@
     </message>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>Afficher plus</translation>
     </message>
     <message>
       <source>No Notifications</source>
