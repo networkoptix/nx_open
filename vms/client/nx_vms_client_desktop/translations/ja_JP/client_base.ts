@@ -5026,7 +5026,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>RESTRICTED</source>
-      <translation>制限あり</translation>
+      <translation>権限なし</translation>
     </message>
     <message>
       <source>Authorize</source>
