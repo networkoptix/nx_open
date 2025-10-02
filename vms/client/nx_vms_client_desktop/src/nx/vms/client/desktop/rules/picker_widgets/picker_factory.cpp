@@ -2,7 +2,6 @@
 
 #include "picker_factory.h"
 
-#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/rules/action_builder_field.h>
 #include <nx/vms/rules/action_builder_fields/builtin_fields.h>
 #include <nx/vms/rules/camera_validation_policy.h>
@@ -281,7 +280,7 @@ PickerWidget* createActionFieldWidget(
     if (fieldId == fieldMetatype<nx::vms::rules::HttpAuthField>())
         return createPickerImpl<HttpAuthPicker>(field, context, parent);
 
-    if (fieldId == fieldMetatype<nx::vms::rules::HttpHeadersField>() && ini().developerMode)
+    if (fieldId == fieldMetatype<nx::vms::rules::HttpHeadersField>())
         return createPickerImpl<HttpHeadersPickerWidget>(field, context, parent);
 
     if (fieldId == fieldMetatype<nx::vms::rules::HttpMethodField>())
