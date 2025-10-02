@@ -479,7 +479,7 @@
     </message>
     <message>
       <source>press and hold</source>
-      <translation>押したまま</translation>
+      <translation>長押し</translation>
     </message>
   </context>
   <context>
