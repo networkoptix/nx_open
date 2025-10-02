@@ -81,6 +81,13 @@ Controls.ApplicationWindow
         onHeightChanged: autoScrollDelayTimer.restart()
     }
 
+    SnackBar
+    {
+        id: snackBar
+        parent: Overlay.overlay
+        y: screenNavigationBar.y - height - 16
+    }
+
     ScreenNavigationBar
     {
         id: screenNavigationBar
