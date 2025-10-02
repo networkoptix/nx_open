@@ -2,17 +2,14 @@
 
 #pragma once
 
+#include <analytics/common/object_metadata.h>
 #include <nx/vms/api/data/pixelation_settings.h>
 
-#include "analytics/common/object_metadata.h"
-#include "paint_image_filter.h"
-
-namespace nx::vms::common { class PixelationSettings; }
-namespace nx::vms::common::pixelation { class Pixelation; }
+#include <transcoding/filters/abstract_image_filter.h>
 
 namespace nx::core::transcoding {
 
-class NX_VMS_COMMON_API PixelationImageFilter: public PaintImageFilter
+class NX_VMS_COMMON_API PixelationImageFilter: public QnAbstractImageFilter
 {
 public:
     PixelationImageFilter(const nx::vms::api::PixelationSettings& settings);
@@ -26,7 +23,6 @@ public:
     void setMetadata(const QnConstAbstractCompressedMetadataPtr& metadata);
 
 private:
-    std::shared_ptr<nx::vms::common::pixelation::Pixelation> m_pixelation;
     nx::vms::api::PixelationSettings m_settings;
     QnConstAbstractCompressedMetadataPtr m_metadata;
 };
