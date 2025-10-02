@@ -163,7 +163,7 @@ bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayou
             messageBox.setInformativeText(
                 tr("These layouts are shared with other users, so they will be deleted for their"
                     " accounts as well.",
-                    "",
+                    "Numerus form depends on the amount of layouts",
                     sharedLayouts.size()));
         }
         else
@@ -518,7 +518,7 @@ bool Resources::moveProxiedWebPages(QWidget* parent, const QnResourceList& resou
     const auto text = tr(
         "You are about to move these web pages to Server \"%1\". These web pages proxy all"
              " requested contents, and their proxy server will change to Server \"%1\".",
-        "",
+        "Numerus form depends on the amount of web pages",
         webPages.count());
 
     messageBox.setWindowTitle(nx::branding::vmsName());

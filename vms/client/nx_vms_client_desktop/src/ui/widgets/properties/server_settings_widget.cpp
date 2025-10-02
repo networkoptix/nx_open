@@ -436,7 +436,8 @@ void QnServerSettingsWidget::updateCertificatesInfo()
 
     int certificateCount = updateCertificatesLabels();
 
-    ui->certificateLabel->setText(tr("Certificates", "", certificateCount));
+    ui->certificateLabel->setText(
+        tr("Certificates", "Numerus form depends on the certificates count", certificateCount));
     ui->certificateHint->setHintText(
         tr("Server utilizes these %n SSL certificates to authenticate its identity",
             "",

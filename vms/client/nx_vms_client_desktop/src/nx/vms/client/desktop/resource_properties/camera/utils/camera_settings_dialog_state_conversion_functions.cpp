@@ -418,7 +418,7 @@ void setAudioEnabled(bool value, const Cameras& cameras)
                 "Failed to enable audio on %n devices", "", skippedCameras.size()),
             CameraSettingsDialogStateConversionFunctions::tr(
                 "These devices do not have audio inputs or are not configured correctly.",
-                "", skippedCameras.size()),
+                "Numerus form depends on the total number of devices", skippedCameras.size()),
             QDialogButtonBox::Ok, QDialogButtonBox::Ok, QApplication::activeWindow());
         messageBox.addCustomWidget(new QnResourceListView(skippedCameras, &messageBox));
         messageBox.exec();
@@ -453,7 +453,7 @@ void setTwoWayAudioEnabled(bool value, const Cameras& cameras)
                 "Failed to enable 2-way audio on %n devices", "", skippedCameras.size()),
             CameraSettingsDialogStateConversionFunctions::tr(
                 "These devices do not have audio outputs or are not configured correctly.",
-                "", skippedCameras.size()),
+                "Numerus form depends on the total number of devices", skippedCameras.size()),
             QDialogButtonBox::Ok, QDialogButtonBox::Ok, QApplication::activeWindow());
         messageBox.addCustomWidget(new QnResourceListView(skippedCameras, &messageBox));
         messageBox.exec();

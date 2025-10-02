@@ -3340,9 +3340,9 @@ void QnWorkbenchVideoWallHandler::filterAllowedMediaResources(QnResourceList& re
                 resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("You cannot add to the video wall devices for which you do not have View "
-                       "Live permission.", "", count),
+                       "Live permission.", "Numerus form depends on the number of devices", count),
                     tr("You cannot add to the video wall cameras for which you do not have View "
-                       "Live permission.", "", count)),
+                       "Live permission.", "Numerus form depends on the number of cameras", count)),
                 noAccessResources);
             QnSessionAwareMessageBox messageBox(mainWindowWidget());
             messageBox.setIcon(QnMessageBoxIcon::Critical);

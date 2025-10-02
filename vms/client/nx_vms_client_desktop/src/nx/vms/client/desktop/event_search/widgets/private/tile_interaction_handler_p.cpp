@@ -275,7 +275,9 @@ void TileInteractionHandler::navigateToSource(
     if (openResources.size() != resourceList.size())
     {
         const auto message = tr("Double click to add cameras to the current layout "
-            "or ctrl+click to open in a new tab", "", resourceList.size());
+            "or ctrl+click to open in a new tab",
+            "Numerus form depends on the number of cameras",
+            resourceList.size());
 
         showMessage(message, instantMessages);
     }

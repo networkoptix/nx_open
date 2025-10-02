@@ -48,7 +48,7 @@ void LocalFiles::invalidChars(QWidget* parent, const QString& invalidSet)
         parent,
         tr(
             "File name must not contain the following reserved characters:",
-            "Plural relates to the word _characters_ here, not _file name_.",
+            "Numerus form depends on the amount of characters",
             invalidSet.size())
         + '\n'
         + invalidSet);

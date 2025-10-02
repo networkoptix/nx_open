@@ -245,9 +245,10 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(
                 if (!cameras.empty())
                 {
                     QnMessageBox messageBox(QnMessageBoxIcon::Warning,
-                        tr("Backup will not be activated for %1 devices: ").arg(cameras.size()),
-                        tr("%1 suitable cloud storage services are required to activate backup for them.")
-                            .arg(cameras.size()),
+                        tr("Backup will not be activated for %n devices:", "", cameras.size()),
+                        tr("%n suitable cloud storage services are required to activate backup for them.",
+                            "",
+                            cameras.size()),
                         QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                         QDialogButtonBox::Ok,
                         this);

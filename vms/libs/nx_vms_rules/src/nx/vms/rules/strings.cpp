@@ -423,18 +423,18 @@ QString Strings::camerasWereRemoved(common::SystemContext* context, int count)
 {
     return QnDeviceDependentStrings::getDefaultNameFromSet(
         context->resourcePool(),
-        tr("Selected devices were removed", "", count),
-        tr("Selected cameras were removed", "", count));
+        tr("Selected devices were removed", "Numerus form depend on devices count", count),
+        tr("Selected cameras were removed", "Numerus form depend on cameras count", count));
 }
 
 QString Strings::serversWereRemoved(int count)
 {
-    return tr("Selected servers were removed", "", count);
+    return tr("Selected servers were removed", "Numerus form depend on servers count", count);
 }
 
 QString Strings::layoutsWereRemoved(int count)
 {
-    return tr("Selected layouts were removed", "", count);
+    return tr("Selected layouts were removed", "Numerus form depend on layouts count", count);
 }
 
 QString Strings::negativeTime()

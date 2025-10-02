@@ -463,9 +463,10 @@ void LicenseDeactivationDialogs::unexpectedError(
     Private::showMessage(
         parent,
         QnMessageBoxIcon::Critical,
-        tr("Cannot deactivate licenses", "", licenses.count()),
-        tr("Please try again later.")
-    );
+        tr("Cannot deactivate licenses",
+            "Numerus form depends on the amount of licenses",
+            licenses.count()),
+        tr("Please try again later."));
 }
 
 void LicenseDeactivationDialogs::networkError(QWidget* parent)

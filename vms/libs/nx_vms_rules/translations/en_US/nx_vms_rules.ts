@@ -204,34 +204,6 @@
         <source>For</source>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>Selected devices were removed</source>
-        <translation>
-            <numerusform>Selected device was removed</numerusform>
-            <numerusform>Selected devices were removed</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Selected cameras were removed</source>
-        <translation>
-            <numerusform>Selected camera was removed</numerusform>
-            <numerusform>Selected cameras were removed</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Selected servers were removed</source>
-        <translation>
-            <numerusform>Selected server was removed</numerusform>
-            <numerusform>Selected servers were removed</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Selected layouts were removed</source>
-        <translation>
-            <numerusform>Selected layout was removed</numerusform>
-            <numerusform>Selected layouts were removed</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Time value cannot be less than zero</source>
         <translation></translation>
@@ -290,44 +262,76 @@
     </message>
     <message>
         <source>Method</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select Integration Action</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Integration not found for Integration Action %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unsupported JSON value type in key %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Total number of events</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Removed subject</source>
         <comment>The subject is user or group</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Removed device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Removed server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Removed layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected devices were removed</source>
+        <comment>Numerus form depend on devices count</comment>
+        <translation>
+            <numerusform>Selected device was removed</numerusform>
+            <numerusform>Selected devices were removed</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected cameras were removed</source>
+        <comment>Numerus form depend on cameras count</comment>
+        <translation>
+            <numerusform>Selected camera was removed</numerusform>
+            <numerusform>Selected cameras were removed</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected servers were removed</source>
+        <comment>Numerus form depend on servers count</comment>
+        <translation>
+            <numerusform>Selected server was removed</numerusform>
+            <numerusform>Selected servers were removed</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected layouts were removed</source>
+        <comment>Numerus form depend on layouts count</comment>
+        <translation>
+            <numerusform>Selected layout was removed</numerusform>
+            <numerusform>Selected layouts were removed</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -470,30 +474,30 @@
     </message>
     <message>
         <source>Device disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Camera disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>I/O Module disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Device disconnected at %1</source>
         <comment>%1 is a server name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Camera disconnected at %1</source>
         <comment>%1 is a server name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>I/O Module disconnected at %1</source>
         <comment>%1 is a server name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -591,7 +595,7 @@
     </message>
     <message>
         <source>Fan failure at %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -663,6 +667,7 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
         <source>Some of the headers are not valid</source>
+        <comment>Numerus form depends on the amount of invalid headers</comment>
         <translation>
             <numerusform>One of the headers is not valid</numerusform>
             <numerusform>Some of the headers are not valid</numerusform>
@@ -670,6 +675,7 @@
     </message>
     <message numerus="yes">
         <source>All the headers are not valid</source>
+        <comment>Numerus form depends on the total amount of headers</comment>
         <translation>
             <numerusform>The header is not valid</numerusform>
             <numerusform>All the headers are not valid</numerusform>
@@ -680,18 +686,18 @@
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
         <source>Not allowed HTTP method</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::rules::IntegrationAction</name>
     <message>
         <source>Integration Action</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Integration Action Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -857,7 +863,7 @@
     <message>
         <source>Network Issue at %1</source>
         <comment>%1 is a server name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -868,7 +874,7 @@
     </message>
     <message>
         <source>Force Acknowledgment</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1120,7 +1126,7 @@
     </message>
     <message>
         <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1161,7 +1167,7 @@
     </message>
     <message>
         <source>Internal HTTPS Request</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

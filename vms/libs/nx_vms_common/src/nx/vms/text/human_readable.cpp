@@ -308,37 +308,37 @@ QString HumanReadable::digitalSizeUnit(DigitalSizeUnit unit, SuffixFormat suffix
         case Bytes:
         {
             return (suffixFormat == SuffixFormat::Full)
-                ? tr("Byte(s)", "Full suffix for displaying bytes", count)
+                ? tr("Bytes", "Numerus: Full suffix for displaying bytes", count)
                 : tr("B", "Suffix for displaying bytes");
         }
         case Kilo:
         {
             return (suffixFormat == SuffixFormat::Full)
-                ? tr("Kilobyte(s)", "Full suffix for displaying kilobytes", count)
+                ? tr("Kilobytes", "Numerus: Full suffix for displaying kilobytes", count)
                 : tr("KB", "Suffix for displaying kilobytes");
         }
         case Mega:
         {
             return (suffixFormat == SuffixFormat::Full)
-                ? tr("Megabyte(s)", "Full suffix for displaying megabytes", count)
+                ? tr("Megabytes", "Numerus: Full suffix for displaying megabytes", count)
                 : tr("MB", "Suffix for displaying megabytes");
         }
         case Giga:
         {
             return (suffixFormat == SuffixFormat::Full)
-                ? tr("Gigabyte(s)", "Full suffix for displaying gigabytes", count)
+                ? tr("Gigabytes", "Numerus: Full suffix for displaying gigabytes", count)
                 : tr("GB", "Suffix for displaying gigabytes");
         }
         case Tera:
         {
             return (suffixFormat == SuffixFormat::Full)
-                ? tr("Terabyte(s)", "Full suffix for displaying terabytes", count)
+                ? tr("Terabytes", "Numerus: Full suffix for displaying terabytes", count)
                 : tr("TB", "Suffix for displaying terabytes");
         }
         case Peta:
         {
             return (suffixFormat == SuffixFormat::Full)
-                ? tr("Petabyte(s)", "Full suffix for displaying petabytes", count)
+                ? tr("Petabytes", "Numerus: Full suffix for displaying petabytes", count)
                 : tr("PB", "Suffix for displaying petabytes");
         }
         default:

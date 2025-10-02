@@ -31,10 +31,16 @@ ValidationResult HttpHeadersFieldValidator::validity(
     }
 
     if (valid > 0 && invalid > 0)
-        return {QValidator::State::Intermediate, tr("Some of the headers are not valid", "", invalid)};
+        return {QValidator::State::Intermediate,
+            tr("Some of the headers are not valid",
+                "Numerus form depends on the amount of invalid headers",
+                invalid)};
 
     if (invalid > 0)
-        return {QValidator::State::Invalid, tr("All the headers are not valid", "", invalid)};
+        return {QValidator::State::Invalid,
+            tr("All the headers are not valid",
+                "Numerus form depends on the total amount of headers",
+                invalid)};
 
     return {};
 }

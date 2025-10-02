@@ -1409,7 +1409,9 @@ void initialize(Manager* manager, Action* root)
         .dynamicText(new FunctionalTextFactory(
             [](const Parameters& parameters, WindowContext* /*context*/)
             {
-                return ContextMenu::tr("Show on Items", "", parameters.resources().size());
+                return ContextMenu::tr("Show on Items",
+                    "Numerus form depends on the amount of items",
+                    parameters.resources().size());
             },
             manager));
 
@@ -1526,11 +1528,12 @@ void initialize(Manager* manager, Action* root)
         .dynamicText(new FunctionalTextFactory(
             [](const Parameters& parameters, WindowContext* /*context*/)
             {
-                return ContextMenu::tr("Mute Items", "", parameters.widgets().size());
+                return ContextMenu::tr("Mute Items",
+                    "Numerus form depends on the amount of items",
+                    parameters.widgets().size());
             },
             manager))
-        .condition(ConditionWrapper(
-            new ItemMuteActionCondition(true)));
+        .condition(ConditionWrapper(new ItemMuteActionCondition(true)));
 
     factory(ItemUnmuteAction)
         .flags(Scene | SingleTarget | MultiTarget | IntentionallyAmbiguous)
@@ -1538,11 +1541,12 @@ void initialize(Manager* manager, Action* root)
         .dynamicText(new FunctionalTextFactory(
             [](const Parameters& parameters, WindowContext* /*context*/)
             {
-                return ContextMenu::tr("Unmute Items", "", parameters.widgets().size());
+                return ContextMenu::tr("Unmute Items",
+                    "Numerus form depends on the amount of items",
+                    parameters.widgets().size());
             },
             manager))
-        .condition(ConditionWrapper(
-            new ItemMuteActionCondition(false)));
+        .condition(ConditionWrapper(new ItemMuteActionCondition(false)));
 
     factory(CreateNewCustomGroupAction)
         .mode(DesktopMode)

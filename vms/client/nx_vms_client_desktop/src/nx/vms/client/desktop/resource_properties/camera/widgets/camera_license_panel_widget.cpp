@@ -75,8 +75,8 @@ void CameraLicensePanelWidget::loadState(const CameraSettingsDialogState& state)
     check_box_utils::setupTristateCheckbox(ui->useLicenseCheckBox, state.recording.enabled);
     updateLicensesButton(state);
     ui->useLicenseCheckBox->setText(state.saasInitialized
-        ? tr("Use Service", "", state.devicesCount)
-        : tr("Use License", "", state.devicesCount));
+        ? tr("Use Services", "Numerus form depends on the devices count", state.devicesCount)
+        : tr("Use Licenses", "Numerus form depends on the devices count", state.devicesCount));
 
     setReadOnly(ui->useLicenseCheckBox, state.readOnly);
 }

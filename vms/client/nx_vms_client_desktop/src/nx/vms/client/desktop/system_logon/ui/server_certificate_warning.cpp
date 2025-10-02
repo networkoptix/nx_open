@@ -233,7 +233,9 @@ ServerCertificateWarning::ServerCertificateWarning(
         const auto certificatesNumber = certificatesInfo.size();
         const auto checkBoxText = certificatesNumber == 1
             ? tr("I trust this server")
-            : tr("I trust these servers", "", certificatesNumber);
+            : tr("I trust these servers",
+                 "Numerus form depends on the number of certificates",
+                 certificatesNumber);
         auto checkbox = new QCheckBox(checkBoxText);
         auto updateButtonState =
             [connectButton, checkbox]

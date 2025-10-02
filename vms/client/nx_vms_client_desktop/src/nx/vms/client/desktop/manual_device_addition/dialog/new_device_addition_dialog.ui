@@ -495,10 +495,8 @@
        <item>
         <widget class="QLabel" name="searchPlaceholderText">
          <property name="text">
-          <string>
-              Enter address, subnet range or subnet mask, login and password
-              and click on the "Search" button
-          </string>
+          <string>Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

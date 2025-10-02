@@ -260,7 +260,7 @@ QString EventTile::Private::getElidedResourceText(const QStringList& list)
     // If we need to show '<Source 1> + <N>', and it doesn't fit into one line, we
     // truncate Source 1 and add an ellipsis ... after the truncated name.
     // <N> is (total number of sources - 1).
-    QString additionalText = tr(" + %n", "", list.size() - 1);
+    QString additionalText = QString(" + %1").arg(list.size() - 1);
     if (getWidthOfText(list.front() + additionalText, q->ui->resourceListLabel) > maxWidth)
     {
         return getElidedStringByRowsNumberAndWidth(q->ui->resourceListLabel,

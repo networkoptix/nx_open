@@ -795,24 +795,26 @@ void QnAuditLogDialog::triggerAction(
         switch (actionId)
         {
             case menu::CameraSettingsAction:
-                QnMessageBox::warning(this, QnDeviceDependentStrings::getDefaultNameFromSet(
-                    resourcePool(),
-                    tr("These devices are removed from Site", "", count),
-                    tr("These cameras are removed from Site", "", count)));
+                QnMessageBox::warning(this,
+                    QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+                        tr("These devices are removed from Site",
+                            "Numerus form depends on the number of devices",
+                            count),
+                        tr("These cameras are removed from Site",
+                            "Numerus form depends on the number of cameras",
+                            count)));
                 break;
             case menu::ServerSettingsAction:
-                // Entry cannot have more than one server, so let default string be singular.
-                QnMessageBox::warning(this, tr("This server is removed from Site",
-                    "", count));
+                // Entry cannot have more than one server.
+                QnMessageBox::warning(this, tr("This server is removed from Site"));
                 break;
             case menu::UserSettingsAction:
-                // Entry cannot have more than one user, so let default string be singular.
-                QnMessageBox::warning(this, tr("This user is removed from Site",
-                    "", count));
+                // Entry cannot have more than one user.
+                QnMessageBox::warning(this, tr("This user is removed from Site"));
                 break;
             default:
                 QnMessageBox::warning(this, tr("These resources are removed from Site",
-                    "", count));
+                    "Numerus form depends on the number of resources", count));
                 break;
         }
 
