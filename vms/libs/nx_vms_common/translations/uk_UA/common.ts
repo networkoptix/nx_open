@@ -105,61 +105,61 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Numerus: Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
+      <translation>
+        <numerusform>Байти</numerusform>
+        <numerusform>Байти</numerusform>
+        <numerusform>Байти</numerusform>
+        <numerusform>Байти</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Numerus: Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
+      <translation>
+        <numerusform>Кілобайт</numerusform>
+        <numerusform>Кілобайт</numerusform>
+        <numerusform>Кілобайт</numerusform>
+        <numerusform>Кілобайт</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Numerus: Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
+      <translation>
+        <numerusform>Мегабайти</numerusform>
+        <numerusform>Мегабайти</numerusform>
+        <numerusform>Мегабайти</numerusform>
+        <numerusform>Мегабайти</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Numerus: Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
+      <translation>
+        <numerusform>Гігабайтів</numerusform>
+        <numerusform>Гігабайтів</numerusform>
+        <numerusform>Гігабайтів</numerusform>
+        <numerusform>Гігабайтів</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Numerus: Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
+      <translation>
+        <numerusform>Терабайт</numerusform>
+        <numerusform>Терабайт</numerusform>
+        <numerusform>Терабайт</numerusform>
+        <numerusform>Терабайт</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Numerus: Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
+      <translation>
+        <numerusform>Петбайтів</numerusform>
+        <numerusform>Петбайтів</numerusform>
+        <numerusform>Петбайтів</numerusform>
+        <numerusform>Петбайтів</numerusform>
       </translation>
     </message>
   </context>

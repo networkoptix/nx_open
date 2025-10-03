@@ -2089,11 +2089,11 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>Ces serveurs sont supprimés du site</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>Ces utilisateurs sont supprimés du site</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -6759,9 +6759,9 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>%n services de stockage cloud adaptés sont nécessaires pour activer la sauvegarde pour eux.</numerusform>
+        <numerusform>%n services de stockage cloud adaptés sont nécessaires pour activer la sauvegarde pour eux.</numerusform>
       </translation>
     </message>
   </context>

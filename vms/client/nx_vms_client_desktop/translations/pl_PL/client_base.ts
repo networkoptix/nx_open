@@ -2131,11 +2131,11 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>Ten serwer usunięto z witryny</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>Ten użytkownik został usunięty z witryny</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -6969,20 +6969,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>Kopia zapasowa nie zostanie aktywowana dla %n urządzeń:</numerusform>
+        <numerusform>Kopia zapasowa nie zostanie aktywowana dla %n urządzeń:</numerusform>
+        <numerusform>Kopia zapasowa nie zostanie aktywowana dla %n urządzeń:</numerusform>
+        <numerusform>Kopia zapasowa nie zostanie aktywowana dla %n urządzeń:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>%n odpowiednich usług przechowywania w chmurze jest wymagane, aby aktywować kopię zapasową.</numerusform>
+        <numerusform>%n odpowiednich usług przechowywania w chmurze jest wymagane, aby aktywować kopię zapasową.</numerusform>
+        <numerusform>%n odpowiednich usług przechowywania w chmurze jest wymagane, aby aktywować kopię zapasową.</numerusform>
+        <numerusform>%n odpowiednich usług przechowywania w chmurze jest wymagane, aby aktywować kopię zapasową.</numerusform>
       </translation>
     </message>
   </context>

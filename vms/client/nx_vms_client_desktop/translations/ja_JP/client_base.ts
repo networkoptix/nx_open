@@ -2068,11 +2068,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>このサーバーはサイトから削除されています。</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>このユーザーはサイトから削除されています。</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -6644,14 +6644,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>%n デバイスのバックアップは有効化されません:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>バックアップを有効化するには、%n 式の適切なクラウドストレージサービスが必要です。</numerusform>
       </translation>
     </message>
   </context>
@@ -7032,15 +7032,15 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
+      <translation>
+        <numerusform>サービスを使用</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
+      <translation>
+        <numerusform>ライセンスを使用</numerusform>
       </translation>
     </message>
   </context>
@@ -7434,7 +7434,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+      <translation>チャネルパートナーユーザーのアクセス権限は組織レベルで管理されており、サイトのユーザー管理では表示されません。</translation>
     </message>
     <message>
       <source>Learn more</source>

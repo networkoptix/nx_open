@@ -2068,11 +2068,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>此伺服器已從站點中移除</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>此使用者已從站點中移除</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -6649,8 +6649,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>需要再%n個適當的雲端儲存服務才能將它們啟用備份</numerusform>
       </translation>
     </message>
   </context>

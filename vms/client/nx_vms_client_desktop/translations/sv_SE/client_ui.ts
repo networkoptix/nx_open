@@ -1689,8 +1689,8 @@
     <message>
       <source>Enter address, subnet range or subnet mask, login and password
 and click on the &quot;Search&quot; button</source>
-      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
-and click on the &quot;Search&quot; button</translation>
+      <translation>Ange adress, subnät intervall eller subnät mask, inloggning och lösenord
+och klicka på &quot;Sök&quot; knappen</translation>
     </message>
   </context>
   <context>

@@ -1689,8 +1689,10 @@
     <message>
       <source>Enter address, subnet range or subnet mask, login and password
 and click on the &quot;Search&quot; button</source>
-      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
-and click on the &quot;Search&quot; button</translation>
+      <translation>
+              Masukkan alamat, rentang subnet atau subnet mask, login dan kata sandi
+              dan klik tombol &quot;Cari&quot;
+</translation>
     </message>
   </context>
   <context>

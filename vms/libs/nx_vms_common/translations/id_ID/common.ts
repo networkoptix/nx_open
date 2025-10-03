@@ -105,42 +105,42 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Numerus: Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Numerus: Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Numerus: Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Megabytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Numerus: Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gigabytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Numerus: Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Terabytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Numerus: Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Petabytes</numerusform>
       </translation>
     </message>

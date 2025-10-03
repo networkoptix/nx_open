@@ -2089,11 +2089,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>Este servidor foi eliminado do sitio</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>Este usuario foi eliminado do sitio</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -6752,16 +6752,16 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>A copia de seguridade non se activará para os dispositivos %n:</numerusform>
+        <numerusform>A copia de seguridade non se activará para os dispositivos %n:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>%n requírense servizos de almacenamento na nube axeitados para activar a copia de seguridade para eles.</numerusform>
+        <numerusform>%n requírense servizos de almacenamento na nube axeitados para activar a copia de seguridade para eles.</numerusform>
       </translation>
     </message>
   </context>
@@ -7146,17 +7146,17 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     <message numerus="yes">
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
-        <numerusform>Use Services</numerusform>
+      <translation>
+        <numerusform>Usar servizos</numerusform>
+        <numerusform>Usar servizos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
-        <numerusform>Use Licenses</numerusform>
+      <translation>
+        <numerusform>Usar licenzas</numerusform>
+        <numerusform>Usar licenzas</numerusform>
       </translation>
     </message>
   </context>
@@ -7557,7 +7557,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+      <translation>O acceso dos usuarios dos socios de canle (partners) xestiónase a nivel de organización e non son visibles na xestión de usuarios do sitio.</translation>
     </message>
     <message>
       <source>Learn more</source>

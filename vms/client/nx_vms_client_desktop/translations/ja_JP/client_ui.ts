@@ -1689,8 +1689,8 @@
     <message>
       <source>Enter address, subnet range or subnet mask, login and password
 and click on the &quot;Search&quot; button</source>
-      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
-and click on the &quot;Search&quot; button</translation>
+      <translation>アドレス、サブネット範囲またはサブネットマスク、ログイン名、パスワードを入力し、
+「検索」ボタンをクリックしてください。</translation>
     </message>
   </context>
   <context>

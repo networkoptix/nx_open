@@ -2089,11 +2089,11 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>Denne server er fjernet fra Sitet</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>Denne bruger er fjernet fra Sitet</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -6752,16 +6752,16 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>Sikkerhedskopiering aktiveres ikke for %n enheder:</numerusform>
+        <numerusform>Sikkerhedskopiering aktiveres ikke for %n enheder:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>%n Der kræves passende cloud lagringstjenester for at aktivere sikkerhedskopiering for dem.</numerusform>
+        <numerusform>%n Der kræves passende cloud lagringstjenester for at aktivere sikkerhedskopiering for dem.</numerusform>
       </translation>
     </message>
   </context>
@@ -7146,17 +7146,17 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <message numerus="yes">
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
-        <numerusform>Use Services</numerusform>
+      <translation>
+        <numerusform>Brug tjenester</numerusform>
+        <numerusform>Brug tjenester</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
-        <numerusform>Use Licenses</numerusform>
+      <translation>
+        <numerusform>Brug Licenser</numerusform>
+        <numerusform>Brug Licenser</numerusform>
       </translation>
     </message>
   </context>
@@ -7557,7 +7557,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+      <translation>Kanal Partner brugere&apos; adgang administreres på organisationsniveau, og de er ikke synlige i webstedet brugerstyring.</translation>
     </message>
     <message>
       <source>Learn more</source>

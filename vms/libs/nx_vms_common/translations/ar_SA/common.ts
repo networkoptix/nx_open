@@ -105,73 +105,73 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Numerus: Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
+      <translation>
+        <numerusform>بايت</numerusform>
+        <numerusform>بايت</numerusform>
+        <numerusform>بايت</numerusform>
+        <numerusform>بايت</numerusform>
+        <numerusform>بايت</numerusform>
+        <numerusform>بايت</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Numerus: Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
+      <translation>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Numerus: Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
+      <translation>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Numerus: Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
+      <translation>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Numerus: Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
+      <translation>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Numerus: Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
+      <translation>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
       </translation>
     </message>
   </context>

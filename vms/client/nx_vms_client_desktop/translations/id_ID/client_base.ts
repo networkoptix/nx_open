@@ -2068,11 +2068,11 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>Server ini dihapus dari Site</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>User ini dihapus dari Site</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -6643,14 +6643,14 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>Backup tidak akan diaktifkan untuk perangkat %n:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>%n diperlukan layanan penyimpanan cloud yang sesuai untuk mengaktifkan backup untuk layanan tersebut.</numerusform>
       </translation>
     </message>
   </context>
@@ -7031,15 +7031,15 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message numerus="yes">
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
+      <translation>
+        <numerusform>Penggunaan Layanan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
+      <translation>
+        <numerusform>Penggunaan Lisensi</numerusform>
       </translation>
     </message>
   </context>
@@ -7433,7 +7433,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+      <translation>Pengguna Channel Partner&apos; akses dikelola di tingkat Organisasi, dan mereka tidak terlihat dalam manajemen pengguna site.Pelajari lebih lanjut.</translation>
     </message>
     <message>
       <source>Learn more</source>

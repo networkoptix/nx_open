@@ -2068,11 +2068,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>Máy chủ này đã bị xóa khỏi Chi nhánh</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>Người dùng này đã bị xóa khỏi Chi nhánh</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -6643,14 +6643,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>Sao lưu sẽ không được kích hoạt cho %n thiết bị:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>%n cần có dịch vụ lưu trữ đám mây phù hợp để kích hoạt tính năng sao lưu.</numerusform>
       </translation>
     </message>
   </context>

@@ -105,7 +105,7 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Numerus: Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bytes</numerusform>
         <numerusform>Bytes</numerusform>
       </translation>
@@ -113,7 +113,7 @@
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Numerus: Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kilobytes</numerusform>
         <numerusform>Kilobytes</numerusform>
       </translation>
@@ -121,7 +121,7 @@
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Numerus: Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Megabytes</numerusform>
         <numerusform>Megabytes</numerusform>
       </translation>
@@ -129,7 +129,7 @@
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Numerus: Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gigabytes</numerusform>
         <numerusform>Gigabytes</numerusform>
       </translation>
@@ -137,7 +137,7 @@
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Numerus: Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Terabytes</numerusform>
         <numerusform>Terabytes</numerusform>
       </translation>
@@ -145,7 +145,7 @@
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Numerus: Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Petabytes</numerusform>
         <numerusform>Petabytes</numerusform>
       </translation>
