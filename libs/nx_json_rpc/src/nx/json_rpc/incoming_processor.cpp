@@ -137,8 +137,11 @@ void IncomingProcessor::onBatchResponse(BatchRequest* batchRequest, int request,
     if (!NX_ASSERT(it != m_batchRequests.end(), "Failed to find %1 for %2", batchRequest, request))
         return;
 
-    if (!std::holds_alternative<std::nullptr_t>(response.id) || response.error)
+    if (!std::holds_alternative<std::nullptr_t>(response.id)
+        || (response.error && response.error->code == Error::invalidRequest))
+    {
         it->second->responses.push_back(std::move(response));
+    }
 
     if (NX_ASSERT(it->second->requests[request],
         "Response for %1 in %2 is already processed", request, batchRequest))
@@ -152,21 +155,26 @@ void IncomingProcessor::onBatchResponse(BatchRequest* batchRequest, int request,
         m_batchRequests.erase(it);
 
         NX_DEBUG(this, "End of %1", batchRequest);
-        handler(nx::reflect::json::serialize(responses));
+        handler(responses.empty() ? std::string{} : nx::reflect::json::serialize(responses));
     }
 }
 
 void IncomingProcessor::sendResponse(
     Response response, const nx::MoveOnlyFunc<void(std::string)>& handler)
 {
-    NX_DEBUG(this, response.error
-        ? "Send error response " + nx::reflect::json::serialize(response)
-        : "Send response " + nx::reflect::json::serialize(response.id));
     std::string value;
-    if (!std::holds_alternative<std::nullptr_t>(response.id) || response.error)
+    if (!std::holds_alternative<std::nullptr_t>(response.id)
+        || (response.error && response.error->code == Error::invalidRequest))
+    {
         value = nx::reflect::json::serialize(response);
+        NX_DEBUG(this, response.error
+            ? "Send error response " + value
+            : "Send response " + nx::reflect::json::serialize(response.id));
+    }
     else
-        NX_DEBUG(this, "Ignored response %1", nx::reflect::json::serialize(response));
+    {
+        NX_DEBUG(this, "Ignored response " + nx::reflect::json::serialize(response));
+    }
     handler(std::move(value));
 }
 

@@ -215,13 +215,24 @@ struct NX_JSON_RPC_API Error
     // XML-RPC: https://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
     enum Code
     {
+        /**%apidoc
+         * Invalid JSON was received by the server. An error occurred on the server while parsing
+         * the JSON text.
+         */
         parseError = -32700,
         encodingError = -32701,
         charsetError = -32702,
 
+        /**%apidoc The JSON sent is not a valid Request object. */
         invalidRequest = -32600,
+
+        /**%apidoc The method does not exist / is not available. */
         methodNotFound = -32601,
+
+        /**%apidoc Invalid method parameter(s). */
         invalidParams = -32602,
+
+        /**%apidoc Internal JSON-RPC error. */
         internalError = -32603,
 
         applicationError = -32500,
