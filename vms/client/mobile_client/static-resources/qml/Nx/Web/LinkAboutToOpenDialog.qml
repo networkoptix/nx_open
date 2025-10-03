@@ -10,25 +10,25 @@ PopupBase
 
     required property string link
 
-    title: qsTr("Open link?")
-    messages: [qsTr("External link will open in the browser")]
+    icon: "image://skin/48x48/Solid/warning.svg?primary=yellow"
+    title: qsTr("Open external link in browser?")
 
     buttonBoxButtons:
     [
         PopupButton
         {
-            text: qsTr("Cancel")
-            onClicked: control.close()
-        },
-        PopupButton
-        {
             text: qsTr("Open")
-            accented: true
             onClicked:
             {
                 control.close()
                 Qt.openUrlExternally(control.link)
             }
+        },
+        PopupButton
+        {
+            text: qsTr("Cancel")
+            accented: true
+            onClicked: control.close()
         }
     ]
 }
