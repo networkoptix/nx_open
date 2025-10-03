@@ -2,6 +2,7 @@
 
 #include "mobile_client_uri_handler.h"
 
+#include <QtCore/QUrlQuery>
 #include <QtGui/QDesktopServices>
 
 #include <core/resource/resource.h>
@@ -17,11 +18,12 @@
 #include <nx/vms/client/core/network/oauth_client_constants.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/mobile/application_context.h>
+#include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/system_context.h>
-#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
 #include <nx/vms/client/mobile/utils/operation_manager.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/utils/system_uri.h>
 #include <utils/common/delayed.h>
 
@@ -73,6 +75,7 @@ public:
     bool loginToCloud(const SystemUri& uri);
 
     void handleClientCommand(const SystemUri& uri);
+    void handlePushNotification(const QUrl& url);
 
 public:
     const QPointer<nx::vms::client::mobile::OperationManager> operationManager;
@@ -288,6 +291,14 @@ void QnMobileClientUriHandler::Private::switchToSessionsScreen()
     QObject::disconnect(connection);
 }
 
+void QnMobileClientUriHandler::Private::handlePushNotification(const QUrl& url)
+{
+    QUrlQuery query{url};
+    const auto id = query.queryItemValue("push_notification_id").toStdString();
+    const auto user = cloudStatusWatcher->cloudLogin().toStdString();
+    appContext()->pushNotificationStorage()->markAsRead(user, id);
+}
+
 void QnMobileClientUriHandler::Private::connectToServerDirectly(const SystemUri& uri)
 {
     NX_DEBUG(this, "connectToServerDirectly(): start");
@@ -497,6 +508,8 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& nativeUrl)
         case SystemUri::ClientCommand::OpenOnPortal:
             break;
     }
+
+    d->handlePushNotification(nativeUrl);
 
     NX_DEBUG(this, "handleUrl(): end");
 }
