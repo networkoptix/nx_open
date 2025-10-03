@@ -363,7 +363,7 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>Feed</translation>
     </message>
     <message>
       <source>Show more</source>
@@ -371,11 +371,11 @@
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>Ingen Notifikationer</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>Ingen push notifikationer blev fundet.</translation>
     </message>
   </context>
   <context>
