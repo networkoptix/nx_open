@@ -7,8 +7,8 @@
 extern "C" {
 
 // Implementation of PushNotificationStorage.java.
-JNIEXPORT void JNICALL Java_com_nxvms_mobile_utils_PushNotificationStorage_addUserNotification(
-    JNIEnv*,
+JNIEXPORT jstring JNICALL Java_com_nxvms_mobile_utils_PushNotificationStorage_addUserNotification(
+    JNIEnv* env,
     jclass,
     jobject context,
     jstring user,
@@ -23,7 +23,7 @@ JNIEXPORT void JNICALL Java_com_nxvms_mobile_utils_PushNotificationStorage_addUs
 
     auto secureStorage = std::make_shared<SecureStorage>(QJniObject{context});
     PushNotificationStorage notificationStorage{secureStorage};
-    notificationStorage.addUserNotification(
+    const std::string& id = notificationStorage.addUserNotification(
         toStr(user),
         toStr(title),
         toStr(description),
@@ -31,6 +31,8 @@ JNIEXPORT void JNICALL Java_com_nxvms_mobile_utils_PushNotificationStorage_addUs
         toStr(cloudSystemId),
         toStr(imageId)
     );
+
+    return env->NewStringUTF(id.c_str());
 }
 
 }

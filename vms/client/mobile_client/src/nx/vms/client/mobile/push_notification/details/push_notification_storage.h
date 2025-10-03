@@ -37,7 +37,7 @@ public:
     std::vector<PushNotification> userNotifications(const std::string& user);
     std::optional<std::vector<std::byte>> loadImage(const std::string& id);
     void markAsRead(const std::string& user, const std::string& id);
-    void addUserNotification(
+    std::string addUserNotification(
         const std::string& user,
         const std::string& title,
         const std::string& description,

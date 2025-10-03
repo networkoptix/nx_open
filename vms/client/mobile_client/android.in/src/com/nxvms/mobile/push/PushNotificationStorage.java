@@ -9,7 +9,7 @@ public class PushNotificationStorage
     // Implemented in push_notification_storage_android.cpp.
     static { System.loadLibrary("push_notification_storage"); }
 
-    public static native void addUserNotification(
+    public static native String addUserNotification(
         Context context,
         String user,
         String title,

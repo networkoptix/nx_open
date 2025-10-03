@@ -185,7 +185,7 @@ PushNotificationStorage::PushNotificationStorage(std::shared_ptr<SecureStorage> 
     d->storage = storage;
 }
 
-void PushNotificationStorage::addUserNotification(
+std::string PushNotificationStorage::addUserNotification(
     const std::string& user,
     const std::string& title,
     const std::string& description,
@@ -199,8 +199,9 @@ void PushNotificationStorage::addUserNotification(
             [this](const PushNotification& notification) { d->removeImage(notification); };
 
         const auto time = now();
+        const auto id = std::to_string(time.count());
         data->addUserNotification(user, PushNotification{
-            .id = std::to_string(time.count()),
+            .id = id,
             .title = title,
             .description = description,
             .url = url,
@@ -211,7 +212,11 @@ void PushNotificationStorage::addUserNotification(
         onRemoved);
 
         d->save(*data);
+
+        return id;
     }
+
+    return {};
 }
 
 std::vector<PushNotification> PushNotificationStorage::userNotifications(const std::string& user)

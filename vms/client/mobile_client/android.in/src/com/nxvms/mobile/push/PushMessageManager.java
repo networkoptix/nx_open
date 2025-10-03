@@ -61,6 +61,7 @@ public class PushMessageManager
     {
         public Context context;
         public long when = 0;
+        public String id;
         public String tag;
         public String caption;
         public String description;
@@ -68,6 +69,7 @@ public class PushMessageManager
         public String url;
         public String cloudSystemId;
         public String imageUrl;
+        public String imagePath;
     };
 
     public static void requestPushNotificationPermission()
@@ -188,15 +190,13 @@ public class PushMessageManager
             return;
         }
 
+        saveNotification(localData.user, context);
         showNotificationInternal(context, null);
+
         if (!TextUtils.isEmpty(context.imageUrl))
         {
             Logger.info(kLogTag, "show notification with preview, loading content.");
             updateNotificationImage(context, localData);
-        }
-        else
-        {
-            saveNotification(localData.user, context);
         }
     }
 
@@ -223,14 +223,18 @@ public class PushMessageManager
     {
         Logger.info("save notification", "Saving notification");
 
-        PushNotificationStorage.addUserNotification(
+        final String fileName = UUID.randomUUID().toString() + ".png";
+        context.imagePath = context.context.getFilesDir().getAbsolutePath()
+            + "/push_notifications/" + fileName;
+
+        context.id = PushNotificationStorage.addUserNotification(
             context.context,
             user,
             context.caption,
             context.description,
             context.url,
             context.cloudSystemId,
-            context.imageUrl);
+            context.imagePath);
     }
 
     static public void showNotificationInternal(
@@ -280,7 +284,10 @@ public class PushMessageManager
 
         if (!TextUtils.isEmpty(context.url))
         {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(context.url));
+            Uri uri = Uri.parse(context.url).buildUpon()
+                .appendQueryParameter("push_notification_id", context.id).build();
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             builder.setContentIntent(PendingIntent.getActivity(context.context, 0, intent,
                 PendingIntent.FLAG_IMMUTABLE));
         }
@@ -406,15 +413,11 @@ public class PushMessageManager
             method = targetMethod;
         }
 
-        public String saveNotificationImage(Bitmap image)
+        public void saveNotificationImage(Bitmap image)
         {
             final String kLogTag = "save notification image";
 
-            final String fileName = context.tag + ".png";
-            final String filePath = context.context.getFilesDir().getAbsolutePath()
-                + "/push_notifications/" + fileName;
-
-            File file = new File(filePath);
+            File file = new File(context.imagePath);
             file.getParentFile().mkdirs();
 
             try (FileOutputStream stream = new FileOutputStream(file))
@@ -425,8 +428,6 @@ public class PushMessageManager
             {
                 Logger.error(kLogTag, "Failed to save image" + e);
             }
-
-            return filePath;
         }
 
         @Override
@@ -508,9 +509,7 @@ public class PushMessageManager
                         : "image was decoded.");
 
                     if (result != null)
-                        context.imageUrl = saveNotificationImage(result);
-
-                    PushMessageManager.saveNotification(data.user, context);
+                        saveNotificationImage(result);
 
                     return result;
                 }

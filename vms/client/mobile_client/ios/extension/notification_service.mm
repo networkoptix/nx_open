@@ -513,17 +513,32 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
 {
     extension::Logger::log(@"Save notification");
 
-    const NSString* url = [self.content.userInfo objectForKey: @"url"];
+    NSString* url = [self.content.userInfo objectForKey: @"url"];
 
     auto secureStorage = std::make_shared<SecureStorage>();
     PushNotificationStorage notificationStorage{secureStorage};
-    notificationStorage.addUserNotification(
+    const std::string id = notificationStorage.addUserNotification(
         self.user,
         [self.content.title UTF8String],
         [self.content.body UTF8String],
         url ? [url UTF8String] : "",
         self.cloudSystemId,
         self.imageUrl);
+
+    NSURLComponents* newUrl = [NSURLComponents componentsWithString: url];
+
+    NSMutableArray<NSURLQueryItem*>* newItems =
+        newUrl.queryItems ? [newUrl.queryItems mutableCopy] : [NSMutableArray array];
+
+    NSURLQueryItem* idItem = [NSURLQueryItem
+        queryItemWithName: @"push_notification_id"
+        value: [NSString stringWithUTF8String: id.c_str()]];
+
+    [newItems addObject: idItem];
+    newUrl.queryItems = newItems;
+    NSMutableDictionary* userInfo = [self.content.userInfo mutableCopy];
+    userInfo[@"url"] = newUrl.string;
+    self.content.userInfo = userInfo;
 }
 
 - (void)URLSession:(NSURLSession*) session
