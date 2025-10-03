@@ -73,7 +73,7 @@
     <name>CameraSettingsLicenseWatcher::Private</name>
     <message numerus="yes">
       <source>%1 are used</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 Bruges</numerusform>
         <numerusform>Form: Anden</numerusform>
@@ -81,7 +81,7 @@
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
-      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 er obligatorisk</numerusform>
         <numerusform>%1 er påkrævet</numerusform>
@@ -905,13 +905,6 @@
       <source>Delete Bookmarks...</source>
       <translation>Slet bogmærker...</translation>
     </message>
-    <message numerus="yes">
-      <source>Show on Items</source>
-      <translation>
-        <numerusform>Vis på elementer</numerusform>
-        <numerusform>Vis på elementer</numerusform>
-      </translation>
-    </message>
     <message>
       <source>PTZ</source>
       <translation>PTZ</translation>
@@ -1040,20 +1033,6 @@
       <source>Convert to Shared Layout</source>
       <translation>Konverter til delt layout</translation>
     </message>
-    <message numerus="yes">
-      <source>Mute Items</source>
-      <translation>
-        <numerusform>Form: Anden</numerusform>
-        <numerusform>Form: Anden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Unmute Items</source>
-      <translation>
-        <numerusform>Form: Anden</numerusform>
-        <numerusform>Form: Anden</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Connect to Site</source>
       <translation>Opret forbindelse til Site</translation>
@@ -1141,6 +1120,30 @@
     <message>
       <source>Custom</source>
       <translation>Brugerdefineret</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation>
+        <numerusform>Vis på elementer</numerusform>
+        <numerusform>Vis på elementer</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation>
+        <numerusform>Form: Anden</numerusform>
+        <numerusform>Form: Anden</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1407,13 +1410,6 @@ Licensnøgle: %2</translation>
         <numerusform>Deaktiver %n Anden</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Kan ikke deaktivere licenser</numerusform>
-        <numerusform>Kan ikke deaktivere licenser</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Please try again later.</source>
       <translation>Prøv venligst igen senere.</translation>
@@ -1439,6 +1435,14 @@ Licensnøgle: %2</translation>
       <translation>
         <numerusform>%n licenser deaktiveret</numerusform>
         <numerusform>%n licenser deaktiveret</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <comment>Numerus form depends on the amount of licenses</comment>
+      <translation>
+        <numerusform>Kan ikke deaktivere licenser</numerusform>
+        <numerusform>Kan ikke deaktivere licenser</numerusform>
       </translation>
     </message>
   </context>
@@ -1500,7 +1504,7 @@ Licensnøgle: %2</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
-      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <comment>Numerus form depends on the amount of characters</comment>
       <translation>
         <numerusform>Form: Anden:</numerusform>
         <numerusform>Form: Anden:</numerusform>
@@ -2083,8 +2087,17 @@ Licensnøgle: %2</translation>
         <numerusform>Detaljer for %n kameraer på %1</numerusform>
       </translation>
     </message>
+    <message>
+      <source>This server is removed from Site</source>
+      <translation type="unfinished">This server is removed from Site</translation>
+    </message>
+    <message>
+      <source>This user is removed from Site</source>
+      <translation type="unfinished">This user is removed from Site</translation>
+    </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
+      <comment>Numerus form depends on the number of devices</comment>
       <translation>
         <numerusform>Disse enheder er fjernet fra Sitet</numerusform>
         <numerusform>Disse enheder er fjernet fra Sitet</numerusform>
@@ -2092,6 +2105,7 @@ Licensnøgle: %2</translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
+      <comment>Numerus form depends on the number of cameras</comment>
       <translation>
         <numerusform>Disse kameraer er fjernet fra Sitet</numerusform>
         <numerusform>Disse kameraer er fjernet fra Sitet</numerusform>
@@ -2099,23 +2113,10 @@ Licensnøgle: %2</translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
+      <comment>Numerus form depends on the number of resources</comment>
       <translation>
         <numerusform>Disse ressourcer er fjernet fra Sitet</numerusform>
         <numerusform>Disse ressourcer er fjernet fra Sitet</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>This server is removed from Site</source>
-      <translation>
-        <numerusform>Denne server er fjernet fra Sitet</numerusform>
-        <numerusform>Denne server er fjernet fra Sitet</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>This user is removed from Site</source>
-      <translation>
-        <numerusform>Denne bruger er fjernet fra Sitet</numerusform>
-        <numerusform>Denne bruger er fjernet fra Sitet</numerusform>
       </translation>
     </message>
   </context>
@@ -4127,13 +4128,6 @@ Licensnøgle: %2</translation>
   <context>
     <name>QnServerSettingsWidget</name>
     <message numerus="yes">
-      <source>Certificates</source>
-      <translation>
-        <numerusform>Certifikater</numerusform>
-        <numerusform>Certifikater</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation>
         <numerusform>Serveren bruger disse %n SSL-certifikater til at autentificere sin identitet</numerusform>
@@ -4159,6 +4153,14 @@ Licensnøgle: %2</translation>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
       <translation>Usikker (digest) godkendelse skal deaktiveres for din konto, før fjernadgang er tilgængelig.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Certificates</source>
+      <comment>Numerus form depends on the certificates count</comment>
+      <translation>
+        <numerusform>Certifikater</numerusform>
+        <numerusform>Certifikater</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5179,13 +5181,9 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
       <source>PC %1</source>
       <translation>PC %1</translation>
     </message>
-    <message>
-      <source>PC %1 - Display %2</source>
-      <translation>PC %1 - Visning %2</translation>
-    </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
-      <comment>%2 will be substituted by _list_ of displays</comment>
+      <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
       <translation>
         <numerusform>PC %1 - Skærme %2</numerusform>
         <numerusform>PC %1 - Skærme %2</numerusform>
@@ -5411,20 +5409,6 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
         <numerusform>Kunne ikke åbne %n kameraer på videovæggen:</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation>
-        <numerusform>Du kan ikke tilføje enheder til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
-        <numerusform>Du kan ikke tilføje enheder til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation>
-        <numerusform>Du kan ikke tilføje kameraer til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
-        <numerusform>Du kan ikke tilføje kameraer til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
       <translation>Skærmen er låst og kan ikke ændres</translation>
@@ -5440,6 +5424,22 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <message>
       <source>Cannot find compatible client version: %1</source>
       <translation>Kan ikke finde kompatibel klientversion: %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
+      <comment>Numerus form depends on the number of devices</comment>
+      <translation>
+        <numerusform>Du kan ikke tilføje enheder til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
+        <numerusform>Du kan ikke tilføje enheder til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
+      <comment>Numerus form depends on the number of cameras</comment>
+      <translation>
+        <numerusform>Du kan ikke tilføje kameraer til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
+        <numerusform>Du kan ikke tilføje kameraer til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5631,13 +5631,6 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
       <translation>Flyt Delvist</translation>
     </message>
     <message numerus="yes">
-      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation>
-        <numerusform>Du er ved at flytte disse websider til Server &quot;%1&quot;. Disse websider proxyer alt anmodet indhold, og deres proxyserver vil ændres til Server &quot;%1&quot;.</numerusform>
-        <numerusform>Du er ved at flytte disse websider til Server &quot;%1&quot;. Disse websider proxyer alt anmodet indhold, og deres proxyserver vil ændres til Server &quot;%1&quot;.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Delete %n layouts?</source>
       <translation>
         <numerusform>Slet %n layouts?</numerusform>
@@ -5677,13 +5670,6 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
       <translation>Konverter</translation>
     </message>
     <message numerus="yes">
-      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation>
-        <numerusform>Disse layouts deles med andre brugere, så de slettes også for deres konti.</numerusform>
-        <numerusform>Disse layouts deles med andre brugere, så de slettes også for deres konti.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <translation>
         <numerusform>%n layouts deles med andre brugere, så de slettes også for deres konti.</numerusform>
@@ -5704,6 +5690,22 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <message>
       <source>Maximum number of devices for this server is reached</source>
       <translation>Maksimalt antal enheder for denne server er nået</translation>
+    </message>
+    <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerus form depends on the amount of layouts</comment>
+      <translation>
+        <numerusform>Disse layouts deles med andre brugere, så de slettes også for deres konti.</numerusform>
+        <numerusform>Disse layouts deles med andre brugere, så de slettes også for deres konti.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
+      <comment>Numerus form depends on the amount of web pages</comment>
+      <translation>
+        <numerusform>Du er ved at flytte disse websider til Server &quot;%1&quot;. Disse websider proxyer alt anmodet indhold, og deres proxyserver vil ændres til Server &quot;%1&quot;.</numerusform>
+        <numerusform>Du er ved at flytte disse websider til Server &quot;%1&quot;. Disse websider proxyer alt anmodet indhold, og deres proxyserver vil ændres til Server &quot;%1&quot;.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6745,16 +6747,22 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
       <translation>Men du kan stadig bruge en fælles switch til at aktivere sikkerhedskopier for de kameraer, hvor dette er muligt</translation>
     </message>
     <message>
-      <source>Backup will not be activated for %1 devices: </source>
-      <translation>Sikkerhedskopiering aktiveres ikke for %1 enheder: </translation>
-    </message>
-    <message>
-      <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation>%1 Der kræves passende cloud lagringstjenester for at aktivere sikkerhedskopiering for dem.</translation>
-    </message>
-    <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
       <translation>Backup vil blive slået fra for nyligt tilføjede kameraer på alle servere på webstedet</translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup will not be activated for %n devices:</source>
+      <translation type="unfinished">
+        <numerusform>Backup will not be activated for %n devices:</numerusform>
+        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services are required to activate backup for them.</source>
+      <translation type="unfinished">
+        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7136,17 +7144,19 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
   <context>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
-      <source>Use License</source>
-      <translation>
-        <numerusform>Brug Licens</numerusform>
-        <numerusform>Brug Licens</numerusform>
+      <source>Use Services</source>
+      <comment>Numerus form depends on the devices count</comment>
+      <translation type="unfinished">
+        <numerusform>Use Services</numerusform>
+        <numerusform>Use Services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Use Service</source>
-      <translation>
-        <numerusform>Brug Tjeneste</numerusform>
-        <numerusform>Brug Tjeneste</numerusform>
+      <source>Use Licenses</source>
+      <comment>Numerus form depends on the devices count</comment>
+      <translation type="unfinished">
+        <numerusform>Use Licenses</numerusform>
+        <numerusform>Use Licenses</numerusform>
       </translation>
     </message>
   </context>
@@ -7465,24 +7475,10 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
       </translation>
     </message>
     <message numerus="yes">
-      <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
-        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
       <translation>
         <numerusform>Kunne ikke aktivere 2-vejs lyd på %n enheder</numerusform>
         <numerusform>Kunne ikke aktivere 2-vejs lyd på %n enheder</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
-        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
       </translation>
     </message>
     <message>
@@ -7500,6 +7496,22 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
       <translation>Du skal vælge en enhed, som du vil overføre lydstrømmen til og bruge til lydafspilning.</translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices do not have audio outputs or are not configured correctly.</source>
+      <comment>Numerus form depends on the total number of devices</comment>
+      <translation>
+        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
+        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices do not have audio inputs or are not configured correctly.</source>
+      <comment>Numerus form depends on the total number of devices</comment>
+      <translation>
+        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
+        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7544,8 +7556,12 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
       <translation>Kanal Partner brugere har adgang til dette websted</translation>
     </message>
     <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
-      <translation>Kanal Partner brugere&apos; adgang administreres på organisationsniveau, og de er ikke synlige i site brugerstyringen.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Lær mere&lt;/a&gt;</translation>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>Læs mere</translation>
     </message>
   </context>
   <context>
@@ -8177,13 +8193,6 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <message>
       <source>UNKNOWN</source>
       <translation>UKENDT</translation>
-    </message>
-    <message numerus="yes">
-      <source> + %n</source>
-      <translation>
-        <numerusform> + %n</numerusform>
-        <numerusform> + %n</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -8871,13 +8880,6 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
         <numerusform>%n deaktiveringer tilbage.</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Deaktiver licenser?</numerusform>
-        <numerusform>Deaktiver licenser?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Deactivate</source>
       <translation>Deaktiver</translation>
@@ -8892,7 +8894,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 er i brug</numerusform>
         <numerusform>%1 er i brug</numerusform>
@@ -8900,10 +8902,18 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>Mindst %1 er påkrævet</numerusform>
         <numerusform>Mindst %1 er påkrævet</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <comment>Numerus form depends on the amount of licenses</comment>
+      <translation>
+        <numerusform>Deaktiver licenser?</numerusform>
+        <numerusform>Deaktiver licenser?</numerusform>
       </translation>
     </message>
   </context>
@@ -9022,8 +9032,8 @@ Husk at nulstille lognings niveauet til standardindstillingen, når du har indsa
       <translation>Lognings niveau forringer ydeevnen</translation>
     </message>
     <message>
-      <source>&lt;None&gt;</source>
-      <translation>&lt;None&gt;</translation>
+      <source>None</source>
+      <translation>Ingen</translation>
     </message>
   </context>
   <context>
@@ -10811,13 +10821,6 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
       <source>Continue</source>
       <translation>Fortsæt</translation>
     </message>
-    <message numerus="yes">
-      <source>I trust these servers</source>
-      <translation>
-        <numerusform>Jeg stoler på disse servere</numerusform>
-        <numerusform>Jeg stoler på disse servere</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I trust this server</source>
       <translation>Jeg tillid til denne server</translation>
@@ -10825,6 +10828,14 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
     <message>
       <source>Certificate details</source>
       <translation>Certifikatets detaljer</translation>
+    </message>
+    <message numerus="yes">
+      <source>I trust these servers</source>
+      <comment>Numerus form depends on the number of certificates</comment>
+      <translation>
+        <numerusform>Jeg stoler på disse servere</numerusform>
+        <numerusform>Jeg stoler på disse servere</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11205,13 +11216,6 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
         <numerusform>... og %n mere</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation>
-        <numerusform>Dobbeltklik for at tilføje kameraer til det aktuelle layout eller ctrl+klik for at åbne i en ny fane</numerusform>
-        <numerusform>Dobbeltklik for at tilføje kameraer til det aktuelle layout eller ctrl+klik for at åbne i en ny fane</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No available archive</source>
       <translation>Intet tilgængeligt arkiv</translation>
@@ -11263,6 +11267,14 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
     <message>
       <source>This action is not supported for notifications from other Sites</source>
       <translation>Denne handling understøttes ikke for notifikationer fra andre Sites</translation>
+    </message>
+    <message numerus="yes">
+      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
+      <comment>Numerus form depends on the number of cameras</comment>
+      <translation>
+        <numerusform>Dobbeltklik for at tilføje kameraer til det aktuelle layout eller ctrl+klik for at åbne i en ny fane</numerusform>
+        <numerusform>Dobbeltklik for at tilføje kameraer til det aktuelle layout eller ctrl+klik for at åbne i en ny fane</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11737,34 +11749,13 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
       <source>Already uploaded files will be kept.</source>
       <translation>Allerede uploadede filer vil blive gemt.</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected file formats are not supported</source>
-      <translation>
-        <numerusform>Valgte filformater understøttes ikke</numerusform>
-        <numerusform>Valgte filformater understøttes ikke</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
       <translation>Brug .MKV, .AVI, .MP4 eller andre videofiler.</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>Valgte filer har ikke tidsstempler</numerusform>
-        <numerusform>Valgte filer har ikke tidsstempler</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
       <translation>Kun videofiler med korrekt tidsstempel understøttes.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files are too old</source>
-      <translation>
-        <numerusform>De valgte filer er for gamle</numerusform>
-        <numerusform>De valgte filer er for gamle</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
@@ -11778,27 +11769,6 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
       <translation>
         <numerusform>Udvalgte filer blev optaget mellem %1 og %2, men kun filer, der blev optaget inden for de sidste %n dage, kan uploades. Du kan ændre dette i kameraets arkivindstillinger.</numerusform>
         <numerusform>Udvalgte filer blev optaget mellem %1 og %2, men kun filer, der blev optaget inden for de sidste %n dage, kan uploades. Du kan ændre dette i kameraets arkivindstillinger.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation>
-        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede uploades</numerusform>
-        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede uploades</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>Du kan uploade disse filer til en anden instans af et virtuelt kamera.</numerusform>
-        <numerusform>Du kan uploade disse filer til en anden instans af et virtuelt kamera.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede er blevet uploadet</numerusform>
-        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede er blevet uploadet</numerusform>
       </translation>
     </message>
     <message>
@@ -11816,20 +11786,6 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
     <message>
       <source>No new files to upload in selected folder</source>
       <translation>Ingen nye filer at uploade i den valgte mappe</translation>
-    </message>
-    <message numerus="yes">
-      <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>Nogle optagelser kan blive slettet efter upload af disse filer</numerusform>
-        <numerusform>Nogle optagelser kan blive slettet efter upload af disse filer</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>Der er ikke meget ledig plads tilbage på serverens lagerplads. Nogle gamle optagelser kan blive slettet for at frigøre plads. Bemærk, at hvis de valgte filer tilfældigvis er de ældste på serveren, vil de blive slettet umiddelbart efter upload.</numerusform>
-        <numerusform>Der er ikke meget ledig plads tilbage på serverens lagerplads. Nogle gamle optagelser kan blive slettet for at frigøre plads. Bemærk, at hvis de valgte filer tilfældigvis er de ældste på serveren, vil de blive slettet umiddelbart efter upload.</numerusform>
-      </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
@@ -11883,6 +11839,70 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
       <translation>%1 dækker den periode, hvor videoen uploades.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>Valgte filformater understøttes ikke</numerusform>
+        <numerusform>Valgte filformater understøttes ikke</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>Valgte filer har ikke tidsstempler</numerusform>
+        <numerusform>Valgte filer har ikke tidsstempler</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>De valgte filer er for gamle</numerusform>
+        <numerusform>De valgte filer er for gamle</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede uploades</numerusform>
+        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede uploades</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Virtual Camera.</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>Du kan uploade disse filer til en anden instans af et virtuelt kamera.</numerusform>
+        <numerusform>Du kan uploade disse filer til en anden instans af et virtuelt kamera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede er blevet uploadet</numerusform>
+        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede er blevet uploadet</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <comment>Numerus form depends on the amount of files uploaded</comment>
+      <translation>
+        <numerusform>Nogle optagelser kan blive slettet efter upload af disse filer</numerusform>
+        <numerusform>Nogle optagelser kan blive slettet efter upload af disse filer</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <comment>Numerus form depends on the amount of files uploaded</comment>
+      <translation>
+        <numerusform>Der er ikke meget ledig plads tilbage på serverens lagerplads. Nogle gamle optagelser kan blive slettet for at frigøre plads. Bemærk, at hvis de valgte filer tilfældigvis er de ældste på serveren, vil de blive slettet umiddelbart efter upload.</numerusform>
+        <numerusform>Der er ikke meget ledig plads tilbage på serverens lagerplads. Nogle gamle optagelser kan blive slettet for at frigøre plads. Bemærk, at hvis de valgte filer tilfældigvis er de ældste på serveren, vil de blive slettet umiddelbart efter upload.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12844,7 +12864,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
-      <comment>Form depends on invalid rule count</comment>
+      <comment>Numerus form depends on the invalid rule count</comment>
       <translation>
         <numerusform>Nogle af reglerne blev ikke aktiveret</numerusform>
         <numerusform>Nogle af reglerne blev ikke aktiveret</numerusform>
@@ -12852,7 +12872,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
-      <comment>Form depends on invalid rule count</comment>
+      <comment>Numerus form depends on the invalid rule count</comment>
       <translation>
         <numerusform>Nogle af de valgte regler kan ikke aktiveres, da de har forkerte parametre. Ret dem og aktiver reglen igen.</numerusform>
         <numerusform>Nogle af de valgte regler kan ikke aktiveres, da de har forkerte parametre. Ret dem og aktiver reglen igen.</numerusform>

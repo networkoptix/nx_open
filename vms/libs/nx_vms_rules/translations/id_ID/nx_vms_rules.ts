@@ -202,30 +202,6 @@
       <source>For</source>
       <translation>Untuk</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected devices were removed</source>
-      <translation>
-        <numerusform>Perangkat yang dipilih telah dihapus</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected cameras were removed</source>
-      <translation>
-        <numerusform>Kamera yang dipilih telah dihapus</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected servers were removed</source>
-      <translation>
-        <numerusform>Server yang dipilih telah dihapus</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected layouts were removed</source>
-      <translation>
-        <numerusform>Layout yang dipilih telah dihapus</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Time value cannot be less than zero</source>
       <translation>Nilai waktu tidak boleh kurang dari nol</translation>
@@ -322,6 +298,34 @@
     <message>
       <source>Removed layout</source>
       <translation>Layout dihapus</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <comment>Numerus form depend on devices count</comment>
+      <translation>
+        <numerusform>Perangkat yang dipilih telah dihapus</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <comment>Numerus form depend on cameras count</comment>
+      <translation>
+        <numerusform>Kamera yang dipilih telah dihapus</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <comment>Numerus form depend on servers count</comment>
+      <translation>
+        <numerusform>Server yang dipilih telah dihapus</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <comment>Numerus form depend on layouts count</comment>
+      <translation>
+        <numerusform>Layout yang dipilih telah dihapus</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -656,12 +660,14 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
+      <comment>Numerus form depends on the amount of invalid headers</comment>
       <translation>
         <numerusform>Beberapa header tidak valid</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
+      <comment>Numerus form depends on the total amount of headers</comment>
       <translation>
         <numerusform>Semua header tidak valid</numerusform>
       </translation>

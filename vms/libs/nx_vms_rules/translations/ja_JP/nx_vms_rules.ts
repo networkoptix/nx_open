@@ -202,30 +202,6 @@
       <source>For</source>
       <translation>対象</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected devices were removed</source>
-      <translation>
-        <numerusform>選択したデバイスは削除されました</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected cameras were removed</source>
-      <translation>
-        <numerusform>選択したカメラは削除されました</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected servers were removed</source>
-      <translation>
-        <numerusform>選択したサーバーは削除されました</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected layouts were removed</source>
-      <translation>
-        <numerusform>選択したレイアウトは削除されました</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Time value cannot be less than zero</source>
       <translation>時間は0未満にできません。</translation>
@@ -322,6 +298,34 @@
     <message>
       <source>Removed layout</source>
       <translation>削除されたレイアウト</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <comment>Numerus form depend on devices count</comment>
+      <translation>
+        <numerusform>選択したデバイスは削除されました</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <comment>Numerus form depend on cameras count</comment>
+      <translation>
+        <numerusform>選択したカメラは削除されました</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <comment>Numerus form depend on servers count</comment>
+      <translation>
+        <numerusform>選択したサーバーは削除されました</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <comment>Numerus form depend on layouts count</comment>
+      <translation>
+        <numerusform>選択したレイアウトは削除されました</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -656,12 +660,14 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
+      <comment>Numerus form depends on the amount of invalid headers</comment>
       <translation>
         <numerusform>一部のヘッダーが不正です。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
+      <comment>Numerus form depends on the total amount of headers</comment>
       <translation>
         <numerusform>すべてのヘッダーが不正です。</numerusform>
       </translation>

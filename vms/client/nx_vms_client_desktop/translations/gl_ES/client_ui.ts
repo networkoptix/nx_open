@@ -1687,14 +1687,10 @@
       <translation>Atopar dispositivos</translation>
     </message>
     <message>
-      <source>
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
-          </source>
-      <translation>
-              Introducir o enderezo, o rango de subrede ou a máscara de subrede, o nome de usuario e o contrasinal
-              e premer no botón &quot;Buscar&quot;
-          </translation>
+      <source>Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</source>
+      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</translation>
     </message>
   </context>
   <context>

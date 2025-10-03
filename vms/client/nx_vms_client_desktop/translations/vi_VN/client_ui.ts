@@ -1687,14 +1687,10 @@
       <translation>Tìm thiết bị</translation>
     </message>
     <message>
-      <source>
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
-          </source>
-      <translation>
-              Nhập địa chỉ, phạm vi mạng con hoặc mặt nạ mạng con, tên đăng nhập và mật khẩu
-              và nhấp vào nút &quot;Tìm kiếm&quot;
-          </translation>
+      <source>Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</source>
+      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</translation>
     </message>
   </context>
   <context>

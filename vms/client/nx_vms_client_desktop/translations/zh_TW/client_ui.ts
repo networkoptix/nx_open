@@ -1687,14 +1687,10 @@
       <translation>搜尋裝置</translation>
     </message>
     <message>
-      <source>
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
-          </source>
-      <translation>
-              輸入位址、子網路範圍或子網路遮罩、登入名稱和密碼
-              然後點選 &quot;搜尋&quot; 按鈕
-          </translation>
+      <source>Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</source>
+      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</translation>
     </message>
   </context>
   <context>

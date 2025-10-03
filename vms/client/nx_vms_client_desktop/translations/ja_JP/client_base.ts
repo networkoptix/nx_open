@@ -72,14 +72,14 @@
     <name>CameraSettingsLicenseWatcher::Private</name>
     <message numerus="yes">
       <source>%1 are used</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 が使用されます</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
-      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 が必要です</numerusform>
       </translation>
@@ -902,12 +902,6 @@
       <source>Delete Bookmarks...</source>
       <translation>ブックマークを削除...</translation>
     </message>
-    <message numerus="yes">
-      <source>Show on Items</source>
-      <translation>
-        <numerusform>アイテムを表示</numerusform>
-      </translation>
-    </message>
     <message>
       <source>PTZ</source>
       <translation>PTZ</translation>
@@ -1036,18 +1030,6 @@
       <source>Convert to Shared Layout</source>
       <translation>共有レイアウトに変換</translation>
     </message>
-    <message numerus="yes">
-      <source>Mute Items</source>
-      <translation>
-        <numerusform>アイテムをミュート</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Unmute Items</source>
-      <translation>
-        <numerusform>アイテムのミュートを解除</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Connect to Site</source>
       <translation>サイトに接続</translation>
@@ -1135,6 +1117,27 @@
     <message>
       <source>Custom</source>
       <translation>カスタム</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation>
+        <numerusform>アイテムを表示</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation>
+        <numerusform>アイテムをミュート</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation>
+        <numerusform>アイテムのミュートを解除</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1397,12 +1400,6 @@ License Key: %2</source>
         <numerusform>その他 %n を解除</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>ライセンスを無効化できません</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Please try again later.</source>
       <translation>後でもう一度お試しください。</translation>
@@ -1427,6 +1424,13 @@ License Key: %2</source>
       <source>%n licenses deactivated</source>
       <translation>
         <numerusform>%nライセンスを無効化しました</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <comment>Numerus form depends on the amount of licenses</comment>
+      <translation>
+        <numerusform>ライセンスを無効化できません</numerusform>
       </translation>
     </message>
   </context>
@@ -1487,7 +1491,7 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
-      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <comment>Numerus form depends on the amount of characters</comment>
       <translation>
         <numerusform>ファイル名には、以下の予約文字は利用できません:</numerusform>
       </translation>
@@ -2062,34 +2066,33 @@ License Key: %2</source>
         <numerusform>%1 カメラのうち %n 台の詳細</numerusform>
       </translation>
     </message>
+    <message>
+      <source>This server is removed from Site</source>
+      <translation type="unfinished">This server is removed from Site</translation>
+    </message>
+    <message>
+      <source>This user is removed from Site</source>
+      <translation type="unfinished">This user is removed from Site</translation>
+    </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
+      <comment>Numerus form depends on the number of devices</comment>
       <translation>
         <numerusform>これらのデバイスはサイトから削除されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
+      <comment>Numerus form depends on the number of cameras</comment>
       <translation>
         <numerusform>これらのカメラはサイトから削除されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
+      <comment>Numerus form depends on the number of resources</comment>
       <translation>
         <numerusform>これらのリソースはサイトから削除されています。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>This server is removed from Site</source>
-      <translation>
-        <numerusform>このサーバーはサイトから削除されています。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>This user is removed from Site</source>
-      <translation>
-        <numerusform>このユーザーはサイトから削除されています。</numerusform>
       </translation>
     </message>
   </context>
@@ -4085,12 +4088,6 @@ License Key: %2</source>
   <context>
     <name>QnServerSettingsWidget</name>
     <message numerus="yes">
-      <source>Certificates</source>
-      <translation>
-        <numerusform>証明書</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation>
         <numerusform>サーバーはこちらのSSL 証明書 %n つ を使用して身元を証明します。</numerusform>
@@ -4115,6 +4112,13 @@ License Key: %2</source>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
       <translation>リモートアクセスを利用できるようにするには、アカウントの安全でない (Digest) 認証を無効にする必要があります。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Certificates</source>
+      <comment>Numerus form depends on the certificates count</comment>
+      <translation>
+        <numerusform>証明書</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5126,13 +5130,9 @@ If you intended to move analytics data to another storage location, please conta
       <source>PC %1</source>
       <translation>PC %1</translation>
     </message>
-    <message>
-      <source>PC %1 - Display %2</source>
-      <translation>PC %1 - ディスプレイ %2</translation>
-    </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
-      <comment>%2 will be substituted by _list_ of displays</comment>
+      <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
       <translation>
         <numerusform>PC %1 - ディスプレイ %2</numerusform>
       </translation>
@@ -5352,18 +5352,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n 台のカメラをビデオウォールで開けませんでした:</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation>
-        <numerusform>ライブ表示権限を持っていないデバイスをビデオウォールに追加することはできません。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation>
-        <numerusform>ライブ表示権限を持っていないカメラをビデオウォールに追加することはできません。</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
       <translation>スクリーンがロックされているため変更できません</translation>
@@ -5379,6 +5367,20 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cannot find compatible client version: %1</source>
       <translation>互換性のあるクライアントバージョンが見つかりません: %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
+      <comment>Numerus form depends on the number of devices</comment>
+      <translation>
+        <numerusform>ライブ表示権限を持っていないデバイスをビデオウォールに追加することはできません。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
+      <comment>Numerus form depends on the number of cameras</comment>
+      <translation>
+        <numerusform>ライブ表示権限を持っていないカメラをビデオウォールに追加することはできません。</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5560,12 +5562,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>部分的に移動</translation>
     </message>
     <message numerus="yes">
-      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation>
-        <numerusform>これらのWebページをサーバー &quot;%1&quot; に移動しようとしています。 これらのWebページは要求されたすべてのコンテンツをプロキシし、プロキシサーバーはサーバー &quot;%1&quot; に変更されます。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Delete %n layouts?</source>
       <translation>
         <numerusform>%n レイアウトを削除しますか?</numerusform>
@@ -5602,12 +5598,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>変換</translation>
     </message>
     <message numerus="yes">
-      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation>
-        <numerusform>これらのレイアウトは他のユーザーと共有されており、共有しているユーザーのアカウントでも削除されます。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <translation>
         <numerusform>%n レイアウトは他のユーザーと共有されており、共有しているユーザーのアカウントでも削除されます。</numerusform>
@@ -5626,6 +5616,20 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Maximum number of devices for this server is reached</source>
       <translation>このサーバーのデバイスの最大数に達しました</translation>
+    </message>
+    <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerus form depends on the amount of layouts</comment>
+      <translation>
+        <numerusform>これらのレイアウトは他のユーザーと共有されており、共有しているユーザーのアカウントでも削除されます。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
+      <comment>Numerus form depends on the amount of web pages</comment>
+      <translation>
+        <numerusform>これらのWebページをサーバー &quot;%1&quot; に移動しようとしています。 これらのWebページは要求されたすべてのコンテンツをプロキシし、プロキシサーバーはサーバー &quot;%1&quot; に変更されます。</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6635,16 +6639,20 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ただし共通スイッチを使用することで、バックアップが可能なカメラについては有効化できます。</translation>
     </message>
     <message>
-      <source>Backup will not be activated for %1 devices: </source>
-      <translation>%1 デバイスのバックアップは有効化されません: </translation>
-    </message>
-    <message>
-      <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation>バックアップを有効化するには、%1 式の適切なクラウドストレージサービスが必要です。</translation>
-    </message>
-    <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
       <translation>サイト内のすべてのサーバーで、新規追加されたカメラのバックアップがオフになります。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup will not be activated for %n devices:</source>
+      <translation type="unfinished">
+        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services are required to activate backup for them.</source>
+      <translation type="unfinished">
+        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7022,15 +7030,17 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
-      <source>Use License</source>
-      <translation>
-        <numerusform>ライセンスを使用</numerusform>
+      <source>Use Services</source>
+      <comment>Numerus form depends on the devices count</comment>
+      <translation type="unfinished">
+        <numerusform>Use Services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Use Service</source>
-      <translation>
-        <numerusform>サービスを使用する</numerusform>
+      <source>Use Licenses</source>
+      <comment>Numerus form depends on the devices count</comment>
+      <translation type="unfinished">
+        <numerusform>Use Licenses</numerusform>
       </translation>
     </message>
   </context>
@@ -7345,21 +7355,9 @@ If you intended to move analytics data to another storage location, please conta
       </translation>
     </message>
     <message numerus="yes">
-      <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>これらのデバイスには音声入力が存在しないか、または正しく構成されていません。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
       <translation>
         <numerusform>%n デバイスで双方向音声を有効にできませんでした</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>これらのデバイスには音声出力が存在しないか、または正しく構成されていません。</numerusform>
       </translation>
     </message>
     <message>
@@ -7377,6 +7375,20 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
       <translation>音声ストリームの送信先として音声を再生するデバイスを選択する必要があります。</translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices do not have audio outputs or are not configured correctly.</source>
+      <comment>Numerus form depends on the total number of devices</comment>
+      <translation>
+        <numerusform>これらのデバイスには音声出力が存在しないか、または正しく構成されていません。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices do not have audio inputs or are not configured correctly.</source>
+      <comment>Numerus form depends on the total number of devices</comment>
+      <translation>
+        <numerusform>これらのデバイスには音声入力が存在しないか、または正しく構成されていません。</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7421,8 +7433,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>チャネルパートナーのユーザーはこのサイトにアクセスできます。</translation>
     </message>
     <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
-      <translation>チャネルパートナーユーザーのアクセス権限は組織レベルで管理されており、サイトのユーザー管理では表示されません。&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;詳細はこちら&lt;/a&gt;</translation>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>詳細</translation>
     </message>
   </context>
   <context>
@@ -8047,12 +8063,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>UNKNOWN</source>
       <translation>不明</translation>
-    </message>
-    <message numerus="yes">
-      <source> + %n</source>
-      <translation>
-        <numerusform> + %n</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -8735,12 +8745,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>残り無効化回数は %n 回です。</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>ライセンスを解除しますか?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Deactivate</source>
       <translation>解除</translation>
@@ -8755,16 +8759,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 を使用中</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>少なくとも %1 が必要です</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <comment>Numerus form depends on the amount of licenses</comment>
+      <translation>
+        <numerusform>ライセンスを解除しますか?</numerusform>
       </translation>
     </message>
   </context>
@@ -8882,8 +8893,8 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation>ログレベルによってはパフォーマンスが低下します。</translation>
     </message>
     <message>
-      <source>&lt;None&gt;</source>
-      <translation>&lt;なし&gt;</translation>
+      <source>None</source>
+      <translation>なし</translation>
     </message>
   </context>
   <context>
@@ -10653,12 +10664,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Continue</source>
       <translation>続行</translation>
     </message>
-    <message numerus="yes">
-      <source>I trust these servers</source>
-      <translation>
-        <numerusform>これらのサーバーを信用する</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I trust this server</source>
       <translation>このサーバーを信用する</translation>
@@ -10666,6 +10671,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Certificate details</source>
       <translation>証明書の詳細</translation>
+    </message>
+    <message numerus="yes">
+      <source>I trust these servers</source>
+      <comment>Numerus form depends on the number of certificates</comment>
+      <translation>
+        <numerusform>これらのサーバーを信用する</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11040,12 +11052,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <numerusform>... ほか %n 件</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation>
-        <numerusform>現在のレイアウトにカメラを追加するにはダブルクリック、新規タブで開くには Ctrl + クリックしてください</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No available archive</source>
       <translation>利用可能なアーカイブがありません</translation>
@@ -11097,6 +11103,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>This action is not supported for notifications from other Sites</source>
       <translation>このアクションは、他のサイトからの通知には対応していません。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
+      <comment>Numerus form depends on the number of cameras</comment>
+      <translation>
+        <numerusform>現在のレイアウトにカメラを追加するにはダブルクリック、新規タブで開くには Ctrl + クリックしてください</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11571,31 +11584,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Already uploaded files will be kept.</source>
       <translation>アップロード済みのファイルは保持されます。</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected file formats are not supported</source>
-      <translation>
-        <numerusform>選択したファイル形式はサポートされていません</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
       <translation>.MKV、.AVI、.MP4、またはその他の映像ファイルを使用してください。</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>選択したファイルにはタイムスタンプがありません</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
       <translation>正しいタイムスタンプを持つ映像ファイルのみがサポートされています。</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files are too old</source>
-      <translation>
-        <numerusform>選択したファイルは古すぎます</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
@@ -11607,24 +11602,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
         <numerusform>選択したファイルは %1 から %2 までに録画されたものですが、アップロードできるのは直近 %n 日間に録画されたファイルのみです。これはカメラのアーカイブ設定で変更できます。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation>
-        <numerusform>選択したファイルは、すでにアップロードされている映像の期間と重複します。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>これらのファイルは別の仮想カメラにアップロードできます。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>選択したファイルは、すでにアップロードされている映像の期間と重複します。</numerusform>
       </translation>
     </message>
     <message>
@@ -11642,18 +11619,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>No new files to upload in selected folder</source>
       <translation>選択したフォルダーには、アップロードできる新しいファイルがありません</translation>
-    </message>
-    <message numerus="yes">
-      <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>これらのファイルをアップロードした後、一部の映像が削除されることがあります</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>サーバーストレージには十分な空き領域がありません。保存領域を確保するために、古い映像が削除されることがあります。また、選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されることにご注意ください。</numerusform>
-      </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
@@ -11707,6 +11672,62 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
       <translation>%1 は、アップロードされている映像の期間と重複します。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>選択したファイル形式はサポートされていません</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>選択したファイルにはタイムスタンプがありません</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>選択したファイルは古すぎます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>選択したファイルは、すでにアップロードされている映像の期間と重複します。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Virtual Camera.</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>これらのファイルは別の仮想カメラにアップロードできます。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>選択したファイルは、すでにアップロードされている映像の期間と重複します。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <comment>Numerus form depends on the amount of files uploaded</comment>
+      <translation>
+        <numerusform>これらのファイルをアップロードした後、一部の映像が削除されることがあります</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <comment>Numerus form depends on the amount of files uploaded</comment>
+      <translation>
+        <numerusform>サーバーストレージには十分な空き領域がありません。保存領域を確保するために、古い映像が削除されることがあります。また、選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されることにご注意ください。</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12662,14 +12683,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
-      <comment>Form depends on invalid rule count</comment>
+      <comment>Numerus form depends on the invalid rule count</comment>
       <translation>
         <numerusform>一部のルールは有効化できませんでした。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
-      <comment>Form depends on invalid rule count</comment>
+      <comment>Numerus form depends on the invalid rule count</comment>
       <translation>
         <numerusform>選択したルールの一部は、パラメーターが間違っているため有効化できません。修正してルールを再度有効化してください。</numerusform>
       </translation>

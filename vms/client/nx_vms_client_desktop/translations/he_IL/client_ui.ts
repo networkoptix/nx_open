@@ -1687,14 +1687,10 @@
       <translation type="unfinished">Find Devices</translation>
     </message>
     <message>
-      <source>
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
-          </source>
-      <translation type="unfinished">
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
-          </translation>
+      <source>Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</source>
+      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</translation>
     </message>
   </context>
   <context>

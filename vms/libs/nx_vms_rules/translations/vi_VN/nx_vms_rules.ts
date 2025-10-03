@@ -202,30 +202,6 @@
       <source>For</source>
       <translation>Dành cho</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected devices were removed</source>
-      <translation>
-        <numerusform>Các thiết bị đang chọn đã bị xóa</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected cameras were removed</source>
-      <translation>
-        <numerusform>Các camera đang chọn đã bị xóa</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected servers were removed</source>
-      <translation>
-        <numerusform>Các máy chủ đang chọn đã bị xóa</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected layouts were removed</source>
-      <translation>
-        <numerusform>Các bố cục đang chọn đã bị xóa</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Time value cannot be less than zero</source>
       <translation>Giá trị thời gian không thể nhỏ hơn 0</translation>
@@ -322,6 +298,34 @@
     <message>
       <source>Removed layout</source>
       <translation>Bố cục đã xóa</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <comment>Numerus form depend on devices count</comment>
+      <translation>
+        <numerusform>Các thiết bị đang chọn đã bị xóa</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <comment>Numerus form depend on cameras count</comment>
+      <translation>
+        <numerusform>Các camera đang chọn đã bị xóa</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <comment>Numerus form depend on servers count</comment>
+      <translation>
+        <numerusform>Các máy chủ đang chọn đã bị xóa</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <comment>Numerus form depend on layouts count</comment>
+      <translation>
+        <numerusform>Các bố cục đang chọn đã bị xóa</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -656,12 +660,14 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
+      <comment>Numerus form depends on the amount of invalid headers</comment>
       <translation>
         <numerusform>Một số tiêu đề không hợp lệ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
+      <comment>Numerus form depends on the total amount of headers</comment>
       <translation>
         <numerusform>Tất cả các tiêu đề đều không hợp lệ</numerusform>
       </translation>

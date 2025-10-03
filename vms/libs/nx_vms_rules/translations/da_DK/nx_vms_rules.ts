@@ -204,34 +204,6 @@
       <source>For</source>
       <translation>Til</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected devices were removed</source>
-      <translation>
-        <numerusform>Valgte enheder blev fjernet</numerusform>
-        <numerusform>Valgte enheder blev fjernet</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected cameras were removed</source>
-      <translation>
-        <numerusform>Valgte kameraer blev fjernet</numerusform>
-        <numerusform>Valgte kameraer blev fjernet</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected servers were removed</source>
-      <translation>
-        <numerusform>Valgte servere blev fjernet</numerusform>
-        <numerusform>Valgte servere blev fjernet</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected layouts were removed</source>
-      <translation>
-        <numerusform>Valgte layout blev fjernet</numerusform>
-        <numerusform>Valgte layout blev fjernet</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Time value cannot be less than zero</source>
       <translation>Tidsværdi kan ikke være mindre end nul</translation>
@@ -328,6 +300,38 @@
     <message>
       <source>Removed layout</source>
       <translation>Fjernet layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <comment>Numerus form depend on devices count</comment>
+      <translation>
+        <numerusform>Valgte enheder blev fjernet</numerusform>
+        <numerusform>Valgte enheder blev fjernet</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <comment>Numerus form depend on cameras count</comment>
+      <translation>
+        <numerusform>Valgte kameraer blev fjernet</numerusform>
+        <numerusform>Valgte kameraer blev fjernet</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <comment>Numerus form depend on servers count</comment>
+      <translation>
+        <numerusform>Valgte servere blev fjernet</numerusform>
+        <numerusform>Valgte servere blev fjernet</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <comment>Numerus form depend on layouts count</comment>
+      <translation>
+        <numerusform>Valgte layout blev fjernet</numerusform>
+        <numerusform>Valgte layout blev fjernet</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -663,6 +667,7 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
+      <comment>Numerus form depends on the amount of invalid headers</comment>
       <translation>
         <numerusform>Nogle af overskrifterne er ikke gyldige</numerusform>
         <numerusform>Nogle af overskrifterne er ikke gyldige</numerusform>
@@ -670,6 +675,7 @@
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
+      <comment>Numerus form depends on the total amount of headers</comment>
       <translation>
         <numerusform>Alle overskrifter er ikke gyldige</numerusform>
         <numerusform>Alle overskrifter er ikke gyldige</numerusform>

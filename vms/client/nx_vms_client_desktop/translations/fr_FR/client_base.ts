@@ -73,7 +73,7 @@
     <name>CameraSettingsLicenseWatcher::Private</name>
     <message numerus="yes">
       <source>%1 are used</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 est utilisé</numerusform>
         <numerusform>%1 sont utilisés</numerusform>
@@ -81,7 +81,7 @@
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
-      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 est requis</numerusform>
         <numerusform>%1 sont requis</numerusform>
@@ -905,13 +905,6 @@
       <source>Delete Bookmarks...</source>
       <translation>Supprimer les signets...</translation>
     </message>
-    <message numerus="yes">
-      <source>Show on Items</source>
-      <translation>
-        <numerusform>Afficher sur l'élément</numerusform>
-        <numerusform>Afficher sur les éléments</numerusform>
-      </translation>
-    </message>
     <message>
       <source>PTZ</source>
       <translation>PTZ</translation>
@@ -1040,20 +1033,6 @@
       <source>Convert to Shared Layout</source>
       <translation>Convertir en mise en page partagée</translation>
     </message>
-    <message numerus="yes">
-      <source>Mute Items</source>
-      <translation>
-        <numerusform>Couper le son de l'élément</numerusform>
-        <numerusform>Couper le son des éléments</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Unmute Items</source>
-      <translation>
-        <numerusform>Rétablir le son de l'élément</numerusform>
-        <numerusform>Rétablir le son des éléments</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Connect to Site</source>
       <translation>Se connecter au site</translation>
@@ -1141,6 +1120,30 @@
     <message>
       <source>Custom</source>
       <translation>Personnalisé</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation>
+        <numerusform>Afficher sur l'élément</numerusform>
+        <numerusform>Afficher sur les éléments</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation>
+        <numerusform>Couper le son de l'élément</numerusform>
+        <numerusform>Couper le son des éléments</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation>
+        <numerusform>Rétablir le son de l'élément</numerusform>
+        <numerusform>Rétablir le son des éléments</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1407,13 +1410,6 @@ Clé de licence : %2</translation>
         <numerusform>Désactiver %n autre</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Ne peut pas désactiver licenses</numerusform>
-        <numerusform>Ne peut pas désactiver licenses</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Please try again later.</source>
       <translation>Veuillez réessayer plus tard.</translation>
@@ -1439,6 +1435,14 @@ Clé de licence : %2</translation>
       <translation>
         <numerusform>%n licences désactivées</numerusform>
         <numerusform>%n licences désactivées</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <comment>Numerus form depends on the amount of licenses</comment>
+      <translation>
+        <numerusform>Ne peut pas désactiver licenses</numerusform>
+        <numerusform>Ne peut pas désactiver licenses</numerusform>
       </translation>
     </message>
   </context>
@@ -1500,7 +1504,7 @@ Clé de licence : %2</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
-      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <comment>Numerus form depends on the amount of characters</comment>
       <translation>
         <numerusform>Nom du fichier ne doit pas contenir le caractère réservé suivant:</numerusform>
         <numerusform>Nom du fichier ne doit pas contenir les caractères réservés suivants:</numerusform>
@@ -2083,8 +2087,17 @@ Clé de licence : %2</translation>
         <numerusform>Détails pour %n caméras de %1</numerusform>
       </translation>
     </message>
+    <message>
+      <source>This server is removed from Site</source>
+      <translation type="unfinished">This server is removed from Site</translation>
+    </message>
+    <message>
+      <source>This user is removed from Site</source>
+      <translation type="unfinished">This user is removed from Site</translation>
+    </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
+      <comment>Numerus form depends on the number of devices</comment>
       <translation>
         <numerusform>Cet appareil est retiré du site</numerusform>
         <numerusform>Ces appareils sont retirés du site</numerusform>
@@ -2092,6 +2105,7 @@ Clé de licence : %2</translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
+      <comment>Numerus form depends on the number of cameras</comment>
       <translation>
         <numerusform>Cet caméra est retirée du site</numerusform>
         <numerusform>Ces caméras sont retirées du site</numerusform>
@@ -2099,23 +2113,10 @@ Clé de licence : %2</translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
+      <comment>Numerus form depends on the number of resources</comment>
       <translation>
         <numerusform>Cet ressource est retirée du site</numerusform>
         <numerusform>Ces ressources sont retirées du site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>This server is removed from Site</source>
-      <translation>
-        <numerusform>Ce serveur est supprimé du site</numerusform>
-        <numerusform>Ces serveurs sont supprimés du site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>This user is removed from Site</source>
-      <translation>
-        <numerusform>Cet utilisateur est supprimé du site</numerusform>
-        <numerusform>Ces utilisateurs sont supprimés du site</numerusform>
       </translation>
     </message>
   </context>
@@ -4127,13 +4128,6 @@ Clé de licence : %2</translation>
   <context>
     <name>QnServerSettingsWidget</name>
     <message numerus="yes">
-      <source>Certificates</source>
-      <translation>
-        <numerusform>Certificat</numerusform>
-        <numerusform>Certificats</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation>
         <numerusform>Le serveur utilise ce certificat SSL %n pour authentifier son identité</numerusform>
@@ -4159,6 +4153,14 @@ Clé de licence : %2</translation>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
       <translation>L'authentification non sécurisée (digest) doit être désactivée pour votre compte avant que l'accès à distance soit disponible.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Certificates</source>
+      <comment>Numerus form depends on the certificates count</comment>
+      <translation>
+        <numerusform>Certificat</numerusform>
+        <numerusform>Certificats</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5179,13 +5181,9 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>PC %1</source>
       <translation>PC %1</translation>
     </message>
-    <message>
-      <source>PC %1 - Display %2</source>
-      <translation>PC %1 - Affichage %2</translation>
-    </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
-      <comment>%2 will be substituted by _list_ of displays</comment>
+      <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
       <translation>
         <numerusform>PC %1 - Affichage %2</numerusform>
         <numerusform>PC %1 - Affichage %2</numerusform>
@@ -5411,20 +5409,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>Échec de l'ouverture de %n caméras sur le mur vidéo :</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation>
-        <numerusform>Vous ne pouvez pas ajouter au mur vidéo un appareil pour lequel vous ne disposez pas de l'autorisation Afficher en direct.</numerusform>
-        <numerusform>Vous ne pouvez pas ajouter au mur vidéo des appareils pour lesquels vous ne disposez pas de l'autorisation Afficher en direct.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation>
-        <numerusform>Vous ne pouvez pas ajouter au mur vidéo une caméra pour laquelle vous ne disposez pas de l'autorisation Voir en Direct.</numerusform>
-        <numerusform>Vous ne pouvez pas ajouter au mur vidéo des caméras pour lesquelles vous ne disposez pas de l'autorisation Voir en direct</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
       <translation>L'écran est verrouillé et ne peut pas être modifié</translation>
@@ -5440,6 +5424,22 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Cannot find compatible client version: %1</source>
       <translation>Impossible de trouver la version client compatible : %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
+      <comment>Numerus form depends on the number of devices</comment>
+      <translation>
+        <numerusform>Vous ne pouvez pas ajouter au mur vidéo un appareil pour lequel vous ne disposez pas de l'autorisation Afficher en direct.</numerusform>
+        <numerusform>Vous ne pouvez pas ajouter au mur vidéo des appareils pour lesquels vous ne disposez pas de l'autorisation Afficher en direct.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
+      <comment>Numerus form depends on the number of cameras</comment>
+      <translation>
+        <numerusform>Vous ne pouvez pas ajouter au mur vidéo une caméra pour laquelle vous ne disposez pas de l'autorisation Voir en Direct.</numerusform>
+        <numerusform>Vous ne pouvez pas ajouter au mur vidéo des caméras pour lesquelles vous ne disposez pas de l'autorisation Voir en direct</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5631,13 +5631,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Déplacer partiellement</translation>
     </message>
     <message numerus="yes">
-      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation>
-        <numerusform>Vous êtes sur le point de déplacer ces pages web vers le serveur &quot;%1&quot;. Ces pages Web proxy tous les contenus demandés, et leur serveur proxy passera au serveur &quot;%1&quot;.</numerusform>
-        <numerusform>Vous êtes sur le point de déplacer ces pages web vers le serveur &quot;%1&quot;. Ces pages Web proxy tous les contenus demandés, et leur serveur proxy passera au serveur &quot;%1&quot;.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Delete %n layouts?</source>
       <translation>
         <numerusform>Supprimer %n mise en page ?</numerusform>
@@ -5677,13 +5670,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Convertir</translation>
     </message>
     <message numerus="yes">
-      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation>
-        <numerusform>Cette mise en page est partagée avec d'autres utilisateurs, elle sera donc également supprimée de leurs comptes.</numerusform>
-        <numerusform>Ces mises en page sont partagées avec d'autres utilisateurs, elles seront donc également supprimées de leurs comptes.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <translation>
         <numerusform>%n mise en page est partagée avec d'autres utilisateurs, elle sera donc également supprimée de leurs comptes.</numerusform>
@@ -5704,6 +5690,22 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Maximum number of devices for this server is reached</source>
       <translation>Le nombre maximal d'appareils pour ce serveur est atteint</translation>
+    </message>
+    <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerus form depends on the amount of layouts</comment>
+      <translation>
+        <numerusform>Cette mise en page est partagée avec d'autres utilisateurs, elle sera donc également supprimée de leurs comptes.</numerusform>
+        <numerusform>Ces mises en page sont partagées avec d'autres utilisateurs, elles seront donc également supprimées de leurs comptes.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
+      <comment>Numerus form depends on the amount of web pages</comment>
+      <translation>
+        <numerusform>Vous êtes sur le point de déplacer ces pages web vers le serveur &quot;%1&quot;. Ces pages Web proxy tous les contenus demandés, et leur serveur proxy passera au serveur &quot;%1&quot;.</numerusform>
+        <numerusform>Vous êtes sur le point de déplacer ces pages web vers le serveur &quot;%1&quot;. Ces pages Web proxy tous les contenus demandés, et leur serveur proxy passera au serveur &quot;%1&quot;.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6745,16 +6747,22 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Mais vous pouvez toujours utiliser un commutateur commun pour activer les sauvegardes pour les caméras pour lesquelles cela est possible</translation>
     </message>
     <message>
-      <source>Backup will not be activated for %1 devices: </source>
-      <translation>La sauvegarde ne sera pas activée pour %1 appareils : </translation>
-    </message>
-    <message>
-      <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation>%1 services de stockage cloud adaptés sont nécessaires pour activer la sauvegarde pour eux.</translation>
-    </message>
-    <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
       <translation>La sauvegarde sera désactivée pour les caméras nouvellement ajoutées sur tous les serveurs du site</translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup will not be activated for %n devices:</source>
+      <translation type="unfinished">
+        <numerusform>Backup will not be activated for %n devices:</numerusform>
+        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services are required to activate backup for them.</source>
+      <translation type="unfinished">
+        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7136,17 +7144,19 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
   <context>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
-      <source>Use License</source>
-      <translation>
-        <numerusform>Utiliser la licence</numerusform>
-        <numerusform>Utiliser les Licences</numerusform>
+      <source>Use Services</source>
+      <comment>Numerus form depends on the devices count</comment>
+      <translation type="unfinished">
+        <numerusform>Use Services</numerusform>
+        <numerusform>Use Services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Use Service</source>
-      <translation>
-        <numerusform>Utiliser le service</numerusform>
-        <numerusform>Utiliser le service</numerusform>
+      <source>Use Licenses</source>
+      <comment>Numerus form depends on the devices count</comment>
+      <translation type="unfinished">
+        <numerusform>Use Licenses</numerusform>
+        <numerusform>Use Licenses</numerusform>
       </translation>
     </message>
   </context>
@@ -7465,24 +7475,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       </translation>
     </message>
     <message numerus="yes">
-      <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>Ce périphérique n'a pas d'entrée audio ou n'est pas configuré correctement.</numerusform>
-        <numerusform>Ces périphériques n'ont pas d'entrée audio ou ne sont pas configurés correctement.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
       <translation>
         <numerusform>Impossible d'activer l'audio bidirectionnel sur %n appareil</numerusform>
         <numerusform>Impossible d'activer l'audio bidirectionnel sur %n appareils</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>Ce périphérique n'a pas de sortie audio ou n'est pas configuré correctement.</numerusform>
-        <numerusform>Ces périphériques n'ont pas de sorties audio ou ne sont pas configurés correctement.</numerusform>
       </translation>
     </message>
     <message>
@@ -7500,6 +7496,22 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
       <translation>Vous devez sélectionner un périphérique pour transmettre le flux audio et l'utiliser pour la lecture audio.</translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices do not have audio outputs or are not configured correctly.</source>
+      <comment>Numerus form depends on the total number of devices</comment>
+      <translation>
+        <numerusform>Ce périphérique n'a pas de sortie audio ou n'est pas configuré correctement.</numerusform>
+        <numerusform>Ces périphériques n'ont pas de sorties audio ou ne sont pas configurés correctement.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices do not have audio inputs or are not configured correctly.</source>
+      <comment>Numerus form depends on the total number of devices</comment>
+      <translation>
+        <numerusform>Ce périphérique n'a pas d'entrée audio ou n'est pas configuré correctement.</numerusform>
+        <numerusform>Ces périphériques n'ont pas d'entrée audio ou ne sont pas configurés correctement.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7544,8 +7556,12 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Les utilisateurs du partenaire de distribution ont accès à ce site</translation>
     </message>
     <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
-      <translation>L'accès des utilisateurs des partenaires de distribution&apos; est géré au niveau de l'organisation et n'est pas visible dans la gestion des utilisateurs du site.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;En savoir plus&lt;/a&gt;</translation>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>En savoir plus</translation>
     </message>
   </context>
   <context>
@@ -8177,13 +8193,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>UNKNOWN</source>
       <translation>INCONNU</translation>
-    </message>
-    <message numerus="yes">
-      <source> + %n</source>
-      <translation>
-        <numerusform> + %n</numerusform>
-        <numerusform> + %n</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -8871,13 +8880,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>%n désactivations restantes.</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Désactiver licences?</numerusform>
-        <numerusform>Désactiver licences?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Deactivate</source>
       <translation>Désactiver</translation>
@@ -8892,7 +8894,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 est actuellement en cours d’utilisation</numerusform>
         <numerusform>%1 sont actuellement en cours d’utilisation</numerusform>
@@ -8900,10 +8902,18 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>Au moins %1 est nécessaire</numerusform>
         <numerusform>Au moins %1 sont nécessaires</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <comment>Numerus form depends on the amount of licenses</comment>
+      <translation>
+        <numerusform>Désactiver licences?</numerusform>
+        <numerusform>Désactiver licences?</numerusform>
       </translation>
     </message>
   </context>
@@ -9022,8 +9032,8 @@ N'oubliez pas de retourner le niveau de log à son paramètre par défaut après
       <translation>Le niveau de log réduit les performances</translation>
     </message>
     <message>
-      <source>&lt;None&gt;</source>
-      <translation>&lt;Aucun&gt;</translation>
+      <source>None</source>
+      <translation>Aucun</translation>
     </message>
   </context>
   <context>
@@ -10812,13 +10822,6 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
       <source>Continue</source>
       <translation>Continuer</translation>
     </message>
-    <message numerus="yes">
-      <source>I trust these servers</source>
-      <translation>
-        <numerusform>Je fais confiance à ce serveur</numerusform>
-        <numerusform>Je fais confiance à ces serveurs</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I trust this server</source>
       <translation>Je fais confiance à ce serveur</translation>
@@ -10826,6 +10829,14 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     <message>
       <source>Certificate details</source>
       <translation>Détails du certificat</translation>
+    </message>
+    <message numerus="yes">
+      <source>I trust these servers</source>
+      <comment>Numerus form depends on the number of certificates</comment>
+      <translation>
+        <numerusform>Je fais confiance à ce serveur</numerusform>
+        <numerusform>Je fais confiance à ces serveurs</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11206,13 +11217,6 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
         <numerusform>... et %n de plus</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation>
-        <numerusform>Double-cliquez pour ajouter des caméras à la mise en page actuelle ou ctrl + clic pour ouvrir un nouvel onglet</numerusform>
-        <numerusform>Double-cliquez pour ajouter des caméras à la mise en page actuelle ou ctrl + clic pour ouvrir un nouvel onglet</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No available archive</source>
       <translation>Aucune archive disponible</translation>
@@ -11264,6 +11268,14 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     <message>
       <source>This action is not supported for notifications from other Sites</source>
       <translation>Cette action n'est pas prise en charge pour les notifications provenant d'autres sites</translation>
+    </message>
+    <message numerus="yes">
+      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
+      <comment>Numerus form depends on the number of cameras</comment>
+      <translation>
+        <numerusform>Double-cliquez pour ajouter des caméras à la mise en page actuelle ou ctrl + clic pour ouvrir un nouvel onglet</numerusform>
+        <numerusform>Double-cliquez pour ajouter des caméras à la mise en page actuelle ou ctrl + clic pour ouvrir un nouvel onglet</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11739,34 +11751,13 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
       <source>Already uploaded files will be kept.</source>
       <translation>Les fichiers déjà téléchargés seront conservés.</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected file formats are not supported</source>
-      <translation>
-        <numerusform>Le format de fichier sélectionné n'est pas pris en charge</numerusform>
-        <numerusform>Les formats de fichier sélectionnés ne sont pas pris en charge</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
       <translation>Utiliser .MKV, .AVI, .MP4 ou d'autres fichiers vidéo.</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>Le fichier sélectionné n'a pas d'horodatage</numerusform>
-        <numerusform>Les fichiers sélectionnés n'ont pas d'horodatage</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
       <translation>Seuls les fichiers vidéo avec un horodatage correct sont pris en charge.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files are too old</source>
-      <translation>
-        <numerusform>Le fichier sélectionné est trop vieux</numerusform>
-        <numerusform>Les fichiers sélectionnés sont trop vieux</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
@@ -11780,27 +11771,6 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
       <translation>
         <numerusform>Les fichiers sélectionnés ont été enregistrés entre %1 et %2, mais seulement les fichiers enregistrés au cours des %n derniers jours peuvent être téléchargés. Vous pouvez le modifier dans les paramètres d'archivage de la caméra.</numerusform>
         <numerusform>Les fichiers sélectionnés ont été enregistrés entre %1 et %2, mais seulement les fichiers enregistrés au cours des %n derniers jours peuvent être téléchargés. Vous pouvez le modifier dans les paramètres d'archivage de la caméra.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation>
-        <numerusform>Le fichier sélectionné couvre les périodes pour lesquelles des vidéos sont déjà en cours de téléchargement</numerusform>
-        <numerusform>Les fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont déjà en cours de téléchargement</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>Vous pouvez télécharger ce fichier dans une autre instance d'une Caméra Virtuelle.</numerusform>
-        <numerusform>Vous pouvez envoyer ces fichiers sur une instance différente d'une caméra virtuelle.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>Le fichier sélectionné couvre les périodes pour lesquelles des vidéos ont déjà été téléchargées</numerusform>
-        <numerusform>Les fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos ont déjà été téléchargées</numerusform>
       </translation>
     </message>
     <message>
@@ -11818,20 +11788,6 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     <message>
       <source>No new files to upload in selected folder</source>
       <translation>Aucun nouveau fichier à télécharger dans le dossier sélectionné</translation>
-    </message>
-    <message numerus="yes">
-      <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>Cette séquence peut être supprimée après le téléchargement de ces fichiers</numerusform>
-        <numerusform>Certaines séquences peuvent être supprimées après le téléchargement de ces fichiers</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage du serveur. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur le serveur, ils seront supprimés juste après avoir été téléchargés.</numerusform>
-        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage des serveurs. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur les serveurs, ils seront supprimés juste après leur téléchargement.</numerusform>
-      </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
@@ -11885,6 +11841,70 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
       <translation>%1 couvre la période pendant laquelle la vidéo est téléchargée.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>Le format de fichier sélectionné n'est pas pris en charge</numerusform>
+        <numerusform>Les formats de fichier sélectionnés ne sont pas pris en charge</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>Le fichier sélectionné n'a pas d'horodatage</numerusform>
+        <numerusform>Les fichiers sélectionnés n'ont pas d'horodatage</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>Le fichier sélectionné est trop vieux</numerusform>
+        <numerusform>Les fichiers sélectionnés sont trop vieux</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>Le fichier sélectionné couvre les périodes pour lesquelles des vidéos sont déjà en cours de téléchargement</numerusform>
+        <numerusform>Les fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont déjà en cours de téléchargement</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Virtual Camera.</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>Vous pouvez télécharger ce fichier dans une autre instance d'une Caméra Virtuelle.</numerusform>
+        <numerusform>Vous pouvez envoyer ces fichiers sur une instance différente d'une caméra virtuelle.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation>
+        <numerusform>Le fichier sélectionné couvre les périodes pour lesquelles des vidéos ont déjà été téléchargées</numerusform>
+        <numerusform>Les fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos ont déjà été téléchargées</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <comment>Numerus form depends on the amount of files uploaded</comment>
+      <translation>
+        <numerusform>Cette séquence peut être supprimée après le téléchargement de ces fichiers</numerusform>
+        <numerusform>Certaines séquences peuvent être supprimées après le téléchargement de ces fichiers</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <comment>Numerus form depends on the amount of files uploaded</comment>
+      <translation>
+        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage du serveur. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur le serveur, ils seront supprimés juste après avoir été téléchargés.</numerusform>
+        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage des serveurs. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur les serveurs, ils seront supprimés juste après leur téléchargement.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12848,7 +12868,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
-      <comment>Form depends on invalid rule count</comment>
+      <comment>Numerus form depends on the invalid rule count</comment>
       <translation>
         <numerusform>Une règle n'a pas été activée</numerusform>
         <numerusform>Certaines règles n'ont pas été activées</numerusform>
@@ -12856,7 +12876,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
-      <comment>Form depends on invalid rule count</comment>
+      <comment>Numerus form depends on the invalid rule count</comment>
       <translation>
         <numerusform>La règles sélectionnée ne peut pas être activée car ces paramètres sont incorrects. Corrigez-les et réactivez la règle.</numerusform>
         <numerusform>Certaines règles sélectionnées ne peuvent pas être activées car leurs paramètres sont incorrects. Corrigez-les et réactivez la règle.</numerusform>

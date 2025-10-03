@@ -204,34 +204,6 @@
       <source>For</source>
       <translation>För</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected devices were removed</source>
-      <translation>
-        <numerusform>Utvalda enheter togs bort</numerusform>
-        <numerusform>Utvalda enheter togs bort</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected cameras were removed</source>
-      <translation>
-        <numerusform>Utvalda kameror togs bort</numerusform>
-        <numerusform>Utvalda kameror togs bort</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected servers were removed</source>
-      <translation>
-        <numerusform>Utvalda servrar togs bort</numerusform>
-        <numerusform>Utvalda servrar togs bort</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected layouts were removed</source>
-      <translation>
-        <numerusform>Valda layouter togs bort</numerusform>
-        <numerusform>Valda layouter togs bort</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Time value cannot be less than zero</source>
       <translation>Tidsvärdet får inte vara mindre än noll</translation>
@@ -328,6 +300,38 @@
     <message>
       <source>Removed layout</source>
       <translation>Borttagen layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <comment>Numerus form depend on devices count</comment>
+      <translation>
+        <numerusform>Utvalda enheter togs bort</numerusform>
+        <numerusform>Utvalda enheter togs bort</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <comment>Numerus form depend on cameras count</comment>
+      <translation>
+        <numerusform>Utvalda kameror togs bort</numerusform>
+        <numerusform>Utvalda kameror togs bort</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <comment>Numerus form depend on servers count</comment>
+      <translation>
+        <numerusform>Utvalda servrar togs bort</numerusform>
+        <numerusform>Utvalda servrar togs bort</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <comment>Numerus form depend on layouts count</comment>
+      <translation>
+        <numerusform>Valda layouter togs bort</numerusform>
+        <numerusform>Valda layouter togs bort</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -663,6 +667,7 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
+      <comment>Numerus form depends on the amount of invalid headers</comment>
       <translation>
         <numerusform>Vissa av rubrikerna är inte giltiga</numerusform>
         <numerusform>Vissa av rubrikerna är inte giltiga</numerusform>
@@ -670,6 +675,7 @@
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
+      <comment>Numerus form depends on the total amount of headers</comment>
       <translation>
         <numerusform>Alla rubriker är inte giltiga</numerusform>
         <numerusform>Alla rubriker är inte giltiga</numerusform>
