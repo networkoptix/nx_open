@@ -1174,7 +1174,7 @@
     <message>
       <source>Days</source>
       <comment>Capitalized long suffix for displaying days</comment>
-      <translation> 日</translation>
+      <translation>日</translation>
     </message>
     <message>
       <source>Wks</source>

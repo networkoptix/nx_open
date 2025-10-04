@@ -1182,8 +1182,8 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>günler</numerusform>
-        <numerusform>günler</numerusform>
+        <numerusform>gün</numerusform>
+        <numerusform>gün</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1253,9 +1253,9 @@
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Milisaniye</numerusform>
-        <numerusform>Milliseconds</numerusform>
+        <numerusform>Milisaniye</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1293,25 +1293,25 @@
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Capitalized full suffix for displaying weeks</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Haftalar</numerusform>
-        <numerusform>Weeks</numerusform>
+        <numerusform>Haftalar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Months</source>
       <comment>Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Aylar</numerusform>
-        <numerusform>Months</numerusform>
+        <numerusform>Aylar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Yıllar</numerusform>
-        <numerusform>Years</numerusform>
+        <numerusform>Yıllar</numerusform>
       </translation>
     </message>
   </context>

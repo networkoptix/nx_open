@@ -1158,8 +1158,8 @@
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>segundo</numerusform>
-        <numerusform>segundo</numerusform>
+        <numerusform>segundos</numerusform>
+        <numerusform>segundos</numerusform>
       </translation>
     </message>
     <message numerus="yes">

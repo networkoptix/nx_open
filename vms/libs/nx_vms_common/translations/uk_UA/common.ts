@@ -1253,16 +1253,16 @@
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
         <numerusform>мілісекунда</numerusform>
-        <numerusform>мілісекунд</numerusform>
-        <numerusform>мілісекунд</numerusform>
-        <numerusform>мілісекунд</numerusform>
+        <numerusform>мілісекунда</numerusform>
+        <numerusform>мілісекунда</numerusform>
+        <numerusform>мілісекунда</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>секунда</numerusform>
+        <numerusform>секунд</numerusform>
         <numerusform>секунд</numerusform>
         <numerusform>секунд</numerusform>
         <numerusform>секунд</numerusform>
@@ -1272,7 +1272,7 @@
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>хвилина</numerusform>
+        <numerusform>хвилин</numerusform>
         <numerusform>хвилин</numerusform>
         <numerusform>хвилин</numerusform>
         <numerusform>хвилин</numerusform>
@@ -1282,9 +1282,9 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>година</numerusform>
         <numerusform>години</numerusform>
-        <numerusform>годин</numerusform>
+        <numerusform>години</numerusform>
+        <numerusform>години</numerusform>
         <numerusform>години</numerusform>
       </translation>
     </message>
@@ -1293,9 +1293,9 @@
       <comment>Full suffix for displaying days</comment>
       <translation>
         <numerusform>день</numerusform>
-        <numerusform>дні</numerusform>
-        <numerusform>днів</numerusform>
-        <numerusform>днів</numerusform>
+        <numerusform>день</numerusform>
+        <numerusform>день</numerusform>
+        <numerusform>день</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1303,9 +1303,9 @@
       <comment>Full suffix for displaying weeks</comment>
       <translation>
         <numerusform>тиждень</numerusform>
-        <numerusform>тижнів</numerusform>
-        <numerusform>тижнів</numerusform>
-        <numerusform>тижнів</numerusform>
+        <numerusform>тиждень</numerusform>
+        <numerusform>тиждень</numerusform>
+        <numerusform>тиждень</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1313,19 +1313,19 @@
       <comment>Full suffix for displaying months</comment>
       <translation>
         <numerusform>місяць</numerusform>
-        <numerusform>місяців</numerusform>
-        <numerusform>місяців</numerusform>
-        <numerusform>місяців</numerusform>
+        <numerusform>місяць</numerusform>
+        <numerusform>місяць</numerusform>
+        <numerusform>місяць</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>рік</numerusform>
         <numerusform>роки</numerusform>
-        <numerusform>років</numerusform>
-        <numerusform>років</numerusform>
+        <numerusform>роки</numerusform>
+        <numerusform>роки</numerusform>
+        <numerusform>роки</numerusform>
       </translation>
     </message>
     <message>
