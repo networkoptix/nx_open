@@ -76,11 +76,11 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 jsou použity</numerusform>
-        <numerusform>%1 jsou použity</numerusform>
-        <numerusform>%1 jsou použity</numerusform>
-        <numerusform>%1 jsou použity</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 are used</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1429,11 +1429,11 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Nelze deaktivovat licence</numerusform>
-        <numerusform>Nelze deaktivovat licence</numerusform>
-        <numerusform>Nelze deaktivovat licence</numerusform>
-        <numerusform>Nelze deaktivovat licence</numerusform>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
     <message>
@@ -1527,11 +1527,11 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation>
-        <numerusform>Název souboru nesmí obsahovat následující vyhrazené znaky:</numerusform>
-        <numerusform>Název souboru nesmí obsahovat následující vyhrazené znaky:</numerusform>
-        <numerusform>Název souboru nesmí obsahovat následující vyhrazené znaky:</numerusform>
-        <numerusform>Název souboru nesmí obsahovat následující vyhrazené znaky:</numerusform>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>
@@ -5292,11 +5292,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation>
-        <numerusform>PC %1 - Monitory %2</numerusform>
-        <numerusform>PC %1 - Monitory %2</numerusform>
-        <numerusform>PC %1 - Monitory %2</numerusform>
-        <numerusform>PC %1 - Monitory %2</numerusform>
+      <translation type="unfinished">
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
   </context>
@@ -9147,11 +9147,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Deaktivovat licence?</numerusform>
-        <numerusform>Deaktivovat licence?</numerusform>
-        <numerusform>Deaktivovat licence?</numerusform>
-        <numerusform>Deaktivovat licence?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
     <message>
@@ -9169,21 +9169,21 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 are currently in use</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+      <translation type="unfinished">
+        <numerusform>At least %1 are required</numerusform>
+        <numerusform>At least %1 are required</numerusform>
+        <numerusform>At least %1 are required</numerusform>
+        <numerusform>At least %1 are required</numerusform>
       </translation>
     </message>
   </context>
@@ -11542,11 +11542,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation>
-        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
-        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
-        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
-        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
+      <translation type="unfinished">
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
       </translation>
     </message>
     <message>
@@ -12076,11 +12076,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation>
-        <numerusform>Vybrané formáty souborů nejsou podporovány</numerusform>
-        <numerusform>Vybrané formáty souborů nejsou podporovány</numerusform>
-        <numerusform>Vybrané formáty souborů nejsou podporovány</numerusform>
-        <numerusform>Vybrané formáty souborů nejsou podporovány</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
       </translation>
     </message>
     <message>
@@ -12089,11 +12089,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>Vybrané soubory nemají časové značky</numerusform>
-        <numerusform>Vybrané soubory nemají časové značky</numerusform>
-        <numerusform>Vybrané soubory nemají časové značky</numerusform>
-        <numerusform>Vybrané soubory nemají časové značky</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
       </translation>
     </message>
     <message>
@@ -12102,11 +12102,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation>
-        <numerusform>Vybrané soubory jsou příliš staré</numerusform>
-        <numerusform>Vybrané soubory jsou příliš staré</numerusform>
-        <numerusform>Vybrané soubory jsou příliš staré</numerusform>
-        <numerusform>Vybrané soubory jsou příliš staré</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -12129,29 +12129,29 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation>
-        <numerusform>Vybrané soubory pokrývají období, pro které jsou videa již nahrávána</numerusform>
-        <numerusform>Vybrané soubory pokrývají období, pro které jsou videa již nahrávána</numerusform>
-        <numerusform>Vybrané soubory pokrývají období, pro které jsou videa již nahrávána</numerusform>
-        <numerusform>Vybrané soubory pokrývají období, pro které jsou videa již nahrávána</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>Tyto soubory můžete nahrát do jiné instance virtuální kamery.</numerusform>
-        <numerusform>Tyto soubory můžete nahrát do jiné instance virtuální kamery.</numerusform>
-        <numerusform>Tyto soubory můžete nahrát do jiné instance virtuální kamery.</numerusform>
-        <numerusform>Tyto soubory můžete nahrát do jiné instance virtuální kamery.</numerusform>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>Vybrané soubory pokrývají období, pro které již videa byla nahrána</numerusform>
-        <numerusform>Vybrané soubory pokrývají období, pro které již videa byla nahrána</numerusform>
-        <numerusform>Vybrané soubory pokrývají období, pro které již videa byla nahrána</numerusform>
-        <numerusform>Vybrané soubory pokrývají období, pro které již videa byla nahrána</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>
     </message>
     <message>
@@ -12172,20 +12172,20 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>Některé záběry mohou být po nahrání těchto souborů smazány</numerusform>
-        <numerusform>Některé záběry mohou být po nahrání těchto souborů smazány</numerusform>
-        <numerusform>Některé záběry mohou být po nahrání těchto souborů smazány</numerusform>
-        <numerusform>Některé záběry mohou být po nahrání těchto souborů smazány</numerusform>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>Na úložišti serveru není dostatek volného místa. Některé staré záběry mohou být smazané, aby se uvolnilo místo. Všimněte si, že pokud se vybrané soubory stanou na serveru nejstaršími, budou po nahrání smazaná.</numerusform>
-        <numerusform>Na úložišti serveru není dostatek volného místa. Některé staré záběry mohou být smazané, aby se uvolnilo místo. Všimněte si, že pokud se vybrané soubory stanou na serveru nejstaršími, budou po nahrání smazaná.</numerusform>
-        <numerusform>Na úložišti serveru není dostatek volného místa. Některé staré záběry mohou být smazané, aby se uvolnilo místo. Všimněte si, že pokud se vybrané soubory stanou na serveru nejstaršími, budou po nahrání smazaná.</numerusform>
-        <numerusform>Na úložišti serveru není dostatek volného místa. Některé staré záběry mohou být smazané, aby se uvolnilo místo. Všimněte si, že pokud se vybrané soubory stanou na serveru nejstaršími, budou po nahrání smazaná.</numerusform>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
       </translation>
     </message>
     <message>

@@ -697,7 +697,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>borrar</translation>
+      <translation>Borrar</translation>
     </message>
   </context>
   <context>

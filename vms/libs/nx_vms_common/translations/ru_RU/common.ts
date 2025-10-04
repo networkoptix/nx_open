@@ -1252,20 +1252,20 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>миллисекунда</numerusform>
         <numerusform>миллисекунды</numerusform>
-        <numerusform>миллисекунд</numerusform>
-        <numerusform>миллисекунд</numerusform>
+        <numerusform>миллисекунды</numerusform>
+        <numerusform>миллисекунды</numerusform>
+        <numerusform>миллисекунды</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>секунда</numerusform>
         <numerusform>секунды</numerusform>
-        <numerusform>секунд</numerusform>
-        <numerusform>секунд</numerusform>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1273,27 +1273,27 @@
       <comment>Full suffix for displaying minutes</comment>
       <translation>
         <numerusform>минута</numerusform>
-        <numerusform>минуты</numerusform>
-        <numerusform>минут</numerusform>
-        <numerusform>минут</numerusform>
+        <numerusform>минута</numerusform>
+        <numerusform>минута</numerusform>
+        <numerusform>минута</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>час</numerusform>
         <numerusform>часа</numerusform>
-        <numerusform>часов</numerusform>
-        <numerusform>часов</numerusform>
+        <numerusform>часа</numerusform>
+        <numerusform>часа</numerusform>
+        <numerusform>часа</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>день</numerusform>
-        <numerusform>дня</numerusform>
+        <numerusform>дней</numerusform>
+        <numerusform>дней</numerusform>
         <numerusform>дней</numerusform>
         <numerusform>дней</numerusform>
       </translation>
@@ -1303,9 +1303,9 @@
       <comment>Full suffix for displaying weeks</comment>
       <translation>
         <numerusform>неделя</numerusform>
-        <numerusform>недели</numerusform>
-        <numerusform>недель</numerusform>
-        <numerusform>недель</numerusform>
+        <numerusform>неделя</numerusform>
+        <numerusform>неделя</numerusform>
+        <numerusform>неделя</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1313,9 +1313,9 @@
       <comment>Full suffix for displaying months</comment>
       <translation>
         <numerusform>месяц</numerusform>
-        <numerusform>месяца</numerusform>
-        <numerusform>месяцев</numerusform>
-        <numerusform>месяцев</numerusform>
+        <numerusform>месяц</numerusform>
+        <numerusform>месяц</numerusform>
+        <numerusform>месяц</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1323,9 +1323,9 @@
       <comment>Full suffix for displaying years</comment>
       <translation>
         <numerusform>год</numerusform>
-        <numerusform>года</numerusform>
-        <numerusform>лет</numerusform>
-        <numerusform>лет</numerusform>
+        <numerusform>год</numerusform>
+        <numerusform>год</numerusform>
+        <numerusform>год</numerusform>
       </translation>
     </message>
     <message>

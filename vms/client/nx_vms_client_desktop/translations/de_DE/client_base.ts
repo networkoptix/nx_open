@@ -74,17 +74,17 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 wird verwendet</numerusform>
-        <numerusform>%1 werden verwendet</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 are used</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 ist erforderlich</numerusform>
-        <numerusform>%1 sind erforderlich</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 are required</numerusform>
       </translation>
     </message>
   </context>
@@ -907,9 +907,9 @@
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation>
-        <numerusform>Im Artikel anzeigen</numerusform>
-        <numerusform>In Artikeln anzeigen</numerusform>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
       </translation>
     </message>
     <message>
@@ -1409,9 +1409,9 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Lizenz kann nicht deaktiviert werden</numerusform>
-        <numerusform>Lizenzen können nicht deaktiviert werden</numerusform>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
     <message>
@@ -1501,9 +1501,9 @@ Lizenzschlüssel: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation>
-        <numerusform>Der Dateiname darf das folgende Zeichen nicht enthalten:</numerusform>
-        <numerusform>Der Dateiname darf die folgenden Zeichen nicht enthalten:</numerusform>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>
@@ -4128,9 +4128,9 @@ Lizenzschlüssel: %2</translation>
     <name>QnServerSettingsWidget</name>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation>
-        <numerusform>Zertifikat</numerusform>
-        <numerusform>Zertifikate</numerusform>
+      <translation type="unfinished">
+        <numerusform>Certificates</numerusform>
+        <numerusform>Certificates</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5186,9 +5186,9 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation>
-        <numerusform>PC %1 - Monitor %2</numerusform>
-        <numerusform>PC %1 - Monitore %2</numerusform>
+      <translation type="unfinished">
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7466,9 +7466,9 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>Dieses Gerät hat keine Audioeingänge oder sie sind nicht richtig konfiguriert.</numerusform>
-        <numerusform>Diese Geräte haben keine Audioeingänge oder sie sind nicht richtig konfiguriert.</numerusform>
+      <translation type="unfinished">
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7480,9 +7480,9 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>Dieses Gerät hat keine Audioausgänge oder sie sind nicht richtig konfiguriert.</numerusform>
-        <numerusform>Diese Geräte haben keine Audioausgänge oder sie sind nicht richtig konfiguriert.</numerusform>
+      <translation type="unfinished">
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
       </translation>
     </message>
     <message>
@@ -8873,9 +8873,9 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Lizenz deaktivieren?</numerusform>
-        <numerusform>Lizenzen deaktivieren?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
     <message>
@@ -8893,17 +8893,17 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 ist derzeit im Einsatz</numerusform>
-        <numerusform>%1 sind derzeit im Einsatz</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 are currently in use</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Mindestens %1 ist erforderlich</numerusform>
-        <numerusform>Mindestens %1 sind erforderlich</numerusform>
+      <translation type="unfinished">
+        <numerusform>At least %1 are required</numerusform>
+        <numerusform>At least %1 are required</numerusform>
       </translation>
     </message>
   </context>
@@ -11208,9 +11208,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation>
-        <numerusform>Doppelklicken Sie, um die Kamera zum aktuellen Layout hinzuzufügen, oder Strg+Klick, um sie in einer neuen Registerkarte zu öffnen</numerusform>
-        <numerusform>Doppelklicken Sie, um die Kameras zum aktuellen Layout hinzuzufügen, oder Strg+Klick, um sie in einer neuen Registerkarte zu öffnen</numerusform>
+      <translation type="unfinished">
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
       </translation>
     </message>
     <message>
@@ -11740,9 +11740,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation>
-        <numerusform>Ausgewähltes Dateiformat wird nicht unterstützt</numerusform>
-        <numerusform>Ausgewählte Dateiformate werden nicht unterstützt</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
       </translation>
     </message>
     <message>
@@ -11751,9 +11751,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>Ausgewähltes Dateiformat hat keinen Zeitstempel</numerusform>
-        <numerusform>Ausgewählte Dateiformate haben keinen Zeitstempel</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
       </translation>
     </message>
     <message>
@@ -11762,9 +11762,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation>
-        <numerusform>Ausgewählte Datei ist zu alt</numerusform>
-        <numerusform>Ausgewählte Dateien sind zu alt</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11783,23 +11783,23 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation>
-        <numerusform>Ausgewählte Datei umfasst Zeiträume, für die bereits Videos hochgeladen werden</numerusform>
-        <numerusform>Ausgewählte Dateien umfassen Zeiträume, für die bereits Videos hochgeladen werden</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>Sie können diese Dateien auf eine andere Instanz einer virtuellen Kamera hochladen.</numerusform>
-        <numerusform>Sie können diese Dateien auf eine andere Instanz mehrerer virtueller Kameras hochladen.</numerusform>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>Ausgewählte Datei umfasst Zeiträume, für die bereits Videos hochgeladen wurden</numerusform>
-        <numerusform>Ausgewählte Dateien umfassen Zeiträume, für die bereits Videos hochgeladen wurden</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>
     </message>
     <message>
@@ -11820,16 +11820,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>Das Material kann nach dem Hochladen gelöscht werden</numerusform>
-        <numerusform>Das Material kann nach dem Hochladen gelöscht werden</numerusform>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>Auf dem Serverspeicher ist nicht genügend freier Speicherplatz vorhanden. Einige alte Aufnahmen können gelöscht werden, um Speicherplatz freizugeben. Beachten Sie, dass ausgewählte Dateien, die auf dem Server am ältesten sind, unmittelbar nach dem Hochladen gelöscht werden.</numerusform>
-        <numerusform>Auf dem Serverspeicher ist nicht genügend freier Speicherplatz vorhanden. Einige alte Aufnahmen können gelöscht werden, um Speicherplatz freizugeben. Beachten Sie, dass ausgewählte Dateien, die auf dem Server am ältesten sind, unmittelbar nach dem Hochladen gelöscht werden.</numerusform>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
       </translation>
     </message>
     <message>

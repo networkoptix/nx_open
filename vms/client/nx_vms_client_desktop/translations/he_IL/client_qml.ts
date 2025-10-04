@@ -705,7 +705,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>מחיקה</translation>
+      <translation>מחק</translation>
     </message>
   </context>
   <context>

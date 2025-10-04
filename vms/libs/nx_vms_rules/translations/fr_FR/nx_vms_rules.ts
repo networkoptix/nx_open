@@ -207,28 +207,28 @@
     <message numerus="yes">
       <source>Selected devices were removed</source>
       <translation>
-        <numerusform>L'appareil sélectionné a été supprimé</numerusform>
+        <numerusform>Les appareils sélectionnés ont été supprimés</numerusform>
         <numerusform>Les appareils sélectionnés ont été supprimés</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
       <translation>
-        <numerusform>La caméra sélectionnée a été supprimée</numerusform>
+        <numerusform>Les caméras sélectionnées ont été supprimées</numerusform>
         <numerusform>Les caméras sélectionnées ont été supprimées</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
       <translation>
-        <numerusform>Le serveur sélectionné a été supprimé</numerusform>
+        <numerusform>Les serveurs sélectionnés ont été supprimés</numerusform>
         <numerusform>Les serveurs sélectionnés ont été supprimés</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
       <translation>
-        <numerusform>La mise en page sélectionnée a été supprimée</numerusform>
+        <numerusform>Les mises en page sélectionnées ont été supprimées</numerusform>
         <numerusform>Les mises en page sélectionnées ont été supprimées</numerusform>
       </translation>
     </message>
@@ -665,13 +665,13 @@
       <source>Some of the headers are not valid</source>
       <translation>
         <numerusform>Certain en-tête n'est pas valide</numerusform>
-        <numerusform>Certains en-têtes ne sont pas valides</numerusform>
+        <numerusform>Certain en-tête n'est pas valide</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
       <translation>
-        <numerusform>L'en-tête n'est pas valide</numerusform>
+        <numerusform>Tous les en-têtes ne sont pas valides</numerusform>
         <numerusform>Tous les en-têtes ne sont pas valides</numerusform>
       </translation>
     </message>
