@@ -1161,8 +1161,8 @@
       <source>seconds</source>
       <comment>Numerus: Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>másodpercek</numerusform>
-        <numerusform>másodpercek</numerusform>
+        <numerusform>másodperc</numerusform>
+        <numerusform>másodperc</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1185,8 +1185,8 @@
       <source>days</source>
       <comment>Numerus: Full suffix for displaying days</comment>
       <translation>
-        <numerusform>napok</numerusform>
-        <numerusform>napok</numerusform>
+        <numerusform>nap</numerusform>
+        <numerusform>nap</numerusform>
       </translation>
     </message>
     <message numerus="yes">

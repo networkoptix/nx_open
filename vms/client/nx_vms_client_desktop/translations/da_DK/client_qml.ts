@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation>LDAP - Avancerede indstillinger</translation>
+      <translation>LDAP - Avancerede Indstillinger</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation>Log Ind Attribut</translation>
+      <translation>Login-attribut</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -60,7 +60,7 @@
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation>Synkroniserings Interval</translation>
+      <translation>Synkroniserings interval</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
@@ -678,7 +678,7 @@ Vælg en Integration for at begynde at konfigurere dens parametre.</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation>360° ligerektangulær</translation>
+      <translation>360° lige rektangulær</translation>
     </message>
   </context>
   <context>
@@ -2281,7 +2281,7 @@ Tryk på Alt + klik for at følge objektet</translation>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation>Fjern tilladelsen %1</translation>
+      <translation>Fjern %1 tilladelse</translation>
     </message>
     <message>
       <source>Also inherits it from</source>
@@ -2889,7 +2889,7 @@ Tryk på Alt + klik for at følge objektet</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation>Du skal kun angive brugeren&apos;s e-mailadresse.</translation>
+      <translation>Du skal kun angive bruger&apos;s e-mail-adresse.</translation>
     </message>
     <message>
       <source>Permission Groups</source>

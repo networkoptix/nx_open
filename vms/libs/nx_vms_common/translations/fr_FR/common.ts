@@ -1154,7 +1154,7 @@
       <comment>Numerus: Full suffix for displaying milliseconds</comment>
       <translation>
         <numerusform>milliseconde</numerusform>
-        <numerusform>millisecondes</numerusform>
+        <numerusform>milliseconde</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1162,14 +1162,14 @@
       <comment>Numerus: Full suffix for displaying seconds</comment>
       <translation>
         <numerusform>seconde</numerusform>
-        <numerusform>secondes</numerusform>
+        <numerusform>seconde</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Numerus: Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>minutes</numerusform>
+        <numerusform>minute</numerusform>
         <numerusform>minute</numerusform>
       </translation>
     </message>
@@ -1177,7 +1177,7 @@
       <source>hours</source>
       <comment>Numerus: Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>heures</numerusform>
+        <numerusform>heure</numerusform>
         <numerusform>heure</numerusform>
       </translation>
     </message>
@@ -1185,8 +1185,8 @@
       <source>days</source>
       <comment>Numerus: Full suffix for displaying days</comment>
       <translation>
-        <numerusform>jours</numerusform>
-        <numerusform>jours</numerusform>
+        <numerusform>jour</numerusform>
+        <numerusform>jour</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1236,7 +1236,7 @@
     <message>
       <source>Days</source>
       <comment>Numerus: Capitalized long suffix for displaying days</comment>
-      <translation>Jours</translation>
+      <translation>Jour</translation>
     </message>
     <message>
       <source>Wks</source>
@@ -1257,7 +1257,7 @@
       <source>Milliseconds</source>
       <comment>Numerus: Capitalized full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>Milliseconde</numerusform>
+        <numerusform>Millisecondes</numerusform>
         <numerusform>Millisecondes</numerusform>
       </translation>
     </message>
@@ -1265,7 +1265,7 @@
       <source>Seconds</source>
       <comment>Numerus: Capitalized full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>Seconde</numerusform>
+        <numerusform>Secondes</numerusform>
         <numerusform>Secondes</numerusform>
       </translation>
     </message>
@@ -1281,7 +1281,7 @@
       <source>Hours</source>
       <comment>Numerus: Capitalized full suffix for displaying hours</comment>
       <translation>
-        <numerusform>Heure</numerusform>
+        <numerusform>Heures</numerusform>
         <numerusform>Heures</numerusform>
       </translation>
     </message>
@@ -1297,7 +1297,7 @@
       <source>Weeks</source>
       <comment>Numerus: Capitalized full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>Semaine</numerusform>
+        <numerusform>Semaines</numerusform>
         <numerusform>Semaines</numerusform>
       </translation>
     </message>
@@ -1313,7 +1313,7 @@
       <source>Years</source>
       <comment>Numerus: Capitalized full suffix for displaying years</comment>
       <translation>
-        <numerusform>Année</numerusform>
+        <numerusform>Années</numerusform>
         <numerusform>Années</numerusform>
       </translation>
     </message>

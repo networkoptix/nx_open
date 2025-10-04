@@ -1119,7 +1119,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Custom</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
@@ -1440,7 +1440,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Cannot deactivate licenses</numerusform>
         <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
@@ -1505,7 +1505,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>File name must not contain the following reserved characters:</numerusform>
         <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
@@ -5184,7 +5184,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>PC %1 - Displays %2</numerusform>
         <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
@@ -8911,7 +8911,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Deactivate licenses?</numerusform>
         <numerusform>Deactivate licenses?</numerusform>
       </translation>
@@ -11844,7 +11844,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Selected file formats are not supported</numerusform>
         <numerusform>Selected file formats are not supported</numerusform>
       </translation>
@@ -11852,7 +11852,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Selected files do not have timestamps</numerusform>
         <numerusform>Selected files do not have timestamps</numerusform>
       </translation>
@@ -11860,7 +11860,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Selected files are too old</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Selected files are too old</numerusform>
         <numerusform>Selected files are too old</numerusform>
       </translation>
@@ -11868,7 +11868,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
       </translation>
@@ -11884,7 +11884,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>
@@ -11892,7 +11892,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Some footage may be deleted after uploading these files</numerusform>
         <numerusform>Some footage may be deleted after uploading these files</numerusform>
       </translation>
@@ -11900,7 +11900,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
         <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
       </translation>

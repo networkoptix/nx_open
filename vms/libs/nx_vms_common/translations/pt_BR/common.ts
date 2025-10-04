@@ -1161,24 +1161,24 @@
       <source>seconds</source>
       <comment>Numerus: Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>segundo</numerusform>
-        <numerusform>segundo</numerusform>
+        <numerusform>segundos</numerusform>
+        <numerusform>segundos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Numerus: Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>minuto</numerusform>
-        <numerusform>minuto</numerusform>
+        <numerusform>minutos</numerusform>
+        <numerusform>minutos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Numerus: Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>hora</numerusform>
-        <numerusform>hora</numerusform>
+        <numerusform>horas</numerusform>
+        <numerusform>horas</numerusform>
       </translation>
     </message>
     <message numerus="yes">

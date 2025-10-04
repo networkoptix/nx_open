@@ -693,7 +693,7 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation>Hapus</translation>
     </message>
   </context>
   <context>

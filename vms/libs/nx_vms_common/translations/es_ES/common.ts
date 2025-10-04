@@ -1161,8 +1161,8 @@
       <source>seconds</source>
       <comment>Numerus: Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>segundos</numerusform>
-        <numerusform>segundos</numerusform>
+        <numerusform>segundo</numerusform>
+        <numerusform>segundo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1256,17 +1256,17 @@
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Numerus: Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Milisegundos</numerusform>
-        <numerusform>Milliseconds</numerusform>
+        <numerusform>Milisegundos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Numerus: Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Segundos</numerusform>
-        <numerusform>Seconds</numerusform>
+        <numerusform>Segundos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1280,9 +1280,9 @@
     <message numerus="yes">
       <source>Hours</source>
       <comment>Numerus: Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Horas</numerusform>
-        <numerusform>Hours</numerusform>
+        <numerusform>Horas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1296,25 +1296,25 @@
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Numerus: Capitalized full suffix for displaying weeks</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Semanas</numerusform>
-        <numerusform>Weeks</numerusform>
+        <numerusform>Semanas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Months</source>
       <comment>Numerus: Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Meses</numerusform>
-        <numerusform>Months</numerusform>
+        <numerusform>Meses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Numerus: Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Años</numerusform>
-        <numerusform>Years</numerusform>
+        <numerusform>Años</numerusform>
       </translation>
     </message>
   </context>

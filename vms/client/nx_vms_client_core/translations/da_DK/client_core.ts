@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Invalid login or password</source>
-      <translation>Ugyldig brugernavn eller adgangskode</translation>
+      <translation>Ugyldigt login eller adgangskode</translation>
     </message>
     <message>
       <source>Incorrect username or password.</source>
@@ -90,15 +90,15 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>For mange forsøg. Prøv igen senere.</translation>
+      <translation>For mange forsøg. Prøv igen om et minut.</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
-      <translation>Kompatibilitetstilstand for versioner lavere end %1 understøttes ikke.</translation>
+      <translation>Kompatibilitetstilstand for versioner ældre end %1 understøttes ikke.</translation>
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation>Intern fejl, prøv igen senere.</translation>
+      <translation>Intern fejl. Prøv igen senere.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation>Forbindelse til serveren kunne ikke etableres. Prøv igen senere.</translation>
+      <translation>Forbindelse til serveren kunne ikke oprettes. Prøv igen senere.</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -116,7 +116,7 @@
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Log venligst ind på %1 igen.</translation>
+      <translation>Log ind på %1 igen.</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
-      <translation>Tofaktorgodkendelseskode krævet.</translation>
+      <translation>To-faktor autentificering er påkrævet.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
@@ -211,15 +211,15 @@
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation>Servercertifikat er ugyldigt.</translation>
+      <translation>Servercertifikatet er ugyldigt.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation>Opretter forbindelse til %1 for første gang?</translation>
+      <translation>Forbinder du til %1 for første gang?</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation>hjælpeartikel</translation>
+      <translation>hjælp artikel</translation>
     </message>
     <message>
       <source>Read this %1 to learn more about certificate validation.</source>
@@ -294,7 +294,7 @@
     <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation>Eksempelformat for inputenheden %1 understøttes ikke.</translation>
+      <translation>Eksempel format for inputenheden %1 understøttes ikke.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>

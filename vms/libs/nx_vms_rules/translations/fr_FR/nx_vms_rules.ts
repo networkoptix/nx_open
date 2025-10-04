@@ -305,7 +305,7 @@
       <source>Selected devices were removed</source>
       <comment>Numerus form depend on devices count</comment>
       <translation>
-        <numerusform>L'appareil sélectionné a été supprimé</numerusform>
+        <numerusform>Les appareils sélectionnés ont été supprimés</numerusform>
         <numerusform>Les appareils sélectionnés ont été supprimés</numerusform>
       </translation>
     </message>
@@ -313,7 +313,7 @@
       <source>Selected cameras were removed</source>
       <comment>Numerus form depend on cameras count</comment>
       <translation>
-        <numerusform>La caméra sélectionnée a été supprimée</numerusform>
+        <numerusform>Les caméras sélectionnées ont été supprimées</numerusform>
         <numerusform>Les caméras sélectionnées ont été supprimées</numerusform>
       </translation>
     </message>
@@ -321,7 +321,7 @@
       <source>Selected servers were removed</source>
       <comment>Numerus form depend on servers count</comment>
       <translation>
-        <numerusform>Le serveur sélectionné a été supprimé</numerusform>
+        <numerusform>Les serveurs sélectionnés ont été supprimés</numerusform>
         <numerusform>Les serveurs sélectionnés ont été supprimés</numerusform>
       </translation>
     </message>
@@ -329,7 +329,7 @@
       <source>Selected layouts were removed</source>
       <comment>Numerus form depend on layouts count</comment>
       <translation>
-        <numerusform>La mise en page sélectionnée a été supprimée</numerusform>
+        <numerusform>Les mises en page sélectionnées ont été supprimées</numerusform>
         <numerusform>Les mises en page sélectionnées ont été supprimées</numerusform>
       </translation>
     </message>
@@ -670,14 +670,14 @@
       <comment>Numerus form depends on the amount of invalid headers</comment>
       <translation>
         <numerusform>Certain en-tête n'est pas valide</numerusform>
-        <numerusform>Certains en-têtes ne sont pas valides</numerusform>
+        <numerusform>Certain en-tête n'est pas valide</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
       <comment>Numerus form depends on the total amount of headers</comment>
       <translation>
-        <numerusform>L'en-tête n'est pas valide</numerusform>
+        <numerusform>Tous les en-têtes ne sont pas valides</numerusform>
         <numerusform>Tous les en-têtes ne sont pas valides</numerusform>
       </translation>
     </message>
