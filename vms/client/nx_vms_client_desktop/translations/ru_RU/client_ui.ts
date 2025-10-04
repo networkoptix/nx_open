@@ -342,7 +342,7 @@
     </message>
     <message>
       <source>seconds</source>
-      <translation>секунд</translation>
+      <translation>сек</translation>
     </message>
     <message>
       <source>Tags:</source>
@@ -492,7 +492,7 @@
     </message>
     <message>
       <source>seconds</source>
-      <translation>секунд</translation>
+      <translation>сек</translation>
     </message>
   </context>
   <context>

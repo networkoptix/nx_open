@@ -1159,24 +1159,24 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>ميلي ثانيه</numerusform>
-        <numerusform>ميلي ثانيه</numerusform>
-        <numerusform>ميلي ثانيه</numerusform>
-        <numerusform>ميلي ثانيه</numerusform>
-        <numerusform>ميلي ثانيه</numerusform>
-        <numerusform>ميلي ثانيه</numerusform>
+        <numerusform>مللي ثانية</numerusform>
+        <numerusform>مللي ثانية</numerusform>
+        <numerusform>مللي ثانية</numerusform>
+        <numerusform>مللي ثانية</numerusform>
+        <numerusform>مللي ثانية</numerusform>
+        <numerusform>مللي ثانية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>ثوانٍ</numerusform>
-        <numerusform>ثوانٍ</numerusform>
-        <numerusform>ثوانٍ</numerusform>
-        <numerusform>ثوانٍ</numerusform>
-        <numerusform>ثوانٍ</numerusform>
-        <numerusform>ثوانٍ</numerusform>
+        <numerusform>seconds</numerusform>
+        <numerusform>seconds</numerusform>
+        <numerusform>seconds</numerusform>
+        <numerusform>seconds</numerusform>
+        <numerusform>seconds</numerusform>
+        <numerusform>seconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">

@@ -76,7 +76,7 @@
     </message>
     <message>
       <source>Of Type</source>
-      <translation>Af Typen</translation>
+      <translation>Af typen</translation>
     </message>
     <message>
       <source>And Object</source>
@@ -389,7 +389,7 @@
     </message>
     <message>
       <source>And Caption</source>
-      <translation>Og Billedtekst</translation>
+      <translation>Og billedtekst</translation>
     </message>
     <message>
       <source>And Description</source>
@@ -477,7 +477,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation>Begynd Når</translation>
+      <translation>Start Når</translation>
     </message>
     <message>
       <source>Occurs at</source>
@@ -584,7 +584,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>Handlingsinterval</translation>
+      <translation>Interval af handling</translation>
     </message>
   </context>
   <context>
@@ -603,7 +603,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>Handlingsinterval</translation>
+      <translation>Interval af handling</translation>
     </message>
   </context>
   <context>
@@ -637,7 +637,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>Handlingsinterval</translation>
+      <translation>Interval af handling</translation>
     </message>
   </context>
   <context>
@@ -656,7 +656,7 @@
     </message>
     <message>
       <source>And Caption</source>
-      <translation>Og Billedtekst</translation>
+      <translation>Og billedtekst</translation>
     </message>
     <message>
       <source>And Description</source>
@@ -692,7 +692,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation>Begynd Når</translation>
+      <translation>Start Når</translation>
     </message>
   </context>
   <context>
@@ -711,7 +711,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>Handlingsinterval</translation>
+      <translation>Interval af handling</translation>
     </message>
     <message>
       <source>Execute to users</source>
@@ -742,7 +742,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>Handlingsinterval</translation>
+      <translation>Interval af handling</translation>
     </message>
   </context>
   <context>
@@ -832,7 +832,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>Handlingsinterval</translation>
+      <translation>Interval af handling</translation>
     </message>
   </context>
   <context>

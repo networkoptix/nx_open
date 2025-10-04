@@ -170,7 +170,7 @@
     </message>
     <message>
       <source>Detected by</source>
-      <translation>에 의해 감지됨</translation>
+      <translation>감지됨</translation>
     </message>
   </context>
   <context>

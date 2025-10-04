@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>GPU Information</source>
-      <translation>Information</translation>
+      <translation>GPU Information</translation>
     </message>
     <message>
       <source>Support</source>
@@ -40,7 +40,7 @@
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation>Billedforbedring:</translation>
+      <translation>Billedforbedring</translation>
     </message>
     <message>
       <source>Enable image enhancement</source>
@@ -276,7 +276,7 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation>Ingen grænse</translation>
+      <translation>Ingen Grænse</translation>
     </message>
     <message>
       <source>Fixed</source>
@@ -323,11 +323,11 @@
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation>Spring over den aktuelle kø</translation>
+      <translation>Spring Aktuel Kø Over</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation>Alle filer er sikkerhedskopieret! Nye filer sikkerhedskopieres automatisk</translation>
+      <translation>Alle filer er sikkerhedskopieret succesfuldt! Nye filer vil automatisk blive sikkerhedskopieret</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Nulstil Filter</translation>
+      <translation>Nulstil filter</translation>
     </message>
   </context>
   <context>

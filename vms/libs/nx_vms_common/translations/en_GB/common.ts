@@ -1000,7 +1000,7 @@
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
         <numerusform>millisecond</numerusform>
-        <numerusform>milliseconds</numerusform>
+        <numerusform>millisecond</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1023,7 +1023,7 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>hour</numerusform>
+        <numerusform>hours</numerusform>
         <numerusform>hours</numerusform>
       </translation>
     </message>
@@ -1031,7 +1031,7 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>day</numerusform>
+        <numerusform>days</numerusform>
         <numerusform>days</numerusform>
       </translation>
     </message>
@@ -1039,7 +1039,7 @@
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>week</numerusform>
+        <numerusform>weeks</numerusform>
         <numerusform>weeks</numerusform>
       </translation>
     </message>
@@ -1047,7 +1047,7 @@
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform>month</numerusform>
+        <numerusform>months</numerusform>
         <numerusform>months</numerusform>
       </translation>
     </message>
@@ -1055,7 +1055,7 @@
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>year</numerusform>
+        <numerusform>years</numerusform>
         <numerusform>years</numerusform>
       </translation>
     </message>

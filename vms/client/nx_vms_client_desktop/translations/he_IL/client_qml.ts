@@ -627,7 +627,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation>מחיקה</translation>
+      <translation>מחק</translation>
     </message>
   </context>
   <context>

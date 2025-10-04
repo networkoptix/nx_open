@@ -609,7 +609,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation>Hapus</translation>
     </message>
   </context>
   <context>
@@ -1428,7 +1428,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation>Membuat baru...</translation>
+      <translation>Membuat Baru...</translation>
     </message>
     <message>
       <source>Settings</source>

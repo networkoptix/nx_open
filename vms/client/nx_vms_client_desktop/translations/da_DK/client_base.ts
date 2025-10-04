@@ -65,17 +65,17 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 Bruges</numerusform>
-        <numerusform>Form: Anden</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 are used</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 er obligatorisk</numerusform>
-        <numerusform>%1 er påkrævet</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 are required</numerusform>
       </translation>
     </message>
   </context>
@@ -943,9 +943,9 @@
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation>
-        <numerusform>Vis på elementer</numerusform>
-        <numerusform>Vis på elementer</numerusform>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
       </translation>
     </message>
     <message>
@@ -1102,16 +1102,16 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation>
-        <numerusform>Form: Anden</numerusform>
-        <numerusform>Form: Anden</numerusform>
+      <translation type="unfinished">
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation>
-        <numerusform>Form: Anden</numerusform>
-        <numerusform>Form: Anden</numerusform>
+      <translation type="unfinished">
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
       </translation>
     </message>
     <message>
@@ -1543,9 +1543,9 @@ Licensnøgle: %2</translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Kan ikke deaktivere licenser</numerusform>
-        <numerusform>Kan ikke deaktivere licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
     <message>
@@ -1635,9 +1635,9 @@ Licensnøgle: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation>
-        <numerusform>Form: Anden:</numerusform>
-        <numerusform>Form: Anden:</numerusform>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>
@@ -2639,7 +2639,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Kameraer</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -4284,7 +4284,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>Indtast din adgangskode til kontoen</translation>
+      <translation>Indtast adgangskoden til din konto</translation>
     </message>
     <message>
       <source>Save</source>
@@ -4925,9 +4925,9 @@ Licensnøgle: %2</translation>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation>
-        <numerusform>Certifikater</numerusform>
-        <numerusform>Certifikater</numerusform>
+      <translation type="unfinished">
+        <numerusform>Certificates</numerusform>
+        <numerusform>Certificates</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5390,11 +5390,11 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation>Netværksdelt ressource</translation>
+      <translation>Netværk Delt Ressource</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
-      <translation>Ugyldige login oplysninger til ekstern lagring</translation>
+      <translation>Ugyldige legitimationsoplysninger for eksternt lager</translation>
     </message>
     <message>
       <source>Invalid storage path</source>
@@ -5406,7 +5406,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Storage path used by another server</source>
-      <translation>Lagringssti brugt af en anden server</translation>
+      <translation>Lagersti brugt af en anden server</translation>
     </message>
     <message>
       <source>Add Storage</source>
@@ -5414,7 +5414,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
-      <translation>Det anbefales ikke at bruge én optagelsesplacering til forskellige servere.</translation>
+      <translation>Det anbefales ikke at bruge én optagelsesplacering for forskellige servere.</translation>
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
@@ -5480,7 +5480,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <name>QnSystemHealthStringsHelper</name>
     <message>
       <source>Email address is not set</source>
-      <translation>E-mail adressen er ikke angivet</translation>
+      <translation>E-mailadressen er ikke angivet</translation>
     </message>
     <message>
       <source>No licenses</source>
@@ -5488,7 +5488,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Email server is not set</source>
-      <translation>E-mail serveren er ikke indstillet</translation>
+      <translation>E-mailserveren er ikke indstillet</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
@@ -5508,11 +5508,11 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Email address is not set.</source>
-      <translation>E-mail adressen er ikke angivet.</translation>
+      <translation>E-mailadressen er ikke angivet.</translation>
     </message>
     <message>
       <source>Email server is not set.</source>
-      <translation>E-mail serveren er ikke indstillet.</translation>
+      <translation>E-mailserveren er ikke indstillet.</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
@@ -5540,7 +5540,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation>Nogle brugere har ikke angivet deres e-mail adresser</translation>
+      <translation>Nogle brugere har ikke angivet deres e-mailadresser</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
@@ -5548,7 +5548,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>Nogle brugere har ikke angivet deres e-mail adresser.</translation>
+      <translation>Nogle brugere har ikke angivet deres e-mailadresser.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
@@ -5578,7 +5578,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation>Ingen server har internetadgang til tids synkronisering</translation>
+      <translation>Ingen server har internetadgang til tidssynkronisering</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
@@ -5602,11 +5602,11 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation>Lagring til analyse data er ikke angivet</translation>
+      <translation>Lagring til analysedata er ikke angivet</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation>Systemlagring bruges til analyse data</translation>
+      <translation>Systemlagring bruges til analysedata</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -5618,15 +5618,15 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Local recording services overused</source>
-      <translation>Lokale registrerings tjenester overbrugt</translation>
+      <translation>Lokale optagelsestjenester overbrugt</translation>
     </message>
     <message>
       <source>Cloud storage services overused</source>
-      <translation>Overbrugte cloud lagrings tjenester</translation>
+      <translation>Overbrugte cloud lagringstjenester</translation>
     </message>
     <message>
       <source>Paid integrations services overused</source>
-      <translation>Betalte integrations tjenester overudnyttes</translation>
+      <translation>Betalt integrationstjenester overbrugt</translation>
     </message>
     <message>
       <source>System suspended</source>
@@ -5642,7 +5642,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Intercom missed call</source>
-      <translation>Intercom opkald mistet</translation>
+      <translation>Intercom ubesvarede opkald</translation>
     </message>
   </context>
   <context>
@@ -5665,11 +5665,11 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation>Aktivér automatisk registrering af enheder og servere samt automatisk kontrol af enheds status</translation>
+      <translation>Aktivér automatisk registrering af enheder og servere samt automatisk kontrol af enhedsstatus</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation>Aktivér automatisk registrering af kameraer og servere samt automatisk kontrol af kamera status</translation>
+      <translation>Aktivér automatisk registrering af kameraer og servere samt automatisk kontrol af kamerastatus</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
@@ -5696,7 +5696,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation>Regnearks fil (CSV)</translation>
+      <translation>Regnearksfil (CSV)</translation>
     </message>
   </context>
   <context>
@@ -5733,7 +5733,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Custom access rights</source>
-      <translation>Brugerdefinerede adgangs rettigheder</translation>
+      <translation>Brugerdefinerede adgangsrettigheder</translation>
     </message>
   </context>
   <context>
@@ -5744,7 +5744,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Email is not valid</source>
-      <translation>E-mail adressen er ikke gyldig</translation>
+      <translation>E-mailadressen er ikke gyldig</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -5794,9 +5794,9 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation>
-        <numerusform>PC %1 - Skærme %2</numerusform>
-        <numerusform>PC %1 - Skærme %2</numerusform>
+      <translation type="unfinished">
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5899,11 +5899,11 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
       <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation>Skærm optagelses systemet er ikke initialiseret endnu. Prøv igen senere.</translation>
+      <translation>Skærmoptagelse af delsystemet er endnu ikke initialiseret. Prøv igen senere.</translation>
     </message>
     <message>
       <source>Recording in %1...</source>
-      <translation>Optagelse i %1...</translation>
+      <translation>Optager i %1...</translation>
     </message>
     <message>
       <source>Recorded Video</source>
@@ -5919,7 +5919,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation>AVI (Lyd/Video Interleaved)</translation>
+      <translation>AVI (Lyd/Video-Interleaved)</translation>
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
@@ -6051,16 +6051,16 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation>
-        <numerusform>Du kan ikke tilføje enheder til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
-        <numerusform>Du kan ikke tilføje enheder til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
+      <translation type="unfinished">
+        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation>
-        <numerusform>Du kan ikke tilføje kameraer til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
-        <numerusform>Du kan ikke tilføje kameraer til videovæggen, som du ikke har tilladelse til at se live.</numerusform>
+      <translation type="unfinished">
+        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
       </translation>
     </message>
     <message>
@@ -6084,7 +6084,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation>Åbn virtuelle kameraoptagelser...</translation>
+      <translation>Åbn Virtuelle Kameraoptagelser...</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
@@ -6100,9 +6100,9 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation>
-        <numerusform>Valgte filformater understøttes ikke</numerusform>
-        <numerusform>Valgte filformater understøttes ikke</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
       </translation>
     </message>
     <message>
@@ -6111,9 +6111,9 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>Valgte filer har ikke tidsstempler</numerusform>
-        <numerusform>Valgte filer har ikke tidsstempler</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
       </translation>
     </message>
     <message>
@@ -6122,49 +6122,49 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation>
-        <numerusform>De valgte filer er for gamle</numerusform>
-        <numerusform>De valgte filer er for gamle</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
-        <numerusform>Den valgte fil blev optaget den %1, men kun filer, der blev optaget inden for de sidste %n dage, kan uploades. Du kan ændre dette i kameraets arkivindstillinger.</numerusform>
-        <numerusform>Den valgte fil blev optaget den %1, men kun filer, der blev optaget inden for de sidste %n dage, kan uploades. Du kan ændre dette i kameraets arkivindstillinger.</numerusform>
+        <numerusform>Den valgte fil blev optaget på %1, men kun filer, der blev optaget i de sidste %n dage, kan uploades. Du kan ændre dette i kameraets arkivindstillinger.</numerusform>
+        <numerusform>Den valgte fil blev optaget på %1, men kun filer, der blev optaget i de sidste %n dage, kan uploades. Du kan ændre dette i kameraets arkivindstillinger.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
-        <numerusform>Udvalgte filer blev optaget mellem %1 og %2, men kun filer, der blev optaget inden for de sidste %n dage, kan uploades. Du kan ændre dette i kameraets arkivindstillinger.</numerusform>
-        <numerusform>Udvalgte filer blev optaget mellem %1 og %2, men kun filer, der blev optaget inden for de sidste %n dage, kan uploades. Du kan ændre dette i kameraets arkivindstillinger.</numerusform>
+        <numerusform>Valgte filer blev optaget mellem %1 og %2, men kun filer der blev registreret i de sidste %n dage kan uploades. Du kan ændre dette i kameraets arkivindstillinger.</numerusform>
+        <numerusform>Valgte filer blev optaget mellem %1 og %2, men kun filer der blev registreret i de sidste %n dage kan uploades. Du kan ændre dette i kameraets arkivindstillinger.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation>
-        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede uploades</numerusform>
-        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede uploades</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>Du kan uploade disse filer til en anden instans af et virtuelt kamera.</numerusform>
-        <numerusform>Du kan uploade disse filer til en anden instans af et virtuelt kamera.</numerusform>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede er blevet uploadet</numerusform>
-        <numerusform>Udvalgte filer dækker perioder, hvor videoer allerede er blevet uploadet</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation>Ikke nok plads på serverlageret</translation>
+      <translation>Ikke nok plads på serverlager</translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
@@ -6180,33 +6180,33 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>Nogle optagelser kan blive slettet efter upload af disse filer</numerusform>
-        <numerusform>Nogle optagelser kan blive slettet efter upload af disse filer</numerusform>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>Der er ikke meget ledig plads tilbage på serverens lagerplads. Nogle gamle optagelser kan blive slettet for at frigøre plads. Bemærk, at hvis de valgte filer tilfældigvis er de ældste på serveren, vil de blive slettet umiddelbart efter upload.</numerusform>
-        <numerusform>Der er ikke meget ledig plads tilbage på serverens lagerplads. Nogle gamle optagelser kan blive slettet for at frigøre plads. Bemærk, at hvis de valgte filer tilfældigvis er de ældste på serveren, vil de blive slettet umiddelbart efter upload.</numerusform>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>For at forhindre dette kan du tilføje ekstra lagerplads. Du kan også kontrollere, hvilke optagelser der slettes først, ved at ændre arkivets opbevaringstid i kameraindstillingerne.</translation>
+      <translation>For at forhindre dette kan du tilføje ekstra lagring. Du kan også styre, hvilke optagelser vil blive slettet først ved at ændre arkiv holde tid i kameraindstillinger.</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation>Uploade alligevel?</translation>
+      <translation>Upload alligevel?</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>Kunne ikke starte upload, da bruger &quot;%1&quot; i øjeblikket uploader optagelser til dette kamera.</translation>
+      <translation>Kunne ikke starte upload da bruger &quot;%1&quot; i øjeblikket uploader optagelser til dette kamera.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation>Kunne ikke starte upload, da en anden bruger i øjeblikket uploader optagelser til dette kamera.</translation>
+      <translation>Kunne ikke starte upload da en anden bruger i øjeblikket uploader optagelser til dette kamera.</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
@@ -6214,21 +6214,21 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
-      <translation>Sørg for, at der er nok plads på serverens lagerplads.</translation>
+      <translation>Sørg for, at der er nok plads på serverlagring.</translation>
     </message>
     <message>
       <source>Uploading footage</source>
-      <translation>Upload af optagelser</translation>
+      <translation>Uploader optagelser</translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 har et ikke understøttet format.</translation>
+      <translation>%1 har ikke understøttet format.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 har ikke et tidsstempel.</translation>
+      <translation>%1 har ikke tidsstempel.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
@@ -6436,9 +6436,9 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation>
-        <numerusform>Du er ved at flytte disse websider til Server &quot;%1&quot;. Disse websider proxyer alt anmodet indhold, og deres proxyserver vil ændres til Server &quot;%1&quot;.</numerusform>
-        <numerusform>Du er ved at flytte disse websider til Server &quot;%1&quot;. Disse websider proxyer alt anmodet indhold, og deres proxyserver vil ændres til Server &quot;%1&quot;.</numerusform>
+      <translation type="unfinished">
+        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6462,9 +6462,9 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
-      <translation>
-        <numerusform>Disse layouts deles med andre brugere, så de slettes også for deres konti.</numerusform>
-        <numerusform>Disse layouts deles med andre brugere, så de slettes også for deres konti.</numerusform>
+      <translation type="unfinished">
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7604,13 +7604,13 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation>Brugerdefineret nummer, der kan tildeles et kamera til hurtig identifikation og adgang</translation>
+      <translation>Brugerdefineret nummer, der kan tildeles et kamera for hurtig identifikation og adgang</translation>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
       <translation>
-        <numerusform>Dette ID er allerede brugt på følgende %n kameraer:</numerusform>
-        <numerusform>Dette ID er allerede brugt på følgende %n kameraer:</numerusform>
+        <numerusform>Dette ID bruges allerede på følgende %n kameraer:</numerusform>
+        <numerusform>Dette ID bruges allerede på følgende %n kameraer:</numerusform>
       </translation>
     </message>
     <message>
@@ -8084,9 +8084,9 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
-        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
+      <translation type="unfinished">
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8098,9 +8098,9 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
-        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
+      <translation type="unfinished">
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
       </translation>
     </message>
     <message>
@@ -8335,7 +8335,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
-      <translation>Kunne ikke forbinde til serveren. Videovæggen vil blive lukket.</translation>
+      <translation>Kunne ikke oprette forbindelse til serveren. Videovæggen vil blive lukket.</translation>
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
@@ -8485,11 +8485,11 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
-      <translation>Optagelse kan ikke aktiveres for visse kameraer.</translation>
+      <translation>Optagelse kan ikke aktiveres for nogle kameraer.</translation>
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
-      <translation>Planlægningsindstillinger er ikke kompatible med visse enheder.</translation>
+      <translation>Planlægnings indstillinger er ikke kompatible med visse enheder.</translation>
     </message>
     <message>
       <source>Copy archive length settings</source>
@@ -8501,7 +8501,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Recording will not be enabled on some cameras.</source>
-      <translation>Optagelse vil ikke være aktiveret på alle kameraer.</translation>
+      <translation>Optagelse vil ikke blive aktiveret på nogle kameraer.</translation>
     </message>
   </context>
   <context>
@@ -8581,7 +8581,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Could not find video encoder %1.</source>
-      <translation>Kunne ikke finde video encoderen %1.</translation>
+      <translation>Kunne ikke finde video encoder %1.</translation>
     </message>
     <message>
       <source>Screen width must be a multiple of 8.</source>
@@ -8597,11 +8597,11 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>Kunne ikke initialisere lydenheden &quot;%1&quot;.</translation>
+      <translation>Kunne ikke initialisere lydenhed &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
-      <translation>Kunne ikke starte den primære lydenhed.</translation>
+      <translation>Kunne ikke starte primær lydenhed.</translation>
     </message>
   </context>
   <context>
@@ -8639,7 +8639,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Scan</source>
-      <translation>Skan</translation>
+      <translation>Scan</translation>
     </message>
     <message>
       <source>Search</source>
@@ -8680,8 +8680,8 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
       <translation>
-        <numerusform>%n enheder tilføjes. Du kan lukke denne dialogboks eller starte en ny søgning</numerusform>
-        <numerusform>%n enheder tilføjes. Du kan lukke denne dialogboks eller starte en ny søgning</numerusform>
+        <numerusform>%n enheder tilføjes. Du kan lukke denne dialog eller starte en ny søgning</numerusform>
+        <numerusform>%n enheder tilføjes. Du kan lukke denne dialog eller starte en ny søgning</numerusform>
       </translation>
     </message>
     <message>
@@ -8723,11 +8723,11 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation>Gennemgå og accepter venligst %1 for at fortsætte</translation>
+      <translation>Gennemgå og acceptere %1 for at fortsætte</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation>For at bruge softwaren skal du acceptere slutbruger licensaftalen</translation>
+      <translation>For at bruge softwaren skal du acceptere slut bruger licens aftalen</translation>
     </message>
   </context>
   <context>
@@ -8805,7 +8805,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Target</source>
-      <translation>Destination</translation>
+      <translation>Lokation</translation>
     </message>
     <message>
       <source>Description</source>
@@ -9348,7 +9348,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation>Brugerdefineret nummer, der kan tildeles et layout for hurtig identifikation og adgang</translation>
+      <translation>Tilpasset nummer, der kan tildeles til et layout til hurtig identifikation og adgang</translation>
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
@@ -9425,7 +9425,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
-      <translation>Det ser ud til, at du har skiftet LDAP server. Det anbefales at fjerne alle eksisterende LDAP brugere og grupper, før du importerer brugere og grupper fra en ny LDAP server.</translation>
+      <translation>Det ser ud som om du har ændret LDAP server. Det anbefales at fjerne alle eksisterende LDAP-brugere og grupper, før du importerer brugere og grupper fra en ny LDAP server.</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -9441,7 +9441,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Synchronize LDAP Users and Groups</source>
-      <translation>Synkroniser LDAP brugere og grupper</translation>
+      <translation>Synkroniser LDAP brugere og -grupper</translation>
     </message>
     <message>
       <source>Synchronize</source>
@@ -9484,17 +9484,17 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 er i brug</numerusform>
-        <numerusform>%1 er i brug</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 are currently in use</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Mindst %1 er påkrævet</numerusform>
-        <numerusform>Mindst %1 er påkrævet</numerusform>
+      <translation type="unfinished">
+        <numerusform>At least %1 are required</numerusform>
+        <numerusform>At least %1 are required</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -9506,9 +9506,9 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Deaktiver licenser?</numerusform>
-        <numerusform>Deaktiver licenser?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
     <message>
@@ -9563,8 +9563,8 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <message>
       <source>The selected Logging Level may not be collecting enough information.
 The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
-      <translation>Det valgte logningsniveau indsamler muligvis ikke nok information.
-Logningsniveauet &quot;%1&quot; vil give dig mere detaljerede oplysninger.</translation>
+      <translation>Det valgte lognings niveau indsamler muligvis ikke nok information.
+Logging Niveau &quot;%1&quot; vil give dig mere detaljeret information.</translation>
     </message>
     <message>
       <source>The selected Logging Level may degrade your system&apos;s performance.
@@ -9628,7 +9628,7 @@ Husk at returnere logningsniveauet til dets standardindstilling, når du har ind
     </message>
     <message>
       <source>Default Logging level</source>
-      <translation>Standard Lognings Niveau</translation>
+      <translation>Standard lognings niveau</translation>
     </message>
     <message>
       <source>Logging level degrades the performance of the system</source>
@@ -9636,7 +9636,7 @@ Husk at returnere logningsniveauet til dets standardindstilling, når du har ind
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
-      <translation>Ikke-standard Logging niveau. Vi anbefaler at indstille det til &quot;info&quot;</translation>
+      <translation>Ikke standard Logging niveau. Vi anbefaler at indstille det til &quot;info&quot;</translation>
     </message>
   </context>
   <context>
@@ -9714,7 +9714,7 @@ Husk at returnere logningsniveauet til dets standardindstilling, når du har ind
     <name>nx::vms::client::desktop::LookupListActionHandler</name>
     <message>
       <source>Network request failed</source>
-      <translation>Netværksanmodning mislykkedes</translation>
+      <translation>Netværks anmodning mislykkedes</translation>
     </message>
   </context>
   <context>
@@ -9729,7 +9729,7 @@ Husk at returnere logningsniveauet til dets standardindstilling, når du har ind
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-      <translation>Feltet Enhedsadresse skal indeholde et gyldigt URL, IP adresse eller RTSP link.</translation>
+      <translation>Feltet Enhedsadresse skal indeholde et gyldigt URL-, IP-adresse eller RTSP link.</translation>
     </message>
     <message>
       <source>First address in range is greater than the last one.</source>
@@ -9737,7 +9737,7 @@ Husk at returnere logningsniveauet til dets standardindstilling, når du har ind
     </message>
     <message>
       <source>The specified IP address range has more than 255 addresses.</source>
-      <translation>Det angivne IP adresse område har mere end 255 adresser.</translation>
+      <translation>Det angivne IP adresse interval har mere end 255 adresser.</translation>
     </message>
     <message>
       <source>Can not start the search process</source>
@@ -10182,7 +10182,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Ready to update to</source>
-      <translation>Klar til at opdatere</translation>
+      <translation>Klar til at opdatere til</translation>
     </message>
     <message>
       <source>System updated to</source>
@@ -10226,7 +10226,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation>Opdatering fra media servere</translation>
+      <translation>Opdater fra medie servere</translation>
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
@@ -10279,15 +10279,15 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>You cannot modify a user with a non-unique login</source>
-      <translation>Du kan ikke ændre en bruger med et ikke unikt login</translation>
+      <translation>Du kan ikke ændre en bruger med et ikke-unikt login</translation>
     </message>
     <message>
       <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
-      <translation>Du har muligvis ikke tilladelse til at ændre bestemte medlemmer af denne gruppe, eller den indeholder brugere med dublerede logins</translation>
+      <translation>Du har muligvis ikke tilladelse til at ændre visse medlemmer af denne gruppe, eller det omfatter brugere med duplikerede logins</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this group</source>
-      <translation>Du har ikke tilladelser til at ændre denne gruppe</translation>
+      <translation>Du har ikke tilladelse til at ændre denne gruppe</translation>
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the system is connected to LDAP server</source>
@@ -10343,7 +10343,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     <name>nx::vms::client::desktop::ObjectTrackingButton</name>
     <message>
       <source>Object tracking is ON</source>
-      <translation>Objekt sporing er TIL</translation>
+      <translation>Objektsporing er TIL</translation>
     </message>
   </context>
   <context>
@@ -10407,7 +10407,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation>Klar til at downloade opdateringen</translation>
+      <translation>Klar til at downloade opdatering</translation>
     </message>
     <message>
       <source>Downloading update</source>
@@ -10443,7 +10443,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation>Opdatering af indhold er ugyldigt.</translation>
+      <translation>Opdateringens indhold er ugyldigt.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
@@ -11016,7 +11016,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation>Dobbelt streaming er deaktiveret eller understøttes ikke</translation>
+      <translation>Dobbeltstreaming er deaktiveret eller understøttes ikke</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
@@ -11210,7 +11210,7 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
-      <translation>Vandmærker vil blive vist over live, arkiv og eksporterede videoer til ikke-superbrugere. Du og andre superbrugere vil ikke se dem.</translation>
+      <translation>Vandmærker vil blive vist over live, arkiv og eksporterede videoer til ikke-power-brugere. Du og andre power-brugere vil ikke se dem.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
@@ -11256,7 +11256,7 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation>Certifikatet genereres automatisk og fastgøres til %1</translation>
+      <translation>Certifikatet er auto-genereret og fastgjort til %1</translation>
     </message>
     <message>
       <source>Server ID: %1</source>
@@ -11265,8 +11265,8 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
-      <translation>Nogen kan udgive %1 til at stjæle dine personlige oplysninger.
-Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat.</translation>
+      <translation>Nogen udgiver sig muligvis for at være %1 for at stjæle dine personlige oplysninger.
+Pin ikke dette certifikat, hvis du ikke har ændret %2 Serverens SSL certifikat.</translation>
     </message>
     <message>
       <source>Custom Certificate</source>
@@ -11286,7 +11286,7 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
-      <translation>Kontakt en bruger med Administratorers tilladelser for at løse dette problem.</translation>
+      <translation>Kontakt en bruger med Administratorers rettigheder for at løse dette problem.</translation>
     </message>
     <message>
       <source>Not Part Of Certificate</source>
@@ -11313,9 +11313,9 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
-      <translation>
-        <numerusform>Jeg stoler på disse servere</numerusform>
-        <numerusform>Jeg stoler på disse servere</numerusform>
+      <translation type="unfinished">
+        <numerusform>I trust these servers</numerusform>
+        <numerusform>I trust these servers</numerusform>
       </translation>
     </message>
     <message>
@@ -11599,8 +11599,8 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
       <translation>
-        <numerusform>E-mail adressen er ikke angivet for %n brugere</numerusform>
-        <numerusform>E-mail adressen er ikke angivet for %n brugere</numerusform>
+        <numerusform>E-mailadressen er ikke angivet for %n brugere</numerusform>
+        <numerusform>E-mailadressen er ikke angivet for %n brugere</numerusform>
       </translation>
     </message>
     <message>
@@ -11648,8 +11648,8 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
       <translation>
-        <numerusform>Lagerplads til analysedata er ikke indstillet på %n Servere</numerusform>
-        <numerusform>Lagerplads til analysedata er ikke indstillet på %n Servere</numerusform>
+        <numerusform>Lagring til analysedata er ikke indstillet på %n servere</numerusform>
+        <numerusform>Lagring til analysedata er ikke indstillet på %n servere</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11701,9 +11701,9 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation>
-        <numerusform>Dobbeltklik for at tilføje kameraer til det aktuelle layout eller ctrl+klik for at åbne i en ny fane</numerusform>
-        <numerusform>Dobbeltklik for at tilføje kameraer til det aktuelle layout eller ctrl+klik for at åbne i en ny fane</numerusform>
+      <translation type="unfinished">
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
       </translation>
     </message>
     <message>
@@ -11994,7 +11994,7 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
-      <translation>LDAP server er offline. Brugere er ikke i stand til at logge ind.</translation>
+      <translation>LDAP-serveren er offline. Brugere kan ikke logge ind.</translation>
     </message>
     <message>
       <source>User is not found in the LDAP database.</source>
@@ -12121,7 +12121,7 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
-      <translation>Det anbefales ikke at give den midlertidige bruger brede tilladelser. Nogle handlinger virker muligvis ikke.</translation>
+      <translation>At give brede tilladelser til den midlertidige bruger anbefales ikke. Nogle handlinger virker måske ikke.</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended.</source>
@@ -12156,7 +12156,7 @@ Må ikke pin dette certifikat, hvis du ikke har ændret %2 Server SSL certifikat
     </message>
     <message>
       <source>Copy the Access Link and share it with intended user</source>
-      <translation>Kopier adgangs linket og del det med den tiltænkte bruger</translation>
+      <translation>Kopier Adgangs linket og del det med den tilsigtede bruger</translation>
     </message>
   </context>
   <context>
@@ -12693,11 +12693,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::rules::AnalyticsEventTypePicker</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Analyse hændelser kan konfigureres på bestemte kameraer.</translation>
+      <translation>Analysehændelser kan konfigureres på bestemte kameraer.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Vælg kameraer ved hjælp af knappen ovenfor for at se listen over understøttede begivenheder.</translation>
+      <translation>Vælg kameraer ved hjælp af knappen ovenfor for at se listen over understøttede hændelser.</translation>
     </message>
   </context>
   <context>
@@ -12908,7 +12908,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation>Leder du efter et lokalt layout? Vælg kun én bruger fra &quot;Vis til&quot; listen for at vise deres lokale layouts som en mulighed her.</translation>
+      <translation>Leder du efter et lokalt layout? Vælg kun én bruger fra listen &quot;Vis til&quot; for at vise deres lokale layouts som en mulighed her.</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners</source>
@@ -12948,7 +12948,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation>Indeholder listeposter</translation>
+      <translation>Indeholder liste poster</translation>
     </message>
     <message>
       <source>Does not contain list entries</source>
@@ -12967,7 +12967,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
     <message>
       <source>Lookup lists network request failed</source>
-      <translation>Anmodning om netværks søgning mislykkedes</translation>
+      <translation>Opslag lister netværksanmodning mislykkedes</translation>
     </message>
   </context>
   <context>
@@ -13125,7 +13125,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation>Interesse områder</translation>
+      <translation>Interesseområder</translation>
     </message>
     <message>
       <source>Hotspots</source>
@@ -13210,13 +13210,13 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation>Udfyld venligst følgende for deaktivering af licens</translation>
+      <translation>Udfyld venligst følgende for at deaktivere licensen</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation>
-        <numerusform>Bemærk, at hver licensnøgle kan deaktiveres maksimum af %n gange.</numerusform>
-        <numerusform>Bemærk, at hver licensnøgle kan deaktiveres maksimum af %n gange.</numerusform>
+        <numerusform>Bemærk at hver licensnøgle maksimalt kan deaktiveres %n gange.</numerusform>
+        <numerusform>Bemærk at hver licensnøgle maksimalt kan deaktiveres %n gange.</numerusform>
       </translation>
     </message>
   </context>
@@ -13234,7 +13234,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation>Layout er fuld</translation>
+      <translation>Layoutet er fuldt</translation>
     </message>
     <message>
       <source>Failed to change password</source>

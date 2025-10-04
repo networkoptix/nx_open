@@ -841,7 +841,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Moduli I / O</translation>
+      <translation>Modulo I / O</translation>
     </message>
     <message>
       <source>I/O module</source>

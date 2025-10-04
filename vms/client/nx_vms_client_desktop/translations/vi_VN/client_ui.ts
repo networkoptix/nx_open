@@ -481,7 +481,7 @@
     </message>
     <message>
       <source>Test</source>
-      <translation>Kiểm tra</translation>
+      <translation>Thử</translation>
     </message>
   </context>
   <context>

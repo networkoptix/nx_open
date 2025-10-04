@@ -473,7 +473,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation>Bắt đầu khi</translation>
+      <translation>Bắt đầu khi nào</translation>
     </message>
     <message>
       <source>Occurs at</source>
@@ -687,7 +687,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation>Bắt đầu khi</translation>
+      <translation>Bắt đầu khi nào</translation>
     </message>
   </context>
   <context>

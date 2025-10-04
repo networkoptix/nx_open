@@ -1007,8 +1007,8 @@
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>seconde</numerusform>
-        <numerusform>seconde</numerusform>
+        <numerusform>seconden</numerusform>
+        <numerusform>seconden</numerusform>
       </translation>
     </message>
     <message numerus="yes">

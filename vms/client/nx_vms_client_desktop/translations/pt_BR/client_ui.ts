@@ -469,7 +469,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation>Apagar</translation>
+      <translation>Excluir</translation>
     </message>
     <message>
       <source>Event Rules</source>

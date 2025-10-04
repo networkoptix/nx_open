@@ -1007,8 +1007,8 @@
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>sekunden</numerusform>
-        <numerusform>sekunden</numerusform>
+        <numerusform>Sekunde</numerusform>
+        <numerusform>Sekunde</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1031,8 +1031,8 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>tage</numerusform>
-        <numerusform>tage</numerusform>
+        <numerusform>Tag</numerusform>
+        <numerusform>Tag</numerusform>
       </translation>
     </message>
     <message numerus="yes">

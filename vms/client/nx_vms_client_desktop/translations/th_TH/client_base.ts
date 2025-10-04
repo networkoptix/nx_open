@@ -63,8 +63,8 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 มีการใช้</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are used</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -939,8 +939,8 @@
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation>
-        <numerusform>แสดงในรายการ</numerusform>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
       </translation>
     </message>
     <message>
@@ -1189,7 +1189,7 @@
     <name>DurationPickerWidgetStrings</name>
     <message>
       <source>Instant</source>
-      <translation>ทางด่วน</translation>
+      <translation>แทน</translation>
     </message>
     <message>
       <source>No more than once per</source>
@@ -1530,8 +1530,8 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>ไม่สามารถยกเลิกการอนุญาตได้</numerusform>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
     <message>
@@ -1619,8 +1619,8 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation>
-        <numerusform>ชื่อไฟล์ต้องไม่มีอักขระสงวนไว้ต่อไปนี้:</numerusform>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>
@@ -2498,7 +2498,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation>ทางด่วน</translation>
+      <translation>แทน</translation>
     </message>
     <message>
       <source>Stops</source>
@@ -3406,7 +3406,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>คัดลอกเลือกไปที่คลิปบอร์ด</translation>
+      <translation>คัดลอกส่วนที่เลือกไปยังคลิปบอร์ด</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -3467,7 +3467,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation>การกระทำ</translation>
+      <translation>กระทำ</translation>
     </message>
     <message>
       <source>Target</source>
@@ -5722,8 +5722,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation>
-        <numerusform>PC %1 - แสดงผล %2</numerusform>
+      <translation type="unfinished">
+        <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
   </context>
@@ -6020,8 +6020,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation>
-        <numerusform>ไม่สนับสนุนรูปแบบไฟล์ที่เลือก</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected file formats are not supported</numerusform>
       </translation>
     </message>
     <message>
@@ -6030,8 +6030,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>ไฟล์ที่เลือกไม่มี timestamps</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files do not have timestamps</numerusform>
       </translation>
     </message>
     <message>
@@ -6040,8 +6040,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation>
-        <numerusform>ไฟล์ที่เลือกเก่าเกินไป</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6058,20 +6058,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation>
-        <numerusform>ไฟล์ที่เลือกครอบคลุมช่วงเวลาที่วิดีโอกำลังอัปโหลดอยู่</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>คุณสามารถอัปโหลดไฟล์เหล่านี้ไปยังอินสแตนซ์อื่น ๆ ของ Wearable Camera</numerusform>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>ไฟล์ที่เลือกครอบคลุมช่วงเวลาที่วิดีโอกำลังอัปโหลดอยู่</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>
     </message>
     <message>
@@ -6092,14 +6092,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>วิดีโอบางอย่างอาจถูกลบหลังจากอัปโหลดไฟล์เหล่านี้</numerusform>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>พื้นที่เก็บข้อมูลของเซิร์ฟเวอร์ไม่เหลือมากนัก วิดีโอเก่าบางส่วนอาจถูกลบเพื่อเพิ่มพื้นที่ว่าง โปรดทราบว่าหากไฟล์ที่เลือกเป็นไฟล์ที่เก่าที่สุดบนเซิร์ฟเวอร์ไฟล์เหล่านี้จะถูกลบออกทันทีหลังจากอัปโหลด</numerusform>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
       </translation>
     </message>
     <message>
@@ -9333,15 +9333,15 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 มีใช้อยู่ในปัจจุบัน</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are currently in use</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>จำเป็นต้องกรอกอย่างน้อยหนึ่งหน่วย %1</numerusform>
+      <translation type="unfinished">
+        <numerusform>At least %1 are required</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -9352,8 +9352,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>ปิดใช้งานใบอนุญาตหรือไม่?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
     <message>
@@ -11142,8 +11142,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
-      <translation>
-        <numerusform>ฉันเชื่อถือเซิร์ฟเวอร์เหล่านี้</numerusform>
+      <translation type="unfinished">
+        <numerusform>I trust these servers</numerusform>
       </translation>
     </message>
     <message>
@@ -11521,8 +11521,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation>
-        <numerusform>ดับเบิลคลิกเพื่อเพิ่มกล้องในเค้าโครงปัจจุบันหรือ ctrl + คลิกเพื่อเปิดในแท็บใหม่</numerusform>
+      <translation type="unfinished">
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
       </translation>
     </message>
     <message>

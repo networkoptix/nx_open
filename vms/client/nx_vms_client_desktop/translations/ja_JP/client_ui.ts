@@ -2067,7 +2067,7 @@
     </message>
     <message>
       <source>to</source>
-      <translation>対象ユーザー</translation>
+      <translation>追加先</translation>
     </message>
   </context>
   <context>

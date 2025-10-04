@@ -1767,7 +1767,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation>Åpne filmappe</translation>
+      <translation>Åpne mappen Filer</translation>
     </message>
   </context>
   <context>

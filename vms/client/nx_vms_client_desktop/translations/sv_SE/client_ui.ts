@@ -1767,7 +1767,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation>Öppna filmapp</translation>
+      <translation>Öppna mappen Filer</translation>
     </message>
   </context>
   <context>

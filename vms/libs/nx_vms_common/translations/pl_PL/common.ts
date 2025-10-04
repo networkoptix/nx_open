@@ -1089,10 +1089,10 @@
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>sekunda</numerusform>
-        <numerusform>sekunda</numerusform>
-        <numerusform>sekunda</numerusform>
-        <numerusform>sekunda</numerusform>
+        <numerusform>sekund</numerusform>
+        <numerusform>sekund</numerusform>
+        <numerusform>sekund</numerusform>
+        <numerusform>sekund</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1119,7 +1119,7 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>dzień</numerusform>
+        <numerusform>dni</numerusform>
         <numerusform>dni</numerusform>
         <numerusform>dni</numerusform>
         <numerusform>dni</numerusform>
@@ -1131,7 +1131,7 @@
       <translation>
         <numerusform>tydzień</numerusform>
         <numerusform>tygodni</numerusform>
-        <numerusform>tygodni</numerusform>
+        <numerusform>tydzień</numerusform>
         <numerusform>tygodnie</numerusform>
       </translation>
     </message>
@@ -1198,21 +1198,21 @@
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milisekund</numerusform>
+      <translation>
         <numerusform>sekund</numerusform>
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
+        <numerusform>sekund</numerusform>
+        <numerusform>sekund</numerusform>
+        <numerusform>sekund</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>sekund</numerusform>
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
+        <numerusform>sekund</numerusform>
+        <numerusform>sekund</numerusform>
+        <numerusform>sekund</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1228,11 +1228,11 @@
     <message numerus="yes">
       <source>Hours</source>
       <comment>Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>godzin</numerusform>
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
+        <numerusform>godzin</numerusform>
+        <numerusform>godzin</numerusform>
+        <numerusform>godzin</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1248,31 +1248,31 @@
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Capitalized full suffix for displaying weeks</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>tygodni</numerusform>
-        <numerusform>Weeks</numerusform>
-        <numerusform>Weeks</numerusform>
-        <numerusform>Weeks</numerusform>
+        <numerusform>tygodni</numerusform>
+        <numerusform>tygodni</numerusform>
+        <numerusform>tygodni</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Months</source>
       <comment>Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>miesięcy</numerusform>
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
+        <numerusform>miesięcy</numerusform>
+        <numerusform>miesięcy</numerusform>
+        <numerusform>miesięcy</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>lat</numerusform>
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
+        <numerusform>lat</numerusform>
+        <numerusform>lat</numerusform>
+        <numerusform>lat</numerusform>
       </translation>
     </message>
   </context>

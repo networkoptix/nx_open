@@ -69,21 +69,21 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 используется</numerusform>
-        <numerusform>%1 используются</numerusform>
-        <numerusform>%1 используются</numerusform>
-        <numerusform>%1 используются</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 are used</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 требуется</numerusform>
-        <numerusform>%1 требуется</numerusform>
-        <numerusform>%1 требуется</numerusform>
-        <numerusform>%1 требуется</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 are required</numerusform>
       </translation>
     </message>
   </context>
@@ -951,11 +951,11 @@
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation>
-        <numerusform>Показывать на элементе</numerusform>
-        <numerusform>Показывать на элементах</numerusform>
-        <numerusform>Показывать на элементах</numerusform>
-        <numerusform>Показывать на элементах</numerusform>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
       </translation>
     </message>
     <message>
@@ -1113,7 +1113,7 @@
     <message numerus="yes">
       <source>Mute Items</source>
       <translation type="unfinished">
-        <numerusform>Отключить звук</numerusform>
+        <numerusform>Mute Items</numerusform>
         <numerusform>Mute Items</numerusform>
         <numerusform>Mute Items</numerusform>
         <numerusform>Mute Items</numerusform>
@@ -1122,7 +1122,7 @@
     <message numerus="yes">
       <source>Unmute Items</source>
       <translation type="unfinished">
-        <numerusform>Включить звук</numerusform>
+        <numerusform>Unmute Items</numerusform>
         <numerusform>Unmute Items</numerusform>
         <numerusform>Unmute Items</numerusform>
         <numerusform>Unmute Items</numerusform>
@@ -1210,7 +1210,7 @@
     <name>DurationPickerWidgetStrings</name>
     <message>
       <source>Instant</source>
-      <translation>Мгновенно</translation>
+      <translation>Немедленно</translation>
     </message>
     <message>
       <source>No more than once per</source>
@@ -1381,7 +1381,7 @@
     <message numerus="yes">
       <source>%n layouts</source>
       <translation>
-        <numerusform>%n раскладка</numerusform>
+        <numerusform>%n раскладкa</numerusform>
         <numerusform>%n раскладки</numerusform>
         <numerusform>%n раскладкок</numerusform>
         <numerusform>%n раскладкок</numerusform>
@@ -1569,11 +1569,11 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Не удалось деактивировать лицензию</numerusform>
-        <numerusform>Не удалось деактивировать лицензии</numerusform>
-        <numerusform>Не удалось деактивировать лицензии</numerusform>
-        <numerusform>Не удалось деактивировать лицензии</numerusform>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
     <message>
@@ -1667,11 +1667,11 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation>
-        <numerusform>Имя файла не должно содержать следующий зарезервированный символ:</numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>
@@ -2600,7 +2600,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation>Мгновенно</translation>
+      <translation>Немедленно</translation>
     </message>
     <message>
       <source>Stops</source>
@@ -3535,15 +3535,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Скопировать в буфер обмена</translation>
+      <translation>Скопировать выделение в буфер обмена</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Экспорт выделенного в файл...</translation>
+      <translation>Экспорт выделения в файл...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Выделить все</translation>
+      <translation>Выбрать всё</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -5061,11 +5061,11 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation>
-        <numerusform>Сертификат</numerusform>
-        <numerusform>Сертификата</numerusform>
-        <numerusform>Сертификатов</numerusform>
-        <numerusform>Сертификатов</numerusform>
+      <translation type="unfinished">
+        <numerusform>Certificates</numerusform>
+        <numerusform>Certificates</numerusform>
+        <numerusform>Certificates</numerusform>
+        <numerusform>Certificates</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5470,7 +5470,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Тб</translation>
+      <translation>%1 ТБ</translation>
     </message>
     <message>
       <source>smb</source>
@@ -5936,11 +5936,11 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation>
-        <numerusform>ПК %1 - дисплей %2</numerusform>
-        <numerusform>ПК %1 - дисплеи %2</numerusform>
-        <numerusform>ПК %1 - дисплеи %2</numerusform>
-        <numerusform>ПК %1 - дисплеи %2</numerusform>
+      <translation type="unfinished">
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
   </context>
@@ -6258,11 +6258,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation>
-        <numerusform>Формат выбранного файла не поддерживается</numerusform>
-        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
-        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
-        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
       </translation>
     </message>
     <message>
@@ -6271,11 +6271,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>Выбранный файл не имеет временных меток</numerusform>
-        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
-        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
-        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
       </translation>
     </message>
     <message>
@@ -6284,11 +6284,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation>
-        <numerusform>Выбранный файл слишком старый</numerusform>
-        <numerusform>Выбранные файлы слишком старые</numerusform>
-        <numerusform>Выбранные файлы слишком старые</numerusform>
-        <numerusform>Выбранные файлы слишком старые</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6311,29 +6311,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation>
-        <numerusform>Выбранный файл охватывает период, для которого видео уже присутствует</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>Вы можете загрузить этот файл в другой экземпляр виртуальной камеры.</numerusform>
-        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
-        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
-        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>Выбранный файл охватывает период, для которог видео уже загружено</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>
     </message>
     <message>
@@ -6354,20 +6354,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этого файла</numerusform>
-        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
-        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
-        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
-        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
-        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
-        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
       </translation>
     </message>
     <message>
@@ -9784,21 +9784,21 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 уже используeтся</numerusform>
-        <numerusform>%1 уже используются</numerusform>
-        <numerusform>%1 уже используются</numerusform>
-        <numerusform>%1 уже используются</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 are currently in use</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Требуется по крайней мере %1</numerusform>
-        <numerusform>Требуются по крайней мере %1</numerusform>
-        <numerusform>Требуются по крайней мере %1</numerusform>
-        <numerusform>Требуются по крайней мере %1</numerusform>
+      <translation type="unfinished">
+        <numerusform>At least %1 are required</numerusform>
+        <numerusform>At least %1 are required</numerusform>
+        <numerusform>At least %1 are required</numerusform>
+        <numerusform>At least %1 are required</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -9812,11 +9812,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Деактивировать лицензию?</numerusform>
-        <numerusform>Деактивировать лицензии?</numerusform>
-        <numerusform>Деактивировать лицензии?</numerusform>
-        <numerusform>Деактивировать лицензии?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
     <message>
@@ -11030,11 +11030,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкий</translation>
+      <translation>Низкая</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокий</translation>
+      <translation>Высокая</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11658,7 +11658,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>I trust these servers</source>
       <translation type="unfinished">
-        <numerusform>Я доверяю этим серверам</numerusform>
+        <numerusform>I trust these servers</numerusform>
         <numerusform>I trust these servers</numerusform>
         <numerusform>I trust these servers</numerusform>
         <numerusform>I trust these servers</numerusform>
@@ -12063,11 +12063,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation>
-        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
-        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
-        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
-        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
+      <translation type="unfinished">
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
       </translation>
     </message>
     <message>

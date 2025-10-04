@@ -917,7 +917,7 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation>Spol tilbake</translation>
+      <translation>Spole</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>

@@ -615,7 +615,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation>Apagar</translation>
+      <translation>Excluir</translation>
     </message>
   </context>
   <context>

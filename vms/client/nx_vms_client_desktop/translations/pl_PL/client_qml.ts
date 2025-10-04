@@ -173,7 +173,7 @@
     </message>
     <message>
       <source>Detected by</source>
-      <translation>Wykryty przez</translation>
+      <translation>Wykryte przez</translation>
     </message>
   </context>
   <context>

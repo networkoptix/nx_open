@@ -2332,7 +2332,7 @@
     </message>
     <message>
       <source>FPS</source>
-      <translation>פריימים לשניה</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <source>s</source>

@@ -1179,7 +1179,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>Ім'я користувача</translation>
+      <translation>Логін</translation>
     </message>
     <message>
       <source>Password to authenticate (optional)</source>
@@ -2332,7 +2332,7 @@
     </message>
     <message>
       <source>FPS</source>
-      <translation>FPS</translation>
+      <translation>Кадрів в секунду</translation>
     </message>
     <message>
       <source>s</source>
