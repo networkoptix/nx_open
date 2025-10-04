@@ -1687,14 +1687,10 @@
       <translation>Hitta enheter</translation>
     </message>
     <message>
-      <source>
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
-          </source>
-      <translation>
-              Ange adress, subnätintervall eller subnätmask, inloggning och lösenord
-              och klicka på &quot;Sök&quot; -knappen
-          </translation>
+      <source>Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</source>
+      <translation>Ange adress, subnät intervall eller subnät mask, inloggning och lösenord
+och klicka på &quot;Sök&quot; knappen</translation>
     </message>
   </context>
   <context>

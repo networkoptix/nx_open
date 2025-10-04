@@ -1687,14 +1687,10 @@
       <translation>Trouver des appareils</translation>
     </message>
     <message>
-      <source>
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
-          </source>
-      <translation>
-              Entrez l'adresse, la plage de sous-réseau ou le masque de sous-réseau, le login et le mot de passe
-              et cliquez sur le bouton &quot;Rechercher&quot;
-          </translation>
+      <source>Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</source>
+      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</translation>
     </message>
   </context>
   <context>

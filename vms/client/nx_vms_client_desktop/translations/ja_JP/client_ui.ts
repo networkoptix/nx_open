@@ -1687,14 +1687,10 @@
       <translation>デバイスを検索</translation>
     </message>
     <message>
-      <source>
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
-          </source>
-      <translation>
-              アドレス、サブネット範囲またはサブネットマスク、ログイン名、パスワードを入力し、
-              「検索」ボタンをクリックしてください。
-          </translation>
+      <source>Enter address, subnet range or subnet mask, login and password
+and click on the &quot;Search&quot; button</source>
+      <translation>アドレス、サブネット範囲またはサブネットマスク、ログイン名、パスワードを入力し、
+「検索」ボタンをクリックしてください。</translation>
     </message>
   </context>
   <context>

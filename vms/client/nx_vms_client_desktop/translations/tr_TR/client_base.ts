@@ -73,18 +73,18 @@
     <name>CameraSettingsLicenseWatcher::Private</name>
     <message numerus="yes">
       <source>%1 are used</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 kullanıldı</numerusform>
-        <numerusform>%1 kullanıldı</numerusform>
+      <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <translation type="unfinished">
+        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 are used</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
-      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 gerekli</numerusform>
-        <numerusform>%1 gerekli</numerusform>
+      <comment>Numerus: text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+      <translation type="unfinished">
+        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 are required</numerusform>
       </translation>
     </message>
   </context>
@@ -905,13 +905,6 @@
       <source>Delete Bookmarks...</source>
       <translation>Yer imlerini sil...</translation>
     </message>
-    <message numerus="yes">
-      <source>Show on Items</source>
-      <translation>
-        <numerusform>Öğelerde Göster</numerusform>
-        <numerusform>Öğelerde Göster</numerusform>
-      </translation>
-    </message>
     <message>
       <source>PTZ</source>
       <translation>PTZ</translation>
@@ -1040,20 +1033,6 @@
       <source>Convert to Shared Layout</source>
       <translation>Paylaşılan Ekran Düzenine Dönüştür</translation>
     </message>
-    <message numerus="yes">
-      <source>Mute Items</source>
-      <translation>
-        <numerusform>Öğeleri Sessize Al</numerusform>
-        <numerusform>Öğeleri Sessize Al</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Unmute Items</source>
-      <translation>
-        <numerusform>Öğelerin sesini aç</numerusform>
-        <numerusform>Öğelerin Sesini Aç</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Connect to Site</source>
       <translation>Siteye bağlan</translation>
@@ -1141,6 +1120,30 @@
     <message>
       <source>Custom</source>
       <translation>Özel Ayarlar</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation type="unfinished">
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <comment>Numerus form depends on the amount of items</comment>
+      <translation type="unfinished">
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1406,13 +1409,6 @@ License Key: %2</source>
         <numerusform>%n den kalanı devre dışı bırak</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Lisanslar devre dışı bırakılamadı</numerusform>
-        <numerusform>Lisanslar devre dışı bırakılamadı</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Please try again later.</source>
       <translation>Lütfen daha sonra tekrar dene.</translation>
@@ -1438,6 +1434,14 @@ License Key: %2</source>
       <translation>
         <numerusform>%n Lisans deaktif edildi</numerusform>
         <numerusform>%n Lisans deaktif edildi</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <comment>Numerus form depends on the amount of licenses</comment>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
   </context>
@@ -1499,10 +1503,10 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
-      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation>
-        <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir:</numerusform>
-        <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir:</numerusform>
+      <comment>Numerus form depends on the amount of characters</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>
@@ -2082,8 +2086,17 @@ License Key: %2</source>
         <numerusform>%1%n kamera için detaylar</numerusform>
       </translation>
     </message>
+    <message>
+      <source>This server is removed from Site</source>
+      <translation type="unfinished">This server is removed from Site</translation>
+    </message>
+    <message>
+      <source>This user is removed from Site</source>
+      <translation type="unfinished">This user is removed from Site</translation>
+    </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
+      <comment>Numerus form depends on the number of devices</comment>
       <translation type="unfinished">
         <numerusform>These devices are removed from Site</numerusform>
         <numerusform>These devices are removed from Site</numerusform>
@@ -2091,6 +2104,7 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
+      <comment>Numerus form depends on the number of cameras</comment>
       <translation type="unfinished">
         <numerusform>These cameras are removed from Site</numerusform>
         <numerusform>These cameras are removed from Site</numerusform>
@@ -2098,23 +2112,10 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
+      <comment>Numerus form depends on the number of resources</comment>
       <translation type="unfinished">
         <numerusform>These resources are removed from Site</numerusform>
         <numerusform>These resources are removed from Site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>This server is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This server is removed from Site</numerusform>
-        <numerusform>This server is removed from Site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>This user is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This user is removed from Site</numerusform>
-        <numerusform>This user is removed from Site</numerusform>
       </translation>
     </message>
   </context>
@@ -4126,13 +4127,6 @@ License Key: %2</source>
   <context>
     <name>QnServerSettingsWidget</name>
     <message numerus="yes">
-      <source>Certificates</source>
-      <translation>
-        <numerusform>Sertifikalar</numerusform>
-        <numerusform>Sertifikalar</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation>
         <numerusform>Sunucu, kimliğini doğrulamak için bu %n SSL sertifikasını kullanıyor</numerusform>
@@ -4158,6 +4152,14 @@ License Key: %2</source>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
       <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Certificates</source>
+      <comment>Numerus form depends on the certificates count</comment>
+      <translation type="unfinished">
+        <numerusform>Certificates</numerusform>
+        <numerusform>Certificates</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5178,16 +5180,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>PC %1</source>
       <translation>PC %1</translation>
     </message>
-    <message>
-      <source>PC %1 - Display %2</source>
-      <translation>PC %1 - Ekran %2</translation>
-    </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
-      <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation>
-        <numerusform>PC %1 - Ekran %2</numerusform>
-        <numerusform>PC %1 - Ekran %2</numerusform>
+      <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
+      <translation type="unfinished">
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5410,20 +5408,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>%n Kamera video duvarında açılamadı:</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation>
-        <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı cihazlarına ekleme yapamazsınız.</numerusform>
-        <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı cihazlarına ekleme yapamazsınız.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation>
-        <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı kameralarına ekleme yapamazsınız.</numerusform>
-        <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı kameralarına ekleme yapamazsınız.</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
       <translation>Ekran kilitli ve değiştirilemez</translation>
@@ -5439,6 +5423,22 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Cannot find compatible client version: %1</source>
       <translation type="unfinished">Cannot find compatible client version: %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
+      <comment>Numerus form depends on the number of devices</comment>
+      <translation type="unfinished">
+        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
+      <comment>Numerus form depends on the number of cameras</comment>
+      <translation type="unfinished">
+        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5630,13 +5630,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Kısmen Taşı</translation>
     </message>
     <message numerus="yes">
-      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation>
-        <numerusform>Bu web sayfalarını Sunucu &quot;%1&quot; taşımak üzeresiniz. Bu web sayfaları istenen tüm içerikleri proxy olarak kullanır ve proxy sunucuları Server &quot;%1&quot; olarak değişir.</numerusform>
-        <numerusform>Bu web sayfalarını Sunucu &quot;%1&quot; taşımak üzeresiniz. Bu web sayfaları istenen tüm içerikleri proxy olarak kullanır ve proxy sunucuları Server &quot;%1&quot; olarak değişir.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Delete %n layouts?</source>
       <translation>
         <numerusform>%n Ekran düzeni silinsin mi?</numerusform>
@@ -5676,13 +5669,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Dönüştür</translation>
     </message>
     <message numerus="yes">
-      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation>
-        <numerusform>Bu ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecektir.</numerusform>
-        <numerusform>Bu ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecektir.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <translation>
         <numerusform>%n ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecek.</numerusform>
@@ -5703,6 +5689,22 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Maximum number of devices for this server is reached</source>
       <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+    </message>
+    <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerus form depends on the amount of layouts</comment>
+      <translation type="unfinished">
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
+      <comment>Numerus form depends on the amount of web pages</comment>
+      <translation type="unfinished">
+        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6744,16 +6746,22 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
     </message>
     <message>
-      <source>Backup will not be activated for %1 devices: </source>
-      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
-    </message>
-    <message>
-      <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
-    </message>
-    <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
       <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup will not be activated for %n devices:</source>
+      <translation type="unfinished">
+        <numerusform>Backup will not be activated for %n devices:</numerusform>
+        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services are required to activate backup for them.</source>
+      <translation type="unfinished">
+        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7135,17 +7143,19 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   <context>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
-      <source>Use License</source>
-      <translation>
-        <numerusform>Lisansı Kullan</numerusform>
-        <numerusform>Lisansı Kullan</numerusform>
+      <source>Use Services</source>
+      <comment>Numerus form depends on the devices count</comment>
+      <translation type="unfinished">
+        <numerusform>Use Services</numerusform>
+        <numerusform>Use Services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Use Service</source>
-      <translation>
-        <numerusform>Hizmeti Kullan</numerusform>
-        <numerusform>Hizmeti Kullan</numerusform>
+      <source>Use Licenses</source>
+      <comment>Numerus form depends on the devices count</comment>
+      <translation type="unfinished">
+        <numerusform>Use Licenses</numerusform>
+        <numerusform>Use Licenses</numerusform>
       </translation>
     </message>
   </context>
@@ -7464,24 +7474,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       </translation>
     </message>
     <message numerus="yes">
-      <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>Bu cihazların ses girişleri yoktur veya doğru şekilde yapılandırılmamıştır.</numerusform>
-        <numerusform>Bu cihazların ses girişleri yoktur veya doğru şekilde yapılandırılmamıştır.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
       <translation>
         <numerusform>%n cihazda 2 yönlü ses etkinleştirilemedi</numerusform>
         <numerusform>%n cihazda 2 yönlü ses etkinleştirilemedi</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation>
-        <numerusform>Bu cihazlarda ses çıkışı yoktur veya doğru şekilde yapılandırılmamıştır.</numerusform>
-        <numerusform>Bu cihazlarda ses çıkışı yoktur veya doğru şekilde yapılandırılmamıştır.</numerusform>
       </translation>
     </message>
     <message>
@@ -7499,6 +7495,22 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
       <translation>Ses akışını iletmek ve ses oynatmak için kullanılmak üzere bir cihaz seçmeniz gerekir.</translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices do not have audio outputs or are not configured correctly.</source>
+      <comment>Numerus form depends on the total number of devices</comment>
+      <translation type="unfinished">
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices do not have audio inputs or are not configured correctly.</source>
+      <comment>Numerus form depends on the total number of devices</comment>
+      <translation type="unfinished">
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7543,8 +7555,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation type="unfinished">Channel Partner users have access to this site</translation>
     </message>
     <message>
-      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
-      <translation>Kanal Ortağı kullanıcılarının&apos; erişimi Kuruluş düzeyinde yönetilir ve site kullanıcı yönetiminde görünmezler.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Daha fazla bilgi edinin&lt;/a&gt;</translation>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation type="unfinished">Learn more</translation>
     </message>
   </context>
   <context>
@@ -8176,13 +8192,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>UNKNOWN</source>
       <translation type="unfinished">UNKNOWN</translation>
-    </message>
-    <message numerus="yes">
-      <source> + %n</source>
-      <translation type="unfinished">
-        <numerusform> + %n</numerusform>
-        <numerusform> + %n</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -8870,13 +8879,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>%n deaktivasyon kaldı.</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Lisansları devre dışı bırak?</numerusform>
-        <numerusform>Lisansları devre dışı bırak?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Deactivate</source>
       <translation>Devre dışı bırak</translation>
@@ -8891,18 +8893,26 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 şu anda kullanımda</numerusform>
-        <numerusform>%1 şu anda kullanımda</numerusform>
+      <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation type="unfinished">
+        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 are currently in use</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Için en az %1 gerekli</numerusform>
-        <numerusform>Için en az %1 gerekli</numerusform>
+      <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation type="unfinished">
+        <numerusform>At least %1 are required</numerusform>
+        <numerusform>At least %1 are required</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <comment>Numerus form depends on the amount of licenses</comment>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
   </context>
@@ -9021,8 +9031,8 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation type="unfinished">Logging level degrades performance</translation>
     </message>
     <message>
-      <source>&lt;None&gt;</source>
-      <translation type="unfinished">&lt;None&gt;</translation>
+      <source>None</source>
+      <translation type="unfinished">None</translation>
     </message>
   </context>
   <context>
@@ -10808,13 +10818,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Continue</source>
       <translation>Devam et</translation>
     </message>
-    <message numerus="yes">
-      <source>I trust these servers</source>
-      <translation>
-        <numerusform>Bu sunuculara güveniyorum</numerusform>
-        <numerusform>Bu sunuculara güveniyorum</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I trust this server</source>
       <translation>Bu sunucuya güveniyorum</translation>
@@ -10822,6 +10825,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Certificate details</source>
       <translation>Sertifika ayrıntıları</translation>
+    </message>
+    <message numerus="yes">
+      <source>I trust these servers</source>
+      <comment>Numerus form depends on the number of certificates</comment>
+      <translation type="unfinished">
+        <numerusform>I trust these servers</numerusform>
+        <numerusform>I trust these servers</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11202,13 +11213,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <numerusform>... ve %n den fazlası</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation>
-        <numerusform>Ekran düzenine kamera eklemek için çift tıklayın ya da ctrl+tıklama yaparak yeni sekmede açın</numerusform>
-        <numerusform>Ekran düzenine kamera eklemek için çift tıklayın ya da ctrl+tıklama yaparak yeni sekmede açın</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No available archive</source>
       <translation>Kullanılabilir arşiv yok</translation>
@@ -11260,6 +11264,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>This action is not supported for notifications from other Sites</source>
       <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+    </message>
+    <message numerus="yes">
+      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
+      <comment>Numerus form depends on the number of cameras</comment>
+      <translation type="unfinished">
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11734,34 +11746,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Already uploaded files will be kept.</source>
       <translation>Yüklenmiş dosyalar saklanacaktır.</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected file formats are not supported</source>
-      <translation>
-        <numerusform>Seçilen dosya biçimleri desteklenmiyor</numerusform>
-        <numerusform>Seçilen dosya biçimleri desteklenmiyor</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
       <translation>.MKV, .AVI, .MP4 veya diğer video dosyalarını kullanın.</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>Seçilen dosyalarda zaman damgası yok</numerusform>
-        <numerusform>Seçilen dosyalarda zaman damgası yok</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
       <translation>Sadece doğru zaman damgası olan video dosyaları desteklenir.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files are too old</source>
-      <translation>
-        <numerusform>Seçili dosyalar çok eski</numerusform>
-        <numerusform>Seçili dosyalar çok eski</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
@@ -11775,27 +11766,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>
         <numerusform>Seçilen dosyalar %1 ile %2 arasında kaydedildi, ancak yalnızca son %n gün içinde kaydedilen dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
         <numerusform>Seçilen dosyalar %1 ile %2 arasında kaydedildi, ancak yalnızca son %n gün içinde kaydedilen dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation>
-        <numerusform>Seçilen dosyalar, videoların zaten yüklendiği süreleri kapsar</numerusform>
-        <numerusform>Seçilen dosyalar, videoların zaten yüklendiği süreleri kapsar</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>Bu dosyaları sanal kameranın farklı bir örneğine yükleyebilirsiniz.</numerusform>
-        <numerusform>Bu dosyaları sanal kameranın farklı bir örneğine yükleyebilirsiniz.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>Seçilen dosya, videonun zaten yüklendiği süreleri kapsar</numerusform>
-        <numerusform>Seçilen dosyalar, videoların zaten yüklendiği süreleri kapsar</numerusform>
       </translation>
     </message>
     <message>
@@ -11813,20 +11783,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>No new files to upload in selected folder</source>
       <translation>Seçilen klasörde eklenecek yeni dosya bulunamadı</translation>
-    </message>
-    <message numerus="yes">
-      <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>Bu dosyaları yükledikten sonra bazı görüntüler silinebilir</numerusform>
-        <numerusform>Bu dosyaları yükledikten sonra bazı görüntüler silinebilir</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>Sunucu depolama biriminde çok boş alan değil. Bazı eski görüntüleri yer açmak için silinebilir. Seçilen dosyalar sunucudaki en eski dosyalar olursa, yüklendikten hemen sonra silineceklerini unutmayın.</numerusform>
-        <numerusform>Sunucu depolama biriminde çok boş alan değil. Bazı eski görüntüleri yer açmak için silinebilir. Seçilen dosyalar sunucudaki en eski dosyalar olursa, yüklendikten hemen sonra silineceklerini unutmayın.</numerusform>
-      </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
@@ -11880,6 +11836,70 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
       <translation>%1, videonun zaten yüklendiği süreyi kapsar.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation type="unfinished">
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation type="unfinished">
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Virtual Camera.</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <comment>Numerus form depends on the number of files</comment>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <comment>Numerus form depends on the amount of files uploaded</comment>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <comment>Numerus form depends on the amount of files uploaded</comment>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12841,7 +12861,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
-      <comment>Form depends on invalid rule count</comment>
+      <comment>Numerus form depends on the invalid rule count</comment>
       <translation type="unfinished">
         <numerusform>Some of the rules were not enabled</numerusform>
         <numerusform>Some of the rules were not enabled</numerusform>
@@ -12849,7 +12869,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
-      <comment>Form depends on invalid rule count</comment>
+      <comment>Numerus form depends on the invalid rule count</comment>
       <translation type="unfinished">
         <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
         <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>

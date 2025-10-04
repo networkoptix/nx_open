@@ -103,45 +103,45 @@
       <translation>PB</translation>
     </message>
     <message numerus="yes">
-      <source>Byte(s)</source>
-      <comment>Full suffix for displaying bytes</comment>
+      <source>Bytes</source>
+      <comment>Numerus: Full suffix for displaying bytes</comment>
       <translation>
-        <numerusform>바이트</numerusform>
+        <numerusform>Bytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Kilobyte(s)</source>
-      <comment>Full suffix for displaying kilobytes</comment>
+      <source>Kilobytes</source>
+      <comment>Numerus: Full suffix for displaying kilobytes</comment>
       <translation>
-        <numerusform>킬로바이트</numerusform>
+        <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Megabyte(s)</source>
-      <comment>Full suffix for displaying megabytes</comment>
+      <source>Megabytes</source>
+      <comment>Numerus: Full suffix for displaying megabytes</comment>
       <translation>
-        <numerusform>메가바이트</numerusform>
+        <numerusform>Megabytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Gigabyte(s)</source>
-      <comment>Full suffix for displaying gigabytes</comment>
+      <source>Gigabytes</source>
+      <comment>Numerus: Full suffix for displaying gigabytes</comment>
       <translation>
-        <numerusform>기가 바이트</numerusform>
+        <numerusform>Gigabytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Terabyte(s)</source>
-      <comment>Full suffix for displaying terabytes</comment>
+      <source>Terabytes</source>
+      <comment>Numerus: Full suffix for displaying terabytes</comment>
       <translation>
-        <numerusform>테라바이트</numerusform>
+        <numerusform>Terabytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Petabyte(s)</source>
-      <comment>Full suffix for displaying petabytes</comment>
+      <source>Petabytes</source>
+      <comment>Numerus: Full suffix for displaying petabytes</comment>
       <translation>
-        <numerusform>페타 바이트</numerusform>
+        <numerusform>Petabytes</numerusform>
       </translation>
     </message>
   </context>
@@ -267,8 +267,9 @@
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation>
-        <numerusform>%1은 양방향 오디오를 지원하지 않습니다.</numerusform>
+      <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
+      <translation type="unfinished">
+        <numerusform>%1 does not support two-way audio</numerusform>
       </translation>
     </message>
   </context>
@@ -503,8 +504,9 @@
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation>
-        <numerusform>%1 입력 포트가 없음</numerusform>
+      <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
+      <translation type="unfinished">
+        <numerusform>%1 have no input ports</numerusform>
       </translation>
     </message>
   </context>
@@ -526,8 +528,9 @@
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation>
-        <numerusform>%1에는 출력 릴레이가 없습니다.</numerusform>
+      <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
+      <translation type="unfinished">
+        <numerusform>%1 have no output relays</numerusform>
       </translation>
     </message>
   </context>
@@ -1097,154 +1100,154 @@
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>밀리초</numerusform>
+      <comment>Numerus: Full suffix for displaying milliseconds</comment>
+      <translation type="unfinished">
+        <numerusform>milliseconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>초</numerusform>
+      <comment>Numerus: Full suffix for displaying seconds</comment>
+      <translation type="unfinished">
+        <numerusform>seconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>분</numerusform>
+      <comment>Numerus: Full suffix for displaying minutes</comment>
+      <translation type="unfinished">
+        <numerusform>minutes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>시간</numerusform>
+      <comment>Numerus: Full suffix for displaying hours</comment>
+      <translation type="unfinished">
+        <numerusform>hours</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>일</numerusform>
+      <comment>Numerus: Full suffix for displaying days</comment>
+      <translation type="unfinished">
+        <numerusform>days</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>주</numerusform>
+      <comment>Numerus: Full suffix for displaying weeks</comment>
+      <translation type="unfinished">
+        <numerusform>weeks</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>개월</numerusform>
+      <comment>Numerus: Full suffix for displaying months</comment>
+      <translation type="unfinished">
+        <numerusform>months</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>년</numerusform>
+      <comment>Numerus: Full suffix for displaying years</comment>
+      <translation type="unfinished">
+        <numerusform>years</numerusform>
       </translation>
     </message>
     <message>
       <source>Msec</source>
-      <comment>Capitalized long suffix for displaying milliseconds</comment>
-      <translation>밀리초</translation>
+      <comment>Numerus: Capitalized long suffix for displaying milliseconds</comment>
+      <translation type="unfinished">Msec</translation>
     </message>
     <message>
       <source>Sec</source>
-      <comment>Capitalized long suffix for displaying seconds</comment>
-      <translation>초</translation>
+      <comment>Numerus: Capitalized long suffix for displaying seconds</comment>
+      <translation type="unfinished">Sec</translation>
     </message>
     <message>
       <source>Min</source>
-      <comment>Capitalized long suffix for displaying minutes</comment>
-      <translation>최소</translation>
+      <comment>Numerus: Capitalized long suffix for displaying minutes</comment>
+      <translation type="unfinished">Min</translation>
     </message>
     <message>
       <source>Hrs</source>
-      <comment>Capitalized long suffix for displaying hours</comment>
-      <translation>시간</translation>
+      <comment>Numerus: Capitalized long suffix for displaying hours</comment>
+      <translation type="unfinished">Hrs</translation>
     </message>
     <message>
       <source>Days</source>
-      <comment>Capitalized long suffix for displaying days</comment>
-      <translation>일</translation>
+      <comment>Numerus: Capitalized long suffix for displaying days</comment>
+      <translation type="unfinished">Days</translation>
     </message>
     <message>
       <source>Wks</source>
-      <comment>Capitalized long suffix for displaying weeks</comment>
-      <translation>주</translation>
+      <comment>Numerus: Capitalized long suffix for displaying weeks</comment>
+      <translation type="unfinished">Wks</translation>
     </message>
     <message>
       <source>Mos</source>
-      <comment>Capitalized long suffix for displaying months</comment>
-      <translation>개월</translation>
+      <comment>Numerus: Capitalized long suffix for displaying months</comment>
+      <translation type="unfinished">Mos</translation>
     </message>
     <message>
       <source>Yrs</source>
-      <comment>Capitalized long suffix for displaying years</comment>
-      <translation>년</translation>
+      <comment>Numerus: Capitalized long suffix for displaying years</comment>
+      <translation type="unfinished">Yrs</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
-      <comment>Capitalized full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>밀리초</numerusform>
+      <comment>Numerus: Capitalized full suffix for displaying milliseconds</comment>
+      <translation type="unfinished">
+        <numerusform>Milliseconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
-      <comment>Capitalized full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>초</numerusform>
+      <comment>Numerus: Capitalized full suffix for displaying seconds</comment>
+      <translation type="unfinished">
+        <numerusform>Seconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Minutes</source>
-      <comment>Capitalized full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>분</numerusform>
+      <comment>Numerus: Capitalized full suffix for displaying minutes</comment>
+      <translation type="unfinished">
+        <numerusform>Minutes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Hours</source>
-      <comment>Capitalized full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>시간</numerusform>
+      <comment>Numerus: Capitalized full suffix for displaying hours</comment>
+      <translation type="unfinished">
+        <numerusform>Hours</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Days</source>
-      <comment>Capitalized full suffix for displaying days</comment>
+      <comment>Numerus: Capitalized full suffix for displaying days</comment>
       <translation>
         <numerusform>일</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Weeks</source>
-      <comment>Capitalized full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>주</numerusform>
+      <comment>Numerus: Capitalized full suffix for displaying weeks</comment>
+      <translation type="unfinished">
+        <numerusform>Weeks</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Months</source>
-      <comment>Capitalized full suffix for displaying months</comment>
-      <translation>
-        <numerusform>개월</numerusform>
+      <comment>Numerus: Capitalized full suffix for displaying months</comment>
+      <translation type="unfinished">
+        <numerusform>Months</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
-      <comment>Capitalized full suffix for displaying years</comment>
-      <translation>
-        <numerusform>년</numerusform>
+      <comment>Numerus: Capitalized full suffix for displaying years</comment>
+      <translation type="unfinished">
+        <numerusform>Years</numerusform>
       </translation>
     </message>
   </context>

@@ -204,34 +204,6 @@
       <source>For</source>
       <translation>Para</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected devices were removed</source>
-      <translation>
-        <numerusform>Elimináronse os dispositivos seleccionados</numerusform>
-        <numerusform>Elimináronse os dispositivos seleccionados</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected cameras were removed</source>
-      <translation>
-        <numerusform>Elimináronse as cámaras seleccionadas</numerusform>
-        <numerusform>Elimináronse as cámaras seleccionadas</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected servers were removed</source>
-      <translation>
-        <numerusform>Elimináronse os servidores seleccionados</numerusform>
-        <numerusform>Elimináronse os servidores seleccionados</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected layouts were removed</source>
-      <translation>
-        <numerusform>Elimináronse os deseños seleccionados</numerusform>
-        <numerusform>Elimináronse os deseños seleccionados</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Time value cannot be less than zero</source>
       <translation>O valor do tempo non pode ser inferior a cero</translation>
@@ -328,6 +300,38 @@
     <message>
       <source>Removed layout</source>
       <translation>Deseño eliminado</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <comment>Numerus form depend on devices count</comment>
+      <translation type="unfinished">
+        <numerusform>Selected devices were removed</numerusform>
+        <numerusform>Selected devices were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <comment>Numerus form depend on cameras count</comment>
+      <translation type="unfinished">
+        <numerusform>Selected cameras were removed</numerusform>
+        <numerusform>Selected cameras were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <comment>Numerus form depend on servers count</comment>
+      <translation type="unfinished">
+        <numerusform>Selected servers were removed</numerusform>
+        <numerusform>Selected servers were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <comment>Numerus form depend on layouts count</comment>
+      <translation type="unfinished">
+        <numerusform>Selected layouts were removed</numerusform>
+        <numerusform>Selected layouts were removed</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -663,16 +667,18 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
-      <translation>
-        <numerusform>Algunhas das cabeceiras non son válidas</numerusform>
-        <numerusform>Algunhas das cabeceiras non son válidas</numerusform>
+      <comment>Numerus form depends on the amount of invalid headers</comment>
+      <translation type="unfinished">
+        <numerusform>Some of the headers are not valid</numerusform>
+        <numerusform>Some of the headers are not valid</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
-      <translation>
-        <numerusform>Todas as cabeceiras son inválidas</numerusform>
-        <numerusform>Todas as cabeceiras son inválidas</numerusform>
+      <comment>Numerus form depends on the total amount of headers</comment>
+      <translation type="unfinished">
+        <numerusform>All the headers are not valid</numerusform>
+        <numerusform>All the headers are not valid</numerusform>
       </translation>
     </message>
   </context>

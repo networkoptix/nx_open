@@ -363,19 +363,19 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>Pantalla de noticias</translation>
     </message>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>Mostrar más</translation>
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>No hay Notificaciones</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>No se encuentran notificaciones push.</translation>
     </message>
   </context>
   <context>
@@ -495,20 +495,16 @@
   <context>
     <name>LinkAboutToOpenDialog</name>
     <message>
-      <source>Open link?</source>
-      <translation>¿Abrir el enlace?</translation>
-    </message>
-    <message>
-      <source>External link will open in the browser</source>
-      <translation>El enlace se abrirá en el navegador</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Cancelar</translation>
     </message>
     <message>
       <source>Open</source>
       <translation>Abrir</translation>
+    </message>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation type="unfinished">Open external link in browser?</translation>
     </message>
   </context>
   <context>

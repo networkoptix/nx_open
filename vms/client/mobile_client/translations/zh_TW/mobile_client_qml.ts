@@ -494,20 +494,16 @@
   <context>
     <name>LinkAboutToOpenDialog</name>
     <message>
-      <source>Open link?</source>
-      <translation>開啟連結？</translation>
-    </message>
-    <message>
-      <source>External link will open in the browser</source>
-      <translation>外部連結將在瀏覽器中開啟</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>取消</translation>
     </message>
     <message>
       <source>Open</source>
       <translation>開啟</translation>
+    </message>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation type="unfinished">Open external link in browser?</translation>
     </message>
   </context>
   <context>

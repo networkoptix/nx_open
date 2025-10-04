@@ -497,20 +497,16 @@
   <context>
     <name>LinkAboutToOpenDialog</name>
     <message>
-      <source>Open link?</source>
-      <translation>Otworzyć link?</translation>
-    </message>
-    <message>
-      <source>External link will open in the browser</source>
-      <translation>Link zewnętrzny zostanie otwarty w przeglądarce</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Anuluj</translation>
     </message>
     <message>
       <source>Open</source>
       <translation>Otwórz</translation>
+    </message>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation type="unfinished">Open external link in browser?</translation>
     </message>
   </context>
   <context>

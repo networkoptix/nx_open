@@ -204,34 +204,6 @@
       <source>For</source>
       <translation type="unfinished">For</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected devices were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected cameras were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected servers were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected layouts were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Time value cannot be less than zero</source>
       <translation type="unfinished">Time value cannot be less than zero</translation>
@@ -328,6 +300,38 @@
     <message>
       <source>Removed layout</source>
       <translation type="unfinished">Removed layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <comment>Numerus form depend on devices count</comment>
+      <translation type="unfinished">
+        <numerusform>Selected devices were removed</numerusform>
+        <numerusform>Selected devices were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <comment>Numerus form depend on cameras count</comment>
+      <translation type="unfinished">
+        <numerusform>Selected cameras were removed</numerusform>
+        <numerusform>Selected cameras were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <comment>Numerus form depend on servers count</comment>
+      <translation type="unfinished">
+        <numerusform>Selected servers were removed</numerusform>
+        <numerusform>Selected servers were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <comment>Numerus form depend on layouts count</comment>
+      <translation type="unfinished">
+        <numerusform>Selected layouts were removed</numerusform>
+        <numerusform>Selected layouts were removed</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -663,6 +667,7 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
+      <comment>Numerus form depends on the amount of invalid headers</comment>
       <translation type="unfinished">
         <numerusform>Some of the headers are not valid</numerusform>
         <numerusform>Some of the headers are not valid</numerusform>
@@ -670,6 +675,7 @@
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
+      <comment>Numerus form depends on the total amount of headers</comment>
       <translation type="unfinished">
         <numerusform>All the headers are not valid</numerusform>
         <numerusform>All the headers are not valid</numerusform>
