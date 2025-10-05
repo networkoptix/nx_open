@@ -514,8 +514,8 @@
     <message numerus="yes">
       <source>%1 have no input ports</source>
       <translation>
-        <numerusform>%1 har ingen input-porte</numerusform>
-        <numerusform>%1 har ingen input-porte</numerusform>
+        <numerusform>%1 har ingen input porte</numerusform>
+        <numerusform>%1 har ingen input porte</numerusform>
       </translation>
     </message>
   </context>
@@ -1243,7 +1243,7 @@
     <message>
       <source>Mos</source>
       <comment>Capitalized long suffix for displaying months</comment>
-      <translation>Mos</translation>
+      <translation>Måneder</translation>
     </message>
     <message>
       <source>Yrs</source>
