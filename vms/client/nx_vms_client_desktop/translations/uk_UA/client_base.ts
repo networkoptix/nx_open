@@ -69,11 +69,11 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 використовуються</numerusform>
+        <numerusform>%1 використовуються</numerusform>
+        <numerusform>%1 використовуються</numerusform>
+        <numerusform>%1 використовуються</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1569,11 +1569,11 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>Не вдалося деактивувати ліцензії</numerusform>
+        <numerusform>Не вдалося деактивувати ліцензії</numerusform>
+        <numerusform>Не вдалося деактивувати ліцензії</numerusform>
+        <numerusform>Не вдалося деактивувати ліцензії</numerusform>
       </translation>
     </message>
     <message>
@@ -1667,11 +1667,11 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Ім’я файлу не повинно містити наступних зарезервованих символів:</numerusform>
+        <numerusform>Ім’я файлу не повинно містити наступних зарезервованих символів:</numerusform>
+        <numerusform>Ім’я файлу не повинно містити наступних зарезервованих символів:</numerusform>
+        <numerusform>Ім’я файлу не повинно містити наступних зарезервованих символів:</numerusform>
       </translation>
     </message>
   </context>
@@ -5936,11 +5936,11 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>ПК %1 - Дисплеї %2</numerusform>
+        <numerusform>ПК %1 - Дисплеї %2</numerusform>
+        <numerusform>ПК %1 - Дисплеї %2</numerusform>
+        <numerusform>ПК %1 - Дисплеї %2</numerusform>
       </translation>
     </message>
   </context>
@@ -6258,11 +6258,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Обрані формати файлів не підтримуються</numerusform>
+        <numerusform>Обрані формати файлів не підтримуються</numerusform>
+        <numerusform>Обрані формати файлів не підтримуються</numerusform>
+        <numerusform>Обрані формати файлів не підтримуються</numerusform>
       </translation>
     </message>
     <message>
@@ -6271,11 +6271,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Обрані файли не містять міток часу</numerusform>
+        <numerusform>Обрані файли не містять міток часу</numerusform>
+        <numerusform>Обрані файли не містять міток часу</numerusform>
+        <numerusform>Обрані файли не містять міток часу</numerusform>
       </translation>
     </message>
     <message>
@@ -6284,11 +6284,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>Обрані файли занадно старі</numerusform>
+        <numerusform>Обрані файли занадно старі</numerusform>
+        <numerusform>Обрані файли занадно старі</numerusform>
+        <numerusform>Обрані файли занадно старі</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6311,29 +6311,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Обрані файли охоплюють періоди, для яких відео вже завантажені</numerusform>
+        <numerusform>Обрані файли охоплюють періоди, для яких відео вже завантажені</numerusform>
+        <numerusform>Обрані файли охоплюють періоди, для яких відео вже завантажені</numerusform>
+        <numerusform>Обрані файли охоплюють періоди, для яких відео вже завантажені</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Ви можете завантажити ці файли в інший екземпляр віртуальної камери.</numerusform>
+        <numerusform>Ви можете завантажити ці файли в інший екземпляр віртуальної камери.</numerusform>
+        <numerusform>Ви можете завантажити ці файли в інший екземпляр віртуальної камери.</numerusform>
+        <numerusform>Ви можете завантажити ці файли в інший екземпляр віртуальної камери.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Обраний файл охоплює період, для якого відео вже завантажено</numerusform>
+        <numerusform>Обраний файл охоплює період, для якого відео вже завантажено</numerusform>
+        <numerusform>Обраний файл охоплює період, для якого відео вже завантажено</numerusform>
+        <numerusform>Обраний файл охоплює період, для якого відео вже завантажено</numerusform>
       </translation>
     </message>
     <message>
@@ -6354,20 +6354,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>Деякі фрагменти архіву можуть бути видалені після завантаження цих файлів</numerusform>
+        <numerusform>Деякі фрагменти архіву можуть бути видалені після завантаження цих файлів</numerusform>
+        <numerusform>Деякі фрагменти архіву можуть бути видалені після завантаження цих файлів</numerusform>
+        <numerusform>Деякі фрагменти архіву можуть бути видалені після завантаження цих файлів</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>На сервері майже не залишилося вільного місця. Щоб звільнити місце деякі старі записи можна видалити. Зверніть увагу, що якщо вибрані файли є найстарішими на сервері, вони будуть видалені відразу ж після їх завантаження.</numerusform>
+        <numerusform>На сервері майже не залишилося вільного місця. Щоб звільнити місце деякі старі записи можна видалити. Зверніть увагу, що якщо вибрані файли є найстарішими на сервері, вони будуть видалені відразу ж після їх завантаження.</numerusform>
+        <numerusform>На сервері майже не залишилося вільного місця. Щоб звільнити місце деякі старі записи можна видалити. Зверніть увагу, що якщо вибрані файли є найстарішими на сервері, вони будуть видалені відразу ж після їх завантаження.</numerusform>
+        <numerusform>На сервері майже не залишилося вільного місця. Щоб звільнити місце деякі старі записи можна видалити. Зверніть увагу, що якщо вибрані файли є найстарішими на сервері, вони будуть видалені відразу ж після їх завантаження.</numerusform>
       </translation>
     </message>
     <message>
@@ -9784,21 +9784,21 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 використовуються</numerusform>
+        <numerusform>%1 використовуються</numerusform>
+        <numerusform>%1 використовуються</numerusform>
+        <numerusform>%1 використовуються</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Потрібно принаймні %1</numerusform>
+        <numerusform>Потрібно принаймні %1</numerusform>
+        <numerusform>Потрібно принаймні %1</numerusform>
+        <numerusform>Потрібно принаймні %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -9812,11 +9812,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>Деактивувати ліцензії?</numerusform>
+        <numerusform>Деактивувати ліцензії?</numerusform>
+        <numerusform>Деактивувати ліцензії?</numerusform>
+        <numerusform>Деактивувати ліцензії?</numerusform>
       </translation>
     </message>
     <message>
@@ -12064,11 +12064,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Двічі клiкнiть, щоб додати камеру до поточної розкладки, або Ctrl + клік, щоб відкрити нову вкладку</numerusform>
+        <numerusform>Двічі клiкнiть, щоб додати камеру до поточної розкладки, або Ctrl + клік, щоб відкрити нову вкладку</numerusform>
+        <numerusform>Двічі клiкнiть, щоб додати камеру до поточної розкладки, або Ctrl + клік, щоб відкрити нову вкладку</numerusform>
+        <numerusform>Двічі клiкнiть, щоб додати камеру до поточної розкладки, або Ctrl + клік, щоб відкрити нову вкладку</numerusform>
       </translation>
     </message>
     <message>

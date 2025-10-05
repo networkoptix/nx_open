@@ -172,7 +172,7 @@
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
+      <translation>Шинж чанарууд:</translation>
     </message>
     <message>
       <source>Object Type:</source>
@@ -1111,7 +1111,7 @@
     </message>
     <message>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Бүх төхөөрөмж</translation>
     </message>
     <message>
       <source>Default</source>

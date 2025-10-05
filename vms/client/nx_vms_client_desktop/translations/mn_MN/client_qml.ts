@@ -658,7 +658,7 @@
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Шинж чанарууд</translation>
     </message>
   </context>
   <context>

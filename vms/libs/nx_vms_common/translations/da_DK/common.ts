@@ -1092,7 +1092,7 @@
     <message>
       <source>Mos</source>
       <comment>Capitalized long suffix for displaying months</comment>
-      <translation>Mos</translation>
+      <translation>Måneder</translation>
     </message>
     <message>
       <source>Yrs</source>
