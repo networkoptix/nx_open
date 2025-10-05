@@ -740,7 +740,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Шинж чанарууд</translation>
     </message>
     <message>
       <source>Select type</source>

@@ -74,9 +74,9 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>S'utilitzen %1</numerusform>
+        <numerusform>S'utilitzen %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1440,9 +1440,9 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>No es poden desactivar les llicències</numerusform>
+        <numerusform>No es poden desactivar les llicències</numerusform>
       </translation>
     </message>
   </context>
@@ -1505,9 +1505,9 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>El nom de l'arxiu ha de contenir els caràcters reservats següents:</numerusform>
+        <numerusform>El nom de l'arxiu no pot contenir els caràcters reservats següents:</numerusform>
       </translation>
     </message>
   </context>
@@ -5184,9 +5184,9 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>Ordinador %1 - Pantalles %2</numerusform>
+        <numerusform>Ordinador %1 - Pantalles %2</numerusform>
       </translation>
     </message>
   </context>
@@ -8895,25 +8895,25 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 estan actualment en ús</numerusform>
+        <numerusform>%1 estan actualment en ús</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Es requereixen almenys %1</numerusform>
+        <numerusform>Es requereixen almenys %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>Voleu desactivar les llicències?</numerusform>
+        <numerusform>Voleu desactivar les llicències?</numerusform>
       </translation>
     </message>
   </context>
@@ -11272,9 +11272,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Feu doble clic per afegir càmeres al disseny actual o bé premeu la tecla Ctrl i feu clic per obrir-lo en una pestanya nova</numerusform>
+        <numerusform>Feu doble clic per afegir càmeres al disseny actual o bé premeu Ctrl i feu clic per obrir-lo en una pestanya nova</numerusform>
       </translation>
     </message>
   </context>
@@ -11844,65 +11844,65 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Els formats d'arxiu seleccionats no són compatibles</numerusform>
+        <numerusform>Els formats d'arxiu seleccionats no són compatibles</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Els arxius seleccionats no tenen marques horàries</numerusform>
+        <numerusform>Els arxius seleccionats no tenen marques horàries</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>Els arxius seleccionats són massa antics</numerusform>
+        <numerusform>Els arxius seleccionats són massa antics</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Els arxius seleccionats cobreixen períodes per als quals ja s'estan penjant vídeos</numerusform>
+        <numerusform>Els arxius seleccionats cobreixen períodes per als quals ja s'estan penjant vídeos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Podeu penjar aquests arxius a una instància diferent d'una càmera virtual.</numerusform>
+        <numerusform>Podeu carregar aquests arxius a una instància diferent d'una càmera virtual.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Els arxius seleccionats cobreixen períodes per als quals ja s'han penjat vídeos</numerusform>
+        <numerusform>Els arxius seleccionats cobreixen períodes per als quals ja s'han penjat vídeos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>Es podrien esborrar algunes imatges després de penjar aquests arxius</numerusform>
+        <numerusform>Es podrien esborrar algunes imatges després de penjar aquests arxius</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>No queda gaire espai lliure a l'emmagatzematge del servidor. Es podrien esborrar algunes imatges antigues per alliberar espai. Tingueu en compte que si els arxius seleccionats són els més antics del servidor, s'esborraran just després de penjar-los.</numerusform>
+        <numerusform>No queda gaire espai lliure a l'emmagatzematge del servidor. Es podrien esborrar algunes imatges antigues per alliberar espai. Tingueu en compte que si els arxius seleccionats són els més antics del servidor, s'esborraran just després de penjar-los.</numerusform>
       </translation>
     </message>
   </context>

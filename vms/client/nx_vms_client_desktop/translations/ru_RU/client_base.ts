@@ -76,21 +76,21 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 используются</numerusform>
+        <numerusform>%1 используются</numerusform>
+        <numerusform>%1 используются</numerusform>
+        <numerusform>%1 используются</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Numerus: text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>%1 требуется</numerusform>
+        <numerusform>%1 требуется</numerusform>
+        <numerusform>%1 требуется</numerusform>
+        <numerusform>%1 требуется</numerusform>
       </translation>
     </message>
   </context>
@@ -1130,31 +1130,31 @@
     <message numerus="yes">
       <source>Show on Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>Показывать на элементе</numerusform>
+        <numerusform>Показывать на элементах</numerusform>
+        <numerusform>Показывать на элементах</numerusform>
+        <numerusform>Показывать на элементах</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>Отключить звук</numerusform>
+        <numerusform>Отключить звук</numerusform>
+        <numerusform>Отключить звук</numerusform>
+        <numerusform>Отключить звук</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>Включить звук</numerusform>
+        <numerusform>Включить звук</numerusform>
+        <numerusform>Включить звук</numerusform>
+        <numerusform>Включить звук</numerusform>
       </translation>
     </message>
   </context>
@@ -1462,11 +1462,11 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>Не удалось деактивировать лицензию</numerusform>
+        <numerusform>Не удалось деактивировать лицензию</numerusform>
+        <numerusform>Не удалось деактивировать лицензию</numerusform>
+        <numerusform>Не удалось деактивировать лицензию</numerusform>
       </translation>
     </message>
   </context>
@@ -1531,11 +1531,11 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
       </translation>
     </message>
   </context>
@@ -4239,11 +4239,11 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Certificates</source>
       <comment>Numerus form depends on the certificates count</comment>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>Сертификат</numerusform>
+        <numerusform>Сертификата</numerusform>
+        <numerusform>Сертификатов</numerusform>
+        <numerusform>Сертификатов</numerusform>
       </translation>
     </message>
   </context>
@@ -5286,11 +5286,11 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>ПК %1 - дисплей %2</numerusform>
+        <numerusform>ПК %1 - дисплей %2</numerusform>
+        <numerusform>ПК %1 - дисплей %2</numerusform>
+        <numerusform>ПК %1 - дисплей %2</numerusform>
       </translation>
     </message>
   </context>
@@ -9167,31 +9167,31 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 уже используются</numerusform>
+        <numerusform>%1 уже используются</numerusform>
+        <numerusform>%1 уже используются</numerusform>
+        <numerusform>%1 уже используются</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Требуются по крайней мере %1</numerusform>
+        <numerusform>Требуются по крайней мере %1</numerusform>
+        <numerusform>Требуются по крайней мере %1</numerusform>
+        <numerusform>Требуются по крайней мере %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>Деактивировать лицензию?</numerusform>
+        <numerusform>Деактивировать лицензию?</numerusform>
+        <numerusform>Деактивировать лицензию?</numerusform>
+        <numerusform>Деактивировать лицензию?</numerusform>
       </translation>
     </message>
   </context>
@@ -11150,11 +11150,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>I trust these servers</source>
       <comment>Numerus form depends on the number of certificates</comment>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
-        <numerusform>I trust these servers</numerusform>
-        <numerusform>I trust these servers</numerusform>
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>Я доверяю этим серверам</numerusform>
+        <numerusform>Я доверяю этим серверам</numerusform>
+        <numerusform>Я доверяю этим серверам</numerusform>
+        <numerusform>Я доверяю этим серверам</numerusform>
       </translation>
     </message>
   </context>
@@ -11603,11 +11603,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
       </translation>
     </message>
   </context>
@@ -12181,81 +12181,81 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
+        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
+        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
+        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
+        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
+        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
+        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>Выбранные файлы слишком старые</numerusform>
+        <numerusform>Выбранные файлы слишком старые</numerusform>
+        <numerusform>Выбранные файлы слишком старые</numerusform>
+        <numerusform>Выбранные файлы слишком старые</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
+        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
+        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
+        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
       </translation>
     </message>
   </context>

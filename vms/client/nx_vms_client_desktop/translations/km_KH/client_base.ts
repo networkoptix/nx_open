@@ -1429,7 +1429,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
@@ -5133,7 +5133,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
@@ -8773,7 +8773,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>

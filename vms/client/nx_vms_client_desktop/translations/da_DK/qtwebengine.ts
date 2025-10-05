@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation>Generel filbetjeningsfejl</translation>
+      <translation>Generel fil betjenings fejl</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>

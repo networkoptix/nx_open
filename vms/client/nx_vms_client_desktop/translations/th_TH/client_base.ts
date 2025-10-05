@@ -73,8 +73,8 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 มีการใช้</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1121,8 +1121,8 @@
     <message numerus="yes">
       <source>Show on Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>แสดงในรายการ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1429,8 +1429,8 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>ไม่สามารถยกเลิกการอนุญาตได้</numerusform>
       </translation>
     </message>
   </context>
@@ -1492,8 +1492,8 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>ชื่อไฟล์ต้องไม่มีอักขระสงวนไว้ต่อไปนี้:</numerusform>
       </translation>
     </message>
   </context>
@@ -5133,8 +5133,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>PC %1 - แสดงผล %2</numerusform>
       </translation>
     </message>
   </context>
@@ -8759,22 +8759,22 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1  มีใช้อยู่ในปัจจุบัน</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>อย่างน้อย %1 ที่ต้องการ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>ปิดใช้งานใบอนุญาตหรือไม่?</numerusform>
       </translation>
     </message>
   </context>
@@ -10674,8 +10674,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>I trust these servers</source>
       <comment>Numerus form depends on the number of certificates</comment>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>ฉันเชื่อถือเซิร์ฟเวอร์เหล่านี้</numerusform>
       </translation>
     </message>
   </context>
@@ -11106,8 +11106,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>ดับเบิลคลิกเพื่อเพิ่มกล้องในเค้าโครงปัจจุบันหรือ ctrl + คลิกเพื่อเปิดในแท็บใหม่</numerusform>
       </translation>
     </message>
   </context>
@@ -11675,57 +11675,57 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>ไม่สนับสนุนรูปแบบไฟล์ที่เลือก</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>ไฟล์ที่เลือกไม่มี timestamps</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>ไฟล์ที่เลือกเก่าเกินไป</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>ไฟล์ที่เลือกครอบคลุมช่วงเวลาที่วิดีโอกำลังอัปโหลดอยู่</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>คุณสามารถอัปโหลดไฟล์เหล่านี้ไปยังอินสแตนซ์อื่น ๆ ของ Wearable Camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>ไฟล์ที่เลือกครอบคลุมช่วงเวลาที่วิดีโอกำลังอัปโหลดอยู่</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>วิดีโอบางอย่างอาจถูกลบหลังจากอัปโหลดไฟล์เหล่านี้</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>พื้นที่เก็บข้อมูลของเซิร์ฟเวอร์ไม่เหลือมากนัก วิดีโอเก่าบางส่วนอาจถูกลบเพื่อเพิ่มพื้นที่ว่าง โปรดทราบว่าหากไฟล์ที่เลือกเป็นไฟล์ที่เก่าที่สุดบนเซิร์ฟเวอร์ไฟล์เหล่านี้จะถูกลบออกทันทีหลังจากอัปโหลด</numerusform>
       </translation>
     </message>
   </context>

@@ -516,8 +516,8 @@
       <source>%1 have no input ports</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
       <translation>
-        <numerusform>%1 har ingen input-porte</numerusform>
-        <numerusform>%1 har ingen input-porte</numerusform>
+        <numerusform>%1 har ingen input porte</numerusform>
+        <numerusform>%1 har ingen input porte</numerusform>
       </translation>
     </message>
   </context>
@@ -1246,7 +1246,7 @@
     <message>
       <source>Mos</source>
       <comment>Numerus: Capitalized long suffix for displaying months</comment>
-      <translation>Mos</translation>
+      <translation>Måneder</translation>
     </message>
     <message>
       <source>Yrs</source>

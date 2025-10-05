@@ -74,17 +74,17 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 se utilizan</numerusform>
+        <numerusform>%1 se utilizan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Numerus: text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>Se requiere %1</numerusform>
+        <numerusform>Se requiere %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1124,9 +1124,9 @@
     <message numerus="yes">
       <source>Show on Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>Mostrar en artículos</numerusform>
+        <numerusform>Mostrar en Items</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1440,9 +1440,9 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>No se pueden desactivar las licencias</numerusform>
+        <numerusform>No se pueden desactivar las licencias</numerusform>
       </translation>
     </message>
   </context>
@@ -1505,9 +1505,9 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados:</numerusform>
+        <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados:</numerusform>
       </translation>
     </message>
   </context>
@@ -4157,9 +4157,9 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Certificates</source>
       <comment>Numerus form depends on the certificates count</comment>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>Certificados</numerusform>
+        <numerusform>Certificados</numerusform>
       </translation>
     </message>
   </context>
@@ -5184,9 +5184,9 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>PC %1 -Pantallas %2</numerusform>
+        <numerusform>PC %1 -Pantallas %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5428,17 +5428,17 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
       <comment>Numerus form depends on the number of devices</comment>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>No puede agregar al muro de videos dispositivos para los cuales no tiene permiso Ver en vivo.</numerusform>
+        <numerusform>No puede agregar al muro de videos dispositivos para los cuales no tiene permiso Ver en vivo.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>No puede agregar al muro de videos dispositivos para los cuales no tiene permiso Ver en vivo.</numerusform>
+        <numerusform>No puede agregar al muro de videos dispositivos para los cuales no tiene permiso Ver en vivo.</numerusform>
       </translation>
     </message>
   </context>
@@ -7500,17 +7500,17 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
       <comment>Numerus form depends on the total number of devices</comment>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Estos dispositivos no tienen salida de audio o no están configurados correctamente.</numerusform>
+        <numerusform>Estos dispositivos no tienen salida de audio o no están configurados correctamente.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
       <comment>Numerus form depends on the total number of devices</comment>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Estos dispositivos no tienen entrada de audio o no están configurados correctamente.</numerusform>
+        <numerusform>Estos dispositivos no tienen entrada de audio o no están configurados correctamente.</numerusform>
       </translation>
     </message>
   </context>
@@ -8895,25 +8895,25 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 están actualmente en uso</numerusform>
+        <numerusform>%1 están actualmente en uso</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Se requieren al menos %1</numerusform>
+        <numerusform>Se requieren al menos %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>¿Deseas desactivar las licencias?</numerusform>
+        <numerusform>¿Deseas desactivar las licencias?</numerusform>
       </translation>
     </message>
   </context>
@@ -10832,9 +10832,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>I trust these servers</source>
       <comment>Numerus form depends on the number of certificates</comment>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>Confío en estos servidores</numerusform>
+        <numerusform>Confío en estos servidores</numerusform>
       </translation>
     </message>
   </context>
@@ -11271,9 +11271,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Haga doble clic para agregar cámaras al diseño actual o presione ctrl + clic para abrir en una nueva pestaña</numerusform>
+        <numerusform>Haga doble clic para agregar cámaras al diseño actual o presione ctrl + clic para abrir en una nueva pestaña</numerusform>
       </translation>
     </message>
   </context>
@@ -11843,65 +11843,65 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Los formatos de archivo seleccionados no son compatibles</numerusform>
+        <numerusform>Los formatos de archivo seleccionados no son compatibles</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Los archivos seleccionados no tienen marcas de tiempo</numerusform>
+        <numerusform>Los archivos seleccionados no tienen marcas de tiempo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>Los archivos seleccionados son demasiado viejos</numerusform>
+        <numerusform>Los archivos seleccionados son demasiado viejos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Los archivos seleccionados cubren períodos para los cuales ya se están cargando videos</numerusform>
+        <numerusform>Los archivos seleccionados cubren períodos para los cuales ya se están cargando videos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Puede cargar estos archivos en una instancia diferente de una cámara virtual.</numerusform>
+        <numerusform>Puede cargar estos archivos en una instancia diferente de una cámara virtual.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Los archivos seleccionados cubren períodos para los cuales ya se han subido videos</numerusform>
+        <numerusform>Los archivos seleccionados cubren períodos para los cuales ya se han subido videos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>Algunas imágenes se podrían ser eliminados después de cargar estos archivos</numerusform>
+        <numerusform>Algunas imágenes se podrían ser eliminados después de cargar estos archivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>No queda mucho espacio libre en el almacenamiento del servidor. Algunas imágenes viejas pueden eliminarse para liberar espacio. Tenga en cuenta que si los archivos seleccionados resultan ser los más antiguos en el servidor, se eliminarán inmediatamente después de ser cargados.</numerusform>
+        <numerusform>No queda mucho espacio libre en el almacenamiento del servidor. Algunas imágenes viejas pueden eliminarse para liberar espacio. Tenga en cuenta que si los archivos seleccionados resultan ser los más antiguos en el servidor, se eliminarán inmediatamente después de ser cargados.</numerusform>
       </translation>
     </message>
   </context>

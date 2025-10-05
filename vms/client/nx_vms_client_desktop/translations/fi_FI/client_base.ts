@@ -74,9 +74,9 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 käytetään</numerusform>
+        <numerusform>%1 käytetään</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1440,9 +1440,9 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>Lisenssejä ei voitu deaktivoida</numerusform>
+        <numerusform>Lisenssejä ei voitu deaktivoida</numerusform>
       </translation>
     </message>
   </context>
@@ -1505,9 +1505,9 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Tiedostonimi ei saa sisältää seuraavia varattuja merkkejä:</numerusform>
+        <numerusform>Tiedostonimi ei saa sisältää seuraavia varattuja merkkejä:</numerusform>
       </translation>
     </message>
   </context>
@@ -5184,9 +5184,9 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>PC %1 - Näytöt %2</numerusform>
+        <numerusform>PC %1 - Näytöt %2</numerusform>
       </translation>
     </message>
   </context>
@@ -8895,25 +8895,25 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 ovat käytössä</numerusform>
+        <numerusform>%1 ovat käytössä</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Tarvitaan vähintään %1</numerusform>
+        <numerusform>Tarvitaan vähintään %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>Deaktivoi lisenssit?</numerusform>
+        <numerusform>Deaktivoi lisenssit?</numerusform>
       </translation>
     </message>
   </context>
@@ -11272,9 +11272,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Lisää kamerat nykyiseen asetteluun kaksoisnapsauttamalla tai avataksesi uuden välilehden ctrl + napsauttamalla</numerusform>
+        <numerusform>Lisää kamerat nykyiseen asetteluun kaksoisnapsauttamalla tai avataksesi uuden välilehden ctrl + napsauttamalla</numerusform>
       </translation>
     </message>
   </context>
@@ -11844,65 +11844,65 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Valittuja tiedostomuotoja ei tueta</numerusform>
+        <numerusform>Valittuja tiedostomuotoja ei tueta</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Valituilla tiedostoilla ei ole aikaleimoja</numerusform>
+        <numerusform>Valituilla tiedostoilla ei ole aikaleimoja</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>Valitut tiedostot ovat liian vanhoja</numerusform>
+        <numerusform>Valitut tiedostot ovat liian vanhoja</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Valitut tiedostot kattavat aikajaksoja, joiden videoita on jo ladattu</numerusform>
+        <numerusform>Valitut tiedostot kattavat aikajaksoja, joiden videoita on jo ladattu</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Voit ladata nämä tiedostot virtuaalikameran toiseen instanssiin.</numerusform>
+        <numerusform>Voit ladata nämä tiedostot virtuaalikameran toiseen instanssiin.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Valitut tiedostot kattavat aikajaksoja, joiden videoita on jo ladattu</numerusform>
+        <numerusform>Valitut tiedostot kattavat aikajaksoja, joiden videoita on jo ladattu</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>Jotkin videot voidaan poistaa näiden tiedostojen lataamisen jälkeen</numerusform>
+        <numerusform>Jotkin videot voidaan poistaa näiden tiedostojen lataamisen jälkeen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>Palvelimen tallennuksessa ei ole paljon vapaata tilaa. Joitakin vanhoja materiaaleja voidaan poistaa vapauttamalla tilaa. Huomaa, että jos valitut tiedostot ovat palvelimen vanhimpia, ne poistetaan heti lataamisen jälkeen.</numerusform>
+        <numerusform>Palvelimen tallennuksessa ei ole paljon vapaata tilaa. Joitakin vanhoja materiaaleja voidaan poistaa vapauttamalla tilaa. Huomaa, että jos valitut tiedostot ovat palvelimen vanhimpia, ne poistetaan heti lataamisen jälkeen.</numerusform>
       </translation>
     </message>
   </context>
