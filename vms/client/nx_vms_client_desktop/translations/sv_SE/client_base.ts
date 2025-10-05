@@ -74,17 +74,17 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 används</numerusform>
+        <numerusform>%1 används</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>%1 krävs</numerusform>
+        <numerusform>%1 krävs</numerusform>
       </translation>
     </message>
   </context>
@@ -907,9 +907,9 @@
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>Visa på objekt</numerusform>
+        <numerusform>Visa på objekt</numerusform>
       </translation>
     </message>
     <message>
@@ -1042,16 +1042,16 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>Tysta objekt</numerusform>
+        <numerusform>Tysta objekt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>Slå på ljudet för objekt</numerusform>
+        <numerusform>Slå på ljudet för objekt</numerusform>
       </translation>
     </message>
     <message>
@@ -1409,9 +1409,9 @@ Licensnyckel: %2</translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>Kan inte avaktivera licenser</numerusform>
+        <numerusform>Kan inte avaktivera licenser</numerusform>
       </translation>
     </message>
     <message>
@@ -1501,9 +1501,9 @@ Licensnyckel: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Filnamnet får inte innehålla följande reserverade tecken:</numerusform>
+        <numerusform>Filnamnet får inte innehålla följande reserverade tecken:</numerusform>
       </translation>
     </message>
   </context>
@@ -2085,23 +2085,23 @@ Licensnyckel: %2</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
-        <numerusform>These devices are removed from Site</numerusform>
+      <translation>
+        <numerusform>Dessa enheter tas bort från sajten</numerusform>
+        <numerusform>Dessa enheter tas bort från sajten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
-        <numerusform>These cameras are removed from Site</numerusform>
+      <translation>
+        <numerusform>Dessa kameror tas bort från sajten</numerusform>
+        <numerusform>Dessa kameror tas bort från sajten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
-        <numerusform>These resources are removed from Site</numerusform>
+      <translation>
+        <numerusform>Dessa resurser tas bort från System</numerusform>
+        <numerusform>Dessa resurser tas bort från System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4128,9 +4128,9 @@ Licensnyckel: %2</translation>
     <name>QnServerSettingsWidget</name>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>Certifikat</numerusform>
+        <numerusform>Certifikat</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5186,9 +5186,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>PC %1 - Visar %2</numerusform>
+        <numerusform>PC %1 - Visar %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5413,16 +5413,16 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>Du kan inte lägga till videoväggsenheter för vilka du inte har behörigheten Visa Live.</numerusform>
+        <numerusform>Du kan inte lägga till videoväggsenheter för vilka du inte har behörigheten Visa Live.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>Du kan inte lägga till kameror på videoväggen som du inte har View Live-behörighet för.</numerusform>
+        <numerusform>Du kan inte lägga till kameror på videoväggen som du inte har View Live-behörighet för.</numerusform>
       </translation>
     </message>
     <message>
@@ -5632,9 +5632,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Du håller på att flytta dessa webbsidor till server &quot;%1&quot;. Dessa webbsidor proxyar allt begärt innehåll, och deras proxyserver ändras till server &quot;%1&quot;.</numerusform>
+        <numerusform>Du håller på att flytta dessa webbsidor till server &quot;%1&quot;. Dessa webbsidor proxyar allt begärt innehåll, och deras proxyserver ändras till server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5678,9 +5678,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>Dessa layouter delas med andra användare, så de kommer också att raderas för deras konton.</numerusform>
+        <numerusform>Dessa layouter delas med andra användare, så de kommer också att raderas för deras konton.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7466,9 +7466,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7480,9 +7480,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
       </translation>
     </message>
     <message>
@@ -8873,9 +8873,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>Avaktivera licenser?</numerusform>
+        <numerusform>Avaktivera licenser?</numerusform>
       </translation>
     </message>
     <message>
@@ -8893,17 +8893,17 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 används för närvarande</numerusform>
+        <numerusform>%1 används för närvarande</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Åtminstone %1 krävs</numerusform>
+        <numerusform>Åtminstone %1 krävs</numerusform>
       </translation>
     </message>
   </context>
@@ -10813,9 +10813,9 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>Jag litar på dessa servrar</numerusform>
+        <numerusform>Jag litar på dessa servrar</numerusform>
       </translation>
     </message>
     <message>
@@ -11207,9 +11207,9 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Dubbelklicka för att lägga till kameror i den aktuella layouten eller ctrl + klicka för att öppna i en ny flik</numerusform>
+        <numerusform>Dubbelklicka för att lägga till kameror i den aktuella layouten eller ctrl + klicka för att öppna i en ny flik</numerusform>
       </translation>
     </message>
     <message>
@@ -11739,9 +11739,9 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Valda filformat stöds inte</numerusform>
+        <numerusform>Valda filformat stöds inte</numerusform>
       </translation>
     </message>
     <message>
@@ -11750,9 +11750,9 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Valda filer har inte tidsstämplar</numerusform>
+        <numerusform>Valda filer har inte tidsstämplar</numerusform>
       </translation>
     </message>
     <message>
@@ -11761,9 +11761,9 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>Valda filer är för gamla</numerusform>
+        <numerusform>Valda filer är för gamla</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11782,23 +11782,23 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Valda filer täcker perioder för vilka videoklipp redan laddas upp</numerusform>
+        <numerusform>Valda filer täcker perioder för vilka videoklipp redan laddas upp</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Du kan ladda upp dessa filer till en annan instans av en kroppsburen kamera.</numerusform>
+        <numerusform>Du kan ladda upp dessa filer till en annan instans av en kroppsburen kamera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Valda filer täcker perioder för vilka videoklipp redan har laddats upp</numerusform>
+        <numerusform>Valda filer täcker perioder för vilka videoklipp redan har laddats upp</numerusform>
       </translation>
     </message>
     <message>
@@ -11819,16 +11819,16 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>Vissa bilder kan raderas efter uppladdning av dessa filer</numerusform>
+        <numerusform>Vissa bilder kan raderas efter uppladdning av dessa filer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>Det finns inte mycket ledigt utrymme kvar på serverlagring. Vissa gamla bilder kan raderas för att frigöra utrymme. Observera att om valda filer råkar vara de äldsta på servern, kommer de att raderas direkt efter att ha laddats upp.</numerusform>
+        <numerusform>Det finns inte mycket ledigt utrymme kvar på serverlagring. Vissa gamla bilder kan raderas för att frigöra utrymme. Observera att om valda filer råkar vara de äldsta på servern, kommer de att raderas direkt efter att ha laddats upp.</numerusform>
       </translation>
     </message>
     <message>
@@ -12847,17 +12847,17 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
-        <numerusform>Some of the rules were not enabled</numerusform>
+      <translation>
+        <numerusform>Vissa regler var inte aktiverade</numerusform>
+        <numerusform>Vissa regler var inte aktiverade</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      <translation>
+        <numerusform>Vissa av de valda reglerna kan inte aktiveras eftersom de har fel parametrar. Fixa dem och aktivera regeln igen.</numerusform>
+        <numerusform>Vissa av de valda reglerna kan inte aktiveras eftersom de har fel parametrar. Fixa dem och aktivera regeln igen.</numerusform>
       </translation>
     </message>
   </context>

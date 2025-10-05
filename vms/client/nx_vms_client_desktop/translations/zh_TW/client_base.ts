@@ -73,15 +73,15 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>已使用 %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>需要%1</numerusform>
       </translation>
     </message>
   </context>
@@ -904,8 +904,8 @@
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>在項目中顯示</numerusform>
       </translation>
     </message>
     <message>
@@ -1038,14 +1038,14 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>將項目靜音</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>將項目取消靜音</numerusform>
       </translation>
     </message>
     <message>
@@ -1399,8 +1399,8 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>無法重置授權</numerusform>
       </translation>
     </message>
     <message>
@@ -1488,8 +1488,8 @@ License Key: %2</source>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>檔名不可包含以下字元:</numerusform>
       </translation>
     </message>
   </context>
@@ -2064,20 +2064,20 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
+      <translation>
+        <numerusform>這些裝置已從站點移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
+      <translation>
+        <numerusform>這些攝影機已從站點移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
+      <translation>
+        <numerusform>這些資源已從站點移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4086,8 +4086,8 @@ License Key: %2</source>
     <name>QnServerSettingsWidget</name>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>憑證</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5133,8 +5133,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>PC %1 - 螢幕 %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5354,14 +5354,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>您無法將沒有「瀏覽即時影像」權限的裝置新增至電視牆。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>您無法將沒有「瀏覽即時影像」權限的裝置新增至電視牆。</numerusform>
       </translation>
     </message>
     <message>
@@ -5561,8 +5561,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>這些伺服器代理轉送(proxy)的網頁即將被移動到伺服器 &quot;%1&quot;，其使用的代理伺服器亦將變更為&quot;%1&quot;。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5603,8 +5603,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>這些佈局與其他使用者共享，因此也將從他們的帳戶中刪除。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7345,8 +7345,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>沒有偵測到這些設備的音訊輸入或是設定不正確。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7357,8 +7357,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>沒有偵測到這些設備的音訊輸出或是設定不正確。</numerusform>
       </translation>
     </message>
     <message>
@@ -8736,8 +8736,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>要重置授權?</numerusform>
       </translation>
     </message>
     <message>
@@ -8755,15 +8755,15 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 已被使用</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>最少需要 %1</numerusform>
       </translation>
     </message>
   </context>
@@ -10651,8 +10651,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>信任這些伺服器</numerusform>
       </translation>
     </message>
     <message>
@@ -11038,8 +11038,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>雙擊將攝影機添加到當前佈局或按住Ctrl加單擊鍵以在新分頁中打開</numerusform>
       </translation>
     </message>
     <message>
@@ -11569,8 +11569,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>不支援所選檔案格式</numerusform>
       </translation>
     </message>
     <message>
@@ -11579,8 +11579,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>所選的檔案沒有時間戳記</numerusform>
       </translation>
     </message>
     <message>
@@ -11589,8 +11589,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>所選檔案太舊</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11607,20 +11607,20 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>所選的檔案包含了已上載影像的區段</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>您可以上傳這些檔案至不同的虛擬攝影機.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>所選的檔案包含了已上傳過的影像</numerusform>
       </translation>
     </message>
     <message>
@@ -11641,14 +11641,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>上傳這些檔案後可能有些錄影資料會被刪除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>伺服器儲存裝置上沒有太多可用空間。 請注意, 如果所選的檔案是伺服器中最舊的資料，則可能會在上傳後被刪除。</numerusform>
       </translation>
     </message>
     <message>
@@ -12659,15 +12659,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
+      <translation>
+        <numerusform>部分規則未啟用</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      <translation>
+        <numerusform>某些選定的規則由於參數錯誤而無法啟用，請修正它們並再次啟用規則。</numerusform>
       </translation>
     </message>
   </context>

@@ -1449,7 +1449,7 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Cannot deactivate licenses</numerusform>
         <numerusform>Cannot deactivate licenses</numerusform>
         <numerusform>Cannot deactivate licenses</numerusform>
@@ -5398,7 +5398,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>PC %1 - Displays %2</numerusform>
         <numerusform>PC %1 - Displays %2</numerusform>
         <numerusform>PC %1 - Displays %2</numerusform>
@@ -9421,7 +9421,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Deactivate licenses?</numerusform>
         <numerusform>Deactivate licenses?</numerusform>
         <numerusform>Deactivate licenses?</numerusform>
