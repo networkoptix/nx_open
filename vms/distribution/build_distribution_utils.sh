@@ -330,6 +330,7 @@ distrib_copyServerSystemLibs() # destination_path
     if [[ "${ARCH}" != "arm" ]]; then
         fallback_libs_to_copy+=(
             libdrm.so.2
+            libgomp.so.1
         )
     fi
 
