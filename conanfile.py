@@ -233,7 +233,7 @@ class NxOpenConan(ConanFile):
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
                 self.requires("os_deps_for_desktop_linux/ubuntu_focal"
-                    "#e89b9e29cdcfa7699fa4810eae291feb")
+                    "#e3b3c4100f7d891449e13cb22ac44715")
 
         if self.haveDesktopClient:
             if self.isMacos:
