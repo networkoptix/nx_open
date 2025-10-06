@@ -268,8 +268,8 @@
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
-        <numerusform>%1 does not support two-way audio</numerusform>
+      <translation>
+        <numerusform>%1 不支持双向音频</numerusform>
       </translation>
     </message>
   </context>
@@ -505,8 +505,8 @@
     <message numerus="yes">
       <source>%1 have no input ports</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
-        <numerusform>%1 have no input ports</numerusform>
+      <translation>
+        <numerusform>%1 无报警输入</numerusform>
       </translation>
     </message>
   </context>
@@ -529,8 +529,8 @@
     <message numerus="yes">
       <source>%1 have no output relays</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
-        <numerusform>%1 have no output relays</numerusform>
+      <translation>
+        <numerusform>%1 无报警输出</numerusform>
       </translation>
     </message>
   </context>
@@ -1101,57 +1101,57 @@
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Numerus: Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
+      <translation>
+        <numerusform>毫秒</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Numerus: Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>seconds</numerusform>
+      <translation>
+        <numerusform>秒</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Numerus: Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>分</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Numerus: Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>小时</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Numerus: Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>天</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Numerus: Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
+      <translation>
+        <numerusform>周</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Numerus: Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
+      <translation>
+        <numerusform>月</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Numerus: Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
+      <translation>
+        <numerusform>年</numerusform>
       </translation>
     </message>
     <message>
@@ -1167,7 +1167,7 @@
     <message>
       <source>Min</source>
       <comment>Numerus: Capitalized long suffix for displaying minutes</comment>
-      <translation type="unfinished">Min</translation>
+      <translation>最小值</translation>
     </message>
     <message>
       <source>Hrs</source>

@@ -1176,113 +1176,113 @@
     <message numerus="yes">
       <source>hours</source>
       <comment>Numerus: Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>saat</numerusform>
+        <numerusform>saat</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Numerus: Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>gün</numerusform>
+        <numerusform>gün</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Numerus: Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
+      <translation>
+        <numerusform>hafta</numerusform>
+        <numerusform>hafta</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Numerus: Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
+      <translation>
+        <numerusform>ay</numerusform>
+        <numerusform>ay</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Numerus: Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
+      <translation>
+        <numerusform>yıl</numerusform>
+        <numerusform>yıl</numerusform>
       </translation>
     </message>
     <message>
       <source>Msec</source>
       <comment>Numerus: Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>Msn</translation>
     </message>
     <message>
       <source>Sec</source>
       <comment>Numerus: Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>Saniye</translation>
     </message>
     <message>
       <source>Min</source>
       <comment>Numerus: Capitalized long suffix for displaying minutes</comment>
-      <translation type="unfinished">Min</translation>
+      <translation>Dk</translation>
     </message>
     <message>
       <source>Hrs</source>
       <comment>Numerus: Capitalized long suffix for displaying hours</comment>
-      <translation type="unfinished">Hrs</translation>
+      <translation>Sa</translation>
     </message>
     <message>
       <source>Days</source>
       <comment>Numerus: Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Günler</translation>
     </message>
     <message>
       <source>Wks</source>
       <comment>Numerus: Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>Haftalar</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Numerus: Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>Aylar</translation>
     </message>
     <message>
       <source>Yrs</source>
       <comment>Numerus: Capitalized long suffix for displaying years</comment>
-      <translation type="unfinished">Yrs</translation>
+      <translation>Yıllar</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Numerus: Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
+      <translation>
+        <numerusform>Milisaniye</numerusform>
+        <numerusform>Milisaniye</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Numerus: Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
+      <translation>
+        <numerusform>Saniye</numerusform>
+        <numerusform>Saniye</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Numerus: Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>Minutes</numerusform>
-        <numerusform>Minutes</numerusform>
+      <translation>
+        <numerusform>Dakika</numerusform>
+        <numerusform>Dakika</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Hours</source>
       <comment>Numerus: Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
+      <translation>
+        <numerusform>Saat</numerusform>
+        <numerusform>Saat</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1296,25 +1296,25 @@
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Numerus: Capitalized full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
-        <numerusform>Weeks</numerusform>
+      <translation>
+        <numerusform>Haftalar</numerusform>
+        <numerusform>Haftalar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Months</source>
       <comment>Numerus: Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
+      <translation>
+        <numerusform>Aylar</numerusform>
+        <numerusform>Aylar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Numerus: Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
+      <translation>
+        <numerusform>Yıllar</numerusform>
+        <numerusform>Yıllar</numerusform>
       </translation>
     </message>
   </context>

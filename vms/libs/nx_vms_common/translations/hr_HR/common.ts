@@ -286,7 +286,7 @@
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 does not support two-way audio</numerusform>
         <numerusform>%1 does not support two-way audio</numerusform>
         <numerusform>%1 does not support two-way audio</numerusform>
@@ -525,7 +525,7 @@
     <message numerus="yes">
       <source>%1 have no input ports</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 have no input ports</numerusform>
         <numerusform>%1 have no input ports</numerusform>
         <numerusform>%1 have no input ports</numerusform>
@@ -551,7 +551,7 @@
     <message numerus="yes">
       <source>%1 have no output relays</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 have no output relays</numerusform>
         <numerusform>%1 have no output relays</numerusform>
         <numerusform>%1 have no output relays</numerusform>
@@ -1212,7 +1212,7 @@
     <message numerus="yes">
       <source>seconds</source>
       <comment>Numerus: Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>seconds</numerusform>
         <numerusform>seconds</numerusform>
         <numerusform>seconds</numerusform>
@@ -1221,7 +1221,7 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Numerus: Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>minutes</numerusform>
         <numerusform>minutes</numerusform>
         <numerusform>minutes</numerusform>
@@ -1333,7 +1333,7 @@
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Numerus: Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Minutes</numerusform>
         <numerusform>Minutes</numerusform>
         <numerusform>Minutes</numerusform>

@@ -277,9 +277,9 @@
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
+      <translation>
+        <numerusform>%1 bieden geen ondersteuning voor twee-weg audio</numerusform>
+        <numerusform>%1 bieden geen ondersteuning voor twee-weg audio</numerusform>
       </translation>
     </message>
   </context>
@@ -515,9 +515,9 @@
     <message numerus="yes">
       <source>%1 have no input ports</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
+      <translation>
+        <numerusform>%1 geeft geen inputpoorten</numerusform>
+        <numerusform>%1 geeft geen inputpoorten</numerusform>
       </translation>
     </message>
   </context>
@@ -540,9 +540,9 @@
     <message numerus="yes">
       <source>%1 have no output relays</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
+      <translation>
+        <numerusform>%1 hebben geen relaisuitgangen</numerusform>
+        <numerusform>%1 hebben geen relaisuitgangen</numerusform>
       </translation>
     </message>
   </context>
@@ -1152,65 +1152,65 @@
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Numerus: Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
+      <translation>
+        <numerusform>milliseconde</numerusform>
+        <numerusform>milliseconde</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Numerus: Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
+      <translation>
+        <numerusform>seconden</numerusform>
+        <numerusform>seconden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Numerus: Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>minuut</numerusform>
+        <numerusform>minuut</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Numerus: Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>uur</numerusform>
+        <numerusform>uur</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Numerus: Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>dagen</numerusform>
+        <numerusform>dagen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Numerus: Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
+      <translation>
+        <numerusform>week</numerusform>
+        <numerusform>week</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Numerus: Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
+      <translation>
+        <numerusform>maand</numerusform>
+        <numerusform>maand</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Numerus: Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
+      <translation>
+        <numerusform>jaar</numerusform>
+        <numerusform>jaar</numerusform>
       </translation>
     </message>
     <message>
@@ -1226,7 +1226,7 @@
     <message>
       <source>Min</source>
       <comment>Numerus: Capitalized long suffix for displaying minutes</comment>
-      <translation type="unfinished">Min</translation>
+      <translation>Min</translation>
     </message>
     <message>
       <source>Hrs</source>
@@ -1272,9 +1272,9 @@
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Numerus: Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>Minutes</numerusform>
-        <numerusform>Minutes</numerusform>
+      <translation>
+        <numerusform>Minuten</numerusform>
+        <numerusform>Minuten</numerusform>
       </translation>
     </message>
     <message numerus="yes">

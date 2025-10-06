@@ -295,11 +295,11 @@
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
+      <translation>
+        <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
+        <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
+        <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
+        <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
       </translation>
     </message>
   </context>
@@ -535,11 +535,11 @@
     <message numerus="yes">
       <source>%1 have no input ports</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
+      <translation>
+        <numerusform>%1 nemá žádné vstupní porty</numerusform>
+        <numerusform>%1 nemá žádné vstupní porty</numerusform>
+        <numerusform>%1 nemá žádné vstupní porty</numerusform>
+        <numerusform>%1 nemá žádné vstupní porty</numerusform>
       </translation>
     </message>
   </context>
@@ -562,11 +562,11 @@
     <message numerus="yes">
       <source>%1 have no output relays</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
+      <translation>
+        <numerusform>%1 nemá žádný reléový výstup</numerusform>
+        <numerusform>%1 nemá žádný reléový výstup</numerusform>
+        <numerusform>%1 nemá žádný reléový výstup</numerusform>
+        <numerusform>%1 nemá žádný reléový výstup</numerusform>
       </translation>
     </message>
   </context>
@@ -1254,81 +1254,81 @@
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Numerus: Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
+      <translation>
+        <numerusform>milisekundy</numerusform>
+        <numerusform>milisekundy</numerusform>
+        <numerusform>milisekundy</numerusform>
+        <numerusform>milisekundy</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Numerus: Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
+      <translation>
+        <numerusform>sekundy</numerusform>
+        <numerusform>sekundy</numerusform>
+        <numerusform>sekundy</numerusform>
+        <numerusform>sekundy</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Numerus: Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>minuty</numerusform>
+        <numerusform>minuty</numerusform>
+        <numerusform>minuty</numerusform>
+        <numerusform>minuty</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Numerus: Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>hodin</numerusform>
+        <numerusform>hodin</numerusform>
+        <numerusform>hodin</numerusform>
+        <numerusform>hodin</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Numerus: Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>dny</numerusform>
+        <numerusform>dny</numerusform>
+        <numerusform>dny</numerusform>
+        <numerusform>dny</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Numerus: Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
+      <translation>
+        <numerusform>týdny</numerusform>
+        <numerusform>týdny</numerusform>
+        <numerusform>týdny</numerusform>
+        <numerusform>týdny</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Numerus: Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
+      <translation>
+        <numerusform>měsíce</numerusform>
+        <numerusform>měsíce</numerusform>
+        <numerusform>měsíce</numerusform>
+        <numerusform>měsíce</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Numerus: Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
+      <translation>
+        <numerusform>roky</numerusform>
+        <numerusform>roky</numerusform>
+        <numerusform>roky</numerusform>
+        <numerusform>roky</numerusform>
       </translation>
     </message>
     <message>
@@ -1394,11 +1394,11 @@
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Numerus: Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>Minutes</numerusform>
-        <numerusform>Minutes</numerusform>
-        <numerusform>Minutes</numerusform>
-        <numerusform>Minutes</numerusform>
+      <translation>
+        <numerusform>Minut</numerusform>
+        <numerusform>Minut</numerusform>
+        <numerusform>Minut</numerusform>
+        <numerusform>Minut</numerusform>
       </translation>
     </message>
     <message numerus="yes">

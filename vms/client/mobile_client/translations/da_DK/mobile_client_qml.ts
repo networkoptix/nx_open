@@ -504,7 +504,7 @@
     </message>
     <message>
       <source>Open external link in browser?</source>
-      <translation type="unfinished">Open external link in browser?</translation>
+      <translation>Åbn eksternt link i browser?</translation>
     </message>
   </context>
   <context>

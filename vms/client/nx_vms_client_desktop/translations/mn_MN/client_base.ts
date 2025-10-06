@@ -4301,7 +4301,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>2FA DISABLED</source>
-      <translation type="unfinished">2FA DISABLED</translation>
+      <translation>2 талт баталгаажуулалт иэвхигүй</translation>
     </message>
   </context>
   <context>
@@ -9033,7 +9033,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
   </context>
   <context>
@@ -12678,7 +12678,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Шинж чанарууд</translation>
     </message>
   </context>
   <context>

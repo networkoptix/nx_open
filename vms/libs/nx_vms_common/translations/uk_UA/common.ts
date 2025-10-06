@@ -1284,51 +1284,51 @@
     <message numerus="yes">
       <source>hours</source>
       <comment>Numerus: Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>години</numerusform>
+        <numerusform>години</numerusform>
+        <numerusform>години</numerusform>
+        <numerusform>години</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Numerus: Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>день</numerusform>
+        <numerusform>день</numerusform>
+        <numerusform>день</numerusform>
+        <numerusform>день</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Numerus: Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
+      <translation>
+        <numerusform>тиждень</numerusform>
+        <numerusform>тиждень</numerusform>
+        <numerusform>тиждень</numerusform>
+        <numerusform>тиждень</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Numerus: Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
+      <translation>
+        <numerusform>місяць</numerusform>
+        <numerusform>місяць</numerusform>
+        <numerusform>місяць</numerusform>
+        <numerusform>місяць</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Numerus: Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
+      <translation>
+        <numerusform>роки</numerusform>
+        <numerusform>роки</numerusform>
+        <numerusform>роки</numerusform>
+        <numerusform>роки</numerusform>
       </translation>
     </message>
     <message>
@@ -1394,11 +1394,11 @@
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Numerus: Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>Minutes</numerusform>
-        <numerusform>Minutes</numerusform>
-        <numerusform>Minutes</numerusform>
-        <numerusform>Minutes</numerusform>
+      <translation>
+        <numerusform>Хвилин</numerusform>
+        <numerusform>Хвилин</numerusform>
+        <numerusform>Хвилин</numerusform>
+        <numerusform>Хвилин</numerusform>
       </translation>
     </message>
     <message numerus="yes">

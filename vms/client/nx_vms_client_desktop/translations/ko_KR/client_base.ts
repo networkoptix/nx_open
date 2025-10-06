@@ -73,15 +73,15 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1가 사용됩니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Numerus: text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>%1 이 필요합니다</numerusform>
       </translation>
     </message>
   </context>
@@ -1121,22 +1121,22 @@
     <message numerus="yes">
       <source>Show on Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>아이템 표시</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>항목 음소거</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>항목 음소거 해제</numerusform>
       </translation>
     </message>
   </context>
@@ -1429,8 +1429,8 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>라이센스를 비활성화할 수 없습니다</numerusform>
       </translation>
     </message>
   </context>
@@ -1492,8 +1492,8 @@ License Key: %2</source>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>파일 이름에는 다음 지정된 문자가 포함되어서는 안됩니다:</numerusform>
       </translation>
     </message>
   </context>
@@ -4116,8 +4116,8 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Certificates</source>
       <comment>Numerus form depends on the certificates count</comment>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>인증서</numerusform>
       </translation>
     </message>
   </context>
@@ -5133,8 +5133,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>PC %1- 디스플레이 %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5371,15 +5371,15 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
       <comment>Numerus form depends on the number of devices</comment>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>라이브 보기 권한이 없는 비디오월 장치에는 추가할 수 없습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>라이브 보기 권한이 없는 카메라는 비디오 월에 추가할 수 없습니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -5620,15 +5620,15 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerus form depends on the amount of layouts</comment>
-      <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>이러한 레이아웃은 다른 사용자와 공유되므로 해당 계정에서도 삭제됩니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
       <comment>Numerus form depends on the amount of web pages</comment>
-      <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>이 웹 페이지를 Server &quot;%1&quot;로 옮기려고 합니다. 이 웹 페이지는 요청된 모든 콘텐츠를 프록시하고, 프록시 서버는 Server &quot;%1&quot;로 변경됩니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -7378,15 +7378,15 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
       <comment>Numerus form depends on the total number of devices</comment>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>이러한 장치에는 오디오 출력이 없거나 올바르게 구성되지 않았습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
       <comment>Numerus form depends on the total number of devices</comment>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>이러한 장치에는 오디오 입력이 없거나 올바르게 구성되지 않았습니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -7437,7 +7437,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>자세히 알아보기</translation>
     </message>
   </context>
   <context>
@@ -8759,22 +8759,22 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1는(가) 현재 사용 중 입니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>적어도 %1 개가 필요합니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>라이선스를 비활성화 하시겠습니까?</numerusform>
       </translation>
     </message>
   </context>
@@ -8893,7 +8893,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>없음</translation>
     </message>
   </context>
   <context>
@@ -10674,8 +10674,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>I trust these servers</source>
       <comment>Numerus form depends on the number of certificates</comment>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>나는 이 서버를 신뢰합니다</numerusform>
       </translation>
     </message>
   </context>
@@ -11106,8 +11106,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>현재 레이아웃에 카메라를 추가하려면 두 번 클릭하고 새 탭에서 열려면 Ctrl + 클릭</numerusform>
       </translation>
     </message>
   </context>
@@ -11675,57 +11675,57 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>선택된 동영상 확장자는 지원하지 않습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>선택한 파일에 타임 스탬프가 없습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>선택한 파일은 너무 오래되었습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>선택한 파일 커버는 동영상 이미 업로드 되는 기간입니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>이러한 파일을 다른 가상 카메라 인스턴스에 업로드 할 수 있습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>선택한 파일 커버는 동영상 이미 업로드 된 기간입니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>선택된 촬영영상은 전송후 삭제 될 수 있습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>서버 저장 영역에 여유 공간이 거의 없습니다. 일부 오래된 장면은 공간을 확보하기 위해 삭제 될 수 있습니다. 선택한 파일이 서버에서 가장 오래된 파일 일 경우 업로드 한 직후에 삭제됩니다.</numerusform>
       </translation>
     </message>
   </context>

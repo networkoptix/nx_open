@@ -302,29 +302,29 @@
     <message numerus="yes">
       <source>Selected devices were removed</source>
       <comment>Numerus form depend on devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>所的裝置已移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
       <comment>Numerus form depend on cameras count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>所選的攝影機已被移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
       <comment>Numerus form depend on servers count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>所選的伺服器已被移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
       <comment>Numerus form depend on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>所選的佈局已被移除</numerusform>
       </translation>
     </message>
   </context>
@@ -661,15 +661,15 @@
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
       <comment>Numerus form depends on the amount of invalid headers</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
+      <translation>
+        <numerusform>有些標頭無效</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
       <comment>Numerus form depends on the total amount of headers</comment>
-      <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
+      <translation>
+        <numerusform>所有標頭皆無效</numerusform>
       </translation>
     </message>
   </context>

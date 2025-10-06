@@ -76,11 +76,11 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 בשימוש</numerusform>
+        <numerusform>%1 בשימוש</numerusform>
+        <numerusform>%1 בשימוש</numerusform>
+        <numerusform>%1 בשימוש</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1462,11 +1462,11 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
+        <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
+        <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
+        <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
       </translation>
     </message>
   </context>
@@ -1531,11 +1531,11 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
       </translation>
     </message>
   </context>
@@ -5286,11 +5286,11 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>מחשב %1 - תצוגות %2</numerusform>
+        <numerusform>מחשב %1 - תצוגות %2</numerusform>
+        <numerusform>מחשב %1 - תצוגות %2</numerusform>
+        <numerusform>מחשב %1 - תצוגות %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7809,7 +7809,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>למד עוד</translation>
     </message>
   </context>
   <context>
@@ -9167,31 +9167,31 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
+        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
+        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
+        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Numerus: text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>לפחות %1 נדרשים</numerusform>
+        <numerusform>לפחות %1 נדרשים</numerusform>
+        <numerusform>לפחות %1 נדרשים</numerusform>
+        <numerusform>לפחות %1 נדרשים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>להשבית רישיונות?</numerusform>
+        <numerusform>להשבית רישיונות?</numerusform>
+        <numerusform>להשבית רישיונות?</numerusform>
+        <numerusform>להשבית רישיונות?</numerusform>
       </translation>
     </message>
   </context>
@@ -9313,7 +9313,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>ללא</translation>
     </message>
   </context>
   <context>
@@ -11604,11 +11604,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
+        <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
+        <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
+        <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
       </translation>
     </message>
   </context>
@@ -12182,81 +12182,81 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
+        <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
+        <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
+        <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
+        <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
+        <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
+        <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
+        <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
+        <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
+        <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
+        <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
+        <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
+        <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
+        <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
+        <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
+        <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
+        <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
+        <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
+        <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
+        <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
+        <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
+        <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
+        <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
+        <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
+        <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
       </translation>
     </message>
   </context>

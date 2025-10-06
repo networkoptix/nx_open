@@ -277,7 +277,7 @@
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 does not support two-way audio</numerusform>
         <numerusform>%1 does not support two-way audio</numerusform>
       </translation>
@@ -515,7 +515,7 @@
     <message numerus="yes">
       <source>%1 have no input ports</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 have no input ports</numerusform>
         <numerusform>%1 have no input ports</numerusform>
       </translation>
@@ -540,7 +540,7 @@
     <message numerus="yes">
       <source>%1 have no output relays</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 have no output relays</numerusform>
         <numerusform>%1 have no output relays</numerusform>
       </translation>
@@ -1152,15 +1152,15 @@
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Numerus: Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
+      <translation>
+        <numerusform>millisecond</numerusform>
+        <numerusform>millisecond</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Numerus: Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>seconds</numerusform>
         <numerusform>seconds</numerusform>
       </translation>
@@ -1168,7 +1168,7 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Numerus: Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>minutes</numerusform>
         <numerusform>minutes</numerusform>
       </translation>
@@ -1176,7 +1176,7 @@
     <message numerus="yes">
       <source>hours</source>
       <comment>Numerus: Full suffix for displaying hours</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>hours</numerusform>
         <numerusform>hours</numerusform>
       </translation>
@@ -1184,7 +1184,7 @@
     <message numerus="yes">
       <source>days</source>
       <comment>Numerus: Full suffix for displaying days</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>days</numerusform>
         <numerusform>days</numerusform>
       </translation>
@@ -1192,7 +1192,7 @@
     <message numerus="yes">
       <source>weeks</source>
       <comment>Numerus: Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>weeks</numerusform>
         <numerusform>weeks</numerusform>
       </translation>
@@ -1200,7 +1200,7 @@
     <message numerus="yes">
       <source>months</source>
       <comment>Numerus: Full suffix for displaying months</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>months</numerusform>
         <numerusform>months</numerusform>
       </translation>
@@ -1208,7 +1208,7 @@
     <message numerus="yes">
       <source>years</source>
       <comment>Numerus: Full suffix for displaying years</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>years</numerusform>
         <numerusform>years</numerusform>
       </translation>
@@ -1272,7 +1272,7 @@
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Numerus: Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Minutes</numerusform>
         <numerusform>Minutes</numerusform>
       </translation>
