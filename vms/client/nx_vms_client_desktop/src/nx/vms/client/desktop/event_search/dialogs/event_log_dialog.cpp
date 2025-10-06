@@ -23,6 +23,7 @@
 #include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
@@ -258,6 +259,15 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     connect(ui->eventComboBox, QnComboboxCurrentIndexChanged, this, &EventLogDialog::updateData);
     connect(ui->actionComboBox, QnComboboxCurrentIndexChanged, this, &EventLogDialog::updateData);
     connect(ui->refreshButton, &QAbstractButton::clicked, this, &EventLogDialog::updateData);
+    connect(
+        appContext()->cloudServiceChecker(),
+        &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,
+        this,
+        [this](nx::vms::client::core::CloudServiceChecker::CloudServices changedServices)
+        {
+            if (changedServices.testFlag(nx::vms::client::core::CloudService::push_notifications))
+                updateData();
+        });
     connect(ui->eventRulesButton, &QAbstractButton::clicked,
         action(menu::OpenVmsRulesDialogAction), &QAction::trigger);
 

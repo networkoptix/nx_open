@@ -23,6 +23,7 @@ namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::client::core {
 
 class ColorTheme;
+class CloudFeaturesWatcher;
 class CloudCrossSystemManager;
 class CloudServiceChecker;
 class CloudLayoutsManager;
@@ -212,6 +213,8 @@ public:
     NetworkModule* networkModule() const;
 
     CloudServiceChecker* cloudServiceChecker() const;
+
+    CloudFeaturesWatcher* cloudFeaturesWatcher() const;
 
     void resetEngine();
 

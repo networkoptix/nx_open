@@ -29,6 +29,7 @@
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
+#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -575,6 +576,12 @@ void LayoutActionHandler::saveLayoutAsCloud(const core::LayoutResourcePtr& layou
 {
     if (!NX_ASSERT(layout))
         return;
+
+    if (!NX_ASSERT(appContext()->cloudServiceChecker()->hasService(
+        nx::vms::client::core::CloudService::docdb)))
+    {
+        return;
+    }
 
     NX_ASSERT(!layout->isCrossSystem());
 

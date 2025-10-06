@@ -127,8 +127,13 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "[Dev] Overrides the current Client's Cloud Host. Allows to connect to the Server that \n"
         "uses the specified Cloud Host. Use 'auto' to allow client switch cloud host on the fly.");
 
+    NX_INI_FLAG(true, enableKeychain,
+        "[Dev] Control using keychain to simplify development of modules which call the keychain"
+        " each time after rebuilding.");
+
     // VMS-59730
-    NX_INI_STRING("",
+    NX_INI_STRING(
+        "",
         unsupportedCloudServices,
         "[Dev] Disables UI for specific cloud services. Allows to hide UI elements related to\n"
         "certain cloud services, marking them as unavailable. Possible values:\n"
@@ -137,9 +142,14 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         " * \"docdb\" - disables UI for Document Database service.\n"
         "Services can be combined using space, comma or semicolon.");
 
-    NX_INI_FLAG(true, enableKeychain,
-        "[Dev] Control using keychain to simplify development of modules which call the keychain"
-        " each time after rebuilding.");
+    // MOBILE-2539
+    NX_INI_STRING(
+        "",
+        forcefullyDisabledFeatures,
+        "[Dev] Disables UI for specific cloud features. Allows to hide UI elements related to\n"
+        "certain cloud features, marking them as disabled. Reserved for future use, no specific\n"
+        "feature flags are currently defined.\n"
+        "Features can be combined using space, comma or semicolon when implemented.");
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();

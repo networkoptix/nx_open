@@ -38,23 +38,43 @@ ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* 
     ui->setupUi(this);
     setPaletteColor(ui->doLabel, QPalette::WindowText, QPalette().color(QPalette::Light));
 
-    auto itemFilters = defaultItemFilters();
-    if (!appContext()->cloudServiceChecker()->hasService(
-            nx::vms::client::core::CloudService::push_notifications))
+    auto updateActionTypeComboBox = [this]()
     {
-        const auto customFilter = [](const nx::vms::common::SystemContext* /*systemContext*/,
-            const nx::vms::rules::ItemDescriptor& description)
+        auto itemFilters = defaultItemFilters();
+        if (!appContext()->cloudServiceChecker()->hasService(
+            nx::vms::client::core::CloudService::push_notifications))
         {
-            return description.id != kPushNotificationActionId;
-        };
-        itemFilters.push_back(customFilter);
-    }
+            const auto customFilter = [](const nx::vms::common::SystemContext* /*systemContext*/,
+                const nx::vms::rules::ItemDescriptor& description)
+            {
+                return description.id != kPushNotificationActionId;
+            };
+            itemFilters.push_back(customFilter);
+        }
 
-    const auto sortedListOfActions = sortItems(filterItems(systemContext(),
-        itemFilters,
-        systemContext()->vmsRulesEngine()->actions().values()));
-    for (const auto& actionDescriptor: sortedListOfActions)
-        ui->actionTypeComboBox->addItem(actionDescriptor.displayName, actionDescriptor.id);
+        const auto sortedListOfActions = sortItems(filterItems(systemContext(),
+            itemFilters,
+            systemContext()->vmsRulesEngine()->actions().values()));
+
+        ui->actionTypeComboBox->clear();
+        for (const auto& actionDescriptor: sortedListOfActions)
+            ui->actionTypeComboBox->addItem(actionDescriptor.displayName, actionDescriptor.id);
+    };
+
+    updateActionTypeComboBox();
+    connect(
+        appContext()->cloudServiceChecker(),
+        &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,
+        this,
+        [this, updateActionTypeComboBox](auto changedServices)
+        {
+            if (changedServices.testFlag(nx::vms::client::core::CloudService::push_notifications))
+            {
+                const auto currentText = ui->actionTypeComboBox->currentText();
+                updateActionTypeComboBox();
+                ui->actionTypeComboBox->setCurrentText(currentText);
+            }
+        });
 
     connect(
         ui->actionTypeComboBox,

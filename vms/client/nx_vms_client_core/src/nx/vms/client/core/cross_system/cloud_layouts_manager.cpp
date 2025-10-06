@@ -99,6 +99,16 @@ struct CloudLayoutsManager::Private
 
         timer->setInterval(kRequestInterval);
         timer->callOnTimeout([this](){ updateLayouts(); });
+
+        connect(
+            appContext()->cloudServiceChecker(),
+            &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,
+            q,
+            [this](auto changedServices)
+            {
+                if (changedServices.testFlag(nx::vms::client::core::CloudService::docdb))
+                    updateLayouts();
+            });
     }
 
     ~Private()
@@ -228,8 +238,9 @@ struct CloudLayoutsManager::Private
     void updateLayouts()
     {
         if (!appContext()->cloudServiceChecker()->hasService(
-                nx::vms::client::core::CloudService::docdb))
+            nx::vms::client::core::CloudService::docdb))
         {
+            addLayoutsToResourcePool({});
             return;
         }
 
@@ -311,6 +322,13 @@ struct CloudLayoutsManager::Private
 
     LayoutResourcePtr convertLocalLayout(const LayoutResourcePtr& layout)
     {
+        if (!NX_ASSERT(appContext()->cloudServiceChecker()->hasService(
+            nx::vms::client::core::CloudService::docdb), "It is not possible to convert a regular "
+            "layout into a cloud layout if docdb is not available."))
+        {
+            return LayoutResourcePtr();
+        }
+
         auto existingLayouts = systemContext->resourcePool()->getResources<LayoutResource>();
         QStringList usedNames;
         std::transform(

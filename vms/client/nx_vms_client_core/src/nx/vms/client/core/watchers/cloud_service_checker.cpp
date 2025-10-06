@@ -6,12 +6,17 @@
 #include <nx/utils/std_string_utils.h>
 #include <nx/vms/client/core/ini.h>
 
-namespace nx::vms::client::core {
+namespace {
 
-CloudService fromString(std::string_view string)
+nx::vms::client::core::CloudService fromString(std::string_view string)
 {
-    return nx::reflect::fromString<CloudService>(string, CloudService::none);
+    return nx::reflect::fromString<nx::vms::client::core::CloudService>(
+        string, nx::vms::client::core::CloudService::none);
 }
+
+} // namespace
+
+namespace nx::vms::client::core {
 
 struct CloudServiceChecker::Private
 {
@@ -42,7 +47,7 @@ CloudServiceChecker::~CloudServiceChecker()
 {
 }
 
-bool CloudServiceChecker::hasService(const CloudService& service) const
+bool CloudServiceChecker::hasService(CloudService service) const
 {
     return !d->unsupportedCloudServices.testFlag(service);
 }

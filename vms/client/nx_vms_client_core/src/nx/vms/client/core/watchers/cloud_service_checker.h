@@ -16,6 +16,15 @@ NX_REFLECTION_ENUM_CLASS(CloudService,
     docdb = 1 << 2
 );
 
+/**
+ * Checks availability of cloud services on startup to control UI functionality.
+ *
+ * At client startup, verifies which services are supported by the specific cloud instance.
+ * Client responds to the supported services list by enabling/disabling corresponding UI elements.
+ * Service availability depends on infrastructure capabilities and instance-specific configuration.
+ * For example, Private Cloud lacks push_notifications service, so the client should not display
+ * Mobile Notification Actions in UI.
+ */
 class NX_VMS_CLIENT_CORE_API CloudServiceChecker: public QObject
 {
     Q_OBJECT
@@ -25,7 +34,10 @@ public:
     explicit CloudServiceChecker(QObject* parent = nullptr);
     virtual ~CloudServiceChecker() override;
 
-    bool hasService(const CloudService& service) const;
+    bool hasService(CloudService service) const;
+
+signals:
+    void supportedServicesChanged(CloudServices changedServices);
 
 private:
     struct Private;
