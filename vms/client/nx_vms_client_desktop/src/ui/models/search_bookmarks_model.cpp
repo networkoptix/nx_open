@@ -13,6 +13,7 @@
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/client/core/event_search/utils/bookmark_search_utils.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/bookmarks/bookmark_utils.h>
@@ -194,7 +195,7 @@ void QnSearchBookmarksModelPrivate::setRange(qint64 utcStartTimeMs, qint64 utcFi
 
 void QnSearchBookmarksModelPrivate::setFilterText(const QString& text)
 {
-    m_filter.text = text;
+    m_filter.text = nx::vms::client::core::formatFilterText(text);
 }
 
 const std::set<nx::Uuid>& QnSearchBookmarksModelPrivate::cameras() const
