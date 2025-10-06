@@ -74,7 +74,7 @@
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1 が使用</numerusform>
+        <numerusform>%1 が使用中</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5562,7 +5562,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
       <translation>
-        <numerusform>これらのWebページをサーバー &quot;%1&quot; に移動しようとしています。 これらのWebページは要求されたすべてのコンテンツをプロキシし、プロキシサーバーはサーバー &quot;%1&quot; に変更されます。</numerusform>
+        <numerusform>これらのWebページをサーバー &quot;%1&quot; に移動しようとしています。 これらのWebページは要求されたすべてのコンテンツをプロキシします。プロキシサーバーはサーバー &quot;%1&quot; に変更されます。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11652,7 +11652,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation>
-        <numerusform>サーバーストレージには十分な空き領域がありません。保存領域を確保するために、古い映像が削除されることがあります。また、選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されることにご注意ください。</numerusform>
+        <numerusform>サーバーストレージには十分な空き領域がありません。保存領域を確保するために、古い映像が削除されることがあります。また、選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されます。</numerusform>
       </translation>
     </message>
     <message>
