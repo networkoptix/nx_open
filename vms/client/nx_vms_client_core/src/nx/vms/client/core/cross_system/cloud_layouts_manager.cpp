@@ -28,6 +28,7 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/delayed.h>
 
@@ -98,6 +99,16 @@ struct CloudLayoutsManager::Private
 
         timer->setInterval(kRequestInterval);
         timer->callOnTimeout([this](){ updateLayouts(); });
+
+        connect(
+            appContext()->cloudServiceChecker(),
+            &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,
+            q,
+            [this](auto changedServices)
+            {
+                if (changedServices.testFlag(nx::vms::client::core::CloudService::docdb))
+                    updateLayouts();
+            });
     }
 
     ~Private()
@@ -226,6 +237,13 @@ struct CloudLayoutsManager::Private
 
     void updateLayouts()
     {
+        if (!appContext()->cloudServiceChecker()->hasService(
+            nx::vms::client::core::CloudService::docdb))
+        {
+            addLayoutsToResourcePool({});
+            return;
+        }
+
         QUrlQuery query;
         query.addQueryItem("matchPrefix", "");
         query.addQueryItem("responseType", "dataOnly");
@@ -304,6 +322,13 @@ struct CloudLayoutsManager::Private
 
     LayoutResourcePtr convertLocalLayout(const LayoutResourcePtr& layout)
     {
+        if (!NX_ASSERT(appContext()->cloudServiceChecker()->hasService(
+            nx::vms::client::core::CloudService::docdb), "It is not possible to convert a regular "
+            "layout into a cloud layout if docdb is not available."))
+        {
+            return LayoutResourcePtr();
+        }
+
         auto existingLayouts = systemContext->resourcePool()->getResources<LayoutResource>();
         QStringList usedNames;
         std::transform(

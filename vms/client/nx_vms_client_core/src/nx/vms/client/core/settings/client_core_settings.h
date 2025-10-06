@@ -53,6 +53,10 @@ public:
     using SerializableCredentialsList = std::vector<SerializableCredentials>;
     using SystemAuthenticationData = std::unordered_map<nx::Uuid, SerializableCredentialsList>;
     using SystemAuthenticationCacheData = std::unordered_map<QString, std::string>;
+    using CloudFeatures = std::unordered_map<std::string, std::string>;
+
+    SecureProperty<CloudFeatures> lastKnownCloudEnabledFeatures{
+        this, "lastKnownCloudEnabledFeatures"};
 
     // System credentials by local system id.
     SecureProperty<SystemAuthenticationData> systemAuthenticationData{

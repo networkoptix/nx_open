@@ -178,6 +178,16 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         [this] { changeHeaderItemsVisibilityIfNeeded(); });
 
     connect(
+        appContext()->cloudServiceChecker(),
+        &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,
+        this,
+        [this](auto changedServices)
+        {
+            if (changedServices.testFlag(nx::vms::client::core::CloudService::cloud_notifications))
+                changeHeaderItemsVisibilityIfNeeded();
+        });
+
+    connect(
         system()->userNotificationSettingsManager(),
         &UserNotificationSettingsManager::settingsChanged,
         this,

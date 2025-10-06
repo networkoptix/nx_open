@@ -23,6 +23,8 @@ namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::client::core {
 
 class ColorTheme;
+class CloudServiceChecker;
+class CloudFeaturesWatcher;
 class CloudCrossSystemManager;
 class CloudLayoutsManager;
 class CloudStatusWatcher;
@@ -206,6 +208,10 @@ public:
     virtual std::unique_ptr<QnAbstractStreamDataProvider> createAudioInputProvider() const;
 
     NetworkModule* networkModule() const;
+
+    CloudServiceChecker* cloudServiceChecker() const;
+
+    CloudFeaturesWatcher* cloudFeaturesWatcher() const;
 
     void resetEngine();
 

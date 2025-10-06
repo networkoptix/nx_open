@@ -117,6 +117,26 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(true, validateCloudLayouts,
         "[Dev] Additional cloud layouts validation.");
+
+    // VMS-59730
+    NX_INI_STRING(
+        "",
+        unsupportedCloudServices,
+        "[Dev] Disables UI for specific cloud services. Allows to hide UI elements related to\n"
+        "certain cloud services, marking them as unavailable. Possible values:\n"
+        " * \"cloud_notifications\" - disables UI for cross-site notifications service.\n"
+        " * \"push_notifications\" - disables UI for push notifications service.\n"
+        " * \"docdb\" - disables UI for Document Database service.\n"
+        "Services can be combined using space, comma or semicolon.");
+
+    // MOBILE-2539
+    NX_INI_STRING(
+        "",
+        forcefullyDisabledFeatures,
+        "[Dev] Disables UI for specific cloud features. Allows to hide UI elements related to\n"
+        "certain cloud features, marking them as disabled. Reserved for future use, no specific\n"
+        "feature flags are currently defined.\n"
+        "Features can be combined using space, comma or semicolon when implemented.");
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();

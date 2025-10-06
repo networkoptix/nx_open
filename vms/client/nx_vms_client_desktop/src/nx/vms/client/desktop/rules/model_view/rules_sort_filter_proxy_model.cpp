@@ -69,6 +69,15 @@ RulesSortFilterProxyModel::RulesSortFilterProxyModel(QObject* parent):
     setSortRole(RulesTableModel::SortDataRole);
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setFilterKeyColumn(-1);
+    connect(
+        appContext()->cloudServiceChecker(),
+        &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,
+        this,
+        [this](nx::vms::client::core::CloudServiceChecker::CloudServices changedServices)
+        {
+            if (changedServices.testFlag(nx::vms::client::core::CloudService::push_notifications))
+                invalidateFilter();
+        });
 }
 
 bool RulesSortFilterProxyModel::filterAcceptsRow(

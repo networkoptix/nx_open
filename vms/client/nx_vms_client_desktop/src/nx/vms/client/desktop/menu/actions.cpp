@@ -568,6 +568,7 @@ void initialize(Manager* manager, Action* root)
             && condition::applyToCurrentLayout(
                 condition::canSaveLayoutAs()
                 && condition::hasFlags(Qn::cross_system, MatchMode::none))
+            && condition::hasDocDBService()
             && !condition::isShowreelReviewMode()
             && !condition::showreelIsRunning());
 
