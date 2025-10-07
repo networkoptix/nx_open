@@ -3,7 +3,6 @@
 #ifndef QN_COMMAND_LINE_PARSER_H
 #define QN_COMMAND_LINE_PARSER_H
 
-#include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QSharedPointer>

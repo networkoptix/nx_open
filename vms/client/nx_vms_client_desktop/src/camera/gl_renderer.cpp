@@ -2,7 +2,6 @@
 
 #include "gl_renderer.h"
 
-#include <QtCore/QCoreApplication> //< For Q_DECLARE_TR_FUNCTIONS.
 #include <QtCore/QScopedPointer>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QPainter>
