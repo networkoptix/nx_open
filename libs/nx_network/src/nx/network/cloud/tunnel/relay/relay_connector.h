@@ -35,7 +35,7 @@ public:
     virtual const AddressEntry& targetPeerAddress() const override;
 
 private:
-    const nx::Url m_relayUrl;
+    nx::Url m_relayUrl;
     const AddressEntry m_targetHostAddress;
     std::string m_connectSessionId;
     std::unique_ptr<nx::cloud::relay::api::Client> m_relayClient;
