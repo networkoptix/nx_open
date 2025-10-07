@@ -952,7 +952,7 @@
     <message numerus="yes">
       <source>Show on Items</source>
       <translation>
-        <numerusform>Pokaż na elemencie</numerusform>
+        <numerusform>Pokaż na elementach</numerusform>
         <numerusform>Pokaż na elementach</numerusform>
         <numerusform>Pokaż na elementach</numerusform>
         <numerusform>Pokaż na elementach</numerusform>
@@ -11657,7 +11657,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     <message numerus="yes">
       <source>I trust these servers</source>
       <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+        <numerusform>Ufam tym serwerom</numerusform>
         <numerusform>I trust these servers</numerusform>
         <numerusform>I trust these servers</numerusform>
         <numerusform>I trust these servers</numerusform>
