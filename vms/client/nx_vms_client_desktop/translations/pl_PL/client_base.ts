@@ -1131,7 +1131,7 @@
       <source>Show on Items</source>
       <comment>Numerus form depends on the amount of items</comment>
       <translation>
-        <numerusform>Pokaż na elemencie</numerusform>
+        <numerusform>Pokaż na elementach</numerusform>
         <numerusform>Pokaż na elementach</numerusform>
         <numerusform>Pokaż na elementach</numerusform>
         <numerusform>Pokaż na elementach</numerusform>
@@ -7376,7 +7376,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
       <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
+        <numerusform>Użyj usług</numerusform>
         <numerusform>Use Services</numerusform>
         <numerusform>Use Services</numerusform>
         <numerusform>Use Services</numerusform>
@@ -7386,7 +7386,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
       <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
+        <numerusform>Użyj licencji</numerusform>
         <numerusform>Use Licenses</numerusform>
         <numerusform>Use Licenses</numerusform>
         <numerusform>Use Licenses</numerusform>
@@ -7804,7 +7804,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+      <translation>Dostęp użytkowników Partnerów kanałowych jest zarządzany na poziomie organizacji i nie są oni widoczni w zarządzaniu użytkownikami witryny.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -11150,7 +11150,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
       <source>I trust these servers</source>
       <comment>Numerus form depends on the number of certificates</comment>
       <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+        <numerusform>Ufam tym serwerom</numerusform>
         <numerusform>I trust these servers</numerusform>
         <numerusform>I trust these servers</numerusform>
         <numerusform>I trust these servers</numerusform>
@@ -13231,7 +13231,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       <source>Some of the rules were not enabled</source>
       <comment>Numerus form depends on the invalid rule count</comment>
       <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
+        <numerusform>Niektóre z reguł nie zostały włączone</numerusform>
         <numerusform>Some of the rules were not enabled</numerusform>
         <numerusform>Some of the rules were not enabled</numerusform>
         <numerusform>Some of the rules were not enabled</numerusform>
@@ -13241,7 +13241,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Numerus form depends on the invalid rule count</comment>
       <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+        <numerusform>Niektórych z wybranych reguł nie można włączyć, ponieważ mają nieprawidłowe parametry. Popraw je i włącz regułę ponownie.</numerusform>
         <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
         <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
         <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>

@@ -1305,7 +1305,7 @@
       <source>weeks</source>
       <comment>Numerus: Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>tydzień</numerusform>
+        <numerusform>tygodnie</numerusform>
         <numerusform>tygodni</numerusform>
         <numerusform>tydzień</numerusform>
         <numerusform>tygodnie</numerusform>
@@ -1315,7 +1315,7 @@
       <source>months</source>
       <comment>Numerus: Full suffix for displaying months</comment>
       <translation>
-        <numerusform>miesiąc</numerusform>
+        <numerusform>miesiące</numerusform>
         <numerusform>miesiąc</numerusform>
         <numerusform>miesiąc</numerusform>
         <numerusform>miesiąc</numerusform>
@@ -1325,7 +1325,7 @@
       <source>years</source>
       <comment>Numerus: Full suffix for displaying years</comment>
       <translation>
-        <numerusform>rok</numerusform>
+        <numerusform>lata</numerusform>
         <numerusform>rok</numerusform>
         <numerusform>rok</numerusform>
         <numerusform>rok</numerusform>

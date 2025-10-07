@@ -506,7 +506,7 @@
     </message>
     <message>
       <source>Open external link in browser?</source>
-      <translation type="unfinished">Open external link in browser?</translation>
+      <translation>Otworzyć zewnętrzny link w przeglądarce?</translation>
     </message>
   </context>
   <context>
