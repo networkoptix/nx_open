@@ -187,6 +187,7 @@ NX_REFLECTION_INSTRUMENT(ExportRapidReviewPersistentSettings,
 struct NX_VMS_CLIENT_DESKTOP_API ExportMediaPersistentSettings
 {
     bool applyFilters = false;
+    bool pixelate = true;
     QString fileFormat;
 
     bool hasVideo = true;

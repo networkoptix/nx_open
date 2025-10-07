@@ -119,7 +119,6 @@ void ExportSettingsDialogState::applyTranscodingSettings()
         settings.enhancement = availableTranscodingSettings.enhancement;
         settings.dewarping = availableTranscodingSettings.dewarping;
         settings.zoomWindow = availableTranscodingSettings.zoomWindow;
-        settings.pixelationSettings = availableTranscodingSettings.pixelationSettings;
     }
     else
     {
@@ -128,8 +127,11 @@ void ExportSettingsDialogState::applyTranscodingSettings()
         settings.enhancement = {};
         settings.dewarping = {};
         settings.zoomWindow = {};
-        settings.pixelationSettings = uncheckedPixelationSettings;
     }
+
+    settings.pixelationSettings = exportMediaPersistentSettings.pixelate
+            ? systemPixelationSettings
+            : api::PixelationSettings(false);
 }
 
 void ExportSettingsDialogState::updateBookmarkText()
@@ -232,16 +234,18 @@ State ExportSettingsDialogStateReducer::setTimestampTimeZone(
     return state;
 }
 
-std::pair<bool, State> ExportSettingsDialogStateReducer::setApplyFilters(State state, bool value)
+std::pair<bool, State> ExportSettingsDialogStateReducer::setApplyFilters(State state, bool filters, bool pixelation)
 {
     bool transcode = false;
     if (state.exportMediaPersistentSettings.areFiltersForced())
         transcode = true;
     else
-        transcode = value;
+        transcode = filters || pixelation;
 
-    if (state.exportMediaPersistentSettings.setTranscoding(transcode))
+    if (state.exportMediaPersistentSettings.setTranscoding(transcode)
+        || state.exportMediaPersistentSettings.pixelate != pixelation)
     {
+        state.exportMediaPersistentSettings.pixelate = pixelation;
         state.applyTranscodingSettings();
         return {true, std::move(state)};
     }
@@ -309,12 +313,11 @@ State ExportSettingsDialogStateReducer::setBookmarks(State state, const QnCamera
     return state;
 }
 
-State ExportSettingsDialogStateReducer::setMediaResourceSettings(State state, bool hasVideo, const nx::core::transcoding::Settings& settings, bool forcePixelation)
+State ExportSettingsDialogStateReducer::setMediaResourceSettings(State state, bool hasVideo, const nx::core::transcoding::Settings& settings)
 {
     state.availableTranscodingSettings = settings;
     state.exportMediaPersistentSettings.hasVideo = hasVideo;
-    state.uncheckedPixelationSettings = {forcePixelation};
-
+    state.systemPixelationSettings = settings.pixelationSettings.value_or(api::PixelationSettings(false));
     state.applyTranscodingSettings();
 
     return state;
@@ -492,6 +495,7 @@ State ExportSettingsDialogStateReducer::setMediaFilename(State state, const File
 
     bool needTranscoding = state.exportMediaSettings.transcodingSettings.watermark.visible()
         || state.exportMediaPersistentSettings.applyFilters
+        || state.exportMediaPersistentSettings.pixelate
         || state.exportMediaPersistentSettings.areFiltersForced();
 
     if (state.exportMediaPersistentSettings.setTranscoding(needTranscoding))

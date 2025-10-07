@@ -108,6 +108,7 @@ bool pixelate(CLVideoDecoderOutput* frame, const QRect& box, int intensity)
         w = std::min(w, frameWidth - x);
         h = std::min(h, frameHeight - y);
 
+        // TODO: @pprivalov remove hardcoded value
         blur(frame->data[i] + y * frame->linesize[i] + x, w, h, frame->linesize[i], /*intensity*/ 15);
     }
     return true;

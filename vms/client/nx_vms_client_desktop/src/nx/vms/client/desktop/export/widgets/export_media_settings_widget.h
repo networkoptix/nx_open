@@ -22,7 +22,9 @@ public:
     struct Data
     {
         bool applyFilters = true;
+        bool pixelate = true;
         bool transcodingAllowed = true;
+        bool isAdmin = true;
     };
 
     void setData(const Data& data);

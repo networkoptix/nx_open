@@ -203,7 +203,11 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->layoutFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(ExportMode::layout));
 
     connect(ui->exportMediaSettingsPage, &ExportMediaSettingsWidget::dataEdited,
-        d.get(), [this](const ExportMediaSettingsWidget::Data& data) { d->dispatch(Reducer::setApplyFilters, data.applyFilters); });
+        d.get(),
+        [this](const ExportMediaSettingsWidget::Data& data)
+        {
+            d->dispatch(Reducer::setApplyFilters, data.applyFilters, data.pixelate);
+        });
     connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataEdited,
         d.get(), [this](const ExportLayoutSettingsWidget::Data& data) { d->dispatch(Reducer::setLayoutReadOnly, data.readOnly); });
     connect(m_passwordWidget, &ExportPasswordWidget::dataEdited,
@@ -599,7 +603,11 @@ void ExportSettingsDialog::updateWidgetsState()
 
     // Applying data to UI.
     // All UI events should be locked here.
-    ui->exportMediaSettingsPage->setData({transcodingChecked, !transcodingLocked});
+    ui->exportMediaSettingsPage->setData({
+        .applyFilters=transcodingChecked,
+        .pixelate=d->state().exportMediaPersistentSettings.pixelate,
+        .transcodingAllowed=!transcodingLocked,
+        .isAdmin=context()->user()->isAdministrator()});
     m_passwordWidget->setVisible(mode == ExportMode::layout
         || nx::core::layout::isLayoutExtension(ui->mediaFilenamePanel->filename().completeFileName()));
 
@@ -684,8 +692,7 @@ void ExportSettingsDialog::setMediaParams(
         ? systemSettings()->pixelationSettings()
         : api::PixelationSettings({true});
 
-
-    d->dispatch(Reducer::setMediaResourceSettings, mediaResource->hasVideo(), settings, !systemContext()->user()->isAdministrator());
+    d->dispatch(Reducer::setMediaResourceSettings, mediaResource->hasVideo(), settings);
 
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
 
@@ -697,7 +704,11 @@ void ExportSettingsDialog::setMediaParams(
         ui->textButton->setEnabled(false);
         ui->infoButton->setEnabled(false);
         ui->speedButton->setEnabled(false);
-        ui->exportMediaSettingsPage->setData({false, false});
+        ui->exportMediaSettingsPage->setData({
+            .applyFilters=false,
+            .pixelate=false,
+            .transcodingAllowed=false,
+            .isAdmin=context()->user()->isAdministrator()});
     }
 }
 

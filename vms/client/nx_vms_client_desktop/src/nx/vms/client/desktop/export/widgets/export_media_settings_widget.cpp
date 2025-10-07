@@ -15,6 +15,8 @@ ExportMediaSettingsWidget::ExportMediaSettingsWidget(QWidget* parent):
 
     connect(ui->filtersCheckBox, &QCheckBox::clicked,
         this, &ExportMediaSettingsWidget::emitDataEdited);
+    connect(ui->nonObfuscatedCheckbox, &QCheckBox::clicked,
+        this, &ExportMediaSettingsWidget::emitDataEdited);
 }
 
 ExportMediaSettingsWidget::~ExportMediaSettingsWidget()
@@ -25,6 +27,7 @@ void ExportMediaSettingsWidget::emitDataEdited()
 {
     Data data;
     data.applyFilters = ui->filtersCheckBox->isChecked();
+    data.pixelate = !ui->nonObfuscatedCheckbox->isChecked();
     emit dataEdited(data);
 }
 
@@ -32,6 +35,8 @@ void ExportMediaSettingsWidget::setData(const Data& data)
 {
     ui->filtersCheckBox->setEnabled(data.transcodingAllowed);
     ui->filtersCheckBox->setChecked(data.applyFilters);
+    ui->nonObfuscatedCheckbox->setEnabled(data.isAdmin);
+    ui->nonObfuscatedCheckbox->setChecked(!data.pixelate);
 }
 
 QLayout* ExportMediaSettingsWidget::passwordPlaceholder()
