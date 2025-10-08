@@ -362,7 +362,7 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>新聞</translation>
     </message>
     <message>
       <source>Show more</source>
@@ -370,11 +370,11 @@
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>沒有通知</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>未找到推播通知。</translation>
     </message>
   </context>
   <context>
@@ -503,7 +503,7 @@
     </message>
     <message>
       <source>Open external link in browser?</source>
-      <translation type="unfinished">Open external link in browser?</translation>
+      <translation>在瀏覽器中開啟外部連結？</translation>
     </message>
   </context>
   <context>

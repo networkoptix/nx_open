@@ -975,6 +975,14 @@
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
       <translation>若匯出時有套用影像強化設定或使用者自訂內容(如文字，圖片或書籤內容等)，則此影像需要重新編碼。CPU使用率會暫時提高且需要較長時間來完成。</translation>
     </message>
+    <message>
+      <source>Non-obfuscated video</source>
+      <translation type="unfinished">Non-obfuscated video</translation>
+    </message>
+    <message>
+      <source>Obfuscation is used to protect sensitive information but also increases CPU usage and export time</source>
+      <translation type="unfinished">Obfuscation is used to protect sensitive information but also increases CPU usage and export time</translation>
+    </message>
   </context>
   <context>
     <name>ExportPasswordWidget</name>
@@ -1689,8 +1697,8 @@
     <message>
       <source>Enter address, subnet range or subnet mask, login and password
 and click on the &quot;Search&quot; button</source>
-      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
-and click on the &quot;Search&quot; button</translation>
+      <translation>
+輸入位址、子網路範圍或子網路遮罩、登入名稱和密碼，然後點選 &quot;搜尋&quot; 按鈕</translation>
     </message>
   </context>
   <context>

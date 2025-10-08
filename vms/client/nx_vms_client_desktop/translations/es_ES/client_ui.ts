@@ -975,6 +975,14 @@
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
       <translation>La aplicación de filtros y la adición de superposiciones requieren una transcodificación que aumentará el uso de la CPU y puede llevar un tiempo considerable.</translation>
     </message>
+    <message>
+      <source>Non-obfuscated video</source>
+      <translation type="unfinished">Non-obfuscated video</translation>
+    </message>
+    <message>
+      <source>Obfuscation is used to protect sensitive information but also increases CPU usage and export time</source>
+      <translation type="unfinished">Obfuscation is used to protect sensitive information but also increases CPU usage and export time</translation>
+    </message>
   </context>
   <context>
     <name>ExportPasswordWidget</name>
