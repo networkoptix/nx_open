@@ -6643,8 +6643,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform> %n 個裝置將不會啟用備份： </numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7031,15 +7031,15 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
+      <translation>
+        <numerusform>使用服務</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
+      <translation>
+        <numerusform>使用授權</numerusform>
       </translation>
     </message>
   </context>
@@ -7433,7 +7433,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+      <translation>通路夥伴使用者的存取權限是在組織用戶層級進行管理，因此不會出現在站點的使用者管理頁面。</translation>
     </message>
     <message>
       <source>Learn more</source>
