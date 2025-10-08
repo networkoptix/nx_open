@@ -153,7 +153,11 @@ protected:
     };
 
     template<typename Method, typename Model>
-    auto call(Method method, Model model, const Request& request, ResponseAttributes* responseAttributes)
+    auto call(
+        Method method,
+        Model model,
+        const Request& request,
+        ResponseAttributes* responseAttributes = nullptr)
     {
         auto d = static_cast<Derived*>(this);
         if constexpr (ArgumentCount<Method>::value == 3)
@@ -222,8 +226,9 @@ protected:
     }
 
     template<typename Id>
-    Response responseById(Id id, const Request& request, ResponseAttributes responseAttributes = {})
+    Response responseById(Id id, const Request& request)
     {
+        ResponseAttributes responseAttributes;
         auto resource = readById(id, request, &responseAttributes, ErrorId::internalServerError);
         return response(std::move(resource), request, std::move(responseAttributes));
     }
@@ -399,8 +404,8 @@ protected:
             auto* d = static_cast<Derived*>(this);
             if constexpr (std::is_base_of_v<Model, ReadType>)
             {
-                Model existing{(request.forceSystemAccess(),
-                    call(&Derived::read, std::move(id), request, /*responseAttributes*/ nullptr))};
+                Model existing{
+                    (request.forceSystemAccess(), call(&Derived::read, std::move(id), request))};
                 d->mergeModel(request, &model, &existing, std::move(parseInfo));
                 if (useReflect)
                     return existing;
@@ -511,18 +516,17 @@ Response CrudHandler<Derived>::executePost(const Request& request)
             }
             else if constexpr (requires { &Derived::read; })
             {
-                ResponseAttributes responseAttributes;
                 // This is pretty wasteful, since the idea here is just to check for existence.
                 // TODO: `virtual bool checkExisting(const nx::Uuid&) const { /*use resource pool*/ }
-                if (call(&Derived::read, std::move(id), request, &responseAttributes).size() == 1)
+                if (call(&Derived::read, std::move(id), request).size() == 1)
                     throw Exception::forbidden("Already exists");
             }
         }
 
-        ResponseAttributes responseAttributes;
         using Result = typename nx::traits::FunctionTraits<&Derived::create>::ReturnType;
         if constexpr (!std::is_same<Result, void>::value)
         {
+            ResponseAttributes responseAttributes;
             auto result = call(&Derived::create, std::move(model), request, &responseAttributes);
             return response(std::move(result), request, std::move(responseAttributes));
         }
@@ -530,11 +534,12 @@ Response CrudHandler<Derived>::executePost(const Request& request)
             && HasGetId<Model>::value)
         {
             auto id = getId(model);
-            call(&Derived::create, std::move(model), request, &responseAttributes);
-            return responseById(std::move(id), request, std::move(responseAttributes));
+            call(&Derived::create, std::move(model), request);
+            return responseById(std::move(id), request);
         }
         else
         {
+            ResponseAttributes responseAttributes;
             call(&Derived::create, std::move(model), request, &responseAttributes);
             return response(Void{}, request, std::move(responseAttributes));
         }
@@ -589,11 +594,11 @@ Response CrudHandler<Derived>::executePut(const Request& request)
         Model model{request.parseContentOrThrow<Model>()};
         if constexpr (requires { &Derived::fillMissingParams; })
             d->fillMissingParams(&model, request);
-        ResponseAttributes responseAttributes;
         if (idParam(request).value || m_idParamName.isEmpty())
         {
             if constexpr (!std::is_same<Result, void>::value)
             {
+                ResponseAttributes responseAttributes;
                 auto result =
                     call(&Derived::update, std::move(model), request, &responseAttributes);
                 if constexpr (requires { &Result::size; })
@@ -614,54 +619,46 @@ Response CrudHandler<Derived>::executePut(const Request& request)
             {
                 if constexpr (requires { &Derived::read; })
                 {
-                    using IdType = std::conditional_t<
-                        HasGetId<Model>::value,
-                        typename HasGetId<Model>::type,
-                        std::monostate
-                    >;
-                    IdType id = {};
-
                     if constexpr (HasGetId<Model>::value)
                     {
-                        id = getId(model);
-                        if (id == IdType{})
+                        auto id = getId(model);
+                        if (id == decltype(id){})
                             throw Exception::missingParameter(m_idParamName);
-                    }
-
-                    call(&Derived::update, std::move(model), request, &responseAttributes);
-                    if constexpr (HasGetId<Model>::value)
-                    {
                         if (!m_features.testFlag(CrudFeature::fastUpdate))
-                            return responseById(id, request, std::move(responseAttributes));
+                        {
+                            call(&Derived::update, std::move(model), request);
+                            return responseById(id, request);
+                        }
                     }
                 }
-                else
-                {
-                    call(&Derived::update, std::move(model), request, &responseAttributes);
-                }
-
+                ResponseAttributes responseAttributes;
+                call(&Derived::update, std::move(model), request, &responseAttributes);
                 return response(Void{}, request, std::move(responseAttributes));
             }
         }
 
         if constexpr (!std::is_same<Result, void>::value)
         {
+            ResponseAttributes responseAttributes;
             auto result = call(&Derived::update, std::move(model), request, &responseAttributes);
             return response(std::move(result), request, std::move(responseAttributes));
         }
         else
         {
-            call(&Derived::update, std::move(model), request, &responseAttributes);
             if constexpr (requires { &Derived::read; })
             {
                 if (!m_features.testFlag(CrudFeature::fastUpdate))
                 {
                     auto emptyFilter = traits::FunctionArgumentType<&Derived::read, 0>{};
+                    call(&Derived::update, std::move(model), request);
+                    ResponseAttributes responseAttributes;
                     auto result =
                         call(&Derived::read, std::move(emptyFilter), request, &responseAttributes);
                     return response(std::move(result), request, std::move(responseAttributes));
                 }
             }
+            ResponseAttributes responseAttributes;
+            call(&Derived::update, std::move(model), request, &responseAttributes);
             return response(Void{}, request, std::move(responseAttributes));
         }
     }
@@ -686,9 +683,9 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
         Model model = mergedModel<Model>(useId, request);
         if constexpr (requires { &Derived::fillMissingParams; })
             d->fillMissingParams(&model, request);
-        ResponseAttributes responseAttributes;
         if constexpr (!std::is_same_v<Result, void>)
         {
+            ResponseAttributes responseAttributes;
             auto result =
                 call(&Derived::update, std::move(model), request, &responseAttributes);
             return response(std::move(result), request, std::move(responseAttributes));
@@ -697,22 +694,21 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
         {
             if constexpr (HasGetId<Model>::value)
             {
-                std::decay_t<decltype(getId(model))> id = getId(model);
-                call(&Derived::update, std::move(model), request, &responseAttributes);
                 if (!m_features.testFlag(CrudFeature::fastUpdate))
                 {
+                    std::decay_t<decltype(getId(model))> id = getId(model);
+                    call(&Derived::update, std::move(model), request);
                     if (useId)
-                        return responseById(std::move(id), request, std::move(responseAttributes));
+                        return responseById(std::move(id), request);
 
+                    ResponseAttributes responseAttributes;
                     auto result =
                         call(&Derived::read, std::move(id), request, &responseAttributes);
                     return response(std::move(result), request, std::move(responseAttributes));
                 }
             }
-            else
-            {
-                call(&Derived::update, std::move(model), request, &responseAttributes);
-            }
+            ResponseAttributes responseAttributes;
+            call(&Derived::update, std::move(model), request, &responseAttributes);
             return response(Void{}, request, std::move(responseAttributes));
         }
     }

@@ -52,6 +52,12 @@ static std::tuple<http::Method, QString> methodAndPath(json_rpc::Context* contex
     static const auto kSubsTails = nx::reflect::enumeration::visitAllItems<Subs>(
         [](auto&&... e) { return std::array{std::make_pair(subsTail(e.value), e.value)...}; });
 
+    if (context->request.method.empty())
+    {
+        NX_ASSERT(context->subscribed, "Only notification requests do not have method");
+        return {http::Method::get, QString{}};
+    }
+
     std::string_view method = context->request.method;
     for (const auto& [tail, subs]: kSubsTails)
     {
