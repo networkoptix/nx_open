@@ -87,7 +87,29 @@ struct ResourceSelectionModelAdapter::Private
         }
     }
 
-    bool isRowAccepted(int sourceRow, const QModelIndex& sourceParent) const
+    bool isIndexAccepted(const QModelIndex& sourceIndex, bool checkParents = true) const
+    {
+        if (!sourceIndex.isValid())
+            return false;
+
+        if (externalFilter && !externalFilter(sourceIndex))
+            return false;
+
+        const auto text = sourceIndex.data(Qt::DisplayRole).toString();
+        if (text.contains(filterText, Qt::CaseInsensitive))
+            return true;
+
+        if (isExtraInfoRequired)
+        {
+            const auto extraInfo = sourceIndex.data(Qn::ExtraInfoRole).toString();
+            return extraInfo.contains(filterText, Qt::CaseInsensitive);
+        }
+
+        return checkParents ? isIndexAccepted(sourceIndex.parent(), true) : false;
+    }
+
+    bool isRowAccepted(int sourceRow, const QModelIndex& sourceParent,
+        bool checkParents = true) const
     {
         const auto sourceModel = q->sourceModel();
         if (!NX_ASSERT(sourceModel))
@@ -98,24 +120,14 @@ struct ResourceSelectionModelAdapter::Private
 
         const auto sourceIndex = sourceModel->index(sourceRow, 0, sourceParent);
 
+        if (isIndexAccepted(sourceIndex, checkParents))
+            return true;
+
         const int childCount = sourceModel->rowCount(sourceIndex);
         for (int i = 0; i < childCount; i++)
         {
-            if (isRowAccepted(i, sourceIndex))
+            if (isRowAccepted(i, sourceIndex, false))
                 return true;
-        }
-
-        if (externalFilter && !externalFilter(sourceIndex))
-            return false;
-
-        const auto text = sourceModel->data(sourceIndex, Qt::DisplayRole).toString();
-        if (text.contains(filterText, Qt::CaseInsensitive))
-            return true;
-
-        if (isExtraInfoRequired)
-        {
-            const auto extraInfo = sourceModel->data(sourceIndex, Qn::ExtraInfoRole).toString();
-            return extraInfo.contains(filterText, Qt::CaseInsensitive);
         }
 
         return false;

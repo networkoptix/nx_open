@@ -159,6 +159,7 @@ Item
         {
             // Search happens in an escaped text, so also escape filter text here.
             const escaped = tree.filterText
+                .trim()
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
 
