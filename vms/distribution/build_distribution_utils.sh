@@ -318,13 +318,6 @@ distrib_copyServerSystemLibs() # destination_path
     local -a fallback_libs_to_copy=(
         libasound.so.2
         libudev.so.1
-        # libatomic is duplicated here and in stdcpp directory. We do it because this library
-        # logically belongs to cpp runtime libraries, which are processed by
-        # choose_newer_stdcpp.sh during startup, but this script does not work correctly if
-        # libstdcpp found in the system is new, but libatomic package is not installed. Hence, try
-        # to ensure libatomic availability using manage_fallback_libs.sh. TODO: implement more
-        # elegant solution.
-        libatomic.so.1
     )
 
     if [[ "${ARCH}" != "arm" ]]; then
@@ -484,6 +477,11 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         libicuuc
         libicudata
         libicui18n
+    )
+
+    # libatomic
+    libs_to_copy+=(
+        libatomic
     )
 
     mkdir -p "${STAGE}/${LIB_INSTALL_PATH}"
