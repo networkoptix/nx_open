@@ -168,6 +168,8 @@ copyLibs()
     echo "  Copying 3rd-party libs"
 
     local -r THIRD_PARTY_LIBS=(
+        libatomic.so.1
+
         libavcodec.so.61
         libavfilter.so.10
         libavformat.so.61

@@ -13,7 +13,7 @@ if(LINUX AND NOT ANDROID)
     nx_store_known_files_in_directory(${os_deps_pkg_config_dir})
     set(ENV{PKG_CONFIG_PATH} ${os_deps_pkg_config_dir})
 
-    set(cpp_runtime_libs libstdc++.so.6 libatomic.so.1 libgcc_s.so.1)
+    set(cpp_runtime_libs libstdc++.so.6 libgcc_s.so.1)
     if(arch STREQUAL "x64")
         list(APPEND cpp_runtime_libs libmvec.so.1)
     endif()
@@ -25,4 +25,8 @@ if(LINUX AND NOT ANDROID)
     endif()
 
     string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")
+
+    # Although libatomic is a part or the C++ runtime, we do not include it into cpp_runtime_libs.
+    # We handle it separately and for now we just copy it into the final package `lib`.
+    nx_copy_system_libraries(libatomic.so.1)
 endif()
