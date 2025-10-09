@@ -102,7 +102,7 @@
     </message>
     <message>
       <source>Create Bookmark</source>
-      <translation>ブックマークを作成</translation>
+      <translation>ブックマーク作成</translation>
     </message>
     <message>
       <source>At</source>
