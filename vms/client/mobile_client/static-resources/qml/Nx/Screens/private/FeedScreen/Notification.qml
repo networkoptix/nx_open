@@ -133,7 +133,7 @@ Control
                 anchors.centerIn: parent
 
                 visible: !!url
-                sourcePath: "image://skin/48x48/Solid/play.svg"
+                sourcePath: "image://skin/feed/play.svg"
                 sourceSize: Qt.size(48, 48)
                 primaryColor: ColorTheme.colors.light1
             }
