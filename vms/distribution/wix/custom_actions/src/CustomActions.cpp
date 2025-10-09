@@ -140,6 +140,13 @@ UINT __stdcall DeleteOldMediaserverSettings(MSIHANDLE hInstall)
         ;
         status != ERROR_SUCCESS)
     {
+        if (status == ERROR_FILE_NOT_FOUND)
+        {
+            WcaLog(LOGMSG_STANDARD, "Key %S doesn't exist. Skipping operation.",
+                (LPCWSTR) registryPath);
+            return wca.success();
+        }
+
         WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S. Error code: %d",
             (LPCWSTR) registryPath, status);
         return wca.failure();
@@ -301,6 +308,13 @@ UINT __stdcall DeleteRegistryKeys(MSIHANDLE hInstall)
         ;
         status != ERROR_SUCCESS)
     {
+        if (status == ERROR_FILE_NOT_FOUND)
+        {
+            WcaLog(LOGMSG_STANDARD, "Key %S doesn't exist. Skipping operation.",
+                (LPCWSTR) registryPath);
+            return wca.success();
+        }
+
         WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S. Error code: %d",
             (LPCWSTR) registryPath, status);
         return wca.failure();
@@ -330,6 +344,13 @@ UINT __stdcall DeleteAllRegistryKeys(MSIHANDLE hInstall)
         ;
         status != ERROR_SUCCESS)
     {
+        if (status == ERROR_FILE_NOT_FOUND)
+        {
+            WcaLog(LOGMSG_STANDARD, "Key %S doesn't exist. Skipping operation.",
+                (LPCWSTR) registryPath);
+            return wca.success();
+        }
+
         WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S. Error code: %d",
             (LPCWSTR) keyParent, status);
         return wca.failure();
@@ -415,6 +436,13 @@ UINT __stdcall CleanAutorunRegistryKeys(MSIHANDLE hInstall)
         ;
         status != ERROR_SUCCESS)
     {
+        if (status == ERROR_FILE_NOT_FOUND)
+        {
+            WcaLog(LOGMSG_STANDARD, "Key %S doesn't exist. Skipping operation.",
+                (LPCWSTR) registryPath);
+            return wca.success();
+        }
+
         WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S. Error code: %d",
             (LPCWSTR) registryPath, status);
         return wca.failure();
@@ -471,7 +499,7 @@ UINT __stdcall CleanClientRegistryKeys(MSIHANDLE hInstall)
     const CAtlString keyName = registryPath.Mid(lastSlashPos + 1);
 
     CRegKey regKey;
-    if(const auto status = regKey.Open(
+    if (const auto status = regKey.Open(
         HKEY_CURRENT_USER, keyParent, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY)
         ;
         status == ERROR_SUCCESS)
