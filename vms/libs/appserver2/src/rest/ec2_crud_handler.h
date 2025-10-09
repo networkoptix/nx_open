@@ -127,6 +127,8 @@ public:
         using namespace nx::utils::model;
 
         auto d = static_cast<Derived*>(this);
+        const bool isNotification =
+            request.jsonRpcContext() && request.jsonRpcContext()->subscribed;
         nx::utils::Guard guard;
         if (responseAttributes)
         {
@@ -136,14 +138,14 @@ public:
                 nx::network::http::insertOrReplaceHeader(&responseAttributes->httpHeaders,
                     {"ETag", nx::utils::toHex(etags->get().remove(d->subscriptionId(getId(id))))});
             }
-            else
+            else if (isNotification)
             {
                 // CollectionHash for all items.
                 guard = nx::utils::Guard([&]() { d->read({}, request, responseAttributes); });
             }
         }
 
-        if (request.jsonRpcContext() && request.jsonRpcContext()->subscribed)
+        if (isNotification)
             return; //< Do nothing as this is a notification for a WebSocket connection.
 
         auto processor = m_queryProcessor->getAccess(d->prepareAuditRecord(request));
@@ -325,7 +327,7 @@ protected:
                 }
                 else
                 {
-                    auto etags = calculateEtags(d->read({}, request, /*responseAttributes*/ nullptr));
+                    nx::network::rest::CollectionHash etags;
                     etag = etags.calculate(std::move(item)).first;
                 }
             }
