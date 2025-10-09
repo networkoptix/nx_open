@@ -2534,11 +2534,11 @@ Alt + クリックを使用してください。</translation>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation>API インテグレーション登録リクエストを承認する</translation>
+      <translation>API インテグレーション登録リクエストを許可する</translation>
     </message>
     <message>
       <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation>API インテグレーションの登録リクエストを有効化すると、サードパーティが統合を通じて承認リクエストを送信できるようになります。安全策は講じられていますが、長時間の使用は推奨されません。使用状況を注意深く監視し、すべての必要なインテグレーションのインストール完了後、このオプションを無効化してください。</translation>
+      <translation>API インテグレーションの登録リクエストを有効化すると、サードパーティがインテグレーションを通じて承認リクエストを送信できるようになります。安全策は講じられていますが、長時間の使用は推奨されません。使用状況を注意深く監視し、すべての必要なインテグレーションのインストール完了後、このオプションを無効化してください。</translation>
     </message>
   </context>
   <context>
