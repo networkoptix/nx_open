@@ -228,6 +228,9 @@ list(APPEND compiling_options
     -DQT_DIR="${QT_DIR}"
     -DQT_HOST_PATH="${QT_HOST_PATH}"
     -DNX_KIT_UT_TMP_DIR="${nx_kit_ut_tmp_dir}"
+    # CI build fails when compiler tries to produce PDB file here (probably the path is too long),
+    # so just use Release to avoid creating PDB.
+    -DCMAKE_TRY_COMPILE_CONFIGURATION=Release
 )
 
 # OUTPUT and BYPRODUCTS must be the last arguments - see the function definition.

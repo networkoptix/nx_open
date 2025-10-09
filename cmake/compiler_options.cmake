@@ -364,12 +364,18 @@ if(compilerMsvc)
     # avoid possible interprocess locks, and thus improves the parallelability of the entire build
     # process. The .pdb files are generated during the linking process - the "/DEBUG" flag passed
     # to the linker is responsible for this.
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Z7")
-    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG")
-
-    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /DEBUG")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "Embedded") # /Z7
+    add_link_options(/DEBUG)
+    # Change /Ob1 -> /Ob2 for RelWithDebInfo to match the Release build.
+    foreach(lang C CXX)
+        string(REGEX REPLACE "(^| )/Ob[0-3]( |$)" " " CMAKE_${lang}_FLAGS_RELWITHDEBINFO "${CMAKE_${lang}_FLAGS_RELWITHDEBINFO}")
+        set(CMAKE_${lang}_FLAGS_RELWITHDEBINFO "${CMAKE_${lang}_FLAGS_RELWITHDEBINFO} /Ob2" CACHE STRING "" FORCE)
+    endforeach()
+    # Change /INCREMENTAL -> /INCREMENTAL:NO for RelWithDebInfo to match the Release build.
+    foreach(kind EXE SHARED MODULE)
+        string(REGEX REPLACE "(^| )/INCREMENTAL(:NO)?( |$)" " " CMAKE_${kind}_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_${kind}_LINKER_FLAGS_RELWITHDEBINFO}")
+        set(CMAKE_${kind}_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_${kind}_LINKER_FLAGS_RELWITHDEBINFO} /INCREMENTAL:NO" CACHE STRING "" FORCE)
+    endforeach()
 endif()
 
 if(MSVC)
