@@ -402,7 +402,7 @@
     <name>nx::vms::rules::BookmarkAction</name>
     <message>
       <source>Create Bookmark</source>
-      <translation>ブックマークを作成</translation>
+      <translation>ブックマーク作成</translation>
     </message>
     <message>
       <source>Add Tags</source>
@@ -645,7 +645,7 @@
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
     <message>
       <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
-      <translation>Basic または Digest 認証方式が選択されている場合は、ユーザーとパスワードのフィールドを入力する必要があります。</translation>
+      <translation>Basic または Digest 認証方式を選択した場合、ユーザーとパスワードのフィールドに入力する必要があります。</translation>
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>

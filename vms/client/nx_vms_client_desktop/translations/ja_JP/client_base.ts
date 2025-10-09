@@ -7188,7 +7188,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Devices</source>
-      <translation>デバイスを選択してください</translation>
+      <translation>デバイス選択</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -7196,7 +7196,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Device</source>
-      <translation>デバイスを選択してください</translation>
+      <translation>デバイス選択</translation>
     </message>
     <message>
       <source>Select Camera</source>
@@ -12390,7 +12390,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>DO</source>
-      <translation>動作</translation>
+      <translation>応答</translation>
     </message>
     <message>
       <source>ACTION</source>
