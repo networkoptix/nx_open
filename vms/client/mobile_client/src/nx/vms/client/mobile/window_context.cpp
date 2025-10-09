@@ -171,6 +171,11 @@ RemoteLogManager* WindowContext::logManager() const
     return d->remoteLogManager.get();
 }
 
+QnMobileClientUriHandler* WindowContext::uriHandler() const
+{
+    return d->uriHandler.get();
+}
+
 QnMobileClientUiController* WindowContext::deprecatedUiController() const
 {
     return d->deprecatedUiController.get();

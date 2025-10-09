@@ -70,6 +70,9 @@ QVariant PushNotificationModel::data(const QModelIndex &index, int role) const
 
         case ReadRole:
             return item.isRead;
+
+        case UrlRole:
+            return QUrl{QString::fromStdString(item.url)};
     }
 
     NX_ASSERT(false, "Unexpected role: %1", role);
@@ -107,6 +110,7 @@ QHash<int, QByteArray> PushNotificationModel::roleNames() const
     result[ImageRole] = "image";
     result[TimeRole] = "time";
     result[ReadRole] = "read";
+    result[UrlRole] = "url";
     return result;
 }
 

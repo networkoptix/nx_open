@@ -20,6 +20,7 @@ Control
     property alias image: image.source
     property string source: ""
     property bool read: false
+    property string url: ""
     property bool expanded: false
 
     readonly property int kTitleRightPadding: 24
@@ -125,6 +126,16 @@ Control
                     height: image.paintedHeight
                     radius: 4
                 }
+            }
+
+            ColoredImage
+            {
+                anchors.centerIn: parent
+
+                visible: !!url
+                sourcePath: "image://skin/48x48/Solid/play.svg"
+                sourceSize: Qt.size(48, 48)
+                primaryColor: ColorTheme.colors.light1
             }
         }
 

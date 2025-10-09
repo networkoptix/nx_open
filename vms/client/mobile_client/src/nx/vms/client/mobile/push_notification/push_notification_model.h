@@ -22,6 +22,7 @@ public:
         ImageRole,
         TimeRole,
         ReadRole,
+        UrlRole,
     };
 
 public:
