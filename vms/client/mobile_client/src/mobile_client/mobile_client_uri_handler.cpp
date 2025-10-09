@@ -303,6 +303,14 @@ void QnMobileClientUriHandler::Private::connectToServerDirectly(const SystemUri&
 {
     NX_DEBUG(this, "connectToServerDirectly(): start");
     const auto sessionManager = appContext()->mainWindowContext()->sessionManager();
+
+    if (auto systemContext = appContext()->currentSystemContext();
+        systemContext && systemContext->cloudSystemId() == uri.systemAddress)
+    {
+        connectedCallback(uri);
+        return;
+    }
+
     sessionManager->stopSessionByUser();
 
     // Switch to sessions screen and wait for the change to avoid side effects with a login process.

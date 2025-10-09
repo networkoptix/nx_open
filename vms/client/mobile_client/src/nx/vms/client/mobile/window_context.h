@@ -8,6 +8,7 @@
 #include <nx/vms/client/core/window_context.h>
 
 Q_MOC_INCLUDE("mobile_client/mobile_client_ui_controller.h")
+Q_MOC_INCLUDE("mobile_client/mobile_client_uri_handler.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/maintenance/remote_log_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/session/session_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/system_context.h")
@@ -15,8 +16,7 @@ Q_MOC_INCLUDE("nx/vms/client/mobile/ui/ui_controller.h")
 
 class QQuickWindow;
 class QnMobileClientUiController;
-
-class QQuickWindow;
+class QnMobileClientUriHandler;
 class QnTextureSizeHelper;
 
 namespace nx::vms::client::core { class SystemContext; }
@@ -49,6 +49,10 @@ class WindowContext: public core::WindowContext
         READ logManager
         CONSTANT)
 
+    Q_PROPERTY(QnMobileClientUriHandler* uriHandler
+        READ uriHandler
+        CONSTANT)
+
     // Deprecated classes.
     Q_PROPERTY(QnMobileClientUiController* depricatedUiController
         READ depricatedUiController
@@ -70,6 +74,8 @@ public:
     SessionManager* sessionManager() const;
 
     RemoteLogManager* logManager() const;
+
+    QnMobileClientUriHandler* uriHandler() const;
 
     // Deprivated classes
     QnMobileClientUiController* depricatedUiController() const;

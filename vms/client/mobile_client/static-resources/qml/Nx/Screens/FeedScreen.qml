@@ -108,8 +108,14 @@ Page
                 image: model.image
                 time: model.time
                 read: model.read
+                url: model.url
 
-                onClicked: model.read = true
+                onClicked:
+                {
+                    model.read = true
+                    if (model.url)
+                        windowContext.uriHandler.handleUrl(model.url)
+                }
             }
 
             leftItem: Button
