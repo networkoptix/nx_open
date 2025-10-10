@@ -977,11 +977,11 @@
     </message>
     <message>
       <source>Non-obfuscated video</source>
-      <translation type="unfinished">Non-obfuscated video</translation>
+      <translation>Video yang tidak dikaburkan</translation>
     </message>
     <message>
       <source>Obfuscation is used to protect sensitive information but also increases CPU usage and export time</source>
-      <translation type="unfinished">Obfuscation is used to protect sensitive information but also increases CPU usage and export time</translation>
+      <translation>Pengaburan digunakan untuk melindungi informasi sensitif tetapi juga meningkatkan penggunaan CPU dan waktu ekspor</translation>
     </message>
   </context>
   <context>

@@ -977,11 +977,11 @@
     </message>
     <message>
       <source>Non-obfuscated video</source>
-      <translation type="unfinished">Non-obfuscated video</translation>
+      <translation>Wideo bez zaciemnienia</translation>
     </message>
     <message>
       <source>Obfuscation is used to protect sensitive information but also increases CPU usage and export time</source>
-      <translation type="unfinished">Obfuscation is used to protect sensitive information but also increases CPU usage and export time</translation>
+      <translation>Zaciemnianie jest stosowane w celu ochrony poufnych informacji, ale zwiększa również wykorzystanie procesora i czas eksportu</translation>
     </message>
   </context>
   <context>

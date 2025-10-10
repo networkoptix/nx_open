@@ -7553,7 +7553,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>nx::vms::client::desktop::ChannelPartnerUserNotificationManager</name>
     <message>
       <source>Channel Partner users have access to this site</source>
-      <translation type="unfinished">Channel Partner users have access to this site</translation>
+      <translation>Los Usuarios del Canal de Socios tienen acceso a este sitio</translation>
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>

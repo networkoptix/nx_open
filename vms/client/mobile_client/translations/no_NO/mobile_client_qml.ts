@@ -375,7 +375,7 @@
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>Ingen push-varsler ble funnet.</translation>
     </message>
   </context>
   <context>

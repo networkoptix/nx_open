@@ -1697,8 +1697,8 @@
     <message>
       <source>Enter address, subnet range or subnet mask, login and password
 and click on the &quot;Search&quot; button</source>
-      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
-and click on the &quot;Search&quot; button</translation>
+      <translation>Skriv inn adresse, subnet område eller subnet maske, brukernavn og passord
+og klikk på &quot;Søk&quot; knappen</translation>
     </message>
   </context>
   <context>
