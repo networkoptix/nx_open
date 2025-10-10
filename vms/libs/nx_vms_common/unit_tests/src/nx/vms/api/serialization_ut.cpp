@@ -193,6 +193,7 @@ const UserSessionSettings kDefaultUserSessionSettings{
     .sessionsLimitPerUser = 5'000,
     .remoteSessionTimeoutS = 6h,
     .remoteSessionUpdateS = 10s,
+    .remoteSessionUpdateKeysS = 5min,
     .useSessionLimitForCloud = false
 };
 
