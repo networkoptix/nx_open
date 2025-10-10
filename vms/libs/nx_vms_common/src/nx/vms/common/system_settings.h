@@ -71,6 +71,7 @@ struct NX_VMS_COMMON_API SystemSettingNames
     DECLARE_SETTING_NAME(primaryTimeServer);
     DECLARE_SETTING_NAME(remoteSessionTimeoutS);
     DECLARE_SETTING_NAME(remoteSessionUpdateS);
+    DECLARE_SETTING_NAME(remoteSessionUpdateKeysS);
     DECLARE_SETTING_NAME(resourceFileUri);
     DECLARE_SETTING_NAME(securityForPowerUsers);
     DECLARE_SETTING_NAME(sessionLimitS);
@@ -121,6 +122,7 @@ struct NX_VMS_COMMON_API SystemSettingNames
         maxHttpTranscodingSessions,
         remoteSessionTimeoutS,
         remoteSessionUpdateS,
+        remoteSessionUpdateKeysS,
         resourceFileUri,
         securityForPowerUsers,
         sessionLimitS,
@@ -481,6 +483,9 @@ public:
 
     std::chrono::seconds remoteSessionUpdate() const;
     void setRemoteSessionUpdate(std::chrono::seconds value);
+
+    std::chrono::seconds remoteSessionUpdateKeys() const;
+    void setRemoteSessionUpdateKeys(std::chrono::seconds value);
 
     std::chrono::seconds remoteSessionTimeout() const;
     void setRemoteSessionTimeout(std::chrono::seconds value);
