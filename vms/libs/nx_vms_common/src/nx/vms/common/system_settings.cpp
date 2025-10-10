@@ -214,6 +214,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<int>* sessionsLimitAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* sessionsLimitPerUserAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::chrono::seconds>* remoteSessionUpdateSAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::seconds>* remoteSessionUpdateKeysSAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::chrono::seconds>* remoteSessionTimeoutSAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* defaultVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* defaultExportVideoCodecAdaptor = nullptr;
@@ -811,6 +812,11 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [](const std::chrono::seconds& value) { return value > 0s; }, this,
         [] { return tr("Update interval for remote session token cache (other Servers and Cloud)."); });
 
+    d->remoteSessionUpdateKeysSAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
+        Names::remoteSessionUpdateKeysS, 5min,
+        [](const std::chrono::seconds& value) { return value > 0s; }, this,
+        [] { return tr("Update interval for public keys from the Cloud."); });
+
     d->remoteSessionTimeoutSAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
         Names::remoteSessionTimeoutS, 6h,
         [](const std::chrono::seconds& value) { return value > 0s; }, this,
@@ -1188,6 +1194,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
+        d->remoteSessionUpdateKeysSAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::remoteSessionUpdateChanged,
+        Qt::QueuedConnection);
+
+    connect(
         d->remoteSessionTimeoutSAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
@@ -1375,6 +1388,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->sessionsLimitAdaptor
         << d->sessionsLimitPerUserAdaptor
         << d->remoteSessionUpdateSAdaptor
+        << d->remoteSessionUpdateKeysSAdaptor
         << d->remoteSessionTimeoutSAdaptor
         << d->defaultVideoCodecAdaptor
         << d->defaultExportVideoCodecAdaptor
@@ -2351,6 +2365,16 @@ std::chrono::seconds SystemSettings::remoteSessionUpdate() const
 void SystemSettings::setRemoteSessionUpdate(std::chrono::seconds value)
 {
     d->remoteSessionUpdateSAdaptor->setValue(value);
+}
+
+std::chrono::seconds SystemSettings::remoteSessionUpdateKeys() const
+{
+    return d->remoteSessionUpdateKeysSAdaptor->value();
+}
+
+void SystemSettings::setRemoteSessionUpdateKeys(std::chrono::seconds value)
+{
+    d->remoteSessionUpdateKeysSAdaptor->setValue(value);
 }
 
 std::chrono::seconds SystemSettings::remoteSessionTimeout() const

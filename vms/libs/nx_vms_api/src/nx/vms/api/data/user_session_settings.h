@@ -15,6 +15,7 @@ struct NX_VMS_API UserSessionSettings
 
     std::optional<std::chrono::seconds> remoteSessionTimeoutS;
     std::optional<std::chrono::seconds> remoteSessionUpdateS;
+    std::optional<std::chrono::seconds> remoteSessionUpdateKeysS;
 
     std::optional<bool> useSessionLimitForCloud;
 
@@ -26,6 +27,7 @@ struct NX_VMS_API UserSessionSettings
     (sessionsLimitPerUser) \
     (remoteSessionTimeoutS) \
     (remoteSessionUpdateS) \
+    (remoteSessionUpdateKeysS) \
     (useSessionLimitForCloud)
 NX_REFLECTION_INSTRUMENT(UserSessionSettings, UserSessionSettings_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(UserSessionSettings, (json), NX_VMS_API)
