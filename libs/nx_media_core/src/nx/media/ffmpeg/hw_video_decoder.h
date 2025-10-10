@@ -71,7 +71,7 @@ private:
     nx::metric::Storage* m_metrics = nullptr;
     uint32_t m_channel = 0;
     QnAbstractMediaData::MediaFlags m_flags {};
-    MultiThreadDecodePolicy m_mtDecodingPolicy;
+    MultiThreadDecodePolicy m_mtDecodingPolicy = MultiThreadDecodePolicy::enabled;
 };
 
 } // namespace nx::media::ffmpeg
