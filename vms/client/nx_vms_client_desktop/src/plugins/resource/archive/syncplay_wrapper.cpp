@@ -39,6 +39,7 @@ struct ReaderInfo
 
     QnAbstractArchiveStreamReader* reader;
     QnAbstractArchiveDelegate* oldDelegate;
+    int64_t syncDelegateIndex; //< Used as the identifier of the synchronization delegate to remove it from the list.
     QnlTimeSource* cam;
     bool buffering;
     bool isEOF;
@@ -278,12 +279,11 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* r
 
     NX_MUTEX_LOCKER lock1(&d->readerListMutex);
     NX_MUTEX_LOCKER lock2(&d->timeMutex);
-
-    d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
-    //reader->setEnabled(d->enabled);
-
+    ReaderInfo info(reader, reader->getArchiveDelegate(), cam);
     reader->setArchiveDelegate(std::make_unique<QnSyncPlayArchiveDelegate>(reader, this, reader->releaseArchiveDelegate()));
+    info.syncDelegateIndex = (int64_t)reader->getArchiveDelegate();
     reader->setCycleMode(false);
+    d->readers << info;
 
     connect(reader, &QnAbstractArchiveStreamReader::beforeJump, this,
         &QnArchiveSyncPlayWrapper::onBeforeJump, Qt::DirectConnection);
@@ -427,8 +427,6 @@ void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
             d->lastJumpTime = getDisplayedTimeInternal();
     }
 
-    //qDebug() << "reinitTime=" << QDateTime::fromMSecsSinceEpoch(d->lastJumpTime/1000).toString("hh:mm:ss.zzz");
-
     d->timer.restart();
 }
 
@@ -498,8 +496,9 @@ void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
     NX_MUTEX_LOCKER lock2(&d->timeMutex);
     for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
     {
-        if (i->reader->getArchiveDelegate() == value)
+        if (i->syncDelegateIndex == (int64_t)value)
         {
+            NX_ERROR(this, "Remove ID: %1", value);
             if (i->buffering)
                 d->bufferingCnt--;
             i->reader->disconnect(this);
