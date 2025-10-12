@@ -12780,7 +12780,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Sitio</translation>
     </message>
   </context>
   <context>
