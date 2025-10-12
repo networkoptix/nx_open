@@ -483,7 +483,7 @@
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Остановленный</translation>
     </message>
   </context>
   <context>
