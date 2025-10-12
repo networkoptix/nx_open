@@ -300,7 +300,7 @@
     <name>nx::vms::client::core::DirectSystemFinder</name>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Sitio</translation>
     </message>
     <message>
       <source>Site (%1)</source>
