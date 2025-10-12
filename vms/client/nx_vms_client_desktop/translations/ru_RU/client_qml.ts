@@ -539,7 +539,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Остановленный</translation>
     </message>
     <message>
       <source>New</source>
