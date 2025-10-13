@@ -1105,6 +1105,17 @@ TCPSocket::TCPSocket(
 
 TCPSocket::~TCPSocket()
 {
+    // TCPSocket does not inherit BasicPollable.
+    if (isInSelfAioThread())
+    {
+        pleaseStopSync();
+    }
+    else
+    {
+        NX_CRITICAL(!getAioThread()->isSocketBeingMonitored(this),
+            "You MUST cancel running async operation before deleting pollable "
+            "if you delete it from non-aio thread");
+    }
     --SocketGlobals::instance().debugCounters().tcpSocketCount;
     SocketGlobals::instance().allocationAnalyzer().recordObjectDestruction(this);
 }
