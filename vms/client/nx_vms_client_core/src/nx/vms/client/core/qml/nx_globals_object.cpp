@@ -457,4 +457,10 @@ void NxGlobalsObject::registerQmlType()
         [](QQmlEngine*, QJSEngine*) { return new NxGlobalsObject(); });
 }
 
+void NxGlobalsObject::forceCrash() const
+{
+    int* x = (int*) 0xDEAD;
+    *x = 0xBEEF;
+}
+
 } // namespace nx::vms::client::core

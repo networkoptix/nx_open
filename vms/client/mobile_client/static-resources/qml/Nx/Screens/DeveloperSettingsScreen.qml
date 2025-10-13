@@ -291,6 +291,14 @@ BaseSettingsScreen
                 onClicked: d.copySessionIdToClipboard()
             }
         }
+
+        Button
+        {
+            visible: d.crashdumpsEnabled
+            text: qsTr("Force Crash")
+            color: ColorTheme.colors.red_core
+            onClicked: NxGlobals.forceCrash()
+        }
     }
 
     ItemSelectionDialog
@@ -331,8 +339,14 @@ BaseSettingsScreen
 
         property string logSessionId: windowContext.logManager.remoteLogSessionId()
         property string crashpadClientId: NxGlobals.getCrashpadClientId()
+        property bool crashdumpsEnabled: false
 
         onLogSessionIdChanged: copySessionIdToClipboard()
-        Component.onCompleted: copySessionIdToClipboard()
+        Component.onCompleted: {
+            copySessionIdToClipboard()
+            // Prevent showing crash button just after enabling crashdump uploads - the app should
+            // be restarted first to apply changes.
+            crashdumpsEnabled = appContext.settings.crashdumpUploadsEnabled
+        }
     }
 }
