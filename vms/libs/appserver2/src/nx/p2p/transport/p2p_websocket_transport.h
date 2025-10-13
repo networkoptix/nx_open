@@ -8,7 +8,7 @@
 
 namespace nx::p2p {
 
-class P2PWebsocketTransport : public IP2PTransport
+class P2PWebsocketTransport: public IP2PTransport
 {
 public:
     P2PWebsocketTransport(
@@ -33,6 +33,9 @@ public:
         nx::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
 
     virtual QString lastErrorMessage() const override;
+
+    virtual void suspendReadingConnection() override;
+    virtual void resumeReadingConnection() override;
 
     nx::network::websocket::Statistics outputStatistics() const
     {

@@ -64,6 +64,9 @@ public:
      */
     void start();
 
+    void resumeReadingConnection();
+    void suspendReadingConnection();
+
     /**
      * Makes sense only in multiFrameMessage mode.
      * Indicates that the next sendAsync will close current message
@@ -123,6 +126,7 @@ private:
     FrameType m_defaultFrameType;
     std::optional<Serializer::Compression> m_compression;
     bool m_readingCeased = false;
+    bool m_readingSuspended = false;
     bool m_pingPongDisabled = false;
     QString m_lastErrorMessage;
 

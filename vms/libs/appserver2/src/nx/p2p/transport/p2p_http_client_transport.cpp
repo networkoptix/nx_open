@@ -69,6 +69,28 @@ void P2PHttpClientTransport::start(nx::MoveOnlyFunc<void(SystemError::ErrorCode)
         });
 }
 
+void P2PHttpClientTransport::suspendReadingConnection()
+{
+    dispatch(
+        [this]()
+        {
+            m_readingSuspended = true;
+            stopOrResumeReaderWhileInAioThread();
+        }
+    );
+}
+
+void P2PHttpClientTransport::resumeReadingConnection()
+{
+    dispatch(
+        [this]()
+        {
+            m_readingSuspended = false;
+            stopOrResumeReaderWhileInAioThread();
+        }
+    );
+}
+
 void P2PHttpClientTransport::setPingTimeout(std::optional<std::chrono::milliseconds> pingTimeout)
 {
     s_pingTimeout = pingTimeout;
@@ -361,7 +383,7 @@ network::SocketAddress P2PHttpClientTransport::getForeignAddress() const
 
 void P2PHttpClientTransport::stopOrResumeReaderWhileInAioThread()
 {
-    if (m_incomingMessageQueue.size() > kMaxMessageQueueSize)
+    if (m_incomingMessageQueue.size() > kMaxMessageQueueSize || m_readingSuspended)
     {
         NX_DEBUG(
             this, "Incoming message queue overflow detected (%1 pending)",
@@ -370,7 +392,8 @@ void P2PHttpClientTransport::stopOrResumeReaderWhileInAioThread()
     }
     else if (
         m_incomingMessageQueue.size() < kMaxMessageQueueSize / 2
-        && !m_readHttpClient->isReading())
+        && !m_readHttpClient->isReading()
+        && !m_readingSuspended)
     {
         m_readHttpClient->resumeReading();
     }

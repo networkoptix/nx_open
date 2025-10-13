@@ -69,4 +69,14 @@ QString P2PWebsocketTransport::lastErrorMessage() const
     return m_webSocket->lastErrorMessage();
 }
 
+void P2PWebsocketTransport::suspendReadingConnection()
+{
+    m_webSocket->suspendReadingConnection();
+}
+
+void P2PWebsocketTransport::resumeReadingConnection()
+{
+    m_webSocket->resumeReadingConnection();
+}
+
 } // namespace nx::network

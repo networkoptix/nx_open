@@ -243,9 +243,7 @@ void ConnectionBase::onHttpClientDone()
             if (m_httpClient->contentLocationUrl().scheme() == nx::network::http::kSecureUrlSchemeName)
                 url.setScheme(nx::network::http::kSecureUrlSchemeName);
 
-            m_httpClient->doGet(
-                url,
-                std::bind(&ConnectionBase::onHttpClientDone, this));
+            m_httpClient->doGet(url, [this]() { onHttpClientDone(); });
         }
         else
         {
@@ -413,7 +411,7 @@ void ConnectionBase::startConnection()
     if (requestUrl.password().isEmpty())
         fillAuthInfo(m_httpClient.get());
 
-    m_httpClient->doGet(requestUrl, std::bind(&ConnectionBase::onHttpClientDone, this));
+    m_httpClient->doGet(requestUrl, [this]() { onHttpClientDone(); });
 }
 
 void ConnectionBase::startReading()
@@ -421,10 +419,24 @@ void ConnectionBase::startReading()
     m_startedClassId = typeid(*this).hash_code();
 
     NX_VERBOSE(this, "Connection Starting reading, state [%1]", state());
-    using namespace std::placeholders;
     m_p2pTransport->readSomeAsync(
         &m_readBuffer,
-        std::bind(&ConnectionBase::onNewMessageRead, this, _1, _2));
+        [this](SystemError::ErrorCode errorCode, std::size_t bytesTransferred)
+        {
+            onNewMessageRead(errorCode, bytesTransferred);
+        });
+}
+
+void ConnectionBase::suspendReading()
+{
+    m_readingSuspended = true;
+    m_p2pTransport->suspendReadingConnection();
+}
+
+void ConnectionBase::resumeReading()
+{
+    m_readingSuspended = false;
+    m_p2pTransport->resumeReadingConnection();
 }
 
 ConnectionBase::State ConnectionBase::state() const
@@ -593,7 +605,10 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
                 using namespace std::placeholders;
                 m_p2pTransport->sendAsync(
                     &m_dataToSend.front(),
-                    std::bind(&ConnectionBase::onMessageSent, this, _1, _2));
+                    [this](SystemError::ErrorCode errorCode, std::size_t bytesTransferred)
+                    {
+                        onMessageSent(errorCode, bytesTransferred);
+                    });
             }
         }
     );
@@ -626,7 +641,10 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
 
         m_p2pTransport->sendAsync(
             &m_dataToSend.front(),
-            std::bind(&ConnectionBase::onMessageSent, this, _1, _2));
+            [this](SystemError::ErrorCode errorCode, std::size_t bytesTransferred)
+            {
+                onMessageSent(errorCode, bytesTransferred);
+            });
     }
     else
     {
@@ -671,11 +689,17 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
 
     handleMessage(m_readBuffer);
 
-    using namespace std::placeholders;
     m_readBuffer.resize(0);
+
+    if (m_readingSuspended)
+        return;
+
     m_p2pTransport->readSomeAsync(
         &m_readBuffer,
-        std::bind(&ConnectionBase::onNewMessageRead, this, _1, _2));
+        [this](SystemError::ErrorCode errorCode, std::size_t bytesTransferred)
+        {
+            onNewMessageRead(errorCode, bytesTransferred);
+        });
 }
 
 void ConnectionBase::handleMessage(const nx::Buffer& message)

@@ -147,6 +147,9 @@ public:
     void startConnection();
     void startReading();
 
+    void suspendReading();
+    void resumeReading();
+
     QObject* opaqueObject();
 
     nx::Url remoteAddr() const;
@@ -309,6 +312,7 @@ private:
     size_t m_maxBufferSize = 0;
     nx::network::aio::Timer m_pongTimer;
     std::unique_ptr<TransactionFilter> m_filter;
+    bool m_readingSuspended = false;
 
     // For tests.
     static bool s_noPingSupportClientHeader;

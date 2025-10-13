@@ -48,6 +48,9 @@ public:
     virtual network::aio::AbstractAioThread* getAioThread() const override;
     virtual network::SocketAddress getForeignAddress() const override;
 
+    virtual void suspendReadingConnection() override;
+    virtual void resumeReadingConnection() override;
+
     // For tests.
     static void setPingTimeout(std::optional<std::chrono::milliseconds> pingTimeout);
     static void setPingPongDisabled(bool value);

@@ -75,6 +75,36 @@ void WebSocket::start()
         });
 }
 
+void WebSocket::resumeReadingConnection()
+{
+    dispatch(
+        [this]()
+        {
+            if (m_readingSuspended)
+            {
+                m_readingSuspended = false;
+
+                m_socket->readSomeAsync(
+                    &m_readBuffer,
+                    [this](SystemError::ErrorCode error, size_t transferred)
+                    {
+                        onRead(error, transferred);
+                    });
+            }
+        }
+    );
+}
+
+void WebSocket::suspendReadingConnection()
+{
+    dispatch(
+        [this]()
+        {
+            m_readingSuspended = true;
+            cancelIoInAioThread(aio::EventType::etRead);
+        });
+}
+
 void WebSocket::onPingTimer()
 {
     m_pongTimer->start(
@@ -156,6 +186,9 @@ void WebSocket::onRead(SystemError::ErrorCode error, size_t transferred)
         m_readingCeased = true;
         return;
     }
+
+    if (m_readingSuspended)
+        return;
 
     m_socket->readSomeAsync(
         &m_readBuffer,
@@ -246,12 +279,16 @@ void WebSocket::readAnyAsync(
                 if (m_readingCeased)
                 {
                     m_readingCeased = false;
-                    m_socket->readSomeAsync(
-                        &m_readBuffer,
-                        [this](SystemError::ErrorCode error, size_t transferred)
-                        {
-                            onRead(error, transferred);
-                        });
+
+                    if (!m_readingSuspended)
+                    {
+                        m_socket->readSomeAsync(
+                            &m_readBuffer,
+                            [this](SystemError::ErrorCode error, size_t transferred)
+                            {
+                                onRead(error, transferred);
+                            });
+                    }
                 }
 
                 return;

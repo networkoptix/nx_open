@@ -47,6 +47,9 @@ public:
     virtual void start(
         nx::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
 
+    virtual void suspendReadingConnection() override;
+    virtual void resumeReadingConnection() override;
+
     nx::network::http::HttpHeaders firstResponseHeaders() const;
 
     // For tests.
@@ -99,6 +102,7 @@ private:
     std::queue<OutgoingData> m_outgoingMessageQueue;
     bool m_sendInProgress = false;
     nx::Lockable<network::http::HttpHeaders> m_firstResponseHeaders;
+    bool m_readingSuspended = false;
 
     // For tests.
     static std::optional<std::chrono::milliseconds> s_pingTimeout;

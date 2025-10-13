@@ -60,11 +60,6 @@ void BaseServerConnection::stopReadingConnection()
         });
 }
 
-bool BaseServerConnection::isReadingConnection() const
-{
-    return m_readingConnection;
-}
-
 void BaseServerConnection::sendBufAsync(const nx::Buffer* buf)
 {
     NX_ASSERT(m_streamSocket);

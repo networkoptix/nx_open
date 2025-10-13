@@ -55,8 +55,6 @@ public:
 
     void stopReadingConnection();
 
-    bool isReadingConnection() const;
-
     /**
      * @param buf Must be valid until send completion.
      */

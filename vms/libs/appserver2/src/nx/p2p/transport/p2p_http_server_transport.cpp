@@ -590,6 +590,20 @@ network::SocketAddress P2PHttpServerTransport::getForeignAddress() const
     return m_sendSocket->getForeignAddress();
 }
 
+void P2PHttpServerTransport::suspendReadingConnection()
+{
+    // Not implemented.
+    // This class is not used outside the cloud backend, but
+    // IP2PTransport::suspendReadingConnection is used only there.
+}
+
+void P2PHttpServerTransport::resumeReadingConnection()
+{
+    // Not implemented.
+    // This class is not used outside the cloud backend, but
+    // IP2PTransport::resumeReadingConnection is used only there.
+}
+
 void P2PHttpServerTransport::stopWhileInAioThread()
 {
     m_pingTimer.cancelSync();
