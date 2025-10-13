@@ -127,6 +127,9 @@ public:
      */
     Q_INVOKABLE QString getCrashpadClientId() const;
 
+    /** Forces the application to crash by writing to invalid address. */
+    Q_INVOKABLE void forceCrash() const;
+
     static void registerQmlType();
 };
 
