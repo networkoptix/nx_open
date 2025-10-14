@@ -32,4 +32,9 @@ int StreamWriter::size() const
     return -1;
 }
 
+const char* StreamWriter::locationUrl() const
+{
+    return "sample://location";
+}
+
 } // namespace nx::vms_server_plugins::cloud_storage::sample

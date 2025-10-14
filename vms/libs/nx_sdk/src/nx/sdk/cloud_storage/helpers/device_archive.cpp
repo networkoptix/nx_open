@@ -11,23 +11,45 @@ int64_t timePointToInt64Ms(system_clock::time_point tp)
     return duration_cast<milliseconds>(tp.time_since_epoch()).count();
 }
 
+MediaChunk::MediaChunk(int64_t startTimeMs, int64_t durationMs, const char* bucketUrl):
+    m_startTimeMs(startTimeMs),
+    m_durationMs(durationMs),
+    m_bucketUrl(bucketUrl)
+{}
+
+int64_t MediaChunk::startTimeMs() const
+{
+    return m_startTimeMs;
+}
+
+int64_t MediaChunk::durationMs() const
+{
+    return m_durationMs;
+}
+
+const char* MediaChunk::locationUrl() const
+{
+    return m_bucketUrl;
+}
+
 std::string MediaChunk::toString() const
 {
-    return "(" + std::to_string(timePointToInt64Ms(startPoint)) +
-        ", " + std::to_string(durationMs.count()) +
-        ", " + std::to_string(bucketId) + ")";
+    return "(" + std::to_string(m_startTimeMs) +
+        ", " + std::to_string(m_durationMs) +
+        ", " + std::string(m_bucketUrl) + ")";
 }
 
 bool MediaChunk::operator<(const MediaChunk& other) const
 {
-    if (bucketId != other.bucketId)
-        return bucketId < other.bucketId;
+    int urlComparisonRes = strcmp(m_bucketUrl, other.m_bucketUrl);
+    if (urlComparisonRes != 0)
+        return urlComparisonRes < 0;
 
-    if (startPoint != other.startPoint)
-        return startPoint < other.startPoint;
+    if (m_startTimeMs != other.m_startTimeMs)
+        return m_startTimeMs < other.m_startTimeMs;
 
-    if (durationMs != other.durationMs)
-        return durationMs < other.durationMs;
+    if (m_durationMs != other.m_durationMs)
+        return m_durationMs < other.m_durationMs;
 
     return false;
 }
@@ -46,48 +68,8 @@ std::string toString(const std::vector<MediaChunk>& chunks)
     return result;
 }
 
-BucketDescriptionList::BucketDescriptionList(std::vector<BucketDescription> data):
-    DataList<BucketDescription>(std::move(data))
-{}
-
-void BucketDescriptionList::goToBeginning() const
-{
-    Base::goToBeginning();
-}
-
-void BucketDescriptionList::next() const
-{
-    Base::next();
-}
-
-bool BucketDescriptionList::atEnd() const
-{
-    return Base::atEnd();
-}
-
-int BucketDescriptionList::urlLen() const
-{
-    const auto* b = Base::get();
-    if (!b)
-        return -1;
-
-    return b->url.size() + 1;
-}
-
-bool BucketDescriptionList::get(char* url, int* bucketId) const
-{
-    const auto* b = Base::get();
-    if (!b)
-        return false;
-
-    *bucketId = b->bucketId;
-    ::strncpy(url, b->url.data(), b->url.size());
-    url[b->url.size()] = '\0';
-    return true;
-}
-
-MediaChunkList::MediaChunkList(std::vector<MediaChunk> chunks):
-    DataList<MediaChunk>(std::move(chunks))
+MediaChunkList::MediaChunkList(const std::vector<MediaChunk>& chunks):
+    DataList<MediaChunk>(chunks)
 {
 }
 
@@ -106,36 +88,35 @@ bool MediaChunkList::atEnd() const
     return Base::atEnd();
 }
 
-bool MediaChunkList::get(
-    int64_t* outStartTimeMs, int64_t* outDurationMs, int* outBucketId) const
+const IMediaChunk* MediaChunkList::get() const
 {
-    const auto* chunk = Base::get();
-    if (!chunk)
-        return false;
-
-    *outStartTimeMs = timePointToInt64Ms(chunk->startPoint);
-    *outDurationMs = chunk->durationMs.count();
-    *outBucketId = chunk->bucketId;
-    return true;
+    return Base::get();
 }
 
-IndexArchive::IndexArchive(int streamIndex, const IndexData& indexData):
+IndexArchive::IndexArchive(int streamIndex, const IndexData& indexData)
+    :
     m_streamIndex(streamIndex)
 {
-    m_addedChunks.reset(new MediaChunkList({}));
-    m_removedChunks.reset(new MediaChunkList({}));
     for (const auto& operationToPeriod: indexData)
     {
         switch (operationToPeriod.first)
         {
             case ChunkOperation::add:
-                m_addedChunks.reset(new MediaChunkList(std::move(operationToPeriod.second)));
+                m_addedChunks.reset(
+                    new MediaChunkList(operationToPeriod.second));
                 break;
             case ChunkOperation::remove:
-                m_removedChunks.reset(new MediaChunkList(std::move(operationToPeriod.second)));
+                m_removedChunks.reset(
+                    new MediaChunkList(operationToPeriod.second));
                 break;
         }
     }
+
+    if (!m_addedChunks)
+        m_addedChunks.reset(new MediaChunkList({}));
+
+    if (!m_removedChunks)
+        m_removedChunks.reset(new MediaChunkList({}));
 }
 
 const IMediaChunkList* IndexArchive::addedChunks() const

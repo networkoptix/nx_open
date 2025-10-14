@@ -52,6 +52,14 @@ public:
      * Total size of written data so far.
      */
     virtual int size() const = 0;
+
+    /**
+     * Returns last location of where data has been written. It's not location
+     * of an individual media chunk, but general physical storage location.
+     * This url should be passed later to the DeviceAgent::createStreamReader when
+     * requesting this media chunk for reading later.
+     */
+    virtual const char* locationUrl() const = 0;
 };
 
 } // namespace nx::sdk::cloud_storage

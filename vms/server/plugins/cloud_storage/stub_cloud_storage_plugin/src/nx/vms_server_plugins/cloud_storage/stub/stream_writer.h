@@ -26,6 +26,7 @@ public:
     virtual nx::sdk::ErrorCode putData(const nx::sdk::cloud_storage::IMediaDataPacket* packet) override;
     virtual nx::sdk::ErrorCode close(int64_t durationMs) override;
     virtual int size() const override;
+    virtual const char* locationUrl() const override;
 
 private:
     std::shared_ptr<DataManager> m_dataManager;

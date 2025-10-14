@@ -25,6 +25,7 @@ public:
 
     virtual nx::sdk::ErrorCode close(int64_t durationMs) override;
     virtual int size() const override;
+    virtual const char* locationUrl() const override;
 };
 
 } // namespace nx::vms_server_plugins::cloud_storage::stub
