@@ -26,7 +26,7 @@ struct PushNotification
     bool isRead = false;
 };
 NX_REFLECTION_INSTRUMENT(PushNotification,
-    (id)(time)(title)(description)(url)(cloudSystemId)(imageId))
+    (id)(time)(title)(description)(url)(cloudSystemId)(imageId)(isRead))
 
 class PushNotificationStorage
 {
@@ -36,7 +36,7 @@ public:
 
     std::vector<PushNotification> userNotifications(const std::string& user);
     std::optional<std::vector<std::byte>> loadImage(const std::string& id);
-    void markAsRead(const std::string& user, const std::string& id);
+    void setIsRead(const std::string& user, const std::string& id, bool value);
     std::string addUserNotification(
         const std::string& user,
         const std::string& title,

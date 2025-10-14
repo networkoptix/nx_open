@@ -227,12 +227,12 @@ std::vector<PushNotification> PushNotificationStorage::userNotifications(const s
     return {};
 }
 
-void PushNotificationStorage::markAsRead(const std::string& user, const std::string& id)
+void PushNotificationStorage::setIsRead(const std::string& user, const std::string& id, bool value)
 {
     if (auto data = d->load())
     {
         if (PushNotification* notification = data->find(user, id))
-            notification->isRead = true;
+            notification->isRead = value;
 
         d->save(*data);
     }
