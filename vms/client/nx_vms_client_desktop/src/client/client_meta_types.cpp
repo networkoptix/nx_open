@@ -343,6 +343,7 @@ void registerQmlTypesInternal()
     SortFilterProxyModel::registerQmlType();
     ldap_settings::registerQmlType();
     BlurMaskPreview::registerQmlType();
+    SimpleBlurMaskPreview::registerQmlType();
 }
 
 void registerQmlTypes()

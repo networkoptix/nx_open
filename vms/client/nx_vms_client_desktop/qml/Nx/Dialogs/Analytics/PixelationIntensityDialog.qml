@@ -28,15 +28,18 @@ Dialog
     {
         spacing: 8
 
-        BlurMaskPreview
+        SimpleBlurMaskPreview
         {
+
             intensity: dialog.intensity
-            imageSource: ":/skin/system_settings/pixelation_intensity_preview.png"
             blurRectangles: [
                 Qt.rect(88, 229, 62, 32),
                 Qt.rect(333, 17, 53, 72),
-                Qt.rect(434, 9, 53, 72)
+                Qt.rect(434, 9, 53, 72),
+                Qt.rect(143, 119, 50, 49)
             ]
+            width: 554
+            height: 400
         }
 
         Row

@@ -15,6 +15,8 @@ public:
     PixelationImageFilter(const nx::vms::api::PixelationSettings& settings);
     ~PixelationImageFilter();
 
+    static void pixelateImage(QImage* image, QList<QRect> m_blurRectangles, double intensity);
+
     virtual CLVideoDecoderOutputPtr updateImage(
         const CLVideoDecoderOutputPtr& frame) override;
 

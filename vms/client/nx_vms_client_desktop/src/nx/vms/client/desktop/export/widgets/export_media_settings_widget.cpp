@@ -35,7 +35,7 @@ void ExportMediaSettingsWidget::setData(const Data& data)
 {
     ui->filtersCheckBox->setEnabled(data.transcodingAllowed);
     ui->filtersCheckBox->setChecked(data.applyFilters);
-    ui->nonObfuscatedCheckbox->setEnabled(data.isAdmin);
+    ui->nonObfuscatedCheckbox->setEnabled(data.isNonObfuscatedExportAllowd);
     ui->nonObfuscatedCheckbox->setChecked(!data.pixelate);
 }
 

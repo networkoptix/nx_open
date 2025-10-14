@@ -8,11 +8,15 @@
 #include <QtOpenGL/QOpenGLVertexArrayObject>
 #include <QtOpenGLWidgets/QOpenGLWidget>
 
+#include <QPainter>
+#include <QQuickImageProvider>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
 #include <ui/graphics/shaders/blur_shader_program.h>
 #include <ui/graphics/shaders/color_shader_program.h>
 #include <ui/graphics/shaders/texture_color_shader_program.h>
+
+#include <nx/core/transcoding/filters/pixelation_image_filter.h>
 
 namespace nx::vms::client::desktop {
 
@@ -255,6 +259,38 @@ void BlurMaskPreviewRenderer::render()
 
     m_object->release();
     m_shader->release();
+}
+
+SimpleBlurMaskPreview::SimpleBlurMaskPreview(QQuickItem* parent)
+    : QQuickPaintedItem(parent)
+{
+    connect(this, &SimpleBlurMaskPreview::intensityChanged, this, [this](double value)
+    {
+        m_intensity = value;
+        update();
+    });
+}
+
+void SimpleBlurMaskPreview::paint(QPainter* painter)
+{
+    QImage* image = new QImage(m_imageSource);
+    if (m_intensity > .0f && m_blurRectangles.size() > 0)
+    {
+        nx::core::transcoding::PixelationImageFilter::pixelateImage(
+            image, m_blurRectangles, m_intensity);
+    }
+    painter->drawImage(0, 0, *image);
+    delete image;
+}
+
+
+SimpleBlurMaskPreview::~SimpleBlurMaskPreview()
+{
+}
+
+void SimpleBlurMaskPreview::registerQmlType()
+{
+    qmlRegisterType<SimpleBlurMaskPreview>("nx.vms.client.desktop", 1, 0, "SimpleBlurMaskPreview");
 }
 
 BlurMaskPreview::BlurMaskPreview():

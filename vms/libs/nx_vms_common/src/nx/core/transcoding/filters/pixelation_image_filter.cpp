@@ -3,6 +3,7 @@
 #include "pixelation_image_filter.h"
 
 #include <optional>
+#include <QImage>
 
 #include <analytics/common/object_metadata.h>
 #include <nx/fusion/serialization/ubjson.h>
@@ -14,6 +15,8 @@ extern "C" {
 
 namespace nx::core::transcoding {
 namespace {
+
+constexpr int kIntensityToInt = 10;
 
 std::optional<nx::common::metadata::ObjectMetadataPacket> objectDataPacketFromMetadata(
     const QnConstAbstractCompressedMetadataPtr& metadata)
@@ -75,7 +78,7 @@ void blur(uint8_t* data, int w, int h, int stride, int radius)
     }
 }
 
-bool pixelate(CLVideoDecoderOutput* frame, const QRect& box, int intensity)
+bool pixelate(CLVideoDecoderOutputPtr frame, const QRect& box, int intensity)
 {
     const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat)frame->format);
     if (!descriptor)
@@ -108,13 +111,24 @@ bool pixelate(CLVideoDecoderOutput* frame, const QRect& box, int intensity)
         w = std::min(w, frameWidth - x);
         h = std::min(h, frameHeight - y);
 
-        // TODO: @pprivalov remove hardcoded value
-        blur(frame->data[i] + y * frame->linesize[i] + x, w, h, frame->linesize[i], /*intensity*/ 15);
+        blur(frame->data[i] + y * frame->linesize[i] + x, w, h, frame->linesize[i], intensity);
     }
     return true;
 }
 
 } // namespace
+
+void PixelationImageFilter::pixelateImage(QImage* image, QList<QRect> m_blurRectangles, double intensity)
+{
+    CLVideoDecoderOutputPtr frame(new CLVideoDecoderOutput(image->convertToFormat(QImage::Format_RGB32)));
+    NX_ASSERT(frame, "Failed to convert image to frame");
+    int intens = int(intensity * kIntensityToInt);
+    for (const auto box: m_blurRectangles)
+    {
+        pixelate(frame, box, intens);
+    }
+    *image = frame->toImage();
+}
 
 PixelationImageFilter::PixelationImageFilter(const nx::vms::api::PixelationSettings& settings):
     m_settings(settings)
@@ -152,7 +166,7 @@ CLVideoDecoderOutputPtr PixelationImageFilter::updateImage(
                     (int)(objectMetadata.boundingBox.width() * w),
                     (int)(objectMetadata.boundingBox.height() * h) };
 
-                pixelate(result.get(), box, (int)m_settings.intensity);
+                pixelate(result, box, (int)(m_settings.intensity * kIntensityToInt));
             }
         }
     }

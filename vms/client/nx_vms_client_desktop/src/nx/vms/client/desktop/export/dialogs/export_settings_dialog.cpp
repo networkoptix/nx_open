@@ -15,6 +15,7 @@
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -136,7 +137,8 @@ ExportSettingsDialog::ExportSettingsDialog(
     d(new Private(bookmark, kPreviewSize, watermark)),
     ui(new ::Ui::ExportSettingsDialog),
     isFileNameValid(isFileNameValid),
-    m_passwordWidget(new ExportPasswordWidget(this))
+    m_passwordWidget(new ExportPasswordWidget(this)),
+    isNonObfuscatedAllowed(accessController()->hasGlobalPermissions(GlobalPermission::viewUnredactedVideo))
 {
     ui->setupUi(this);
     setHelpTopic(this, HelpTopic::Id::Exporting);
@@ -607,7 +609,7 @@ void ExportSettingsDialog::updateWidgetsState()
         .applyFilters=transcodingChecked,
         .pixelate=d->state().exportMediaPersistentSettings.pixelate,
         .transcodingAllowed=!transcodingLocked,
-        .isAdmin=context()->user()->isAdministrator()});
+        .isNonObfuscatedExportAllowd=isNonObfuscatedAllowed});
     m_passwordWidget->setVisible(mode == ExportMode::layout
         || nx::core::layout::isLayoutExtension(ui->mediaFilenamePanel->filename().completeFileName()));
 
@@ -688,9 +690,7 @@ void ExportSettingsDialog::setMediaParams(
     settings.dewarping = itemData.dewarpingParams;
     settings.zoomWindow = itemData.zoomRect;
     settings.rotation = itemData.rotation;
-    settings.pixelationSettings = systemContext()->user()->isAdministrator()
-        ? systemSettings()->pixelationSettings()
-        : api::PixelationSettings({true});
+    settings.pixelationSettings = systemSettings()->pixelationSettings();
 
     d->dispatch(Reducer::setMediaResourceSettings, mediaResource->hasVideo(), settings);
 
@@ -708,7 +708,7 @@ void ExportSettingsDialog::setMediaParams(
             .applyFilters=false,
             .pixelate=false,
             .transcodingAllowed=false,
-            .isAdmin=context()->user()->isAdministrator()});
+            .isNonObfuscatedExportAllowd=isNonObfuscatedAllowed});
     }
 }
 

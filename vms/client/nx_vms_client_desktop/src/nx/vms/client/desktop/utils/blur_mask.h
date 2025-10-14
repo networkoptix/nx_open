@@ -8,6 +8,7 @@
 
 #include <QtGui/QOpenGLFunctions>
 #include <QtQuick/QQuickFramebufferObject>
+#include <QtQuick/QQuickPaintedItem>
 
 class QOpenGLFramebufferObject;
 class QOpenGLBuffer;
@@ -66,6 +67,27 @@ private:
     std::vector<Vertex> m_vertices = {};
     std::unique_ptr<QOpenGLBuffer> m_buffer;
     std::unique_ptr<QOpenGLVertexArrayObject> m_object;
+};
+
+class SimpleBlurMaskPreview: public QQuickPaintedItem
+{
+    Q_OBJECT
+    Q_PROPERTY(QList<QRect> blurRectangles MEMBER m_blurRectangles NOTIFY blurRectanglesChanged)
+    Q_PROPERTY(double intensity MEMBER m_intensity NOTIFY intensityChanged)
+
+public:
+    SimpleBlurMaskPreview(QQuickItem *parent = nullptr);
+    static void registerQmlType();
+    virtual ~SimpleBlurMaskPreview() override;
+    void paint(QPainter* painter) override;
+
+signals:
+    void blurRectanglesChanged();
+    void intensityChanged(double value);
+private:
+    const QString m_imageSource = ":/skin/system_settings/pixelation_intensity_preview.png";
+    QList<QRect> m_blurRectangles;
+    double m_intensity = 1.0;
 };
 
 class BlurMaskPreview: public QQuickFramebufferObject

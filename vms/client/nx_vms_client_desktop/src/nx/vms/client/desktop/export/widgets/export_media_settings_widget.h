@@ -24,7 +24,7 @@ public:
         bool applyFilters = true;
         bool pixelate = true;
         bool transcodingAllowed = true;
-        bool isAdmin = true;
+        bool isNonObfuscatedExportAllowd = true;
     };
 
     void setData(const Data& data);

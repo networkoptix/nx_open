@@ -96,6 +96,7 @@ private:
     QScopedPointer<Ui::ExportSettingsDialog> ui;
     FileNameValidator isFileNameValid;
     ExportPasswordWidget* m_passwordWidget;
+    bool isNonObfuscatedAllowed;
 };
 
 } // namespace nx::vms::client::desktop
