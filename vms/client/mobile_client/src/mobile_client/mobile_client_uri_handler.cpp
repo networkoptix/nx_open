@@ -296,7 +296,7 @@ void QnMobileClientUriHandler::Private::handlePushNotification(const QUrl& url)
     QUrlQuery query{url};
     const auto id = query.queryItemValue("push_notification_id").toStdString();
     const auto user = cloudStatusWatcher->cloudLogin().toStdString();
-    appContext()->pushNotificationStorage()->markAsRead(user, id);
+    appContext()->pushNotificationStorage()->setIsRead(user, id, true);
 }
 
 void QnMobileClientUriHandler::Private::connectToServerDirectly(const SystemUri& uri)

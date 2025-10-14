@@ -36,22 +36,22 @@ int PushNotificationModel::rowCount(const QModelIndex&) const
 
 QVariant PushNotificationModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() < 0 || index.row() >= (int)d->notifications.size())
+    if (!index.isValid() || index.row() < 0 || index.row() >= (int) d->notifications.size())
         return {};
 
     const auto& item = d->notifications[index.row()];
 
     switch (role)
     {
-        case titleRole:
+        case TitleRole:
             return QString::fromStdString(item.title);
-        case descriptionRole:
+        case DescriptionRole:
             return QString::fromStdString(item.description);
-        case imageRole:
+        case ImageRole:
             return item.imageId.empty()
                 ? ""
                 : PushNotificationImageProvider::url(QString::fromStdString(item.imageId));
-        case timeRole:
+        case TimeRole:
         {
             using namespace text;
 
@@ -68,7 +68,7 @@ QVariant PushNotificationModel::data(const QModelIndex &index, int role) const
             return tr("%1 ago", "notification time, like '1 min ago'").arg(result);
         }
 
-        case readRole:
+        case ReadRole:
             return item.isRead;
     }
 
@@ -77,14 +77,36 @@ QVariant PushNotificationModel::data(const QModelIndex &index, int role) const
     return {};
 }
 
+bool PushNotificationModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+    if (!index.isValid() || index.row() < 0 || index.row() >= (int) d->notifications.size())
+        return false;
+
+    if (role == ReadRole)
+    {
+        PushNotification& notification = d->notifications[index.row()];
+        notification.isRead = value.toBool();
+
+        const auto& user = appContext()->cloudStatusWatcher()->cloudLogin().toStdString();
+        appContext()->pushNotificationStorage()->setIsRead(
+            user, notification.id, notification.isRead);
+
+        emit dataChanged(index, index, {ReadRole});
+        return true;
+    }
+
+    NX_ASSERT(false, "Unexpected role: %1", role);
+    return QAbstractListModel::setData(index, value, role);
+}
+
 QHash<int, QByteArray> PushNotificationModel::roleNames() const
 {
     auto result = QAbstractListModel::roleNames();
-    result[titleRole] = "title";
-    result[descriptionRole] = "description";
-    result[imageRole] = "image";
-    result[timeRole] = "time";
-    result[readRole] = "read";
+    result[TitleRole] = "title";
+    result[DescriptionRole] = "description";
+    result[ImageRole] = "image";
+    result[TimeRole] = "time";
+    result[ReadRole] = "read";
     return result;
 }
 
