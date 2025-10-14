@@ -582,14 +582,14 @@ struct MediaFileInfo: FileInfo
 
         const auto parts = split(baseName, '_');
         streamIndex = std::stol(parts[0]);
-        startTime = system_clock::time_point(milliseconds(std::stoll(parts[1])));
+        startTimeMs = std::stoll(parts[1]);
         if (parts.size() == 3)
-            duration = milliseconds(std::stol(parts[2]));
+            durationMs = std::stol(parts[2]);
     }
 
     int streamIndex = -1;
-    std::optional<milliseconds> duration;
-    system_clock::time_point startTime{};
+    int64_t durationMs;
+    int64_t startTimeMs = -1;
 };
 
 std::string normalizeSeparators(std::string s)
@@ -1358,7 +1358,7 @@ std::string DataManager::devicePath(const std::string& deviceId) const
 }
 
 ArchiveIndex DataManager::getArchive(
-    std::optional<std::chrono::system_clock::time_point> startTime) const
+    std::optional<int64_t> startTime) const
 {
     ArchiveIndex result;
     for (const auto& bucketDir: getFileInfoList(m_workDir))
@@ -1388,16 +1388,16 @@ ArchiveIndex DataManager::getArchive(
             for (const auto& file: getFileInfoList(deviceDir.fullPath, kMediaFileExtenstion))
             {
                 auto mediaFileInfo = MediaFileInfo(file);
-                if (!mediaFileInfo.duration
-                    || (startTime && mediaFileInfo.startTime <= startTime))
+                if (!mediaFileInfo.durationMs
+                    || (startTime && mediaFileInfo.startTimeMs <= startTime))
                 {
                     continue;
                 }
 
                 deviceArchiveIndex.chunksPerStream[mediaFileInfo.streamIndex].push_back(MediaChunk{
-                    mediaFileInfo.startTime, /* startPoint */
-                    *mediaFileInfo.duration, /* durationMs */
-                    m_bucketUrlToId.second /* bucketId */});
+                    mediaFileInfo.startTimeMs, /* startPoint */
+                    mediaFileInfo.durationMs, /* durationMs */
+                    m_bucketUrlToId.first.data() /* bucketId */});
             }
 
             result.deviceArchiveIndexList.push_back(deviceArchiveIndex);

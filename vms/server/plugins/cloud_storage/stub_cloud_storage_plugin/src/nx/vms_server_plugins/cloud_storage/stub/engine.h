@@ -75,8 +75,8 @@ private:
     std::thread m_worker;
     mutable std::mutex m_mutex;
     bool m_needToStop = false;
-    std::optional<std::chrono::system_clock::time_point> m_lastReportTimePoint;
-    std::optional<std::chrono::system_clock::time_point> m_lastScanTimePoint;
+    std::optional<int64_t> m_lastReportTimePoint;
+    std::optional<int64_t> m_lastScanTimePoint;
 
     nx::sdk::cloud_storage::IDeviceAgent* findDeviceAgentById(
         const std::string& id,

@@ -140,7 +140,7 @@ public:
         int64_t startTimeMs,
         int64_t durationMs) const;
 
-    ArchiveIndex getArchive(std::optional<std::chrono::system_clock::time_point> startTime) const;
+    ArchiveIndex getArchive(std::optional<int64_t> startTime) const;
     void saveTrackImage(
         const char* data,
         nx::sdk::cloud_storage::TrackImageType type);

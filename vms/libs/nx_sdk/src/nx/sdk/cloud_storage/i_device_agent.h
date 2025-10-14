@@ -61,7 +61,7 @@ public:
     }
 
     protected: virtual void doCreateStreamReader(
-        const char* bucketUrl,
+        const char* locationUrl,
         nxcip::MediaStreamQuality quality,
         int64_t startTimeUs,
         int64_t durationUs,

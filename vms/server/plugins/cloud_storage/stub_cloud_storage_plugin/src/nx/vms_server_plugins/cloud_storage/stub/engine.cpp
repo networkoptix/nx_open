@@ -16,14 +16,14 @@ namespace nx::vms_server_plugins::cloud_storage::stub {
 
 using namespace std::chrono;
 
-std::optional<system_clock::time_point> getTimePointFromSeqId(const std::string& s)
+std::optional<int64_t> getTimePointFromSeqId(const std::string& s)
 {
     if (s.empty())
         return std::nullopt;
 
     try
     {
-        return system_clock::time_point(milliseconds(std::stol(s)));
+        return std::stol(s);
     }
     catch(...)
     {
@@ -31,7 +31,7 @@ std::optional<system_clock::time_point> getTimePointFromSeqId(const std::string&
     }
 }
 
-static constexpr seconds kReportPeriod = 5s;
+static constexpr int64_t kReportPeriodMs = 5*1000;
 
 Engine::~Engine()
 {
@@ -92,8 +92,10 @@ void Engine::startAsyncTasks(const char* lastSequenceId)
                     return;
                 }
 
+                const auto nowMs =
+                    duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
                 if (m_lastReportTimePoint
-                    && *m_lastReportTimePoint + kReportPeriod > system_clock::now())
+                    && *m_lastReportTimePoint + kReportPeriodMs > nowMs)
                 {
                     lock.unlock();
                     std::this_thread::sleep_for(10ms);
@@ -101,15 +103,14 @@ void Engine::startAsyncTasks(const char* lastSequenceId)
                 }
 
                 using namespace nx::sdk::cloud_storage;
-                constexpr static auto kSafetyScanPeriod = 2min;
+                constexpr static auto kSafetyScanPeriod = 2 * 60 * 1000;
                 const auto lastPointFromArgument = getTimePointFromSeqId(lastSequenceId);
                 if (lastPointFromArgument)
                     m_lastScanTimePoint = lastPointFromArgument;
 
-                std::optional<system_clock::time_point> scanStartTime = m_lastScanTimePoint
-                    ? std::optional<system_clock::time_point>(std::max(
-                        system_clock::time_point(0ms), *m_lastScanTimePoint - kSafetyScanPeriod))
-                    : std::nullopt;
+                std::optional<int64_t> scanStartTime = m_lastScanTimePoint
+                    ? std::max<int64_t>(0, *m_lastScanTimePoint - kSafetyScanPeriod)
+                    : std::optional<int64_t>(std::nullopt);
 
                 nx::sdk::cloud_storage::CloudChunkData cloudChunkData;
                 const auto archiveIndex = m_dataManager->getArchive(scanStartTime);
@@ -132,7 +133,7 @@ void Engine::startAsyncTasks(const char* lastSequenceId)
 
                         if (!entry.second.empty())
                         {
-                            const auto lastChunkStartTime = entry.second.back().startPoint;
+                            const auto lastChunkStartTime = entry.second.back().startTimeMs();
                             if (lastChunkStartTime > scanStartTime)
                                 scanStartTime = lastChunkStartTime;
                         }
@@ -151,21 +152,16 @@ void Engine::startAsyncTasks(const char* lastSequenceId)
                         deviceAgent, deviceIdToDeviceData.second));
                 }
 
-                BucketDescriptionList bucketDescriptionList({BucketDescription{
-                    m_dataManager->bucketUrlAndId().first, /* url */
-                    m_dataManager->bucketUrlAndId().second /* bucketId */}});
-                m_handler->onBucketDescriptionUpdated(m_integrationId.data(), &bucketDescriptionList);
-
                 // Real-life implementation should manage its free space by itself and
                 // report data removal along with the newly added time periods here.
-                const auto currentSequenceId = scanStartTime ?
-                    std::to_string(duration_cast<milliseconds>(scanStartTime->time_since_epoch()).count()):
-                    "0";
+                const auto currentSequenceId =
+                    scanStartTime ? std::to_string(*scanStartTime) : "0";
                 m_handler->onArchiveUpdated(
                     m_integrationId.data(), currentSequenceId.data(), nx::sdk::ErrorCode::noError, &result);
 
                 m_lastScanTimePoint = scanStartTime;
-                m_lastReportTimePoint = system_clock::now();
+                m_lastReportTimePoint =
+                    duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
             }
         });
 }

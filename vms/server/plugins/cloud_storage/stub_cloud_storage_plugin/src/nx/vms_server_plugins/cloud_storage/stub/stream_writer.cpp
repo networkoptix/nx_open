@@ -11,6 +11,8 @@ namespace nx::vms_server_plugins::cloud_storage::stub {
 
 using namespace std::chrono;
 
+constexpr auto kLocationUrl = "stub://location";
+
 StreamWriter::StreamWriter(
     const std::shared_ptr<DataManager>& dataManager,
     const std::string& deviceId,
@@ -23,6 +25,11 @@ StreamWriter::StreamWriter(
 {
     m_mediaFile = m_dataManager->writableMediaFile(
         deviceId, streamIndex, milliseconds(startTimeMs), codecList, opaqueMetadata);
+}
+
+const char* StreamWriter::locationUrl() const
+{
+    return kLocationUrl;
 }
 
 nx::sdk::ErrorCode StreamWriter::putData(const nx::sdk::cloud_storage::IMediaDataPacket* packet)

@@ -19,60 +19,44 @@ enum class ChunkOperation
     remove,
 };
 
-struct MediaChunk
+/**
+ * This struct describes previously recorded media file.
+ */
+class MediaChunk: public IMediaChunk
 {
-    std::chrono::system_clock::time_point startPoint{};
-    std::chrono::milliseconds durationMs{-1};
-    int bucketId = -1;
+public:
+    MediaChunk(int64_t startTimeMs, int64_t durationMs, const char* bucketUrl);
 
-    bool operator<(const MediaChunk& other) const;
+    virtual int64_t startTimeMs() const override;
+    virtual int64_t durationMs() const override;
+    virtual const char* locationUrl() const override;
 
     std::string toString() const;
+    bool operator<(const MediaChunk& other) const;
+
+private:
+    int64_t m_startTimeMs = -1;
+    int64_t m_durationMs = -1;
+    const char* m_bucketUrl = nullptr;
 };
 
 std::string toString(const std::vector<MediaChunk>& chunks);
-
-struct BucketDescription
-{
-    std::string url;
-    int bucketId = -1;
-};
 
 using IndexData = std::map<ChunkOperation, std::vector<MediaChunk>>;
 using DeviceData = std::map<int /*streamIndex*/, IndexData>;
 using CloudChunkData = std::map<std::string, DeviceData>;
 
-class BucketDescriptionList:
-    public nx::sdk::RefCountable<IBucketDescriptionList>,
-    public DataList<BucketDescription>
-{
-public:
-    BucketDescriptionList(std::vector<BucketDescription> data);
-
-    virtual void goToBeginning() const override;
-    virtual void next() const override;
-    virtual bool atEnd() const override;
-    virtual int urlLen() const override;
-    virtual bool get(char* url, int* bucketId) const override;
-
-private:
-    using Base = DataList<BucketDescription>;
-};
-
-/**
- * This struct describes previously recorded media file.
- */
 class MediaChunkList:
     public nx::sdk::RefCountable<IMediaChunkList>,
     public DataList<MediaChunk>
 {
 public:
-    MediaChunkList(std::vector<MediaChunk> chunks);
+    MediaChunkList(const std::vector<MediaChunk>& chunks);
 
     virtual void goToBeginning() const override;
     virtual void next() const override;
     virtual bool atEnd() const override;
-    virtual bool get(int64_t* outStartTimeMs, int64_t* durationMs, int* bucketId) const override;
+    virtual const IMediaChunk* get() const override;
 
 private:
     using Base = DataList<MediaChunk>;
