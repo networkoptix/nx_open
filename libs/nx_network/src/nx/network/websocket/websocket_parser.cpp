@@ -126,8 +126,11 @@ Parser::ParseState Parser::readHeaderFixed(char* data)
     m_opCode = (FrameType)(*data & 0x0F);
     m_fin = (*data >> 7) & 0x01;
 
-    if (static_cast<bool>((*data >> 6) & 0x01)) //< RSV1 bit set
-        m_doUncompress = true;
+    if (m_firstFrame)
+    {
+        if (static_cast<bool>((*data >> 6) & 0x01)) //< RSV1 bit set
+            m_doUncompress = true;
+    }
 
     data++;
     m_masked = (*data >> 7) & 0x01;
@@ -144,7 +147,7 @@ Parser::ParseState Parser::readHeaderFixed(char* data)
 
 void Parser::handleFrame()
 {
-    if (m_doUncompress)
+    if (m_doUncompress && isDataFrame(m_opCode))
     {
         if (nx::utils::bstream::gzip::Compressor::isZlibCompressed(m_frameBuffer))
         {
@@ -154,7 +157,8 @@ void Parser::handleFrame()
         }
         else
         {
-            m_frameBuffer.append("\x00\x00\xff\xff", 4);
+            if (m_fin)
+                m_frameBuffer.append("\x00\x00\xff\xff", 4);
             m_uncompressor.processData(m_frameBuffer);
             m_frameBuffer = m_uncompressed;
             m_uncompressed.clear();

@@ -59,7 +59,7 @@ struct Serializer::Private
             deflateEnd(&stream);
     }
 
-    nx::Buffer compress(nx::Buffer payload)
+    nx::Buffer compress(nx::Buffer payload, bool fin)
     {
         if (initError != Z_OK)
             return payload;
@@ -71,12 +71,12 @@ struct Serializer::Private
         stream.avail_in = (uInt) payload.size();
         stream.next_out = (Bytef*) output.data();
         stream.avail_out = (uInt) output.size();
-        if (deflate(&stream, Z_SYNC_FLUSH) != Z_OK)
+        if (deflate(&stream, fin ? Z_SYNC_FLUSH : Z_NO_FLUSH) != Z_OK)
             return payload;
 
         if (stream.avail_in == 0)
         {
-            output.resize(output.size() - (size_t) stream.avail_out - kSyncTailLength);
+            output.resize(output.size() - (size_t) stream.avail_out - (fin ? kSyncTailLength : 0));
             return output;
         }
         return payload;
@@ -136,7 +136,7 @@ nx::Buffer Serializer::prepareFrame(
                 {
                     if (!d)
                         d = std::make_unique<Private>();
-                    payload = d->compress(std::move(payload));
+                    payload = d->compress(std::move(payload), fin);
                 }
                 break;
             default:

@@ -48,8 +48,8 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
     if (data.empty())
         return true;
 
-    bool isFirstInflateAttempt = d->method == Method::gzip;
-    int zFlushMode = d->method == Method::gzip ? Z_NO_FLUSH : Z_SYNC_FLUSH;
+    bool isFirstInflateAttempt = true;
+    int zFlushMode = Z_NO_FLUSH;
 
     d->zStream.next_in = (Bytef*) data.data();
     d->zStream.avail_in = (uInt) data.size();
