@@ -883,6 +883,9 @@ bool Player::Private::createArchiveReader()
 
 bool Player::Private::initDataProvider()
 {
+    if (videoSurfaces.empty())
+        return false;
+
     if (!createArchiveReader())
     {
         setMediaStatus(MediaStatus::NoMedia);
