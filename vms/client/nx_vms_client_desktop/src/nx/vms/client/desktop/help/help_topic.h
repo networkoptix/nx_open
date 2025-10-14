@@ -149,6 +149,7 @@ public:
         NewUser,
         NotificationsPanel,
         ObjectSearch,
+        AdvancedObjectSearch,
         OtherSystems,
         PluginsAndAnalytics,
         PtzManagement_Tour,

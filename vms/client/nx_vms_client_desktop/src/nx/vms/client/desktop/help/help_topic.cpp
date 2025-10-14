@@ -290,6 +290,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "notifications_panel.html";
         case Id::ObjectSearch:
             return "objects_tab.html";
+        case Id::AdvancedObjectSearch:
+            return "advanced_object_search.html";
         case Id::OtherSystems:
             return "configuring_multi-server_envir.html";
         case Id::PluginsAndAnalytics:
