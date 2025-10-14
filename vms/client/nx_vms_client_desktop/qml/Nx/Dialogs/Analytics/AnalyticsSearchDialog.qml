@@ -46,7 +46,7 @@ Window
 
     title: qsTr("Advanced Object Search")
 
-    ContextHelp.topicId: HelpTopic.ObjectSearch
+    ContextHelp.topicId: HelpTopic.AdvancedObjectSearch
 
     onVisibleChanged:
     {
