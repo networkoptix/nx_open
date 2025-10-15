@@ -4,6 +4,9 @@
 
 #include <QtQml/QtQml>
 
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
 #include <nx/vms/text/human_readable.h>
@@ -50,7 +53,7 @@ int PushNotificationModel::rowCount(const QModelIndex&) const
     return d->notifications.size();
 }
 
-QVariant PushNotificationModel::data(const QModelIndex &index, int role) const
+QVariant PushNotificationModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid() || index.row() < 0 || index.row() >= (int) d->notifications.size())
         return {};
@@ -61,12 +64,24 @@ QVariant PushNotificationModel::data(const QModelIndex &index, int role) const
     {
         case TitleRole:
             return QString::fromStdString(item.title);
+
         case DescriptionRole:
             return QString::fromStdString(item.description);
+
         case ImageRole:
             return item.imageId.empty()
                 ? ""
                 : PushNotificationImageProvider::url(QString::fromStdString(item.imageId));
+
+        case SourceRole:
+        {
+            if (auto context = appContext()->cloudCrossSystemManager()->systemContext(
+                QString::fromStdString(item.cloudSystemId)))
+            {
+                return context->systemDescription()->name();
+            }
+        }
+
         case TimeRole:
         {
             using namespace text;
@@ -125,6 +140,7 @@ QHash<int, QByteArray> PushNotificationModel::roleNames() const
     auto result = QAbstractListModel::roleNames();
     result[TitleRole] = "title";
     result[DescriptionRole] = "description";
+    result[SourceRole] = "source";
     result[ImageRole] = "image";
     result[TimeRole] = "time";
     result[ViewedRole] = "viewed";
@@ -174,8 +190,9 @@ bool PushNotificationFilterModel::filterAcceptsRow(int row, const QModelIndex& p
     auto hasSystemMatch =
         [&]()
         {
-            return m_cloudSystemIds.empty()
-                || m_cloudSystemIds.contains(index.data(Roles::CloudSystemIdRole).toString());
+            return !m_cloudSystemIds.isValid()
+                || m_cloudSystemIds.toStringList().contains(
+                    index.data(Roles::CloudSystemIdRole).toString());
         };
 
     return hasSystemMatch() && hasRegExpMatch() && hasFilterMatch();

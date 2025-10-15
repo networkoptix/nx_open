@@ -148,7 +148,7 @@ Rectangle
                 "iconSource": feedStateProvider.buttonIconSource,
                 "iconIndicatorText": feedStateProvider.buttonIconIndicatorText,
                 "screenId": Controller.FeedScreen,
-                "openScreen": () => Workflow.openFeedScreen(feedStateProvider)
+                "openScreen": () => Workflow.openFeedMenuScreen(feedStateProvider)
             },
             {
                 "objectName": "switchToMenuScreenButton",

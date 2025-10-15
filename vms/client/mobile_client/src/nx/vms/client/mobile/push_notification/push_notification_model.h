@@ -22,6 +22,7 @@ public:
     {
         TitleRole = Qt::UserRole + 1,
         DescriptionRole,
+        SourceRole,
         ImageRole,
         TimeRole,
         ViewedRole,
@@ -57,7 +58,7 @@ class PushNotificationFilterModel: public QSortFilterProxyModel
 {
     Q_OBJECT
     Q_PROPERTY(int count READ count NOTIFY countChanged)
-    Q_PROPERTY(QStringList cloudSystemIds MEMBER m_cloudSystemIds NOTIFY cloudSystemIdsChanged)
+    Q_PROPERTY(QVariant cloudSystemIds MEMBER m_cloudSystemIds NOTIFY cloudSystemIdsChanged)
     Q_PROPERTY(Filter filter MEMBER m_filter NOTIFY filterChanged)
 
 public:
@@ -83,7 +84,7 @@ signals:
     void filterChanged();
 
 private:
-    QStringList m_cloudSystemIds;
+    QVariant m_cloudSystemIds;
     Filter m_filter;
 };
 

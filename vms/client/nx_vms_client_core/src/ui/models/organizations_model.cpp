@@ -11,6 +11,7 @@
 #include <nx/utils/coro/when_all.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/common/models/linearization_list_model.h>
 #include <nx/vms/client/core/network/cloud_api.h>
 
@@ -918,6 +919,29 @@ bool OrganizationsModel::hasChildren(const QModelIndex &parent) const
         : d->root.get();
 
     return parentNode && parentNode->type != OrganizationsModel::System;
+}
+
+QStringList OrganizationsModel::childSystemIds(const QModelIndex& parent) const
+{
+    if (!d->root)
+        return {};
+
+    QStringList result;
+    auto addSystemIds = nx::utils::y_combinator(
+        [&](auto addSystemIds, const TreeNode* node) -> void
+        {
+            if (node->type == NodeType::System)
+                result.append(node->id.toSimpleString());
+
+            for (const auto& child: node->allChildren())
+                addSystemIds(child.get());
+        });
+
+    addSystemIds(parent.isValid()
+        ? static_cast<TreeNode*>(parent.internalPointer())
+        : d->root.get());
+
+    return result;
 }
 
 QHash<int, QByteArray> OrganizationsModel::roleNames() const
