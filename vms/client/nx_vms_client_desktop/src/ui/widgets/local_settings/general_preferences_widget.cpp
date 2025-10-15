@@ -33,7 +33,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget* parent):
     ui->setupUi(this);
 
     if (!nx::vms::utils::isAutoRunSupported())
-        ui->startupSettingsGroup->hide();
+        ui->autoStartCheckBox->hide();
 
     setHelpTopic(ui->mediaFoldersGroupBox, HelpTopic::Id::MediaFolders);
     setHelpTopic(ui->pauseOnInactivityCheckBox,
@@ -57,6 +57,8 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget* parent):
     connect(ui->pauseOnInactivityCheckBox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->idleTimeoutSpinBox, QnSpinboxIntValueChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->autoLoginCheckBox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->autoStartCheckBox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
@@ -102,6 +104,7 @@ void QnGeneralPreferencesWidget::applyChanges()
         recordingSettingsChanged = true;
     }
 
+    appContext()->localSettings()->autoLogin = autoLogin();
     appContext()->localSettings()->restoreUserSessionData = restoreUserSessionData();
 
     appContext()->localSettings()->allowComputerEnteringSleepMode =
@@ -120,6 +123,7 @@ void QnGeneralPreferencesWidget::loadDataToUi()
     setPrimaryAudioDeviceName(screenRecordingSettings()->primaryAudioDeviceName());
     setSecondaryAudioDeviceName(screenRecordingSettings()->secondaryAudioDeviceName());
     setAutoStart(appContext()->localSettings()->autoStart());
+    setAutoLogin(appContext()->localSettings()->autoLogin());
     setRestoreUserSessionData(appContext()->localSettings()->restoreUserSessionData());
     setAllowComputerEnteringSleepMode(
         appContext()->localSettings()->allowComputerEnteringSleepMode());
@@ -161,6 +165,9 @@ bool QnGeneralPreferencesWidget::hasChanges() const
         return true;
 
     if (screenRecordingSettings()->secondaryAudioDeviceName() != secondaryAudioDeviceName())
+        return true;
+
+    if (appContext()->localSettings()->autoLogin() != autoLogin())
         return true;
 
     if (appContext()->localSettings()->restoreUserSessionData() != restoreUserSessionData())
@@ -329,6 +336,16 @@ void QnGeneralPreferencesWidget::setSecondaryAudioDeviceName(const QString &name
     }
 
     ui->secondaryAudioDeviceComboBox->setCurrentIndex(0);
+}
+
+bool QnGeneralPreferencesWidget::autoLogin() const
+{
+    return ui->autoLoginCheckBox->isChecked();
+}
+
+void QnGeneralPreferencesWidget::setAutoLogin(bool value)
+{
+    ui->autoLoginCheckBox->setChecked(value);
 }
 
 bool QnGeneralPreferencesWidget::restoreUserSessionData() const
