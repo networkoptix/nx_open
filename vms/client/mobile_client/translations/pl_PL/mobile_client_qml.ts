@@ -368,16 +368,20 @@
       <translation>Strumień</translation>
     </message>
     <message>
-      <source>Show more</source>
-      <translation>Pokaż więcej</translation>
-    </message>
-    <message>
       <source>No Notifications</source>
       <translation>Brak powiadomień</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
       <translation>Nie znaleziono powiadomień push.</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
     </message>
   </context>
   <context>
@@ -549,6 +553,13 @@
     <message>
       <source>CANCEL</source>
       <translation>ANULUJ</translation>
+    </message>
+  </context>
+  <context>
+    <name>Notification</name>
+    <message>
+      <source>Show more</source>
+      <translation type="unfinished">Show more</translation>
     </message>
   </context>
   <context>

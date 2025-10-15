@@ -365,16 +365,20 @@
       <translation>フィード</translation>
     </message>
     <message>
-      <source>Show more</source>
-      <translation>詳細を表示</translation>
-    </message>
-    <message>
       <source>No Notifications</source>
       <translation>通知はありません</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
       <translation>プッシュ通知が見つかりませんでした。</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
     </message>
   </context>
   <context>
@@ -546,6 +550,13 @@
     <message>
       <source>CANCEL</source>
       <translation>キャンセル</translation>
+    </message>
+  </context>
+  <context>
+    <name>Notification</name>
+    <message>
+      <source>Show more</source>
+      <translation type="unfinished">Show more</translation>
     </message>
   </context>
   <context>

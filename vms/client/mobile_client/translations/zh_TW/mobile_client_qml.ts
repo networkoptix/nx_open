@@ -365,16 +365,20 @@
       <translation>新聞</translation>
     </message>
     <message>
-      <source>Show more</source>
-      <translation>顯示更多</translation>
-    </message>
-    <message>
       <source>No Notifications</source>
       <translation>沒有通知</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
       <translation>未找到推播通知。</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
     </message>
   </context>
   <context>
@@ -546,6 +550,13 @@
     <message>
       <source>CANCEL</source>
       <translation>取消</translation>
+    </message>
+  </context>
+  <context>
+    <name>Notification</name>
+    <message>
+      <source>Show more</source>
+      <translation type="unfinished">Show more</translation>
     </message>
   </context>
   <context>

@@ -365,16 +365,20 @@
       <translation>Feed</translation>
     </message>
     <message>
-      <source>Show more</source>
-      <translation>Tampilkan lebih banyak</translation>
-    </message>
-    <message>
       <source>No Notifications</source>
       <translation>Tidak ada Notifikasi</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
       <translation>Tidak ada push notifikasi yang ditemukan.</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
     </message>
   </context>
   <context>
@@ -546,6 +550,13 @@
     <message>
       <source>CANCEL</source>
       <translation>BATAL</translation>
+    </message>
+  </context>
+  <context>
+    <name>Notification</name>
+    <message>
+      <source>Show more</source>
+      <translation type="unfinished">Show more</translation>
     </message>
   </context>
   <context>
