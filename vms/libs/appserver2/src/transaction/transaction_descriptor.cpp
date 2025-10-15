@@ -54,23 +54,6 @@ namespace detail {
 
 namespace {
 
-Result checkTierLimit(
-    SystemContext* systemContext,
-    const nx::vms::api::CameraAttributesData& param)
-{
-    using namespace nx::vms::api;
-    const auto saasManager = systemContext->saasServiceManager();
-    int limit = saasManager->tier().maxDaysArchiveLocal;
-    if (limit && (param.maxArchivePeriodS.count() < 0
-            || std::chrono::seconds(param.maxArchivePeriodS) > std::chrono::days(limit)))
-    {
-        return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-            "Maximum number of archive seconds must be provided in range up to %1."),
-                limit * 3600 * 24));
-    }
-    return Result();
-}
-
 GlobalPermissions getGlobalPermissions(const SystemContext& context, const nx::Uuid& id)
 {
     return context.resourceAccessManager()
@@ -2078,9 +2061,6 @@ struct ModifyCameraAttributesAccess
         if (hasSystemAccess(accessData))
             return Result();
 
-        if (auto result = checkTierLimit(systemContext, param); !result)
-            return result;
-
         const auto& resPool = systemContext->resourcePool();
         auto accessManager = systemContext->resourceAccessManager();
         auto camera = resPool->getResourceById<QnVirtualCameraResource>(param.cameraId);
@@ -2259,9 +2239,6 @@ struct ModifyCameraAttributesListAccess
         bool recordingWasEnabled = false;
         for (const auto& p: param)
         {
-            if (auto result = checkTierLimit(systemContext, p); !result)
-                return result;
-
             auto camera = resPool->getResourceById(
                 p.cameraId).dynamicCast<QnVirtualCameraResource>();
             if (!camera)
