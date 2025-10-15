@@ -14,9 +14,25 @@ auto toStdSet(const Container& source)
 }
 
 template<typename Container>
+auto toStdSet(Container&& source)
+{
+    return std::set(
+        std::make_move_iterator(source.begin()),
+        std::make_move_iterator(source.end()));
+}
+
+template<typename Container>
 auto toStdVector(const Container& source)
 {
     return std::vector(source.begin(), source.end());
+}
+
+template<typename Container>
+auto toStdVector(Container&& source)
+{
+    return std::vector(
+        std::make_move_iterator(source.begin()),
+        std::make_move_iterator(source.end()));
 }
 
 } // namespace nx

@@ -7,8 +7,8 @@
 #include <core/resource/camera_media_stream_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/crypt/symmetrical.h>
-#include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/std_helpers.h>
 
 namespace nx {
 
@@ -153,8 +153,8 @@ std::set<nx::Uuid> CameraResourceStub::enabledAnalyticsEngines() const
     if (!d->supportedObjectTypes.empty() || !d->supportedEventTypes.empty())
     {
         return nx::utils::set_union(
-            nx::utils::toStdSet(d->supportedObjectTypes.keys()),
-            nx::utils::toStdSet(d->supportedEventTypes.keys()));
+            nx::toStdSet(d->supportedObjectTypes.keys()),
+            nx::toStdSet(d->supportedEventTypes.keys()));
     }
     return base_type::enabledAnalyticsEngines();
 }

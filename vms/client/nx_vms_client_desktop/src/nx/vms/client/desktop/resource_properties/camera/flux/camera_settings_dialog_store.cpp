@@ -11,6 +11,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/utils/std_helpers.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/common/flux/private_flux_store.h>
 #include <nx/vms/time/formatter.h>
@@ -774,7 +775,7 @@ bool CameraSettingsDialogStore::analyticsSettingsLoading() const
 
 void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const QVariantList& value)
 {
-    setUserEnabledAnalyticsEngines(nx::utils::toStdSet(nx::utils::toTypedQList<nx::Uuid>(value)));
+    setUserEnabledAnalyticsEngines(nx::toStdSet(nx::utils::toTypedQList<nx::Uuid>(value)));
 }
 
 int CameraSettingsDialogStore::analyticsStreamIndex(const nx::Uuid& engineId) const

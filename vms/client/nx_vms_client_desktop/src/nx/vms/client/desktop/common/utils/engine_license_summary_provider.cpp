@@ -4,6 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/utils/std_helpers.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -63,7 +64,7 @@ QVariant EngineLicenseSummaryProvider::licenseSummary(
         {
             usageHelper.proposeChange(
                 camera->getId(),
-                nx::utils::toStdSet(nx::utils::toTypedQList<nx::Uuid>(proposedEngines)));
+                nx::toStdSet(nx::utils::toTypedQList<nx::Uuid>(proposedEngines)));
         }
 
         auto summary = usageHelper.info(engine->plugin()->manifest().id).toVariantMap();

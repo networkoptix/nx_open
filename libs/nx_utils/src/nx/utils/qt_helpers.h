@@ -4,8 +4,6 @@
 
 #include <type_traits>
 
-#include <set>
-
 #include <QtCore/QSet>
 #include <QtCore/QString>
 #include <QtCore/QVariantList>
@@ -17,12 +15,6 @@ template<typename Container>
 auto toQSet(const Container& source)
 {
     return QSet(source.begin(), source.end());
-}
-
-template<typename Container>
-auto toStdSet(const Container& source)
-{
-    return std::set(source.begin(), source.end());
 }
 
 template<typename Container>
