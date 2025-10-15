@@ -138,6 +138,7 @@ def create_mobile_client_archive(config, output_file):
     mobile_client_qml_dir = Path(config['mobile_client_qml_dir'])
     lib_dir = Path(config['cmake_binary_dir']) / 'lib'
     mobile_client_binary_name = config['mobile_client_binary_name']
+    crashpad_handler_path = config['crashpad_handler_path']
     asan_library_name = config['asan_library_name']
     font_dir = config['fonts_directory']
 
@@ -204,6 +205,9 @@ def create_mobile_client_archive(config, output_file):
         zip.write(
             binaries_dir / mobile_client_binary_name,
             f'{target_bin_dir}/{mobile_client_binary_name}')
+        zip.write(
+            crashpad_handler_path,
+            f'{target_bin_dir}/{Path(crashpad_handler_path).name}')
         zip.write(current_binary_dir / 'qt.conf', target_bin_dir + '/qt.conf')
         if tools.is_linux():
             zip.write(current_binary_dir / 'qt.conf', target_libexec_dir + '/qt.conf')

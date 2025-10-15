@@ -15,6 +15,7 @@ fonts_directory: '${CMAKE_BINARY_DIR}/bin/fonts'
 
 # Source binary
 mobile_client_binary_name: '$<TARGET_FILE_NAME:mobile_client>'
+crashpad_handler_path: '${CRASHPAD_HANDLER_PATH}'
 
 # ASan required library
 asan_library_name: '${asan_library_name}'
