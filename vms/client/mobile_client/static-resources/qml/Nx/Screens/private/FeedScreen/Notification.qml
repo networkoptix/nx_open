@@ -19,7 +19,7 @@ Control
     property alias time: time.text
     property alias image: image.source
     property string source: ""
-    property bool read: false
+    property bool viewed: false
     property string url: ""
     property bool expanded: false
 
@@ -32,7 +32,7 @@ Control
 
     background: Rectangle
     {
-        color: read ? ColorTheme.colors.dark7 : ColorTheme.colors.dark9
+        color: viewed ? ColorTheme.colors.dark7 : ColorTheme.colors.dark9
         radius: 10
 
         Rectangle
@@ -44,7 +44,7 @@ Control
             anchors.topMargin: 28
             anchors.rightMargin: 20
 
-            visible: !read
+            visible: !viewed
             width: 8
             height: 8
             radius: width / 2
@@ -104,6 +104,7 @@ Control
             wrapMode: Text.Wrap
             maximumLineCount: 2
             elide: Text.ElideRight
+            textFormat: Text.StyledText
         }
 
         Image
@@ -151,6 +152,7 @@ Control
             wrapMode: Text.Wrap
             maximumLineCount: expanded ? undefined : 2
             elide: Text.ElideRight
+            textFormat: Text.StyledText
         }
 
         RowLayout
