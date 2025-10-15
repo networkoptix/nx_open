@@ -54,6 +54,8 @@ private:
         std::chrono::seconds defaultPeriodValue,
         const PeriodStorage& value);
 
+    std::optional<std::chrono::seconds> forcedValue() const;
+
     std::chrono::seconds m_defaultPeriodValue{0};
     PeriodStorage m_value;
     std::chrono::seconds m_forcedMaxValue{};

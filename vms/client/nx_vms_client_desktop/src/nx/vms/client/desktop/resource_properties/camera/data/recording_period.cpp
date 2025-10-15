@@ -154,8 +154,23 @@ bool RecordingPeriod::isApplicable() const
     return autoState == Qt::Checked || hasManualPeriodValue();
 }
 
+std::optional<std::chrono::seconds> RecordingPeriod::forcedValue() const
+{
+    if (m_forcedMaxValue.count())
+    {
+        if (!m_value.hasValue())
+            return m_forcedMaxValue;
+        const int valueSeconds = m_value.get().count();
+        if (valueSeconds < 0 || valueSeconds > m_forcedMaxValue.count())
+            return m_forcedMaxValue;
+    }
+    return std::nullopt;
+}
+
 std::chrono::seconds RecordingPeriod::displayValue() const
 {
+    if (const auto forced = forcedValue())
+        return *forced;
     return (m_value.hasValue() && hasPeriodValue(m_value.get()))
         ? std::chrono::seconds(std::llabs(m_value.get().count()))
         : m_defaultPeriodValue;
@@ -163,6 +178,8 @@ std::chrono::seconds RecordingPeriod::displayValue() const
 
 std::chrono::seconds RecordingPeriod::rawValue() const
 {
+    if (const auto forced = forcedValue())
+        return *forced;
     return m_value.valueOr(m_defaultPeriodValue);
 }
 
