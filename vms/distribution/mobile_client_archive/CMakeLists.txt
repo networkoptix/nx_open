@@ -10,7 +10,7 @@ set(mobile_client_archive_file
     "${distribution_output_dir}/${mobile_client_archive_distribution_name}.zip")
 
 set(mobile_client_qml_root
-    "${CMAKE_SOURCE_DIR}/open/vms/client/mobile_client/static-resources/qml/")
+    "${open_source_root}/vms/client/mobile_client/static-resources/qml/")
 
 set(compiled_qml_directory "${CMAKE_CURRENT_BINARY_DIR}/qml")
 

@@ -109,6 +109,13 @@ if(WINDOWS AND withDistributions)
     nx_wix_generate_localization_file()
 endif()
 
+if(NOT IOS AND NOT EMSCRIPTEN)
+    set(CRASHPAD_HANDLER_PATH "${CONAN_CRASHPAD_ROOT}/bin/crashpad_handler${CMAKE_EXECUTABLE_SUFFIX}")
+    nx_copy(
+        "${CRASHPAD_HANDLER_PATH}"
+        DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+endif()
+
 add_subdirectory(cloud)
 add_subdirectory(dependencies)
 add_subdirectory(libs)

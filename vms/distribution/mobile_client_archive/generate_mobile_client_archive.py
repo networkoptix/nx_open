@@ -101,6 +101,7 @@ def create_mobile_client_archive(config, output_file):
     locale_resources_directory = qt_directory / 'resources'
     webengine_locales_directory = qt_directory / 'translations/qtwebengine_locales'
     asan_library_name = config['asan_library_name']
+    crashpad_handler_path = config['crashpad_handler_path']
 
     with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zip:
         tools.zip_files_to(zip, tools.ffmpeg_files(binaries_dir), binaries_dir)
@@ -139,6 +140,7 @@ def create_mobile_client_archive(config, output_file):
             zip.write(binaries_dir / asan_library_name, asan_library_name)
 
         zip.write(binaries_dir / mobile_client_binary_name, mobile_client_binary_name)
+        zip.write(crashpad_handler_path, Path(crashpad_handler_path).name)
         zip.write(current_binary_dir / 'qt.conf', 'qt.conf')
 
         # Write metadata
