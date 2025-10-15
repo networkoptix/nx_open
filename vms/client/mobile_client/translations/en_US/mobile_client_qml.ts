@@ -366,16 +366,20 @@
         <translation></translation>
     </message>
     <message>
-        <source>Show more</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>No Notifications</source>
         <translation></translation>
     </message>
     <message>
         <source>No push notifications were found.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Unviewed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Viewed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -547,6 +551,13 @@
     <message>
         <source>CANCEL</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>Notification</name>
+    <message>
+        <source>Show more</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
