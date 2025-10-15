@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
+#include <QtCore/QSortFilterProxyModel>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
@@ -21,8 +22,9 @@ public:
         DescriptionRole,
         ImageRole,
         TimeRole,
-        ReadRole,
+        ViewedRole,
         UrlRole,
+        CloudSystemIdRole,
     };
 
 public:
@@ -40,6 +42,37 @@ public:
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
+};
+
+class PushNotificationFilterModel: public QSortFilterProxyModel
+{
+    Q_OBJECT
+    Q_PROPERTY(QStringList cloudSystemIds MEMBER m_cloudSystemIds NOTIFY cloudSystemIdsChanged)
+    Q_PROPERTY(Filter filter MEMBER m_filter NOTIFY filterChanged)
+
+public:
+    enum Filter
+    {
+        All,
+        Viewed,
+        Unviewed,
+    };
+    Q_ENUM(Filter)
+
+public:
+    PushNotificationFilterModel(QObject* parent = nullptr);
+    static void registerQmlType();
+
+protected:
+    virtual bool filterAcceptsRow(int row, const QModelIndex& parent) const override;
+
+signals:
+    void cloudSystemIdsChanged();
+    void filterChanged();
+
+private:
+    QStringList m_cloudSystemIds;
+    Filter m_filter;
 };
 
 } // namespace nx::vms::client::mobile

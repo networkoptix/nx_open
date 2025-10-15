@@ -124,6 +124,7 @@ void registerQmlTypes()
     UiController::registerQmlType();
     ShareBookmarkBackend::registerQmlType();
     PushNotificationModel::registerQmlType();
+    PushNotificationFilterModel::registerQmlType();
 
     qmlRegisterUncreatableMetaObject(nx::vms::api::staticMetaObject, "nx.vms.api", 1, 0,
         "API", "API is a namespace");
