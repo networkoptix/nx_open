@@ -36,7 +36,8 @@ Page
     leftPadding: 20
     rightPadding: 20
 
-    leftButtonIcon.source: ""
+    onLeftButtonClicked: Workflow.popCurrentScreen()
+
     rightControl: IconButton
     {
         id: filterButton
@@ -58,6 +59,43 @@ Page
 
     states:
     [
+        State
+        {
+            when: !feedState.hasOsPermission
+
+            PropertyChanges
+            {
+                search.opacity: 0
+                notifications.opacity: 0
+                filterButton.opacity: 0
+
+                placeholder.text: qsTr("Notifications Off")
+                placeholder.description: qsTr("Notifications are currently disabled for this app. "
+                    + "To enable notifications use your phone's settings")
+                placeholder.imageSource:
+                    "image://skin/64x64/Outline/notification_off.svg?primary=light10"
+            }
+        },
+        State
+        {
+            when: !feedState.notificationsEnabled
+
+            PropertyChanges
+            {
+                search.opacity: 0
+                notifications.opacity: 0
+                filterButton.opacity: 0
+
+                placeholder.text: qsTr("Notifications Off")
+                placeholder.description: qsTr("You disabled push notifications for this site. To "
+                    + "enable them, go to the Settings page.")
+                placeholder.imageSource:
+                    "image://skin/64x64/Outline/notification_off.svg?primary=light10"
+
+                placeholder.buttonText: qsTr("Settings")
+                placeholder.onButtonClicked: Workflow.openSettingsScreen()
+            }
+        },
         State
         {
             when: empty && !searching && !filtered
@@ -99,43 +137,6 @@ Page
 
                 placeholder.buttonText: qsTr("View All")
                 placeholder.onButtonClicked: filterModel.filter = PushNotificationFilterModel.All
-            }
-        },
-        State
-        {
-            when: !feedState.hasOsPermission
-
-            PropertyChanges
-            {
-                search.opacity: 0
-                notifications.opacity: 0
-                filterButton.opacity: 0
-
-                placeholder.text: qsTr("Notifications Off")
-                placeholder.description: qsTr("Notifications are currently disabled for this app. "
-                    + "To enable notifications use your phone's settings")
-                placeholder.imageSource:
-                    "image://skin/feed/64x64/Outline/notification_off.svg?primary=light10"
-            }
-        },
-        State
-        {
-            when: !feedState.notificationsEnabled
-
-            PropertyChanges
-            {
-                search.opacity: 0
-                notifications.opacity: 0
-                filterButton.opacity: 0
-
-                placeholder.text: qsTr("Notifications Off")
-                placeholder.description: qsTr("You disabled push notifications for this site. To "
-                    + "enable them, go to the Settings page.")
-                placeholder.imageSource:
-                    "image://skin/feed/64x64/Outline/notification_off.svg?primary=light10"
-
-                placeholder.buttonText: qsTr("Settings")
-                placeholder.onButtonClicked: Workflow.openSettingsScreen()
             }
         }
     ]
@@ -247,6 +248,7 @@ Page
 
                     title: highlightMatchingText(model.title)
                     description: highlightMatchingText(model.description)
+                    source: feedState.cloudSystemIds.length > 1 ? model.source : ""
                     image: model.image
                     time: model.time
                     viewed: model.viewed

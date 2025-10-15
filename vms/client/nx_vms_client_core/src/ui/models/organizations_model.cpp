@@ -977,6 +977,29 @@ bool OrganizationsModel::hasChildren(const QModelIndex &parent) const
     return parentNode && parentNode->type != OrganizationsModel::System;
 }
 
+QStringList OrganizationsModel::childSystemIds(const QModelIndex& parent) const
+{
+    if (!d->root)
+        return {};
+
+    QStringList result;
+    auto addSystemIds = nx::utils::y_combinator(
+        [&](auto addSystemIds, const TreeNode* node) -> void
+        {
+            if (node->type == NodeType::System)
+                result.append(node->id.toSimpleString());
+
+            for (const auto& child: node->allChildren())
+                addSystemIds(child.get());
+        });
+
+    addSystemIds(parent.isValid()
+        ? static_cast<TreeNode*>(parent.internalPointer())
+        : d->root.get());
+
+    return result;
+}
+
 QHash<int, QByteArray> OrganizationsModel::roleNames() const
 {
     static const QHash<int, QByteArray> kRoleNames{

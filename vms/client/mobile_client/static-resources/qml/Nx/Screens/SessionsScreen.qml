@@ -10,6 +10,7 @@ import Nx.Core.Controls
 import Nx.Controls
 import Nx.Items
 import Nx.Mobile
+import Nx.Mobile.Controls
 import Nx.Models
 import Nx.Mobile.Ui.Sheets
 import Nx.Ui
@@ -54,6 +55,14 @@ Page
         icon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
         icon.width: 24
         icon.height: 24
+
+        Indicator
+        {
+            id: rightButtonIndicator
+
+            anchors.margins: rightButton.padding * 2
+            visible: !!text
+        }
     }
 
     centerControl:
@@ -166,13 +175,15 @@ Page
                         ? accessor.getData(linearizationListModel.sourceRoot, "display")
                         : ""
                 }
+
                 rightButton
                 {
-                    icon.source: searchField.visible
-                        ? "image://skin/24x24/Outline/close.svg?primary=light10"
-                        : "image://skin/24x24/Outline/search.svg?primary=light10"
-                    onClicked: searchField.visible ? endSearch() : startSearch()
+                    icon.source: feedStateProvider.buttonIconSource
+                    onClicked: Workflow.openFeedScreen(feedStateProvider)
                 }
+
+                rightButtonIndicator.text: feedStateProvider.buttonIconIndicatorText
+
                 systemTabs.visible: false
                 searchField.visible: false
             }
@@ -255,6 +266,13 @@ Page
                         ? organizationsModel.sitesRoot
                         : sessionsScreen.rootIndex)
         }
+    }
+
+    FeedStateProvider
+    {
+        id: feedStateProvider
+
+        cloudSystemIds: organizationsModel.childSystemIds(sessionsScreen.rootIndex)
     }
 
     HorizontalSlide
