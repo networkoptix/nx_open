@@ -68,6 +68,13 @@ void mapObjectTypes(
 
     for (taxonomy::ObjectType* objectType: objectTypes)
     {
+        // Always map main type id so that unsupported base nodes (empty typeIds()) are still
+        // resolvable (needed when UI stores mainTypeId explicitly or we inject it into the
+        // analytics object type ids list for selection persistence).
+        const auto mainId = objectType->mainTypeId();
+        if (!mainId.isEmpty() && !outObjectTypesById.contains(mainId))
+            outObjectTypesById.insert(mainId, objectType);
+
         for (const auto& id: objectType->typeIds())
             outObjectTypesById.insert(id, objectType);
 
@@ -334,8 +341,7 @@ QStringList AnalyticsFilterModel::getAnalyticsObjectTypeIds(ObjectType* filterOb
     if (!filterObjectType)
         return {};
 
-    const auto ids = filterObjectType->fullSubtreeTypeIds();
-    return QStringList{ids.begin(), ids.end()};
+    return filterObjectType->fullTreeTypeIdsIncludingBaseIfNeeded();
 }
 
 bool AnalyticsFilterModel::isActive() const

@@ -35,6 +35,7 @@ struct ObjectType::Private
     std::vector<ObjectType*> derivedObjectTypes;
     std::vector<Attribute*> attributes;
     const AbstractStateViewFilter* filter = nullptr;
+    mutable std::optional<QStringList> fullTreeTypeIdsIncludingBaseIfNeededCache;
 };
 
 ObjectType::ObjectType(
@@ -114,6 +115,20 @@ std::vector<QString> ObjectType::fullSubtreeTypeIds() const
 
     d->cachedFullSubtreeTypeIds = std::vector<QString>(result.begin(), result.end());
     return *d->cachedFullSubtreeTypeIds;
+}
+
+QStringList ObjectType::fullTreeTypeIdsIncludingBaseIfNeeded() const
+{
+    if (d->fullTreeTypeIdsIncludingBaseIfNeededCache)
+        return *d->fullTreeTypeIdsIncludingBaseIfNeededCache;
+
+    const auto subtree = fullSubtreeTypeIds();
+    QStringList result{subtree.begin(), subtree.end()};
+    if (typeIds().empty() && !subtree.empty())
+        result.push_front(mainTypeId());
+
+    d->fullTreeTypeIdsIncludingBaseIfNeededCache = result;
+    return *d->fullTreeTypeIdsIncludingBaseIfNeededCache;
 }
 
 QString ObjectType::id() const
