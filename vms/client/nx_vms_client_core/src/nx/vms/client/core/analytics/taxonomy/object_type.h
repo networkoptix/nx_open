@@ -63,6 +63,13 @@ public:
      */
     std::vector<QString> fullSubtreeTypeIds() const;
 
+    /**
+    * Ids of Object or Event types from which the node is built and ids of all its explicit and
+    * hidden descendants that pass the filter which was used to build the state view. If the node
+    * itself has no typeIds (currently unsupported base node), its mainTypeId is included as well.
+    */
+    QStringList fullTreeTypeIdsIncludingBaseIfNeeded() const;
+
     QString id() const;
 
     QString name() const;
