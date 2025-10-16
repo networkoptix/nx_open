@@ -98,7 +98,6 @@ Item
                             anchors.left: tileHeader.left
                             font.pixelSize: 24
                             font.weight: Font.Medium
-                            font.capitalization: tile.name ? Font.AllUppercase : Font.MixedCase
                         }
 
                         ContextHintButton
