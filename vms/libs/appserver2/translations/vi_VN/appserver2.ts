@@ -4,10 +4,6 @@
   <context>
     <name>ServerApiErrors</name>
     <message>
-      <source>Maximum number of archive seconds must be provided in range up to %1.</source>
-      <translation>Số giây lưu trữ tối đa phải được cung cấp trong phạm vi lên tới %1.</translation>
-    </message>
-    <message>
       <source>User Group &apos;%1&apos; does not exist.</source>
       <translation>Nhóm người dùng &apos;%1&apos; không tồn tại.</translation>
     </message>

@@ -4,10 +4,6 @@
   <context>
     <name>ServerApiErrors</name>
     <message>
-      <source>Maximum number of archive seconds must be provided in range up to %1.</source>
-      <translation>Det maksimale antal arkiv sekunder skal angives inden for et område op til %1.</translation>
-    </message>
-    <message>
       <source>User Group &apos;%1&apos; does not exist.</source>
       <translation>Brugergruppen &apos;%1&apos; findes ikke.</translation>
     </message>
