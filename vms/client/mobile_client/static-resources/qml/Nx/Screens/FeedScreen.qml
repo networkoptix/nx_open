@@ -151,6 +151,7 @@ Page
             id: search
 
             Layout.fillWidth: true
+            Layout.preferredHeight: 36
 
             readonly property var regExp:
                 new RegExp(`(${NxGlobals.makeSearchRegExpNoAnchors(text)})`, 'i')

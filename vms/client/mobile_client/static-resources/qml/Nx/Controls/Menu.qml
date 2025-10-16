@@ -16,7 +16,14 @@ Menu
         return implicitItemWidth + leftPadding + rightPadding
     }
 
-    background: Rectangle { color: ColorTheme.colors.dark7 }
+    topPadding: 8
+    bottomPadding: 8
+
+    background: Rectangle
+    {
+        color: ColorTheme.colors.dark14
+        radius: 6
+    }
 
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside | Popup.CloseOnReleaseOutside
     modal: true
