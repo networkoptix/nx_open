@@ -503,6 +503,10 @@ QnVirtualCameraResource::QnVirtualCameraResource():
                 updateAudioRequiredOnDevice(prevValue);
                 updateAudioRequiredOnDevice(newValue);
             }
+            else if (key == nx::vms::api::device_properties::kForcedAudioStream)
+            {
+                updateAudioRequired();
+            }
         });
 
     directConnect(
