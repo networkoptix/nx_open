@@ -13,79 +13,6 @@ else()
     set(enable_hw_decoders_by_default FALSE)
 endif()
 
-nx_option(withQuickSyncDecoder "Enable QuickSync hardware decoder" ${enable_hw_decoders_by_default})
-nx_option(withNvidiaDecoder "Enable Nvidia hardware decoder" ${enable_hw_decoders_by_default})
-
-nx_configure_file(supported_decoders.h.in
-    ${CMAKE_CURRENT_BINARY_DIR}/include/nx/media/supported_decoders.h)
-
-if(withNvidiaDecoder)
-    # Isolate C/CXX compile options specified on the top level via `add_compile_options` from CUDA
-    # compile options. CUDA compiler tries to process unknown warning/error options itself and
-    # fails.
-    get_directory_property(compile_options COMPILE_OPTIONS)
-    list(JOIN compile_options " " compile_options)
-    string(APPEND CMAKE_C_FLAGS " ${compile_options}")
-    string(APPEND CMAKE_CXX_FLAGS " ${compile_options}")
-    set_directory_properties(PROPERTIES COMPILE_OPTIONS "")
-
-    enable_language(CUDA)
-    find_package(CUDAToolkit)
-
-    # Add Nvidia decoder sources.
-    list(APPEND additional_sources_include_dirs
-        ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Interface)
-    list(APPEND additional_sources_include_dirs
-        ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples)
-    list(APPEND additional_sources
-        ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples/NvCodec/NvDecoder.cpp
-    )
-
-    set(color_conversion_src_path ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples/Utils)
-    list(APPEND additional_sources
-        ${color_conversion_src_path}/ColorSpace.cu
-        ${color_conversion_src_path}/Resize.cu
-    )
-endif()
-
-if(withQuickSyncDecoder)
-    # Add allocators from artifacts/intel_media_sdk/.
-    set(intel_media_sdk_dir ${artifacts_dir}/intel_media_sdk/samples/sample_common)
-    list(APPEND additional_sources_include_dirs ${intel_media_sdk_dir}/include)
-    list(APPEND additional_sources
-        ${intel_media_sdk_dir}/include/base_allocator.h
-        ${intel_media_sdk_dir}/include/sysmem_allocator.h
-        ${intel_media_sdk_dir}/src/base_allocator.cpp
-        ${intel_media_sdk_dir}/src/sysmem_allocator.cpp
-    )
-
-    if(LINUX)
-        list(APPEND additional_sources
-            ${intel_media_sdk_dir}/include/vaapi_allocator.h
-            ${intel_media_sdk_dir}/src/vaapi_allocator.cpp
-        )
-    endif()
-    if(WINDOWS)
-        list(APPEND additional_sources
-            ${intel_media_sdk_dir}/include/d3d_allocator.h
-            ${intel_media_sdk_dir}/src/d3d_allocator.cpp
-        )
-    endif()
-
-    # Add sources from artifacts/libva/va/.
-    if(LINUX)
-        set(libva_src_dir ${artifacts_dir}/libva/va)
-
-        file(GLOB_RECURSE libva_files CONFIGURE_DEPENDS
-            ${libva_src_dir}/*.h
-            ${libva_src_dir}/*.cpp
-        )
-
-        list(APPEND additional_sources ${libva_files})
-        list(APPEND additional_sources_include_dirs ${libva_src_dir})
-    endif()
-endif()
-
 if(APPLE)
     file(GLOB_RECURSE objc_files
         src/nx/media/*.mm
@@ -153,27 +80,6 @@ if(targetDevice STREQUAL "linux_x64")
     find_package(libva REQUIRED)
     pkg_check_modules(DRM REQUIRED IMPORTED_TARGET libdrm)
     target_link_libraries(nx_media PRIVATE libva::libva X11 dl GL libegl_stub PkgConfig::DRM)
-endif()
-
-if(withNvidiaDecoder)
-    target_link_libraries(nx_media PRIVATE CUDA::cudart)
-else()
-    nx_exclude_sources_from_target(nx_media src/nx/media/nvidia)
-endif()
-
-if(withQuickSyncDecoder)
-    find_package(libvpl REQUIRED)
-    target_link_libraries(nx_media PRIVATE libvpl::vpl)
-
-    if(LINUX)
-        find_package(intel-onevpl REQUIRED)
-        target_link_libraries(nx_media PRIVATE intel-onevpl::mfx-gen)
-    elseif(WINDOWS)
-        include("${CONAN_INTEL-MEDIA-SDK-BIN_ROOT}/intel_media_sdk.cmake")
-        target_link_libraries(nx_media PRIVATE opengl32 dxva2 d3d9 intel-media-sdk)
-    endif()
-else()
-    nx_exclude_sources_from_target(nx_media src/nx/media/quick_sync)
 endif()
 
 if(withTests)
