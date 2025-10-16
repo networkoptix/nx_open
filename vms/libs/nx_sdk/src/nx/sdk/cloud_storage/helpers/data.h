@@ -121,6 +121,7 @@ public:
     TimePeriod(const char* jsonStr) noexcept(false);
     TimePeriod(const nx::kit::Json& json) noexcept(false);
     TimePeriod(std::chrono::milliseconds startTimestamp, std::chrono::milliseconds duration);
+    TimePeriod(const int64_t startTimeMs, const int64_t durationMs);
     TimePeriod() = default;
 
     static ValueOrError<TimePeriod> fromJson(const char* jsonStr) noexcept;
@@ -141,40 +142,19 @@ public:
     bool operator!=(const TimePeriod& other) const;
 };
 
-class TimePeriodList
+class DeltaTimePeriods
 {
 public:
-    TimePeriodList(const char* jsonStr) noexcept(false);
-    TimePeriodList(const nx::kit::Json& json) noexcept(false);
-    TimePeriodList() = default;
+    static DeltaTimePeriods pack(const std::vector<TimePeriod>& periods, SortOrder order);
 
-    static ValueOrError<TimePeriodList> fromJson(const char* jsonStr) noexcept;
-    static ValueOrError<TimePeriodList> fromJson(const nx::kit::Json& json) noexcept;
+    //template <typename T> T unpack();
 
-    TimePeriodList(SortOrder order);
-
-    template<typename T>
-    TimePeriodList(const T&) = delete;
-
-    void forEach(std::function<void(const TimePeriod&)> func) const;
     nx::kit::Json to_json() const;
-    void reverse();
-    void shrink(size_t size);
-    void append(const TimePeriod& period);
-    void setLastDuration(std::chrono::milliseconds duration);
-
-    SortOrder sortOrder() const;
-    size_t size() const;
-    bool empty() const;
-    std::optional<TimePeriod> last() const;
+    const std::vector<int64_t>& data() const { return m_periods;}
 
 private:
-    SortOrder m_order = SortOrder::ascending;
     std::vector<int64_t> m_periods;
-    std::optional<std::chrono::milliseconds> m_lastStartTimestmapMs;
-
-private:
-    void recalculateLastTimestamp();
+    SortOrder m_sortorder = SortOrder::ascending;
 };
 
 struct KeyValuePair
@@ -338,10 +318,10 @@ public:
  */
 struct Motion
 {
-    int channel = 0;
-    std::chrono::milliseconds startTimestamp;
-    std::chrono::milliseconds duration{};
     std::string deviceId;
+    std::chrono::milliseconds startTimeMs;
+    std::chrono::milliseconds durationMs;
+    int channel = 0;
 
     /**
      * Binary motion mask data. Encoded in base64.
@@ -351,7 +331,7 @@ struct Motion
      * before encoding to base64. The mask is rotated by 90 degree. The very first bit of the mask
      * is the top-left corner bit. The next bit is for 1st column, 2nd row, etc.
      */
-    std::string dataBase64;
+    std::string region;
 
 public:
     Motion() = default;
@@ -384,13 +364,14 @@ public:
 
     static ValueOrError<Rect> fromJson(const char* jsonStr) noexcept;
     static ValueOrError<Rect> fromJson(const nx::kit::Json& json) noexcept;
-
     template<typename T>
     Rect(const T&) = delete;
 
     bool operator==(const Rect&) const;
 
     nx::kit::Json to_json() const;
+    std::string to_string() const;
+    static Rect from_string(const std::string& value);
 
     bool isEmpty() const;
     bool intersectsWith(const Rect& other) const;
@@ -430,22 +411,19 @@ struct MotionFilter
      * If distance between two time periods less than this value, then those periods must be merged
      * ignoring the gap.
      */
-    std::chrono::milliseconds detailLevel;
+    std::optional<std::chrono::milliseconds> detailLevel;
 
 public:
     MotionFilter() = default;
-    MotionFilter(const char* jsonData) noexcept(false);
-    MotionFilter(const nx::kit::Json& json) noexcept(false);
 
-    static ValueOrError<MotionFilter> fromJson(const char* jsonStr) noexcept;
-    static ValueOrError<MotionFilter> fromJson(const nx::kit::Json& json) noexcept;
+    static ValueOrError<MotionFilter> fromUrlQuery(const char* urlQuery);
 
     template<typename T>
     MotionFilter(const T&) = delete;
 
     bool operator==(const MotionFilter&) const;
 
-    nx::kit::Json to_json() const;
+    std::string toUrlQuery() const;
 };
 
 using Attribute = KeyValuePair;
@@ -915,4 +893,4 @@ public:
     nx::kit::Json to_json() const;
 };
 
-} // nx::sdk::namespace cloud_storage
+} // namespace nx::sdk::cloud_storage

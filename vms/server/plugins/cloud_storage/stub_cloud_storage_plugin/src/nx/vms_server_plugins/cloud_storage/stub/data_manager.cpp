@@ -1224,18 +1224,23 @@ nx::sdk::ErrorCode DataManager::saveMetadataImpl(const Data& data)
 
 std::string DataManager::queryMotion(const nx::sdk::cloud_storage::MotionFilter& filter) const
 {
-    nx::sdk::cloud_storage::TimePeriodList result;
+    using namespace nx::sdk::cloud_storage;
+    std::vector<TimePeriod> filtered;
     {
         std::lock_guard<std::mutex> lock(*m_mutex);
         for (const auto& candidate: m_cloudMotion)
         {
             if (motionMaches(candidate, filter))
-                result.append({candidate.startTimestamp, candidate.duration});
+                filtered.push_back({candidate.startTimeMs, candidate.durationMs});
         }
     }
+    if (filter.order == nx::sdk::cloud_storage::SortOrder::descending)
+        std::reverse(filtered.begin(), filtered.end());
+    if (filter.limit && filtered.size() > filter.limit)
+        filtered.resize(*filter.limit);
 
-    result = sdk::cloud_storage::sortAndLimitTimePeriods(
-        std::move(result), filter.order, filter.limit);
+    using namespace nx::sdk::cloud_storage;
+    auto result = DeltaTimePeriods::pack(filtered, filter.order);
     return result.to_json().dump();
 }
 
@@ -1277,51 +1282,31 @@ void ArchiveIndex::sort()
     }
 }
 
-nx::sdk::cloud_storage::TimePeriodList roundForFiveSecondGrid(
-    nx::sdk::cloud_storage::TimePeriodList periods)
+void roundToGrid(std::vector<nx::sdk::cloud_storage::TimePeriod>& periods, int intervalMs = 5000)
 {
-    nx::sdk::cloud_storage::TimePeriodList fiveSecPeriods;
-    std::function<void(const nx::sdk::cloud_storage::TimePeriod&)> buildPeriodsFunc =
-        [&](const auto& tp)
+    using namespace std::chrono;
+    for (auto& period: periods)
     {
-        nx::sdk::cloud_storage::TimePeriod fiveSecPeriod;
-        fiveSecPeriod.startTimestamp =
-            (tp.startTimestamp / 1000 - (tp.startTimestamp / 1000) % 5) * 1000;
-
-        const auto tpEnd = tp.startTimestamp + tp.duration;
-        const auto fiveSecEnd = (tpEnd / 1000 - (tpEnd / 1000) % 5) * 1000 + 5s;
-        fiveSecPeriod.duration = fiveSecEnd - fiveSecPeriod.startTimestamp;
-        if (fiveSecPeriods.empty() || fiveSecPeriods.last() != fiveSecPeriod)
-            fiveSecPeriods.append(fiveSecPeriod);
-    };
-    periods.forEach(buildPeriodsFunc);
-
-    nx::sdk::cloud_storage::TimePeriodList result;
-    std::function<void(const nx::sdk::cloud_storage::TimePeriod&)> buildResultFunc =
-        [&](const auto& tp)
-    {
-        if (result.empty())
+        auto endTime = period.duration.count() > 0
+            ? period.startTimestamp + period.duration : milliseconds(0);
+        const int64_t dt = period.startTimestamp.count() % intervalMs;
+        if (dt > 0)
+            period.startTimestamp -= milliseconds(dt);
+        if (endTime.count() > 0)
         {
-            result.append(tp);
-            return;
+            const int64_t dt = endTime.count() % intervalMs;
+            if (dt > 0)
+                endTime += milliseconds(intervalMs - dt);
+            period.duration = endTime - period.startTimestamp;
         }
-
-        if (result.last()->endTimestamp() >= tp.startTimestamp)
-        {
-            result.setLastDuration((std::max)(
-                *result.last()->endTimestamp() - result.last()->startTimestamp,
-                *tp.endTimestamp() - result.last()->startTimestamp));
-        }
-    };
-    fiveSecPeriods.forEach(buildResultFunc);
-
-    return result;
+    }
 }
 
 std::string DataManager::queryAnalyticsPeriods(
     const nx::sdk::cloud_storage::AnalyticsFilter& filter) const
 {
-    nx::sdk::cloud_storage::TimePeriodList result;
+    using namespace nx::sdk::cloud_storage;
+    std::vector<TimePeriod> result;
     {
         std::lock_guard<std::mutex> lock(*m_mutex);
         for (const auto& candidate: m_cloudAnalytics)
@@ -1333,15 +1318,16 @@ std::string DataManager::queryAnalyticsPeriods(
                 duration_cast<milliseconds>(candidate.firstAppearanceTimestamp);
             const auto endTime =
                 duration_cast<milliseconds>(candidate.lastAppearanceTimestamp);
-            result.append({startTime, endTime - startTime});
+            result.push_back({startTime, endTime - startTime});
         }
     }
-
-    result = sdk::cloud_storage::sortAndLimitTimePeriods(
-        result, filter.order, filter.maxObjectTracksToSelect);
-    result = roundForFiveSecondGrid(std::move(result));
-    result.to_json().dump();
-    return result.to_json().dump();
+    if (filter.order == nx::sdk::cloud_storage::SortOrder::descending)
+        std::reverse(result.begin(), result.end());
+    if (filter.maxObjectTracksToSelect && result.size() > filter.maxObjectTracksToSelect)
+        result.resize(*filter.maxObjectTracksToSelect);
+    roundToGrid(result, 5000);
+    auto compressed = DeltaTimePeriods::pack(result, filter.order);
+    return compressed.to_json().dump();
 }
 
 void DataManager::addDevice(const nx::sdk::cloud_storage::DeviceDescription& deviceDescription)
@@ -1383,7 +1369,6 @@ ArchiveIndex DataManager::getArchive(
                 continue;
 
             deviceArchiveIndex.deviceDescription = *maybeDescription;
-            TimePeriodList timePeriods;
             std::lock_guard<std::mutex> lock(*m_mutex);
             for (const auto& file: getFileInfoList(deviceDir.fullPath, kMediaFileExtenstion))
             {

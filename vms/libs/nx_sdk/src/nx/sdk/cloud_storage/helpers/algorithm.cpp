@@ -325,7 +325,7 @@ bool motionMaches(const Motion& motion, const MotionFilter& filter)
             return false;
     }
 
-    if (!filter.timePeriod.contains(motion.startTimestamp))
+    if (!filter.timePeriod.contains(motion.startTimeMs))
         return false;
 
     const bool isEmptyFilter = std::all_of(
@@ -347,7 +347,7 @@ bool motionMaches(const Motion& motion, const MotionFilter& filter)
             rect = Rect{0.f, 0.f, (double) kMotionGridWidth, (double) kMotionGridHeight};
 
         auto matcher = RegionMatcher(rect);
-        if (matcher.match(fromBase64(motion.dataBase64)))
+        if (matcher.match(fromBase64(motion.region)))
             return true;
     }
 
@@ -460,18 +460,6 @@ bool objectTrackMatches(const ObjectTrack& objectTrack, const AnalyticsFilter& f
     }
 
     return true;
-}
-
-TimePeriodList sortAndLimitTimePeriods(
-    TimePeriodList periods, SortOrder order, std::optional<int> limit)
-{
-    if (order != periods.sortOrder())
-        periods.reverse();
-
-    if (limit)
-        periods.shrink(*limit);
-
-    return periods;
 }
 
 std::vector<uint8_t> fromBase64(const std::string& data)

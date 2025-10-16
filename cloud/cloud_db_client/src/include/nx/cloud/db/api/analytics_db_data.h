@@ -13,6 +13,8 @@
 #include <nx/utils/url_query.h>
 #include <nx/utils/uuid.h>
 
+#include "time_period_data.h"
+
 namespace nx::cloud::db::api {
 
 struct BoundingBoxData
@@ -117,13 +119,5 @@ struct GetTracksParamsData
 
     nx::UrlQuery toUrlQuery() const;
 };
-
-struct TimePeriod
-{
-    int64_t startTimeMs = 0;
-    int64_t durationMs = 0;
-};
-
-using TimePeriodList = std::vector<TimePeriod>;
 
 } // namespace nx::cloud::db::api

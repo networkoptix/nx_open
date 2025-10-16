@@ -3,6 +3,7 @@
 #include "analytics_db_manager.h"
 
 #include <nx/cloud/cloud_services_ini.h>
+#include <nx/cloud/db/client/time_periods_helper.h>
 #include <nx/network/http/rest/http_rest_client.h>
 
 #include "cdb_request_path.h"
@@ -74,20 +75,6 @@ void AnalyticsDbManager::getTracks(
         std::move(completionHandler));
 }
 
-api::TimePeriodList uncompressTimePeriods(const std::vector<int64_t>& compressed)
-{
-    api::TimePeriodList result(compressed.size() / 2);
-    int64_t current = 0;
-    for (size_t i = 0; i < compressed.size() / 2; ++i)
-    {
-        current += compressed[i * 2];
-        result[i].startTimeMs = current * kAgregationIntervalMs;
-        result[i].durationMs = compressed[i * 2 + 1] * kAgregationIntervalMs;
-        current += compressed[i * 2 + 1];
-    }
-    return result;
-}
-
 void AnalyticsDbManager::getTrackPeriods(
     const api::GetTracksParamsData& filter,
     nx::MoveOnlyFunc<void(api::ResultCode, const api::TimePeriodList& data)> completionHandler)
@@ -101,7 +88,8 @@ void AnalyticsDbManager::getTrackPeriods(
         query,
         [handler = std::move(completionHandler)](api::ResultCode code, std::vector<int64_t> compressed)
         {
-            handler(code, uncompressTimePeriods(compressed));
+            using namespace nx::cloud::db::client;
+            handler(code, uncompressTimePeriods<api::TimePeriodList>(compressed, /*ascOrder*/ true, kAgregationIntervalMs));
         });
 }
 

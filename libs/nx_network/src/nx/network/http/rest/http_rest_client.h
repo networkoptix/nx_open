@@ -63,6 +63,23 @@ std::string substituteParameters(
     return resultPath;
 }
 
+template<typename ArgumentType>
+bool substituteParameter(
+    std::string* path,
+    const std::string& paramName,
+    const ArgumentType& argument)
+{
+    const std::string name = std::string("{") + paramName + "}";
+    const auto pos = path->find(name);
+    if (pos == std::string::npos)
+        return false;
+    path->replace(
+        pos,
+        name.length(),
+        argument);
+    return true;
+}
+
 /**
  * Convenience function to convert a REST HTTP path template, e.g.
  * /accounts/{accountId}/systems/{systemId} to a regex string, replacing all occurrences of

@@ -35,6 +35,7 @@ class NX_VMS_COMMON_API QnTimePeriodList:
 
 public:
     QnTimePeriodList();
+    QnTimePeriodList(size_type count);
     QnTimePeriodList(const QnTimePeriod &singlePeriod);
 
     /**

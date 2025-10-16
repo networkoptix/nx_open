@@ -33,6 +33,12 @@ QnTimePeriodList::QnTimePeriodList():
 {
 }
 
+QnTimePeriodList::QnTimePeriodList(size_type count):
+    base_type(count)
+{
+
+}
+
 QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 timeMs, bool searchForward) const
 {
     if (isEmpty())

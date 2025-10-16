@@ -281,7 +281,7 @@ void Engine::doQueryMotionTimePeriods(
             throw std::logic_error("Plugin has not been properly initialized");
 
         const auto motionData =
-            m_dataManager->queryMotion(nx::sdk::cloud_storage::MotionFilter(filter));
+            m_dataManager->queryMotion(nx::sdk::cloud_storage::MotionFilter::fromUrlQuery(filter).value());
         *outResult = nx::sdk::Result<nx::sdk::IString*>(new nx::sdk::String(motionData));
         NX_OUTPUT << __func__ << ": Successfully fetched some motion: '" << motionData << "'";
     }

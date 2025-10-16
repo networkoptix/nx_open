@@ -294,6 +294,7 @@ public:
     virtual const nx::sdk::IString* getHomeDir() const override { return new nx::sdk::String(); }
     virtual const char* serverId() const override { return ""; }
     virtual IString* cloudSystemId() const override { return new nx::sdk::String(); }
+    virtual IString* cloudOrgId() const override { return new nx::sdk::String(); }
     virtual IString* cloudAuthKey() const override { return new nx::sdk::String(); }
     virtual IString* supportedVectorizationModels() const override { return new nx::sdk::String(); }
     virtual IString* getDataDir() const override { return new nx::sdk::String(); }

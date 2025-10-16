@@ -163,7 +163,7 @@ public:
     virtual IString* supportedVectorizationModels() const = 0;
 };
 
-class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider6>
+class IUtilityProvider7: public Interface<IUtilityProvider7, IUtilityProvider6>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider7"); }
@@ -178,6 +178,14 @@ public:
     public: std::string dataDir() const { return Ptr(getDataDir())->str(); }
 };
 
-using IUtilityProvider7 = IUtilityProvider;
+class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider7>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider8"); }
+
+    virtual IString* cloudOrgId() const = 0;
+};
+
+using IUtilityProvider8 = IUtilityProvider;
 
 } // namespace nx::sdk

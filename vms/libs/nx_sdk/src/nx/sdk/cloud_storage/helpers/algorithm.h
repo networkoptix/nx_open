@@ -12,8 +12,6 @@ void sortAndLimitBookmarks(const BookmarkFilter& filter, std::vector<Bookmark>* 
 bool motionMaches(const Motion& motion, const MotionFilter& filter);
 
 bool objectTrackMatches(const ObjectTrack& objectTrack, const AnalyticsFilter& filter);
-TimePeriodList sortAndLimitTimePeriods(
-    TimePeriodList periods, SortOrder order, std::optional<int> limit);
 
 std::vector<uint8_t> fromBase64(const std::string& data);
 std::string toBase64(const std::vector<uint8_t>& data);

@@ -113,27 +113,22 @@ std::optional<Duration> getOptionalDurationValue(
     return Duration((int64_t) value.number_value());
 }
 
-// string or int64_t are supported so far
 template<typename T>
-std::vector<T> getBasicListValue(const nx::kit::Json& json, const std::string& key)
+std::vector<T> getBasicListValue(const nx::kit::Json& value)
 {
-    const auto value = json[key];
-    if (!value.is_array())
-        throw std::logic_error("Value '" + key + "' is not an array");
-
     std::vector<T> result;
-    for (const auto& entry: value.array_items())
+    for (const auto& entry : value.array_items())
     {
         if constexpr (std::is_same_v<std::string, T>)
         {
             if (!entry.is_string())
-                throw std::logic_error("Value '" + key + "' is not an array of strings");
+                throw std::logic_error("Value is not an array of strings");
             result.push_back(entry.string_value());
         }
         else if constexpr (std::is_same_v<int64_t, T>)
         {
             if (!entry.is_number())
-                throw std::logic_error("Value '" + key + "' is not an array of numbers");
+                throw std::logic_error("Value  is not an array of numbers");
             result.push_back(entry.number_value());
         }
         else
@@ -143,6 +138,16 @@ std::vector<T> getBasicListValue(const nx::kit::Json& json, const std::string& k
     }
 
     return result;
+}
+
+// string or int64_t are supported so far
+template<typename T>
+std::vector<T> getBasicListValue(const nx::kit::Json& json, const std::string& key)
+{
+    const nx::kit::Json value = json[key];
+    if (!value.is_array())
+        throw std::logic_error("Value '" + key + "' is not an array");
+    return getBasicListValue<T>(value);
 }
 
 template<typename Data>
@@ -841,11 +846,11 @@ Motion::Motion(const char* jsonData): Motion(parseJson(jsonData))
 
 Motion::Motion(const nx::kit::Json& json)
 {
-    channel = getIntValue(json, "channel");
-    startTimestamp = milliseconds(getIntValue(json, "startTimestamp"));
-    duration = milliseconds(getIntValue(json, "duration"));
+    startTimeMs = milliseconds(getIntValue(json, "startTimeMs"));
+    durationMs = milliseconds(getIntValue(json, "durationMs"));
     deviceId = getStringValue(json, "deviceId");
-    dataBase64 = getStringValue(json, "dataBase64");
+    channel = getIntValue(json, "channel");
+    region = getStringValue(json, "region");
 }
 
 ValueOrError<Motion> Motion::fromJson(const char* jsonStr) noexcept
@@ -874,18 +879,19 @@ ValueOrError<Motion> Motion::fromJson(const nx::kit::Json& json) noexcept
 
 bool Motion::operator==(const Motion& other) const
 {
-    return other.channel == channel && other.dataBase64 == dataBase64 && other.deviceId == deviceId
-        && other.duration == duration && other.startTimestamp == startTimestamp;
+    return other.region == region && other.deviceId == deviceId
+        && other.channel == channel &&
+        other.durationMs == durationMs && other.startTimeMs == startTimeMs;
 }
 
 nx::kit::Json Motion::to_json() const
 {
     return nx::kit::Json::object({
-        {"channel", channel},
-        {"startTimestamp", (double) startTimestamp.count()},
-        {"duration", (double) duration.count()},
+        {"startTimeMs", (double) startTimeMs.count()},
+        {"durationMs", (double) durationMs.count()},
         {"deviceId", deviceId},
-        {"dataBase64", dataBase64},
+        {"channel", channel},
+        {"region", region},
         });
 }
 
@@ -985,6 +991,30 @@ nx::kit::Json Rect::to_json() const
         });
 }
 
+std::string Rect::to_string() const
+{
+    std::stringstream result;
+    result << x << ',' << y << ',' << w << 'x' << h;
+    return result.str();
+}
+
+Rect Rect::from_string(const std::string& value)
+{
+    std::vector<std::string> params = split(value, ",");
+    if (params.size() != 3)
+        return Rect();
+
+    std::vector<std::string> sizeParams = split(params[2], "x");
+    if (sizeParams.size() != 2)
+        return Rect();
+    Rect result;
+    result.x = std::stoi(params[0]);
+    result.y = std::stoi(params[1]);
+    result.w = std::stoi(sizeParams[0]);
+    result.h = std::stoi(sizeParams[1]);
+    return result;
+}
+
 TimePeriod::TimePeriod(const char* jsonStr): TimePeriod(parseJson(jsonStr))
 {
 }
@@ -1028,234 +1058,51 @@ TimePeriod::TimePeriod(
 {
 }
 
-TimePeriodList::TimePeriodList(const char* jsonStr): TimePeriodList(parseJson(jsonStr))
+TimePeriod::TimePeriod(
+    const int64_t startTimeMs,
+    const int64_t durationMs)
+    :
+    startTimestamp(milliseconds(startTimeMs)),
+    duration(milliseconds(durationMs))
 {
 }
 
-TimePeriodList::TimePeriodList(SortOrder order): m_order(order)
+DeltaTimePeriods DeltaTimePeriods::pack(
+    const std::vector<TimePeriod>& periods,
+    SortOrder order)
 {
-}
-
-TimePeriodList::TimePeriodList(const nx::kit::Json& json) noexcept(false)
-{
-    m_order = sortOrderFromString(getStringValue(json, "order"));
-    m_periods = getBasicListValue<int64_t>(json, "periods");
-    recalculateLastTimestamp();
-}
-
-ValueOrError<TimePeriodList> TimePeriodList::fromJson(const char* jsonStr) noexcept
-{
-    try
+    DeltaTimePeriods result;
+    result.m_periods.reserve(periods.size() * 2);
+    std::chrono::milliseconds lastValue{};
+    if (order == SortOrder::ascending)
     {
-        return ValueOrError<TimePeriodList>::makeValue(TimePeriodList(jsonStr));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<TimePeriodList>::makeError(e.what());
-    }
-}
-
-ValueOrError<TimePeriodList> TimePeriodList::fromJson(const nx::kit::Json& json) noexcept
-{
-    try
-    {
-        return ValueOrError<TimePeriodList>::makeValue(TimePeriodList(json));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<TimePeriodList>::makeError(e.what());
-    }
-}
-
-void TimePeriodList::forEach(std::function<void(const TimePeriod&)> func) const
-{
-    if (m_periods.size() < 2)
-        return;
-
-    auto p = TimePeriod(milliseconds(m_periods[0]), milliseconds(m_periods[1]));
-    func(p);
-
-    for (size_t i = 3; i < m_periods.size(); i += 2)
-    {
-        if (m_order == SortOrder::ascending)
+        for (const auto& period: periods)
         {
-            p = TimePeriod(
-                milliseconds(m_periods[i - 1]) + p.startTimestamp,
-                milliseconds(m_periods[i]));
+            result.m_periods.push_back((period.startTimestamp - lastValue).count());
+            result.m_periods.push_back(period.duration.count());
+            lastValue = period.startTimestamp + period.duration;
         }
-        else
-        {
-            p = TimePeriod(
-                p.startTimestamp - milliseconds(m_periods[i - 1]),
-                milliseconds(m_periods[i]));
-        }
-
-        func(p);
-    }
-}
-
-SortOrder TimePeriodList::sortOrder() const
-{
-    return m_order;
-}
-
-void TimePeriodList::reverse()
-{
-    if (!m_periods.empty())
-    {
-        std::vector<TimePeriod> reversed;
-        forEach([&reversed](const auto& p) { reversed.push_back(p); });
-        std::reverse(reversed.begin(), reversed.end());
-        m_periods.clear();
-        m_periods.push_back(reversed[0].startTimestamp.count());
-        m_periods.push_back(reversed[0].duration.count());
-        for (size_t i = 1; i < reversed.size(); i++)
-        {
-            if (m_order == SortOrder::ascending)
-            {
-                m_periods.push_back(
-                    reversed[i - 1].startTimestamp.count() - reversed[i].startTimestamp.count());
-                m_periods.push_back(reversed[i].duration.count());
-            }
-            else
-            {
-                m_periods.push_back(
-                    reversed[i].startTimestamp.count() - reversed[i - 1].startTimestamp.count());
-                m_periods.push_back(reversed[i].duration.count());
-            }
-        }
-    }
-
-    if (m_order == SortOrder::ascending)
-        m_order = SortOrder::descending;
-    else
-        m_order = SortOrder::ascending;
-
-    recalculateLastTimestamp();
-}
-
-void TimePeriodList::recalculateLastTimestamp()
-{
-    m_lastStartTimestmapMs = std::nullopt;
-    const auto lastPeriod = last();
-    if (lastPeriod)
-        m_lastStartTimestmapMs = lastPeriod->startTimestamp;
-}
-
-void TimePeriodList::append(const TimePeriod& period)
-{
-    if (m_periods.empty())
-    {
-        m_periods.push_back(period.startTimestamp.count());
     }
     else
     {
-        if (m_order == SortOrder::ascending)
+        for (const auto& period: periods)
         {
-            m_periods.push_back(
-                period.startTimestamp.count() - m_lastStartTimestmapMs->count());
-        }
-        else
-        {
-            m_periods.push_back(
-                m_lastStartTimestmapMs->count() - period.startTimestamp.count());
+            const auto endTime = period.startTimestamp + period.duration;
+            result.m_periods.push_back(std::abs((lastValue - endTime).count()));
+            result.m_periods.push_back(period.duration.count());
+            lastValue = period.startTimestamp;
         }
     }
-    m_lastStartTimestmapMs = period.startTimestamp;
 
-    m_periods.push_back(period.duration.count());
-}
-
-bool TimePeriodList::empty() const
-{
-    return m_periods.empty();
-}
-
-std::optional<TimePeriod> TimePeriodList::last() const
-{
-    if (m_periods.empty())
-        return std::nullopt;
-
-    auto startTimestamp = m_periods[0];
-    for (size_t i = 2; i < m_periods.size(); i += 2)
-    {
-        if (m_order == SortOrder::ascending)
-            startTimestamp += m_periods[i];
-        else
-            startTimestamp -= m_periods[i];
-    }
-
-    return TimePeriod{milliseconds(startTimestamp), milliseconds(m_periods.back())};
-}
-
-void TimePeriodList::setLastDuration(std::chrono::milliseconds duration)
-{
-    if (m_periods.empty())
-        return;
-
-    m_periods[m_periods.size() - 1] = duration.count();
-}
-
-size_t TimePeriodList::size() const
-{
-    return m_periods.size() / 2;
-}
-
-void TimePeriodList::shrink(size_t size)
-{
-    if (size < this->size())
-        m_periods.resize(size * 2);
-    recalculateLastTimestamp();
-}
-
-nx::kit::Json TimePeriodList::TimePeriodList::to_json() const
-{
-    auto result = nx::kit::Json::object();
-    result["order"] = sortOrderToString(m_order);
-    auto periodArray = nx::kit::Json::array();
-    for (const int64_t& v: m_periods)
-        periodArray.push_back((double) v);
-
-    result["periods"] = periodArray;
     return result;
 }
 
-MotionFilter::MotionFilter(const char* jsonData): MotionFilter(parseJson(jsonData))
+nx::kit::Json DeltaTimePeriods::to_json() const
 {
-}
-
-MotionFilter::MotionFilter(const nx::kit::Json& json)
-{
-    deviceIds = getBasicListValue<std::string>(json, "deviceIds");
-    timePeriod = getObjectValue<TimePeriod>(json, "timePeriod");
-    regions = getObjectListValue<Rect>(json, "regions");
-    const auto optionalLimit = getOptionalIntValue(json, "limit");
-    limit = optionalLimit ? std::optional<int>((int)*optionalLimit) : std::nullopt;
-    detailLevel = milliseconds(getIntValue(json, "detailLevel"));
-}
-
-ValueOrError<MotionFilter> MotionFilter::fromJson(const char* jsonStr) noexcept
-{
-    try
-    {
-        return ValueOrError<MotionFilter>::makeValue(MotionFilter(jsonStr));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<MotionFilter>::makeError(e.what());
-    }
-}
-
-ValueOrError<MotionFilter> MotionFilter::fromJson(const nx::kit::Json& json) noexcept
-{
-    try
-    {
-        return ValueOrError<MotionFilter>::makeValue(MotionFilter(json));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<MotionFilter>::makeError(e.what());
-    }
+    auto periodArray = nx::kit::Json::array();
+    for (const int64_t& v : m_periods)
+        periodArray.push_back((double)v);
+    return periodArray;
 }
 
 bool MotionFilter::operator==(const MotionFilter& other) const
@@ -1264,24 +1111,69 @@ bool MotionFilter::operator==(const MotionFilter& other) const
         && other.regions == regions && other.timePeriod == timePeriod;
 }
 
-nx::kit::Json MotionFilter::to_json() const
+ValueOrError<MotionFilter>
+MotionFilter::fromUrlQuery(const char* urlQuery)
 {
-    auto result = nx::kit::Json::object({
-        {"timePeriod", timePeriod},
-        {"order", sortOrderToString(order)},
-        {"detailLevel", (double) detailLevel.count() },
-        });
+    MotionFilter result;
 
-    auto deviceIdJson = nx::kit::Json::array();
-    for (const auto& id: deviceIds)
-        deviceIdJson.push_back(nx::kit::Json(id));
+    std::vector<std::string> params = split(urlQuery, "&");
+    for (int i = 0; i < params.size(); i++)
+    {
+        std::vector<std::string> param = split(params[i], "=");
+        if (param.size() != 2)
+            continue;
 
-    result["deviceIds"] = objectListToJson(deviceIds);
-    result["regions"] = objectListToJson(regions);
+        if (param[0].compare("deviceId") == 0)
+            result.deviceIds.push_back(param[1]);
+        else if (param[0].compare("startTimeMs") == 0)
+            result.timePeriod.startTimestamp = milliseconds(std::stoi(param[1]));
+        else if (param[0].compare("boundingBox") == 0)
+            result.regions.push_back(Rect::from_string(param[1]));
+        else if (param[0].compare("limit") == 0)
+            result.limit = std::stoi(param[1]);
+        else if (param[0].compare("interval") == 0)
+            result.detailLevel = milliseconds(std::stoi(param[1]));
+    }
+    for (int i = 0; i < params.size(); i++)
+    {
+        std::vector<std::string> param = split(params[i], "=");
+        if (param.size() != 2)
+            continue;
+        if (param[0].compare("endTimeMs") == 0)
+            result.timePeriod.duration = milliseconds(std::stoi(param[1])) - result.timePeriod.startTimestamp;
+    }
+
+    return ValueOrError<MotionFilter>::makeValue(result);
+}
+
+std::string MotionFilter::toUrlQuery() const
+{
+    std::stringstream result;
+
+    auto addValue = [&result](const std::string& name, const auto& value)
+        {
+            if (!result.str().empty())
+                result << '&';
+            result << name << '=' << value;
+        };
+
+    for (const auto& device: deviceIds)
+        addValue("deviceId", device);
+    if (timePeriod.startTimestamp.count() > 0)
+        addValue("startTimeMs", timePeriod.startTimestamp.count());
+    if (auto endTime = timePeriod.endTimestamp())
+        addValue("endTimeMs", endTime->count());
+    for (const auto& region: regions)
+        addValue("boundingBox", region.to_string());
     if (limit)
-        result["limit"] = *limit;
+        addValue("limit", *limit);
+    using namespace std::chrono;
+    if (detailLevel)
+        addValue("interval", detailLevel->count());
 
-    return result;
+    addValue("order", sortOrderToString(order));
+
+    return result.str();
 }
 
 CodecInfoData::CodecInfoData()
