@@ -556,7 +556,7 @@
     <name>Notification</name>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>Xem thêm</translation>
     </message>
   </context>
   <context>

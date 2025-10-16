@@ -375,11 +375,11 @@
     </message>
     <message>
       <source>Unviewed</source>
-      <translation type="unfinished">Unviewed</translation>
+      <translation>No Visto</translation>
     </message>
     <message>
       <source>Viewed</source>
-      <translation type="unfinished">Viewed</translation>
+      <translation>Visto</translation>
     </message>
   </context>
   <context>
@@ -557,7 +557,7 @@
     <name>Notification</name>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>Mostrar más</translation>
     </message>
   </context>
   <context>

@@ -559,7 +559,7 @@
     <name>Notification</name>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>Pokaż więcej</translation>
     </message>
   </context>
   <context>

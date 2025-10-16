@@ -4,10 +4,6 @@
   <context>
     <name>ServerApiErrors</name>
     <message>
-      <source>Maximum number of archive seconds must be provided in range up to %1.</source>
-      <translation>アーカイブの最大秒数は %1 までの範囲で指定する必要があります。</translation>
-    </message>
-    <message>
       <source>User Group &apos;%1&apos; does not exist.</source>
       <translation>ユーザーグループ &apos;%1&apos; は存在しません。</translation>
     </message>
