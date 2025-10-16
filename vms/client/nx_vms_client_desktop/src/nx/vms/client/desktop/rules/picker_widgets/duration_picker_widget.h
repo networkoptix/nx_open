@@ -20,6 +20,19 @@
 
 namespace nx::vms::client::desktop::rules {
 
+class DurationPickerTranslationHelper
+{
+    Q_DECLARE_TR_FUNCTIONS(DurationPickerTranslationHelper)
+
+public:
+    // Return translated strings used in DurationPicker.
+    static QString alsoInclude();
+    static QString begin();
+    static QString beforeEvent();
+    static QString end();
+    static QString afterEvent();
+};
+
 /** Used for types that could be represented as a time period. */
 template<typename F>
 class DurationPicker: public PlainFieldPickerWidget<F>
@@ -73,32 +86,17 @@ protected:
             if (m_field->descriptor()->fieldName == vms::rules::utils::kRecordBeforeFieldName)
             {
                 base::setDisplayName(isFixedDuration
-                    ? TimeDurationWidget::tr(
-                        "Also include",
-                        /*comment*/ "Part of the text, action duration: "
-                        "Also include <time> Before Event")
-                    : TimeDurationWidget::tr(
-                        "Begin",
-                        /*comment*/ "Part of the text, action duration: "
-                        "Begin <time> Before Event"));
-
-                m_timeDurationWidget->setAdditionalText(TimeDurationWidget::tr(
-                    "Before Event",
-                    /*comment*/ "Part of the text, action duration: "
-                    "Begin <time> Before Event"));
+                    ? DurationPickerTranslationHelper::alsoInclude()
+                    : DurationPickerTranslationHelper::begin());
+                m_timeDurationWidget->setAdditionalText(
+                    DurationPickerTranslationHelper::beforeEvent());
             }
 
             if (m_field->descriptor()->fieldName == vms::rules::utils::kRecordAfterFieldName)
             {
-                base::setDisplayName(TimeDurationWidget::tr(
-                    "End",
-                    /*comment*/ "Part of the text, action duration: "
-                    "End <time> After Event"));
-
-                m_timeDurationWidget->setAdditionalText(TimeDurationWidget::tr(
-                    "After Event",
-                    /*comment*/ "Part of the text, action duration: "
-                    "End <time> After Event"));
+                base::setDisplayName(DurationPickerTranslationHelper::end());
+                m_timeDurationWidget->setAdditionalText(
+                    DurationPickerTranslationHelper::afterEvent());
 
                 // Post recording must not be visible when fixed duration is set.
                 this->setVisible(!isFixedDuration);

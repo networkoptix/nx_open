@@ -244,7 +244,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .requiredGlobalPermission(GlobalPermission::viewLogs)
         .shortcut("Ctrl+L")
-        .text("Event log...")
+        .text(ContextMenu::tr("Event log..."))
         .condition(!condition::showreelIsRunning());
 
     factory(OpenVmsRulesDialogAction)
