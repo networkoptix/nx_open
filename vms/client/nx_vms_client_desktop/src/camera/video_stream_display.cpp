@@ -19,7 +19,6 @@ extern "C" {
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/media/ffmpeg/abstract_video_decoder.h>
 #include <nx/media/ffmpeg/hw_video_decoder_old_player.h>
-#include <nx/media/supported_decoders.h>
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
@@ -33,14 +32,6 @@ extern "C" {
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <utils/common/adaptive_sleep.h>
-
-#if NX_MEDIA_NVIDIA_DECODER_SUPPORTED
-    #include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
-#endif
-
-#if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
-    #include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
-#endif
 
 #include "gl_renderer.h"
 
@@ -400,40 +391,6 @@ bool canAddFFmpegHW(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
         && nx::media::HwVideoDecoderOldPlayer::isSupported(data);
 }
 
-bool canAddNvidia(
-    [[maybe_unused]] const QnConstCompressedVideoDataPtr& data,
-    [[maybe_unused]] bool reverseMode)
-{
-    #if NX_MEDIA_NVIDIA_DECODER_SUPPORTED
-        return appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::legacyopengl
-            && isNvidia()
-            && appContext()->localSettings()->hardwareDecodingEnabled()
-            && !reverseMode
-            && NvidiaVideoDecoderOldPlayer::instanceCount()
-                < appContext()->localSettings()->maxNVidiaHardwareDecoders()
-            && NvidiaVideoDecoderOldPlayer::isSupported(data);
-    #else
-        return false;
-    #endif
-}
-
-bool canAddIntel(
-    [[maybe_unused]] const QnConstCompressedVideoDataPtr& data,
-    [[maybe_unused]] bool reverseMode)
-{
-    #if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
-        return appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::legacyopengl
-            && isIntel()
-            && appContext()->localSettings()->hardwareDecodingEnabled()
-            && !reverseMode
-            && QuickSyncVideoDecoderOldPlayer::instanceCount()
-                < appContext()->localSettings()->maxIntelHardwareDecoders()
-            && QuickSyncVideoDecoderOldPlayer::isSupported(data);
-    #else
-        return false;
-    #endif
-}
-
 bool QnVideoStreamDisplay::shouldUpdateDecoder(
     const QnConstCompressedVideoDataPtr& data,
     bool reverseMode)
@@ -453,12 +410,8 @@ bool QnVideoStreamDisplay::shouldUpdateDecoder(
     }
     else
     {
-        if (canAddIntel(data, reverseMode)
-            || canAddNvidia(data, reverseMode)
-            || canAddFFmpegHW(data, reverseMode))
-        {
+        if (canAddFFmpegHW(data, reverseMode))
             return true; // Decoder should be changed to hardware
-        }
     }
 
     return false;
@@ -468,23 +421,6 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     const QnConstCompressedVideoDataPtr& data, bool mtDecoding) const
 {
     QnAbstractVideoDecoder* decoder = nullptr;
-
-    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_StillImage))
-    {
-        if (canAddIntel(data, m_reverseMode))
-        {
-            #if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
-                decoder = new QuickSyncVideoDecoderOldPlayer();
-            #endif
-        }
-        else if (canAddNvidia(data, m_reverseMode))
-        {
-            #if NX_MEDIA_NVIDIA_DECODER_SUPPORTED
-                decoder = new NvidiaVideoDecoderOldPlayer();
-            #endif
-        }
-    }
-
     if (canAddFFmpegHW(data, m_reverseMode))
     {
         if (auto rhi = appContext()->mainWindowContext()->rhi())

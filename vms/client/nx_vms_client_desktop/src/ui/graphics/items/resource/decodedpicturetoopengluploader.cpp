@@ -15,7 +15,6 @@ extern "C" {
 
 #include <nx/media/config.h>
 #include <nx/media/ffmpeg/texture_helper.h>
-#include <nx/media/supported_decoders.h>
 #include <nx/media/yuvconvert.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -27,14 +26,6 @@ extern "C" {
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <utils/common/util.h> /* For random. */
-
-#if NX_MEDIA_NVIDIA_DECODER_SUPPORTED
-    #include <nx/media/nvidia/nvidia_renderer.h>
-#endif
-
-#if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
-    #include <nx/media/quick_sync/quick_sync_video_frame.h>
-#endif
 
 namespace
 {
@@ -1218,56 +1209,7 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
     const CLConstVideoDecoderOutputPtr& frame)
 {
-    #if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED || NX_MEDIA_NVIDIA_DECODER_SUPPORTED
-        emptyPictureBuf->texturePack()->setPictureFormat((AVPixelFormat)frame->format);
-        emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
-
-        QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
-        QSize displaySize = emptyPictureBuf->displaySize();
-        QSize frameSize = frame->size();
-        if (!displaySize.isEmpty() && frame->scaleFactor != 1)
-            displaySize = displaySize.boundedTo(frameSize);
-        else
-            displaySize = frameSize;
-
-        displaySize = alignSizeCeil(displaySize, 8, 8);
-
-        bool isNewTexture = texture->ensureInitialized(
-            displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
-
-        if (frame->getVideoSurface()->type() == SurfaceType::Nvidia)
-        {
-            #if NX_MEDIA_NVIDIA_DECODER_SUPPORTED
-                if (!nx::media::nvidia::renderToRgb(
-                    frame->getVideoSurface(), texture->m_id, displaySize))
-                {
-                    NX_ERROR(this, "Failed to render video memory to OpenGL texture");
-                    return false;
-                }
-            #endif
-        }
-        else
-        {
-            float cropWidth = 1;
-            float cropHeight = 1;
-            if (!renderToRgb(
-                frame->getVideoSurface(),
-                isNewTexture,
-                texture->m_id,
-                m_initializedContext,
-                frame->scaleFactor,
-                &cropWidth,
-                &cropHeight))
-            {
-                NX_ERROR(this, "Failed to render video memory to OpenGL texture");
-                return false;
-            }
-            texture->m_texCoords = QVector2D(cropWidth, cropHeight);
-        }
-        return true;
-    #else
-        return false;
-    #endif
+    return false;
 }
 
 uchar* DecodedPictureToOpenGLUploader::convertYuvToRgb(
