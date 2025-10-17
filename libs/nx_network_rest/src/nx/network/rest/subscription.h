@@ -49,7 +49,9 @@ public:
     {
         const auto& id = request.jsonRpcContext()->subscriptionId;
         auto subscription = std::make_shared<SubscriptionCallback>(std::move(callback));
-        NX_VERBOSE(this, "Add subscription %1 for %2", subscription.get(), id);
+        NX_VERBOSE(this,
+            "Add subscription %1 %2 for connection %3",
+            subscription.get(), id, request.jsonRpcContext()->connection.id);
 
         nx::utils::Guard guard{
             [this, subscription, sharedGuard = m_asyncOperationGuard.sharedGuard()]()
@@ -64,56 +66,6 @@ public:
         m_subscribedIds[id].emplace(subscription);
         m_subscriptions.emplace(std::move(subscription), std::move(request));
         return guard;
-    }
-
-    template<typename T>
-    void notifyWithPayload(const QString& id, NotifyType notifyType, std::optional<nx::Uuid> user,
-        nx::MoveOnlyFunc<json_rpc::Payload<T>(const nx::Uuid&)> getPayload,
-        nx::MoveOnlyFunc<PostProcessContext(const Request&)> makePostProcess = {},
-        const json::OpenApiSchemas* schemas = {}) const
-    {
-        if (makePostProcess)
-        {
-            auto callbacks = this->callbacks(id, std::move(user), std::move(makePostProcess));
-            for (auto& [user, callbacks]: callbacks)
-            {
-                auto payload = getPayload(user);
-                if (!payload.data)
-                    continue;
-
-                rapidjson::Document extensions;
-                if (payload.extensions)
-                    extensions = nx::json::serialized(*payload.extensions, /*stripDefault*/ false);
-                for (auto& [callback, postProcess]: callbacks)
-                {
-                    auto data = *payload.data;
-                    detail::filter(&data, postProcess.filters);
-                    detail::orderBy(&data, postProcess.filters);
-                    auto document = json::serialize(
-                        data, std::move(postProcess.filters), postProcess.defaultValueAction);
-                    if (schemas)
-                        schemas->postprocessResponse(postProcess.method, postProcess.path, &document);
-                    (*callback)(id, notifyType, &document, &extensions);
-                }
-            }
-        }
-        else
-        {
-            auto callbacks = this->callbacks(id, std::move(user));
-            for (auto& [user, callbacks]: callbacks)
-            {
-                auto payload = getPayload(user);
-                if (!payload.data)
-                    continue;
-
-                auto document = nx::json::serialized(*payload.data, /*stripDefault*/ false);
-                rapidjson::Document extensions;
-                if (payload.extensions)
-                    extensions = nx::json::serialized(*payload.extensions, /*stripDefault*/ false);
-                for (auto& callback: callbacks)
-                    (*callback)(id, notifyType, &document, &extensions);
-            }
-        }
     }
 
     void notify(
@@ -144,68 +96,82 @@ public:
     }
 
     static nx::network::rest::Request payloadRequest(
-        const QString& subscriptionId, const nx::Uuid& userId)
+        const QString& subscriptionId, const nx::Uuid& userId, json_rpc::WeakConnection connection = {})
     {
         using namespace nx::network::rest;
         auto userAccessData = UserAccessData{userId};
         if (userId == kCloudServiceUserAccess.userId || userId == kVideowallUserAccess.userId)
             userAccessData.access = UserAccessData::Access::ReadAllResources;
-        return {json_rpc::Context{.subscribed = true, .subscriptionId = subscriptionId},
+        return {
+            json_rpc::Context{
+                .connection = std::move(connection),
+                .subscribed = true,
+                .subscriptionId = subscriptionId},
             {.session = AuthSession{nx::Uuid{}}, .access = std::move(userAccessData)}};
     }
 
-private:
+protected:
     using Callback = std::shared_ptr<SubscriptionCallback>;
+    using Connection = json_rpc::WeakConnection;
 
-    std::map<nx::Uuid, std::vector<std::pair<Callback, PostProcessContext>>> callbacks(
-        const QString& id,
-        std::optional<nx::Uuid> user,
-        nx::MoveOnlyFunc<PostProcessContext(const Request&)> makePostProcess) const
+    std::map<nx::Uuid,
+        std::map<Connection, std::vector<std::tuple<QString, Callback, PostProcessContext>>>
+    >
+        callbacks(
+            const QString& id,
+            std::optional<nx::Uuid> user,
+            nx::MoveOnlyFunc<PostProcessContext(const Request&)> makePostProcess) const
     {
-        std::map<nx::Uuid, std::vector<std::pair<Callback, PostProcessContext>>> result;
+        std::map<nx::Uuid,
+            std::map<Connection, std::vector<std::tuple<QString, Callback, PostProcessContext>>>>
+            result;
         auto fillResult =
             [this, &result, user = std::move(user), makePostProcess = std::move(makePostProcess)](
-                const auto& callbacks)
+                const auto& id, const auto& callbacks)
             {
                 for (const auto& callback: callbacks)
                 {
                     const auto& request = m_subscriptions.at(callback);
                     const auto userId = request.userSession.access.userId;
                     if (!user || *user == userId)
-                        result[userId].push_back({callback, makePostProcess(request)});
+                    {
+                        result[userId][request.jsonRpcContext()->connection].push_back(
+                            {id, callback, makePostProcess(request)});
+                    }
                 }
             };
         auto lock(m_asyncOperationGuard->lock());
         if (auto it = m_subscribedIds.find(id); it != m_subscribedIds.end())
-            fillResult(it->second);
+            fillResult(it->first, it->second);
         if (auto it = m_subscribedIds.find(QString("*")); it != m_subscribedIds.end())
-            fillResult(it->second);
+            fillResult(it->first, it->second);
         return result;
     }
 
-    std::map<nx::Uuid, std::vector<Callback>> callbacks(
+    std::map<nx::Uuid, std::map<Connection, std::vector<std::tuple<QString, Callback>>>> callbacks(
         const QString& id, std::optional<nx::Uuid> user) const
     {
-        std::map<nx::Uuid, std::vector<Callback>> result;
+        std::map<nx::Uuid, std::map<Connection, std::vector<std::tuple<QString, Callback>>>> result;
         auto fillResult =
-            [this, &result, user = std::move(user)](const auto& callbacks)
+            [this, &result, user = std::move(user)](const auto& id, const auto& callbacks)
             {
                 for (const auto& callback: callbacks)
                 {
                     const auto& request = m_subscriptions.at(callback);
                     const auto userId = request.userSession.access.userId;
                     if (!user || *user == userId)
-                        result[userId].push_back(callback);
+                        result[userId][request.jsonRpcContext()->connection].push_back({id, callback});
                 }
             };
         auto lock(m_asyncOperationGuard->lock());
         if (auto it = m_subscribedIds.find(id); it != m_subscribedIds.end())
-            fillResult(it->second);
+            fillResult(it->first, it->second);
         if (auto it = m_subscribedIds.find(QString("*")); it != m_subscribedIds.end())
-            fillResult(it->second);
+            fillResult(it->first, it->second);
         return result;
     }
 
+private:
     nx::utils::Guard removeSubscription(const std::shared_ptr<SubscriptionCallback>& subscription)
     {
         NX_VERBOSE(this, "Remove subscription %1", subscription.get());

@@ -22,8 +22,8 @@ class NX_JSON_RPC_API WebSocketConnection: public nx::network::aio::BasicPollabl
 public:
     using base_type = nx::network::aio::BasicPollable;
     using ResponseHandler = nx::MoveOnlyFunc<void(Response)>;
-    using RequestHandler = nx::MoveOnlyFunc<void(Request, ResponseHandler, WebSocketConnection*)>;
-    using OnDone = nx::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
+    using RequestHandler = nx::MoveOnlyFunc<void(Request, ResponseHandler, size_t)>;
+    using OnDone = nx::MoveOnlyFunc<void(SystemError::ErrorCode, size_t)>;
 
     WebSocketConnection(
         std::unique_ptr<nx::network::websocket::WebSocket> webSocket, OnDone onDone);
@@ -44,6 +44,8 @@ public:
 
     void addGuard(const QString& id, nx::utils::Guard guard);
     void removeGuard(const QString& id);
+
+    const size_t id;
 
 private:
     virtual void stopWhileInAioThread() override;

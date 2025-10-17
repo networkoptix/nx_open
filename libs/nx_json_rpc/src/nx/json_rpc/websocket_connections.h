@@ -54,9 +54,8 @@ public:
     void clear();
 
     void addConnection(std::shared_ptr<WebSocketConnection> connection);
-    void removeConnection(WebSocketConnection* connection);
-    void updateConnectionGuards(
-        WebSocketConnection* connection, std::vector<nx::utils::Guard> guards);
+    void removeConnection(size_t connection);
+    void updateConnectionGuards(size_t connection, std::vector<nx::utils::Guard> guards);
 
     std::size_t count() const;
 
@@ -70,15 +69,13 @@ private:
         void stop();
     };
 
-    void executeAsync(
-        Connection* connection,
-        std::unique_ptr<Executor> executor,
-        nx::MoveOnlyFunc<void(Response)> handler);
+    using Handler = Executor::ResponseHandler;
+    void executeAsync(Connection* connection, std::unique_ptr<Executor> executor, Handler handler);
 
 private:
     mutable nx::Mutex m_mutex;
     std::vector<std::unique_ptr<ExecutorCreator>> m_executorCreators;
-    std::unordered_map<WebSocketConnection*, Connection> m_connections;
+    std::unordered_map<size_t, Connection> m_connections;
 };
 
 } // namespace nx::json_rpc

@@ -72,7 +72,11 @@ public:
         return {[guards = std::move(guards)]() mutable { guards.clear(); }};
     }
 
-    void notify(const QString& id, nx::network::rest::Handler::NotifyType notifyType)
+    void notify(
+        const QString& id,
+        nx::network::rest::Handler::NotifyType notifyType,
+        std::optional<nx::Uuid> user = {},
+        bool noEtag = false)
     {
         switch (notifyType)
         {
@@ -83,6 +87,6 @@ public:
                 removeAccessible(id);
                 break;
         }
-        TrackPermissionCrudHandler::CrudHandler::notify(id, notifyType);
+        TrackPermissionCrudHandler::CrudHandler::notify(id, notifyType, std::move(user), noEtag);
     }
 };

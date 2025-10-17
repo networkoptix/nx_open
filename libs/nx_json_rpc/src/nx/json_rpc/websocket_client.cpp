@@ -144,8 +144,8 @@ void WebSocketClient::onUpgrade()
         {
             if (m_connection)
             {
-                NX_ASSERT(m_connection.get() == connection,
-                    "m_connection=%1, connection=%2", m_connection, connection);
+                NX_ASSERT(m_connection->id == connection,
+                    "m_connection=%1, connection=%2", m_connection->id, connection);
                 auto connectionPtr = m_connection.get();
                 connectionPtr->pleaseStop([connection = std::move(m_connection)]() {});
             }

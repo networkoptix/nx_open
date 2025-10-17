@@ -51,18 +51,22 @@ std::pair<bool, std::optional<Response>> isResponse(const rapidjson::Value& valu
     return {value.IsObject() && isObjectResponse(value), std::optional<Response>{}};
 }
 
+static std::atomic<size_t> s_id{0};
+
 } // namespace
 
 WebSocketConnection::WebSocketConnection(
     std::unique_ptr<nx::network::websocket::WebSocket> webSocket,
     OnDone onDone)
     :
+    id(++s_id),
     m_onDone(std::move(onDone)),
     m_incomingProcessor{std::make_unique<IncomingProcessor>()},
     m_outgoingProcessor{
         std::make_unique<OutgoingProcessor>([this](auto value) { send(std::move(value)); })},
     m_socket(std::move(webSocket))
 {
+    NX_VERBOSE(this, "New id %1", id);
     base_type::bindToAioThread(m_socket->getAioThread());
     if (auto socket = m_socket->socket())
         m_address = socket->getForeignAddress();
@@ -77,12 +81,13 @@ void WebSocketConnection::setRequestHandler(RequestHandler requestHandler)
                 std::move(request),
                 [this, handler = std::move(responseHandler)](auto response) mutable
                 {
-                    dispatch([response = std::move(response), handler = std::move(handler)]() mutable
-                    {
-                        handler(std::move(response));
-                    });
+                    dispatch(
+                        [response = std::move(response), handler = std::move(handler)]() mutable
+                        {
+                            handler(std::move(response));
+                        });
                 },
-                this);
+                id);
         });
 }
 
@@ -94,7 +99,7 @@ void WebSocketConnection::start()
 
 WebSocketConnection::~WebSocketConnection()
 {
-    nx::moveAndCallOptional(m_onDone, SystemError::noError, this);
+    nx::moveAndCallOptional(m_onDone, SystemError::noError, id);
 }
 
 void WebSocketConnection::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
@@ -150,7 +155,7 @@ void WebSocketConnection::readNextMessage()
             {
                 NX_DEBUG(this, "Failed to read next message with error code %1", errorCode);
                 m_outgoingProcessor->clear(errorCode);
-                nx::moveAndCallOptional(m_onDone, errorCode, this);
+                nx::moveAndCallOptional(m_onDone, errorCode, id);
                 return;
             }
 
@@ -222,7 +227,7 @@ void WebSocketConnection::send(std::string data)
             {
                 NX_DEBUG(this, "Failed to send message with error code %1", errorCode);
                 m_outgoingProcessor->clear(errorCode);
-                nx::moveAndCallOptional(m_onDone, errorCode, this);
+                nx::moveAndCallOptional(m_onDone, errorCode, id);
             }
         });
 }
