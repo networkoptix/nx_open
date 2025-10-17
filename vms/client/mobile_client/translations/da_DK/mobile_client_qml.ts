@@ -375,11 +375,11 @@
     </message>
     <message>
       <source>Unviewed</source>
-      <translation type="unfinished">Unviewed</translation>
+      <translation>Ikke vist</translation>
     </message>
     <message>
       <source>Viewed</source>
-      <translation type="unfinished">Viewed</translation>
+      <translation>Vist</translation>
     </message>
   </context>
   <context>
