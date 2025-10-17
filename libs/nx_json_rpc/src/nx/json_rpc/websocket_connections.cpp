@@ -11,52 +11,44 @@
 namespace nx::json_rpc {
 
 void WebSocketConnections::executeAsync(
-    Connection* connection,
-    std::unique_ptr<Executor> executor,
-    nx::MoveOnlyFunc<void(Response)> handler)
+    Connection* connection, std::unique_ptr<Executor> executor, Handler handler)
 {
+    auto weakConnection = std::weak_ptr(connection->connection);
+    auto h =
+        [h = std::move(handler), weakConnection](auto r)
+        {
+            if (auto c = weakConnection.lock())
+                h(std::move(r));
+        };
     auto threadIt = connection->threads.insert(connection->threads.begin(), std::thread());
     *threadIt = std::thread(
-        [this,
-            executor = std::move(executor),
-            handler = std::move(handler),
-            weakConnection = std::weak_ptr(connection->connection),
-            threadIt]() mutable
+        [this, executor = std::move(executor), h = std::move(h), weakConnection, threadIt]() mutable
         {
-            auto response =
-                [executor = std::move(executor), &weakConnection]()
+            auto handler =
+                [h = std::make_shared<Handler>(std::move(h))]()
                 {
-                    std::promise<Response> promise;
-                    auto future = promise.get_future();
-                    try
-                    {
-                        executor->execute(weakConnection,
-                            [p = std::move(promise)](auto r) mutable { p.set_value(std::move(r)); });
-                        return future.get();
-                    }
-                    catch (const std::exception& e)
-                    {
-                        return nx::json_rpc::Response::makeError(executor->responseId(),
-                            Error::internalError,
-                            NX_FMT("Unhandled exception: %1", e.what()).toStdString());
-                    }
-                    catch (...)
-                    {
-                        return nx::json_rpc::Response::makeError(executor->responseId(),
-                            Error::internalError,
-                            "Unhandled exception");
-                    }
-                }();
+                    return [h](auto r) { (*h)(std::move(r)); };
+                };
+            try
+            {
+                executor->execute(weakConnection, handler());
+            }
+            catch (const std::exception& e)
+            {
+                handler()(nx::json_rpc::Response::makeError(
+                    executor->responseId(), Error::internalError,
+                    NX_FMT("Unhandled exception: %1", e.what()).toStdString()));
+            }
+            catch (...)
+            {
+                handler()(nx::json_rpc::Response::makeError(
+                    executor->responseId(), Error::internalError, "Unhandled exception"));
+            }
             if (auto connection = weakConnection.lock())
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
-                if (auto c = m_connections.find(connection.get()); c != m_connections.end())
+                if (auto c = m_connections.find(connection->id); c != m_connections.end())
                 {
-                    c->second.connection->post(
-                        [handler = std::move(handler), response = std::move(response)]() mutable
-                        {
-                            handler(std::move(response));
-                        });
                     threadIt->detach();
                     c->second.threads.erase(threadIt);
                 }
@@ -103,12 +95,12 @@ void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> co
         });
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        m_connections.emplace(connectionPtr, Connection{std::move(connection)});
+        m_connections.emplace(connectionPtr->id, Connection{std::move(connection)});
     }
     connectionPtr->start();
 }
 
-void WebSocketConnections::removeConnection(WebSocketConnection* connection)
+void WebSocketConnections::removeConnection(size_t connection)
 {
     NX_VERBOSE(this, "Remove connection %1", connection);
     Connection holder;
@@ -124,7 +116,7 @@ void WebSocketConnections::removeConnection(WebSocketConnection* connection)
 }
 
 void WebSocketConnections::updateConnectionGuards(
-    WebSocketConnection* connection, std::vector<nx::utils::Guard> guards)
+    size_t connection, std::vector<nx::utils::Guard> guards)
 {
     std::vector<nx::utils::Guard> oldGuards;
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -143,7 +135,7 @@ std::size_t WebSocketConnections::count() const
 
 void WebSocketConnections::clear()
 {
-    std::unordered_map<WebSocketConnection*, Connection> connections;
+    std::unordered_map<size_t, Connection> connections;
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         m_connections.swap(connections);

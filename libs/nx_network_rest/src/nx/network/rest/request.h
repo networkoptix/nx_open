@@ -41,10 +41,19 @@ NX_REFLECTION_ENUM_CLASS(Subs,
     unsubscribe
 );
 
+struct WeakConnection
+{
+    size_t id = 0;
+    std::weak_ptr<nx::json_rpc::WebSocketConnection> c;
+
+    std::shared_ptr<nx::json_rpc::WebSocketConnection> lock() const { return c.lock(); }
+    bool operator<(const WeakConnection& other) const { return id < other.id; }
+};
+
 struct Context
 {
     nx::json_rpc::Request request;
-    std::weak_ptr<nx::json_rpc::WebSocketConnection> connection;
+    WeakConnection connection;
     bool subscribed = false;
 
     // Field is filled by PathRouter.

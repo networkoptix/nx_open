@@ -6,7 +6,6 @@
 #include <nx/network/rest/crud_handler.h>
 #include <nx/network/rest/subscription.h>
 #include <nx/utils/crud_model.h>
-#include <nx/utils/data_structures/time_out_cache.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/i18n/scoped_locale.h>
 #include <nx/utils/lockable.h>
@@ -66,11 +65,11 @@ public:
     {
         using namespace details;
 
-        auto processor = m_queryProcessor->getAccess(
-            static_cast<const Derived*>(this)->prepareAuditRecord(request));
         auto id = nx::utils::model::getId(filter);
-        validateType(processor, id, m_objectType);
+        if (!request.jsonRpcContext() || !request.jsonRpcContext()->subscribed)
+            validateType(id);
 
+        auto processor = m_queryProcessor->getAccess(this->prepareAuditRecord(request));
         // `std::type_identity` (or similar) can be used to pass the read type info and avoid
         // useless `readType` object instantiation.
         const auto query =
@@ -121,37 +120,15 @@ public:
         return updateCombinedEtag(std::move(id), std::move(result), request, responseAttributes);
     }
 
-    void delete_(DeleteInput id, const Request& request, ResponseAttributes* responseAttributes)
+    void delete_(DeleteInput id, const Request& request)
     {
         using namespace details;
         using namespace nx::utils::model;
 
-        auto d = static_cast<Derived*>(this);
-        const bool isNotification =
-            request.jsonRpcContext() && request.jsonRpcContext()->subscribed;
-        nx::utils::Guard guard;
-        if (responseAttributes)
-        {
-            auto lock = m_etags.lock();
-            if (auto etags = lock->getValue(request.userSession.access.userId))
-            {
-                nx::network::http::insertOrReplaceHeader(&responseAttributes->httpHeaders,
-                    {"ETag", nx::utils::toHex(etags->get().remove(d->subscriptionId(getId(id))))});
-            }
-            else if (isNotification)
-            {
-                // CollectionHash for all items.
-                guard = nx::utils::Guard([&]() { d->read({}, request, responseAttributes); });
-            }
-        }
-
-        if (isNotification)
-            return; //< Do nothing as this is a notification for a WebSocket connection.
-
-        auto processor = m_queryProcessor->getAccess(d->prepareAuditRecord(request));
-        validateType(processor, getId(id), m_objectType);
+        validateType(getId(id));
 
         std::promise<Result> promise;
+        auto processor = m_queryProcessor->getAccess(this->prepareAuditRecord(request));
         processor.processCustomUpdateAsync(
             ApiCommand::CompositeSave,
             [&promise](Result result) { promise.set_value(std::move(result)); },
@@ -178,10 +155,10 @@ public:
         }
         else
         {
+            validateType(nx::utils::model::getId(data));
+            validateResourceTypeId(data);
             std::promise<Result> promise;
             auto processor = m_queryProcessor->getAccess(this->prepareAuditRecord(request));
-            validateType(processor, nx::utils::model::getId(data), m_objectType);
-            validateResourceTypeId(data);
             processor.processCustomUpdateAsync(
                 ApiCommand::CompositeSave,
                 [&promise](Result result) { promise.set_value(std::move(result)); },
@@ -279,7 +256,10 @@ protected:
             etag = etags.combinedHash();
             if (processJsonRpcEtag)
             {
-                m_etags.lock()->put(request.userSession.access.userId, std::move(etags));
+                {
+                    auto lock = m_subscriptions.lock();
+                    (*lock)[request.jsonRpcContext()->connection.id].etags = std::move(etags);
+                }
                 auto providedEtag =
                     nx::network::http::getHeaderValue(request.httpHeaders(), "If-None-Match");
                 if (!providedEtag.empty()
@@ -296,13 +276,14 @@ protected:
         {
             nx::network::rest::CollectionHash::Item item{
                 d->subscriptionId(id), nx::reflect::json::serialize(result.front())};
-            auto lock = m_etags.lock();
-            if (auto etags = lock->getValue(request.userSession.access.userId))
+            if (processJsonRpcEtag)
             {
-                if (processJsonRpcEtag)
+                auto lock = m_subscriptions.lock();
+                if (auto it = lock->find(request.jsonRpcContext()->connection.id);
+                    it != lock->end() && it->second.etags)
                 {
                     bool changed = false;
-                    std::tie(etag, changed) = etags->get().calculate(std::move(item));
+                    std::tie(etag, changed) = it->second.etags->calculate(std::move(item));
                     // NOTE: Here we considering that item is not changed only for notifications.
                     // Initial subscription request for single item always sends item in response
                     // because of current limitations.
@@ -311,25 +292,14 @@ protected:
                 }
                 else
                 {
-                    nx::network::rest::CollectionHash copy{etags->get()};
-                    etag = copy.calculate(std::move(item)).first;
+                    nx::network::rest::CollectionHash etags;
+                    etag = etags.calculate(std::move(item)).first;
                 }
             }
             else
             {
-                lock.unlock();
-                if (processJsonRpcEtag)
-                {
-                    d->read({}, request, responseAttributes); //< Fill m_etags for the usage below.
-                    lock = m_etags.lock();
-                    if (auto etags = lock->getValue(request.userSession.access.userId))
-                        etag = etags->get().calculate(std::move(item)).first;
-                }
-                else
-                {
-                    nx::network::rest::CollectionHash etags;
-                    etag = etags.calculate(std::move(item)).first;
-                }
+                nx::network::rest::CollectionHash etags;
+                etag = etags.calculate(std::move(item)).first;
             }
         }
         if (!etag.empty())
@@ -344,10 +314,9 @@ protected:
     void updateDbTypes(T items, const nx::network::rest::Request& request)
     {
         using namespace details;
-        auto processor = m_queryProcessor->getAccess(this->prepareAuditRecord(request));
         const auto& mainDbItem = std::get<0>(items);
         auto id = nx::utils::model::getId(mainDbItem);
-        validateType(processor, id, m_objectType);
+        validateType(id);
         validateResourceTypeId(mainDbItem);
         static_cast<Derived*>(this)->checkSavePermission(request.userSession.access, mainDbItem);
         using IgnoredDbType = std::decay_t<decltype(mainDbItem)>;
@@ -375,6 +344,7 @@ protected:
                 return result;
             };
         std::promise<Result> promise;
+        auto processor = m_queryProcessor->getAccess(this->prepareAuditRecord(request));
         processor.processCustomUpdateAsync(
             ApiCommand::CompositeSave,
             [&promise](Result result) { promise.set_value(std::move(result)); },
@@ -418,23 +388,130 @@ protected:
         std::optional<nx::Uuid> user = {},
         bool noEtag = false)
     {
+        constexpr int kNone = 0;
+        constexpr int kAll = 1 << 0;
+        constexpr int kOne = 1 << 1;
+        constexpr int kBoth = kAll | kOne;
+        auto ignore =
+            [&](const auto& connection)
+            {
+                auto lock = m_subscriptions.lock();
+                auto it = lock->find(connection);
+                if (it == lock->end())
+                    return kBoth;
+
+                int r = kNone;
+                for (auto [id_, ignore]: {std::pair{id, kOne}, std::pair{QString("*"), kAll}})
+                {
+                    auto n = it->second.notifications.find(id_);
+                    if (n == it->second.notifications.end())
+                    {
+                        r |= ignore;
+                        continue;
+                    }
+                    if (n->second)
+                    {
+                        auto& v = *n->second;
+                        v.push_back({id, notifyType, user, noEtag});
+                        if (const auto size = v.size(); size > 1 && v[size - 1] == v[size - 2])
+                            v.pop_back();
+                        r |= ignore;
+                    }
+                }
+                return r;
+            };
         switch (notifyType)
         {
             case NotifyType::update:
+            {
                 using List = typename nx::traits::FunctionTraits<&Derived::read>::ReturnType;
                 using Data = typename List::value_type;
-                SubscriptionHandler::notifyWithPayload<Data>(id, notifyType, std::move(user),
-                    [this, id, noEtag](const auto& user)
+                auto callbacks = SubscriptionHandler::callbacks(id, std::move(user),
+                    [this](const auto& request) { return makePostProcessContext(request); });
+                for (auto& [user, connections]: callbacks)
+                {
+                    nx::network::rest::json_rpc::Payload<Data> payload;
+                    for (auto& [connection, callbacks]: connections)
                     {
-                        return payloadForUpdate<Data>(id, user, noEtag);
-                    },
-                    [this](const auto& request) { return makePostProcessContext(request); },
-                    this->m_schemas.get());
+                        const int ignore_ = ignore(connection.id);
+                        if (ignore_ == kBoth)
+                            continue;
+
+                        if (!payload.data)
+                        {
+                            payload = payloadForUpdate<Data>(id, user, noEtag, connection);
+                            if (!payload.data)
+                                continue;
+                        }
+                        rapidjson::Document extensions;
+                        if (payload.extensions)
+                        {
+                            extensions =
+                                nx::json::serialized(*payload.extensions, /*stripDefault*/ false);
+                        }
+                        for (auto& [subscriptionId, callback, postProcess]: callbacks)
+                        {
+                            if ((ignore_ == kOne && subscriptionId != "*")
+                                || (ignore_ == kAll && subscriptionId == "*"))
+                            {
+                                continue;
+                            }
+
+                            auto& data = *payload.data;
+                            nx::network::rest::detail::filter(&data, postProcess.filters);
+                            nx::network::rest::detail::orderBy(&data, postProcess.filters);
+                            auto document = nx::network::rest::json::serialize(data,
+                                std::move(postProcess.filters),
+                                postProcess.defaultValueAction);
+                            this->m_schemas->postprocessResponse(
+                                postProcess.method, postProcess.path, &document);
+                            (*callback)(id, notifyType, &document, &extensions);
+                        }
+                    }
+                }
                 break;
+            }
             case NotifyType::delete_:
-                SubscriptionHandler::notifyWithPayload<DeleteInput>(id, notifyType, std::move(user),
-                    [this, id, noEtag](const auto& u) { return payloadForDelete(id, u, noEtag); });
+            {
+                auto callbacks = SubscriptionHandler::callbacks(id, std::move(user));
+                for (auto& [user, connections]: callbacks)
+                {
+                    for (auto& [connection, callbacks]: connections)
+                    {
+                        const int ignore_ = ignore(connection.id);
+                        if (ignore_ == kBoth)
+                            continue;
+
+                        auto data = nx::json::serialized(DeleteInput{id}, /*stripDefault*/ false);
+                        rapidjson::Document extensions;
+                        {
+                            auto lock = m_subscriptions.lock();
+                            if (auto it = lock->find(connection.id);
+                                it != lock->end() && it->second.etags)
+                            {
+                                auto etag = it->second.etags->remove(id);
+                                if (!noEtag)
+                                {
+                                    extensions = nx::json::serialized(
+                                        nx::network::rest::json_rpc::ClientExtensions{
+                                            nx::utils::toHex(etag)},
+                                        /*stripDefault*/ false);
+                                }
+                            }
+                        }
+                        for (auto& [subscriptionId, callback]: callbacks)
+                        {
+                            if (ignore_ == kNone
+                                || (ignore_ == kOne && subscriptionId == "*")
+                                || (ignore_ == kAll && subscriptionId != "*"))
+                            {
+                                (*callback)(id, notifyType, &data, &extensions);
+                            }
+                        }
+                    }
+                }
                 break;
+            }
         }
     }
 
@@ -443,7 +520,7 @@ protected:
 
 private:
     template<typename T>
-    void validateType(const auto& processor, const T& id, ApiObjectType requiredType)
+    void validateType(const T& id)
     {
         if (!static_cast<Derived*>(this)->isValidType(id))
         {
@@ -454,7 +531,10 @@ private:
 
     template<typename T>
     nx::network::rest::json_rpc::Payload<T> payloadForUpdate(
-        const QString& id, const nx::Uuid& user, bool noEtag)
+        const QString& id,
+        const nx::Uuid& user,
+        bool noEtag,
+        nx::network::rest::json_rpc::WeakConnection connection)
     {
         using namespace nx::network::rest;
         json_rpc::Payload<T> result;
@@ -462,7 +542,7 @@ private:
         {
             ResponseAttributes responseAttributes;
             auto list = static_cast<Derived*>(this)->read(
-                {id}, payloadRequest(id, user), &responseAttributes);
+                {id}, payloadRequest(id, user, std::move(connection)), &responseAttributes);
             if (!list.empty())
             {
                 result.data = std::move(list.front());
@@ -479,32 +559,6 @@ private:
         catch (const Exception& e)
         {
             NX_VERBOSE(this, "Failed read() for notification %1: %2", id, e);
-        }
-        return result;
-    }
-
-    nx::network::rest::json_rpc::Payload<DeleteInput> payloadForDelete(
-        const QString& id, const nx::Uuid& user, bool noEtag)
-    {
-        using namespace nx::network::rest;
-        json_rpc::Payload<DeleteInput> result{DeleteInput{id}};
-        if (noEtag)
-            return result;
-
-        try
-        {
-            ResponseAttributes responseAttributes;
-            static_cast<Derived*>(this)->delete_(
-                {id}, payloadRequest(id, user), &responseAttributes);
-            if (auto it = responseAttributes.httpHeaders.find("ETag");
-                it != responseAttributes.httpHeaders.end())
-            {
-                result.extensions.emplace().etag = it->second;
-            }
-        }
-        catch (const Exception& e)
-        {
-            NX_VERBOSE(this, "Failed delete_() for notification %1: %2", id, e);
         }
         return result;
     }
@@ -573,10 +627,120 @@ private:
             });
     }
 
+    virtual nx::utils::Guard subscribe(
+        nx::network::rest::Handler::SubscriptionResponseHandler handler,
+        Request request,
+        SubscriptionCallback callback) override
+    {
+        using namespace nx::network::rest;
+        auto subscriptionId = request.jsonRpcContext()->subscriptionId;
+        auto connection = request.jsonRpcContext()->connection.id;
+        nx::utils::Guard ownGuard{
+            [this, subscriptionId, connection]
+            {
+                auto lock = m_subscriptions.lock();
+                if (auto it = lock->find(connection); it != lock->end())
+                {
+                    it->second.notifications.erase(subscriptionId);
+                    if (subscriptionId == "*")
+                        it->second.etags.reset();
+                    if (it->second.notifications.empty())
+                        lock->erase(it);
+                }
+            }};
+
+        // Prepare place to collect subscription notifications. Turn of usual notification
+        // processing.
+        auto processor = m_queryProcessor->getAccess(this->prepareAuditRecord(request));
+        {
+            std::promise<void> p;
+            std::future<void> f = p.get_future();
+            processor.processCustomUpdateAsync(ApiCommand::NotDefined,
+                [p = std::move(p)](auto&&...) mutable { p.set_value(); },
+                [this, subscriptionId, connection](auto& /*copy*/, auto list)
+                {
+                    list->push_back(
+                        [this, subscriptionId, connection]()
+                        {
+                            {
+                                auto lock = m_subscriptions.lock();
+                                auto& s = (*lock)[connection];
+                                s.notifications[subscriptionId] = Notifications{};
+                            }
+                            NX_VERBOSE(this,
+                                "Start ignoring subscription %1 for connection %2",
+                                subscriptionId, connection);
+                        });
+                    return Result();
+                });
+            f.wait();
+        }
+
+        auto response = nx::network::rest::json_rpc::to(
+            request.jsonRpcContext()->request.responseId(), this->executeGet(request));
+
+        // Add subscription - start collection of notifications instead of sending them to
+        // connection.
+        auto guard =
+            static_cast<Derived*>(this)->addSubscription(std::move(request), std::move(callback));
+
+        // Send subscribe response to connection.
+        handler(std::move(response));
+
+        // Send collected notifications if any and switch to usual notification processing.
+        processor.processCustomUpdateAsync(ApiCommand::NotDefined,
+            [](auto&&...) {},
+            [this, subscriptionId, connection](auto& /*copy*/, auto list)
+            {
+                list->push_back(
+                    [this, subscriptionId, connection]()
+                    {
+                        Notifications notifications;
+                        {
+                            auto lock = m_subscriptions.lock();
+                            if (auto it = lock->find(connection); it != lock->end())
+                            {
+                                auto n = it->second.notifications.find(subscriptionId);
+                                if (n != it->second.notifications.end() && n->second)
+                                {
+                                    notifications = std::move(*n->second);
+                                    n->second.reset();
+                                }
+                            }
+                        }
+                        NX_VERBOSE(this,
+                            "Stop ignoring subscription %1 for connection %2, collected %3",
+                            subscriptionId, connection, notifications.size());
+                        auto d = static_cast<Derived*>(this);
+                        for (auto& n: notifications)
+                        {
+                            std::apply(
+                                [d](auto&&... args)
+                                {
+                                    d->notify(std::forward<decltype(args)>(args)...);
+                                },
+                                std::move(n));
+                        }
+                    });
+                return Result();
+            });
+        return {[g1 = std::move(guard), g2 = std::move(ownGuard)]() {}};
+    }
+
+private:
+    struct Subscriptions
+    {
+        using Notification = std::tuple<QString, NotifyType, std::optional<nx::Uuid>, bool>;
+        using Notifications = std::vector<Notification>;
+        std::map<QString, std::optional<Notifications>> notifications;
+        std::optional<nx::network::rest::CollectionHash> etags;
+    };
+
+    using Notifications = Subscriptions::Notifications;
+
 private:
     static constexpr ApiObjectType m_objectType = details::commandToObjectType(DeleteCommand);
-    nx::Lockable<nx::utils::TimeOutCache<nx::Uuid, nx::network::rest::CollectionHash>> m_etags{
-        /*expirationPeriod*/ std::chrono::seconds{60}, /*maxSize*/ 100};
+    nx::Lockable<std::map<size_t, Subscriptions>> m_subscriptions;
 };
 
 } // namespace ec2

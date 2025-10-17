@@ -19,6 +19,7 @@
 
 #include "handler.h"
 #include "json.h"
+#include "json_rpc/client_extensions.h"
 
 namespace nx::network::rest {
 
@@ -140,7 +141,8 @@ protected:
     virtual Response executePut(const Request& request) override;
     virtual Response executeDelete(const Request& request) override;
     virtual QString subscriptionId(const Request& request) override;
-    virtual nx::utils::Guard subscribe(Request request, SubscriptionCallback callback) override;
+    virtual nx::utils::Guard subscribe(
+        SubscriptionResponseHandler handler, Request request, SubscriptionCallback callback) override;
     virtual QString idParamName() const override { return m_idParamName; }
 
     template<typename T>
@@ -719,13 +721,16 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
 }
 
 template<typename Derived>
-nx::utils::Guard CrudHandler<Derived>::subscribe(Request request, SubscriptionCallback callback)
+nx::utils::Guard CrudHandler<Derived>::subscribe(
+    SubscriptionResponseHandler handler, Request request, SubscriptionCallback callback)
 {
     NX_ASSERT(!request.jsonRpcContext()->subscriptionId.isEmpty(),
         "Id must be filled by setJsonRpcSubscriptionId()");
     if constexpr (requires { &Derived::addSubscription; })
     {
-        return static_cast<Derived*>(this)->addSubscription(std::move(request), std::move(callback));
+        handler(json_rpc::to(request.jsonRpcContext()->request.responseId(), executeGet(request)));
+        return static_cast<Derived*>(this)->addSubscription(
+            std::move(request), std::move(callback));
     }
     else
     {
