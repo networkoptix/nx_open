@@ -64,6 +64,8 @@ Dialog
 
     title: qsTr("Event Rules")
 
+    ContextHelp.topicId: HelpTopic.EventsActions
+
     width: 1177
     height: 745
     minimumWidth: 800
