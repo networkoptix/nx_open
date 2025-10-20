@@ -153,11 +153,16 @@ int HelpTopicAccessor::helpTopicAt(QWidget* widget, const QPoint& pos, bool bubb
             if (QAbstractItemModel* model = view->model())
             {
                 QPoint viewportPos = view->viewport()->mapFrom(view, widgetPos);
-                topicId = qvariant_cast<int>(
-                    model->data(view->indexAt(viewportPos), Qn::HelpTopicIdRole),
-                    HelpTopic::Id::Empty);
-                if (topicId != HelpTopic::Id::Empty)
-                    return topic(topicId);
+                const auto index = view->indexAt(viewportPos);
+                if (index.isValid())
+                {
+                    topicId = qvariant_cast<int>(
+                        model->data(index, Qn::HelpTopicIdRole),
+                        HelpTopic::Id::Empty);
+
+                    if (topicId != HelpTopic::Id::Empty)
+                        return topic(topicId);
+                }
             }
         }
 
