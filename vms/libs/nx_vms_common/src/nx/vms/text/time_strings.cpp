@@ -54,6 +54,31 @@ QString QnTimeStrings::longSuffix(Suffix value)
     return QString();
 }
 
+QString QnTimeStrings::fullSuffix(Suffix value)
+{
+    switch (value)
+    {
+        case Suffix::Milliseconds:
+            return tr("milliseconds");
+        case Suffix::Seconds:
+            return tr("seconds");
+        case Suffix::Minutes:
+            return tr("minutes");
+        case Suffix::Hours:
+            return tr("hours");
+        case Suffix::Days:
+            return tr("days");
+        case Suffix::Weeks:
+            return tr("weeks");
+        case Suffix::Months:
+            return tr("months");
+        case Suffix::Years:
+            return tr("years");
+    }
+
+    return QString();
+}
+
 QString QnTimeStrings::fullSuffix(Suffix value, int count)
 {
     switch (value)
@@ -99,6 +124,31 @@ QString QnTimeStrings::longSuffixCapitalized(Suffix value)
             return tr("Mos", "Numerus: Capitalized long suffix for displaying months");
         case Suffix::Years:
             return tr("Yrs", "Numerus: Capitalized long suffix for displaying years");
+    }
+
+    return QString();
+}
+
+QString QnTimeStrings::fullSuffixCapitalized(Suffix value)
+{
+    switch (value)
+    {
+        case Suffix::Milliseconds:
+            return tr("Milliseconds");
+        case Suffix::Seconds:
+            return tr("Seconds");
+        case Suffix::Minutes:
+            return tr("Minutes");
+        case Suffix::Hours:
+            return tr("Hours");
+        case Suffix::Days:
+            return tr("Days");
+        case Suffix::Weeks:
+            return tr("Weeks");
+        case Suffix::Months:
+            return tr("Months");
+        case Suffix::Years:
+            return tr("Years");
     }
 
     return QString();
