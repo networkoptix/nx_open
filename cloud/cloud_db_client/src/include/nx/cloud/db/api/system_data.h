@@ -630,6 +630,11 @@ struct SystemDataEx: SystemData
      */
     std::optional<SystemSyncInfo> syncInfo;
 
+    /**%apidoc Indicates whether the system is shared directly with the user.
+     *  Present only for org systems.
+     */
+    std::optional<bool> sharedDirectly;
+
     SystemDataEx() = default;
 
     SystemDataEx(SystemData systemData):
@@ -643,7 +648,7 @@ struct SystemDataEx: SystemData
 // TODO: #akolesnikov Move NX_REFLECTION_INSTRUMENT for other types here as well.
 NX_REFLECTION_INSTRUMENT(SystemDataEx,
     (accessRole)(roleIds)(permissions)(stateOfHealth)(usageFrequency)(lastLoginTime)(mergeInfo) \
-    (capabilities)(version)(organizationName)(syncInfo))
+    (capabilities)(version)(organizationName)(syncInfo)(sharedDirectly))
 
 // Providing custom JSON serialization functions so that SystemDataEx::attributes are added on the
 // same level with other fields in the resulting JSON document.
