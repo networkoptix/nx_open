@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QString>
-#include <QtNetwork/QAuthenticator>
 
 #include <nx/vms/api/data/data_macros.h>
 
@@ -53,7 +52,6 @@ public:
     Q_INVOKABLE bool isValid() const;
 
     QString asString() const;
-    QAuthenticator toQAuthenticator() const;
 };
 #define Credentials_Fields (user)(password)
 NX_VMS_API_DECLARE_STRUCT_EX(Credentials, (csv_record)(json)(ubjson)(xml))

@@ -45,12 +45,4 @@ QString Credentials::asString() const
     return !password.isEmpty() ? (user + ':' + password) : user;
 }
 
-QAuthenticator Credentials::toQAuthenticator() const
-{
-    QAuthenticator auth;
-    auth.setUser(user);
-    auth.setPassword(password);
-    return auth;
-}
-
 } // namespace nx::vms::api
