@@ -112,6 +112,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "trigger_camera_output.html";
         case Id::EventsActions_Diagnostics:
             return "write_to_log.html";
+        case Id::EventsActions_Editor:
+            return "event_rule_advanced_settigns_f.html";
         case Id::EventsActions_EmailNotSet:
             return "e-mail_is_not_set_for_users.html";
         case Id::EventsActions_EmailServerNotSet:
