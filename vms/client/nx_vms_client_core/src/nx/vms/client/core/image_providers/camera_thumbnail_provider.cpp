@@ -10,6 +10,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/video_cache.h>
+#include <nx/vms/common/pixelation/pixelation_settings.h>
 
 #include "camera_thumbnail_manager.h"
 
@@ -116,8 +117,11 @@ bool CameraThumbnailProvider::tryLoad()
 
     auto systemContext = SystemContext::fromResource(m_request.camera);
     auto cache = systemContext->videoCache();
-    if (!cache || nx::api::CameraImageRequest::isSpecialTimeValue(m_request.timestampMs))
+    if (!cache || nx::api::CameraImageRequest::isSpecialTimeValue(m_request.timestampMs)
+        || systemContext->pixelationSettings()->isAllTypes() || !systemContext->pixelationSettings()->objectTypeIds().empty())
+    {
         return false;
+    }
 
     std::chrono::microseconds requiredTime(m_request.timestampMs);
     std::chrono::microseconds actualTime{};
