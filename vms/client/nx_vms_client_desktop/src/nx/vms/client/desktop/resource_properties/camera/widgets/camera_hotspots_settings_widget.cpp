@@ -14,6 +14,8 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/camera_hotspots_item_delegate.h>
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/camera_hotspots_item_model.h>
@@ -245,6 +247,8 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
 {
     d->setupUi();
     d->ui->hotspotsEditorWidget->setThumbnail(thumbnail);
+
+    setHelpTopic(this, HelpTopic::Id::CameraSettings_Hotspots);
 
     connect(store, &CameraSettingsDialogStore::stateChanged, this,
         [this](const CameraSettingsDialogState& state)

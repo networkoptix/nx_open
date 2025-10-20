@@ -36,6 +36,7 @@ public:
         CameraSettings_Expert_DisableArchivePrimary,
         CameraSettings_Expert_Rtp,
         CameraSettings_Expert_SettingsControl,
+        CameraSettings_Hotspots,
         CameraSettings,
         CameraSettings_Motion,
         CameraSettings_Recording_ArchiveLength,
