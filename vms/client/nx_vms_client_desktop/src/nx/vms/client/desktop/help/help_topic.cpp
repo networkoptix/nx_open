@@ -170,6 +170,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "storages_misconfiguration.html";
         case Id::EventsActions_VideoAnalytics:
             return "analytics_event.html";
+        case Id::EventRule_AdvancedSettigns:
+            return "event_rule_advanced_settigns_f.html";
         case Id::Exporting:
             return "exporting.html";
         case Id::ForceSecureConnections:

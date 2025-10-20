@@ -89,6 +89,7 @@ public:
         EventsActions_StorageFailure,
         EventsActions_StoragesMisconfigured,
         EventsActions_VideoAnalytics,
+        EventRule_AdvancedSettigns,
         Exporting,
         ForceSecureConnections,
         IOModules,

@@ -16,6 +16,8 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/panel.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -72,6 +74,8 @@ EditVmsRuleDialog::EditVmsRuleDialog(WindowContext* context, QWidget* parent):
 {
     resize(985, 704);
     setMinimumSize(QSize(800, 600));
+
+    setHelpTopic(this, HelpTopic::Id::EventRule_AdvancedSettigns);
 
     setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark7"));
 
