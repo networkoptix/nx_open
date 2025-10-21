@@ -30,7 +30,6 @@ public:
         registerKey<QnIOPortDataList>(ResourceDataKey::kIoSettings);
         registerKey<QList<nx::vms::api::Credentials>>(
             ResourceDataKey::kPossibleDefaultCredentials);
-        registerKey<nx::vms::api::Credentials>(ResourceDataKey::kForcedDefaultCredentials);
         registerKey<QList<QnResourceChannelMapping>>(
             ResourceDataKey::kMultiresourceVideoChannelMapping);
         registerKey<QnHttpConfigureRequestList>(ResourceDataKey::kPreStreamConfigureRequests);

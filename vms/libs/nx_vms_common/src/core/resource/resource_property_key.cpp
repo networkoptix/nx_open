@@ -27,7 +27,6 @@ namespace ResourceDataKey {
 const QString kPossibleDefaultCredentials("possibleDefaultCredentials");
 const QString kMaxFps("MaxFPS");
 const QString kPreferredAuthScheme("preferredAuthScheme");
-const QString kForcedDefaultCredentials("forcedDefaultCredentials");
 const QString kDesiredTransport("desiredTransport");
 const QString kOnvifInputPortAliases("onvifInputPortAliases");
 const QString kOnvifManufacturerReplacement("onvifManufacturerReplacement");

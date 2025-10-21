@@ -61,7 +61,6 @@ namespace ResourceDataKey {
 NX_VMS_COMMON_API extern const QString kPossibleDefaultCredentials;
 NX_VMS_COMMON_API extern const QString kMaxFps;
 NX_VMS_COMMON_API extern const QString kPreferredAuthScheme;
-NX_VMS_COMMON_API extern const QString kForcedDefaultCredentials;
 NX_VMS_COMMON_API extern const QString kDesiredTransport;
 NX_VMS_COMMON_API extern const QString kOnvifInputPortAliases;
 NX_VMS_COMMON_API extern const QString kOnvifManufacturerReplacement;
