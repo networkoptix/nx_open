@@ -187,7 +187,7 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex& index) const
     return result;
 }
 
-QString QnRecordingStatsModel::tooltipText(Columns column) const
+QString QnRecordingStatsModel::tooltipText(Columns /*column*/) const
 {
     return QString(); //< We currently decided to skip tooltips.
 }

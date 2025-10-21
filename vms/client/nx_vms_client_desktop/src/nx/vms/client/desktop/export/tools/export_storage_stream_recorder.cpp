@@ -121,16 +121,6 @@ void ExportStorageStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& m
         if (videoResult && videoResult->dataSize() > 0)
             StorageRecordingContext::writeData(videoResult, streamIndex);
     }
-    else if (md->dataType == QnAbstractMediaData::GENERIC_METADATA)
-    {
-        QnAbstractMediaDataPtr result;
-        if (auto metadata = std::dynamic_pointer_cast<const QnCompressedMetadata>(md);
-        metadata && metadata->metadataType == MetadataType::ObjectDetection)
-        {
-            if (m_videoTranscoder && m_videoTranscoder->getFilterChain())
-            m_videoTranscoder->getFilterChain()->processMetadata(metadata);
-        }
-    }
     else
     {
         StorageRecordingContext::writeData(md, streamIndex);
@@ -479,6 +469,9 @@ bool ExportStorageStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md
                 return false;
             }
         }
+
+        if (metadata->metadataType == MetadataType::ObjectDetection && m_videoTranscoder)
+            m_videoTranscoder->processMetadata(metadata);
     }
 
     return QnStreamRecorder::saveData(md);

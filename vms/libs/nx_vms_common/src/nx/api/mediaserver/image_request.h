@@ -6,6 +6,7 @@
 #include <QtCore/QSize>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/network/rest/request.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/vms/api/data/thumbnail_filter.h>
 
@@ -23,6 +24,7 @@ struct NX_VMS_COMMON_API CameraImageRequest: ImageRequest
 {
     nx::Uuid objectTrackId;
     QnVirtualCameraResourcePtr camera;
+    bool pixelation = false;
 
     CameraImageRequest() = default;
 

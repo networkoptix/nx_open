@@ -195,11 +195,7 @@ using namespace nx::vms::common;
 namespace {
 
 const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
-
-constexpr int kSectionHeight = 20;
-
 constexpr qint64 kOneDayOffsetMs = 60 * 60 * 24 * 1000;
-
 constexpr qint64 kOneWeekOffsetMs = kOneDayOffsetMs * 7;
 
 } // namespace

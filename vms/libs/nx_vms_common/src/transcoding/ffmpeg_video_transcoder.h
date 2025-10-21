@@ -9,6 +9,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/analytics/caching_metadata_consumer.h>
 #include <nx/core/transcoding/filters/filter_chain.h>
 #include <nx/media/ffmpeg/frame_info.h>
 #include <nx/media/video_data_packet.h>
@@ -54,7 +55,6 @@ public:
 
     // Should call before open
     void setFilterChain(nx::core::transcoding::FilterChainPtr filters);
-    nx::core::transcoding::FilterChain* getFilterChain() const;
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
     virtual bool open(const QnConstCompressedVideoDataPtr& video);
@@ -64,6 +64,9 @@ public:
 
     //!Returns picture size (in pixels) of output video stream
     QSize getOutputResolution() const;
+
+    // Process metadata, required for the pixelation filter.
+    void processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata);
 
 private:
     int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
@@ -93,6 +96,7 @@ private:
     nx::metric::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;
     std::optional<int64_t> m_lastEncodedPts;
+    nx::analytics::CachingMetadataConsumer<QnConstAbstractCompressedMetadataPtr> m_metadataCache;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

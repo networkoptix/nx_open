@@ -21,11 +21,10 @@ public:
         std::chrono::microseconds timestamp,
         int channel) const = 0;
 
-    virtual QList<nx::common::metadata::ObjectMetadataPacketPtr> metadataRange(
+    virtual std::list<nx::common::metadata::ObjectMetadataPacketPtr> metadataRange(
         std::chrono::microseconds startTimestamp,
         std::chrono::microseconds endTimestamp,
-        int channel,
-        int maximumCount = std::numeric_limits<int>::max()) const = 0;
+        int channel) const = 0;
 };
 
 } // namespace nx::vms::client::core

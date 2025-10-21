@@ -43,7 +43,7 @@ public:
         m_metadataByTimestamp.insert({timestampUs(metadata), metadata});
     }
 
-    QList<T> findMetadataInRange(
+    std::list<T> findMetadataInRange(
         const qint64 startTimestamp, const qint64 endTimestamp, bool isForward, int maxCount) const
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
@@ -51,7 +51,7 @@ public:
         if (m_metadataByTimestamp.empty())
             return {};
 
-        QList<T> result;
+        std::list<T> result;
 
         if (isForward)
         {
@@ -61,7 +61,7 @@ public:
                 && timestampUs(it->second) < endTimestamp)
             {
                 if (NX_ASSERT(it->second, "Metadata cache should not hold null metadata pointers."))
-                    result.append(it->second);
+                    result.push_back(it->second);
 
                 ++it;
                 --maxCount;
@@ -79,7 +79,7 @@ public:
                     if (timestampUs(it->second) < startTimestamp)
                         break;
 
-                    result.prepend(it->second);
+                    result.push_front(it->second);
                     --maxCount;
                 }
             }
@@ -173,10 +173,9 @@ QnMetaDataV1Ptr MetadataCache<QnMetaDataV1Ptr>::uncompress(
 
 template<>
 QnMetaDataV1Ptr MetadataCache<QnMetaDataV1Ptr>::uncompress(
-    const QnConstAbstractCompressedMetadataPtr& )
+    const QnConstAbstractCompressedMetadataPtr& metadata)
 {
-    NX_ASSERT(false, "Should never be called");
-    return nullptr;
+    return QnMetaDataV1Ptr(std::dynamic_pointer_cast<const QnMetaDataV1>(metadata)->clone());
 }
 
 template<>
@@ -311,13 +310,14 @@ T CachingMetadataConsumer<T>::metadata(
     if (!cache)
         return T();
 
+    // TODO Change it to lower_bound??
     auto list = cache->findMetadataInRange(
         0, timestamp.count() + 1, //< Look for the data in a range from the beginning to timestamp.
         false, 1); //< Take the newest one of them (the one that's in the back of the queue buffer).
 
     if (!list.empty())
     {
-        const auto& ptr = list.first();
+        const auto& ptr = list.front();
         if (MetadataCache<T>::containsTime(ptr, timestamp.count()))
             return ptr;
     }
@@ -326,46 +326,24 @@ T CachingMetadataConsumer<T>::metadata(
 }
 
 template<typename T>
-QList<T> CachingMetadataConsumer<T>::metadataRange(
+std::list<T> CachingMetadataConsumer<T>::metadataRange(
     microseconds startTimestamp,
     microseconds endTimestamp,
-    int channel,
-    PickingPolicy pickingPolicy,
-    int maximumCount) const
+    int channel) const
 {
     if (channel >= d->cachePerChannel.size())
-        return QList<T>();
+        return std::list<T>();
 
     const auto& cache = d->cachePerChannel[channel];
     if (!cache)
-        return QList<T>();
+        return std::list<T>();
 
     return cache->findMetadataInRange(
-        startTimestamp.count(), endTimestamp.count(),
-        pickingPolicy == PickingPolicy::TakeFirst, maximumCount);
+        startTimestamp.count(), endTimestamp.count(), true, std::numeric_limits<int>::max());
 }
 
 template<typename T>
 void CachingMetadataConsumer<T>::processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata)
-{
-    NX_VERBOSE(this, "Metadata packet received, %1, timestamp %2",
-        metadataRepresentation(metadata),
-        metadata->timestamp);
-
-    const auto channel = static_cast<int>(metadata->channelNumber);
-    if (d->cachePerChannel.size() <= channel)
-        d->cachePerChannel.resize(channel + 1);
-
-    auto& cache = d->cachePerChannel[channel];
-    if (cache.isNull())
-        cache.reset(new MetadataCache<T>(d->cacheSize));
-
-    const auto uncompressedMetadata = MetadataCache<T>::uncompress(metadata);
-    cache->insertMetadata(uncompressedMetadata);
-}
-
-template<typename T>
-void CachingMetadataConsumer<T>::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
 {
     NX_VERBOSE(this, "Metadata packet received, %1, timestamp %2",
         metadataRepresentation(metadata),

@@ -36,18 +36,15 @@ ObjectMetadataPacketPtr ConsumingAnalyticsMetadataProvider::metadata(
     return d->metadataConsumer->metadata(timestamp, channel);
 }
 
-QList<ObjectMetadataPacketPtr> ConsumingAnalyticsMetadataProvider::metadataRange(
+std::list<ObjectMetadataPacketPtr> ConsumingAnalyticsMetadataProvider::metadataRange(
     microseconds startTimestamp,
     microseconds endTimestamp,
-    int channel,
-    int maximumCount) const
+    int channel) const
 {
     return d->metadataConsumer->metadataRange(
         startTimestamp,
         endTimestamp,
-        channel,
-        nx::analytics::CachingMetadataConsumer<ObjectMetadataPacketPtr>::PickingPolicy::TakeFirst,
-        maximumCount);
+        channel);
 }
 
 QSharedPointer<nx::analytics::AbstractMetadataConsumer>

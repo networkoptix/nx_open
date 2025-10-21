@@ -161,7 +161,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
         connect(m_exportRecorder, &QnStreamRecorder::recordingFinished,
             this, &QnClientVideoCamera::exportFinished);
         connect(m_exportRecorder, &QnStreamRecorder::recordingFinished, this,
-            [this](const std::optional<nx::recording::Error>& reason, const QString& fileName)
+            [this](const std::optional<nx::recording::Error>& reason, const QString& /*fileName*/)
             {
                 if (reason.has_value())
                     NX_VERBOSE(this, "Export finished with error: %1", reason.value().toString());

@@ -6,8 +6,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
-#include <nx/analytics/caching_metadata_consumer.h>
 #include <nx/core/transcoding/filters/transcoding_settings.h>
+#include <nx/media/meta_data_packet.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <transcoding/filters/abstract_image_filter.h>
 
@@ -45,7 +45,7 @@ public:
     void reset();
     bool empty();
 
-    void processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata);
+    void setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata);
     QSize apply(const QSize& resolution) const;
     CLVideoDecoderOutputPtr apply(const CLVideoDecoderOutputPtr& source) const;
 
@@ -69,7 +69,6 @@ private:
     Settings m_settings;
     std::list<QnAbstractImageFilterPtr> m_legacyFilters;
     std::list<QnAbstractImageFilterPtr> m_filters;
-    nx::analytics::CachingMetadataConsumer<QnConstAbstractCompressedMetadataPtr> m_metadataCache;
 };
 
 using FilterChainPtr = std::unique_ptr<FilterChain>;

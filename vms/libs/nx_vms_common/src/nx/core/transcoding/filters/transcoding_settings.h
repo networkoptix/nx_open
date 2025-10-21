@@ -17,7 +17,6 @@
 #include <utils/common/aspect_ratio.h>
 
 #include "../timestamp_format.h"
-#include "nx/vms/common/pixelation/pixelation_settings.h"
 
 namespace nx::core::transcoding {
 
@@ -50,6 +49,7 @@ struct Settings
 
     // Zoom window region, requires transcoding if not empty.
     QRectF zoomWindow;
+    bool zoomWindowAlignSize = true; //< Align result size to power of 2.
 
     // Item dewarping, requires transcoding if enabled.
     nx::vms::api::dewarping::ViewData dewarping;
@@ -64,6 +64,9 @@ struct Settings
     Watermark watermark;
 
     std::optional<nx::vms::api::PixelationSettings> pixelationSettings;
+
+    // The target resolution to which the image will be scaled before other filters.
+    std::optional<QSize> resolution;
 
     QVector<OverlaySettingsPtr> overlays;
 

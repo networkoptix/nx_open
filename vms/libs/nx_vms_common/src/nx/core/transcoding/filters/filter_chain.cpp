@@ -21,7 +21,6 @@ namespace {
 
 static constexpr float kMinStepChangeCoeff = 0.95f;
 static constexpr float kAspectRatioComparisionPrecision = 0.01f;
-static constexpr int kMetadataCashSize = 1000;
 
 } // namespace
 
@@ -31,8 +30,7 @@ const QSize FilterChain::kDefaultResolutionLimit(8192 - 16, 8192 - 16);
 
 FilterChain::FilterChain(const Settings& settings)
     :
-    m_settings(settings),
-    m_metadataCache(MetadataType::ObjectDetection, kMetadataCashSize)
+    m_settings(settings)
 {
 }
 
@@ -40,7 +38,8 @@ void FilterChain::prepare(const QSize& srcFrameResolution, const QSize& resoluti
 {
     NX_ASSERT(!isReady(), "Double initialization");
 
-    prepareVideoArFilter(srcFrameResolution);
+    if (!m_settings.resolution)
+        prepareVideoArFilter(srcFrameResolution);
 
     const auto isPanoramicCamera = m_settings.layout && m_settings.layout->channelCount() > 1;
     if (isPanoramicCamera)
@@ -51,9 +50,16 @@ void FilterChain::prepare(const QSize& srcFrameResolution, const QSize& resoluti
     prepareDewarpingFilter();
     prepareImageEnhancementFilter();
     prepareRotationFilter();
-    prepareDownscaleFilter(srcFrameResolution, resolutionLimit);
+    if (!m_settings.resolution)
+        prepareDownscaleFilter(srcFrameResolution, resolutionLimit);
     prepareOverlaysFilters();
     prepareWatermarkFilter();
+
+    if (m_settings.resolution)
+    {
+        m_filters.push_back(
+            QnAbstractImageFilterPtr(new QnScaleImageFilter(*m_settings.resolution)));
+    }
 
     m_ready = true;
 }
@@ -109,9 +115,13 @@ void FilterChain::reset()
     m_ready = false;
 }
 
-void FilterChain::processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata)
+void FilterChain::setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata)
 {
-    m_metadataCache.processMetadata(metadata);
+    for (auto filter: m_filters)
+    {
+        if (auto pixelationFilter = filter.dynamicCast<PixelationImageFilter>())
+            pixelationFilter->setMetadata(metadata);
+    }
 }
 
 QSize FilterChain::apply(const QSize& resolution) const
@@ -133,15 +143,7 @@ CLVideoDecoderOutputPtr FilterChain::apply(const CLVideoDecoderOutputPtr& source
     result->copyFrom(source.get());
 
     for (auto filter: m_filters)
-    {
-        auto pixelationFilter = filter.dynamicCast<PixelationImageFilter>();
-        if (pixelationFilter)
-        {
-            pixelationFilter->setMetadata(
-                m_metadataCache.metadata(std::chrono::microseconds(source->pkt_dts), source->channel));
-        }
         result = filter->updateImage(result);
-    }
 
     return result;
 }
@@ -204,7 +206,10 @@ void FilterChain::prepareDewarpingFilter()
 void FilterChain::prepareZoomWindowFilter()
 {
     if (!m_settings.zoomWindow.isEmpty() && !m_settings.dewarping.enabled)
-        m_filters.push_back(QnAbstractImageFilterPtr(new QnCropImageFilter(m_settings.zoomWindow)));
+    {
+        m_filters.push_back(QnAbstractImageFilterPtr(
+            new QnCropImageFilter(m_settings.zoomWindow, m_settings.zoomWindowAlignSize)));
+    }
 }
 
 void FilterChain::prepareImageEnhancementFilter()

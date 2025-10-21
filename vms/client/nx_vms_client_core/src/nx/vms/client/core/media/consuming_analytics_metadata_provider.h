@@ -23,11 +23,10 @@ public:
         std::chrono::microseconds timestamp,
         int channel) const override;
 
-    virtual QList<nx::common::metadata::ObjectMetadataPacketPtr> metadataRange(
+    virtual std::list<nx::common::metadata::ObjectMetadataPacketPtr> metadataRange(
         std::chrono::microseconds startTimestamp,
         std::chrono::microseconds endTimestamp,
-        int channel,
-        int maximumCount) const override;
+        int channel) const override;
 
     virtual QSharedPointer<nx::analytics::AbstractMetadataConsumer> metadataConsumer() const override;
 

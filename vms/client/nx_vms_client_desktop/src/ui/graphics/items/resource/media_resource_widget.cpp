@@ -328,7 +328,7 @@ QVector<QRectF> getBoundingBoxes(
         return {};
 
     // Taking metadata within some range.
-    const QList<nx::common::metadata::ObjectMetadataPacketPtr> metadataPackets =
+    const std::list<nx::common::metadata::ObjectMetadataPacketPtr> metadataPackets =
         analyticsProvider->metadataRange(
             timestamp - 1ms,
             timestamp + 1ms,

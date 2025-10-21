@@ -3,12 +3,15 @@
 #pragma once
 
 #include <chrono>
+#include <list>
 
 #include <QtCore/QScopedPointer>
 
 #include "abstract_metadata_consumer.h"
 
 namespace nx::analytics {
+
+static constexpr int kMetadataCashSize = 1000;
 
 template<typename T>
 class NX_VMS_COMMON_API CachingMetadataConsumer: public AbstractMetadataConsumer
@@ -25,20 +28,12 @@ public:
     T metadata(
         std::chrono::microseconds timestamp, int channel) const;
 
-    enum class PickingPolicy
-    {
-        TakeFirst,
-        TakeLast,
-    };
-    QList<T> metadataRange(
+    std::list<T> metadataRange(
         std::chrono::microseconds startTimestamp,
         std::chrono::microseconds endTimestamp,
-        int channel,
-        PickingPolicy pickingPolicy,
-        int maximumCount) const;
+        int channel) const;
 
     void processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata) override;
-    void processMetadata(const QnAbstractCompressedMetadataPtr& metadata) override;
 
 private:
     class Private;

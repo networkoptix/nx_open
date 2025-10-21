@@ -22,11 +22,11 @@ public:
 
     virtual QSize updatedResolution(const QSize& sourceSize) { return sourceSize; };
 
-    void setMetadata(const QnConstAbstractCompressedMetadataPtr& metadata);
+    void setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata);
 
 private:
     nx::vms::api::PixelationSettings m_settings;
-    QnConstAbstractCompressedMetadataPtr m_metadata;
+    std::list<QnConstAbstractCompressedMetadataPtr> m_metadata;
 };
 
 } // nx::core::transcoding

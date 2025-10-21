@@ -283,6 +283,12 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
         metadataPacketData = nx::recording::helpers::serializeMetadataPacket(metadataPacket);
     }
 
+    if (streamIndex >= context.formatCtx->nb_streams)
+    {
+        NX_WARNING(this, "Invalid media data packet: %1, failed to write it to file", md);
+        return;
+    }
+
     AVStream* stream = context.formatCtx->streams[streamIndex];
     NX_ASSERT(stream->time_base.num && stream->time_base.den);
     NX_ASSERT(md->timestamp >= 0);

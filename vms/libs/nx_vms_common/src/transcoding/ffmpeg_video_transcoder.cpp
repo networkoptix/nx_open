@@ -68,7 +68,8 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     const Config& config, nx::metric::Storage* metrics)
     :
     m_config(config),
-    m_metrics(metrics)
+    m_metrics(metrics),
+    m_metadataCache(MetadataType::ObjectDetection, nx::analytics::kMetadataCashSize)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -342,7 +343,16 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         }
     }
     if (m_filters)
+    {
+        using namespace std::chrono;
+        microseconds timestamp(decodedFrame->pkt_dts);
+        auto metadata = m_metadataCache.metadataRange(
+            timestamp - 1ms,
+            timestamp + 1ms,
+            decodedFrame->channel);
+        m_filters->setMetadata(metadata);
         decodedFrame = m_filters->apply(decodedFrame);
+    }
 
     if (!decodedFrame)
     {
@@ -434,6 +444,11 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     return 0;
 }
 
+void QnFfmpegVideoTranscoder::processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata)
+{
+    m_metadataCache.processMetadata(metadata);
+}
+
 AVCodecContext* QnFfmpegVideoTranscoder::getCodecContext()
 {
     return m_encoderCtx;
@@ -447,9 +462,4 @@ QSize QnFfmpegVideoTranscoder::getOutputResolution() const
 void QnFfmpegVideoTranscoder::setFilterChain(nx::core::transcoding::FilterChainPtr filters)
 {
     m_filters = std::move(filters);
-}
-
-nx::core::transcoding::FilterChain* QnFfmpegVideoTranscoder::getFilterChain() const
-{
-    return m_filters.get();
 }

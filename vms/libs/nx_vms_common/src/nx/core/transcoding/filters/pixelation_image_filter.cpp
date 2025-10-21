@@ -139,7 +139,7 @@ PixelationImageFilter::~PixelationImageFilter()
 {
 }
 
-void PixelationImageFilter::setMetadata(const QnConstAbstractCompressedMetadataPtr& metadata)
+void PixelationImageFilter::setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata)
 {
     m_metadata = metadata;
 }
@@ -147,26 +147,29 @@ void PixelationImageFilter::setMetadata(const QnConstAbstractCompressedMetadataP
 CLVideoDecoderOutputPtr PixelationImageFilter::updateImage(
     const CLVideoDecoderOutputPtr& frame)
 {
-    if (!m_metadata || (m_settings.objectTypeIds.empty() && !m_settings.isAllObjectTypes))
+    if (m_metadata.empty() || (m_settings.objectTypeIds.empty() && !m_settings.isAllObjectTypes))
         return frame;
 
     int w = frame->width;
     int h = frame->height;
     CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput());
     result->copyFrom(frame.get());
-    if (const auto objectDataPacket = objectDataPacketFromMetadata(m_metadata))
+    for (const auto& metadata: m_metadata)
     {
-        for (const auto& objectMetadata: objectDataPacket->objectMetadataList)
+        if (const auto objectDataPacket = objectDataPacketFromMetadata(metadata))
         {
-            if (m_settings.isAllObjectTypes
-                || m_settings.objectTypeIds.contains(objectMetadata.typeId))
+            for (const auto& objectMetadata: objectDataPacket->objectMetadataList)
             {
-                QRect box = { (int)(objectMetadata.boundingBox.x() * w),
-                    (int)(objectMetadata.boundingBox.y() * h),
-                    (int)(objectMetadata.boundingBox.width() * w),
-                    (int)(objectMetadata.boundingBox.height() * h) };
+                if (m_settings.isAllObjectTypes
+                    || m_settings.objectTypeIds.contains(objectMetadata.typeId))
+                {
+                    QRect box = { (int)(objectMetadata.boundingBox.x() * w),
+                        (int)(objectMetadata.boundingBox.y() * h),
+                        (int)(objectMetadata.boundingBox.width() * w),
+                        (int)(objectMetadata.boundingBox.height() * h) };
 
-                pixelate(result, box, (int)(m_settings.intensity * kIntensityToInt));
+                    pixelate(result, box, (int)(m_settings.intensity * kIntensityToInt));
+                }
             }
         }
     }

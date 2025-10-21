@@ -280,7 +280,7 @@ public:
     void updateObjectAreas(microseconds timestamp);
 
     std::vector<Track> fetchTracks(
-        const QList<ObjectMetadataPacketPtr>& objectMetadataPackets,
+        const std::list<ObjectMetadataPacketPtr>& objectMetadataPackets,
         microseconds timestamp) const;
 
 public:
@@ -439,7 +439,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
 }
 
 std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
-    const QList<ObjectMetadataPacketPtr>& objectMetadataPackets,
+    const std::list<ObjectMetadataPacketPtr>& objectMetadataPackets,
     microseconds timestamp) const
 {
     // Left only objects which are to be displayed right now, store tracks for others.
@@ -516,7 +516,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
 
     // Peek some future metatada packets to prolong existing areas' lifetime at least until the
     // latest track id appearance.
-    const QList<ObjectMetadataPacketPtr> objectMetadataPackets = d->metadataProvider->metadataRange(
+    const std::list<ObjectMetadataPacketPtr> objectMetadataPackets = d->metadataProvider->metadataRange(
         timestamp - kMetadataWindowSize,
         timestamp + kMetadataWindowSize,
         channel);
