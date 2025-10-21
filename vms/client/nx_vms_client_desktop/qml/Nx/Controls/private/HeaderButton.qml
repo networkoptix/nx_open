@@ -89,4 +89,10 @@ Button
             primaryColor: control.textColor
         }
     }
+
+    ToolTip
+    {
+        visible: label.implicitWidth > label.width && control.hovered
+        text: control.text
+    }
 }
