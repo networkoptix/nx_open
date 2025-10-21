@@ -13,6 +13,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/client_core_globals.h>
+#include <nx/vms/client/core/event_search/utils/bookmark_search_utils.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
 #include <nx/vms/client/core/event_search/utils/event_search_utils.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
@@ -45,11 +46,6 @@ std::set<nx::Uuid> idsFromCameras(const QnVirtualCameraResourceSet& cameras)
     for (const auto& camera: cameras)
         result.insert(camera->getId());
     return result;
-}
-
-QString formatFilterText(const QString& text)
-{
-    return utils::quoteDelimitedTokens(text, {"OR", "AND"});
 }
 
 QString parseHyperlinks(const QString& text)
