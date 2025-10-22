@@ -6023,7 +6023,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Einde</translation>
+      <translation type="unfinished">End</translation>
     </message>
     <message>
       <source>After Event</source>

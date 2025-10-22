@@ -5913,27 +5913,27 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation>Juga termasuk</translation>
+      <translation type="unfinished">Also include</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>Mulai</translation>
+      <translation type="unfinished">Begin</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>Sebelum Event</translation>
+      <translation type="unfinished">Before Event</translation>
     </message>
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Akhiri</translation>
+      <translation type="unfinished">End</translation>
     </message>
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Setelah Event</translation>
+      <translation type="unfinished">After Event</translation>
     </message>
   </context>
   <context>

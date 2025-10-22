@@ -6022,7 +6022,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Son</translation>
+      <translation type="unfinished">End</translation>
     </message>
     <message>
       <source>After Event</source>

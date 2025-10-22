@@ -5913,27 +5913,27 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation>イベントの</translation>
+      <translation type="unfinished">Also include</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>イベントの</translation>
+      <translation type="unfinished">Begin</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>前も含める</translation>
+      <translation type="unfinished">Before Event</translation>
     </message>
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>イベントの</translation>
+      <translation type="unfinished">End</translation>
     </message>
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>後に終了</translation>
+      <translation type="unfinished">After Event</translation>
     </message>
   </context>
   <context>

@@ -6008,27 +6008,27 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation>Inkludera även</translation>
+      <translation type="unfinished">Also include</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>Börja</translation>
+      <translation type="unfinished">Begin</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>Före händelse</translation>
+      <translation type="unfinished">Before Event</translation>
     </message>
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Slut</translation>
+      <translation type="unfinished">End</translation>
     </message>
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Efter Händelse</translation>
+      <translation type="unfinished">After Event</translation>
     </message>
   </context>
   <context>

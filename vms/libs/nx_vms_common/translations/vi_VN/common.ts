@@ -1866,5 +1866,9 @@
       <source>Encryption key used to encode secure cookie values.</source>
       <translation>Khóa mã hóa được sử dụng để mã hóa các giá trị cookie an toàn.</translation>
     </message>
+    <message>
+      <source>Update interval for public keys from the Cloud.</source>
+      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+    </message>
   </context>
 </TS>

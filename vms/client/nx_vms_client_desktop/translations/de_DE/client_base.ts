@@ -6023,7 +6023,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Ende</translation>
+      <translation type="unfinished">End</translation>
     </message>
     <message>
       <source>After Event</source>

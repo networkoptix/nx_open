@@ -5913,27 +5913,27 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation>Cũng bao gồm</translation>
+      <translation type="unfinished">Also include</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>Bắt đầu</translation>
+      <translation type="unfinished">Begin</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>Trước sự kiện</translation>
+      <translation type="unfinished">Before Event</translation>
     </message>
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Kết thúc</translation>
+      <translation type="unfinished">End</translation>
     </message>
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Sau sự kiện</translation>
+      <translation type="unfinished">After Event</translation>
     </message>
   </context>
   <context>

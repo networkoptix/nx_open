@@ -6023,7 +6023,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Slutt</translation>
+      <translation type="unfinished">End</translation>
     </message>
     <message>
       <source>After Event</source>
