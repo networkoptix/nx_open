@@ -244,6 +244,14 @@
       <source>Copy log ID</source>
       <translation>ログIDをコピー</translation>
     </message>
+    <message>
+      <source>Copy Client ID</source>
+      <translation>クライアントIDをコピー</translation>
+    </message>
+    <message>
+      <source>Force Crash</source>
+      <translation>強制クラッシュ</translation>
+    </message>
   </context>
   <context>
     <name>DeviceSelector</name>

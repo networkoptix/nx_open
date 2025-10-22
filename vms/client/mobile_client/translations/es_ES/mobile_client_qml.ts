@@ -244,6 +244,14 @@
       <source>Copy log ID</source>
       <translation type="unfinished">Copy log ID</translation>
     </message>
+    <message>
+      <source>Copy Client ID</source>
+      <translation>Copiar identificación del Cliente</translation>
+    </message>
+    <message>
+      <source>Force Crash</source>
+      <translation>Forzar el cierre de la aplicación</translation>
+    </message>
   </context>
   <context>
     <name>DeviceSelector</name>

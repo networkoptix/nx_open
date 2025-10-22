@@ -244,6 +244,14 @@
       <source>Copy log ID</source>
       <translation>Copiar ID de rexistro</translation>
     </message>
+    <message>
+      <source>Copy Client ID</source>
+      <translation>Copiar ID de cliente</translation>
+    </message>
+    <message>
+      <source>Force Crash</source>
+      <translation>Forzar choque</translation>
+    </message>
   </context>
   <context>
     <name>DeviceSelector</name>

@@ -244,6 +244,14 @@
       <source>Copy log ID</source>
       <translation>Salin ID log</translation>
     </message>
+    <message>
+      <source>Copy Client ID</source>
+      <translation>Salin ID Klien</translation>
+    </message>
+    <message>
+      <source>Force Crash</source>
+      <translation>Paksa Crash</translation>
+    </message>
   </context>
   <context>
     <name>DeviceSelector</name>
