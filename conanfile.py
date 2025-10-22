@@ -151,7 +151,7 @@ class NxOpenConan(ConanFile):
         if not self.isEmscripten:
             self.build_requires("apidoctool/3.0" "#483c5073667ee722756e0ca31e18972a")
             self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
-            self.build_requires("breakpad-tools/2024.02.16" "#febb04cff817473e0378c3ef9b530197")
+            self.build_requires("breakpad-tools/2024.02.16" "#0b0da27a7ec2f99505630994b48a70a4")
 
         if self.isLinux or self.isWindows:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
