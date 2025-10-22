@@ -1869,5 +1869,9 @@
       <source>Encryption key used to encode secure cookie values.</source>
       <translation>用於對安全 cookie 值進行編碼的加密金鑰。</translation>
     </message>
+    <message>
+      <source>Update interval for public keys from the Cloud.</source>
+      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+    </message>
   </context>
 </TS>

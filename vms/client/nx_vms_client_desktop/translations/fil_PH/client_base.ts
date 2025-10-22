@@ -1145,6 +1145,10 @@
         <numerusform>Unmute Items</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Event log...</source>
+      <translation type="unfinished">Event log...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1190,6 +1194,34 @@
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
       <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
+    </message>
+  </context>
+  <context>
+    <name>DurationPickerTranslationHelper</name>
+    <message>
+      <source>Also include</source>
+      <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Also include</translation>
+    </message>
+    <message>
+      <source>Begin</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Begin</translation>
+    </message>
+    <message>
+      <source>Before Event</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Before Event</translation>
+    </message>
+    <message>
+      <source>End</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">End</translation>
+    </message>
+    <message>
+      <source>After Event</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">After Event</translation>
     </message>
   </context>
   <context>
@@ -6003,34 +6035,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cross-Site features</source>
       <translation type="unfinished">Cross-Site features</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeDurationWidget</name>
-    <message>
-      <source>Also include</source>
-      <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
-    </message>
-    <message>
-      <source>Begin</source>
-      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
-    </message>
-    <message>
-      <source>Before Event</source>
-      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
-    </message>
-    <message>
-      <source>End</source>
-      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
-    </message>
-    <message>
-      <source>After Event</source>
-      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
     </message>
   </context>
   <context>

@@ -1145,6 +1145,10 @@
         <numerusform>Activar son dos elementos</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Event log...</source>
+      <translation type="unfinished">Event log...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1190,6 +1194,34 @@
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
       <translation>A pertenza a grupos LDAP xestiónase no servidor LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>DurationPickerTranslationHelper</name>
+    <message>
+      <source>Also include</source>
+      <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Also include</translation>
+    </message>
+    <message>
+      <source>Begin</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Begin</translation>
+    </message>
+    <message>
+      <source>Before Event</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Before Event</translation>
+    </message>
+    <message>
+      <source>End</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">End</translation>
+    </message>
+    <message>
+      <source>After Event</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">After Event</translation>
     </message>
   </context>
   <context>
@@ -6003,34 +6035,6 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     <message>
       <source>Cross-Site features</source>
       <translation>Características cruzadas dos sitios web</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeDurationWidget</name>
-    <message>
-      <source>Also include</source>
-      <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation>Tamén inclúe</translation>
-    </message>
-    <message>
-      <source>Begin</source>
-      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>Comezar</translation>
-    </message>
-    <message>
-      <source>Before Event</source>
-      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>Antes do evento</translation>
-    </message>
-    <message>
-      <source>End</source>
-      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Rematar</translation>
-    </message>
-    <message>
-      <source>After Event</source>
-      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Despois do Evento</translation>
     </message>
   </context>
   <context>

@@ -1869,5 +1869,9 @@
       <source>Encryption key used to encode secure cookie values.</source>
       <translation>安全な Cookie 値をエンコードするために使用される暗号化キー。</translation>
     </message>
+    <message>
+      <source>Update interval for public keys from the Cloud.</source>
+      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+    </message>
   </context>
 </TS>
