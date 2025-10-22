@@ -369,11 +369,13 @@ if(compilerMsvc)
     # Change /Ob1 -> /Ob2 for RelWithDebInfo to match the Release build.
     foreach(lang C CXX)
         string(REGEX REPLACE "(^| )/Ob[0-3]( |$)" " " CMAKE_${lang}_FLAGS_RELWITHDEBINFO "${CMAKE_${lang}_FLAGS_RELWITHDEBINFO}")
+        string(STRIP "${CMAKE_${lang}_FLAGS_RELWITHDEBINFO}" CMAKE_${lang}_FLAGS_RELWITHDEBINFO)
         set(CMAKE_${lang}_FLAGS_RELWITHDEBINFO "${CMAKE_${lang}_FLAGS_RELWITHDEBINFO} /Ob2" CACHE STRING "" FORCE)
     endforeach()
     # Change /INCREMENTAL -> /INCREMENTAL:NO for RelWithDebInfo to match the Release build.
     foreach(kind EXE SHARED MODULE)
         string(REGEX REPLACE "(^| )/INCREMENTAL(:NO)?( |$)" " " CMAKE_${kind}_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_${kind}_LINKER_FLAGS_RELWITHDEBINFO}")
+        string(STRIP "${CMAKE_${kind}_LINKER_FLAGS_RELWITHDEBINFO}" CMAKE_${kind}_LINKER_FLAGS_RELWITHDEBINFO)
         set(CMAKE_${kind}_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_${kind}_LINKER_FLAGS_RELWITHDEBINFO} /INCREMENTAL:NO" CACHE STRING "" FORCE)
     endforeach()
 endif()
