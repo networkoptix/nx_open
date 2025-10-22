@@ -14,6 +14,7 @@
 #include <nx/vms/client/core/io_ports/io_ports_compatibility_interface.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/rules_help.h>
@@ -64,16 +65,9 @@ void postRejectIntercomCall(
             if (success)
                 return;
 
-            QString error = nx::format(
-                "The call rejection operation for the %1 intercom has failed", intercomId);
-
-            if (!result)
-            {
-                error += nx::format(": %1", result.error().errorId);
-                if (!result.error().errorString.isEmpty())
-                    error += nx::format(", %1", result.error().errorString);
-            }
-            NX_WARNING(NX_SCOPE_TAG, error);
+            NX_LOG_RESPONSE(NX_SCOPE_TAG, success, result,
+                "The call rejection operation for the %1 intercom has failed.",
+                intercomId.toString());
         },
         executor);
 }

@@ -23,6 +23,7 @@
 #include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
@@ -666,18 +667,12 @@ void EventLogDialog::query(
             if (m_request != handle)
                 return;
 
+            NX_LOG_RESPONSE(this, success, records, "Can't read event log.");
+
             if (records)
-            {
                 requestFinished(std::move(*records), nx::network::rest::ErrorId::ok);
-            }
             else
-            {
-                NX_ERROR(this, "Can't read event log, success: %1, code: %2, error: %3",
-                    success, records.error().errorId, records.error().errorString);
-
                 requestFinished(/*records*/ {}, records.error().errorId);
-            }
-
         };
 
     rest::ServerConnection::Timeouts timeouts;

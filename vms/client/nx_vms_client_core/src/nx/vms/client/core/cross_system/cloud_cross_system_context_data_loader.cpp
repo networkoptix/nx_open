@@ -17,6 +17,7 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 
 using namespace std::chrono;
 using namespace nx::vms::api;
@@ -129,17 +130,10 @@ struct CloudCrossSystemContextDataLoader::Private
                 ::rest::Handle,
                 ::rest::ErrorOrData<ServerInformationV1List> result)
             {
-                if (!success)
-                {
-                    NX_WARNING(this, "Servers request failed");
-                    return;
-                }
+                NX_LOG_RESPONSE(this, success, result, "Servers request failed.");
 
-                if (!result)
-                {
-                    NX_WARNING(this, "Servers request failed: %1", QJson::serialized(result.error()));
+                if (!success || !result)
                     return;
-                }
 
                 NX_VERBOSE(this, "Received %1 servers", result->size());
 

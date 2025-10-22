@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/vms/api/data/device_data.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 
 namespace nx::vms::client::core {
 
@@ -35,18 +36,8 @@ bool IoPortsCompatibilityInterface_latest::setIoPortState(
             rest::Handle handle,
             rest::ErrorOrData<QByteArray> response)
         {
-            if (!success || !response)
-            {
-                QString errorMessage = "Extended camera output %1 operation was unsuccessful %1";
-                if (!response && response.error().errorId != nx::network::rest::ErrorId::ok)
-                {
-                    errorMessage += QString(": %1").arg(response.error().errorString);
-                    success = false;
-                }
-
-                if (!success)
-                    NX_WARNING(this, errorMessage, cameraOutputId);
-            }
+            NX_LOG_RESPONSE(this, success, response,
+                "Extended camera output %1 operation was unsuccessful.", cameraOutputId);
 
             if (callback)
                 callback(success);

@@ -17,6 +17,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/core/watchers/traffic_relay_url_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
@@ -245,7 +246,7 @@ void MediaDownloadBackend::downloadVideo(qint64 startTimeMs,
             using ResponseData = rest::ErrorOrData<nx::vms::api::LoginSession>;
             auto tryOpenDownload = nx::utils::guarded(this,
                 [this, context = std::move(context)]
-                (bool /*success*/, int /*handle*/, ResponseData session)
+                (bool success, int /*handle*/, ResponseData session)
                 {
                     if (session)
                     {
@@ -253,8 +254,7 @@ void MediaDownloadBackend::downloadVideo(qint64 startTimeMs,
                         return;
                     }
 
-                    NX_DEBUG(this, "Can't get authorization ticket, error %1",
-                        session.error().errorId);
+                    NX_LOG_RESPONSE(this, success, session, "Can't get authorization ticket.");
 
                     d->showDownloadProcessError();
                 });

@@ -10,6 +10,7 @@
 #include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/bookmarks/bookmark_tags_watcher.h>
 #include <nx/vms/client/desktop/menu/action.h>
@@ -170,15 +171,14 @@ void NotificationActionExecutor::handleAcknowledgeAction()
                 this,
                 [this, id = notification->id(), camera](
                     rest::Handle,
-                    bool /*success*/,
+                    bool success,
                     rest::ErrorOrData<nx::vms::api::BookmarkV3>&& bookmark)
                 {
-                    if (!bookmark)
-                    {
-                        NX_WARNING(this, "Can't acknowledge action id: %1, code: %2, error: %3",
-                            id, bookmark.error().errorId, bookmark.error().errorString);
+                    NX_LOG_RESPONSE(this, success, bookmark,
+                        "Can't acknowledge action id: %1.", id.toString());
+
+                    if (!success || !bookmark)
                         return;
-                    }
 
                     NX_VERBOSE(this, "Acknowledged action id: %1, bookmark id: %2", id, bookmark->id);
 

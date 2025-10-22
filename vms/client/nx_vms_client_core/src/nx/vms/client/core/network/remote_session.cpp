@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
 #include <transaction/message_bus_adapter.h>
 #include <utils/common/delayed.h>
@@ -83,24 +84,19 @@ void RemoteSession::Private::updateTokenExpirationTime()
             rest::Handle /*requestId*/,
             rest::ErrorOrData<nx::vms::api::LoginSession> session)
         {
-            if (session)
-            {
-                const auto now = qnSyncTime->currentTimePoint();
+            NX_LOG_RESPONSE(this, success, session, "Cannot update token expiration time.");
 
-                sessionStartTime = now - session->ageS;
-                if (currentConnection)
-                {
-                    currentConnection->setSessionTokenExpirationTime(
-                        now + session->expiresInS);
-                }
-                emit q->tokenExpirationTimeChanged();
-            }
-            else
+            if (!session)
+                return;
+
+            const auto now = qnSyncTime->currentTimePoint();
+            sessionStartTime = now - session->ageS;
+            if (currentConnection)
             {
-                NX_WARNING(typeid(RemoteSession),
-                    "Cannot update token expiration time, code: %1, error: %2",
-                    session.error().errorId, session.error().errorString);
+                currentConnection->setSessionTokenExpirationTime(
+                    now + session->expiresInS);
             }
+            emit q->tokenExpirationTimeChanged();
         },
         q);
 }

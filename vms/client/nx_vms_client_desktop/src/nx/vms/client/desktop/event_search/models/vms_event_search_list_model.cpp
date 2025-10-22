@@ -18,6 +18,7 @@
 #include <nx/vms/client/core/event_search/models/detail/multi_request_id_holder.h>
 #include <nx/vms/client/core/event_search/models/fetch_request.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/event_search/models/private/event_model_data.h>
@@ -242,17 +243,12 @@ rest::Handle VmsEventSearchListModel::Private::getEvents(
         [this, callback = std::move(callback)](
             bool success, rest::Handle handle, rest::ErrorOrData<EventLogRecordList>&& data)
         {
-            if (!data)
-            {
-                NX_WARNING(this, "Event log request: %1 failed: %2, %3",
-                    handle, data.error().errorId, data.error().errorString);
+            NX_LOG_RESPONSE(this, success, data, "Event log request %1 failed.", handle);
 
+            if (!data)
                 callback(false, handle, {});
-            }
             else
-            {
                 callback(success, handle, std::move(*data));
-            }
         });
 
     auto systemContext = q->systemContext();

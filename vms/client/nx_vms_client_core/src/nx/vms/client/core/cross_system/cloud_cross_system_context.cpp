@@ -34,6 +34,7 @@
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/discovery/manager.h>
@@ -256,10 +257,12 @@ struct CloudCrossSystemContext::Private
         auto callback = nx::utils::guarded(
             q,
             [this](
-                bool /*success*/,
+                bool success,
                 int /*handle*/,
                 rest::ErrorOrData<nx::vms::api::LoginSession> session)
             {
+                NX_LOG_RESPONSE(this, success, session, "Update token error.");
+
                 const bool neededCloudAuthorization = needsCloudAuthorization;
                 if (session)
                 {
@@ -278,8 +281,6 @@ struct CloudCrossSystemContext::Private
                 {
                     if (session.error().errorId == nx::network::rest::ErrorId::sessionTruncated)
                         needsCloudAuthorization = true;
-
-                    NX_VERBOSE(this, "Update token error: %1", session.error().errorId);
                 }
 
                 if (needsCloudAuthorization != neededCloudAuthorization)

@@ -6,6 +6,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/global_permission_deprecated.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 
 using namespace nx::vms::api;
 
@@ -85,8 +86,10 @@ rest::Handle UserResource::saveSettings(
         [this, executor, callback, backup](
             bool success,
             rest::Handle handle,
-            rest::ErrorOrData<nx::vms::api::UserModelV3> /*errorOrData*/)
+            rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
         {
+            NX_LOG_RESPONSE(this, success, errorOrData, "Cannot save user resource settings.");
+
             if (!success)
                 setSettings(backup);
 

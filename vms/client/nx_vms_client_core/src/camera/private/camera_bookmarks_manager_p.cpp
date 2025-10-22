@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/common/api/helpers/bookmark_api_converter.h>
 #include <nx/vms/common/bookmark/bookmark_facade.h>
 #include <utils/common/delayed.h>
@@ -516,8 +517,9 @@ void QnCameraBookmarksManagerPrivate::updateCameraBookmark(
         return;
 
     auto restCallback =
-        [this](bool success, rest::Handle handle, rest::ErrorOrData<QByteArray> /*response*/)
+        [this](bool success, rest::Handle handle, rest::ErrorOrData<QByteArray> response)
         {
+            NX_LOG_RESPONSE(this, success, response, "Cannot update bookmark.");
             handleBookmarkOperation(success, handle);
         };
 
