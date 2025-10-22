@@ -1317,6 +1317,70 @@
             <numerusform>Years</numerusform>
         </translation>
     </message>
+    <message>
+        <source>milliseconds</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>weeks</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>months</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>years</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Milliseconds</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Seconds</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Minutes</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Hours</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Days</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Weeks</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Months</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Years</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>QnUserResource</name>
