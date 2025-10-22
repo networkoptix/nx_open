@@ -24,6 +24,7 @@
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
@@ -227,6 +228,8 @@ void ResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList
             if (success)
                 return;
 
+            NX_ERROR(this, "Save changes failed: %1", errorCode);
+
             // Restore attributes from backup.
             // TODO #lbusygin: Can we simplify code and do not apply changes to resource before
             // saveUserAttributes?
@@ -284,6 +287,8 @@ void ResourcesChangesManager::saveCamerasCore(
             if (errorCode == ec2::ErrorCode::ok)
                 return;
 
+            NX_ERROR(this, "Save changes failed: %1", errorCode);
+
             auto systemContext = SystemContext::fromResource(cameras.first());
             if (NX_ASSERT(systemContext))
             {
@@ -335,11 +340,10 @@ rest::Handle ResourcesChangesManager::saveServer(
             rest::Handle requestId,
             rest::ErrorOrData<QByteArray> reply)
         {
-            if (success && !reply)
-            {
-                NX_ERROR(this, "Save changes failed: %1", reply.error().errorString);
+            NX_LOG_RESPONSE(this, success, reply, "Save changes failed.");
+
+            if (!success || !reply)
                 success = false;
-            }
 
             if (!success)
                 emit saveChangesFailed({{server}});
@@ -399,7 +403,10 @@ bool ResourcesChangesManager::saveVideoWall(
                 callback(success, videoWall);
 
             if (!success)
+            {
+                NX_ERROR(this, "Save changes failed: %1", errorCode);
                 emit saveChangesFailed({{videoWall}});
+            }
         };
 
     nx::vms::api::VideowallData apiVideowall;
@@ -438,7 +445,10 @@ void ResourcesChangesManager::saveWebPage(
                 callback(success, webPage);
 
             if (!success)
+            {
+                NX_ERROR(this, "Save changes failed: %1", errorCode);
                 emit saveChangesFailed({{webPage}});
+            }
         };
 
     nx::vms::api::WebPageData apiWebpage;

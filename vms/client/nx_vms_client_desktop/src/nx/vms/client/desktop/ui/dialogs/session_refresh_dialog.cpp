@@ -10,6 +10,7 @@
 #include <nx/network/rest/auth_result.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/url.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/password_input_field.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
@@ -18,6 +19,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
+#include <nx/vms/client/desktop/utils/rest_error_strings.h>
 #include <nx/vms/utils/system_uri.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
@@ -145,6 +147,8 @@ void SessionRefreshDialog::refreshSession()
             int reqId,
             rest::ErrorOrData<nx::vms::api::LoginSession> session)
         {
+            NX_LOG_RESPONSE(this, success, session, "Can't receive token.");
+
             if (session)
             {
                 NX_DEBUG(this, "Received token with length: %1", session->token.length());
@@ -177,9 +181,9 @@ void SessionRefreshDialog::refreshSession()
             }
             else
             {
-                auto error = session.error();
-                NX_INFO(this, "Can't receive token: %1", QJson::serialized(error));
-                m_validationResult = ValidationResult(QValidator::Invalid, error.errorString);
+                m_validationResult = ValidationResult(
+                    QValidator::Invalid,
+                    RestErrorStrings::description(session.error()));
             }
 
             validationResultReady();

@@ -6,6 +6,7 @@
 #include <camera/private/camera_bookmarks_manager_p.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/common/api/helpers/bookmark_api_converter.h>
 #include <nx/vms/common/bookmark/bookmark_facade.h>
 
@@ -105,6 +106,11 @@ bool QnCameraBookmarksManager::changeBookmarkRest(BookmarkOperation operation,
         [this, requestCallback = std::move(callback), operation]
             (bool success, rest::Handle /*handle*/, rest::ErrorOrData<QByteArray> response)
         {
+            const auto errorMessage = operation == BookmarkOperation::create
+                ? "Cannot create bookmark."
+                : "Cannot update bookmark.";
+            NX_LOG_RESPONSE(this, success, response, errorMessage);
+
             nx::vms::api::BookmarkV3 result;
             if (!success || !response.has_value()
                 || !QJson::deserialize<nx::vms::api::BookmarkV3>(response.value(), &result))

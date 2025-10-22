@@ -9,6 +9,7 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <utils/common/synctime.h>
 
 using namespace nx::vms::client::core;
@@ -80,6 +81,8 @@ void requestCacheInfoUpdate(
             rest::Handle /*handle*/,
             const rest::ErrorOrData<std::vector<nx::vms::api::ServerInformationV1>>& servers)
         {
+            NX_LOG_RESPONSE(NX_SCOPE_TAG, success, servers, "Cannot get servers info.");
+
             if (!success || !servers)
                 return;
 

@@ -5,6 +5,7 @@
 #include <api/server_rest_connection.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 
@@ -80,7 +81,7 @@ void LdapStatusWatcher::refresh()
 
     const auto statusCallback = nx::utils::guarded(this,
         [this](
-            bool /*success*/, int handle, rest::ErrorOrData<api::LdapStatus> status)
+            bool success, int handle, rest::ErrorOrData<api::LdapStatus> status)
         {
             if (handle != m_refreshHandle)
             {
@@ -98,8 +99,7 @@ void LdapStatusWatcher::refresh()
             }
             else
             {
-                auto error = status.error();
-                NX_DEBUG(this, "Request error: %1 (%2).", error.errorId, error.errorString);
+                NX_LOG_RESPONSE(this, success, status, "LDAP status request error.");
                 setStatus({});
             }
 

@@ -10,6 +10,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qobject.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -220,26 +221,7 @@ void EventTestDialog::testEvent(const QString& event)
         event,
         [this](bool success, rest::Handle /*requestId*/, rest::ErrorOrData<QByteArray> result)
         {
-            if (success)
-            {
-                emit eventSent(success);
-                return;
-            }
-
-            QString errorDescription;
-            if (result.has_value())
-            {
-                errorDescription = result.value();
-            }
-            else
-            {
-                const auto& error = result.error();
-                errorDescription = nx::format("Error id - %1").arg(error.errorId);
-                if (!error.errorString.isEmpty())
-                    errorDescription += nx::format(": %2").arg(error.errorString);
-            }
-
-            emit eventSent(success, errorDescription);
+            NX_LOG_RESPONSE(this, success, result, "Test event creation failed.");
         },
         this); //< TODO: #mmalofeev some custom header to be able find test events in the http log?
 }

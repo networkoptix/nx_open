@@ -20,9 +20,6 @@ public:
 
     static constexpr auto kDebugActionName = "Event Test dialog";
     static void registerAction();
-
-signals:
-    void eventSent(bool success, const QString& error = "");
 };
 
 } // namespace nx::vms::client::desktop::rules

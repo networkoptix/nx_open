@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/system_administration/widgets/user_management_tab_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/multi_server_updates_widget.h>
+#include <nx/vms/client/desktop/utils/rest_error_strings.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_settings.h>
@@ -186,7 +187,7 @@ void QnSystemAdministrationDialog::applyChanges()
             }
             else
             {
-                auto error = response.error();
+                const auto& error = response.error();
 
                 // If the session duration is set to be less than the current token's lifetime, the
                 // settings will be applied. The current connection to the server will then be
@@ -202,7 +203,9 @@ void QnSystemAdministrationDialog::applyChanges()
                 NX_DEBUG(this, "Can't save system settings, code: %1, error: %2",
                     error.errorId, error.errorString);
                 QnSessionAwareMessageBox::critical(
-                    this, tr("Failed to save site settings"), error.errorString);
+                    this,
+                    tr("Failed to save site settings"),
+                    RestErrorStrings::description(error));
             }
         };
 

@@ -10,6 +10,7 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
@@ -84,9 +85,10 @@ void ImportFromDeviceDialog::Private::requestArchiveSynchronizationStatus()
             int /*handle*/,
             rest::ErrorOrData<nx::vms::api::RemoteArchiveSynchronizationStatusList> data)
         {
+            NX_LOG_RESPONSE(this, success, data, "Received invalid archive synchronization status data.");
+
             if (!success)
             {
-                NX_WARNING(this, "Received invalid archive synchronization status data.");
                 m_loadingTimer.setInterval(kLoadingAttemptTimeout);
                 m_loadingTimer.start();
                 return;

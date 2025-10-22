@@ -19,6 +19,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -31,6 +32,7 @@
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
+#include <nx/vms/client/desktop/utils/rest_error_strings.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/time/formatter.h>
@@ -516,6 +518,8 @@ void LdapSettingsWidget::applyChanges()
             if (handle == d->currentHandle)
                 d->currentHandle = 0;
 
+            NX_LOG_RESPONSE(this, success, settings, "Failed to apply LDAP settings changes.");
+
             if (settings)
             {
                 NX_ASSERT(success);
@@ -625,7 +629,7 @@ void LdapSettingsWidget::testConnection(
 
     auto callback = nx::utils::guarded(this,
         [this](
-            bool /*success*/, int handle, rest::ErrorOrData<std::vector<QString>> firstDnPerFilter)
+            bool success, int handle, rest::ErrorOrData<std::vector<QString>> firstDnPerFilter)
         {
             if (handle == d->currentHandle)
             {
@@ -637,20 +641,22 @@ void LdapSettingsWidget::testConnection(
                 return;
             }
 
+            NX_LOG_RESPONSE(this, success, firstDnPerFilter, "LDAP test connection failed.");
+
             if (firstDnPerFilter)
             {
                 d->testMessage = tr("Connection OK");
                 d->testState = TestState::ok;
             }
-            else if (!firstDnPerFilter
-                && firstDnPerFilter.error().errorId != network::rest::ErrorId::serviceUnavailable)
+            else if (firstDnPerFilter.error().errorId == network::rest::ErrorId::serviceUnavailable)
             {
-                d->testMessage = firstDnPerFilter.error().errorString;
+                d->testMessage = tr("Cannot connect to LDAP server");
                 d->testState = TestState::error;
             }
             else
             {
-                d->testMessage = tr("Cannot connect to LDAP server");
+                d->testMessage = RestErrorStrings::description(
+                    firstDnPerFilter.error());
                 d->testState = TestState::error;
             }
         });

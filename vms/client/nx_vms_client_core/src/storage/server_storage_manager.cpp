@@ -20,6 +20,7 @@
 #include <nx/vms/client/core/resource/client_storage_resource.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_media_server_manager.h>
@@ -418,23 +419,14 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
         [this](
             bool success,
             rest::Handle handle,
-            rest::ErrorOrData<nx::vms::api::StorageScanInfoFull> errorOrData)
+            rest::ErrorOrData<nx::vms::api::StorageScanInfoFull> response)
         {
-            if (success)
-            {
-                at_archiveRebuildReply(
-                    success,
-                    handle,
-                    *errorOrData);
-            }
-            else
-            {
-                const auto error = errorOrData.error();
-                NX_ERROR(this, "Can't rebuild archive, error: %1, text: %2",
-                    error.errorId, error.errorString);
+            NX_LOG_RESPONSE(this, success, response, "Can't rebuild archive.");
 
-                at_archiveRebuildReply(success, handle, {});
-            }
+            at_archiveRebuildReply(
+                success,
+                handle,
+                success ? *response : nx::vms::api::StorageScanInfoFull{});
         });
 
     int handle = 0;
@@ -459,11 +451,7 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
         auto stopCallback = nx::utils::guarded(this,
             [this](bool success, rest::Handle handle, rest::ErrorOrEmpty errorOrEmpty)
             {
-                if (!errorOrEmpty)
-                {
-                    NX_ERROR(this, "Can't cancel archive rebuild, error: %1, text: %2",
-                        errorOrEmpty.error().errorId, errorOrEmpty.error().errorString);
-                }
+                NX_LOG_RESPONSE(this, success, errorOrEmpty, "Can't cancel archive rebuild.");
 
                 at_archiveRebuildReply(success, handle, {});
             });

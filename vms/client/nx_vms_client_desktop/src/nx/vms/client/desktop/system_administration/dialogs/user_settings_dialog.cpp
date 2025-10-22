@@ -58,6 +58,7 @@
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
+#include <nx/vms/client/desktop/utils/rest_error_strings.h>
 #include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
@@ -475,7 +476,7 @@ struct UserSettingsDialog::Private
         QnMessageBox messageBox(
             QnMessageBoxIcon::Critical,
             message,
-            error.errorString,
+            RestErrorStrings::description(error),
             QDialogButtonBox::Ok,
             QDialogButtonBox::Ok,
             parentWidget);
@@ -497,9 +498,7 @@ struct UserSettingsDialog::Private
         if (!success)
         {
             if (!data && data.error().errorId != nx::network::rest::ErrorId::sessionExpired)
-            {
                 showServerError(tr("Failed to apply changes"), data.error());
-            }
             isSaving = false;
             return;
         }
@@ -953,9 +952,7 @@ void UserSettingsDialog::onResetLink(
                 if (!success)
                 {
                     if (!data && data.error().errorId != nx::network::rest::ErrorId::sessionExpired)
-                    {
                         d->showServerError(tr("Failed to apply changes"), data.error());
-                    }
                     return;
                 }
 

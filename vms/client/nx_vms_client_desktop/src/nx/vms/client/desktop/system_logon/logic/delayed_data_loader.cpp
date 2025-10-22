@@ -8,6 +8,7 @@
 #include <nx/vms/api/data/lookup_list_data.h>
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -44,21 +45,18 @@ struct DelayedDataLoader::Private
         auto callback = nx::utils::guarded(
             q,
             [this](
-                bool /*success*/,
+                bool success,
                 rest::Handle requestId,
                 rest::ErrorOrData<EventLogRecordList> records)
             {
                 if (!requestIds.remove(requestId))
                     return;
 
-                if (!records)
-                {
-                    NX_WARNING(
-                        this,
-                        "Acknowledge request %1 failed, error: %2, string: %3",
-                        requestId, records.error().errorId, records.error().errorString);
+                NX_LOG_RESPONSE(this, success, records,
+                    "Acknowledge request %1 failed.", requestId);
+
+                if (!success || !records)
                     return;
-                }
 
                 NX_VERBOSE(this, "Received %1 acknowledge actions", records->size());
 
@@ -81,21 +79,18 @@ struct DelayedDataLoader::Private
         auto callback = nx::utils::guarded(
             q,
             [this](
-                bool /*success*/,
+                bool success,
                 rest::Handle requestId,
                 rest::ErrorOrData<LookupListDataList> lookupLists)
             {
                 if (!requestIds.remove(requestId))
                     return;
 
-                if (!lookupLists)
-                {
-                    NX_WARNING(
-                        this,
-                        "Lookup Lists request %1 failed, error: %2, string: %3",
-                        requestId, lookupLists.error().errorId, lookupLists.error().errorString);
+                NX_LOG_RESPONSE(this, success, lookupLists,
+                    "Lookup Lists request %1 failed.", requestId);
+
+                if (!success || !lookupLists)
                     return;
-                }
 
                 NX_VERBOSE(this, "Received %1 Lookup Lists entries", lookupLists->size());
 
