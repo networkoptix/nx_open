@@ -4,15 +4,15 @@
 
 #include <nx/kit/utils.h>
 #include <nx/sdk/analytics/i_integration.h>
-#include <nx/sdk/helpers/uuid_helper.h>
-#include <nx/sdk/helpers/log_utils.h>
-#include <nx/sdk/ptr.h>
-#include <nx/sdk/helpers/string_map.h>
-#include <nx/sdk/helpers/string.h>
-#include <nx/sdk/helpers/integration_diagnostic_event.h>
-#include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/helpers/error.h>
+#include <nx/sdk/helpers/integration_diagnostic_event.h>
 #include <nx/sdk/helpers/lib_context.h>
+#include <nx/sdk/helpers/log_utils.h>
+#include <nx/sdk/helpers/settings_response.h>
+#include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/ptr.h>
 
 #undef NX_PRINT_PREFIX
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
@@ -64,6 +64,15 @@ Result<IAction::Result> Engine::executeAction(
     int64_t /*timestampUs*/,
     Ptr<IObjectTrackInfo> /*trackInfo*/,
     const std::map<std::string, std::string>& /*params*/)
+{
+    return {};
+}
+
+Result<IAction::Result> Engine::executeIntegrationAction(
+    const std::string& /*actionId*/,
+    int64_t /*timestampUs*/,
+    const std::map<std::string, std::string>& /*params*/,
+    const std::string& /*state*/)
 {
     return {};
 }
@@ -144,7 +153,7 @@ void Engine::doExecuteAction(Result<IAction::Result>* outResult, const IAction* 
     const auto actionParams = action->params();
 
     if (!logUtils.convertAndOutputStringMap(
-        &params, actionParams.get(), "params", /*outputIndent*/ 4))
+            &params, actionParams.get(), "params", /*outputIndent*/ 4))
     {
         // The error is already logged.
         *outResult = error(ErrorCode::invalidParams, "Invalid action parameters");
@@ -160,6 +169,45 @@ void Engine::doExecuteAction(Result<IAction::Result>* outResult, const IAction* 
         action->timestampUs(),
         action->objectTrackInfo(),
         params);
+}
+
+void Engine::doExecuteIntegrationAction(Result<IAction::Result>* outResult, const IAction* action)
+{
+    if (!action)
+    {
+        NX_PRINT << __func__ << "(): INTERNAL ERROR: action is null";
+        *outResult = error(ErrorCode::invalidParams, "Action is null");
+        return;
+    }
+
+    std::map<std::string, std::string> params;
+
+    #define SAVED_DEBUG_STREAM NX_DEBUG_STREAM
+    // Output action parameters to a temporary stream to ensure thread-safe logging.
+    // This prevents parameters from being interleaved or split by output from other threads.
+    std::ostringstream logBuffer;
+
+    logBuffer << __func__ << "():" << NX_DEBUG_ENDL;
+    logBuffer << "{" << NX_DEBUG_ENDL;
+    logBuffer << "    actionId: " << nx::kit::utils::toString(action->actionId()) << NX_DEBUG_ENDL;
+    logBuffer << "    state: " << nx::kit::utils::toString(action->state()) << NX_DEBUG_ENDL;
+    logBuffer << "    timestampUs: " << action->timestampUs() << NX_DEBUG_ENDL;
+
+    const auto actionParams = action->params();
+
+    if (!logUtils.convertAndOutputStringMap(
+        &params, actionParams.get(), "params", /*outputIndent*/ 4, /*outStream*/ logBuffer))
+    {
+        // The error is already logged.
+        *outResult = error(ErrorCode::invalidParams, "Invalid integration action parameters");
+        return;
+    }
+
+    logBuffer << "}";
+    NX_OUTPUT << logBuffer.str();
+
+    *outResult = executeIntegrationAction(
+        action->actionId(), action->timestampUs(), params, action->state());
 }
 
 void Engine::setHandler(IEngine::IHandler* handler)

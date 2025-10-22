@@ -90,6 +90,21 @@ protected:
         const std::map<std::string, std::string>& params);
 
     /**
+     * Integration Action handler. Called when some Integration Action defined by this Engine is
+     * triggered by the Server.
+     * @param actionId Id of the Integration Action being triggered.
+     * @param timestampUs Timestamp of the moment when the Integration Action was triggered.
+     * @param params If the Engine manifest defines params for the Integration Action being
+     *     triggered, contains their values after they are filled by the user via the Client form.
+     *     Otherwise, empty.
+     */
+    virtual Result<IAction::Result> executeIntegrationAction(
+        const std::string& actionId,
+        int64_t timestampUs,
+        const std::map<std::string, std::string>& params,
+        const std::string& state);
+
+    /**
      * Sends an IntegrationDiagnosticEvent to the Server. Can be called from any thread, but if
      * called before settingsReceived() was called, will be ignored in case setHandler() was not
      * called yet.
@@ -127,6 +142,9 @@ protected:
     virtual void getManifest(Result<const IString*>* outResult) const override;
 
     virtual void doExecuteAction(
+        Result<IAction::Result>* outResult, const IAction* action) override;
+
+    virtual void doExecuteIntegrationAction(
         Result<IAction::Result>* outResult, const IAction* action) override;
 
 private:

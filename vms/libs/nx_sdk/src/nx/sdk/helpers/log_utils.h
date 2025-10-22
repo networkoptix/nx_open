@@ -5,6 +5,8 @@
 #include <map>
 #include <string>
 
+#include <nx/kit/debug.h>
+
 namespace nx::sdk {
 
 class IStringMap;
@@ -46,7 +48,8 @@ struct LogUtils
         std::map<std::string, std::string>* outMap,
         const IStringMap* stringMap,
         const std::string& caption,
-        int outputIndent = 0) const;
+        int outputIndent = 0,
+        std::ostream& outStream = NX_DEBUG_STREAM) const;
 };
 
 } // namespace nx::sdk

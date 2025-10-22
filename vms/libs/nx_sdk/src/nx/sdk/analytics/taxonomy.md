@@ -30,8 +30,8 @@ Analytics Plugin, "Taxonomy features" sub-plugin, located in this SDK:
             set.
             - Empty set is equivalent to the omitted value.
             - Set with a single value is equivalent to a scalar value.
-            - Set with more than one value is called an underdetermined value - semantically, it
-                may stand for an ambiguously or simultaneously detected properties.
+            - Set with more than one value is called an undetermined value - semantically, it may
+                stand for an ambiguously or simultaneously detected properties.
     - Attribute value is technically always a string: for String type, it's the value string as is,
         for other types it's a JSON value.
     - Any Attribute value can be omitted; there is no concept of a default value of an Attribute.

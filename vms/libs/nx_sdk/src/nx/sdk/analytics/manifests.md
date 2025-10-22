@@ -281,6 +281,23 @@ Engine Manifest is a JSON Object containing the following fields:
 
     Optional.
 
+- `"integrationActions"`: Array<ActionDescriptor>
+
+    **This feature has work-in-progress status and can be changed at any time**
+
+    A possibly empty list of Objects, each being a declaration of an Engine IntegrationAction - the
+    user can create an Event Rule and select an Action of type "Integration Action" for it,
+    choosing an IntegrationAction to trigger from the list of all IntegrationActions from all
+    Engines.
+
+    When such Event occurs, the IEngine::executeIntegrationAction() is called and supplied the data
+    for the Action in the form of IAction. Now only Action parameters and timestamp are passed
+    (no ObjectTrack data even for the Events related to Objects).
+
+    Description of ActionDescriptor object is in the file `integration_action_descriptor.md`.
+
+    Optional.
+
 - `"deviceAgentSettingsModel"`: SettingsModel (Object)
 
     Describes the names, types, and default values of the settings that a DeviceAgent of this

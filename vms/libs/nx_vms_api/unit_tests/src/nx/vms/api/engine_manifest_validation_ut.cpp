@@ -2,9 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/vms/api/base_manifest_validation_test.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/integration_action.h>
 #include <nx/vms/api/analytics/object_action.h>
+#include <nx/vms/api/base_manifest_validation_test.h>
 
 namespace nx::vms::api::analytics {
 
@@ -20,6 +21,7 @@ protected:
         m_manifest.objectTypes = makeEntries<ObjectType>("Object");
         m_manifest.groups = makeEntries<Group>("Group");
         m_manifest.objectActions = makeEntries<ObjectAction>("ObjectAction");
+        m_manifest.integrationActions = makeEntries<IntegrationAction>("IntegrationAction");
     }
 
     template<typename List, typename TransformationFunc>
@@ -115,6 +117,32 @@ protected:
     void givenManifestWithDuplicatedObjectActionNames()
     {
         makeIncorrectManifest(&m_manifest.objectActions, [](auto entry) { entry->name = "name"; });
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    void givenManifestWithEmptyIntegrationActionIds()
+    {
+        makeIncorrectManifest(
+            &m_manifest.integrationActions, [](auto entry) { entry->id.clear(); });
+    }
+
+    void givenManifestWithDuplicatedIntegrationActionIds()
+    {
+        makeIncorrectManifest(
+            &m_manifest.integrationActions, [](auto entry) { entry->id = "name"; });
+    }
+
+    void givenManifestWithEmptyIntegrationActionNames()
+    {
+        makeIncorrectManifest(
+            &m_manifest.integrationActions, [](auto entry) { entry->name.clear(); });
+    }
+
+    void givenManifestWithDuplicatedIntegrationActionNames()
+    {
+        makeIncorrectManifest(
+            &m_manifest.integrationActions, [](auto entry) { entry->name = "name"; });
     }
 
     //---------------------------------------------------------------------------------------------

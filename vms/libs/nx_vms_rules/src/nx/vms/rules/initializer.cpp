@@ -13,8 +13,6 @@
 #include "action_builder_field_validators/http_auth_field_validator.h"
 #include "action_builder_field_validators/http_headers_field_validator.h"
 #include "action_builder_field_validators/http_method_field_validator.h"
-#include "action_builder_field_validators/integration_action_field_validator.h"
-#include "action_builder_field_validators/integration_action_parameters_field_validator.h"
 #include "action_builder_field_validators/layout_field_validator.h"
 #include "action_builder_field_validators/optional_time_field_validator.h"
 #include "action_builder_field_validators/sound_field_validator.h"
@@ -83,8 +81,6 @@ void Initializer::registerActions() const
     registerAction<EnterFullscreenAction>();
     registerAction<ExitFullscreenAction>();
     registerAction<HttpAction>();
-    if (ini().integrationActions)
-        registerAction<IntegrationAction>();
     registerAction<NotificationAction>();
     registerAction<OpenLayoutAction>();
     registerAction<PanicRecordingAction>();
@@ -161,11 +157,7 @@ void Initializer::registerFields() const
     registerActionField<HttpAuthTypeField>();
     registerActionField<HttpHeadersField>();
     registerActionField<HttpMethodField>();
-    if (ini().integrationActions)
-    {
-        registerActionField<IntegrationActionField>();
-        registerActionField<IntegrationActionParametersField>(systemContext());
-    }
+    registerActionField<StringSelectionField>();
     registerActionField<TargetLayoutField>();
     registerActionField<OptionalTimeField>();
     registerActionField<OutputPortField>();
@@ -201,11 +193,6 @@ void Initializer::registerFieldValidators() const
     registerActionFieldValidator<HttpAuthField, HttpAuthFieldValidator>();
     registerActionFieldValidator<HttpHeadersField, HttpHeadersFieldValidator>();
     registerActionFieldValidator<HttpMethodField, HttpMethodFieldValidator>();
-    if (ini().integrationActions)
-    {
-        registerActionFieldValidator<IntegrationActionField, IntegrationActionFieldValidator>();
-        registerActionFieldValidator<IntegrationActionField, IntegrationActionParametersFieldValidator>();
-    }
     registerActionFieldValidator<TargetLayoutField, LayoutFieldValidator>();
     registerActionFieldValidator<OptionalTimeField, OptionalTimeFieldValidator>();
     registerActionFieldValidator<SoundField, SoundFieldValidator>();

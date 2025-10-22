@@ -159,20 +159,7 @@ public:
     virtual void setHandler(IHandler* handler) = 0;
 };
 
-/**
- * Main interface for an Analytics Engine instance. The instances are created by a Mediaserver via
- * calling analytics::IIntegration::createEngine() typically on Mediaserver start (or when a new Engine
- * is created by the system administrator), and destroyed (via releaseRef()) on Mediaserver
- * shutdown (or when an existing Engine is deleted by the system administrator).
- *
- * For the VMS end user, each Engine instance is perceived as an independent Analytics Engine
- * which has its own set of values of settings stored in the Mediaserver database.
- *
- * All methods are guaranteed to be called without overlapping even if from different threads (i.e.
- * with a guaranteed barrier between the calls), thus, no synchronization is required for the
- * implementation.
- */
-class IEngine: public Interface<IEngine, IEngine0>
+class IEngine1: public Interface<IEngine1, IEngine0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IEngine1"); }
@@ -200,6 +187,44 @@ public:
         return result;
     }
 };
-using IEngine1 = IEngine;
+
+/**
+ * Main interface for an Analytics Engine instance. The instances are created by a Server via
+ * calling analytics::IIntegration::createEngine() typically on Server start (or when a new Engine
+ * is created by the system administrator), and destroyed (via releaseRef()) on Server shutdown (or
+ * when an existing Engine is deleted by the system administrator).
+ *
+ * For the VMS end user, each Engine instance is perceived as an independent Analytics Engine which
+ * has its own set of values of settings stored in the Server database.
+ *
+ * All methods are guaranteed to be called without overlapping even if from different threads (i.e.
+ * with a guaranteed barrier between the calls), thus, no synchronization is required for the
+ * implementation.
+ */
+class IEngine: public Interface<IEngine, IEngine1>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IEngine2"); }
+
+    /** Called by executeIntegrationAction() */
+    protected: virtual void doExecuteIntegrationAction(
+        Result<IAction::Result>* outResult, const IAction* action) = 0;
+    /**
+     * Integration Action handler. Called when some integration action defined by this Engine is
+     * triggered by Server.
+     *
+     * @param action Provides parameters passed to the integration action been triggered, and a
+     *     means for reporting back integration action results to Server. This object should not be
+     *     used after returning from this function.
+     */
+    public: Result<IAction::Result> executeIntegrationAction(const IAction* action)
+    {
+        Result<IAction::Result> result;
+        doExecuteIntegrationAction(&result, action);
+        return result;
+    }
+
+};
+using IEngine2 = IEngine;
 
 } // namespace nx::sdk::analytics

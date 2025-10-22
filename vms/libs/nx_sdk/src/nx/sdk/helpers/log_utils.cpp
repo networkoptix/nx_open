@@ -21,7 +21,8 @@ bool LogUtils::convertAndOutputStringMap(
     std::map<std::string, std::string>* outMap,
     const IStringMap* stringMap,
     const std::string& caption,
-    int outputIndent) const
+    int outputIndent,
+    std::ostream& outStream) const
 {
     if (!stringMap)
     {
@@ -40,17 +41,20 @@ bool LogUtils::convertAndOutputStringMap(
     {
         const std::string indentStr(outputIndent, ' ');
 
+        // Use outStream to output the content instead of NX_OUTPUT, so that the caller can control
+        // where the output goes. This is useful for preventing interleaving of output from
+        // multiple threads.
         if (!caption.empty())
-            NX_OUTPUT << indentStr << caption << ":";
+            outStream << indentStr << caption << ":" << NX_DEBUG_ENDL;
 
-        NX_OUTPUT << indentStr << "{";
+        outStream << indentStr << "{" << NX_DEBUG_ENDL;
         for (int i = 0; i < count; ++i)
         {
-            NX_OUTPUT << indentStr << "    " << nx::kit::utils::toString(stringMap->key(i))
+            outStream << indentStr << "    " << nx::kit::utils::toString(stringMap->key(i))
                 << ": " << nx::kit::utils::toString(stringMap->value(i))
-                << ((i < count - 1) ? "," : "");
+                << ((i < count - 1) ? "," : "") << NX_DEBUG_ENDL;
         }
-        NX_OUTPUT << indentStr << "}";
+        outStream << indentStr << "}";
     }
 
     for (int i = 0; i < count; ++i)

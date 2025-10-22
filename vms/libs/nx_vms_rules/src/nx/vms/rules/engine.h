@@ -136,6 +136,11 @@ public:
      */
     bool registerAction(const ItemDescriptor& descriptor, const ActionConstructor& constructor);
 
+    /**
+     * Unregisters the action from the engine.
+     */
+    void unregisterAction(const QString& actionType);
+
     /** Map of all the registered actions. */
     const QMap<QString, ItemDescriptor>& actions() const;
 

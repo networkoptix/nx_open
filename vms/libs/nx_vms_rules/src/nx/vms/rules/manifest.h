@@ -35,7 +35,10 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
     userFiltered = 1 << 6,
 
     /** Event global and resource read permissions check is performed for the action recipient */
-    eventPermissions = 1 << 7
+    eventPermissions = 1 << 7,
+
+    /** The action is created in runtime */
+    dynamic = 1 << 8
 )
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)

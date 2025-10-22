@@ -31,18 +31,30 @@ struct TimeFieldProperties
             {"max", QVariant::fromValue(maximumValue)}};
     }
 
+    static std::chrono::seconds secondsFromVariant(const QVariant& variant)
+    {
+        if (variant.canConvert<std::chrono::seconds>())
+            return variant.value<std::chrono::seconds>();
+
+        if (variant.canConvert<int>())
+            return std::chrono::seconds(variant.toInt());
+
+        NX_ASSERT(false, "TimeFieldProperties: Invalid variant type for seconds conversion.");
+        return std::chrono::seconds::zero();
+    }
+
     static TimeFieldProperties fromVariantMap(const QVariantMap& properties)
     {
         TimeFieldProperties result;
 
         if (properties.contains("value"))
-            result.value = properties.value("value").value<std::chrono::seconds>();
+            result.value = secondsFromVariant(properties.value("value"));
 
         if (properties.contains("min"))
-            result.minimumValue = properties.value("min").value<std::chrono::seconds>();
+            result.minimumValue = secondsFromVariant(properties.value("min"));
 
         if (properties.contains("max"))
-            result.maximumValue = properties.value("max").value<std::chrono::seconds>();
+            result.maximumValue = secondsFromVariant(properties.value("max"));
 
         return result;
     }

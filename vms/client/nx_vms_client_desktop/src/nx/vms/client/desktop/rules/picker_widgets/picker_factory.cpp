@@ -23,8 +23,7 @@
 #include "http_headers_picker_widget.h"
 #include "http_parameters_picker_widget.h"
 #include "input_port_picker_widget.h"
-#include "integration_action_picker_widget.h"
-#include "integration_action_parameters_picker_widget.h"
+#include "string_selection_picker_widget.h"
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
 #include "object_lookup_picker_widget.h"
@@ -307,12 +306,6 @@ PickerWidget* createActionFieldWidget(
     if (fieldId == fieldMetatype<vms::rules::StreamQualityField>())
         return createPickerImpl<StreamQualityPicker>(field, context, parent);
 
-    if (fieldId == fieldMetatype<vms::rules::IntegrationActionField>())
-        return createPickerImpl<IntegrationActionPicker>(field, context, parent);
-
-    if (fieldId == fieldMetatype<vms::rules::IntegrationActionParametersField>())
-        return createPickerImpl<IntegrationActionParametersPickerWidget>(field, context, parent);
-
     if (fieldId == fieldMetatype<vms::rules::TargetDevicesField>())
         return createTargetDevicePicker(field, context, parent);
 
@@ -336,6 +329,12 @@ PickerWidget* createActionFieldWidget(
 
     if (fieldId == fieldMetatype<vms::rules::VolumeField>())
         return createPickerImpl<VolumePicker>(field, context, parent);
+
+    if (fieldId == fieldMetatype<nx::vms::rules::StringSelectionField>())
+        return createPickerImpl<ListPicker>(field, context, parent);
+
+    if (fieldId == fieldMetatype<nx::vms::rules::ActionIntField>())
+        return createPickerImpl<NumberPicker<nx::vms::rules::ActionIntField>>(field, context, parent);
 
     return {};
 }

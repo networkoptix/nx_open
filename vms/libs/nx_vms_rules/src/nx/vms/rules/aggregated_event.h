@@ -20,8 +20,8 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API AggregatedEvent: public QObject
 {
     Q_OBJECT
-    using AggregatedInfo = api::rules::AggregatedInfo;
-    using EventLogRecord = api::rules::EventLogRecord;
+    using AggregatedInfo = nx::vms::api::rules::AggregatedInfo;
+    using EventLogRecord = nx::vms::api::rules::EventLogRecord;
 
 public:
     explicit AggregatedEvent(const EventPtr& event);

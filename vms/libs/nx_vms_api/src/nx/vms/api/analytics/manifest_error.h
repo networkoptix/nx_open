@@ -40,8 +40,12 @@ NX_REFLECTION_ENUM_CLASS(ManifestErrorType,
     deviceAgentSettingsModelIsIncorrect = 1 << 21,
 
     uncompressedFramePixelFormatIsNotSpecified = 1 << 22,
-    excessiveUncompressedFramePixelFormatSpecification = 1 << 23
-)
+    excessiveUncompressedFramePixelFormatSpecification = 1 << 23,
+
+    emptyIntegrationActionId = 1 << 24,
+    emptyIntegrationActionName = 1 << 25,
+    duplicatedIntegrationActionId = 1 << 26,
+    duplicatedIntegrationActionName = 1 << 27)
 Q_DECLARE_FLAGS(ManifestErrorTypes, ManifestErrorType)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ManifestErrorTypes)
 

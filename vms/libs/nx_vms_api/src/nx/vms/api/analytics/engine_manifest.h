@@ -10,6 +10,7 @@
 #include <nx/reflect/instrument.h>
 #include <nx/utils/json/qjson.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/analytics/integration_action.h>
 #include <nx/vms/api/analytics/manifest_error.h>
 #include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/vms/api/analytics/object_action.h>
@@ -71,6 +72,10 @@ struct NX_VMS_API EngineManifest
     QList<ObjectAction> objectActions;
 
     /**%apidoc[opt] */
+    QList<IntegrationAction> integrationActions;
+
+
+    /**%apidoc[opt] */
     QJsonObject deviceAgentSettingsModel;
 
     /**%apidoc[opt] */
@@ -92,6 +97,7 @@ struct NX_VMS_API EngineManifest
     (eventTypes) \
     (objectTypes) \
     (objectActions) \
+    (integrationActions) \
     (deviceAgentSettingsModel) \
     (groups) \
     (typeLibrary) \

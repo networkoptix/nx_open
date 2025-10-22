@@ -26,15 +26,19 @@ public:
 
     Engine* engine() const;
 
-    static void connectEngine(
-        Engine* engine,
+    void addDynamicPlugin(std::unique_ptr<Plugin> plugin);
+
+    void connectEngine(
         const QnCommonMessageProcessor* processor,
         Qt::ConnectionType connectionType);
 
     void stop();
 
 private:
+    void reinitializeDynamicPlugins();
+
     std::unique_ptr<Plugin> m_builtinPlugin;
+    std::vector<std::unique_ptr<Plugin>> m_dynamicPlugins;
     std::unique_ptr<Engine> m_engine;
     std::unique_ptr<QThread> m_thread;
 };

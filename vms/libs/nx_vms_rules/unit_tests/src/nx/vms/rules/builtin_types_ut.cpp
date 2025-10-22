@@ -374,8 +374,6 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<ActionIntField>();
     testActionFieldRegistration<ActionTextField>();
     testActionFieldRegistration<ContentTypeField>();
-    testActionFieldRegistration<IntegrationActionField>();
-    testActionFieldRegistration<IntegrationActionParametersField>(systemContext());
     testActionFieldRegistration<EmailMessageField>(systemContext());
     testActionFieldRegistration<EventDevicesField>();
     testActionFieldRegistration<ExtractDetailField>(systemContext());
@@ -400,10 +398,10 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<TargetDeviceField>();
     testActionFieldRegistration<VolumeField>();
     testActionFieldRegistration<HttpAuthField>();
+    testActionFieldRegistration<StringSelectionField>();
 
     testActionRegistration<BookmarkAction>();
     testActionRegistration<BuzzerAction>();
-    testActionRegistration<IntegrationAction>();
     testActionRegistration<DeviceOutputAction>();
     testActionRegistration<DeviceRecordingAction>();
     testActionRegistration<EnterFullscreenAction>();

@@ -35,9 +35,7 @@ NX_VMS_RULES_API api::ActionInfo serialize(
     const BasicAction* action, const QSet<QByteArray>& excludedProperties = {});
 NX_VMS_RULES_API api::EventInfo serialize(const BasicEvent* action, UuidList ruleIds = {});
 
-NX_VMS_RULES_API nx::vms::api::rules::RuleV4 toApi(
-    const nx::vms::rules::Engine* engine,
-    const nx::vms::api::rules::Rule& rule);
+NX_VMS_RULES_API nx::vms::api::rules::RuleV4 toApi(const Rule* rule);
 NX_VMS_RULES_API std::optional<nx::vms::api::rules::Rule> fromApi(
     const nx::vms::rules::Engine* engine,
     nx::vms::api::rules::RuleV4&& rule,

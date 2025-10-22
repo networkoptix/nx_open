@@ -10,6 +10,8 @@
 #include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/common/utils/schedule.h>
+#include <nx/utils/log/log_main.h>
+
 
 #include "../action_builder.h"
 #include "../action_builder_field.h"
@@ -90,43 +92,6 @@ std::pair<QString, QJsonValue> toApi(const QString& fieldName, const Field* fiel
     return {kIdRenamer.toApi(fieldName), asObject};
 }
 
-nx::vms::api::rules::RuleV4 toApi(const Rule* rule)
-{
-    nx::vms::api::rules::RuleV4 result;
-
-    NX_ASSERT(!rule->isInternal());
-
-    result.id = rule->id();
-    result.enabled = rule->enabled();
-    result.comment = rule->comment();
-    result.schedule = nx::vms::common::scheduleFromByteArray(rule->schedule());
-
-    const auto filter = rule->eventFilters().front();
-    result.event["type"] = filter->eventType();
-
-    for (const auto& [name, field]: filter->fields().asKeyValueRange())
-    {
-        if (!field->properties().visible)
-            continue;
-
-        if (auto eventField = toApi(name, field); !eventField.first.isEmpty())
-            result.event.insert(std::move(eventField));
-    }
-
-    const auto builder = rule->actionBuilders().front();
-    result.action["type"] = builder->actionType();
-
-    for (const auto& [name, field]: builder->fields().asKeyValueRange())
-    {
-        if (!field->properties().visible)
-            continue;
-
-        if (auto actionField = toApi(name, field); !actionField.first.isEmpty())
-            result.action.insert(std::move(actionField));
-    }
-
-    return result;
-}
 
 template <class T>
 bool fromApi(std::map<QString, QJsonValue>&& fieldMap, T* target, QString* error)
@@ -329,10 +294,42 @@ api::EventInfo serialize(const BasicEvent* event, UuidList ruleIds)
     return result;
 }
 
-nx::vms::api::rules::RuleV4 toApi(
-    const nx::vms::rules::Engine* engine, const nx::vms::api::rules::Rule& rule)
+nx::vms::api::rules::RuleV4 toApi(const Rule* rule)
 {
-    return toApi(engine->buildRule(rule).get());
+    nx::vms::api::rules::RuleV4 result;
+
+    NX_ASSERT(!rule->isInternal());
+
+    result.id = rule->id();
+    result.enabled = rule->enabled();
+    result.comment = rule->comment();
+    result.schedule = nx::vms::common::scheduleFromByteArray(rule->schedule());
+
+    const auto filter = rule->eventFilters().front();
+    result.event["type"] = filter->eventType();
+
+    for (const auto& [name, field]: filter->fields().asKeyValueRange())
+    {
+        if (!field->properties().visible)
+            continue;
+
+        if (auto eventField = toApi(name, field); !eventField.first.isEmpty())
+            result.event.insert(std::move(eventField));
+    }
+
+    const auto builder = rule->actionBuilders().front();
+    result.action["type"] = builder->actionType();
+
+    for (const auto& [name, field]: builder->fields().asKeyValueRange())
+    {
+        if (!field->properties().visible)
+            continue;
+
+        if (auto actionField = toApi(name, field); !actionField.first.isEmpty())
+            result.action.insert(std::move(actionField));
+    }
+
+    return result;
 }
 
 std::optional<nx::vms::api::rules::Rule> fromApi(

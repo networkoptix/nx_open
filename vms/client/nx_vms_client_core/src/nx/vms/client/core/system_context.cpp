@@ -22,6 +22,7 @@
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
 #include <nx/vms/rules/engine_holder.h>
 #include <nx/vms/rules/initializer.h>
+#include <nx/vms/rules/integration_action_initializer.h>
 
 #include "private/system_context_data_p.h"
 
@@ -58,6 +59,8 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
                 std::make_unique<core::rules::ClientRouter>(this),
                 std::make_unique<nx::vms::rules::Initializer>(this),
                 /*separateThread*/ false);
+            d->vmsRulesEngineHolder->addDynamicPlugin(
+                std::make_unique<nx::vms::rules::IntegrationActionInitializer>(this));
             d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
             d->sessionTimeoutWatcher =
@@ -328,10 +331,7 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     if (!vmsRulesEngine())
         return;
 
-    nx::vms::rules::EngineHolder::connectEngine(
-        vmsRulesEngine(),
-        clientMessageProcessor,
-        Qt::QueuedConnection);
+     d->vmsRulesEngineHolder->connectEngine(clientMessageProcessor, Qt::QueuedConnection);
 }
 
 AccessController* SystemContext::accessController() const

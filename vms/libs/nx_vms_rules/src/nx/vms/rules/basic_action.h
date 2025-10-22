@@ -29,7 +29,7 @@ class NX_VMS_RULES_API BasicAction: public QObject
     Q_PROPERTY(nx::Uuid originPeerId READ originPeerId WRITE setOriginPeerId)
 
 public:
-    QString type() const;
+    virtual QString type() const;
 
     std::chrono::microseconds timestamp() const;
     void setTimestamp(std::chrono::microseconds timestamp);

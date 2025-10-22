@@ -12,9 +12,9 @@
 namespace nx::sdk::analytics {
 
 /**
- * Data supplied to IEngine::executeAction().
+ * Data supplied to IEngine::executeAction() and IEngine::executeIntegrationAction().
  */
-class IAction: public Interface<IAction>
+class IAction0: public Interface<IAction0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IAction"); }
@@ -76,6 +76,19 @@ public:
         bool useDeviceCredentials = false;
     };
 };
-using IAction0 = IAction;
+
+class IAction: public Interface<IAction, IAction0>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IAction1"); }
+
+    /** State ("start"/"stop"/"instant") for which the action is triggered. Needed only for the
+     * Integration Actions. Has a default implementation returning an empty string to avoid a
+     * mandatory implementation for the Object Actions.
+     */
+    virtual const char* state() const { return ""; }
+};
+
+using IAction1 = IAction;
 
 } // namespace nx::sdk::analytics

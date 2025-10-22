@@ -340,7 +340,7 @@ bool Engine::registerAction(const ItemDescriptor& descriptor, const ActionConstr
 
     if (m_actionDescriptors.contains(descriptor.id))
     {
-        NX_ERROR(this, "Register action failed: % is already registered", descriptor.id);
+        NX_ERROR(this, "Register action failed: %1 is already registered", descriptor.id);
         return false;
     }
 
@@ -393,6 +393,12 @@ bool Engine::registerAction(const ItemDescriptor& descriptor, const ActionConstr
     m_actionDescriptors.insert(descriptor.id, descriptor);
 
     return true;
+}
+
+void Engine::unregisterAction(const QString& actionId)
+{
+    m_actionDescriptors.remove(actionId);
+    m_actionTypes.remove(actionId);
 }
 
 bool Engine::registerActionConstructor(const QString& id, const ActionConstructor& constructor)
@@ -635,8 +641,14 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(nx::Uuid id, const QString
 std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuilder& serialized) const
 {
     const auto descriptor = actionDescriptor(serialized.type);
-    if (!NX_ASSERT(descriptor, "Descriptor for the '%1' type is not registered", serialized.type))
+    if (!descriptor)
+    {
+        NX_WARNING(
+            this,
+            "Descriptor for the '%1' type is not registered, cannot build action builder",
+            serialized.type);
         return {};
+    }
 
     auto builder = buildActionBuilder(serialized.id, serialized.type);
     if (!builder)

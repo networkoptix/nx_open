@@ -19,9 +19,18 @@ QMap<QString, QJsonValue> serializeProperties(const QObject* object, const QSet<
 
     for (const auto& propName: names)
     {
+        // IntegrationAction fields are not serialized here, because they are dynamic properties
+        // of and are not found by meta->indexOfProperty(). Instead they are serialized along with
+        // the rest of the dynamic properties to QJsonValues (see code bellow this loop), which
+        // does not allow to correctly serialize complex fields (UUIDs, Users, etc). TODO: Change
+        // this function to allow the correct serialization.
         int index = meta->indexOfProperty(propName.constData());
-        if (!NX_ASSERT(index >= 0, "Property not found: %1", propName))
+        if (index < 0)
+        {
+            NX_DEBUG(NX_SCOPE_TAG,
+                "Absent property (dynamic?): %1 in class: %2", propName, meta->className());
             continue;
+        }
 
         auto prop = meta->property(index);
         auto userType = prop.userType();

@@ -8,6 +8,7 @@
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/api/analytics/integration_action.h>
 
 namespace nx::analytics {
 
@@ -138,10 +139,11 @@ NX_VMS_COMMON_API std::set<QString> supportedEventTypeIdsFromManifest(
     const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
 NX_VMS_COMMON_API nx::vms::common::AnalyticsEngineResourcePtr findEngineByIntegrationActionId(
-    const QString& integrationAction, const QnResourcePool* resourcePool);
+    const QString& integrationActionId, const QnResourcePool* resourcePool);
 
-NX_VMS_COMMON_API std::optional<QJsonObject> findSettingsModelByIntegrationActionId(
-    const QString& integrationAction,
+using IntegrationAction = nx::vms::api::analytics::IntegrationAction;
+NX_VMS_COMMON_API std::optional<IntegrationAction> findIntegrationActionDescriptorById(
+    const QString& integrationActionId,
     const nx::vms::common::AnalyticsEngineResourceList& engines);
 
 } // namespace nx::analytics

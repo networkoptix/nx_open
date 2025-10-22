@@ -620,6 +620,7 @@ ActionPtr ActionBuilder::buildAction(
     action->setRuleId(m_rule ? m_rule->id() : nx::Uuid());
     action->setOriginPeerId(engine()->router()->peerId());
 
+    // TODO: Consider using action descriptor to get list of properties to set.
     const auto propertyNames =
         nx::utils::propertyNames(action.get(), nx::utils::PropertyAccess::writable);
     for (const auto& propertyName: propertyNames)

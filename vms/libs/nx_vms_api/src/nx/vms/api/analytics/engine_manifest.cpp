@@ -161,6 +161,18 @@ std::vector<ManifestError> validate(const EngineManifest& manifest)
 
     validateList(
         &result,
+        manifest.integrationActions,
+        {
+            ManifestErrorType::emptyIntegrationActionId,
+            ManifestErrorType::emptyIntegrationActionName,
+            ManifestErrorType::duplicatedIntegrationActionId,
+            ManifestErrorType::duplicatedIntegrationActionName,
+            "Integration Action"
+        });
+
+
+    validateList(
+        &result,
         manifest.objectActions,
         {
             ManifestErrorType::emptyObjectActionId,

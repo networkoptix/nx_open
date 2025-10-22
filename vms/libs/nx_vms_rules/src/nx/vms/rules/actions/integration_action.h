@@ -3,23 +3,23 @@
 #pragma once
 
 #include <QString>
-#include <string>
 
 #include "../basic_action.h"
-#include "../data_macros.h"
 
 namespace nx::vms::rules {
 
 class NX_VMS_RULES_API IntegrationAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "integration")
-
-    FIELD(QString, integrationAction, setIntegrationAction)
-    FIELD(QJsonObject, integrationActionParameters, setIntegrationActionParameters)
-
 public:
+    IntegrationAction(const QString& type): m_type(type) {};
+
+    QString type() const override { return m_type; }
+
     static const ItemDescriptor& manifest();
+
+private:
+    const QString m_type;
 };
 
 } // namespace nx::vms::rules

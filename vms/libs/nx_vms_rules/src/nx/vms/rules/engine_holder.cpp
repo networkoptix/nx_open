@@ -64,16 +64,17 @@ Engine* EngineHolder::engine() const
 }
 
 void EngineHolder::connectEngine(
-    Engine* engine,
     const QnCommonMessageProcessor* processor,
     Qt::ConnectionType connectionType)
 {
     if (!NX_ASSERT(processor))
         return;
 
+    const auto engine = m_engine.get();
     connect(processor, &QnCommonMessageProcessor::vmsRulesReset, engine,
-        [engine](nx::Uuid /*peerId*/, const nx::vms::api::rules::RuleList& rules)
+        [this, engine](nx::Uuid /*peerId*/, const nx::vms::api::rules::RuleList& rules)
         {
+            this->reinitializeDynamicPlugins();
             engine->resetRules(rules);
         },
         connectionType);
@@ -93,6 +94,33 @@ void EngineHolder::connectEngine(
         connectionType);
 
     engine->router()->init(processor);
+}
+
+void EngineHolder::addDynamicPlugin(std::unique_ptr<Plugin> plugin)
+{
+    auto addPlugin =
+        [this, plugin = std::move(plugin)]() mutable
+        {
+            m_dynamicPlugins.push_back(std::move(plugin));
+        };
+    const auto thread = m_thread.get();
+    if (thread)
+        nx::utils::AsyncHandlerExecutor(thread).submit(std::move(addPlugin));
+    else
+        addPlugin();
+
+}
+
+// Must be called in the Engine thread.
+void EngineHolder::reinitializeDynamicPlugins()
+{
+    NX_ASSERT(m_engine, "Engine is not initialized");
+
+    for (auto& plugin: m_dynamicPlugins)
+    {
+        plugin->deinitialize();
+        plugin->initialize(m_engine.get());
+    }
 }
 
 } // namespace nx::vms::rules
