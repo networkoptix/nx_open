@@ -389,6 +389,30 @@
         <source>Viewed</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Nothing found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try changing the search parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No New Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No new push notifications were found, but you can view your full notification history.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FiltersPanel</name>
