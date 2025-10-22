@@ -1936,5 +1936,9 @@
         <source>Encryption key used to encode secure cookie values.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Update interval for public keys from the Cloud.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
