@@ -7,6 +7,7 @@
 #include "diagnostic_events/integration.h"
 #include "events/integration.h"
 #include "http_requests/integration.h"
+#include "integration_actions/integration.h"
 #include "motion_metadata/integration.h"
 #include "object_actions/integration.h"
 #include "object_detection/integration.h"
@@ -41,6 +42,7 @@ extern "C" NX_PLUGIN_API nx::sdk::IIntegration* createNxPluginByIndex(int instan
         case 13: return new object_actions::Integration();
         case 14: return new http_requests::Integration();
         case 15: return new error_reporting::Integration();
+        case 16: return new integration_actions::Integration();
         default: return nullptr;
     }
 }
