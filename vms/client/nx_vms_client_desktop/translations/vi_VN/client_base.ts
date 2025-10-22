@@ -1139,6 +1139,10 @@
         <numerusform>Bỏ tắt tiếng các mục</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Event log...</source>
+      <translation type="unfinished">Event log...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1184,6 +1188,34 @@
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
       <translation>Thành viên nhóm LDAP được quản lý trên máy chủ LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>DurationPickerTranslationHelper</name>
+    <message>
+      <source>Also include</source>
+      <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Also include</translation>
+    </message>
+    <message>
+      <source>Begin</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Begin</translation>
+    </message>
+    <message>
+      <source>Before Event</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Before Event</translation>
+    </message>
+    <message>
+      <source>End</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">End</translation>
+    </message>
+    <message>
+      <source>After Event</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">After Event</translation>
     </message>
   </context>
   <context>
@@ -5910,34 +5942,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Cross-Site features</source>
       <translation>Tính năng chéo các chi nhánh</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeDurationWidget</name>
-    <message>
-      <source>Also include</source>
-      <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation>Cũng bao gồm</translation>
-    </message>
-    <message>
-      <source>Begin</source>
-      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>Bắt đầu</translation>
-    </message>
-    <message>
-      <source>Before Event</source>
-      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>Trước sự kiện</translation>
-    </message>
-    <message>
-      <source>End</source>
-      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Kết thúc</translation>
-    </message>
-    <message>
-      <source>After Event</source>
-      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>Sau sự kiện</translation>
     </message>
   </context>
   <context>

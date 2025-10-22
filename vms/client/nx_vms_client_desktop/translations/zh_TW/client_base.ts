@@ -1139,6 +1139,10 @@
         <numerusform>將項目取消靜音</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Event log...</source>
+      <translation type="unfinished">Event log...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1184,6 +1188,34 @@
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
       <translation>LDAP 群組成員資格是在 LDAP 伺服器上管理</translation>
+    </message>
+  </context>
+  <context>
+    <name>DurationPickerTranslationHelper</name>
+    <message>
+      <source>Also include</source>
+      <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Also include</translation>
+    </message>
+    <message>
+      <source>Begin</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Begin</translation>
+    </message>
+    <message>
+      <source>Before Event</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Before Event</translation>
+    </message>
+    <message>
+      <source>End</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">End</translation>
+    </message>
+    <message>
+      <source>After Event</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">After Event</translation>
     </message>
   </context>
   <context>
@@ -5910,34 +5942,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cross-Site features</source>
       <translation>跨站點功能</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeDurationWidget</name>
-    <message>
-      <source>Also include</source>
-      <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation>並包含</translation>
-    </message>
-    <message>
-      <source>Begin</source>
-      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>開始</translation>
-    </message>
-    <message>
-      <source>Before Event</source>
-      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>事件之前</translation>
-    </message>
-    <message>
-      <source>End</source>
-      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>結束</translation>
-    </message>
-    <message>
-      <source>After Event</source>
-      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation>事件之後</translation>
     </message>
   </context>
   <context>

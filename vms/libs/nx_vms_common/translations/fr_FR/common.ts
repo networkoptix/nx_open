@@ -1939,5 +1939,9 @@
       <source>Encryption key used to encode secure cookie values.</source>
       <translation>Clé de chiffrement utilisée pour encoder les valeurs de cookies sécurisés.</translation>
     </message>
+    <message>
+      <source>Update interval for public keys from the Cloud.</source>
+      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+    </message>
   </context>
 </TS>
