@@ -5739,6 +5739,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
+    <name>RestErrorStrings</name>
+    <message>
+        <source>Error code: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ShowreelTextFactory</name>
     <message>
         <source>Start Showreel</source>
