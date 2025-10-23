@@ -149,7 +149,7 @@ class NxOpenConan(ConanFile):
         self.build_requires("apidoctool/3.0" "#483c5073667ee722756e0ca31e18972a")
         self.build_requires("qt-host/6.9.0" "#3995869eb604dd7c10d91e6869ca2a9f")
         self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
-        self.build_requires("breakpad-tools/2024.02.16" "#7217d5e71eeff4069d20dd5da605f276")
+        self.build_requires("breakpad-tools/2024.02.16" "#0b0da27a7ec2f99505630994b48a70a4")
 
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
