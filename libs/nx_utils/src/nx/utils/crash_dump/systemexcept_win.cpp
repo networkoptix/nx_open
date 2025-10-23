@@ -22,7 +22,7 @@
 
 #define MAX_SYMBOL_SIZE 1024
 
-static const std::string fullVersionId = nx::utils::AppInfo::applicationFullVersion().toStdString();
+static const std::string fullVersionId = nx::utils::AppInfo::vmsFullVersion().toStdString();
 
 class GlobalCrashDumpSettings
 {

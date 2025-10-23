@@ -26,9 +26,8 @@ QString QnMobileAppInfo::productName() const
 
 QString QnMobileAppInfo::version() const
 {
-    return QString("%1.%2 (rev: %3)").arg(
+    return QString("%1 (rev: %2)").arg(
         nx::build_info::mobileClientVersion(),
-        QString::number(nx::build_info::buildNumber()),
         nx::build_info::revision());
 }
 

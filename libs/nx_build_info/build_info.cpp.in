@@ -38,7 +38,7 @@ QString vmsVersion()
 
 QString mobileClientVersion()
 {
-    return "${mobileClientVersion}";
+    return "${mobileClientVersion.full}";
 }
 
 int buildNumber()

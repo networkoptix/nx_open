@@ -36,7 +36,7 @@ static const struct timespec WAIT_FOR_MUTEX     = { 1 /* sec */, 0 /* nsec */ };
 static const struct timespec WAIT_FOR_THREADS   = { 1 /* sec */, 0 /* nsec */ };
 static const struct timespec WAIT_FOR_MAIN      = { 1 /* sec */, 500000 /* nsec */ };
 
-static const std::string fullVersionId = nx::utils::AppInfo::applicationFullVersion().toStdString();
+static const std::string fullVersionId = nx::utils::AppInfo::vmsFullVersion().toStdString();
 
 /** Thread Keeper without heap usage */
 class ThreadKeeper

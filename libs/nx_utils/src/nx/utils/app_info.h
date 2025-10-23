@@ -9,7 +9,14 @@ namespace nx::utils {
 class NX_UTILS_API AppInfo
 {
 public:
-    static QString applicationFullVersion();
+    /**
+     * Returns full version including commit hash, customization and publication type for
+     * specified product version.
+     */
+    static QString appFullVersion(const QString& version);
+
+    /** Returns full VMS version including commit hash, customization and publication type. */
+    static QString vmsFullVersion();
 
     static QString organizationNameForSettings();
 };

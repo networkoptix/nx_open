@@ -296,7 +296,7 @@ nx::network::http::HttpHeaders ReportData::makeHttpHeaders() const
 #endif
 
     const auto uuidHash = m_host.peerId().toSimpleString().replace("-", "");
-    const auto version = nx::utils::AppInfo::applicationFullVersion();
+    const auto version = nx::utils::AppInfo::vmsFullVersion();
     const auto systemInfo = nx::vms::api::OsInformation::fromBuildInfo().toString();
     const auto systemRuntime = nx::vms::api::OsInformation::currentSystemRuntime();
     const auto system = QString( "%1 %2" ).arg( systemInfo ).arg( systemRuntime )

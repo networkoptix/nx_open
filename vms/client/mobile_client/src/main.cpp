@@ -364,7 +364,9 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 
     QnMobileClientSettings settings;
 
-    nx::vms::statistics::initCrashpad(settings.crashdumpUploadsEnabled());
+    nx::vms::statistics::initCrashpad(
+        settings.crashdumpUploadsEnabled(),
+        nx::build_info::mobileClientVersion());
 
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
