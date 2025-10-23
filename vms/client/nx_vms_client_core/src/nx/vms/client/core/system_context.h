@@ -67,6 +67,10 @@ class NX_VMS_CLIENT_CORE_API SystemContext: public common::SystemContext
         READ userWatcher
         CONSTANT)
 
+    Q_PROPERTY(QString cloudSystemId
+        READ cloudSystemId
+        CONSTANT)
+
     Q_PROPERTY(QnCameraBookmarksManager* bookmarksManager
         READ cameraBookmarksManager
         CONSTANT)

@@ -31,6 +31,11 @@ function hasScreenInStack(screenName)
     return false
 }
 
+function openFeedScreen(feedState)
+{
+    stackView.replace(null, Qt.resolvedUrl("../Screens/FeedScreen.qml"), {"feedState": feedState})
+}
+
 function openSessionsScreen()
 {
     var item = stackView.get(0, Controls.StackView.ForceLoad)
@@ -208,11 +213,6 @@ function openBetaFeaturesScreen()
 function openEventSearchMenuScreen()
 {
     stackView.replace(null, Qt.resolvedUrl("../Screens/EventSearchMenuScreen.qml"))
-}
-
-function openFeedScreen()
-{
-    stackView.replace(null, Qt.resolvedUrl("../Screens/FeedScreen.qml"))
 }
 
 function openMenuScreen()

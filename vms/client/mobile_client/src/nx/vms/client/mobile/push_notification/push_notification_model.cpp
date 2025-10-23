@@ -4,7 +4,6 @@
 
 #include <QtQml/QtQml>
 
-#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
 #include <nx/vms/text/human_readable.h>
@@ -15,6 +14,7 @@ namespace nx::vms::client::mobile {
 
 struct PushNotificationModel::Private
 {
+    QString user;
     std::vector<PushNotification> notifications;
 };
 
@@ -27,6 +27,22 @@ PushNotificationModel::PushNotificationModel(QObject* parent):
 
 PushNotificationModel::~PushNotificationModel()
 {
+}
+
+QString PushNotificationModel::user() const
+{
+    return d->user;
+}
+
+void PushNotificationModel::setUser(const QString& user)
+{
+    if (user == d->user)
+        return;
+
+    d->user = user;
+    emit userChanged();
+
+    update();
 }
 
 int PushNotificationModel::rowCount(const QModelIndex&) const
@@ -93,9 +109,8 @@ bool PushNotificationModel::setData(const QModelIndex& index, const QVariant& va
         PushNotification& notification = d->notifications[index.row()];
         notification.isRead = value.toBool();
 
-        const auto& user = appContext()->cloudStatusWatcher()->cloudLogin().toStdString();
         appContext()->pushNotificationStorage()->setIsRead(
-            user, notification.id, notification.isRead);
+            d->user.toStdString(), notification.id, notification.isRead);
 
         emit dataChanged(index, index, {ViewedRole});
         return true;
@@ -122,10 +137,9 @@ void PushNotificationModel::update()
 {
     emit beginResetModel();
 
-    const auto& user = appContext()->cloudStatusWatcher()->cloudLogin();
-    d->notifications = user.isEmpty()
+    d->notifications = d->user.isEmpty()
         ? std::vector<PushNotification>{}
-        : appContext()->pushNotificationStorage()->userNotifications(user.toStdString());
+        : appContext()->pushNotificationStorage()->userNotifications(d->user.toStdString());
 
     emit endResetModel();
 }
@@ -170,6 +184,15 @@ bool PushNotificationFilterModel::filterAcceptsRow(int row, const QModelIndex& p
 PushNotificationFilterModel::PushNotificationFilterModel(QObject* parent):
     QSortFilterProxyModel(parent)
 {
+    connect(this, &PushNotificationFilterModel::rowsInserted,
+        this, &PushNotificationFilterModel::countChanged);
+    connect(this, &PushNotificationFilterModel::rowsRemoved,
+        this, &PushNotificationFilterModel::countChanged);
+    connect(this, &PushNotificationFilterModel::layoutChanged,
+        this, &PushNotificationFilterModel::countChanged);
+    connect(this, &PushNotificationFilterModel::modelReset,
+        this, &PushNotificationFilterModel::countChanged);
+
     connect(this, &PushNotificationFilterModel::filterChanged,
         this, &PushNotificationFilterModel::invalidate);
     connect(this, &PushNotificationFilterModel::cloudSystemIdsChanged,
