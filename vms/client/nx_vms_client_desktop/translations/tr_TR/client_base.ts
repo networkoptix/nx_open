@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>Event log...</source>
-      <translation type="unfinished">Event log...</translation>
+      <translation>Olay kayıtları...</translation>
     </message>
   </context>
   <context>
@@ -1216,7 +1216,7 @@
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Son</translation>
     </message>
     <message>
       <source>After Event</source>

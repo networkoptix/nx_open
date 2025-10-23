@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>Event log...</source>
-      <translation type="unfinished">Event log...</translation>
+      <translation>Eseménynapló...</translation>
     </message>
   </context>
   <context>

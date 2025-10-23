@@ -1141,7 +1141,7 @@
     </message>
     <message>
       <source>Event log...</source>
-      <translation type="unfinished">Event log...</translation>
+      <translation>事件日志...</translation>
     </message>
   </context>
   <context>
@@ -1210,7 +1210,7 @@
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>结束</translation>
     </message>
     <message>
       <source>After Event</source>

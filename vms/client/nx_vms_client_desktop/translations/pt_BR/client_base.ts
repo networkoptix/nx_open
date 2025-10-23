@@ -1216,7 +1216,7 @@
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Fim</translation>
     </message>
     <message>
       <source>After Event</source>

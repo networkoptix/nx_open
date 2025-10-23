@@ -1159,7 +1159,7 @@
     </message>
     <message>
       <source>Event log...</source>
-      <translation type="unfinished">Event log...</translation>
+      <translation>יומן אירועים...</translation>
     </message>
   </context>
   <context>
