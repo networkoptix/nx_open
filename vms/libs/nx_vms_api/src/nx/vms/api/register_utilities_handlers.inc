@@ -118,7 +118,7 @@ void registerUtilitiesHandlers(
 
     /**%apidoc GET /proxy/{protocol}/{serverId}/{apiRequest}
      * <p>
-     * Proxy methods allow to send any request to any Server using the existing public connection.
+     * Proxy methods allow to send any request to any Server or Cloud using the existing public connection.
      * It is useful to login on a Server that is hidden from the requestor via executing
      * `POST /proxy/https-insecure/{hiddenServerEndpoint}/rest/v{1-}/login/sessions` to the proxy
      * Server that has access to the hidden Server, this request requires Administrator permission
@@ -133,6 +133,29 @@ void registerUtilitiesHandlers(
      * <code>
      * https://&lt;server_ip&gt;:&lt;port&gt;/proxy/https/{72934575-ceb7-54bb-23a0-84b81cf1d3f1}/showLog
      * </code>
+     * </p>
+     * <p>
+     * <b>Authentication:</b><br/>
+     * The proxy supports two authentication headers:
+     * <ul>
+     *   <li>
+     *     <b>Authorization</b> - Standard bearer or session token used to authenticate the request
+     *     on the proxy VMS Server.
+     *   </li>
+     *   <li>
+     *     <b>Proxy-Authorization</b> - Optional bearer or session token used to authenticate the request
+     *     on the proxy VMS Server.
+     *   </li>
+     *   <li>
+     *     <b>Nx-Cloud-Authorization</b> - Optional cloud token that can be provided when the proxied
+     *     request is directed to a Cloud endpoint. In this case:
+     *     <ul>
+     *       <li><code>Authorization</code> or <code>Proxy-Authorization</code> is used to authenticate the user on the proxy VMS Server.</li>
+     *       <li><code>Nx-Cloud-Authorization</code> is used by the proxy to authenticate request on the Cloud side.
+     *           Header should contains bearer cloud token.
+     *     </ul>
+     *   </li>
+     * </ul>
      * </p>
      * %jsonrpc[unused]
      * %caption Proxying
