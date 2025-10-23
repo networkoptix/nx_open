@@ -205,7 +205,7 @@ NxObject
         playable: windowContext.sessionManager.hasConnectedSession
             && !navigator.forceVideoPause
 
-        interruptOnInactivity: CoreUtils.isMobile()
+        interruptOnInactivity: CoreUtils.isMobilePlatform()
     }
 
     MediaResourceHelper

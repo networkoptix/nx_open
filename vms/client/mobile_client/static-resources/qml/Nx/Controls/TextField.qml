@@ -22,7 +22,7 @@ TextField
     property color backgroundColor: ColorTheme.colors.dark7
     property real borderWidth: 2
     placeholderTextColor: ColorTheme.colors.light15
-    selectByMouse: !CoreUtils.isMobile()
+    selectByMouse: !CoreUtils.isMobilePlatform()
     color: showError ? ColorTheme.colors.red_core : ColorTheme.colors.light1
     selectionColor: ColorTheme.colors.brand_core
 

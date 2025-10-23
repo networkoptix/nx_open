@@ -118,7 +118,7 @@ Page
     MediaPlaybackInterruptor
     {
         player: preview.player
-        interruptOnInactivity: CoreUtils.isMobile()
+        interruptOnInactivity: CoreUtils.isMobilePlatform()
     }
 
     IntervalPreview
@@ -250,7 +250,7 @@ Page
                 if (mainWindow.isPortraitLayout)
                 {
                     // Go to landscape mode.
-                    if (CoreUtils.isMobile())
+                    if (CoreUtils.isMobilePlatform())
                         windowContext.ui.windowHelpers.setScreenOrientation(Qt.LandscapeOrientation)
                     else
                         [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
@@ -258,7 +258,7 @@ Page
                 else
                 {
                     // Go to portrait mode.
-                    if (CoreUtils.isMobile())
+                    if (CoreUtils.isMobilePlatform())
                         windowContext.ui.windowHelpers.setScreenOrientation(Qt.PortraitOrientation)
                     else
                         [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
