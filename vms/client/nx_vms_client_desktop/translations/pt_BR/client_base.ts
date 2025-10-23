@@ -6023,7 +6023,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Fim</translation>
     </message>
     <message>
       <source>After Event</source>

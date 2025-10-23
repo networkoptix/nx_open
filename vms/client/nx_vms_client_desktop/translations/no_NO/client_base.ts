@@ -2683,7 +2683,7 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>Du vil bli logget ut av siden. Nettstedet vil være tilgjengelig bare via lokalt nettverk</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
@@ -6023,7 +6023,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Slutt</translation>
     </message>
     <message>
       <source>After Event</source>

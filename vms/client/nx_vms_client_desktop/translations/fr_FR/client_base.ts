@@ -6008,27 +6008,27 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
+      <translation>Inclure également</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>Commencer</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
+      <translation>Avant l'événement</translation>
     </message>
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Fin</translation>
     </message>
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
+      <translation>Après l'événement</translation>
     </message>
   </context>
   <context>

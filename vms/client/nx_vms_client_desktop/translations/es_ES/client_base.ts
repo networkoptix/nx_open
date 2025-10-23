@@ -2683,11 +2683,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>Usted necesita salir del sitio. El sitio solo se puede acceder vía red local</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>El sitio solo podrá tener acceso por la red local</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
