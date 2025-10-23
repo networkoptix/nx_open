@@ -75,11 +75,9 @@ EditVmsRuleDialog::EditVmsRuleDialog(WindowContext* context, QWidget* parent):
     resize(985, 704);
     setMinimumSize(QSize(800, 600));
 
-    setHelpTopic(this, HelpTopic::Id::EventRule_AdvancedSettigns);
+    setHelpTopic(this, HelpTopic::Id::EventsActions_AdvancedSettigns);
 
     setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark7"));
-
-    setHelpTopic(this, HelpTopic::Id::EventsActions_Editor);
 
     auto mainLayout = new QVBoxLayout{this};
     mainLayout->setSpacing(0);

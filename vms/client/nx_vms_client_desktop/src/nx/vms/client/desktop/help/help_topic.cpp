@@ -88,6 +88,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "adding-items-to-layout.html";
         case Id::CloudLayoutsIntroductionAssign:
             return "layout-management.html";
+        case Id::CollectingLogs:
+            return "collecting_logs.html";
         case Id::ConnectToCamerasOverOnlyHttps:
             return "to-connect-to-cameras-over-onl.html";
         case Id::EnableArchiveEncryption:
@@ -96,12 +98,14 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "to-enable-encrypted-video-traf.html";
         case Id::EventLog:
             return "viewing_events_log.html";
+        case Id::EventsActions:
+            return "configuring_events_and_actions.html";
+        case Id::EventsActions_AdvancedSettigns:
+            return "event_rule_advanced_settigns_f.html";
         case Id::EventsActions_Bookmark:
             return "create_bookmark.html";
         case Id::EventsActions_CameraDisconnected:
             return "camera_disconnection_malfuncti.html";
-        case Id::CollectingLogs:
-            return "collecting_logs.html";
         case Id::EventsActions_CameraInput:
             return "input_signal_on_camera.html";
         case Id::EventsActions_CameraIpConflict:
@@ -112,8 +116,6 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "trigger_camera_output.html";
         case Id::EventsActions_Diagnostics:
             return "write_to_log.html";
-        case Id::EventsActions_Editor:
-            return "event_rule_advanced_settigns_f.html";
         case Id::EventsActions_EmailNotSet:
             return "e-mail_is_not_set_for_users.html";
         case Id::EventsActions_EmailServerNotSet:
@@ -124,8 +126,6 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "execute_ptz_preset.html";
         case Id::EventsActions_Generic:
             return "generic_event.html";
-        case Id::EventsActions:
-            return "configuring_events_and_actions.html";
         case Id::EventsActions_LdapSyncIssue:
             return "ldap-sync-failure.html";
         case Id::EventsActions_LicenseIssue:
@@ -174,8 +174,6 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "storages_misconfiguration.html";
         case Id::EventsActions_VideoAnalytics:
             return "analytics_event.html";
-        case Id::EventRule_AdvancedSettigns:
-            return "event_rule_advanced_settigns_f.html";
         case Id::Exporting:
             return "exporting.html";
         case Id::ForceSecureConnections:
