@@ -34,6 +34,8 @@ protected:
 private:
     void obtainServerSdkVersion();
     void obtainPluginHomeDir();
+    void printServerDataDir();
+    void readDataFromSharedContextStorage();
 
 private:
     nx::sdk::analytics::Integration* const m_integration;

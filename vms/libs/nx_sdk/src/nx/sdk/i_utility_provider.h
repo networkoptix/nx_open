@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/interface.h>
 #include <nx/sdk/result.h>
@@ -184,6 +186,20 @@ public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider8"); }
 
     virtual IString* cloudOrgId() const = 0;
+
+    /** Called by sharedContextValue */
+    protected: virtual IString* getSharedContextValue(const char* id, const char* key) const = 0;
+
+    /**
+     *
+     * @return Serialized value from the Server shared context storage, or an empty optional if it
+     * is absent.
+     */
+    public: std::optional<std::string> sharedContextValue(const char* id, const char* key) const
+    {
+        IString* value = getSharedContextValue(id, key);
+        return value ? std::optional<std::string>(value->str()) : std::nullopt;
+    }
 };
 
 using IUtilityProvider8 = IUtilityProvider;

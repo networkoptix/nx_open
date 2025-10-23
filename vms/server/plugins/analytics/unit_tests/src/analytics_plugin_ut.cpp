@@ -298,6 +298,10 @@ public:
     virtual IString* cloudAuthKey() const override { return new nx::sdk::String(); }
     virtual IString* supportedVectorizationModels() const override { return new nx::sdk::String(); }
     virtual IString* getDataDir() const override { return new nx::sdk::String(); }
+    virtual IString* getSharedContextValue(const char* id, const char* key) const override
+    {
+        return new nx::sdk::String("");
+    }
     virtual const char* cloudToken() const override { return ""; }
     virtual void subscribeForCloudTokenUpdate(ICloudTokenSubscriber* /*subscriber*/) override {}
 

@@ -13,6 +13,7 @@ if(withMediaServer
 )
     add_subdirectory(appserver2)
     add_subdirectory(nx_sdk)
+    add_subdirectory(nx_shared_context_storage)
     add_subdirectory(nx_vms_api)
     add_subdirectory(nx_vms_common)
     add_subdirectory(nx_vms_license)

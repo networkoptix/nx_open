@@ -37,7 +37,6 @@ nx_add_target(nx_vms_common LIBRARY
         nx_utils
         nx_sdk
         nx_fusion
-        nx_sdk
         nx_rtp
         nx_metric
         cloud_db_client
