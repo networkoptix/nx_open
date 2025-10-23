@@ -62,7 +62,7 @@ void WindowContext::Private::initializeMainWindow()
     QQmlComponent mainComponent(engine, QUrl("main.qml"));
     mainWindow = qobject_cast<QQuickWindow*>(mainComponent.create());
 
-    if (!nx::build_info::isMobile() && mainWindow)
+    if (!nx::build_info::isMobilePlatform() && mainWindow)
     {
         mainWindow->setWidth(380);
         mainWindow->setHeight(650);

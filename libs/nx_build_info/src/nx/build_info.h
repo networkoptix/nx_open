@@ -63,7 +63,7 @@ NX_BUILD_INFO_API bool isArm();
 
 NX_BUILD_INFO_API bool isAndroid();
 NX_BUILD_INFO_API bool isIos();
-NX_BUILD_INFO_API bool isMobile();
+NX_BUILD_INFO_API bool isMobilePlatform();
 NX_BUILD_INFO_API bool isLinux();
 NX_BUILD_INFO_API bool isWindows();
 NX_BUILD_INFO_API bool isMacOsX();

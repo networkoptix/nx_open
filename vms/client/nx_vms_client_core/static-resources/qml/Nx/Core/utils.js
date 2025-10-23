@@ -75,7 +75,7 @@ function toArray(list)
     return result
 }
 
-function isMobile()
+function isMobilePlatform()
 {
     return Qt.platform.os == "android" || Qt.platform.os == "ios"
 }

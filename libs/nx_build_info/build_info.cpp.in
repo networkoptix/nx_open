@@ -103,7 +103,7 @@ bool isIos()
     return applicationPlatform() == "ios";
 }
 
-bool isMobile()
+bool isMobilePlatform()
 {
     return isAndroid() || isIos();
 }

@@ -192,7 +192,7 @@ bool DesktopAudioOnlyDataProvider::initInputDevices()
 {
     AudioRecordingSettings settings;
     auto primaryAudioDevice = settings.primaryAudioDevice();
-    auto secondaryAudioDevice = nx::build_info::isMobile()
+    auto secondaryAudioDevice = nx::build_info::isMobilePlatform()
         ? AudioDeviceInfo() // It is not allowed to run several devices at mobile platform.
         : settings.secondaryAudioDevice();
 

@@ -26,8 +26,8 @@ TextInput
     property color placeholderColor: ColorTheme.colors.light15
     property color cursorColor: activeColor
     property bool selectionAllowed: true
-    scrollByMouse: CoreUtils.isMobile()
-    selectByMouse: !CoreUtils.isMobile()
+    scrollByMouse: CoreUtils.isMobilePlatform()
+    selectByMouse: !CoreUtils.isMobilePlatform()
     color: showError ? ColorTheme.colors.red_core : ColorTheme.colors.light1
 
     leftPadding: 8

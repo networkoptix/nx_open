@@ -651,7 +651,7 @@ Page
     function hideUi()
     {
         d.uiVisible = false
-        if (CoreUtils.isMobile())
+        if (CoreUtils.isMobilePlatform())
             windowContext.ui.windowHelpers.enterFullscreen()
     }
 
