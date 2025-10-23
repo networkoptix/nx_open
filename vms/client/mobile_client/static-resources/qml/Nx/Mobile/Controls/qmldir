@@ -6,6 +6,7 @@ Button 1.0 Button.qml
 ButtonBox 1.0 ButtonBox.qml
 ComboBox 1.0 ComboBox.qml
 FieldBackground 1.0 FieldBackground.qml
+Indicator 1.0 Indicator.qml
 NumberInput 1.0 NumberInput.qml
 OptionSelector 1.0 OptionSelector.qml
 PasswordInput 1.0 PasswordInput.qml

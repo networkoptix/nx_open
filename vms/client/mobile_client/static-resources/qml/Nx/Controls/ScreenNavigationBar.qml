@@ -8,6 +8,7 @@ import Nx.Controls
 import Nx.Core
 import Nx.Core.Controls
 import Nx.Mobile
+import Nx.Mobile.Controls
 import Nx.Ui
 
 import nx.vms.client.mobile
@@ -85,6 +86,12 @@ Rectangle
                     primaryColor: isSelected
                         ? ColorTheme.colors.dark1
                         : ColorTheme.colors.light1
+
+                    Indicator
+                    {
+                        visible: !!text
+                        text: modelData.iconIndicatorText ?? ""
+                    }
                 }
 
                 onClicked: d.switchToPage(index)
@@ -138,9 +145,10 @@ Rectangle
             },
             {
                 "objectName": "switchToFeedScreenButton",
-                "iconSource": "image://skin/24x24/Outline/notification.svg",
+                "iconSource": feedStateProvider.buttonIconSource,
+                "iconIndicatorText": feedStateProvider.buttonIconIndicatorText,
                 "screenId": Controller.FeedScreen,
-                "openScreen": () => Workflow.openFeedScreen()
+                "openScreen": () => Workflow.openFeedScreen(feedStateProvider)
             },
             {
                 "objectName": "switchToMenuScreenButton",
@@ -159,4 +167,6 @@ Rectangle
             d.buttonModel[index].openScreen()
         }
     }
+
+    FeedStateProvider { id: feedStateProvider }
 }

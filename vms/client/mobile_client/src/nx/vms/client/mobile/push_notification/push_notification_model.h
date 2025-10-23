@@ -15,6 +15,8 @@ struct PushNotification;
 class PushNotificationModel: public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(QString user READ user WRITE setUser NOTIFY userChanged)
+
 public:
     enum Roles
     {
@@ -30,7 +32,11 @@ public:
 public:
     PushNotificationModel(QObject* parent = nullptr);
     virtual ~PushNotificationModel();
-    void update();
+
+    QString user() const;
+    void setUser(const QString& user);
+
+    Q_INVOKABLE void update();
 
     virtual int rowCount(const QModelIndex& parent) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
@@ -38,6 +44,9 @@ public:
     virtual QHash<int, QByteArray> roleNames() const override;
 
     static void registerQmlType();
+
+signals:
+    void userChanged();
 
 private:
     struct Private;
@@ -47,6 +56,7 @@ private:
 class PushNotificationFilterModel: public QSortFilterProxyModel
 {
     Q_OBJECT
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
     Q_PROPERTY(QStringList cloudSystemIds MEMBER m_cloudSystemIds NOTIFY cloudSystemIdsChanged)
     Q_PROPERTY(Filter filter MEMBER m_filter NOTIFY filterChanged)
 
@@ -61,12 +71,14 @@ public:
 
 public:
     PushNotificationFilterModel(QObject* parent = nullptr);
+    int count() const { return rowCount({}); }
     static void registerQmlType();
 
 protected:
     virtual bool filterAcceptsRow(int row, const QModelIndex& parent) const override;
 
 signals:
+    void countChanged();
     void cloudSystemIdsChanged();
     void filterChanged();
 

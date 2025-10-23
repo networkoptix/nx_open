@@ -9,6 +9,7 @@ import Nx.Core.Controls
 import Nx.Mobile.Controls
 import Nx.Controls
 import Nx.Items
+import Nx.Ui
 
 import nx.vms.client.core
 import nx.vms.client.mobile
@@ -18,6 +19,8 @@ import "private/FeedScreen"
 Page
 {
     id: feedScreen
+
+    required property FeedStateProvider feedState
 
     property color highlightColor: ColorTheme.colors.yellow_d1
 
@@ -45,6 +48,12 @@ Page
         icon.height: 24
 
         onClicked: filterMenu.open()
+    }
+
+    function reset()
+    {
+        search.clear()
+        filterModel.filter = PushNotificationFilterModel.All
     }
 
     states:
@@ -90,6 +99,43 @@ Page
 
                 placeholder.buttonText: qsTr("View All")
                 placeholder.onButtonClicked: filterModel.filter = PushNotificationFilterModel.All
+            }
+        },
+        State
+        {
+            when: !feedState.hasOsPermission
+
+            PropertyChanges
+            {
+                search.opacity: 0
+                notifications.opacity: 0
+                filterButton.opacity: 0
+
+                placeholder.text: qsTr("Notifications Off")
+                placeholder.description: qsTr("Notifications are currently disabled for this app. "
+                    + "To enable notifications use your phone's settings")
+                placeholder.imageSource:
+                    "image://skin/feed/64x64/Outline/notification_off.svg?primary=light10"
+            }
+        },
+        State
+        {
+            when: !feedState.notificationsEnabled
+
+            PropertyChanges
+            {
+                search.opacity: 0
+                notifications.opacity: 0
+                filterButton.opacity: 0
+
+                placeholder.text: qsTr("Notifications Off")
+                placeholder.description: qsTr("You disabled push notifications for this site. To "
+                    + "enable them, go to the Settings page.")
+                placeholder.imageSource:
+                    "image://skin/feed/64x64/Outline/notification_off.svg?primary=light10"
+
+                placeholder.buttonText: qsTr("Settings")
+                placeholder.onButtonClicked: Workflow.openSettingsScreen()
             }
         }
     ]
@@ -183,7 +229,7 @@ Page
             {
                 id: filterModel
 
-                sourceModel: PushNotificationModel { }
+                sourceModel: feedState.notifications
                 dynamicSortFilter: false
                 filterRegularExpression: search.regExp
             }
