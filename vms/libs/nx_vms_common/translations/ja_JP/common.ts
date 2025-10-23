@@ -1871,7 +1871,7 @@
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
-      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+      <translation>クラウドからの公開鍵の更新間隔。</translation>
     </message>
   </context>
 </TS>

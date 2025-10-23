@@ -5893,6 +5893,13 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
   </context>
   <context>
+    <name>RestErrorStrings</name>
+    <message>
+      <source>Error code: %1</source>
+      <translation type="unfinished">Error code: %1</translation>
+    </message>
+  </context>
+  <context>
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>

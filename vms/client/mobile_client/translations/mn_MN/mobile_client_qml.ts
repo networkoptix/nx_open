@@ -391,7 +391,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Олдсонгүй</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>

@@ -390,11 +390,11 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Không tìm thấy kết quả nào</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Hãy thử thay đổi các tham số tìm kiếm</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -410,7 +410,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Tất cả</translation>
     </message>
   </context>
   <context>

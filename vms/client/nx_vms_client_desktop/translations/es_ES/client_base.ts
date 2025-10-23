@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>Event log...</source>
-      <translation type="unfinished">Event log...</translation>
+      <translation>Registro de eventos...</translation>
     </message>
   </context>
   <context>
@@ -2716,11 +2716,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>Usted necesita salir del sitio. El sitio solo se puede acceder vía red local</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>El sitio solo podrá tener acceso por la red local</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
@@ -5738,6 +5738,13 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
         <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
         <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>RestErrorStrings</name>
+    <message>
+      <source>Error code: %1</source>
+      <translation type="unfinished">Error code: %1</translation>
     </message>
   </context>
   <context>

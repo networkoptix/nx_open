@@ -390,7 +390,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>未找到内容</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -410,7 +410,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>所有</translation>
     </message>
   </context>
   <context>

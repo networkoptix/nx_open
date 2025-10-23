@@ -390,11 +390,11 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>결과 없음</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>검색 매개변수를 변경해보세요</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -410,7 +410,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>전체</translation>
     </message>
   </context>
   <context>

@@ -392,7 +392,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Nothing found</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -412,7 +412,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>All</translation>
     </message>
   </context>
   <context>

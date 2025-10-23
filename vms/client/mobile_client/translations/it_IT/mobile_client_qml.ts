@@ -391,7 +391,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Non abbiamo trovato nulla</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -411,7 +411,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Tutti</translation>
     </message>
   </context>
   <context>

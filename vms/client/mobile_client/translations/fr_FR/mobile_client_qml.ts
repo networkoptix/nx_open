@@ -391,11 +391,11 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Rien trouvé</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Essayez de modifier les paramètres de recherche</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -411,7 +411,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Tout</translation>
     </message>
   </context>
   <context>

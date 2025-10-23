@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>Event log...</source>
-      <translation type="unfinished">Event log...</translation>
+      <translation>Hændelseslog...</translation>
     </message>
   </context>
   <context>
@@ -1201,27 +1201,27 @@
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
+      <translation>Inkluder også</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>Begynd</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
+      <translation>Før Hændelse</translation>
     </message>
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Slut</translation>
     </message>
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
+      <translation>Efter Hændelse</translation>
     </message>
   </context>
   <context>
@@ -5738,6 +5738,13 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
         <numerusform>Du er ved at flytte disse websider til Server &quot;%1&quot;. Disse websider proxyer alt anmodet indhold, og deres proxyserver vil ændres til Server &quot;%1&quot;.</numerusform>
         <numerusform>Du er ved at flytte disse websider til Server &quot;%1&quot;. Disse websider proxyer alt anmodet indhold, og deres proxyserver vil ændres til Server &quot;%1&quot;.</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>RestErrorStrings</name>
+    <message>
+      <source>Error code: %1</source>
+      <translation type="unfinished">Error code: %1</translation>
     </message>
   </context>
   <context>

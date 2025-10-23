@@ -390,11 +390,11 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>ไม่พบสิ่งใด</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>ลองเปลี่ยนพารามิเตอร์การค้นหา</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -410,7 +410,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>ทั้งหมด</translation>
     </message>
   </context>
   <context>

@@ -393,7 +393,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Nic nenalezeno</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -413,7 +413,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Vše</translation>
     </message>
   </context>
   <context>

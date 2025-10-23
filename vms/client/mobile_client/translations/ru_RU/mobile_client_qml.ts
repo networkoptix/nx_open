@@ -393,11 +393,11 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Ничего не найдено</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Попробуйте изменить параметры поиска</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -413,7 +413,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Все</translation>
     </message>
   </context>
   <context>
