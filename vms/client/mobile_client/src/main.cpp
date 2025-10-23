@@ -361,7 +361,9 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 
     auto settings = std::make_unique<QnMobileClientSettings>();
 
-    nx::vms::statistics::initCrashpad(settings->crashdumpUploadsEnabled());
+    nx::vms::statistics::initCrashpad(
+        settings->crashdumpUploadsEnabled(),
+        nx::build_info::mobileClientVersion());
 
     // Set required graphics API for HW video decoding.
     if (nx::build_info::isAndroid())

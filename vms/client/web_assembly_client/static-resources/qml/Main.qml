@@ -14,7 +14,7 @@ Window {
     color: "lightgrey"
     Text {
       anchors.centerIn: parent
-      text: "Hello Nx VMS Web Assembly Client\nApplication full version: " + applicationFullVersion
+      text: "Hello Nx VMS Web Assembly Client\nApplication full version: " + vmsFullVersion
     }
   }
 }

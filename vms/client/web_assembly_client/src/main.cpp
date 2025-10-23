@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     QQmlApplicationEngine engine;
 
     engine.rootContext()->setContextProperty(
-        "applicationFullVersion", nx::utils::AppInfo::applicationFullVersion());
+        "vmsFullVersion", nx::utils::AppInfo::vmsFullVersion());
 
     engine.load("qrc:///qml/Main.qml");
 

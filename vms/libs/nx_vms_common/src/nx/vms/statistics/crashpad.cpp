@@ -28,7 +28,7 @@ namespace nx::vms::statistics {
 
 namespace {
 
-std::map<std::string, std::string> getAnnotationsForCrash()
+std::map<std::string, std::string> getAnnotationsForCrash(const QString& appVersion)
 {
     std::map<std::string, std::string> annotations;
 
@@ -37,7 +37,7 @@ std::map<std::string, std::string> getAnnotationsForCrash()
         QFileInfo(QCoreApplication::applicationFilePath()).baseName().toStdString()});
     annotations.insert({
         "version",
-        nx::utils::AppInfo::applicationFullVersion().toStdString()});
+        nx::utils::AppInfo::appFullVersion(appVersion).toStdString()});
 
     const auto systemInfo = nx::vms::api::OsInformation::fromBuildInfo().toString();
     const auto systemRuntime = nx::vms::api::OsInformation::currentSystemRuntime();
@@ -136,7 +136,7 @@ base::FilePath getCrashHandlerPath()
 
 } // namespace
 
-NX_VMS_COMMON_API bool initCrashpad(bool enableUploads)
+NX_VMS_COMMON_API bool initCrashpad(bool enableUploads, const QString& appVersion)
 {
     // Initialize crash reports database and crash handler.
     const base::FilePath databasePath = getCrashReportDatabasePath();
@@ -161,7 +161,7 @@ NX_VMS_COMMON_API bool initCrashpad(bool enableUploads)
     const base::FilePath handlerPath = getCrashHandlerPath();
 
     // Add annotations and authorization header.
-    std::map<std::string, std::string> annotations = getAnnotationsForCrash();
+    std::map<std::string, std::string> annotations = getAnnotationsForCrash(appVersion);
 
     const std::string url = defaultCrashReportApiUrl().toStdString();
     const auto authHeaderValue =
