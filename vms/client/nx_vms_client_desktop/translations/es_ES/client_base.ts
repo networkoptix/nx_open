@@ -1201,22 +1201,22 @@
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
+      <translation>También incluye</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>Comienzo</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
+      <translation>Antes del Evento</translation>
     </message>
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Fin</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -12652,21 +12652,6 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
         <numerusform>%n custom headers</numerusform>
         <numerusform>%n custom headers</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
-    <message>
-      <source>No settings model</source>
-      <translation>Modelo sin configuraciones</translation>
-    </message>
-    <message>
-      <source>No parameters</source>
-      <translation>Sin parámetros</translation>
-    </message>
-    <message>
-      <source>Parameters set</source>
-      <translation>Parámetros establecidos</translation>
     </message>
   </context>
   <context>

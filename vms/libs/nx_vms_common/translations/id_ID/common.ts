@@ -1250,6 +1250,70 @@
         <numerusform>Tahun</numerusform>
       </translation>
     </message>
+    <message>
+      <source>milliseconds</source>
+      <translation type="unfinished">milliseconds</translation>
+    </message>
+    <message>
+      <source>seconds</source>
+      <translation type="unfinished">seconds</translation>
+    </message>
+    <message>
+      <source>minutes</source>
+      <translation type="unfinished">minutes</translation>
+    </message>
+    <message>
+      <source>hours</source>
+      <translation type="unfinished">hours</translation>
+    </message>
+    <message>
+      <source>days</source>
+      <translation type="unfinished">days</translation>
+    </message>
+    <message>
+      <source>weeks</source>
+      <translation type="unfinished">weeks</translation>
+    </message>
+    <message>
+      <source>months</source>
+      <translation type="unfinished">months</translation>
+    </message>
+    <message>
+      <source>years</source>
+      <translation type="unfinished">years</translation>
+    </message>
+    <message>
+      <source>Milliseconds</source>
+      <translation type="unfinished">Milliseconds</translation>
+    </message>
+    <message>
+      <source>Seconds</source>
+      <translation type="unfinished">Seconds</translation>
+    </message>
+    <message>
+      <source>Minutes</source>
+      <translation type="unfinished">Minutes</translation>
+    </message>
+    <message>
+      <source>Hours</source>
+      <translation type="unfinished">Hours</translation>
+    </message>
+    <message>
+      <source>Days</source>
+      <translation type="unfinished">Days</translation>
+    </message>
+    <message>
+      <source>Weeks</source>
+      <translation type="unfinished">Weeks</translation>
+    </message>
+    <message>
+      <source>Months</source>
+      <translation type="unfinished">Months</translation>
+    </message>
+    <message>
+      <source>Years</source>
+      <translation type="unfinished">Years</translation>
+    </message>
   </context>
   <context>
     <name>QnUserResource</name>
@@ -1871,7 +1935,7 @@
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
-      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+      <translation>Interval update untuk kunci publik dari Cloud.</translation>
     </message>
   </context>
 </TS>

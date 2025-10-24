@@ -5744,7 +5744,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <name>RestErrorStrings</name>
     <message>
       <source>Error code: %1</source>
-      <translation type="unfinished">Error code: %1</translation>
+      <translation>Felkod: %1</translation>
     </message>
   </context>
   <context>
@@ -12652,21 +12652,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
         <numerusform>%n anpassade rubriker</numerusform>
         <numerusform>%n anpassade rubriker</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
-    <message>
-      <source>No settings model</source>
-      <translation>Ingen inställningsmodell</translation>
-    </message>
-    <message>
-      <source>No parameters</source>
-      <translation>Ingen parameter</translation>
-    </message>
-    <message>
-      <source>Parameters set</source>
-      <translation>Parametrar inställda</translation>
     </message>
   </context>
   <context>

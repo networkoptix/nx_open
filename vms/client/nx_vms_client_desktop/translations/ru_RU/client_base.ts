@@ -13015,21 +13015,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
-    <message>
-      <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
-    </message>
-    <message>
-      <source>No parameters</source>
-      <translation>Параметры отсутствуют</translation>
-    </message>
-    <message>
-      <source>Parameters set</source>
-      <translation>Параметры установлены</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>

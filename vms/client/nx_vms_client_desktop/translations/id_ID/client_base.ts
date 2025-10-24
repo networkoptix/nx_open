@@ -1141,7 +1141,7 @@
     </message>
     <message>
       <source>Event log...</source>
-      <translation type="unfinished">Event log...</translation>
+      <translation>Event Log...</translation>
     </message>
   </context>
   <context>
@@ -5668,7 +5668,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>RestErrorStrings</name>
     <message>
       <source>Error code: %1</source>
-      <translation type="unfinished">Error code: %1</translation>
+      <translation>Kode error：%1</translation>
     </message>
   </context>
   <context>
@@ -12473,21 +12473,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       <translation>
         <numerusform>%n header kustom</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
-    <message>
-      <source>No settings model</source>
-      <translation>Tidak ada pengaturan model</translation>
-    </message>
-    <message>
-      <source>No parameters</source>
-      <translation>Tidak ada parameter</translation>
-    </message>
-    <message>
-      <source>Parameters set</source>
-      <translation>Parameter ditetapkan</translation>
     </message>
   </context>
   <context>

@@ -12653,21 +12653,6 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
-    <message>
-      <source>No settings model</source>
-      <translation>Ingen indstillingsmodel</translation>
-    </message>
-    <message>
-      <source>No parameters</source>
-      <translation>Ingen parametre</translation>
-    </message>
-    <message>
-      <source>Parameters set</source>
-      <translation>Parametre indstillet</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>

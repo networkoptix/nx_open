@@ -12476,21 +12476,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
-    <message>
-      <source>No settings model</source>
-      <translation>Không có mô hình cài đặt</translation>
-    </message>
-    <message>
-      <source>No parameters</source>
-      <translation>Không có tham số</translation>
-    </message>
-    <message>
-      <source>Parameters set</source>
-      <translation>Các thông số được thiết lập</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>

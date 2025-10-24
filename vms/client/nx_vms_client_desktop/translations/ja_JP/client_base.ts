@@ -5668,7 +5668,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>RestErrorStrings</name>
     <message>
       <source>Error code: %1</source>
-      <translation type="unfinished">Error code: %1</translation>
+      <translation>エラーコード: %1</translation>
     </message>
   </context>
   <context>
@@ -12472,21 +12472,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>
         <numerusform>%n カスタムヘッダー</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
-    <message>
-      <source>No settings model</source>
-      <translation>設定モデルなし</translation>
-    </message>
-    <message>
-      <source>No parameters</source>
-      <translation>パラメーターなし</translation>
-    </message>
-    <message>
-      <source>Parameters set</source>
-      <translation>パラメーター設定済み</translation>
     </message>
   </context>
   <context>

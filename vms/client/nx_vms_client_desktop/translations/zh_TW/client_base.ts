@@ -12471,21 +12471,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
-    <message>
-      <source>No settings model</source>
-      <translation>無設定模型</translation>
-    </message>
-    <message>
-      <source>No parameters</source>
-      <translation>沒有參數</translation>
-    </message>
-    <message>
-      <source>Parameters set</source>
-      <translation>參數設定</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>

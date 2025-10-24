@@ -12652,21 +12652,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
-    <message>
-      <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
-    </message>
-    <message>
-      <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
-    </message>
-    <message>
-      <source>Parameters set</source>
-      <translation>Parametere satt</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
