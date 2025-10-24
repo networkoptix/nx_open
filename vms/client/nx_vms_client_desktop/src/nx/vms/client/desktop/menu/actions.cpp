@@ -1357,6 +1357,7 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::canSaveLayoutAs()
             && condition::isLoggedInAsCloudUser()
+            && condition::hasDocDBService()
             && condition::hasFlags(Qn::cross_system, MatchMode::none)
         );
 

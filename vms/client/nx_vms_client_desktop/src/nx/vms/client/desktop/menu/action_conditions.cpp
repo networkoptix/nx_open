@@ -39,6 +39,7 @@
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
+#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
@@ -2629,6 +2630,16 @@ ConditionWrapper parentServerHasActiveBackupStorage()
                     return camera->getParentServer()
                         && camera->getParentServer()->hasActiveBackupStorages();
                 });
+        });
+}
+
+ConditionWrapper hasDocDBService()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, WindowContext* /*context*/)
+        {
+            return appContext()->cloudServiceChecker()->hasService(
+                nx::vms::client::core::CloudService::docdb);
         });
 }
 

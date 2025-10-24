@@ -7,16 +7,25 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/rules/actions/push_notification_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/compatibility.h>
 #include <nx/vms/rules/utils/field.h>
+#include <nx/vms/rules/utils/type.h>
 #include <ui/common/palette.h>
 
+namespace {
+
+const auto kPushNotificationActionId =
+    nx::vms::rules::utils::type<nx::vms::rules::PushNotificationAction>();
+
+} // namespace
 namespace nx::vms::client::desktop::rules {
 
 ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* parent):
