@@ -690,17 +690,6 @@
     </message>
 </context>
 <context>
-    <name>nx::vms::rules::IntegrationAction</name>
-    <message>
-        <source>Integration Action</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Integration Action Parameters</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
         <source>For Plugin</source>

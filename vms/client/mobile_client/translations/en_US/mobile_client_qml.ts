@@ -413,6 +413,22 @@
         <source>All</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Notifications Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FiltersPanel</name>
