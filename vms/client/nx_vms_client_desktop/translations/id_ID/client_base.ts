@@ -1141,7 +1141,7 @@
     </message>
     <message>
       <source>Event log...</source>
-      <translation type="unfinished">Event log...</translation>
+      <translation>Event Log...</translation>
     </message>
   </context>
   <context>
@@ -5662,6 +5662,13 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>
         <numerusform>Anda akan memindahkan halaman web ini ke Server &quot;%1&quot;. Halaman web ini memproksi semua konten yang diminta, dan server proksinya akan berubah menjadi Server &quot;%1&quot;.</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>RestErrorStrings</name>
+    <message>
+      <source>Error code: %1</source>
+      <translation>Kode error：%1</translation>
     </message>
   </context>
   <context>

@@ -5741,6 +5741,13 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
   </context>
   <context>
+    <name>RestErrorStrings</name>
+    <message>
+      <source>Error code: %1</source>
+      <translation type="unfinished">Error code: %1</translation>
+    </message>
+  </context>
+  <context>
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>

@@ -5741,6 +5741,13 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>RestErrorStrings</name>
+    <message>
+      <source>Error code: %1</source>
+      <translation>Felkod: %1</translation>
+    </message>
+  </context>
+  <context>
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>
