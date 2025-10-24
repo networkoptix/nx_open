@@ -41,11 +41,20 @@ SupportInfo supportInfoFromDeviceAgentManifest(const DeviceAgentManifest& device
     for (const QString& objectTypeId: deviceAgentManifest.supportedObjectTypeIds)
         result.objectTypeSupport[objectTypeId] = std::set<QString>();
 
-    for (const auto& eventType: deviceAgentManifest.eventTypes)
-        result.eventTypeSupport[eventType.id] = std::set<QString>();
-
-    for (const auto& objectType: deviceAgentManifest.objectTypes)
-        result.objectTypeSupport[objectType.id] = std::set<QString>();
+    auto addTypes =
+        [](auto* target, const auto& types)
+        {
+            for (const auto& type: types)
+            {
+                target->emplace(type.id, std::set<QString>());
+                if (auto base = type.base.value_or(QString()); !base.isEmpty())
+                    target->emplace(std::move(base), std::set<QString>());
+            }
+        };
+    addTypes(&result.eventTypeSupport, deviceAgentManifest.eventTypes);
+    addTypes(&result.eventTypeSupport, deviceAgentManifest.typeLibrary.eventTypes);
+    addTypes(&result.objectTypeSupport, deviceAgentManifest.objectTypes);
+    addTypes(&result.objectTypeSupport, deviceAgentManifest.typeLibrary.objectTypes);
 
     for (const auto& supportedType: deviceAgentManifest.supportedTypes)
     {
