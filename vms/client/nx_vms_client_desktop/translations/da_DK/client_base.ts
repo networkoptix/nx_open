@@ -5744,7 +5744,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <name>RestErrorStrings</name>
     <message>
       <source>Error code: %1</source>
-      <translation type="unfinished">Error code: %1</translation>
+      <translation>Fejlkode: %1</translation>
     </message>
   </context>
   <context>
