@@ -1453,35 +1453,35 @@
     </message>
     <message>
       <source>milliseconds</source>
-      <translation type="unfinished">milliseconds</translation>
+      <translation>מילי שניות</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>שניות</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>דקות</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>שעות</translation>
     </message>
     <message>
       <source>days</source>
-      <translation type="unfinished">days</translation>
+      <translation>ימים</translation>
     </message>
     <message>
       <source>weeks</source>
-      <translation type="unfinished">weeks</translation>
+      <translation>שבועות</translation>
     </message>
     <message>
       <source>months</source>
-      <translation type="unfinished">months</translation>
+      <translation>חודשים</translation>
     </message>
     <message>
       <source>years</source>
-      <translation type="unfinished">years</translation>
+      <translation>שנים</translation>
     </message>
     <message>
       <source>Milliseconds</source>
@@ -1493,7 +1493,7 @@
     </message>
     <message>
       <source>Minutes</source>
-      <translation type="unfinished">Minutes</translation>
+      <translation>דקות</translation>
     </message>
     <message>
       <source>Hours</source>

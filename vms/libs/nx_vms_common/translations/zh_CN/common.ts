@@ -1252,35 +1252,35 @@
     </message>
     <message>
       <source>milliseconds</source>
-      <translation type="unfinished">milliseconds</translation>
+      <translation>毫秒</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>分</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>小时</translation>
     </message>
     <message>
       <source>days</source>
-      <translation type="unfinished">days</translation>
+      <translation>天</translation>
     </message>
     <message>
       <source>weeks</source>
-      <translation type="unfinished">weeks</translation>
+      <translation>周</translation>
     </message>
     <message>
       <source>months</source>
-      <translation type="unfinished">months</translation>
+      <translation>月</translation>
     </message>
     <message>
       <source>years</source>
-      <translation type="unfinished">years</translation>
+      <translation>年</translation>
     </message>
     <message>
       <source>Milliseconds</source>

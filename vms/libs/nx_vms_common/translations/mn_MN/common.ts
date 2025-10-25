@@ -1328,15 +1328,15 @@
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>минут</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>цаг</translation>
     </message>
     <message>
       <source>days</source>
-      <translation type="unfinished">days</translation>
+      <translation>өдөр</translation>
     </message>
     <message>
       <source>weeks</source>
@@ -1368,7 +1368,7 @@
     </message>
     <message>
       <source>Days</source>
-      <translation type="unfinished">Days</translation>
+      <translation>Өдөр</translation>
     </message>
     <message>
       <source>Weeks</source>

@@ -1256,11 +1256,11 @@
     </message>
     <message>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>seconds</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>minutes</translation>
     </message>
     <message>
       <source>hours</source>
@@ -1292,7 +1292,7 @@
     </message>
     <message>
       <source>Minutes</source>
-      <translation type="unfinished">Minutes</translation>
+      <translation>Minutes</translation>
     </message>
     <message>
       <source>Hours</source>

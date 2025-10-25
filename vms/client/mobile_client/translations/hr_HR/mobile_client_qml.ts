@@ -428,7 +428,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Settings</translation>
     </message>
   </context>
   <context>

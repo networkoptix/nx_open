@@ -415,19 +415,19 @@
     </message>
     <message>
       <source>Notifications Off</source>
-      <translation type="unfinished">Notifications Off</translation>
+      <translation>Notifikationer Fra</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+      <translation>Notifikationer er i øjeblikket deaktiveret for denne app. For at aktivere meddelelser skal du bruge din telefon&apos;s indstillinger</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+      <translation>Du deaktiverede push notifikationer for dette websted. For at aktivere dem, gå til siden Indstillinger.</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Indstillinger</translation>
     </message>
   </context>
   <context>

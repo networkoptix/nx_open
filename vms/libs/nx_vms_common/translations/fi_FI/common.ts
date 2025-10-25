@@ -1319,35 +1319,35 @@
     </message>
     <message>
       <source>milliseconds</source>
-      <translation type="unfinished">milliseconds</translation>
+      <translation>millisekuntia</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sekuntia</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>minuuttia</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>tuntia</translation>
     </message>
     <message>
       <source>days</source>
-      <translation type="unfinished">days</translation>
+      <translation>päiviä</translation>
     </message>
     <message>
       <source>weeks</source>
-      <translation type="unfinished">weeks</translation>
+      <translation>viikkoa</translation>
     </message>
     <message>
       <source>months</source>
-      <translation type="unfinished">months</translation>
+      <translation>kuukautta</translation>
     </message>
     <message>
       <source>years</source>
-      <translation type="unfinished">years</translation>
+      <translation>vuotta</translation>
     </message>
     <message>
       <source>Milliseconds</source>
@@ -1359,7 +1359,7 @@
     </message>
     <message>
       <source>Minutes</source>
-      <translation type="unfinished">Minutes</translation>
+      <translation>Minuuttia</translation>
     </message>
     <message>
       <source>Hours</source>

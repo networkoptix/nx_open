@@ -1319,35 +1319,35 @@
     </message>
     <message>
       <source>milliseconds</source>
-      <translation type="unfinished">milliseconds</translation>
+      <translation>mil·lisegons</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>segons</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>minuts</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>hores</translation>
     </message>
     <message>
       <source>days</source>
-      <translation type="unfinished">days</translation>
+      <translation>dies</translation>
     </message>
     <message>
       <source>weeks</source>
-      <translation type="unfinished">weeks</translation>
+      <translation>setmanes</translation>
     </message>
     <message>
       <source>months</source>
-      <translation type="unfinished">months</translation>
+      <translation>mesos</translation>
     </message>
     <message>
       <source>years</source>
-      <translation type="unfinished">years</translation>
+      <translation>anys</translation>
     </message>
     <message>
       <source>Milliseconds</source>

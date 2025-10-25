@@ -1319,67 +1319,67 @@
     </message>
     <message>
       <source>milliseconds</source>
-      <translation type="unfinished">milliseconds</translation>
+      <translation>millisekunder</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sekunder</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>minuter</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>timmar</translation>
     </message>
     <message>
       <source>days</source>
-      <translation type="unfinished">days</translation>
+      <translation>dagar</translation>
     </message>
     <message>
       <source>weeks</source>
-      <translation type="unfinished">weeks</translation>
+      <translation>veckor</translation>
     </message>
     <message>
       <source>months</source>
-      <translation type="unfinished">months</translation>
+      <translation>månader</translation>
     </message>
     <message>
       <source>years</source>
-      <translation type="unfinished">years</translation>
+      <translation>år</translation>
     </message>
     <message>
       <source>Milliseconds</source>
-      <translation type="unfinished">Milliseconds</translation>
+      <translation>Millisekunder</translation>
     </message>
     <message>
       <source>Seconds</source>
-      <translation type="unfinished">Seconds</translation>
+      <translation>Sekunder</translation>
     </message>
     <message>
       <source>Minutes</source>
-      <translation type="unfinished">Minutes</translation>
+      <translation>Minuter</translation>
     </message>
     <message>
       <source>Hours</source>
-      <translation type="unfinished">Hours</translation>
+      <translation>Timmar</translation>
     </message>
     <message>
       <source>Days</source>
-      <translation type="unfinished">Days</translation>
+      <translation>Dagar</translation>
     </message>
     <message>
       <source>Weeks</source>
-      <translation type="unfinished">Weeks</translation>
+      <translation>Veckor</translation>
     </message>
     <message>
       <source>Months</source>
-      <translation type="unfinished">Months</translation>
+      <translation>Månader</translation>
     </message>
     <message>
       <source>Years</source>
-      <translation type="unfinished">Years</translation>
+      <translation>År</translation>
     </message>
   </context>
   <context>

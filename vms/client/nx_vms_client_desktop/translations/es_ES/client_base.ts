@@ -1221,7 +1221,7 @@
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
+      <translation>Después del Evento</translation>
     </message>
   </context>
   <context>

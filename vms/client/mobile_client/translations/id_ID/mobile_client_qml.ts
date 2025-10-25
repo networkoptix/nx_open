@@ -426,7 +426,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Pengaturan</translation>
     </message>
   </context>
   <context>

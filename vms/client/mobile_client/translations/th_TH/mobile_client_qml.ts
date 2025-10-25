@@ -426,7 +426,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>การตั้งค่า</translation>
     </message>
   </context>
   <context>

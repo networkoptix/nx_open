@@ -1319,67 +1319,67 @@
     </message>
     <message>
       <source>milliseconds</source>
-      <translation type="unfinished">milliseconds</translation>
+      <translation>milisaniye</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>saniye</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>dakika</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>saat</translation>
     </message>
     <message>
       <source>days</source>
-      <translation type="unfinished">days</translation>
+      <translation>gün</translation>
     </message>
     <message>
       <source>weeks</source>
-      <translation type="unfinished">weeks</translation>
+      <translation>hafta</translation>
     </message>
     <message>
       <source>months</source>
-      <translation type="unfinished">months</translation>
+      <translation>ay</translation>
     </message>
     <message>
       <source>years</source>
-      <translation type="unfinished">years</translation>
+      <translation>yıl</translation>
     </message>
     <message>
       <source>Milliseconds</source>
-      <translation type="unfinished">Milliseconds</translation>
+      <translation>Milisaniye</translation>
     </message>
     <message>
       <source>Seconds</source>
-      <translation type="unfinished">Seconds</translation>
+      <translation>Saniye</translation>
     </message>
     <message>
       <source>Minutes</source>
-      <translation type="unfinished">Minutes</translation>
+      <translation>Dakika</translation>
     </message>
     <message>
       <source>Hours</source>
-      <translation type="unfinished">Hours</translation>
+      <translation>Saat</translation>
     </message>
     <message>
       <source>Days</source>
-      <translation type="unfinished">Days</translation>
+      <translation>Günler</translation>
     </message>
     <message>
       <source>Weeks</source>
-      <translation type="unfinished">Weeks</translation>
+      <translation>Haftalar</translation>
     </message>
     <message>
       <source>Months</source>
-      <translation type="unfinished">Months</translation>
+      <translation>Aylar</translation>
     </message>
     <message>
       <source>Years</source>
-      <translation type="unfinished">Years</translation>
+      <translation>Yıllar</translation>
     </message>
   </context>
   <context>

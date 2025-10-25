@@ -429,7 +429,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Nastavení</translation>
     </message>
   </context>
   <context>
