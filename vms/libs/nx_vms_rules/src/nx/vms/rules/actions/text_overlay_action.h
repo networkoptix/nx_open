@@ -19,7 +19,7 @@ class NX_VMS_RULES_API TextOverlayAction: public BasicAction
     FIELD(QString, text, setText)
 
     FIELD(QString, extendedCaption, setExtendedCaption)
-    FIELD(QStringList, detailing, setDetailing)
+    FIELD(QString, detailing, setDetailing)
 
 public:
     static const ItemDescriptor& manifest();

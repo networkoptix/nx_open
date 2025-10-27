@@ -5,7 +5,7 @@
 #include <nx/utils/metatypes.h>
 
 #include "../base_fields/simple_type_field.h"
-#include "../common/time_field_properties.h"
+#include "../base_fields/time_field_properties.h"
 #include "../manifest.h"
 
 namespace nx::vms::rules {

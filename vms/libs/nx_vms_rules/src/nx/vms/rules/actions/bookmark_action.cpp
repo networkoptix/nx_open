@@ -5,7 +5,9 @@
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_devices_field.h"
 #include "../action_builder_fields/text_field.h"
+#include "../action_builder_fields/text_with_fields.h"
 #include "../action_builder_fields/time_field.h"
+#include "../ini.h"
 #include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -65,9 +67,14 @@ const ItemDescriptor& BookmarkAction::manifest()
             utils::makeExtractDetailFieldDescriptor(
                 utils::kNameFieldName,
                 utils::kExtendedCaptionDetailName),
-            utils::makeExtractDetailFieldDescriptor(
+            makeFieldDescriptor<TextWithFields>(
                 utils::kDescriptionFieldName,
-                utils::kDetailingDetailName),
+                NX_DYNAMIC_TRANSLATABLE(Strings::description()),
+                {},
+                {
+                    {"text", "{event.detailingWithAttributes}"},
+                    {"visible", ini().showHiddenTextFields}
+                })
         },
         .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };

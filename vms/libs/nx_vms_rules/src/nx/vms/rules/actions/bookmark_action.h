@@ -20,7 +20,7 @@ class NX_VMS_RULES_API BookmarkAction: public nx::vms::rules::BasicAction
     FIELD(QString, tags, setTags)
 
     FIELD(QString, name, setName)
-    FIELD(QStringList, description, setDescription)
+    FIELD(QString, description, setDescription)
 
 public:
     static const ItemDescriptor& manifest();

@@ -339,6 +339,18 @@ void EventParameterHelper::Private::initFormatFunctions()
             }
         });
 
+    registerFormatFunction("event.detailingWithAttributes",
+        {
+            .formatFunction =
+                [](auto substitution, auto context)
+                {
+                    return Strings::eventDetailing(
+                        context, substitution->event, Qn::RI_NameOnly, true /*withAttributes*/)
+                        .join('\n');
+                },
+            .visible = false
+        });
+
     registerFormatFunction("event.eventName",
         {
             .formatFunction = extractDetailFunction(kCaptionDetailName, Qn::RI_NameOnly),

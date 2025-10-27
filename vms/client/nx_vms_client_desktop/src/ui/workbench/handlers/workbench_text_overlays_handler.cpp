@@ -205,7 +205,7 @@ void QnWorkbenchTextOverlaysHandler::execute(const nx::vms::rules::ActionPtr& ac
         const QString textHtml = formatOverlayText(
             overlayAction->text().trimmed(),
             overlayAction->extendedCaption(),
-            overlayAction->detailing());
+            overlayAction->detailing().split('\n'));
 
         for (const auto& camera: cameras)
             d->showTextOverlays(camera, ruleId, textHtml, duration);

@@ -8,6 +8,7 @@
 #include "../action_builder_fields/target_devices_field.h"
 #include "../action_builder_fields/target_users_field.h"
 #include "../action_builder_fields/text_with_fields.h"
+#include "../ini.h"
 #include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -52,9 +53,14 @@ const ItemDescriptor& TextOverlayAction::manifest()
             utils::makeExtractDetailFieldDescriptor(
                 utils::kExtendedCaptionFieldName,
                 utils::kExtendedCaptionDetailName),
-            utils::makeExtractDetailFieldDescriptor(
-                utils::kDetailingFieldName,
-                utils::kDetailingDetailName),
+            makeFieldDescriptor<TextWithFields>(
+                "detailing",
+                NX_DYNAMIC_TRANSLATABLE(Strings::description()),
+                {},
+                {
+                    {"text", "{event.detailingWithAttributes}"},
+                    {"visible", ini().showHiddenTextFields}
+                })
         },
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},

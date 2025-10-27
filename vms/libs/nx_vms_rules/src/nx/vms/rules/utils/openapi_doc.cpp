@@ -12,7 +12,7 @@
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/rules/common/time_field_properties.h>
+#include <nx/vms/rules/base_fields/time_field_properties.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/field_types.h>
 #include <nx/vms/rules/manifest.h>
