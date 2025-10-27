@@ -53,7 +53,7 @@ QuickControls.Page
                 id: toolBar
                 title: control && control.title
                 titleUnderlineVisible: control.titleUnderlineVisible
-                leftButtonIcon.source: d.kBackButtonIconSource
+                leftButtonIcon.source: stackView.depth > 1 ? d.kBackButtonIconSource : ""
                 onLeftButtonClicked: control.leftButtonClicked()
                 onClicked: control.headerClicked()
             }
