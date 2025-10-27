@@ -41,6 +41,13 @@ Page
                 "text": qsTr("App Settings"),
                 "action": () => Workflow.openSettingsScreen()
             },
+            {
+                "iconSource": "image://skin/24x24/Outline/qr.svg",
+                "text": qsTr("Add Server"),
+                "action":
+                    () => windowContext.mainSystemContext.deploymentManager.deployNewServer(),
+                "visible": windowContext.mainSystemContext.featureAccess.canUseDeployByQrFeature
+            },
         ]
 
         delegate: MenuButtonItem
@@ -53,6 +60,7 @@ Page
             icon.source: modelData.iconSource
             icon.width: 24
             icon.height: 24
+            visible: modelData?.visible ?? true
             Component.onCompleted:
             {
                 if (modelData.initialize)

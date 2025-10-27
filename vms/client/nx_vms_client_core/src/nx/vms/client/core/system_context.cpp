@@ -64,6 +64,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
                 std::make_unique<RemoteSessionTimeoutWatcher>(globalSettings());
             d->trafficRelayUrlWatcher = std::make_unique<TrafficRelayUrlWatcher>(this);
             d->featureAccessWatcher = std::make_unique<FeatureAccessWatcher>(this);
+            d->deploymentManager = std::make_unique<DeploymentManager>(this);
             break;
         }
 
@@ -362,6 +363,11 @@ RemoteSessionTimeoutWatcher* SystemContext::sessionTimeoutWatcher() const
 TrafficRelayUrlWatcher* SystemContext::trafficRelayUrlWatcher() const
 {
     return d->trafficRelayUrlWatcher.get();
+}
+
+DeploymentManager* SystemContext::deploymentManager() const
+{
+    return d->deploymentManager.get();
 }
 
 CameraDataManager* SystemContext::cameraDataManager() const

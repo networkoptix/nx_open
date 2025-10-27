@@ -17,6 +17,7 @@
 #include <nx/vms/client/core/network/server_primary_interface_watcher.h>
 #include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/core/utils/deployment_manager.h>
 #include <nx/vms/client/core/utils/video_cache.h>
 #include <nx/vms/client/core/watchers/feature_access_watcher.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -59,6 +60,7 @@ struct SystemContext::Private
     std::unique_ptr<RemoteSessionTimeoutWatcher> sessionTimeoutWatcher;
     std::unique_ptr<TrafficRelayUrlWatcher> trafficRelayUrlWatcher;
     std::unique_ptr<FeatureAccessWatcher> featureAccessWatcher;
+    std::unique_ptr<DeploymentManager> deploymentManager;
 
     mutable nx::Mutex sessionMutex;
 
