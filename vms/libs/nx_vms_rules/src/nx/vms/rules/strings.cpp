@@ -6,6 +6,7 @@
 
 #include <QtCore/QDateTime>
 
+#include <analytics/common/object_metadata.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -28,12 +29,34 @@
 #include "field_types.h"
 #include "manifest.h"
 #include "utils/event_details.h"
+#include "utils/field_names.h"
 
 namespace {
+
+static const int kMaxValuesInGroup = 2;
 
 QDateTime dateTimeFromMicroseconds(std::chrono::microseconds timestamp)
 {
     return QDateTime::fromMSecsSinceEpoch(timestamp.count() / 1000);
+}
+
+QStringList serializeAttributes(
+    const nx::common::metadata::GroupedAttributes& attributes,
+    const QString& nestedAttributeDelimiter)
+{
+    QStringList result;
+    for (const auto& group: attributes)
+    {
+        QString groupName = group.name;
+        groupName.replace(".", nestedAttributeDelimiter);
+
+        const auto count = std::min<qsizetype>(group.values.size(), kMaxValuesInGroup);
+        result << NX_FMT("%1: %2",
+            groupName,
+            nx::utils::strJoin(group.values.cbegin(), group.values.cbegin() + count, ", "));
+    }
+
+    return result;
 }
 
 } // namespace
@@ -148,7 +171,7 @@ QString Strings::resourceIp(const QnResourcePtr& resource)
 }
 
 QString Strings::eventExtendedDescription(
-    AggregatedEventPtr event,
+    const AggregatedEventPtr& event,
     common::SystemContext* context,
     Qn::ResourceInfoLevel detailLevel)
 {
@@ -185,6 +208,28 @@ QString Strings::eventExtendedDescription(
         result.push_back(Strings::totalNumberOfEvents(QString::number(event->count())));
     }
     return result.join(kLinesSeparator);
+}
+
+QStringList Strings::eventDetailing(
+    common::SystemContext* context,
+    const AggregatedEventPtr& event,
+    Qn::ResourceInfoLevel detailLevel,
+    bool withAttributes)
+{
+    auto result = eventDetails(event->details(context, detailLevel));
+    if (withAttributes)
+    {
+        if (auto value = event->property(utils::kAttributesFieldName); value.isValid())
+        {
+            // Serializing attributes as single line for now.
+            result << serializeAttributes(
+                nx::common::metadata::groupAttributes(
+                    value.value<nx::common::metadata::Attributes>()),
+                /* nestedAttributeDelimiter */ " ").join(' ');
+        }
+    }
+
+    return result;
 }
 
 QString Strings::urlForCamera(

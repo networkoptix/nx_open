@@ -56,7 +56,7 @@ public:
     static QString resourceIp(const QnResourcePtr& resource);
 
     static QString eventExtendedDescription(
-        AggregatedEventPtr event,
+        const AggregatedEventPtr& event,
         common::SystemContext* context,
         Qn::ResourceInfoLevel detailLevel);
 
@@ -79,6 +79,11 @@ public:
     static QString eventName(Engine* engine, const QString& type);
     static QString eventName(common::SystemContext* context, const QString& type);
     static QStringList eventDetails(const QVariantMap& details);
+    static QStringList eventDetailing(
+        common::SystemContext* context,
+        const AggregatedEventPtr& event,
+        Qn::ResourceInfoLevel detailLevel,
+        bool withAttributes);
 
     static QString actionName(Engine* engine, const QString& type);
     static QString actionName(common::SystemContext* context, const QString& type);

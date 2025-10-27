@@ -632,7 +632,11 @@ QString EventLogModel::description(const EventLogModelData& data) const
         vms::rules::utils::kDescriptionDetailName).toString();
 
     if (result.isEmpty())
-        result = Strings::eventDetails(data.details(systemContext())).join('\n');
+    {
+        result = Strings::eventDetailing(
+            systemContext(), data.event(systemContext()), detailLevel(), /*withAttributes*/ true)
+            .join(' ');
+    }
 
     if (result.isEmpty() && hasVideoLink(systemContext(), data))
     {
