@@ -1129,6 +1129,16 @@ bool QnRtspClientArchiveDelegate::setupRtspSession(
             NX_DEBUG(this, "Proxy access through server %1:%2", proxy.hostName(), proxy.port());
             session->setProxyAddr(proxy.hostName(), proxy.port());
         }
+
+        // Servers prior to version 6.1 do not process 'Range: clock=now-' as 'live' and can proxy
+        // the request to another server that stores the archive of this camera. So, we disable
+        // proxy live(ProxyLiveStreamProvider) using the guid server ID, as before.
+        auto serverVersion = extractServerVersion(session->serverInfo());
+        if (!serverVersion.isNull() && serverVersion < nx::utils::SoftwareVersion(6, 1))
+        {
+            session->setAdditionAttribute(
+                Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray(QUuid::WithBraces));
+        }
     }
 
     session->setTransport(nx::vms::api::RtpTransportType::tcp);
