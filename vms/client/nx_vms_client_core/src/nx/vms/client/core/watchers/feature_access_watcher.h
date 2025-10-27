@@ -20,6 +20,10 @@ class NX_VMS_CLIENT_CORE_API FeatureAccessWatcher: public QObject,
         READ canUseShareBookmark
         NOTIFY canUseShareBookmarkChanged)
 
+    Q_PROPERTY(bool canUseDeployByQrFeature
+        READ canUseDeployByQrFeature
+        NOTIFY canUseDeployByQrFeatureChanged)
+
 public:
     FeatureAccessWatcher(SystemContext* context, QObject* parent = nullptr);
 
@@ -27,8 +31,12 @@ public:
 
     bool canUseShareBookmark() const;
 
+    bool canUseDeployByQrFeature() const;
+
 signals:
     void canUseShareBookmarkChanged();
+
+    void canUseDeployByQrFeatureChanged();
 
 private:
     struct Private;

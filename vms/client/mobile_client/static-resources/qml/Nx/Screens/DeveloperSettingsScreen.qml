@@ -299,6 +299,17 @@ BaseSettingsScreen
             color: ColorTheme.colors.red_core
             onClicked: NxGlobals.forceCrash()
         }
+
+        LabeledSwitch
+        {
+            id: allowDeployByQrCodeFeatureSwitch
+
+            width: parent.width
+            text: "Allow QR code feature"
+            checkState: appContext.settings.allowDeployByQrCodeFeature ? Qt.Checked : Qt.Unchecked
+            onCheckStateChanged:
+                appContext.settings.allowDeployByQrCodeFeature = (checkState !== Qt.Unchecked)
+        }
     }
 
     ItemSelectionDialog

@@ -15,6 +15,7 @@ Q_MOC_INCLUDE("camera/camera_bookmarks_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/core/watchers/feature_access_watcher.h")
 Q_MOC_INCLUDE("nx/vms/client/core/watchers/user_watcher.h")
 Q_MOC_INCLUDE("nx/vms/client/core/watchers/watermark_watcher.h")
+Q_MOC_INCLUDE("nx/vms/client/core/utils/deployment_manager.h")
 
 class QnPtzControllerPool;
 class QQmlContext;
@@ -37,6 +38,7 @@ namespace nx::vms::client::core {
 class AccessController;
 class AnalyticsEventsSearchTreeBuilder;
 class CameraDataManager;
+class DeploymentManager;
 class FeatureAccessWatcher;
 class IoPortsCompatibilityInterface;
 class ServerRuntimeEventConnector;
@@ -77,6 +79,10 @@ class NX_VMS_CLIENT_CORE_API SystemContext: public common::SystemContext
 
     Q_PROPERTY(FeatureAccessWatcher* featureAccess
         READ featureAccess
+        CONSTANT)
+
+    Q_PROPERTY(DeploymentManager* deploymentManager
+        READ deploymentManager
         CONSTANT)
 
 public:
@@ -206,6 +212,8 @@ public:
     RemoteSessionTimeoutWatcher* sessionTimeoutWatcher() const;
 
     TrafficRelayUrlWatcher* trafficRelayUrlWatcher() const;
+
+    DeploymentManager* deploymentManager() const;
 
 signals:
     void remoteIdChanged(const nx::Uuid& id);
