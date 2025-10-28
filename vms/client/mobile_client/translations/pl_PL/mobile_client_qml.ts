@@ -246,11 +246,11 @@
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation type="unfinished">Copy Client ID</translation>
+      <translation>Kopiuj identyfikator klienta</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation type="unfinished">Force Crash</translation>
+      <translation>Wymuszona awaria</translation>
     </message>
   </context>
   <context>
@@ -501,6 +501,10 @@
       <source>Logged in as %1</source>
       <comment>%1 is a user name</comment>
       <translation>Zalogowano jako %1</translation>
+    </message>
+    <message>
+      <source>Add Server</source>
+      <translation type="unfinished">Add Server</translation>
     </message>
   </context>
   <context>

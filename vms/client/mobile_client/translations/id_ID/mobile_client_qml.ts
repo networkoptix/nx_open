@@ -499,6 +499,10 @@
       <comment>%1 is a user name</comment>
       <translation>Masuk sebagai %1</translation>
     </message>
+    <message>
+      <source>Add Server</source>
+      <translation type="unfinished">Add Server</translation>
+    </message>
   </context>
   <context>
     <name>MoveOnTapOverlay</name>

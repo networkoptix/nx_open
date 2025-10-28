@@ -499,6 +499,10 @@
       <comment>%1 is a user name</comment>
       <translation>%1 로 로그인됨</translation>
     </message>
+    <message>
+      <source>Add Server</source>
+      <translation type="unfinished">Add Server</translation>
+    </message>
   </context>
   <context>
     <name>MoveOnTapOverlay</name>
