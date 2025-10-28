@@ -1218,7 +1218,7 @@
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>Start</translation>
     </message>
     <message>
       <source>Before Event</source>
@@ -5895,7 +5895,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>RestErrorStrings</name>
     <message>
       <source>Error code: %1</source>
-      <translation type="unfinished">Error code: %1</translation>
+      <translation>Kod błędu: %1</translation>
     </message>
   </context>
   <context>
