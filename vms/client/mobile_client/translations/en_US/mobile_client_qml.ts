@@ -500,6 +500,10 @@
         <comment>%1 is a user name</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Add Server</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MoveOnTapOverlay</name>
