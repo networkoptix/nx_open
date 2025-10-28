@@ -2078,7 +2078,7 @@
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
-      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+      <translation>Interwał aktualizacji kluczy publicznych z chmury.</translation>
     </message>
   </context>
 </TS>

@@ -306,11 +306,11 @@
     </message>
     <message>
       <source>Select Integration Action</source>
-      <translation type="unfinished">Select Integration Action</translation>
+      <translation>Wybierz akcję integracji</translation>
     </message>
     <message>
       <source>Integration not found for Integration Action %1</source>
-      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+      <translation>Nie znaleziono integracji dla akcji integracji %1</translation>
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
@@ -484,25 +484,25 @@
     </message>
     <message>
       <source>Device disconnected</source>
-      <translation type="unfinished">Device disconnected</translation>
+      <translation>Urządzenie odłączone</translation>
     </message>
     <message>
       <source>Camera disconnected</source>
-      <translation type="unfinished">Camera disconnected</translation>
+      <translation>Kamera rozłączona</translation>
     </message>
     <message>
       <source>I/O Module disconnected</source>
-      <translation type="unfinished">I/O Module disconnected</translation>
+      <translation>Moduł I/O odłączony</translation>
     </message>
     <message>
       <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device disconnected at %1</translation>
+      <translation>Urządzenie rozłączone w %1</translation>
     </message>
     <message>
       <source>Camera disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera disconnected at %1</translation>
+      <translation>Kamera odłączona w %1</translation>
     </message>
     <message>
       <source>I/O Module disconnected at %1</source>
@@ -705,11 +705,11 @@
     <name>nx::vms::rules::IntegrationAction</name>
     <message>
       <source>Integration Action</source>
-      <translation type="unfinished">Integration Action</translation>
+      <translation>Akcja Integracji</translation>
     </message>
     <message>
       <source>Integration Action Parameters</source>
-      <translation type="unfinished">Integration Action Parameters</translation>
+      <translation>Parametry akcji integracji</translation>
     </message>
   </context>
   <context>

@@ -6202,7 +6202,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>Start</translation>
     </message>
     <message>
       <source>Before Event</source>
