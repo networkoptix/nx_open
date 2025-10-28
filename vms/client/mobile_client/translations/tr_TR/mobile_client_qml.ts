@@ -589,6 +589,10 @@
       <comment>%1 is a user name</comment>
       <translation>%1 olarak oturum açıldı</translation>
     </message>
+    <message>
+      <source>Add Server</source>
+      <translation type="unfinished">Add Server</translation>
+    </message>
   </context>
   <context>
     <name>MoveOnTapOverlay</name>
