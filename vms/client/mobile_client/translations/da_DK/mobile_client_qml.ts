@@ -502,7 +502,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>Tilføj Server</translation>
     </message>
   </context>
   <context>

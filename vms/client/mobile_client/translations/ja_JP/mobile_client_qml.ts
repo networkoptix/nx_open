@@ -501,7 +501,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>サーバーを追加</translation>
     </message>
   </context>
   <context>

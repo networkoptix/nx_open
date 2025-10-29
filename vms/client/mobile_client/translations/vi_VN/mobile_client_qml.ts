@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation>Tin tức</translation>
+      <translation>Thông tin</translation>
     </message>
     <message>
       <source>Audio</source>
@@ -246,11 +246,11 @@
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation type="unfinished">Copy Client ID</translation>
+      <translation>Sao chép ID máy khách</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation type="unfinished">Force Crash</translation>
+      <translation>Bắt buộc sụp đổ</translation>
     </message>
   </context>
   <context>
@@ -501,7 +501,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>Thêm máy chủ</translation>
     </message>
   </context>
   <context>

@@ -974,7 +974,7 @@
     </message>
     <message>
       <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
+      <translation>Se connecter en tant que</translation>
     </message>
     <message>
       <source>Login</source>
