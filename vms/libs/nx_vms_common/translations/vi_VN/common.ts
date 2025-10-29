@@ -1868,7 +1868,7 @@
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
-      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+      <translation>Khoảng thời gian cập nhật cho khóa công khai từ Đám mây.</translation>
     </message>
   </context>
 </TS>

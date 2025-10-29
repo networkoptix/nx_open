@@ -3804,7 +3804,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation>Tin tức</translation>
+      <translation>Thông tin</translation>
     </message>
     <message>
       <source>Rotate</source>
@@ -4472,7 +4472,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>Tắt lưu trữ đám mây trên một máy chủ sẽ tắt nó trên tất cả các máy chủ. Sao lưu cục bộ phải được cấu hình thủ công.</translation>
     </message>
   </context>
   <context>
@@ -4992,15 +4992,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation type="unfinished">Cloud storage is available</translation>
+      <translation>Bộ lưu trữ đám mây khả dụng</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation type="unfinished">Cloud storage is enabled</translation>
+      <translation>Lưu trữ đám mây đã được bật</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
-      <translation type="unfinished">Cloud Storage is enabled</translation>
+      <translation>Lưu trữ đám mây đã được bật</translation>
     </message>
   </context>
   <context>
@@ -6643,7 +6643,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>Tính năng sao lưu sẽ bị tắt cho các camera mới được thêm vào trên tất cả các máy chủ trong Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -11518,7 +11518,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
-      <translation>Điều này sẽ ngay lập tức xóa quyền truy cập vào trang web của người dùng này</translation>
+      <translation>Điều này sẽ ngay lập tức xóa quyền truy cập vào Chi nhánh của người dùng này</translation>
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>

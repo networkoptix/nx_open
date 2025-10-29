@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation>Tin tức</translation>
+      <translation>Thông tin</translation>
     </message>
     <message>
       <source>Credits</source>
@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>GPU Information</source>
-      <translation>GPU tin tức</translation>
+      <translation>Thông tin GPU</translation>
     </message>
     <message>
       <source>Support</source>
