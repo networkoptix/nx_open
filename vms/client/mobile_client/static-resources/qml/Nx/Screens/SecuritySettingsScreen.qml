@@ -20,7 +20,7 @@ BaseSettingsScreen
     LabeledSwitch
     {
         width: parent.width
-        text: qsTr("Save passwords")
+        text: qsTr("Save Passwords")
         checkState: appContext.settings.savePasswords ? Qt.Checked : Qt.Unchecked
         extraText: qsTr("Automatically log in to servers")
         onClicked:
@@ -30,7 +30,7 @@ BaseSettingsScreen
                 return
 
             var dialog = Workflow.openStandardDialog(
-                "", qsTr("What to do with currently saved passwords?"),
+                "", qsTr("How to handle saved passwords?"),
                 [
                     qsTr("Keep"),
                     {"id": "DELETE", "text": qsTr("Delete"), "accented": true}
@@ -54,7 +54,7 @@ BaseSettingsScreen
             id: securityOptionSwitch
 
             width: parent.width
-            text: qsTr("Security")
+            text: qsTr("Server Certificate Check")
 
             property int lastValidationLevel: Certificate.ValidationLevel.recommended
 

@@ -15,8 +15,8 @@ BaseSettingsScreen
     LabeledSwitch
     {
         width: parent.width
-        text: qsTr("Enable hardware acceleration")
-        extraText: qsTr("Increase performance and battery life")
+        text: qsTr("Hardware Acceleration")
+        extraText: qsTr("Can improve performance and battery life")
         checkState: appContext.settings.enableHardwareDecoding
             ? Qt.Checked
             : Qt.Unchecked
@@ -27,8 +27,8 @@ BaseSettingsScreen
     LabeledSwitch
     {
         width: parent.width
-        text: qsTr("Enable software decoder fallback")
-        extraText: qsTr("Decode some rare video formats using software decoder")
+        text: qsTr("Software Decoder Fallback")
+        extraText: qsTr("Can decode rare video formats using software")
         checkState: appContext.settings.enableSoftwareDecoderFallback
             ? Qt.Checked
             : Qt.Unchecked

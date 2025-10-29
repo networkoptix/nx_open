@@ -17,7 +17,7 @@ BaseSettingsScreen
         id: livePreviews
 
         width: parent.width
-        text: qsTr("Live previews")
+        text: qsTr("Live Previews")
         checkState: appContext.settings.liveVideoPreviews
             ? Qt.Checked
             : Qt.Unchecked
@@ -29,8 +29,9 @@ BaseSettingsScreen
     LabeledSwitch
     {
         width: parent.width
-        text: qsTr("Use server time")
+        text: qsTr("Server Time")
         checkState: appContext.settings.serverTimeMode ? Qt.Checked : Qt.Unchecked
+        extraText: qsTr("Show server time on cameras")
         onCheckStateChanged:
         {
             appContext.settings.serverTimeMode = checkState != Qt.Unchecked

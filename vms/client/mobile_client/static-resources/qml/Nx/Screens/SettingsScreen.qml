@@ -29,40 +29,12 @@ BaseSettingsScreen
 
     LabeledSwitch
     {
-        width: parent.width
-        text: qsTr("Security")
-        icon: "image://skin/24x24/Solid/security.svg?primary=light1"
-        showIndicator: false
-        onClicked: Workflow.openSecuritySettingsScreen()
-    }
-
-    LabeledSwitch
-    {
-        width: parent.width
-        text: qsTr("Performance")
-        icon: "image://skin/24x24/Solid/speed.svg?primary=light1"
-        showIndicator: false
-        onClicked: Workflow.openPerformanceSettingsScreen()
-    }
-
-    LabeledSwitch
-    {
-        width: parent.width
-        text: qsTr("Beta Features")
-        extraText: qsTr("Early access to new features")
-        icon: "image://skin/24x24/Solid/beta_features.svg?primary=light1"
-        showIndicator: false
-        onClicked: Workflow.openBetaFeaturesScreen()
-    }
-
-    LabeledSwitch
-    {
         id: notificationsSwitch
 
         width: parent.width
 
         icon: "image://skin/24x24/Solid/notifications.svg?primary=light1"
-        text: qsTr("Push notifications")
+        text: qsTr("Notifications")
         manualStateChange: true
         interactive: !appContext.pushManager.userUpdateInProgress
         showIndicator: appContext.pushManager.loggedIn && appContext.pushManager.hasOsPermission
@@ -106,7 +78,7 @@ BaseSettingsScreen
         extraText:
         {
             if (!appContext.pushManager.loggedIn)
-                return qsTr("Log in to the cloud to use push notifications")
+                return qsTr("Log in to the cloud to receive notifications")
 
             return appContext.pushManager.hasOsPermission
                 ? ""
@@ -126,11 +98,37 @@ BaseSettingsScreen
 
     LabeledSwitch
     {
+        width: parent.width
+        text: qsTr("Security")
+        icon: "image://skin/24x24/Solid/security.svg?primary=light1"
+        showIndicator: false
+        onClicked: Workflow.openSecuritySettingsScreen()
+    }
+
+    LabeledSwitch
+    {
+        width: parent.width
+        text: qsTr("Performance")
+        icon: "image://skin/24x24/Solid/speed.svg?primary=light1"
+        showIndicator: false
+        onClicked: Workflow.openPerformanceSettingsScreen()
+    }
+
+    LabeledSwitch
+    {
+        width: parent.width
+        text: qsTr("Beta Features")
+        icon: "image://skin/24x24/Solid/beta_features.svg?primary=light1"
+        showIndicator: false
+        onClicked: Workflow.openBetaFeaturesScreen()
+    }
+
+    LabeledSwitch
+    {
         id: appInfoOption
 
         width: parent.width
-        text: qsTr("App Info")
-        extraText: appContext.appInfo.version()
+        text: qsTr("About")
         icon: "image://skin/24x24/Solid/info.svg?primary=light1"
         showIndicator: false
 

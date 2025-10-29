@@ -21,7 +21,7 @@ BaseSettingsScreen
         width: parent.width
 
         text: qsTr("Video Download")
-        extraText: qsTr("Ability to download video")
+        extraText: qsTr("Download video to this device")
         checkState: appContext.settings.useDownloadVideoFeature
             ? Qt.Checked
             : Qt.Unchecked
@@ -38,8 +38,8 @@ BaseSettingsScreen
 
         width: parent.width
 
-        text: qsTr("Speedup connections")
-        extraText: qsTr("Improve network performance")
+        text: qsTr("Optimize Network")
+        extraText: qsTr("Apply network optimization methods")
         checkState: appContext.settings.enableHolePunching
             ? Qt.Checked
             : Qt.Unchecked
@@ -60,9 +60,8 @@ BaseSettingsScreen
 
         width: parent.width
 
-        text: qsTr("Maximum decoders count")
-        extraText:
-            qsTr("Improve video decoding perfomance using maximum hardware decoders count")
+        text: qsTr("Parallel Decoding")
+        extraText: qsTr("Use multiple decoders to improve performance")
         checkState: appContext.settings.useMaxHardwareDecodersCount
             ? Qt.Checked
             : Qt.Unchecked
@@ -84,7 +83,7 @@ BaseSettingsScreen
         function openRestartDialog()
         {
             Workflow.openStandardDialog(
-                qsTr("Please restart the app to apply the changes."))
+                qsTr("Please restart the app to apply changes"))
         }
     }
 }

@@ -140,7 +140,7 @@ void PushNotificationManager::Private::setTargetSystems(
                     return;
 
                 emit q->showPushSettingsErrorMessage(
-                    tr("Cannot change push notifications settings"),
+                    tr("Cannot change notifications settings"),
                     q->checkConnectionErrorText());
             }));
     }
