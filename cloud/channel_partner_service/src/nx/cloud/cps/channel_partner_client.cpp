@@ -62,6 +62,13 @@ ChannelPartnerClient::ChannelPartnerClient(const nx::Url& baseApiUrl)
     httpClientOptions().addAdditionalHeader("cloud-host", baseApiUrl.host().toStdString());
 }
 
+ChannelPartnerClient::ChannelPartnerClient(const nx::Url& baseApiUrl, int idleConnectionsLimit):
+    base_type(baseApiUrl, nx::network::ssl::kDefaultCertificateCheck, idleConnectionsLimit)
+{
+    // TODO: Remove it when CPS service stops requiring it.
+    httpClientOptions().addAdditionalHeader("cloud-host", baseApiUrl.host().toStdString());
+}
+
 ChannelPartnerClient::~ChannelPartnerClient()
 {
     pleaseStopSync();

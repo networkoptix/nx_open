@@ -68,6 +68,7 @@ class ChannelPartnerClient:
 
 public:
     ChannelPartnerClient(const nx::Url& baseApiUrl);
+    ChannelPartnerClient(const nx::Url& baseApiUrl, int idleConnectionsLimit);
     ~ChannelPartnerClient();
 
     void bindSystemToOrganization(
