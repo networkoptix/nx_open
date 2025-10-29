@@ -176,15 +176,15 @@
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</translation>
+      <translation>Để đăng nhập vào Chi nhánh này, hãy tắt &quot;Yêu cầu mã xác minh mỗi lần đăng nhập bằng tài khoản %1&quot; trong cài đặt tài khoản.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your account settings.</source>
-      <translation type="unfinished">You can enable two-factor authentication in your account settings.</translation>
+      <translation>Bạn có thể bật xác thực hai yếu tố trong cài đặt tài khoản của mình.</translation>
     </message>
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
-      <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+      <translation>Máy chủ hoặc mạng không khả dụng. Kiểm tra địa chỉ và kết nối.</translation>
     </message>
   </context>
   <context>

@@ -1360,7 +1360,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>Điều tra bàn điều khiển</translation>
     </message>
   </context>
   <context>

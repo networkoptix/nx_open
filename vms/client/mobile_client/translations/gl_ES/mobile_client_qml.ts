@@ -591,7 +591,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>Engadir Servidor</translation>
     </message>
   </context>
   <context>

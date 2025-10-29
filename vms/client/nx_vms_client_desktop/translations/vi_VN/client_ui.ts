@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation>Tin tức</translation>
+      <translation>Thông tin</translation>
     </message>
     <message>
       <source>Credits</source>
@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>GPU Information</source>
-      <translation>GPU tin tức</translation>
+      <translation>Thông tin GPU</translation>
     </message>
     <message>
       <source>Support</source>
@@ -977,11 +977,11 @@
     </message>
     <message>
       <source>Non-obfuscated video</source>
-      <translation type="unfinished">Non-obfuscated video</translation>
+      <translation>Video không bị làm mờ</translation>
     </message>
     <message>
       <source>Obfuscation is used to protect sensitive information but also increases CPU usage and export time</source>
-      <translation type="unfinished">Obfuscation is used to protect sensitive information but also increases CPU usage and export time</translation>
+      <translation>Việc làm mờ được sử dụng để bảo vệ thông tin nhạy cảm nhưng cũng làm tăng mức sử dụng CPU và thời gian xuất</translation>
     </message>
   </context>
   <context>
@@ -1697,8 +1697,8 @@
     <message>
       <source>Enter address, subnet range or subnet mask, login and password
 and click on the &quot;Search&quot; button</source>
-      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
-and click on the &quot;Search&quot; button</translation>
+      <translation>Nhập địa chỉ, phạm vi mạng con hoặc mặt nạ mạng con, tên đăng nhập và mật khẩu
+và nhấp vào nút &quot;Tìm kiếm&quot;</translation>
     </message>
   </context>
   <context>

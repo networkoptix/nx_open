@@ -593,7 +593,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>Dodaj serwer</translation>
     </message>
   </context>
   <context>

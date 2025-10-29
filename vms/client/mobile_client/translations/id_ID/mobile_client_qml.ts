@@ -414,15 +414,15 @@
     </message>
     <message>
       <source>Notifications Off</source>
-      <translation type="unfinished">Notifications Off</translation>
+      <translation>Notifikasi Mati</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+      <translation>Notifikasi saat ini dinonaktifkan untuk aplikasi ini. Untuk mengaktifkan notifikasi, gunakan pengaturan ponsel Anda&apos;</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+      <translation>Anda menonaktifkan notifikasi push untuk site ini. Untuk mengaktifkannya, buka halaman Pengaturan.</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -590,7 +590,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>Tambahkan Server</translation>
     </message>
   </context>
   <context>
