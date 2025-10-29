@@ -33,6 +33,7 @@
 #include <nx/vms/time/formatter.h>
 #include <settings/qml_settings_adaptor.h>
 #include <ui/camera_thumbnail_provider.h>
+#include <ui/window_utils.h>
 #include <utils/common/delayed.h>
 #include <utils/mobile_app_info.h>
 
@@ -224,7 +225,7 @@ void ApplicationContext::Private::initOsSpecificStuff()
     if (build_info::isAndroid())
     {
         // We have to use android-specific code to check if we use 24-hours time format.
-        time::Formatter::forceSystemTimeFormat(time::is24HoursTimeFormat());
+        time::Formatter::forceSystemTimeFormat(::is24HoursTimeFormat());
     }
 }
 
