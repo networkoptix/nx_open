@@ -41,21 +41,6 @@ SupportInfo supportInfoFromDeviceAgentManifest(const DeviceAgentManifest& device
     for (const QString& objectTypeId: deviceAgentManifest.supportedObjectTypeIds)
         result.objectTypeSupport[objectTypeId] = std::set<QString>();
 
-    auto addTypes =
-        [](auto* target, const auto& types)
-        {
-            for (const auto& type: types)
-            {
-                target->emplace(type.id, std::set<QString>());
-                if (auto base = type.base.value_or(QString()); !base.isEmpty())
-                    target->emplace(std::move(base), std::set<QString>());
-            }
-        };
-    addTypes(&result.eventTypeSupport, deviceAgentManifest.eventTypes);
-    addTypes(&result.eventTypeSupport, deviceAgentManifest.typeLibrary.eventTypes);
-    addTypes(&result.objectTypeSupport, deviceAgentManifest.objectTypes);
-    addTypes(&result.objectTypeSupport, deviceAgentManifest.typeLibrary.objectTypes);
-
     for (const auto& supportedType: deviceAgentManifest.supportedTypes)
     {
         if (supportedType.objectTypeId.isEmpty() && !supportedType.eventTypeId.isEmpty())
@@ -73,6 +58,34 @@ SupportInfo supportInfoFromDeviceAgentManifest(const DeviceAgentManifest& device
                     supportedType.attributes.end());
         }
     }
+
+    auto addBaseTypesForDeprecated =
+        [](auto* target, const auto& types)
+        {
+            for (const auto& type: types)
+            {
+                target->emplace(type.id, std::set<QString>());
+                if (auto base = type.base.value_or(QString()); !base.isEmpty())
+                    target->emplace(std::move(base), std::set<QString>());
+            }
+        };
+    addBaseTypesForDeprecated(&result.eventTypeSupport, deviceAgentManifest.eventTypes);
+    addBaseTypesForDeprecated(&result.objectTypeSupport, deviceAgentManifest.objectTypes);
+
+    auto addBaseTypes =
+        [](auto* target, const auto& types)
+        {
+            for (const auto& type: types)
+            {
+                if (auto base = type.base.value_or(QString()); !base.isEmpty())
+                {
+                    if (target->contains(type.id))
+                        target->emplace(std::move(base), std::set<QString>());
+                }
+            }
+        };
+    addBaseTypes(&result.eventTypeSupport, deviceAgentManifest.typeLibrary.eventTypes);
+    addBaseTypes(&result.objectTypeSupport, deviceAgentManifest.typeLibrary.objectTypes);
 
     return result;
 }
