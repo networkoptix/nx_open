@@ -1836,6 +1836,9 @@ void QnWorkbenchDisplay::synchronizeSceneBounds()
         Qt::KeepAspectRatioByExpanding,
         sizeRect.size(),
         Qt::KeepAspectRatioByExpanding);
+
+    if (m_viewportAnimator->isRunning())
+        fitInView(/*animate*/ true);
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension()
