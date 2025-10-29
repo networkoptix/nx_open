@@ -6763,9 +6763,9 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>La sauvegarde ne sera pas activée pour %n appareil: </numerusform>
+        <numerusform>La sauvegarde ne sera pas activée pour %n appareils : </numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7157,17 +7157,17 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
-        <numerusform>Use Services</numerusform>
+      <translation>
+        <numerusform>Utiliser le service</numerusform>
+        <numerusform>Utiliser les services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
-        <numerusform>Use Licenses</numerusform>
+      <translation>
+        <numerusform>Utiliser la licence</numerusform>
+        <numerusform>Utiliser les licences</numerusform>
       </translation>
     </message>
   </context>
@@ -7568,7 +7568,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+      <translation>L'accès des utilisateurs des partenaires de distribution est géré au niveau de l'organisation et ils ne sont pas visibles dans la gestion des utilisateurs du site.</translation>
     </message>
     <message>
       <source>Learn more</source>

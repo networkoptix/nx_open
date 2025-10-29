@@ -105,8 +105,8 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Numerus: Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Bytes</numerusform>
+      <translation>
+        <numerusform>Byte</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1871,7 +1871,7 @@
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
-      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+      <translation>Khoảng thời gian cập nhật cho khóa công khai từ Đám mây.</translation>
     </message>
   </context>
 </TS>

@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation>Tin tức</translation>
+      <translation>Thông tin</translation>
     </message>
     <message>
       <source>Credits</source>
@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>GPU Information</source>
-      <translation>GPU tin tức</translation>
+      <translation>Thông tin GPU</translation>
     </message>
     <message>
       <source>Support</source>
@@ -1689,8 +1689,8 @@
     <message>
       <source>Enter address, subnet range or subnet mask, login and password
 and click on the &quot;Search&quot; button</source>
-      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
-and click on the &quot;Search&quot; button</translation>
+      <translation>Nhập địa chỉ, phạm vi mạng con hoặc mặt nạ mạng con, tên đăng nhập và mật khẩu
+và nhấp vào nút &quot;Tìm kiếm&quot;</translation>
     </message>
   </context>
   <context>
