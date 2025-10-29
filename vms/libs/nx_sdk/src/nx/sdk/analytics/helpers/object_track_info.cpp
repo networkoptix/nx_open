@@ -116,4 +116,24 @@ void ObjectTrackInfo::setBestShotImage(
     setBestShotImageDataFormat(std::move(bestShotImageDataFormat));
 }
 
+void ObjectTrackInfo::setTitleText(std::string titleText)
+{
+    m_titleText = std::move(titleText);
+}
+void ObjectTrackInfo::setTitleImageData(std::vector<char> titleImageData)
+{
+    m_titleImageData = std::move(titleImageData);
+}
+void ObjectTrackInfo::setTitleImageDataFormat(std::string titleImageDataFormat)
+{
+    m_titleImageDataFormat = std::move(titleImageDataFormat);
+}
+void ObjectTrackInfo::setTitleImage(
+    std::vector<char> titleImageData,
+    std::string titleImageDataFormat)
+{
+    setTitleImageData(std::move(titleImageData));
+    setTitleImageDataFormat(std::move(titleImageDataFormat));
+}
+
 } // namespace nx::sdk::analytics

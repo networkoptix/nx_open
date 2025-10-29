@@ -10,6 +10,7 @@
     "platform": "@platform@",
     "platformModification": "@modification@",
     "withRootTool": @withRootTool@,
+    "withPluginHost": @withPluginHost@,
     "changeSet": "@changeSet@",
     "branch": "@branch@",
     "currentRefs": "@currentRefs@",

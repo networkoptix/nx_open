@@ -23,7 +23,7 @@ using namespace nx::sdk::analytics;
  */
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
     // Call the DeviceAgent helper class constructor telling it to verbosely report to stderr.
-    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true)
+    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ false)
 {
 }
 
@@ -83,7 +83,6 @@ bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> vid
         // Send generated metadata packet to the Server.
         pushMetadataPacket(eventMetadataPacket);
     }
-
     return true; //< There were no errors while processing the video frame.
 }
 

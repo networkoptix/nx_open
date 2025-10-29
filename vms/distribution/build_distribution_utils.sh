@@ -656,6 +656,7 @@ distrib_copyGlLibs()
 # [in] BUILD_DIR
 # [in] CURRENT_BUILD_DIR
 # [in] ENABLE_ROOT_TOOL
+# [in] ENABLE_PLUGIN_HOST
 # [in] OPEN_SOURCE_DIR
 # [in] SERVER_SCRIPTS_DIR
 distrib_copyServerBins() # additional_bins_to_copy...
@@ -700,6 +701,12 @@ distrib_copyServerBins() # additional_bins_to_copy...
         # Fix root-tool rpath.
         local -r lib_path="${INSTALL_ROOT-}/${LIB_INSTALL_PATH}"
         chrpath --replace "${lib_path}:${lib_path}/stdcpp" "${stage_bin}/root-tool"
+    fi
+
+    # if ENABLE_PLUGIN_HOST is not set, consider it to be "true".
+    if [[ "${ENABLE_PLUGIN_HOST-"false"}" == "true" ]]; then
+        echo "Copying plugin-host"
+        install -m 750 "${BUILD_DIR}/bin/plugin-host" "${stage_bin}/"
     fi
 
     echo "Copying nx_log_viewer.html"

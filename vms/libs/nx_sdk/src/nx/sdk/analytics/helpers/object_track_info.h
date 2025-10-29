@@ -6,6 +6,7 @@
 
 #include <nx/sdk/analytics/i_object_track_info.h>
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/i_string.h>
 #include <nx/sdk/ptr.h>
 
 namespace nx::sdk::analytics {
@@ -30,6 +31,13 @@ public:
     virtual const char* titleImageData() const override;
     virtual int titleImageDataSize() const override;
     virtual const char* titleImageDataFormat() const override;
+
+    void setTitleText(std::string titleText);
+    void setTitleImageData(std::vector<char> titleImageData);
+    void setTitleImageDataFormat(std::string titleImageDataFormat);
+    void setTitleImage(
+        std::vector<char> titleImageData,
+        std::string titleImageDataFormat);
 
 protected:
     virtual IList<ITimestampedObjectMetadata>* getTrack() const override;
