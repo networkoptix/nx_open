@@ -101,7 +101,7 @@ NX_REFLECTION_ENUM_CLASS(IntegrationDiagnosticEventLevel,
     error
 );
 
-struct NX_VMS_API EngineIntegrationDiagnosticEventBase
+struct NX_VMS_API IntegrationDiagnosticEventBase
 {
     /**%apidoc Level */
     IntegrationDiagnosticEventLevel level;
@@ -112,18 +112,18 @@ struct NX_VMS_API EngineIntegrationDiagnosticEventBase
     /**%apidoc Description */
     std::string description;
 
-    bool operator==(const EngineIntegrationDiagnosticEventBase& other) const = default;
+    bool operator==(const IntegrationDiagnosticEventBase& other) const = default;
 };
-#define nx_vms_api_analytics_EngineIntegrationDiagnosticEventBase_Fields \
+#define nx_vms_api_analytics_IntegrationDiagnosticEventBase_Fields \
     (level)(caption)(description)
-QN_FUSION_DECLARE_FUNCTIONS(EngineIntegrationDiagnosticEventBase, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(EngineIntegrationDiagnosticEventBase,
-    nx_vms_api_analytics_EngineIntegrationDiagnosticEventBase_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(IntegrationDiagnosticEventBase, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(IntegrationDiagnosticEventBase,
+    nx_vms_api_analytics_IntegrationDiagnosticEventBase_Fields)
 
 /**%apidoc
  * Integration Diagnostic Event from Engine.
  */
-struct NX_VMS_API EngineIntegrationDiagnosticEvent: EngineIntegrationDiagnosticEventBase
+struct NX_VMS_API EngineIntegrationDiagnosticEvent: IntegrationDiagnosticEventBase
 {
     /**%apidoc Engine id */
     nx::Uuid id;
@@ -132,35 +132,21 @@ struct NX_VMS_API EngineIntegrationDiagnosticEvent: EngineIntegrationDiagnosticE
 };
 #define nx_vms_api_analytics_EngineIntegrationDiagnosticEvent_Fields \
     (id) \
-    nx_vms_api_analytics_EngineIntegrationDiagnosticEventBase_Fields
+    nx_vms_api_analytics_IntegrationDiagnosticEventBase_Fields
 QN_FUSION_DECLARE_FUNCTIONS(EngineIntegrationDiagnosticEvent, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(EngineIntegrationDiagnosticEvent,
     nx_vms_api_analytics_EngineIntegrationDiagnosticEvent_Fields)
 
-struct NX_VMS_API DeviceAgentIntegrationDiagnosticEventBase
-{
-    IntegrationDiagnosticEventLevel level;
-    std::string caption;
-    std::string description;
-
-    bool operator==(const DeviceAgentIntegrationDiagnosticEventBase& other) const = default;
-};
-#define nx_vms_api_analytics_DeviceAgentIntegrationDiagnosticEventBase_Fields \
-    (level)(caption)(description)
-QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentIntegrationDiagnosticEventBase, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(DeviceAgentIntegrationDiagnosticEventBase,
-    nx_vms_api_analytics_DeviceAgentIntegrationDiagnosticEventBase_Fields)
-
 /**%apidoc
  *  Integration Diagnostic Event from Device Agent.
  */
-struct NX_VMS_API DeviceAgentIntegrationDiagnosticEvent: ApiTarget, DeviceAgentIntegrationDiagnosticEventBase
+struct NX_VMS_API DeviceAgentIntegrationDiagnosticEvent: ApiTarget, IntegrationDiagnosticEventBase
 {
     bool operator==(const DeviceAgentIntegrationDiagnosticEvent& other) const = default;
 };
 #define nx_vms_api_analytics_DeviceAgentIntegrationDiagnosticEvent_Fields \
     nx_vms_api_analytics_ApiTarget_Fields \
-    nx_vms_api_analytics_DeviceAgentIntegrationDiagnosticEventBase_Fields
+    nx_vms_api_analytics_IntegrationDiagnosticEventBase_Fields
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentIntegrationDiagnosticEvent, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceAgentIntegrationDiagnosticEvent,
     nx_vms_api_analytics_DeviceAgentIntegrationDiagnosticEvent_Fields)
