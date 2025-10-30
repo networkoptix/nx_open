@@ -1056,7 +1056,7 @@
     </message>
     <message>
       <source>PENDING</source>
-      <translation type="unfinished">PENDING</translation>
+      <translation>EN ATTENTE</translation>
     </message>
   </context>
   <context>
