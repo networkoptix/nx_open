@@ -147,14 +147,14 @@ class NxOpenConan(ConanFile):
 
     def build_requirements(self):
         self.build_requires("apidoctool/3.0" "#483c5073667ee722756e0ca31e18972a")
-        self.build_requires("qt-host/6.9.0" "#3995869eb604dd7c10d91e6869ca2a9f")
+        self.build_requires("qt-host/6.9.0" "#1ed505d80eb8881914f63d7d586de0a7")
         self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
         self.build_requires("breakpad-tools/2024.02.16" "#0b0da27a7ec2f99505630994b48a70a4")
 
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
-                self.build_requires("clang/20.1.2" "#45a020e716ad31135c131b24734f0769")
+                self.build_requires("clang/20.1.2" "#bc083c5c0eedbdf254af2744d261f9c8")
             self.build_requires("sdk-gcc/9.5" "#4934f8197fb3e1d7812bd951b1cbae85")
 
         if self.isWindows:
@@ -166,17 +166,17 @@ class NxOpenConan(ConanFile):
         if self.isAndroid:
             self.build_requires("openjdk/18.0.1" "#a8a02e50d3ff18df2248cae06ed5a13c")
             if "ANDROID_HOME" not in os.environ:
-                self.build_requires("AndroidSDK/34" "#eea6103b2dcc6cd808d0e8c2ee512bf9")
+                self.build_requires("AndroidSDK/34" "#2087398e918c534f59a775e88d936e45")
             if "ANDROID_NDK" not in os.environ:
-                self.build_requires("AndroidNDK/r26d" "#0ae8a952a8b231f98f2f7f2d61fd249a")
-        else:
+                self.build_requires("AndroidNDK/r29" "#a170457e398db464111140b1ba7576fc")
             # Java runtime for apidoctool.
+        else:
             self.tool_requires("openjdk-jre/17.0.12" "#ceed4d8b4fdfbd3f680688f67488dc27")
 
     def requirements(self):
         self.requires("cpptrace/0.8.3" "#336ded531d0cad8ec579eb05079591e0")
 
-        self.requires("opentelemetry-cpp/1.17.0" "#feb089e3fbaef23a752681d2b96379bd")
+        self.requires("opentelemetry-cpp/1.17.0" "#421936f14bc8f86e2117effa55fbd715")
         # OpenTelemetry dependencies.
         self.requires("c-ares/1.34.3" "#1f1b2f929424608c837837ea6379ae15")
         self.requires("protobuf/5.27.0" "#56d591557e0fc6a4356fc1dbc6ffbe56")

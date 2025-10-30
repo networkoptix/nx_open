@@ -15,6 +15,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/system_network_headers.h>
 #include <nx/utils/test_support/sync_queue.h>
 
 namespace nx {

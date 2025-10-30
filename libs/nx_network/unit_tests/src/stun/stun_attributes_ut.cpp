@@ -6,6 +6,7 @@
 
 #include <nx/network/stun/stun_attributes.h>
 #include <nx/network/stun/message_parser.h>
+#include <nx/utils/system_network_headers.h>
 
 namespace nx {
 namespace network {
