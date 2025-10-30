@@ -604,7 +604,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation>LDAP ユーザーが %1にログインできるようにするには、 %1 と LDAP サーバー間の接続を確立する必要があります。</translation>
+      <translation>LDAP ユーザーが %1 にログインできるようにするには、 %1 と LDAP サーバー間の接続を確立する必要があります。</translation>
     </message>
   </context>
   <context>
