@@ -91,6 +91,9 @@ public:
     bool previewEnabled() const;
     void setPreviewEnabled(bool value);
 
+    bool obfuscationEnabled() const;
+    void setObfuscationEnabled(bool value);
+
     bool automaticPreviewLoad() const;
     void setAutomaticPreviewLoad(bool value);
     bool isPreviewLoadNeeded() const;

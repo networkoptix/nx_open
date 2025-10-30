@@ -292,7 +292,7 @@ void EventTile::Private::setResourceList(const QStringList& list)
 
 bool EventTile::Private::isPreviewNeeded() const
 {
-    return q->imageProvider() && q->previewEnabled();
+    return q->imageProvider() && q->previewEnabled() && !obfuscationEnabled;
 }
 
 bool EventTile::Private::isPreviewUpdateRequired() const
@@ -371,7 +371,8 @@ void EventTile::Private::updatePreviewsVisibility()
             return;
         }
         else if (q->ui->imagePreviewWidget->imageProvider()
-            || !q->ui->imagePreviewWidget->placeholder().isEmpty())
+            || !q->ui->imagePreviewWidget->placeholder().isEmpty()
+            && !obfuscationEnabled)
         {
             q->ui->videoPreviewWidget->hide();
             q->ui->imagePreviewWidget->show();

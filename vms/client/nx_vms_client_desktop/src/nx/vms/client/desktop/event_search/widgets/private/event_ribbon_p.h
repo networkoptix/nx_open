@@ -114,6 +114,7 @@ private:
     int indexOf(const EventTile* widget) const;
     int indexAtPos(const QPoint& pos) const;
 
+    bool checkTileObfuscation(int index) const;
     void updateTile(int index);
     void updateTilePreview(int index);
     void ensureWidget(int index);

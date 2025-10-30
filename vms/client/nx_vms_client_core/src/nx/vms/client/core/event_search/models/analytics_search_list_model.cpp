@@ -1558,6 +1558,9 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
         case HasTitleImageRole:
             return track.title && track.title->hasImage;
 
+        case ObjectTypeIdRole:
+            return track.objectTypeId;
+
         case DurationRole:
             return QVariant::fromValue(objectDuration(track));
 

@@ -4,6 +4,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/event_search/models/abstract_event_list_model.h>
 
 namespace nx::vms::client::core {
 
@@ -160,6 +161,19 @@ bool ConcatenationListModel::removeRows(int row, int count, const QModelIndex& p
     // Returns true only if all requested rows were removed.
     // This case isn't documented, but seems consistent with QSortFilterProxyModel implementation.
     return result;
+}
+
+SystemContext* ConcatenationListModel::systemContext() const
+{
+    for (const auto& model: m_models)
+    {
+        if (auto listModel = qobject_cast<AbstractEventListModel*>(model))
+        {
+            if (listModel->systemContext())
+                return listModel->systemContext();
+        }
+    }
+    return nullptr;
 }
 
 void ConcatenationListModel::connectToModel(QAbstractListModel* model)

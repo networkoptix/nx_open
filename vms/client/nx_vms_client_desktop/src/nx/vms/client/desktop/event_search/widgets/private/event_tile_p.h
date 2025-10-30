@@ -58,6 +58,7 @@ public:
     LabelDescriptor resourceLabelDescriptor;
     QString iconPath;
     bool previewEnabled = false;
+    bool obfuscationEnabled = false;
     utils::PendingOperation checkDragIsFinished;
     std::chrono::milliseconds timestampMs;
     QScopedPointer<QTimer> timestampLabelUpdateTimer;

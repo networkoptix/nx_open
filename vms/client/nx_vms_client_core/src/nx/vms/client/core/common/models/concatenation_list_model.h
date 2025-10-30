@@ -10,6 +10,7 @@
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/common/models/abstract_mapping_model.h>
+#include <nx/vms/client/core/system_context.h>
 
 namespace nx::vms::client::core {
 
@@ -49,6 +50,8 @@ public:
     // All source models must support removeRows as unconditional removal of requested range,
     //    otherwise partial removal might happen.
     virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
+
+    SystemContext* systemContext() const;
 
 private:
     void sourceModelAboutToBeReset();

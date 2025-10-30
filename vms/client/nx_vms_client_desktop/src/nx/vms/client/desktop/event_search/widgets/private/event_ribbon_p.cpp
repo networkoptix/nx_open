@@ -25,7 +25,11 @@
 #include <nx/utils/metatypes.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/common/models/concatenation_list_model.h>
+#include <nx/vms/client/core/event_search/models/abstract_event_list_model.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/utils/video_cache.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
@@ -39,6 +43,7 @@
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/pixelation/pixelation_settings.h>
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/common/read_only.h>
@@ -258,6 +263,33 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
         });
 }
 
+bool EventRibbon::Private::checkTileObfuscation(int index) const
+{
+    const auto modelIndex = m_model->index(index);
+    core::SystemContext* systemContext = nullptr;
+    if (auto eventModel = dynamic_cast<const core::AbstractEventListModel*>(m_model))
+        systemContext = eventModel->systemContext();
+    else if (auto concatModel = dynamic_cast<const core::ConcatenationListModel*>(m_model))
+        systemContext = concatModel->systemContext();
+
+    if (!systemContext)
+        return false;
+
+    if (systemContext->accessController()->hasGlobalPermissions(GlobalPermission::viewUnredactedVideo))
+    {
+        return false;
+    }
+
+    auto typeId = modelIndex.data(core::ObjectTypeIdRole).value<QString>();
+    if (systemContext->pixelationSettings()->isAllTypes()
+      || systemContext->pixelationSettings()->objectTypeIds().contains(typeId))
+    {
+        return true;
+    }
+
+    return false;
+}
+
 void EventRibbon::Private::updateTile(int index)
 {
     NX_CRITICAL(index >= 0 && index < count());
@@ -328,6 +360,7 @@ void EventRibbon::Private::updateTile(int index)
     widget->setTimestamp(modelIndex.data(core::TimestampRole).value<std::chrono::microseconds>());
     widget->setDescription(tileDescription);
     widget->setFooterText(modelIndex.data(Qn::AdditionalTextRole).toString());
+    widget->setObfuscationEnabled(checkTileObfuscation(index));
     widget->setAttributeList(modelIndex.data(core::AnalyticsAttributesRole)
         .value<core::analytics::AttributeList>());
     widget->setToolTip(modelIndex.data(Qt::ToolTipRole).toString());
@@ -363,12 +396,13 @@ void EventRibbon::Private::updateTilePreview(int index)
     if (!NX_ASSERT(m_model && widget))
         return;
 
-    widget->setPreviewEnabled(m_previewsEnabled);
+    auto obfuscationEnabled = checkTileObfuscation(index);
+    widget->setObfuscationEnabled(obfuscationEnabled);
+    widget->setPreviewEnabled(m_previewsEnabled && !obfuscationEnabled);
     if (!m_previewsEnabled)
         return;
 
     const auto modelIndex = m_model->index(index);
-
     const auto previewResource = modelIndex.data(core::ResourceRole).value<QnResourcePtr>();
     const auto mediaResource = previewResource.dynamicCast<QnMediaResource>();
     if (!mediaResource)

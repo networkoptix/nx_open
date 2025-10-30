@@ -19,6 +19,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/api/data/pixelation_settings.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
@@ -32,6 +34,7 @@
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/dummy.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/point.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -397,6 +400,17 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
             objectInfo.futureRectangleTimestamp,
             timestamp);
 
+        auto pixSetting = systemContext()->globalSettings()->pixelationSettings();
+        if (!accessController()->hasGlobalPermissions(GlobalPermission::viewUnredactedVideo) &&
+            pixSetting.isAllObjectTypes || pixSetting.objectTypeIds.contains(objectInfo.rawData.typeId))
+        {
+            const auto watcher = systemContext()->analyticsTaxonomyStateWatcher();
+            const auto state = NX_ASSERT(watcher) ? watcher->state() : nullptr;
+            const auto objectType = state ? state->objectTypeById(objectInfo.rawData.typeId) : nullptr;
+            const QString title = objectType ? objectType->name() : QString();
+            areaInfo.text = title;
+            areaInfo.hoverText = title;
+        }
         const auto zoomRect = mediaResourceWidget->zoomRect();
         const auto figure = figureFromObjectData(objectInfo, figureRectangle, zoomRect);
         if (!figure || !figure->isValid())

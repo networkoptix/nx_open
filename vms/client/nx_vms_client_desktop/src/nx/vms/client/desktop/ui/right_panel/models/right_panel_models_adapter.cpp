@@ -117,8 +117,6 @@ static constexpr int kSimultaneousPreviewLoadsLimitArm = 5;
 
 static constexpr int kDefaultThumbnailWidth = 224;
 
-static const auto kBypassVideoCachePropertyName = "__qn_bypassVideoCache";
-
 // Load previews no more than one per this time period.
 milliseconds tilePreviewLoadInterval()
 {

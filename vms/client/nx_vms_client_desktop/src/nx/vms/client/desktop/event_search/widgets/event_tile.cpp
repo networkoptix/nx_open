@@ -375,7 +375,8 @@ core::analytics::AttributeList EventTile::attributeList() const
 
 void EventTile::setAttributeList(const core::analytics::AttributeList& value)
 {
-    ui->attributeTable->setContent(value);
+    static core::analytics::AttributeList emptyList = core::analytics::AttributeList();
+    ui->attributeTable->setContent(d->obfuscationEnabled ? emptyList : value);
     ui->attributeTable->setHidden(!d->footerEnabled || value.empty());
 }
 
@@ -726,6 +727,19 @@ void EventTile::setPreviewEnabled(bool value)
     d->updatePreviewsVisibility();
 
     d->updatePreview(/*delay*/ 0ms);
+}
+
+bool EventTile::obfuscationEnabled() const
+{
+    return d->obfuscationEnabled;
+}
+
+void EventTile::setObfuscationEnabled(bool value)
+{
+    if (d->obfuscationEnabled == value)
+        return;
+
+    d->obfuscationEnabled = value;
 }
 
 bool EventTile::footerEnabled() const
