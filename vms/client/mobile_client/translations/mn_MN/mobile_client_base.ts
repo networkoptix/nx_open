@@ -52,16 +52,16 @@
   <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
-      <source>Cannot change push notifications settings</source>
-      <translation>Мэдэгдлийн тохиргоог өөрчлөх боломжгүй</translation>
-    </message>
-    <message>
       <source>Cannot enable push notifications</source>
       <translation>Мэдэгдлийг идэвхжүүлэх боломжгүй</translation>
     </message>
     <message>
       <source>Please check your internet connection</source>
       <translation type="unfinished">Please check your internet connection</translation>
+    </message>
+    <message>
+      <source>Cannot change notifications settings</source>
+      <translation type="unfinished">Cannot change notifications settings</translation>
     </message>
   </context>
   <context>

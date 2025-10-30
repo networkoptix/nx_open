@@ -44,28 +44,28 @@
       <translation type="unfinished">Video Download</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation type="unfinished">Ability to download video</translation>
+      <source>Download video to this device</source>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>เพิ่มความเร็วของการเชื่อมต่อ</translation>
+      <source>Optimize Network</source>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>ปรับปรุงประสิทธิภาพของเครือข่าย</translation>
+      <source>Apply network optimization methods</source>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <source>Parallel Decoding</source>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>โปรดเริ่มต้นแอปพลิเคชันเพื่อใช้การเปลี่ยนแปลง</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -513,16 +513,20 @@
       <translation type="unfinished">Interface</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>ตัวอย่างภาพปัจจุบัน</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>แสดงตัวอย่างในรายการกล้อง</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>ใช้เวลาจากเซิร์ฟเวอร์</translation>
+      <source>Live Previews</source>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation type="unfinished">Server Time</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -643,20 +647,20 @@
       <translation>ประสิทธิภาพ</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>เปิดใช้งานการเร่งด้วยฮาร์ดแวร์</translation>
+      <source>Hardware Acceleration</source>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>เพิ่มประสิทธิภาพและอายุการใช้งานแบตเตอรี่</translation>
+      <source>Can improve performance and battery life</source>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <source>Software Decoder Fallback</source>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -837,16 +841,8 @@
       <translation>เชื่อมต่อเฉพาะเซิร์ฟเวอร์ที่มี public certificates</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>บันทึกรหัสผ่าน</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>เข้าสู่โดยอัตโนมัติไปยังเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>จะทำอย่างไรกับรหัสผ่านที่บันทึกไว้ในปัจจุบัน</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -855,6 +851,18 @@
     <message>
       <source>Delete</source>
       <translation>ลบ</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -958,16 +966,8 @@
       <translation>การตั้งค่า</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>การแจ้งเตือนแบบพุช</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>ทั้งหมด</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>เข้าสู่ระบบคลาวด์เพื่อใช้การแจ้งเตือนแบบพุช</translation>
     </message>
     <message>
       <source>Security</source>
@@ -982,10 +982,6 @@
       <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation type="unfinished">Early access to new features</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation type="unfinished">Interface</translation>
     </message>
@@ -994,8 +990,16 @@
       <translation>ประสิทธิภาพ</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <source>Notifications</source>
+      <translation type="unfinished">Notifications</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation type="unfinished">About</translation>
     </message>
   </context>
   <context>

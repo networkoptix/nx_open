@@ -52,16 +52,16 @@
   <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
-      <source>Cannot change push notifications settings</source>
-      <translation>No se puede guardar la configuración de notificaciones</translation>
-    </message>
-    <message>
       <source>Cannot enable push notifications</source>
       <translation>No se pueden habilitar las notificaciones push</translation>
     </message>
     <message>
       <source>Please check your internet connection</source>
       <translation>Por favor, compruebe su conexión a internet</translation>
+    </message>
+    <message>
+      <source>Cannot change notifications settings</source>
+      <translation type="unfinished">Cannot change notifications settings</translation>
     </message>
   </context>
   <context>

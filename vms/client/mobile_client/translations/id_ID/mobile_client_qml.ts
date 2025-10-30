@@ -44,28 +44,28 @@
       <translation>Video Download</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>Kemampuan untuk download video</translation>
+      <source>Download video to this device</source>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>Mempercepat koneksi</translation>
+      <source>Optimize Network</source>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>Meningkatkan performa jaringan</translation>
+      <source>Apply network optimization methods</source>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>Jumlah dekoder maksimum</translation>
+      <source>Parallel Decoding</source>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Tingkatkan kinerja decoding video menggunakan jumlah hardware decoder maksimum</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>Silakan restart aplikasi untuk menerapkan perubahan.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -513,16 +513,20 @@
       <translation>Interface</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Preview live</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Tampilkan preview di daftar kamera</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Gunakan waktu server</translation>
+      <source>Live Previews</source>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation type="unfinished">Server Time</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -643,20 +647,20 @@
       <translation>Performa</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Aktifkan akselerasi hardware</translation>
+      <source>Hardware Acceleration</source>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>Meningkatkan performa dan masa pakai baterai</translation>
+      <source>Can improve performance and battery life</source>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Aktifkan fallback dekoder software</translation>
+      <source>Software Decoder Fallback</source>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Dekode beberapa format video langka menggunakan dekoder software</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -837,16 +841,8 @@
       <translation>Koneksikan hanya server dengan sertifikat publik</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Simpan kata sandi</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Secara otomatis masuk ke server</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Apa yang harus dilakukan dengan kata sandi yang disimpan saat ini?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -855,6 +851,18 @@
     <message>
       <source>Delete</source>
       <translation>Hapus</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -958,16 +966,8 @@
       <translation>Pengaturan</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Notifikasi push</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Semua</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Masuk ke cloud untuk menggunakan notifikasi push</translation>
     </message>
     <message>
       <source>Security</source>
@@ -982,10 +982,6 @@
       <translation>Fitur Beta</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>Akses awal ke fitur baru</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Interface</translation>
     </message>
@@ -994,8 +990,16 @@
       <translation>Performa</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>Info Aplikasi</translation>
+      <source>Notifications</source>
+      <translation type="unfinished">Notifications</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation type="unfinished">About</translation>
     </message>
   </context>
   <context>

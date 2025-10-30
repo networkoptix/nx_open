@@ -50,16 +50,16 @@
   <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
-      <source>Cannot change push notifications settings</source>
-      <translation>無法更改推播通知設定</translation>
-    </message>
-    <message>
       <source>Cannot enable push notifications</source>
       <translation>無法啟用推播通知</translation>
     </message>
     <message>
       <source>Please check your internet connection</source>
       <translation>請檢查您的網路連線</translation>
+    </message>
+    <message>
+      <source>Cannot change notifications settings</source>
+      <translation type="unfinished">Cannot change notifications settings</translation>
     </message>
   </context>
   <context>

@@ -52,16 +52,16 @@
   <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
-      <source>Cannot change push notifications settings</source>
-      <translation>Det går inte att ändra inställningar för push-aviseringar</translation>
-    </message>
-    <message>
       <source>Cannot enable push notifications</source>
       <translation>Det går inte att aktivera push-aviseringar</translation>
     </message>
     <message>
       <source>Please check your internet connection</source>
       <translation>Vänligen kontrollera din internetanslutning</translation>
+    </message>
+    <message>
+      <source>Cannot change notifications settings</source>
+      <translation type="unfinished">Cannot change notifications settings</translation>
     </message>
   </context>
   <context>

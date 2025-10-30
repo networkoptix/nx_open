@@ -44,28 +44,28 @@
       <translation>Ladda ner video</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>Möjlighet att ladda ner video</translation>
+      <source>Download video to this device</source>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>Snabba upp anslutningar</translation>
+      <source>Optimize Network</source>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>Förbättra nätverksprestanda</translation>
+      <source>Apply network optimization methods</source>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>Maximalt antal avkodare</translation>
+      <source>Parallel Decoding</source>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Förbättra videoavkodningsprestanda med maximalt antal hårdvaruavkodare</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>Starta om appen för att tillämpa ändringarna.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -514,16 +514,20 @@
       <translation>Gränssnitt</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Live-förhandsvisningar</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Visa förhandsvisningar i listan över kameror</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Använd servertid</translation>
+      <source>Live Previews</source>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation type="unfinished">Server Time</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -644,20 +648,20 @@
       <translation>Prestanda</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Aktivera hårdvaruacceleration</translation>
+      <source>Hardware Acceleration</source>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>Öka prestanda och batteritid</translation>
+      <source>Can improve performance and battery life</source>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Aktivera reserv för programvaruavkodare</translation>
+      <source>Software Decoder Fallback</source>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Avkoda några sällsynta videoformat med hjälp av programvaruavkodare</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -838,16 +842,8 @@
       <translation>Anslut endast servrar med offentligt certifikat</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Spara lösenord</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Logga in automatiskt på servrar</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Vad ska man göra med för tillfället sparade lösenord?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -856,6 +852,18 @@
     <message>
       <source>Delete</source>
       <translation>Radera</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -959,16 +967,8 @@
       <translation>Inställningar</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Pushnotifikationer</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Alla</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Logga in i molnet för att använda push-aviseringar</translation>
     </message>
     <message>
       <source>Security</source>
@@ -983,10 +983,6 @@
       <translation>Betafunktioner</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>Tidig tillgång till nya funktioner</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Gränssnitt</translation>
     </message>
@@ -995,8 +991,16 @@
       <translation>Prestanda</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>Appinformation</translation>
+      <source>Notifications</source>
+      <translation type="unfinished">Notifications</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation type="unfinished">About</translation>
     </message>
   </context>
   <context>

@@ -44,28 +44,28 @@
       <translation>Descarga de vídeo</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>Capacidade para descargar vídeo</translation>
+      <source>Download video to this device</source>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>Acelerar as conexións</translation>
+      <source>Optimize Network</source>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>Mellorar o rendemento da rede</translation>
+      <source>Apply network optimization methods</source>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>Número máximo de descodificadores</translation>
+      <source>Parallel Decoding</source>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Mellorar o rendemento da descodificación de vídeo usando o máximo número de descodificadores de hardware</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>Por favor, reinicia a aplicación para aplicar os cambios.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -514,16 +514,20 @@
       <translation>Interface</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Vistas previas en directo</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Mostrar vistas previas na lista de cámaras</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Utilizar a hora do servidor</translation>
+      <source>Live Previews</source>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation type="unfinished">Server Time</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -644,20 +648,20 @@
       <translation>Rendemento</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Activar a aceleración de hardware</translation>
+      <source>Hardware Acceleration</source>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>Aumentar o rendemento e a duración da batería</translation>
+      <source>Can improve performance and battery life</source>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Activar a alternativa do descodificador de software</translation>
+      <source>Software Decoder Fallback</source>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Descodifica algúns formatos de vídeo pouco comúns usando un descodificador de software</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -838,16 +842,8 @@
       <translation>Conecta só servidores con certificados públicos</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Garda contrasinais</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Inicia sesión automaticamente nos servidores</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Que facer cos contrasinais gardados actualmente?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -856,6 +852,18 @@
     <message>
       <source>Delete</source>
       <translation>Borrar</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -959,16 +967,8 @@
       <translation>Configuración</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Notificacións Push</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Todo</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Inicia sesión na nube para usar as notificacións push</translation>
     </message>
     <message>
       <source>Security</source>
@@ -983,10 +983,6 @@
       <translation>Funcións beta</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>Acceso anticipado a novas funcións</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Interface</translation>
     </message>
@@ -995,8 +991,16 @@
       <translation>Rendemento</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>Información da aplicación</translation>
+      <source>Notifications</source>
+      <translation type="unfinished">Notifications</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation type="unfinished">About</translation>
     </message>
   </context>
   <context>

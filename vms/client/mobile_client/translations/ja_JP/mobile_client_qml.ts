@@ -44,28 +44,28 @@
       <translation>映像のダウンロード</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>映像のダウンロード機能</translation>
+      <source>Download video to this device</source>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>接続の高速化</translation>
+      <source>Optimize Network</source>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>ネットワークパフォーマンスを向上させます</translation>
+      <source>Apply network optimization methods</source>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>デコーダー数最大</translation>
+      <source>Parallel Decoding</source>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>ハードウェアデコーダーを最大限利用して、ビデオデコードパフォーマンスを向上させます</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>変更を適用するには、アプリを再起動してください。</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -513,16 +513,20 @@
       <translation>インターフェース</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>ライブプレビュー</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>カメラリストにプレビューを表示します</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>サーバー時刻を使用</translation>
+      <source>Live Previews</source>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation type="unfinished">Server Time</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -643,20 +647,20 @@
       <translation>パフォーマンス</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>ハードウェアアクセラレーションを有効化</translation>
+      <source>Hardware Acceleration</source>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>パフォーマンスとバッテリー効率を向上させます</translation>
+      <source>Can improve performance and battery life</source>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>ソフトウェアデコーダーへのフォールバックを有効化</translation>
+      <source>Software Decoder Fallback</source>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>一般的でない映像フォーマットのデコードに、ソフトウェアデコーダーを使用します</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -837,16 +841,8 @@
       <translation>正式な証明書を持つサーバーにのみ接続します</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>パスワードを保存</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>サーバーへ自動的にログインします</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>すでに保存済みのパスワードはどうしますか?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -855,6 +851,18 @@
     <message>
       <source>Delete</source>
       <translation>削除</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -958,16 +966,8 @@
       <translation>設定</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>プッシュ通知</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>すべて</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>プッシュ通知を使用するには、クラウドにログインしてください。</translation>
     </message>
     <message>
       <source>Security</source>
@@ -982,10 +982,6 @@
       <translation>ベータ版機能</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>新機能の早期公開</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>インターフェース</translation>
     </message>
@@ -994,8 +990,16 @@
       <translation>パフォーマンス</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>アプリ情報</translation>
+      <source>Notifications</source>
+      <translation type="unfinished">Notifications</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation type="unfinished">About</translation>
     </message>
   </context>
   <context>

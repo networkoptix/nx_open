@@ -44,28 +44,28 @@
       <translation>동영상 내려받기</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>비디오를 다운로드 할 수 있는 기능</translation>
+      <source>Download video to this device</source>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>연결 속도 향상</translation>
+      <source>Optimize Network</source>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>네트워크 성능 향상</translation>
+      <source>Apply network optimization methods</source>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <source>Parallel Decoding</source>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>변경 사항을 적용하려면 앱을 다시 시작하십시오.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -513,16 +513,20 @@
       <translation>인터페이스</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>실시간 미리보기</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>카메라 목록에서 미리보기 보여줌</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>서버 시간 사용</translation>
+      <source>Live Previews</source>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation type="unfinished">Server Time</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -643,20 +647,20 @@
       <translation>성능</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>하드웨어 가속 활성화</translation>
+      <source>Hardware Acceleration</source>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>성능과 배터리 수명 증가</translation>
+      <source>Can improve performance and battery life</source>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <source>Software Decoder Fallback</source>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -837,16 +841,8 @@
       <translation>공인인증서가 있는 서버만 연결</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>패스워드 저장</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>서버에 자동 로그인</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>현재 저장된 암호로 무엇을해야합니까?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -855,6 +851,18 @@
     <message>
       <source>Delete</source>
       <translation>삭제</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -958,16 +966,8 @@
       <translation>설정</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>푸시 알림</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>전체</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>푸시 알림을 사용하기 위해 클라우드에 로그인</translation>
     </message>
     <message>
       <source>Security</source>
@@ -982,10 +982,6 @@
       <translation>베타 기능</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>새로운 기능 미리 보기</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>인터페이스</translation>
     </message>
@@ -994,8 +990,16 @@
       <translation>성능</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <source>Notifications</source>
+      <translation type="unfinished">Notifications</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation type="unfinished">About</translation>
     </message>
   </context>
   <context>

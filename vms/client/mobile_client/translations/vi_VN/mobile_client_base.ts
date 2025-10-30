@@ -50,16 +50,16 @@
   <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
-      <source>Cannot change push notifications settings</source>
-      <translation>Không thể thay đổi cài đặt thông báo đẩy</translation>
-    </message>
-    <message>
       <source>Cannot enable push notifications</source>
       <translation>Không thể bật thông báo đẩy</translation>
     </message>
     <message>
       <source>Please check your internet connection</source>
       <translation>Vui lòng kiểm tra kết nối internet của bạn</translation>
+    </message>
+    <message>
+      <source>Cannot change notifications settings</source>
+      <translation type="unfinished">Cannot change notifications settings</translation>
     </message>
   </context>
   <context>
