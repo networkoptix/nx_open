@@ -10,6 +10,8 @@ Indicator 1.0 Indicator.qml
 NumberInput 1.0 NumberInput.qml
 OptionSelector 1.0 OptionSelector.qml
 PasswordInput 1.0 PasswordInput.qml
+RadioButton 1.0 RadioButton.qml
+RadioButtonIndicator 1.0 RadioButtonIndicator.qml
 Sheet 1.0 Sheet.qml
 SwipeControl 1.0 SwipeControl.qml
 SwitchSelector 1.0 SwitchSelector.qml
