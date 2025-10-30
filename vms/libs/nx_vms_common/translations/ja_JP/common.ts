@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation>設定を編集</translation>
+      <translation>設定の編集</translation>
     </message>
   </context>
   <context>
