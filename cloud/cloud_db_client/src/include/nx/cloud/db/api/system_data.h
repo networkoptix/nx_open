@@ -358,13 +358,22 @@ struct ShareSystemRequest
 
     bool operator<(const ShareSystemRequest& rhs) const
     {
-        return std::tie(accountEmail, roleIds, permissions, isEnabled, vmsUserId)
-            < std::tie(
-                rhs.accountEmail,
-                rhs.roleIds,
-                rhs.permissions,
-                rhs.isEnabled,
-                rhs.vmsUserId);
+        // NOTE: std::tie was originally used to implement this function, but Android NDK r29
+        // has issues with tuple comparison when std::vector<std::string> is involved, so the
+        // code was refactored to use explicit field-by-field comparison.
+        if (accountEmail != rhs.accountEmail)
+            return accountEmail < rhs.accountEmail;
+        if (roleIds != rhs.roleIds)
+            return std::lexicographical_compare(
+                roleIds.begin(), roleIds.end(),
+                rhs.roleIds.begin(), rhs.roleIds.end());
+        if (permissions != rhs.permissions)
+            return std::lexicographical_compare(
+                permissions.begin(), permissions.end(),
+                rhs.permissions.begin(), rhs.permissions.end());
+        if (isEnabled != rhs.isEnabled)
+            return isEnabled < rhs.isEnabled;
+        return vmsUserId < rhs.vmsUserId;
     }
 };
 
@@ -431,12 +440,20 @@ struct CdbSystemSharing: public ShareSystemRequest
 
     bool operator<(const CdbSystemSharing& rhs) const
     {
-        return std::tie(static_cast<const base_type&>(*this), systemId, accountId, accountFullName)
-            < std::tie(
-                static_cast<const base_type&>(rhs),
-                rhs.systemId,
-                rhs.accountId,
-                rhs.accountFullName);
+        // NOTE: std::tie was originally used to implement this function, but Android NDK r29
+        // has issues with tuple comparison when std::vector<std::string> is involved, so the
+        // code was refactored to use explicit field-by-field comparison.
+        const auto& base1 = static_cast<const base_type&>(*this);
+        const auto& base2 = static_cast<const base_type&>(rhs);
+        if (base1 != base2)
+            return base1 < base2;
+
+        // Then compare additional fields
+        if (systemId != rhs.systemId)
+            return systemId < rhs.systemId;
+        if (accountId != rhs.accountId)
+            return accountId < rhs.accountId;
+        return accountFullName < rhs.accountFullName;
     }
 };
 
@@ -467,8 +484,18 @@ struct SystemSharing: public CdbSystemSharing
 
     bool operator<(const SystemSharing& rhs) const
     {
-        return std::tie(static_cast<const base_type&>(*this), orgRoleIds)
-            < std::tie(static_cast<const base_type&>(rhs), orgRoleIds);
+        // NOTE: std::tie was originally used to implement this function, but Android NDK r29
+        // has issues with tuple comparison when std::vector<std::string> is involved, so the
+        // code was refactored to use explicit field-by-field comparison.
+        const auto& base1 = static_cast<const base_type&>(*this);
+        const auto& base2 = static_cast<const base_type&>(rhs);
+        if (base1 != base2)
+            return base1 < base2;
+
+        // Then compare orgRoleIds
+        return std::lexicographical_compare(
+            orgRoleIds.begin(), orgRoleIds.end(),
+            rhs.orgRoleIds.begin(), rhs.orgRoleIds.end());
     }
 };
 

@@ -172,7 +172,7 @@ class NxOpenConan(ConanFile):
             if "ANDROID_HOME" not in os.environ:
                 self.build_requires("AndroidSDK/34" "#eea6103b2dcc6cd808d0e8c2ee512bf9")
             if "ANDROID_NDK" not in os.environ:
-                self.build_requires("AndroidNDK/r26d" "#0ae8a952a8b231f98f2f7f2d61fd249a")
+                self.build_requires("AndroidNDK/r29" "#a170457e398db464111140b1ba7576fc")
         elif not self.isEmscripten:
             # Java runtime for apidoctool.
             self.tool_requires("openjdk-jre/17.0.12" "#ceed4d8b4fdfbd3f680688f67488dc27")
@@ -181,7 +181,7 @@ class NxOpenConan(ConanFile):
         if not self.isEmscripten:
             self.requires("cpptrace/0.8.3" "#336ded531d0cad8ec579eb05079591e0")
 
-            self.requires("opentelemetry-cpp/1.17.0" "#feb089e3fbaef23a752681d2b96379bd")
+            self.requires("opentelemetry-cpp/1.17.0" "#421936f14bc8f86e2117effa55fbd715")
             # OpenTelemetry dependencies.
             self.requires("c-ares/1.34.3" "#1f1b2f929424608c837837ea6379ae15")
             self.requires("protobuf/5.27.0" "#56d591557e0fc6a4356fc1dbc6ffbe56")

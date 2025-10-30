@@ -91,7 +91,16 @@ bool AddressEntry::operator==(const AddressEntry& rhs) const
 
 bool AddressEntry::operator<(const AddressEntry& rhs) const
 {
-    return type < rhs.type && host < rhs.host && attributes < rhs.attributes;
+    // NOTE: std::tie was originally used to implement this function, but Android NDK r29
+    // has issues with tuple comparison when std::vector<std::string> is involved, so the
+    // code was refactored to use explicit field-by-field comparison.
+    if (type != rhs.type)
+        return type < rhs.type;
+    if (host != rhs.host)
+        return host < rhs.host;
+    return std::lexicographical_compare(
+        attributes.begin(), attributes.end(),
+        rhs.attributes.begin(), rhs.attributes.end());
 }
 
 std::string AddressEntry::toString() const

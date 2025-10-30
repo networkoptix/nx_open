@@ -28,7 +28,7 @@ protected:
         std::string data;
         HttpHeaders headers;
 
-        auto operator<=>(const Frame&) const = default;
+        bool operator==(const Frame& rhs) const = default;
     };
 
     void givenFrames(const std::vector<Frame>& frames)
