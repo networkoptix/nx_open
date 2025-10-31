@@ -18,6 +18,8 @@ struct TimePeriod
         durationMs(durationMs)
     {
     }
+
+    bool operator==(const TimePeriod&) const = default;
 };
 
 using TimePeriodList = std::vector<TimePeriod>;

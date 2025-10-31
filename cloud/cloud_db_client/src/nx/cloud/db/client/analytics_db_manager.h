@@ -30,18 +30,42 @@ public:
         nx::MoveOnlyFunc<void(api::ResultCode, const api::TimePeriodList& data)> completionHandler) override;
 
     virtual void getBestShotImage(
+        const std::string& orgId,
+        const std::string& siteId,
         const nx::Uuid& trackId,
         nx::MoveOnlyFunc<void(api::ResultCode, const api::TrackImageData& image)> completionHandler) override;
 
     virtual void getTitleImage(
+        const std::string& orgId,
+        const std::string& siteId,
         const nx::Uuid& trackId,
         nx::MoveOnlyFunc<void(api::ResultCode, const api::TrackImageData& image)> completionHandler) override;
+
+    virtual void deleteTracks(
+        const std::string& orgId,
+        const std::string& siteId,
+        std::chrono::milliseconds time,
+        nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+
+    virtual void saveTaxonomy(
+        const std::string& orgId,
+        const std::string& siteId,
+        const api::TaxonomyData& data,
+        nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+
+    virtual void getTaxonomy(
+        const std::string& orgId,
+        const std::string& siteId,
+        nx::MoveOnlyFunc<void(api::ResultCode, api::TaxonomyData)> completionHandler) override;
+
+    static void setCustomUrl(const QString& url);
 
 private:
     ApiRequestsExecutor* requestExecutor();
 private:
     std::unique_ptr<ApiRequestsExecutor> m_customRequestExecutor;
     ApiRequestsExecutor* m_requestsExecutor = nullptr;
+    static QString m_customUrl;
 };
 
 } // namespace nx::cloud::db::api

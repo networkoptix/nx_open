@@ -8,10 +8,12 @@
 
 #include "cdb_request_path.h"
 
-static constexpr char kTracksPath[] = "/analyticsDb/v1/tracks";
-static constexpr char kCompressedTrackPeriodsPath[] = "/analyticsDb/v1/periods/flat";
-static constexpr char kBestShotImagePath[] = "/analyticsDb/v1/tracks/{id}/image/bestShot";
-static constexpr char kTitleImagePath[] = "/analyticsDb/v1/tracks{id}/image/title";
+static constexpr char kDelPostTracksPath[] = "/analytics/v4/internal/objectTracks";
+static constexpr char kGetTracksPath[] = "/analytics/v4/objectTracks";
+static constexpr char kCompressedTrackPeriodsPath[] = "/analytics/v4/footage/flat";
+static constexpr char kBestShotImagePath[] = "/analytics/v4/objectTracks/{id}/bestShotImage";
+static constexpr char kTitleImagePath[] = "/analytics/v4/objectTracks{id}/titleImage";
+static constexpr char kTaxonomyPath[] = "/analytics/v4/internal/taxonomy";
 
 static const int kAgregationIntervalSec = 5;
 static const int kAgregationIntervalMs = kAgregationIntervalSec * 1000;
@@ -20,12 +22,16 @@ namespace nx::cloud::db::client {
 
 using namespace nx::network::http;
 
+QString AnalyticsDbManager::m_customUrl;
+
 AnalyticsDbManager::AnalyticsDbManager(
     ApiRequestsExecutor* requestsExecutor)
     :
     m_requestsExecutor(requestsExecutor)
 {
-    const QString customUrl(nx::cloud::ini().customizedAnalyticsDbUrl);
+    auto customUrl = m_customUrl;
+    if (customUrl.isEmpty())
+        customUrl = nx::cloud::ini().customizedAnalyticsDbUrl;
     if (!customUrl.isEmpty())
     {
         m_customRequestExecutor = std::make_unique<ApiRequestsExecutor>(
@@ -58,7 +64,7 @@ void AnalyticsDbManager::saveTracks(
     const auto vectorizeOnCloud = nx::format("vectorize=%1", autoVectorize);
     requestExecutor()->makeAsyncCall<void>(
         Method::post,
-        kTracksPath,
+        kDelPostTracksPath,
         /*urlQuery*/{ vectorizeOnCloud },
         data,
         std::move(completionHandler));
@@ -70,7 +76,7 @@ void AnalyticsDbManager::getTracks(
 {
     requestExecutor()->makeAsyncCall<api::ReadTracksData>(
         Method::get,
-        kTracksPath,
+        kGetTracksPath,
         filter.toUrlQuery(),
         std::move(completionHandler));
 }
@@ -80,7 +86,7 @@ void AnalyticsDbManager::getTrackPeriods(
     nx::MoveOnlyFunc<void(api::ResultCode, const api::TimePeriodList& data)> completionHandler)
 {
     auto query = filter.toUrlQuery();
-    query.addQueryItem("interval", kAgregationIntervalSec); //< Aggregation interval. So far use same value as VMS.
+    query.addQueryItem("interval", kAgregationIntervalMs); //< Aggregation interval. So far use same value as VMS.
     query.addQueryItem("resultInIntervals", "true");
     requestExecutor()->makeAsyncCall<std::vector<int64_t>>(
         Method::get,
@@ -111,25 +117,101 @@ struct ResponseFetcher
 };
 
 void AnalyticsDbManager::getBestShotImage(
+    const std::string& orgId,
+    const std::string& siteId,
     const nx::Uuid& trackId,
     nx::MoveOnlyFunc<void(api::ResultCode, const api::TrackImageData& image)> completionHandler)
 {
+    nx::UrlQuery query;
+    if (!orgId.empty())
+        query.addQueryItem("organizationId", orgId);
+    query.addQueryItem("siteId", siteId);
     requestExecutor()->makeAsyncCall<void, ResponseFetcher>(
         Method::get,
         nx::network::http::rest::substituteParameters(kBestShotImagePath, { trackId.toSimpleStdString() }),
-        /*urlQuery*/{},
+        query,
         std::move(completionHandler));
 }
 
 void AnalyticsDbManager::getTitleImage(
+    const std::string& orgId,
+    const std::string& siteId,
     const nx::Uuid& trackId,
     nx::MoveOnlyFunc<void(api::ResultCode, const api::TrackImageData& image)> completionHandler)
 {
+    nx::UrlQuery query;
+    if (!orgId.empty())
+        query.addQueryItem("organizationId", orgId);
+    query.addQueryItem("siteId", siteId);
     requestExecutor()->makeAsyncCall<void, ResponseFetcher>(
         Method::get,
         nx::network::http::rest::substituteParameters(kTitleImagePath, { trackId.toSimpleStdString()}),
-        /*urlQuery*/{},
+        query,
         std::move(completionHandler));
+}
+
+void AnalyticsDbManager::deleteTracks(
+    const std::string& orgId,
+    const std::string& siteId,
+    std::chrono::milliseconds time,
+    nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+{
+    nx::UrlQuery query;
+    if (!orgId.empty())
+        query.addQueryItem("organizationId", orgId);
+    query.addQueryItem("siteId", siteId);
+    query.addQueryItem("endTimeMs", time.count());
+    requestExecutor()->makeAsyncCall<void>(
+        Method::delete_,
+        kDelPostTracksPath,
+        query,
+        std::move(completionHandler));
+}
+
+void AnalyticsDbManager::saveTaxonomy(
+    const std::string& orgId,
+    const std::string& siteId,
+    const api::TaxonomyData& data,
+    nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+{
+    nx::UrlQuery query;
+    if (!orgId.empty())
+        query.addQueryItem("organizationId", orgId);
+    query.addQueryItem("siteId", siteId);
+
+    requestExecutor()->makeAsyncCall<void>(
+        Method::post,
+        kTaxonomyPath,
+        query,
+        nx::reflect::json::serialize(data),
+        std::move(completionHandler));
+}
+
+void AnalyticsDbManager::getTaxonomy(
+    const std::string& orgId,
+    const std::string& siteId,
+    nx::MoveOnlyFunc<void(api::ResultCode, api::TaxonomyData)> completionHandler)
+{
+    nx::UrlQuery query;
+    if (!orgId.empty())
+        query.addQueryItem("organizationId", orgId);
+    query.addQueryItem("siteId", siteId);
+
+    requestExecutor()->makeAsyncCall<QByteArray>(
+        Method::get,
+        kTaxonomyPath,
+        query,
+        [handler = std::move(completionHandler)](api::ResultCode result, QByteArray str)
+        {
+            using namespace nx::reflect;
+            const auto [data, success] = json::deserialize<api::TaxonomyData>(str.data());
+            handler(result, data);
+        });
+}
+
+void AnalyticsDbManager::setCustomUrl(const QString& url)
+{
+    m_customUrl = url;
 }
 
 } // namespace nx::cloud::db::client

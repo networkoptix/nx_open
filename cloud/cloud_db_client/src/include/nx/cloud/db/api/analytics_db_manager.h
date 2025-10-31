@@ -34,12 +34,33 @@ public:
         nx::MoveOnlyFunc<void(api::ResultCode, const api::TimePeriodList& data)> completionHandler) = 0;
 
     virtual void getBestShotImage(
+        const std::string& orgId,
+        const std::string& siteId,
         const nx::Uuid& trackId,
         nx::MoveOnlyFunc<void(ResultCode, const TrackImageData& image)> completionHandler) = 0;
 
     virtual void getTitleImage(
+        const std::string& orgId,
+        const std::string& siteId,
         const nx::Uuid& trackId,
         nx::MoveOnlyFunc<void(ResultCode, const TrackImageData& image)> completionHandler) = 0;
+
+    virtual void deleteTracks(
+        const std::string& orgId,
+        const std::string& siteId,
+        std::chrono::milliseconds time,
+        nx::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
+
+    virtual void saveTaxonomy(
+        const std::string& orgId,
+        const std::string& siteId,
+        const api::TaxonomyData& data,
+        nx::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
+
+    virtual void getTaxonomy(
+        const std::string& orgId,
+        const std::string& siteId,
+        nx::MoveOnlyFunc<void(ResultCode, TaxonomyData)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

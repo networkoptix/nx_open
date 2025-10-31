@@ -2,6 +2,8 @@
 
 #include "analytics_db_data.h"
 
+#include <nx/reflect/json/serializer.h>
+
 namespace nx::cloud::db::api {
 
 nx::UrlQuery GetTracksParamsData::toUrlQuery() const
@@ -40,12 +42,12 @@ nx::UrlQuery GetTracksParamsData::toUrlQuery() const
     if (!engineId.isNull())
         query.addQueryItem("engineId", engineId.toSimpleString());
 
+    if (!organizationId.empty())
+        query.addQueryItem("organizationId", QString::fromStdString(organizationId));
+
     // Site ID
     if (!siteId.empty())
         query.addQueryItem("siteId", QString::fromStdString(siteId));
-
-    // TODO: cloud service should auto fill it according to the authorization.
-    query.addQueryItem("organizationId", "");
 
     // Limit
     if (limit > 0)
