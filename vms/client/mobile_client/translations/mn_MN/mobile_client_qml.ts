@@ -1000,7 +1000,7 @@
     </message>
     <message>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Тухай</translation>
     </message>
   </context>
   <context>

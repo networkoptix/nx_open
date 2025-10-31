@@ -59,7 +59,7 @@
     </message>
     <message>
       <source>Cannot change notifications settings</source>
-      <translation type="unfinished">Cannot change notifications settings</translation>
+      <translation>通知設定を変更できません。</translation>
     </message>
   </context>
   <context>

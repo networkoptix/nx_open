@@ -45,27 +45,27 @@
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation type="unfinished">Download video to this device</translation>
+      <translation>Download video ke perangkat ini</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation type="unfinished">Optimize Network</translation>
+      <translation>Optimalkan Jaringan</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation type="unfinished">Apply network optimization methods</translation>
+      <translation>Terapkan metode optimasi jaringan</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation type="unfinished">Parallel Decoding</translation>
+      <translation>Dekoding Paralel</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation type="unfinished">Use multiple decoders to improve performance</translation>
+      <translation>Gunakan beberapa dekoder untuk meningkatkan kinerja</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation type="unfinished">Please restart the app to apply changes</translation>
+      <translation>Silakan restart aplikasi untuk menerapkan perubahan</translation>
     </message>
   </context>
   <context>
@@ -518,15 +518,15 @@
     </message>
     <message>
       <source>Live Previews</source>
-      <translation type="unfinished">Live Previews</translation>
+      <translation>Live Preview</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
-      <translation type="unfinished">Show server time on cameras</translation>
+      <translation>Tampilkan waktu server di kamera</translation>
     </message>
   </context>
   <context>
@@ -648,19 +648,19 @@
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation type="unfinished">Hardware Acceleration</translation>
+      <translation>Akselerasi Perangkat Keras</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation type="unfinished">Can improve performance and battery life</translation>
+      <translation>Dapat meningkatkan kinerja dan masa pakai baterai</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation type="unfinished">Software Decoder Fallback</translation>
+      <translation>Fallback Dekoder Software</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation type="unfinished">Can decode rare video formats using software</translation>
+      <translation>Dekode beberapa format video langka menggunakan dekoder software</translation>
     </message>
   </context>
   <context>
@@ -854,15 +854,15 @@
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation type="unfinished">Save Passwords</translation>
+      <translation>Simpan Kata Sandi</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation type="unfinished">How to handle saved passwords?</translation>
+      <translation>Bagaimana cara menangani kata sandi yang tersimpan?</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation type="unfinished">Server Certificate Check</translation>
+      <translation>Pemeriksaan Sertifikat Server</translation>
     </message>
   </context>
   <context>
@@ -991,15 +991,15 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notifikasi</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+      <translation>Masuk ke cloud untuk menerima notifikasi</translation>
     </message>
     <message>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Tentang</translation>
     </message>
   </context>
   <context>

@@ -527,7 +527,7 @@
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -996,7 +996,7 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notifications</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
@@ -1004,7 +1004,7 @@
     </message>
     <message>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>نبذة</translation>
     </message>
   </context>
   <context>

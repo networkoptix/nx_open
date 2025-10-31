@@ -59,7 +59,7 @@
     </message>
     <message>
       <source>Cannot change notifications settings</source>
-      <translation type="unfinished">Cannot change notifications settings</translation>
+      <translation>Tidak dapat mengubah pengaturan notifikasi</translation>
     </message>
   </context>
   <context>
