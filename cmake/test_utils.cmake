@@ -11,7 +11,9 @@ nx_store_known_file(${testInformationFile})
 set(testTempDirectory "${CMAKE_BINARY_DIR}" CACHE STRING "Temp directory for running tests.")
 
 add_custom_target(unit_tests)
-set_target_properties(unit_tests PROPERTIES FOLDER utils)
+add_custom_target(functional_tests)
+
+set_target_properties(unit_tests functional_tests PROPERTIES FOLDER utils)
 
 function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
     if(NOT withTests)
@@ -119,6 +121,64 @@ function(nx_add_server_plugin_test target) # [NO_GTEST] [NO_QT]
         set_target_properties(${target} PROPERTIES
             VS_USER_PROPS ${CMAKE_BINARY_DIR}/vms/server/plugins/ut_msvc.user.props)
     endif()
+endfunction()
+
+function(nx_add_functional_test target)
+    if (NOT withTests OR NOT LINUX)
+        return()
+    endif()
+
+    set(one_value_args FOLDER)
+    set(multi_value_args DEPENDS FILES BINARIES)
+    cmake_parse_arguments(FT_TEST "" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+    set(dest_dir "${functional_tests_output_dir}/${target}")
+    set(stamp_file "${CMAKE_CURRENT_BINARY_DIR}/${target}.stamp")
+
+    # Create list of dependencies (input files)
+    set(copy_deps ${FT_TEST_FILES})
+
+    set(copy_cmds "")
+
+    foreach(src IN LISTS FT_TEST_FILES)
+        get_filename_component(name "${src}" NAME)
+        list(APPEND copy_cmds
+            COMMAND ${CMAKE_COMMAND} -E copy "${src}" "${dest_dir}/${name}"
+        )
+    endforeach()
+
+    foreach(src IN LISTS FT_TEST_BINARIES)
+        list(APPEND copy_cmds
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${src}" "${dest_dir}/${src}"
+        )
+    endforeach()
+
+    # Add a final step that creates/updates the stamp file
+    list(APPEND copy_cmds
+        COMMAND ${CMAKE_COMMAND} -E touch "${stamp_file}"
+    )
+
+    # Custom command that produces the stamp file and depends on all input files
+    add_custom_command(
+        OUTPUT "${stamp_file}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${dest_dir}"
+        ${copy_cmds}
+        DEPENDS ${copy_deps}
+        COMMENT "Copying functional test files into ${dest_dir}"
+        VERBATIM
+    )
+
+    # The test target depends on the stamp
+    add_custom_target(${target}
+        DEPENDS "${stamp_file}"
+    )
+
+    if(FT_TEST_DEPENDS)
+        add_dependencies(${target} ${FT_TEST_DEPENDS})
+    endif()
+    add_dependencies(functional_tests ${target})
+    set_target_properties(${target} PROPERTIES FOLDER ${FT_TEST_FOLDER})
+
 endfunction()
 
 function(nx_dump_unit_tests)

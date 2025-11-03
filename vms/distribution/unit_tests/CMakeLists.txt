@@ -18,6 +18,9 @@ endif()
 if(TARGET nx_sdk_ut)
     list(APPEND depends nx_sdk_ut)
 endif()
+if(LINUX)
+    list(APPEND depends functional_tests)
+endif()
 
 set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.py)
 

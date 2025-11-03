@@ -217,6 +217,10 @@ def main():
             logging.info("Archiving standalone server_plugin_sdk unit tests")
             archiveSdkUnitTests(a, conf, src_bin_dir)
 
+        if isLinux:
+            archiveByGlob(a, "functional tests", "functional_tests",
+                join(conf.BUILD_DIR, "functional_tests"), "*", recursive=True)
+
         logging.info("Archiving unit test executables")
         if not archiveFiles(a, bin_dir, src_bin_dir, get_list_of_binaries(test_info)):
             logging.info("No unit test executables found")

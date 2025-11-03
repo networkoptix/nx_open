@@ -54,3 +54,6 @@ file(MAKE_DIRECTORY ${distribution_output_dir})
 
 set(translations_output_dir ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/translations)
 file(MAKE_DIRECTORY ${translations_output_dir})
+
+set(functional_tests_output_dir ${CMAKE_BINARY_DIR}/functional_tests)
+file(MAKE_DIRECTORY ${functional_tests_output_dir})
