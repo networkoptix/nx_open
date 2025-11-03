@@ -547,11 +547,19 @@ bool StartupActionsHandler::connectUsingCommandLineAuth(
     if (logonData.address.isNull())
         return false;
 
-    // Fix compatibility mode command line from old versions.
-    const bool isCloudSystem = nx::network::SocketGlobals::addressResolver().isCloudHostname(
-        logonData.address.toString());
-    if (isCloudSystem && logonData.credentials.authToken.isPassword())
-        logonData.userType = nx::vms::api::UserType::cloud;
+    if (startupParameters.isVideoWallMode())
+    {
+        logonData.credentials.authToken =
+            nx::network::http::VideoWallAuthToken(startupParameters.videoWallGuid);
+    }
+    else
+    {
+        // Fix compatibility mode command line from old versions.
+        const bool isCloudSystem = nx::network::SocketGlobals::addressResolver().isCloudHostname(
+            logonData.address.toString());
+        if (isCloudSystem && logonData.credentials.authToken.isPassword())
+            logonData.userType = nx::vms::api::UserType::cloud;
+    }
 
     NX_DEBUG(this, "Connecting to %1 using command line auth", logonData.address);
 
@@ -562,12 +570,6 @@ bool StartupActionsHandler::connectUsingCommandLineAuth(
     {
         d->setDelayedLogon(std::make_unique<LogonData>(std::move(logonData)));
         return true;
-    }
-
-    if (!startupParameters.videoWallGuid.isNull())
-    {
-        logonData.credentials.authToken =
-            nx::network::http::VideoWallAuthToken(startupParameters.videoWallGuid);
     }
 
     menu()->trigger(ConnectAction, Parameters().withArgument(Qn::LogonDataRole, logonData));
