@@ -36,10 +36,13 @@ std::optional<QJsonValue> Content::parse() const
 
 QJsonValue Content::parseOrThrow() const
 {
-    if (type == http::header::ContentType::kForm)
+    if (!type.charset.empty() && type.charset != http::header::ContentType::kDefaultCharset)
+        throw Exception::unsupportedMediaType(ApiErrorStrings::tr("Unsupported charset."));
+
+    if (type.value == http::header::ContentType::kForm.value)
         return Params::fromUrlQuery(QUrlQuery(body)).toJson();
 
-    if (type == http::header::ContentType::kJson)
+    if (type.value == http::header::ContentType::kJson.value)
     {
         QJsonValue value;
         if (!QJsonDetail::deserialize_json(body, &value))
