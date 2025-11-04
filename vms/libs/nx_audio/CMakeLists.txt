@@ -16,12 +16,7 @@ nx_add_target(nx_audio LIBRARY NO_API_MACROS
     FOLDER client/libs
 )
 
-if(APPLE)
-    find_library(OpenAL_LIBRARY_NAME OpenAL REQUIRED)
-    mark_as_advanced(OpenAL_LIBRARY_NAME)
-else()
-    find_package(openal REQUIRED)
-    set(OpenAL_LIBRARY_NAME openal::openal)
-endif()
+find_package(openal REQUIRED)
+set(OpenAL_LIBRARY_NAME openal::openal)
 
 target_link_libraries(nx_audio PUBLIC ${OpenAL_LIBRARY_NAME})

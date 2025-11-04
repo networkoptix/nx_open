@@ -2,13 +2,8 @@
 
 #include "sound.h"
 
-#ifdef Q_OS_MAC
-    #include <openal/al.h>
-    #include <openal/alc.h>
-#else
-    #include <AL/al.h>
-    #include <AL/alc.h>
-#endif
+#include <AL/al.h>
+#include <AL/alc.h>
 
 #include <QDebug>
 
