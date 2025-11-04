@@ -24,6 +24,8 @@ struct PushNotification
     std::string imageId;
     std::chrono::milliseconds time;
     bool isRead = false;
+
+    bool operator==(const PushNotification&) const = default;
 };
 NX_REFLECTION_INSTRUMENT(PushNotification,
     (id)(time)(title)(description)(url)(cloudSystemId)(imageId)(isRead))
