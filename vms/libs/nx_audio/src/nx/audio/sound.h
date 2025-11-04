@@ -12,12 +12,8 @@
 
 #include "high_resolution_elapsed_timer.h"
 
-#if defined(Q_OS_MACOS) || defined(Q_OS_IOS)
-    using ALCdevice = struct ALCdevice_struct;
-#else
-    struct ALCdevice;
-#endif
 
+struct ALCdevice;
 class AudioDevice;
 
 namespace nx {

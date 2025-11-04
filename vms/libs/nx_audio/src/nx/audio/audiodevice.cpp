@@ -7,15 +7,10 @@
 #include "audio.h"
 #include "sound.h"
 
-#if defined(Q_OS_MAC)
-    #include <openal/al.h>
-    #include <openal/alc.h>
-#else
-    #include <AL/al.h>
-    #include <AL/alc.h>
-    #if defined(Q_OS_WINDOWS)
-        #include <AL/alext.h>
-    #endif
+#include <AL/al.h>
+#include <AL/alc.h>
+#if defined(Q_OS_WINDOWS)
+    #include <AL/alext.h>
 #endif
 #include <nx/utils/log/log.h>
 

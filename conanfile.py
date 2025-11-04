@@ -236,8 +236,8 @@ class NxOpenConan(ConanFile):
                 self.requires("hidapi/0.14.0" "#67b81bb0b1ef84cedc49b2e3671a48e6")
             self.requires("pathkit/m134" "#0d764b6df74bb96dbd27b40e38bd7f0a")
 
-        if self.isWindows or self.isAndroid or (self.isLinux and not self.isArm32):
-            self.requires("openal/1.24.3" "#a518a536f692c49abfda01ea0e4cce67")
+        if self.isWindows or self.isMacos or self.isAndroid or self.isIos or (self.isLinux and not self.isArm32):
+            self.requires("openal/1.24.3" "#db9689ec8f243fbedbe297d2c03285e4")
 
         if self.isWindows:
             self.requires("directx/june2010" "#a0cbbd6a9cfef629fae6d2cf5a18bcdd")
@@ -350,7 +350,7 @@ class NxOpenConan(ConanFile):
 
             self.import_package("ffmpeg")
 
-        if self.isLinux or self.isWindows or self.isAndroid:
+        if self.isLinux or self.isWindows  or self.isMacos or self.isAndroid or self.isIos:
             self.import_package("openal")
 
         if finish_import:
