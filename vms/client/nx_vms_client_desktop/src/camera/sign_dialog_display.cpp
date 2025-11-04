@@ -3,6 +3,7 @@
 #include "sign_dialog_display.h"
 
 #include <core/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/nov_archive_delegate.h>
 #include <core/resource/resource.h>
 #include <export/sign_helper.h>
 #include <nx/streaming/archive_stream_reader.h>
@@ -30,9 +31,10 @@ void QnSignDialogDisplay::finalizeSign()
     if (m_reader)
     {
         QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
-        if (aviFile)
+        QnNovArchiveDelegate* novFile = dynamic_cast<QnNovArchiveDelegate*> (m_reader->getArchiveDelegate());
+        if (aviFile || novFile)
         {
-            auto signPattern = aviFile->metadata()->signature;
+            auto signPattern = aviFile ? aviFile->metadata()->signature : novFile->metadata()->signature;
             if (signPattern.isEmpty())
                 signPattern = QnSignHelper::loadSignatureFromFileEnd(m_reader->resource()->getUrl());
             if (!signPattern.isEmpty())

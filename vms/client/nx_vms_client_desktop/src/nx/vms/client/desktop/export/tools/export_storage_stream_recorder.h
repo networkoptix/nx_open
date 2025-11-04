@@ -89,7 +89,6 @@ private:
     virtual void initMetadataStream(StorageContext& context) override;
 
     bool isTranscodingEnabled() const;
-    void updateSignatureAttr(StorageContext* context);
 };
 
 } // namespace nx::vms::client::desktop

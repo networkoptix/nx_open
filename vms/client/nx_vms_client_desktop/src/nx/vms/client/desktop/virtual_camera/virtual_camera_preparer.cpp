@@ -140,7 +140,7 @@ void VirtualCameraPreparer::checkLocally(VirtualCameraPayload& payload)
     }
 
     QnAviResourcePtr resource(new QnAviResource(payload.path));
-    QnAviArchiveDelegatePtr delegate(resource->createArchiveDelegate());
+    QnAviArchiveDelegatePtr delegate(new QnAviArchiveDelegate());
     bool opened = delegate->open(resource);
     if (!opened || !delegate->hasVideo() || resource->hasFlags(Qn::still_image))
     {

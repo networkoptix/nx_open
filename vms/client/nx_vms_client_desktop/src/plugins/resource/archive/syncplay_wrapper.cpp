@@ -498,7 +498,6 @@ void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
     {
         if (i->syncDelegateIndex == (int64_t)value)
         {
-            NX_ERROR(this, "Remove ID: %1", value);
             if (i->buffering)
                 d->bufferingCnt--;
             i->reader->disconnect(this);
