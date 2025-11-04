@@ -81,9 +81,9 @@ protected:
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
     virtual bool needToTruncate(const QnConstAbstractMediaDataPtr& md) const = 0;
     virtual void onSuccessfulWriteData(const QnConstAbstractMediaDataPtr& md) = 0;
-    virtual void onSuccessfulPrepare() = 0;
+    virtual void onSuccessfulPrepare() {};
     virtual void reportFinished();
-    virtual void afterClose() = 0;
+    virtual void afterClose() {};
     virtual bool dataHoleDetected(const QnConstAbstractMediaDataPtr& md);
     virtual void updateContainerMetadata(QnAviArchiveMetadata* /*metadata*/) const {}
     virtual int getStreamIndex(const QnConstAbstractMediaDataPtr& mediaData) const;

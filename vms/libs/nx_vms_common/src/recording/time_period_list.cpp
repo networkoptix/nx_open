@@ -64,7 +64,7 @@ qint64 QnTimePeriodList::roundTimeToPeriodUSec(qint64 timeUsec, bool searchForwa
     {
         if (period->contains(timeMs))
             return timeUsec;
-        else if (searchForward)
+        else if (searchForward || period == cbegin())
             return period->startTimeMs * 1000;
         else
             return period->endTimeMs() * 1000;

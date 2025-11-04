@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/media/config.h>
-#include <nx/vms/client/desktop/export/tools/export_storage_stream_recorder.h>
+#include <nx/vms/client/desktop/export/tools/nov_media_export.h>
 #include <recording/time_period_list.h>
 
 #include "cam_display.h"
@@ -48,17 +48,16 @@ public:
     void setMotionIODevice(QSharedPointer<QBuffer>, int channel);
     QSharedPointer<QBuffer> motionIODevice(int channel);
 
+    nx::vms::client::desktop::NovMediaExport* recorder() {return m_exportRecorder; }
+
     // TODO: #sivanov Refactor parameter set to a structure.
     void exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
-        const QString& fileName, const QString& format,
+        const QString& fileName,
         QnStorageResourcePtr storage,
         const QTimeZone& timeZone,
-        const nx::core::transcoding::Settings& transcodingSettings,
         const QnTimePeriodList& playbackMask = QnTimePeriodList());
 
     void setResource(QnMediaResourcePtr resource);
-    QString exportedFileName() const;
-
     bool isDisplayStarted() const { return m_displayStarted; }
 signals:
     void exportProgress(int progress);
@@ -78,7 +77,7 @@ private:
     // TODO: #sivanov Refactor to unique pointer or 'owner' template.
     QPointer<QnAbstractMediaStreamDataProvider> m_reader;
 
-    QPointer<nx::vms::client::desktop::ExportStorageStreamRecorder> m_exportRecorder;
+    QPointer<nx::vms::client::desktop::NovMediaExport> m_exportRecorder;
     QPointer<QnAbstractMediaStreamDataProvider> m_exportReader;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
     bool m_displayStarted;

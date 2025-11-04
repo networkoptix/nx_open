@@ -39,13 +39,6 @@ QnMediaResourcePtr QnClientVideoCamera::resource() {
     return m_resource;
 }
 
-/*
-void QnClientVideoCamera::streamJump(qint64 time)
-{
-    m_camdispay.jump(time);
-}
-*/
-
 void QnClientVideoCamera::startDisplay()
 {
     NX_DEBUG(this, nx::format("startDisplay %1").arg(m_resource->getId()));
@@ -101,11 +94,9 @@ void QnClientVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val
 
 void QnClientVideoCamera::exportMediaPeriodToFile(
     const QnTimePeriod &timePeriod,
-    const  QString& fileName,
-    const QString& format,
+    const QString& fileName,
     QnStorageResourcePtr storage,
     const QTimeZone& timeZone,
-    const nx::core::transcoding::Settings& transcodingSettings,
     const QnTimePeriodList& playbackMask)
 {
     using namespace nx::recording;
@@ -132,10 +123,6 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
         archiveReader->setQuality(MEDIA_Quality_High, true); // for 'mkv' and 'avi' files
         archiveReader->setPlaybackMask(playbackMask);
 
-        // In the case of AVI, it is required to add filtering.
-        if (fileName.toLower().endsWith(".avi"))
-            archiveReader->addMediaFilter(std::make_shared<H2645Mp4ToAnnexB>());
-
         QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());
         if (rtspClient) {
             // 'slow' open mode. send DESCRIBE and SETUP to server.
@@ -143,15 +130,13 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
             QnVirtualCameraResourcePtr camera = m_resource.dynamicCast<QnVirtualCameraResource>();
             rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false);
-            rtspClient->setMediaRole(transcodingSettings.isTranscodingRequired()
-                ? PlaybackMode::exportWithTranscoding
-                : PlaybackMode::export_);
+            rtspClient->setMediaRole(PlaybackMode::export_);
             rtspClient->setRange(startTimeUs, endTimeUs, 0);
         }
 
         m_exportReader = archiveReader;
 
-        m_exportRecorder = new nx::vms::client::desktop::ExportStorageStreamRecorder(
+        m_exportRecorder = new nx::vms::client::desktop::NovMediaExport(
             m_resource, m_exportReader);
 
         connect(m_exportRecorder, &QnStreamRecorder::recordingProgress,
@@ -170,8 +155,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
 
             }, Qt::DirectConnection);
     }
-    QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (m_exportReader.data());
 
+    QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (m_exportReader.data());
     if (m_motionFileList[0] && archiveReader)
     {
         using namespace nx::vms::api;
@@ -181,26 +166,19 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
         archiveReader->setStreamDataFilter(filter);
         m_exportRecorder->setMotionFileList(m_motionFileList);
     }
-    // TODO: add analytics objects to an export file as well.
 
+    // TODO: add analytics objects to an export file as well.
     m_exportRecorder->clearUnprocessedData();
     m_exportRecorder->setProgressBounds(startTimeUs, endTimeUs);
-
-    if (storage)
-    {
-        m_exportRecorder->addRecordingContext(fileName, storage);
-    }
-    else if (!m_exportRecorder->addRecordingContext(fileName))
+    if (!storage)
     {
         emit exportFinished(Error(Error::Code::fileCreate), fileName);
         return;
     }
 
+    m_exportRecorder->setStorage(fileName, storage);
     m_exportRecorder->setServerTimeZone(timeZone);
-    m_exportRecorder->setContainer(format);
-
-    m_exportRecorder->setTranscodeSettings(transcodingSettings);
-
+    m_exportRecorder->setContainer("mkv");
     m_exportReader->addDataProcessor(m_exportRecorder);
     if (archiveReader)
         archiveReader->jumpTo(startTimeUs, startTimeUs);
@@ -233,7 +211,6 @@ void QnClientVideoCamera::stopExport()
     }
 
     m_exportReader.clear();
-    m_exportRecorder.clear();
 }
 
 void QnClientVideoCamera::setResource(QnMediaResourcePtr resource)
@@ -248,13 +225,4 @@ void QnClientVideoCamera::setMotionIODevice(QSharedPointer<QBuffer> value, int c
 
 QSharedPointer<QBuffer> QnClientVideoCamera::motionIODevice(int channel) {
     return m_motionFileList[channel];
-}
-
-QString QnClientVideoCamera::exportedFileName() const
-{
-    NX_MUTEX_LOCKER lock( &m_exportMutex );
-    if (m_exportRecorder)
-        return m_exportRecorder->fixedFileName();
-    else
-        return QString();
 }

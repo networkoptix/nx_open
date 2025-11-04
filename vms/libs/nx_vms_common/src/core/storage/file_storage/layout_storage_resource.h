@@ -70,7 +70,8 @@ public:
 
     bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);
 
-    QnTimePeriodList getTimePeriods(const QnResourcePtr &resource);
+    QnTimePeriodList getTimePeriods(const QnResourcePtr& resource);
+    std::vector<int64_t> getStartTimes(const QnResourcePtr& resource);
 
     static QString itemUniqueId(const QString& layoutUrl, const QString& itemUniqueId);
 

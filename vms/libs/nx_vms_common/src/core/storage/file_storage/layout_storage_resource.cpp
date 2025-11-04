@@ -292,16 +292,37 @@ QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(const QnResourcePtr
 {
     QString url = resource->getUrl();
     url = url.mid(url.lastIndexOf('?')+1);
-    QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(QnFile::baseName(url)), QIODevice::ReadOnly);
+    std::unique_ptr<QIODevice> chunkData(
+        open(NX_FMT("chunk_%1.bin", QnFile::baseName(url)), QIODevice::ReadOnly));
+
     if (!chunkData)
         return QnTimePeriodList();
 
     QnTimePeriodList chunks;
     QByteArray chunkDataArray(chunkData->readAll());
     chunks.decode(chunkDataArray);
-    delete chunkData;
-
     return chunks;
+}
+
+std::vector<int64_t> QnLayoutFileStorageResource::getStartTimes(const QnResourcePtr& resource)
+{
+    QString url = resource->getUrl();
+    url = url.mid(url.lastIndexOf('?') + 1);
+    auto filename = NX_FMT("start_times_%1.txt", QnFile::baseName(url));
+    std::unique_ptr<QIODevice> startTimesFile(open(filename, QIODevice::ReadOnly));
+    if (!startTimesFile)
+        return std::vector<int64_t>();
+
+    std::vector<int64_t> result;
+    QByteArray data(startTimesFile->readAll());
+    QList<QByteArray> tokens = data.split(' ');
+    for (const QByteArray& p: tokens)
+    {
+        if (!p.isEmpty())
+            result.push_back(p.toLongLong());
+    }
+
+    return result;
 }
 
 QString QnLayoutFileStorageResource::itemUniqueId(const QString& layoutUrl,

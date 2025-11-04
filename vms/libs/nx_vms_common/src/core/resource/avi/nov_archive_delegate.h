@@ -13,10 +13,10 @@ struct AVFormatContext;
 class QnCustomResourceVideoLayout;
 class QnAviAudioLayout;
 
-class QnNovArchiveDelegate: public QnAviArchiveDelegate
+class NX_VMS_COMMON_API QnNovArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
-    QnNovArchiveDelegate();
+    QnNovArchiveDelegate(const QnStorageResourcePtr& storage);
 
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual qint64 seek (qint64 time, bool findIFrame) override;
@@ -24,9 +24,30 @@ public:
         const QnResourcePtr& resource,
         AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher = nullptr) override;
     virtual void setSpeed(qint64 displayTime, double value) override;
+    virtual qint64 startTime() const override;
+    virtual qint64 endTime() const override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
+    virtual AudioLayoutConstPtr getAudioLayout() override;
+    virtual void close() override;
+    virtual std::optional<QnAviArchiveMetadata> metadata() const override;
+private:
+    QString getFileName(const QString& url, int64_t timestamp) const;
+    void findStartEndTime(const QnResourcePtr& resource);
+    bool openFile(const QString& filename);
+
 private:
     QnTimePeriodList m_chunks;
+    std::vector<int64_t> m_startTimes;
+    QnAviArchiveDelegate m_currentFile;
+    std::optional<QnAviArchiveMetadata> m_metadata;
+    int m_fileIndex = 0;
+    QString m_baseFilename;
+    QnResourcePtr m_resource;
+    QnStorageResourcePtr m_storage;
+
     qint64 m_skipFramesBeforeTime;
+    qint64 m_startTime = 0;
+    qint64 m_endTime = 0;
     bool m_reverseMode;
 };
 

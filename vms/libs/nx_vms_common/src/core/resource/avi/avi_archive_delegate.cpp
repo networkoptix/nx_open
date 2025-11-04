@@ -418,6 +418,14 @@ bool QnAviArchiveDelegate::open(
     const QnResourcePtr& resource,
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
 {
+    return open(resource, resource->getUrl(), archiveIntegrityWatcher);
+}
+
+bool  QnAviArchiveDelegate::open(
+    const QnResourcePtr& resource,
+    const QString& url,
+    AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
+{
     NX_MUTEX_LOCKER lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
 
     m_archiveIntegrityWatcher = archiveIntegrityWatcher;
@@ -428,10 +436,12 @@ bool QnAviArchiveDelegate::open(
         if (!checkStorage())
             return false;
 
-        QString url = m_resource->getUrl();
         if (!m_storage->isFileExists(url))
         {
             using namespace nx::utils::url;
+            NX_DEBUG(this, "File %1 is missing in the storage %2",
+                    hidePassword(url), hidePassword(m_storage->getUrl()));
+
             if (m_storage->getStatus() == nx::vms::api::ResourceStatus::online
                 && m_archiveIntegrityWatcher)
             {
@@ -488,6 +498,11 @@ bool QnAviArchiveDelegate::open(
     }
     m_keyFrameFound.resize(m_formatContext->nb_streams, false);
     return findStreams();
+}
+
+bool QnAviArchiveDelegate::opened() const
+{
+    return m_formatContext != nullptr;
 }
 
 void QnAviArchiveDelegate::close()
@@ -716,6 +731,7 @@ void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const A
         video->timestamp = AV_NOPTS_VALUE;
     else
         video->timestamp = qMax(0ll, (qint64) (timeBase * (packetTime - m_firstDts))) +  m_startTimeUs;
+
     if (packet.pts != AV_NOPTS_VALUE) {
         video->pts = qMax(0ll, (qint64) (timeBase * (packet.pts - m_firstDts))) +  m_startTimeUs;
     }

@@ -591,8 +591,10 @@ bool QnGLRenderer::drawVideoTextures(
             {
                 std::unique_ptr<nx::media::VideoFrame> nonOwning(
                     nx::media::FfmpegVideoDecoder::fromAVFrame(decodedFrame.get()));
-
-                painter->drawImage(viewRect, nonOwning->toImage(), sourceRect);
+                if (nonOwning)
+                    painter->drawImage(viewRect, nonOwning->toImage(), sourceRect);
+                else
+                    NX_WARNING(this, "Failed to draw frame, pixel format: %1", decodedFrame->format);
             }
         }
         else
