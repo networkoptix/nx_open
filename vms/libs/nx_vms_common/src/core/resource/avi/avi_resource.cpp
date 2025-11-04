@@ -70,14 +70,14 @@ QString QnAviResource::toString() const
     return getName();
 }
 
-QnAviArchiveDelegate* QnAviResource::createArchiveDelegate() const
+QnAbstractArchiveDelegate* QnAviResource::createArchiveDelegate() const
 {
     auto layoutFile = dynamic_cast<QnLayoutFileStorageResource*>(m_storage.data());
-    QnAviArchiveDelegate* aviDelegate = layoutFile
-        ? new QnNovArchiveDelegate()
-        : new QnAviArchiveDelegate();
-    if (m_storage)
-        aviDelegate->setStorage(m_storage);
+    if (layoutFile)
+        return new QnNovArchiveDelegate(m_storage);
+
+    auto aviDelegate = new QnAviArchiveDelegate();
+    aviDelegate->setStorage(m_storage);
     return aviDelegate;
 }
 
@@ -116,7 +116,7 @@ QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStre
     }
 
     // Calculate using delegate
-    const QScopedPointer<QnAviArchiveDelegate> archiveDelegate(createArchiveDelegate());
+    const QScopedPointer<QnAbstractArchiveDelegate> archiveDelegate(createArchiveDelegate());
     archiveDelegate->open(toSharedPointer(this));
 
     auto result = archiveDelegate->getVideoLayout();
@@ -136,7 +136,7 @@ bool QnAviResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) c
     if (!m_hasVideo.has_value())
     {
         // Read actual data from the file. Warning: this can be very slow!
-        const QScopedPointer<QnAviArchiveDelegate> archiveDelegate(createArchiveDelegate());
+        const QScopedPointer<QnAbstractArchiveDelegate> archiveDelegate(createArchiveDelegate());
         archiveDelegate->open(toSharedPointer(this));
         m_hasVideo = archiveDelegate->hasVideo();
     }

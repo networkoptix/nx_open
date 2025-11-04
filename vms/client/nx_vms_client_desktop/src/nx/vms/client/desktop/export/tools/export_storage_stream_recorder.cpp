@@ -13,62 +13,17 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/export/tools/export_utils.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <recording/helpers/recording_context_helpers.h>
-#include <utils/common/util.h>
 #include <transcoding/transcoding_utils.h>
+#include <utils/common/util.h>
 
 namespace nx::vms::client::desktop {
 
 using namespace nx::core::transcoding;
-
-namespace {
-
-// 16Kb ought to be enough for anybody.
-static const int kMetadataSeekSizeBytes = 16 * 1024;
-
-bool updateInFile(QIODevice* file,
-    QnAviArchiveMetadata::Format fileFormat,
-    const QByteArray& source,
-    const QByteArray& target)
-{
-    NX_ASSERT(file);
-    NX_ASSERT(source.size() == target.size());
-
-    auto pos = -1;
-    switch (fileFormat)
-    {
-        // Mp4 stores metadata at the end of file.
-        case QnAviArchiveMetadata::Format::mp4:
-        {
-            const auto offset = file->size() - kMetadataSeekSizeBytes;
-            file->seek(offset);
-            const auto data = file->read(kMetadataSeekSizeBytes);
-            pos = data.indexOf(source);
-            if (pos >= 0)
-                pos += offset;
-            break;
-        }
-        default:
-        {
-            file->seek(0);
-            const auto data = file->read(kMetadataSeekSizeBytes);
-            pos = data.indexOf(source);
-            break;
-        }
-    }
-
-    if (pos < 0)
-        return false;
-
-    file->seek(pos);
-    file->write(target);
-    return true;
-}
-
-} // namespace
 
 ExportStorageStreamRecorder::ExportStorageStreamRecorder(
     const QnResourcePtr& dev, QnAbstractStreamDataProvider* mediaProvider):
@@ -164,35 +119,10 @@ void ExportStorageStreamRecorder::adjustMetaData(QnAviArchiveMetadata& metaData)
 }
 void ExportStorageStreamRecorder::beforeIoClose(StorageContext& context)
 {
-    updateSignatureAttr(&context);
-}
-
-void ExportStorageStreamRecorder::updateSignatureAttr(StorageContext* context)
-{
-    NX_VERBOSE(this, "SignVideo: update signature of '%1'",
-        nx::utils::url::hidePassword(context->fileName));
-
-    QScopedPointer<QIODevice> file(context->storage->open(context->fileName, QIODevice::ReadWrite));
-    if (!file)
-    {
-        NX_WARNING(this, "SignVideo: could not open the file '%1'",
-            nx::utils::url::hidePassword(context->fileName));
-        return;
-    }
-
-    QByteArray placeholder = QnSignHelper::addSignatureFiller(QnSignHelper::getSignMagic());
     const auto systemContext = SystemContext::fromResource(m_resource);
-    QByteArray signature =
-        QnSignHelper::addSignatureFiller(m_signer.buildSignature(
-            systemContext->licensePool(), systemContext->currentServerId()));
-
-    //New metadata is stored as json, so signature is written base64 - encoded.
-    const bool metadataUpdated = updateInFile(file.data(),
-        context->fileFormat,
-        placeholder.toBase64(),
-        signature.toBase64());
-
-    if (!metadataUpdated)
+    auto signature = m_signer.buildSignature(
+        systemContext->licensePool(), systemContext->currentServerId());
+    if (!updateSignatureInFile(context.storage, context.fileName, context.fileFormat, signature))
         NX_WARNING(this, "SignVideo: metadata tag was not updated");
 }
 
@@ -392,22 +322,6 @@ void ExportStorageStreamRecorder::onFlush(StorageContext& /*context*/)
         if (!result || result->dataSize() == 0)
             break;
         StorageRecordingContext::writeData(result, /*stream index*/0);
-    }
-}
-
-nx::recording::Error::Code toRecordingError(nx::media::StreamEvent code)
-{
-    switch (code)
-    {
-        case nx::media::StreamEvent::tooManyOpenedConnections:
-        case nx::media::StreamEvent::forbiddenWithDefaultPassword:
-        case nx::media::StreamEvent::forbiddenWithNoLicense:
-        case nx::media::StreamEvent::oldFirmware:
-            return nx::recording::Error::Code::temporaryUnavailable;
-        case nx::media::StreamEvent::cannotDecryptMedia:
-            return nx::recording::Error::Code::encryptedArchive;
-        default:
-            return nx::recording::Error::Code::unknown;
     }
 }
 

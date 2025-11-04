@@ -533,10 +533,8 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     m_currentCamera->exportMediaPeriodToFile(d->settings.period,
         uniqId,
-        "mkv",
         d->storage,
         timeZone(resource),
-        d->settings.transcodingSettings,
         playbackMask);
 
     return true;
@@ -582,6 +580,20 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
 
     int numberOfChannels = camera->resource()->getVideoLayout()->channelCount();
     bool error = false;
+
+    if (camera->recorder())
+    {
+        auto strartTimes = camera->recorder()->startTimestamps();
+        if (!strartTimes.empty())
+        {
+            QString strartTimesFileName =
+                NX_FMT("start_times_%1.txt", fileNameForResource(camera->resource()));
+            QByteArray buffer;
+            for(const auto& time: strartTimes)
+                buffer.append(QByteArray::number(time) + " ");
+            writeData(strartTimesFileName, buffer);
+        }
+    }
 
     for (int i = 0; i < numberOfChannels; ++i)
     {

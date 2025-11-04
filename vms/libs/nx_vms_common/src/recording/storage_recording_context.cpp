@@ -211,6 +211,7 @@ void StorageRecordingContext::cleanFfmpegContexts()
 
 void StorageRecordingContext::initIoContext(StorageContext& context)
 {
+    NX_DEBUG(this, "Creating file: %1", context.fileName);
     context.formatCtx->pb = nx::utils::media::createFfmpegIOContext(
         context.storage, context.fileName, QIODevice::WriteOnly);
 

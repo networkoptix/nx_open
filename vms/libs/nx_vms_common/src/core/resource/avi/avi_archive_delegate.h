@@ -40,6 +40,12 @@ public:
     virtual bool open(
         const QnResourcePtr& resource,
         AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher = nullptr) override;
+
+    bool open(
+        const QnResourcePtr& resource,
+        const QString& url,
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher = nullptr);
+    bool opened() const;
     virtual void close() override;
     virtual qint64 startTime() const override;
     virtual void setStartTimeUs(qint64 startTimeUs);
@@ -93,6 +99,7 @@ public:
 
     using BeforeOpenInputCallback = std::function<void(QnAviArchiveDelegate*)>;
     void setBeforeOpenInputCallback(BeforeOpenInputCallback callback);
+
 private:
     qint64 packetTimestamp(const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);

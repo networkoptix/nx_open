@@ -15,7 +15,7 @@
 #include "avi_archive_metadata.h"
 
 class QnArchiveStreamReader;
-class QnAviArchiveDelegate;
+class QnAbstractArchiveDelegate;
 
 class NX_VMS_COMMON_API QnAviResource:
     public QnAbstractArchiveResource
@@ -45,7 +45,7 @@ public:
     /** Timezone of the file if it was stored during export. */
     QTimeZone timeZone() const;
 
-    virtual QnAviArchiveDelegate* createArchiveDelegate() const;
+    virtual QnAbstractArchiveDelegate* createArchiveDelegate() const;
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     /**
