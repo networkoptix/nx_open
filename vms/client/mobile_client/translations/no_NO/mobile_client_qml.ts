@@ -407,7 +407,7 @@
     </message>
     <message>
       <source>View All</source>
-      <translation type="unfinished">View All</translation>
+      <translation>Vis alle</translation>
     </message>
     <message>
       <source>All</source>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+      <translation>Du har deaktivert push-varsler for dette nettstedet. Gå til Innstillinger-siden for å aktivere dem.</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -595,7 +595,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>Legg til server</translation>
     </message>
   </context>
   <context>
