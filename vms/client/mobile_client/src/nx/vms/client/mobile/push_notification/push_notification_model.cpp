@@ -4,64 +4,39 @@
 
 #include <QtQml/QtQml>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/mobile/application_context.h>
-#include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
 #include <nx/vms/text/human_readable.h>
 
 #include "push_notification_image_provider.h"
 
 namespace nx::vms::client::mobile {
 
-struct PushNotificationModel::Private
-{
-    QString user;
-    std::vector<PushNotification> notifications;
-};
-
 PushNotificationModel::PushNotificationModel(QObject* parent):
-    QAbstractListModel(parent),
-    d(new Private{})
+    QAbstractListModel(parent)
 {
-    update();
-}
-
-PushNotificationModel::~PushNotificationModel()
-{
-}
-
-QString PushNotificationModel::user() const
-{
-    return d->user;
-}
-
-void PushNotificationModel::setUser(const QString& user)
-{
-    if (user == d->user)
-        return;
-
-    d->user = user;
-    emit userChanged();
-
-    update();
 }
 
 int PushNotificationModel::rowCount(const QModelIndex&) const
 {
-    return d->notifications.size();
+    return m_notifications.size();
 }
 
 QVariant PushNotificationModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || index.row() < 0 || index.row() >= (int) d->notifications.size())
+    if (!index.isValid() || index.row() < 0 || index.row() >= (int) m_notifications.size())
         return {};
 
-    const auto& item = d->notifications[index.row()];
+    const auto& item = m_notifications[index.row()];
 
     switch (role)
     {
+        case IdRole:
+            return QString::fromStdString(item.id);
+
         case TitleRole:
             return QString::fromStdString(item.title);
 
@@ -104,9 +79,6 @@ QVariant PushNotificationModel::data(const QModelIndex& index, int role) const
 
         case UrlRole:
             return QUrl{QString::fromStdString(item.url)};
-
-        case CloudSystemIdRole:
-            return QString::fromStdString(item.cloudSystemId);
     }
 
     NX_ASSERT(false, "Unexpected role: %1", role);
@@ -116,17 +88,13 @@ QVariant PushNotificationModel::data(const QModelIndex& index, int role) const
 
 bool PushNotificationModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    if (!index.isValid() || index.row() < 0 || index.row() >= (int) d->notifications.size())
+    if (!index.isValid() || index.row() < 0 || index.row() >= (int) m_notifications.size())
         return false;
 
     if (role == ViewedRole)
     {
-        PushNotification& notification = d->notifications[index.row()];
+        PushNotification& notification = m_notifications[index.row()];
         notification.isRead = value.toBool();
-
-        appContext()->pushNotificationStorage()->setIsRead(
-            d->user.toStdString(), notification.id, notification.isRead);
-
         emit dataChanged(index, index, {ViewedRole});
         return true;
     }
@@ -138,6 +106,7 @@ bool PushNotificationModel::setData(const QModelIndex& index, const QVariant& va
 QHash<int, QByteArray> PushNotificationModel::roleNames() const
 {
     auto result = QAbstractListModel::roleNames();
+    result[IdRole] = "id";
     result[TitleRole] = "title";
     result[DescriptionRole] = "description";
     result[SourceRole] = "source";
@@ -145,19 +114,16 @@ QHash<int, QByteArray> PushNotificationModel::roleNames() const
     result[TimeRole] = "time";
     result[ViewedRole] = "viewed";
     result[UrlRole] = "url";
-    result[CloudSystemIdRole] = "cloudSystemId";
     return result;
 }
 
-void PushNotificationModel::update()
+void PushNotificationModel::setNotifications(const QVector<PushNotification>& notifications)
 {
     emit beginResetModel();
-
-    d->notifications = d->user.isEmpty()
-        ? std::vector<PushNotification>{}
-        : appContext()->pushNotificationStorage()->userNotifications(d->user.toStdString());
-
+    m_notifications = notifications;
     emit endResetModel();
+
+    emit notificationsChanged();
 }
 
 void PushNotificationModel::registerQmlType()
@@ -187,32 +153,13 @@ bool PushNotificationFilterModel::filterAcceptsRow(int row, const QModelIndex& p
                 || index.data(Roles::DescriptionRole).toString().contains(regExp);
         };
 
-    auto hasSystemMatch =
-        [&]()
-        {
-            return !m_cloudSystemIds.isValid()
-                || m_cloudSystemIds.toStringList().contains(
-                    index.data(Roles::CloudSystemIdRole).toString());
-        };
-
-    return hasSystemMatch() && hasRegExpMatch() && hasFilterMatch();
+    return hasRegExpMatch() && hasFilterMatch();
 }
 
 PushNotificationFilterModel::PushNotificationFilterModel(QObject* parent):
     QSortFilterProxyModel(parent)
 {
-    connect(this, &PushNotificationFilterModel::rowsInserted,
-        this, &PushNotificationFilterModel::countChanged);
-    connect(this, &PushNotificationFilterModel::rowsRemoved,
-        this, &PushNotificationFilterModel::countChanged);
-    connect(this, &PushNotificationFilterModel::layoutChanged,
-        this, &PushNotificationFilterModel::countChanged);
-    connect(this, &PushNotificationFilterModel::modelReset,
-        this, &PushNotificationFilterModel::countChanged);
-
     connect(this, &PushNotificationFilterModel::filterChanged,
-        this, &PushNotificationFilterModel::invalidate);
-    connect(this, &PushNotificationFilterModel::cloudSystemIdsChanged,
         this, &PushNotificationFilterModel::invalidate);
 }
 

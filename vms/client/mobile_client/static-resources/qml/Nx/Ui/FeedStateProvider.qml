@@ -10,12 +10,13 @@ NxObject
 {
     id: feedState
 
-    readonly property alias notifications: notifications
-    readonly property alias unviewedCount: unviewedNotifications.count
+    readonly property alias notifications: notifications.notifications
+    readonly property alias unviewedCount: notifications.unviewedCount
     readonly property alias notificationsEnabled: d.notificationsEnabled
     readonly property bool hasOsPermission: appContext.pushManager.hasOsPermission
     readonly property bool active: hasOsPermission && notificationsEnabled
     property alias cloudSystemIds: notifications.cloudSystemIds
+    property alias user: notifications.user
     property int updateIntervalMs: 4000
 
     readonly property string buttonIconSource: active
@@ -26,7 +27,8 @@ NxObject
         ? (unviewedCount > 9 ? "9+" : unviewedCount)
         : ""
 
-    function update() { sourceModel.update() }
+    function update() { notifications.update() }
+    function setViewed(id, value) { notifications.setViewed(id, value) }
 
     NxObject
     {
@@ -42,30 +44,14 @@ NxObject
             appContext.pushManager.enabledCheckState === Qt.Checked
                 && selectedSystems.length !== 0
 
-        PushNotificationModel
-        {
-            id: sourceModel
-
-            user: appContext.cloudStatusWatcher.cloudLogin
-        }
-
-        PushNotificationFilterModel
+        PushNotificationProvider
         {
             id: notifications
 
+            user: appContext.cloudStatusWatcher.cloudLogin
             cloudSystemIds: windowContext.sessionManager.hasConnectedSession
                 ? [windowContext.mainSystemContext.cloudSystemId]
                 : []
-
-            sourceModel: sourceModel
-        }
-
-        PushNotificationFilterModel
-        {
-            id: unviewedNotifications
-
-            filter: PushNotificationFilterModel.Unviewed
-            sourceModel: notifications
         }
 
         Timer

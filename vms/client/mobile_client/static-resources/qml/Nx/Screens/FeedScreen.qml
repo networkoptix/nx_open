@@ -6,6 +6,7 @@ import QtQuick.Layouts
 
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Core.Ui
 import Nx.Mobile.Controls
 import Nx.Controls
 import Nx.Items
@@ -49,12 +50,6 @@ Page
         icon.height: 24
 
         onClicked: filterMenu.open()
-    }
-
-    function reset()
-    {
-        search.clear()
-        filterModel.filter = PushNotificationFilterModel.All
     }
 
     states:
@@ -230,8 +225,15 @@ Page
             {
                 id: filterModel
 
-                sourceModel: feedState.notifications
-                dynamicSortFilter: false
+                sourceModel: PushNotificationModel
+                {
+                    id: sourceModel
+
+                    function update() { sourceModel.notifications = feedState.notifications }
+
+                    Component.onCompleted: update()
+                }
+
                 filterRegularExpression: search.regExp
             }
 
@@ -256,9 +258,13 @@ Page
 
                     onClicked:
                     {
-                        model.viewed = true
                         if (model.url)
                             windowContext.uriHandler.handleUrl(model.url)
+
+                        feedState.setViewed(model.id, true)
+                        feedState.update()
+                            
+                        model.viewed = true
                     }
                 }
 
@@ -268,7 +274,13 @@ Page
                     icon.source: "image://skin/20x20/Solid/eye_off.svg"
                     backgroundColor: ColorTheme.colors.light16
 
-                    onClicked: model.viewed = false
+                    onClicked:
+                    {
+                        feedState.setViewed(model.id, false)
+                        feedState.update()
+                        
+                        model.viewed = false
+                    }
                 }
 
                 rightItem: Button
@@ -277,7 +289,13 @@ Page
                     icon.source: "image://skin/20x20/Solid/eye.svg"
                     backgroundColor: ColorTheme.colors.brand
 
-                    onClicked: model.viewed = true
+                    onClicked:
+                    {
+                        feedState.setViewed(model.id, true)
+                        feedState.update()
+                        
+                        model.viewed = true
+                    }
                 }
             }
         }
@@ -313,8 +331,29 @@ Page
     Placeholder
     {
         id: placeholder
+
         anchors.centerIn: parent
         visible: !!text
+    }
+
+    ViewUpdateWatcher
+    {
+        id: refreshWatcher
+
+        view: notifications
+
+        onUpdateRequested:
+        {
+            sourceModel.update()
+            feedState.update()
+        }
+    }
+
+    RefreshIndicator
+    {
+        anchors.horizontalCenter: parent.horizontalCenter
+        progress: refreshWatcher.refreshProgress
+        y: notifications.y + refreshWatcher.overshoot * progress - height - notifications.spacing * 2
     }
 
     function highlightMatchingText(text)

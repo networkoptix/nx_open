@@ -33,6 +33,7 @@
 #include <nx/vms/client/mobile/push_notification/details/push_systems_selection_model.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_model.h>
+#include <nx/vms/client/mobile/push_notification/push_notification_provider.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/session/ui_messages.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
@@ -125,6 +126,7 @@ void registerQmlTypes()
     ShareBookmarkBackend::registerQmlType();
     PushNotificationModel::registerQmlType();
     PushNotificationFilterModel::registerQmlType();
+    PushNotificationProvider::registerQmlType();
 
     qmlRegisterUncreatableMetaObject(nx::vms::api::staticMetaObject, "nx.vms.api", 1, 0,
         "API", "API is a namespace");
