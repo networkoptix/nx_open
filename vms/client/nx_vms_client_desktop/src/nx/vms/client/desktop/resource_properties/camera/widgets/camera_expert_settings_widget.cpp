@@ -363,7 +363,9 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     setHelpTopic(ui->settingsDisableControlCheckBox,
         HelpTopic::Id::CameraSettings_Expert_SettingsControl);
     setHelpTopic(ui->keepCameraTimeSettingsCheckBox,
-        HelpTopic::Id::CameraSettings_Expert_SettingsControl);
+        HelpTopic::Id::CameraSettings_Expert_TimeSync);
+    setHelpTopic(ui->remoteArchiveSynchronizationCheckBox,
+        HelpTopic::Id::CameraSettings_Onvif),
     setHelpTopic(ui->checkBoxPrimaryRecorder,
         HelpTopic::Id::CameraSettings_Expert_DisableArchivePrimary);
     setHelpTopic(ui->checkBoxSecondaryRecorder,
