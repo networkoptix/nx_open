@@ -851,6 +851,8 @@ Motion::Motion(const nx::kit::Json& json)
     deviceId = getStringValue(json, "deviceId");
     channel = getIntValue(json, "channel");
     region = getStringValue(json, "region");
+    organizationId = getStringValue(json, "organizationId");
+    siteId = getStringValue(json, "siteId");
 }
 
 ValueOrError<Motion> Motion::fromJson(const char* jsonStr) noexcept
@@ -887,6 +889,8 @@ bool Motion::operator==(const Motion& other) const
 nx::kit::Json Motion::to_json() const
 {
     return nx::kit::Json::object({
+        {"organizationId", organizationId},
+        {"siteId", siteId},
         {"startTimeMs", (double) startTimeMs.count()},
         {"durationMs", (double) durationMs.count()},
         {"deviceId", deviceId},

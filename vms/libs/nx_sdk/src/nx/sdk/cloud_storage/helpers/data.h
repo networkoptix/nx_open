@@ -322,6 +322,8 @@ struct Motion
     std::chrono::milliseconds startTimeMs;
     std::chrono::milliseconds durationMs;
     int channel = 0;
+    std::string organizationId;
+    std::string siteId;
 
     /**
      * Binary motion mask data. Encoded in base64.
