@@ -49,6 +49,16 @@ Page
         icon.width: 24
         icon.height: 24
 
+        Indicator
+        {
+            anchors.topMargin: filterButton.topPadding + 9
+            anchors.rightMargin: filterButton.rightPadding + 8
+
+            width: 6
+            height: 6
+            visible: feedScreen.filtered
+        }
+
         onClicked: filterMenu.open()
     }
 
@@ -425,6 +435,15 @@ Page
         progress: refreshWatcher.refreshProgress
         y: notifications.y + refreshWatcher.overshoot * progress - height - notifications.spacing * 2
     }
+
+    Binding
+    {
+        target: appContext.pushManager
+        property: "lastUsedFilter"
+        value: filterModel.filter
+    }
+
+    Component.onCompleted: filterModel.filter = appContext.pushManager.lastUsedFilter
 
     function highlightMatchingText(text)
     {
