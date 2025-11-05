@@ -64,6 +64,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "setting_up_camera_transport_pr.html";
         case Id::CameraSettings_Expert_SettingsControl:
             return "preventing_vms_from_c.html";
+        case Id::CameraSettings_Expert_TimeSync:
+            return "time-synchronization-berween-s.html";
         case Id::CameraSettings_Hotspots:
             return "hot-spot-and-camera-linking.html";
         case Id::CameraSettings:
