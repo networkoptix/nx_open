@@ -370,6 +370,24 @@ int PushNotificationManager::usedSystemsCount() const
     return (selected & d->currentSystems).size();
 }
 
+int PushNotificationManager::lastUsedFilter() const
+{
+    return d->remotePushController.confirmedSettings()->lastUsedFilter;
+}
+
+void PushNotificationManager::setLastUsedFilter(int value)
+{
+    if (auto settings = d->remotePushController.confirmedSettings())
+    {
+        const auto userName = d->remotePushController.credentials().username;
+        if (settings->lastUsedFilter == value)
+            return;
+
+        settings->lastUsedFilter = value;
+        updateUserSettings(this, QString::fromStdString(userName), settings);
+    }
+}
+
 QString PushNotificationManager::checkConnectionErrorText() const
 {
     return tr("Please check your internet connection");

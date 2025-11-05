@@ -60,6 +60,11 @@ class PushNotificationManager: public QObject
         READ usedSystemsCount
         NOTIFY usedSystemsCountChanged)
 
+    Q_PROPERTY(int lastUsedFilter
+        READ lastUsedFilter
+        WRITE setLastUsedFilter
+        NOTIFY lastUsedFilterChanged)
+
 public:
     static void registerQmlType();
 
@@ -148,6 +153,16 @@ public:
      */
     int usedSystemsCount() const;
 
+    /**
+     * @return The last used filter on the feed screen.
+     */
+    int lastUsedFilter() const;
+
+    /**
+     * Sets the last used filter on the feed screen.
+     */
+    void setLastUsedFilter(int value);
+
     Q_INVOKABLE QString checkConnectionErrorText() const;
 
 signals:
@@ -165,6 +180,7 @@ signals:
     void hasOsPermissionChanged();
     void systemsCountChanged();
     void usedSystemsCountChanged();
+    void lastUsedFilterChanged();
 
 private:
     struct Private;

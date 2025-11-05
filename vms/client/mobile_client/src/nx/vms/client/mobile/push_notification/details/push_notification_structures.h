@@ -71,6 +71,11 @@ struct LocalPushSettings
      */
     TokenData tokenData;
 
+    /**
+     * The last used filter on the feed screen.
+     */
+    int lastUsedFilter = 0;
+
     LocalPushSettings();
 
     LocalPushSettings(
@@ -88,7 +93,7 @@ struct LocalPushSettings
 
     bool operator == (const LocalPushSettings& /*other*/) const = default;
 };
-NX_REFLECTION_INSTRUMENT(LocalPushSettings, (enabled)(systems)(tokenData))
+NX_REFLECTION_INSTRUMENT(LocalPushSettings, (enabled)(systems)(tokenData)(lastUsedFilter))
 
 using OptionalLocalPushSettings = std::optional<LocalPushSettings>;
 using UserName = QString;
