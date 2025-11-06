@@ -120,7 +120,8 @@ void FfmpegImageProvider::load(bool sync)
             const auto image =
                 [resource, position]() -> QImage
                 {
-                    QnAviArchiveDelegatePtr archiveDelegate(new QnAviArchiveDelegate());
+                    auto aviResource = resource.dynamicCast<QnAviResource>();
+                    auto archiveDelegate = aviResource->createArchiveDelegate();
                     if (!archiveDelegate->open(resource))
                         return {};
 
