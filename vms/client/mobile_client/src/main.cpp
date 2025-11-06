@@ -51,6 +51,7 @@ extern "C" {
 #include <nx/vms/client/core/testkit/http_server.h>
 #include <nx/vms/client/core/testkit/testkit.h>
 #include <nx/vms/client/core/utils/font_loader.h>
+#include <nx/vms/client/core/watchers/cloud_features_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/statistics/crashpad.h>
@@ -364,10 +365,6 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 
     QnMobileClientSettings settings;
 
-    nx::vms::statistics::initCrashpad(
-        settings.crashdumpUploadsEnabled(),
-        nx::build_info::mobileClientVersion());
-
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
     QnMobileClientStartupParameters startupParams(application);
@@ -376,7 +373,7 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     bool loggingIsInitialized = initializeLogging(startupParams);
     initializeNetworkLogging(); //< Should be initialized before ApplicationContext.
 
-    const auto applicationContext = std::make_unique<mobile::ApplicationContext>(startupParams);
+    const auto context = std::make_unique<mobile::ApplicationContext>(startupParams);
 
     if (!loggingIsInitialized)
     {
@@ -388,7 +385,19 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     qnSettings->setStartupParameters(startupParams);
     processStartupParams(startupParams);
 
-    applicationContext->storagePluginFactory()->registerStoragePlugin(
+    using Feature = nx::vms::client::core::CloudFeature;
+    const auto featureWatcher = context->cloudFeaturesWatcher();
+
+    const bool enabledFromCloud = featureWatcher->hasFeature(Feature::vmsClientCrashReporting);
+    const bool forcedByUser = qnSettings->crashdumpUploadsEnabled();
+    const bool enableCrashReporting = enabledFromCloud || forcedByUser;
+    NX_DEBUG(
+        nx::log::Tag(QString("main()")),
+        "Enable crash reporting: %1, forced by user: %2, enabled from cloud: %3",
+        enableCrashReporting, forcedByUser, enabledFromCloud);
+    nx::vms::statistics::initCrashpad(enableCrashReporting, nx::build_info::mobileClientVersion());
+
+    context->storagePluginFactory()->registerStoragePlugin(
         QLatin1String("file"), QnQtFileStorageResource::instance, true);
 
     #if defined(Q_OS_ANDROID)
@@ -406,19 +415,19 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 
     // TODO: Move all the code above in mobile application context destructor with correct
     // deinitialization order.
-    applicationContext->qmlEngine()->removeImageProvider("thumbnail");
-    applicationContext->resetEngine();
+    context->qmlEngine()->removeImageProvider("thumbnail");
+    context->resetEngine();
 
     const auto deinitializationStartTime = steady_clock::now();
 
     // A workaround to ensure no cross-system connections are made after subsequent stopAll call.
-    if (auto csw = applicationContext->cloudStatusWatcher())
+    if (auto csw = context->cloudStatusWatcher())
         csw->suppressCloudInteraction({});
-    if (auto ccsm = applicationContext->cloudCrossSystemManager())
+    if (auto ccsm = context->cloudCrossSystemManager())
         ccsm->resetCloudSystems(/*enableCloudSystems*/ false);
 
     // Stop all long runnables before destroying application context.
-    applicationContext->stopAll();
+    context->stopAll();
 
     // Wait while deleteLater objects will be freed
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);

@@ -11,7 +11,9 @@
 namespace nx::vms::client::core {
 
 NX_REFLECTION_ENUM_CLASS(CloudFeature,
-    none = 0
+    none = 0,
+    vmsClientCrashReporting = 1 << 0,
+    vmsClientQrCodeDeployment = 1 << 1
 );
 
 /**

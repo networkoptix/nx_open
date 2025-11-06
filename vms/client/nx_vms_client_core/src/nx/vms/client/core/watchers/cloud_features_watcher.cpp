@@ -61,17 +61,23 @@ struct CloudFeaturesWatcher::Private
 
         connect(
             appContext()->cloudStatusWatcher(),
+            &CloudStatusWatcher::cloudLoginChanged,
+            q,
+            [this]()
+            {
+                // Update "last used" enabled features when cloud login changes.
+                cloudEnabledFeatures = getLastKnownEnabledFeatures();
+                updateEnabledFeatures();
+            });
+
+        connect(
+            appContext()->cloudStatusWatcher(),
             &CloudStatusWatcher::credentialsChanged,
             q,
             [this]()
             {
-                CloudFeaturesWatcher::CloudFeatures lastKnownEnabledFeatures;
                 const auto credentials = appContext()->cloudStatusWatcher()->credentials();
-                auto cloudFeatures = appContext()->coreSettings()->lastKnownCloudEnabledFeatures();
-                if (cloudFeatures.contains(credentials.username))
-                    fromString(cloudFeatures[credentials.username], &lastKnownEnabledFeatures);
-
-                cloudEnabledFeatures = lastKnownEnabledFeatures;
+                cloudEnabledFeatures = getLastKnownEnabledFeatures();
                 lastUsedCredentials = credentials;
                 retryAttempts = 0;
                 updateEnabledFeatures();
@@ -87,7 +93,7 @@ struct CloudFeaturesWatcher::Private
     CloudFeaturesWatcher* const q = nullptr;
 
     CloudFeaturesWatcher::CloudFeatures enabledFeatures;
-    CloudFeaturesWatcher::CloudFeatures cloudEnabledFeatures;
+    CloudFeaturesWatcher::CloudFeatures cloudEnabledFeatures = getLastKnownEnabledFeatures();
     CloudFeaturesWatcher::CloudFeatures forcefullyDisabledFeatures;
     std::unique_ptr<nx::network::http::AsyncClient> httpClient;
     nx::network::http::Credentials lastUsedCredentials;
@@ -105,6 +111,16 @@ struct CloudFeaturesWatcher::Private
 
         httpClient->pleaseStopSync();
         httpClient.reset();
+    }
+
+    CloudFeaturesWatcher::CloudFeatures getLastKnownEnabledFeatures() const
+    {
+        CloudFeaturesWatcher::CloudFeatures lastKnownEnabledFeatures;
+        const auto credentials = appContext()->cloudStatusWatcher()->credentials();
+        auto cloudFeatures = appContext()->coreSettings()->lastKnownCloudEnabledFeatures();
+        if (cloudFeatures.contains(credentials.username))
+            fromString(cloudFeatures[credentials.username], &lastKnownEnabledFeatures);
+        return lastKnownEnabledFeatures;
     }
 
     void updateLastKnownCloudEnabledFeaturesSettings()

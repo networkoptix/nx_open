@@ -7,6 +7,7 @@
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/watchers/cloud_features_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 
 namespace nx::vms::client::core {
@@ -29,12 +30,13 @@ struct FeatureAccessWatcher::Private
 
     bool canUseShareBookmark = false;
     bool canUseDeployByQrFeature = false;
+    bool canUseCrashReporting = false;
 
     bool isAcceptableCloudSite(const CloudSiteFilter& filter) const;
 
     void updateCanUseShareBookmark();
-
     void updateCanUseDeployByQrFeature();
+    void updateCanUseCrashReporting();
 };
 
 bool FeatureAccessWatcher::Private::isAcceptableCloudSite(const CloudSiteFilter& filter) const
@@ -69,7 +71,10 @@ void FeatureAccessWatcher::Private::updateCanUseShareBookmark()
 
 void FeatureAccessWatcher::Private::updateCanUseDeployByQrFeature()
 {
-    const bool newValue = appContext()->coreSettings()->allowDeployByQrCodeFeature()
+    const bool allowedByFeatureFlag = appContext()->cloudFeaturesWatcher()->hasFeature(
+        CloudFeature::vmsClientQrCodeDeployment);
+    const bool newValue =
+        (allowedByFeatureFlag || appContext()->coreSettings()->forceDeployByQrCodeFeature())
         && isAcceptableCloudSite({.minSiteVersion = kSite61Version, .belongsToOrganization = false})
         && q->systemContext()->userWatcher()->isAdministratorUser();
 
@@ -103,10 +108,16 @@ FeatureAccessWatcher::FeatureAccessWatcher(SystemContext* context, QObject* pare
     connect(settings, &vms::client::core::Settings::changed, this,
         [this, settings](const auto property)
         {
-            if (property && property->name == settings->allowDeployByQrCodeFeature.name)
+            if (property && property->name == settings->forceDeployByQrCodeFeature.name)
                 d->updateCanUseDeployByQrFeature();
         });
 
+    connect(appContext()->cloudFeaturesWatcher(), &CloudFeaturesWatcher::featuresChanged, this,
+        [this](auto changedFeatures)
+        {
+            if (changedFeatures.testFlag(CloudFeature::vmsClientQrCodeDeployment))
+                d->updateCanUseDeployByQrFeature();
+        });
     updateFeaturesAvailability();
 }
 
