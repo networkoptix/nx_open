@@ -11,6 +11,10 @@
         <source>Unsupported content type.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Unsupported charset.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AuthResultTranslations</name>
