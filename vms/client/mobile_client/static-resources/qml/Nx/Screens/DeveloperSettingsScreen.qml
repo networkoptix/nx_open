@@ -259,7 +259,6 @@ BaseSettingsScreen
 
         Button
         {
-            visible: d.crashdumpsEnabled
             text: qsTr("Force Crash")
             color: ColorTheme.colors.red_core
             onClicked: NxGlobals.forceCrash()
