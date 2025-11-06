@@ -7,6 +7,7 @@
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 
 namespace nx::vms::client::core {
 
@@ -69,7 +70,8 @@ void FeatureAccessWatcher::Private::updateCanUseShareBookmark()
 void FeatureAccessWatcher::Private::updateCanUseDeployByQrFeature()
 {
     const bool newValue = appContext()->coreSettings()->allowDeployByQrCodeFeature()
-        && isAcceptableCloudSite({.minSiteVersion = kSite61Version, .belongsToOrganization = true});
+        && isAcceptableCloudSite({.minSiteVersion = kSite61Version, .belongsToOrganization = false})
+        && q->systemContext()->userWatcher()->isAdministratorUser();
 
     if (newValue == canUseDeployByQrFeature)
         return;
@@ -94,6 +96,8 @@ FeatureAccessWatcher::FeatureAccessWatcher(SystemContext* context, QObject* pare
         this, updateFeaturesAvailability);
     connect(context, &SystemContext::credentialsChanged,
         this, updateFeaturesAvailability);
+    connect(context->userWatcher(), &UserWatcher::isAdministratorUserChanged, this,
+        [this]() { d->updateCanUseDeployByQrFeature(); });
 
     const auto settings = appContext()->coreSettings();
     connect(settings, &vms::client::core::Settings::changed, this,
