@@ -32,7 +32,7 @@ Control
 
     background: Rectangle
     {
-        color: viewed ? ColorTheme.colors.dark7 : ColorTheme.colors.dark9
+        color: viewed ? ColorTheme.colors.dark6 : ColorTheme.colors.dark9
         radius: 10
 
         Rectangle
@@ -44,11 +44,20 @@ Control
             anchors.topMargin: 28
             anchors.rightMargin: 20
 
-            visible: !viewed
+            opacity: viewed ? 0.0 : 1.0
             width: 8
             height: 8
             radius: width / 2
             color: ColorTheme.colors.brand
+
+            Behavior on opacity
+            {
+                NumberAnimation
+                {
+                    duration: 300
+                    easing.type: Easing.OutCubic
+                }
+            }
         }
 
         MouseArea
@@ -56,11 +65,20 @@ Control
             anchors.fill: parent
             onClicked: control.clicked()
         }
+
+        Behavior on color
+        {
+            ColorAnimation
+            {
+                duration: 300
+                easing.type: Easing.OutCubic
+            }
+        }
     }
 
     contentItem: ColumnLayout
     {
-        spacing: 16
+        spacing: 20
 
         RowLayout
         {
@@ -90,69 +108,74 @@ Control
             }
         }
 
-        Text
+        ColumnLayout
         {
-            id: title
+            spacing: 16
 
-            Layout.fillWidth: true
-            Layout.rightMargin: source ? undefined : kTitleRightPadding
-
-            font.pixelSize: 18
-            font.weight: Font.Medium
-            color: ColorTheme.colors.light4
-
-            wrapMode: Text.Wrap
-            maximumLineCount: 2
-            elide: Text.ElideRight
-            textFormat: Text.StyledText
-        }
-
-        Image
-        {
-            id: image
-
-            Layout.fillWidth: true
-            Layout.preferredHeight: 180
-
-            visible: status === Image.Ready
-
-            fillMode: Image.PreserveAspectCrop
-
-            layer.enabled: true
-            layer.effect: OpacityMask
+            Text
             {
-                maskSource: Rectangle
+                id: title
+
+                Layout.fillWidth: true
+                Layout.rightMargin: source ? undefined : kTitleRightPadding
+
+                font.pixelSize: 18
+                font.weight: Font.Medium
+                color: ColorTheme.colors.light4
+
+                wrapMode: Text.Wrap
+                maximumLineCount: 2
+                elide: Text.ElideRight
+                textFormat: Text.StyledText
+            }
+
+            Image
+            {
+                id: image
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 180
+
+                visible: status === Image.Ready
+
+                fillMode: Image.PreserveAspectCrop
+
+                layer.enabled: true
+                layer.effect: OpacityMask
                 {
-                    width: image.paintedWidth
-                    height: image.paintedHeight
-                    radius: 4
+                    maskSource: Rectangle
+                    {
+                        width: image.paintedWidth
+                        height: image.paintedHeight
+                        radius: 4
+                    }
+                }
+
+                ColoredImage
+                {
+                    anchors.centerIn: parent
+
+                    visible: !!url
+                    sourcePath: "image://skin/feed/play.svg"
+                    sourceSize: Qt.size(48, 48)
+                    primaryColor: ColorTheme.colors.light1
                 }
             }
 
-            ColoredImage
+            Text
             {
-                anchors.centerIn: parent
+                id: description
 
-                visible: !!url
-                sourcePath: "image://skin/feed/play.svg"
-                sourceSize: Qt.size(48, 48)
-                primaryColor: ColorTheme.colors.light1
+                Layout.fillWidth: true
+
+                color: ColorTheme.colors.light10
+                font.pixelSize: 16
+
+                wrapMode: Text.Wrap
+                maximumLineCount: expanded ? undefined : 2
+                elide: Text.ElideRight
+                textFormat: Text.StyledText
             }
-        }
-
-        Text
-        {
-            id: description
-
-            Layout.fillWidth: true
-
-            color: ColorTheme.colors.light10
-            font.pixelSize: 16
-
-            wrapMode: Text.Wrap
-            maximumLineCount: expanded ? undefined : 2
-            elide: Text.ElideRight
-            textFormat: Text.StyledText
         }
 
         RowLayout
