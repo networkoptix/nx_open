@@ -11,6 +11,10 @@
       <source>Unsupported content type.</source>
       <translation>Loại nội dung không được hỗ trợ.</translation>
     </message>
+    <message>
+      <source>Unsupported charset.</source>
+      <translation type="unfinished">Unsupported charset.</translation>
+    </message>
   </context>
   <context>
     <name>AuthResultTranslations</name>
