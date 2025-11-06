@@ -4,6 +4,8 @@ import QtQuick
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 
+import Nx.Core
+
 Item
 {
     id: control
@@ -14,6 +16,7 @@ Item
 
     property int revealDistance: 50
     property int activationDistance: 100
+    property var activationAnimation
 
     property int spacing: 8
 
@@ -21,6 +24,7 @@ Item
     readonly property int shift: Math.round(shiftPosition)
     readonly property int shiftDirection: Math.sign(shift)
 
+    readonly property var revealedItem: revealedControl?.contentItem ?? null
     readonly property var revealedControl:
     {
         if (Math.abs(shift) < revealDistance)
@@ -43,8 +47,33 @@ Item
     Connections
     {
         target: revealedControl && revealedControl.contentItem
-        function onClicked(event) { activationAnimation.start() }
+        function onClicked(event)
+        {
+            if (activationAnimation)
+                activationAnimation.start()
+            else
+                defaultAnimation.run(/*reset*/ true)
+        }
     }
+
+    Control
+    {
+        id: leftControl
+
+        anchors.left: parent.left
+        height: parent.height
+        visible: shift > 0
+    }
+
+    Control
+    {
+        id: rightControl
+
+        anchors.right: parent.right
+        height: parent.height
+        visible: shift < 0
+    }
+
 
     Control
     {
@@ -53,74 +82,17 @@ Item
         readonly property int maximum: (leftControl.implicitWidth + control.spacing)
         readonly property int minimum: -(rightControl.implicitWidth + control.spacing)
 
-        function clamp(v, min, max)
-        {
-            return Math.max(min, Math.min(max, v));
-        }
-
-        x: clamp(shift, minimum, maximum)
+        x: MathUtils.bound(minimum, shift, maximum)
 
         width: parent.width
         height: parent.height
     }
 
-    Item //< Sticks to the content item.
+    MouseArea
     {
-        anchors.right: content.left
-        anchors.rightMargin: control.spacing
-
-        width: leftControl.implicitWidth
-        height: leftControl.implicitHeight
-
-        Control //< Sticks to the container when stretching.
-        {
-            id: leftControl
-
-            anchors.left: parent.left
-
-            width: Math.max(implicitWidth, shift - control.spacing)
-            height: control.height
-        }
-    }
-
-    Item //< Sticks to the content item.
-    {
-        anchors.left: content.right
-        anchors.leftMargin: control.spacing
-
-        implicitWidth: rightControl.implicitWidth
-        implicitHeight: rightControl.implicitHeight
-
-        Control //< Sticks to the container when stretching.
-        {
-            id: rightControl
-
-            anchors.right: parent.right
-
-            width: Math.max(implicitWidth, -shift - control.spacing)
-            height: control.height
-        }
-    }
-
-    SequentialAnimation on shiftPosition
-    {
-        id: activationAnimation
-
-        running: false
-
-        NumberAnimation
-        {
-            to: revealedControl ? shiftDirection * (control.width + control.spacing) : 0
-            duration: 600
-            easing.type: Easing.OutCubic
-        }
-
-        NumberAnimation
-        {
-            to: 0
-            duration: 300
-            easing.type: Easing.OutCubic
-        }
+        anchors.fill: content
+        enabled: !!revealedControl
+        onClicked: defaultAnimation.run(/*reset*/ true)
     }
 
     NumberAnimation on shiftPosition
@@ -146,40 +118,28 @@ Item
         id: drag
 
         target: null
-        enabled: !activationAnimation.running && !defaultAnimation.running
+        enabled: !defaultAnimation.running && !activationAnimation?.running
         dragThreshold: 20
 
         onActiveChanged:
         {
-            if (!active && !activationAnimation.running)
+            if (active)
+                return
+
+            if (Math.abs(shift) > activationDistance)
+                return control.activate()
+
+            if (!defaultAnimation.running && !activationAnimation?.running)
                 defaultAnimation.run()
         }
 
         yAxis.enabled: false
         xAxis.onActiveValueChanged: (delta) =>
         {
-            shiftPosition += delta
+            const min = rightItem.opacity > 0 ? -(control.width + control.spacing) : 0
+            const max = leftItem.opacity > 0 ? (control.width + control.spacing) : 0
 
-            if (Math.abs(shift) > activationDistance)
-                control.activate();
-        }
-    }
-
-    MouseArea
-    {
-        anchors.fill: content
-        enabled: !!revealedControl
-        onClicked: defaultAnimation.run(/*reset*/ true)
-    }
-
-    layer.enabled: true
-    layer.effect: OpacityMask
-    {
-        maskSource: Rectangle
-        {
-            width: control.width
-            height: control.height
-            radius: 10
+            shiftPosition = MathUtils.bound(min, shiftPosition + delta, max)
         }
     }
 }

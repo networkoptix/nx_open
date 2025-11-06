@@ -145,7 +145,7 @@ Page
 
         icon.width: 20
         icon.height: 20
-        icon.color: ColorTheme.colors.light1
+        icon.color: ColorTheme.colors.dark1
         focusPolicy: Qt.NoFocus
 
         property alias backgroundColor: background.color
@@ -179,6 +179,15 @@ Page
                     font.weight: Font.Medium
                     color: icon.color
                 }
+            }
+        }
+
+        Behavior on opacity
+        {
+            SequentialAnimation
+            {
+                PauseAnimation { duration: 300 }
+                PropertyAction { }
             }
         }
     }
@@ -238,13 +247,21 @@ Page
 
             delegate: SwipeControl
             {
+                id: delegate
+
+                readonly property bool animateActivation: feedScreen.filtered
+
                 width: notifications.width
 
                 revealDistance: 100
                 activationDistance: 100
 
+                activationAnimation: animateActivation ? activationAnimation : undefined
+
                 contentItem: Notification
                 {
+                    id: notification
+
                     width: parent.width
 
                     title: highlightMatchingText(model.title)
@@ -252,7 +269,7 @@ Page
                     source: feedState.cloudSystemIds.length > 1 ? model.source : ""
                     image: model.image
                     time: model.time
-                    viewed: model.viewed
+                    viewed: model.viewed ?? true
                     url: model.url
 
                     onClicked:
@@ -262,39 +279,92 @@ Page
 
                         feedState.setViewed(model.id, true)
                         feedState.update()
-                            
+
                         model.viewed = true
                     }
                 }
 
                 leftItem: Button
                 {
+                    id: unviewedButton
+
                     text: qsTr("Unviewed")
                     icon.source: "image://skin/20x20/Solid/eye_off.svg"
                     backgroundColor: ColorTheme.colors.light16
+                    opacity: model.viewed ? 1.0 : 0.0
 
                     onClicked:
                     {
                         feedState.setViewed(model.id, false)
                         feedState.update()
-                        
+
+                        if (!animateActivation)
+                            apply()
+                    }
+
+                    function apply()
+                    {
                         model.viewed = false
                     }
                 }
 
                 rightItem: Button
                 {
+                    id: viewedButton
+
                     text: qsTr("Viewed")
                     icon.source: "image://skin/20x20/Solid/eye.svg"
                     backgroundColor: ColorTheme.colors.brand
+                    opacity: !model.viewed ? 1.0 : 0.0
 
                     onClicked:
                     {
                         feedState.setViewed(model.id, true)
                         feedState.update()
-                        
+
+                        if (!animateActivation)
+                            apply()
+                    }
+
+                    function apply()
+                    {
                         model.viewed = true
                     }
+                }
+
+                ParallelAnimation
+                {
+                    id: activationAnimation
+
+                    NumberAnimation
+                    {
+                        target: delegate.revealedItem
+                        property: "opacity"
+                        to: 0
+                        duration: 200
+                        easing.type: Easing.OutCubic
+                    }
+
+                    NumberAnimation
+                    {
+                        target: notification
+                        property: "x"
+                        to: -notifications.width
+                        duration: 200
+                        easing.type: Easing.OutCubic
+                    }
+
+                    onFinished: delegate.revealedItem.apply()
+                }
+            }
+
+            displaced: Transition
+            {
+                NumberAnimation
+                {
+                    property: "y"
+                    duration: 200
+                    easing.type: Easing.OutCubic
                 }
             }
         }
