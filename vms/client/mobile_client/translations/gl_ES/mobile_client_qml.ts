@@ -399,15 +399,15 @@
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation type="unfinished">No New Notifications</translation>
+      <translation>Sen novas notificacións</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+      <translation>Non se atoparon novas notificacións push, pero podes ver o teu historial completo de notificacións.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation type="unfinished">View All</translation>
+      <translation>Ver todo</translation>
     </message>
     <message>
       <source>All</source>

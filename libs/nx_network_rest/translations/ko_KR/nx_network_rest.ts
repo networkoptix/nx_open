@@ -11,6 +11,10 @@
       <source>Unsupported content type.</source>
       <translation>지원되지 않는 콘텐츠 유형입니다.</translation>
     </message>
+    <message>
+      <source>Unsupported charset.</source>
+      <translation type="unfinished">Unsupported charset.</translation>
+    </message>
   </context>
   <context>
     <name>AuthResultTranslations</name>
