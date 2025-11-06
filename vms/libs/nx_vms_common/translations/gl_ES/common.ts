@@ -1938,7 +1938,7 @@
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
-      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+      <translation>Intervalo de actualización para as claves públicas da nube.</translation>
     </message>
   </context>
 </TS>
