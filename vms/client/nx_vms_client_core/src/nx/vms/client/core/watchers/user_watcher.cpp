@@ -53,12 +53,29 @@ void UserWatcher::setUser(const QnUserResourcePtr& user)
     if (m_user == user)
         return;
 
+    if (m_user)
+        m_user->disconnect(this);
+
     m_user = user;
 
     NX_VERBOSE(this, "User changed: %1", userName());
 
+    if (m_user)
+    {
+        connect(m_user.get(), &QnUserResource::userGroupsChanged,
+            this, &UserWatcher::isAdministratorUserChanged);
+        connect(m_user.get(), &QnUserResource::permissionsChanged,
+            this, &UserWatcher::isAdministratorUserChanged);
+    }
+
     emit userChanged(user);
     emit userNameChanged();
+    emit isAdministratorUserChanged();
+}
+
+bool UserWatcher::isAdministratorUser() const
+{
+    return m_user && m_user->isAdministrator();
 }
 
 QString UserWatcher::userName() const

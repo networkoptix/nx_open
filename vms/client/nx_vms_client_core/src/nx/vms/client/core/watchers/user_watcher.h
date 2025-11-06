@@ -23,12 +23,15 @@ public:
     const QnUserResourcePtr& user() const;
     QString userName() const;
 
+    bool isAdministratorUser() const;
+
 private:
     void setUser(const QnUserResourcePtr& currentUser);
 
 signals:
     void userChanged(const QnUserResourcePtr& user);
     void userNameChanged();
+    void isAdministratorUserChanged();
 
 private:
     QnUserResourcePtr m_user;
