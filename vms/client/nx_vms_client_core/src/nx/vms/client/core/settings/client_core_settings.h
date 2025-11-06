@@ -134,8 +134,8 @@ public:
     Property<bool> muteOnAudioTransmit{this, "muteOnAudioTransmit", true,
         "Mute audio output while two way audio is engaged."};
 
-    Property<bool> allowDeployByQrCodeFeature{this, "allowDeployByQrCodeFeature", false,
-        "Allow using Deploy by QR Code feature in clients."};
+    Property<bool> forceDeployByQrCodeFeature{this, "forceDeployByQrCodeFeature", false,
+        "Force using Deploy by QR Code feature in clients."};
 
     void storeRecentConnection(
         const nx::Uuid& localSystemId,

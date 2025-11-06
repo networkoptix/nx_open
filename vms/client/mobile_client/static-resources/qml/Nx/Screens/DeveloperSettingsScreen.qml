@@ -302,13 +302,13 @@ BaseSettingsScreen
 
         LabeledSwitch
         {
-            id: allowDeployByQrCodeFeatureSwitch
+            id: forceDeployByQrCodeFeatureSwitch
 
             width: parent.width
-            text: "Allow QR code feature"
-            checkState: appContext.settings.allowDeployByQrCodeFeature ? Qt.Checked : Qt.Unchecked
+            text: "Force QR code feature"
+            checkState: appContext.settings.forceDeployByQrCodeFeature ? Qt.Checked : Qt.Unchecked
             onCheckStateChanged:
-                appContext.settings.allowDeployByQrCodeFeature = (checkState !== Qt.Unchecked)
+                appContext.settings.forceDeployByQrCodeFeature = (checkState !== Qt.Unchecked)
         }
     }
 

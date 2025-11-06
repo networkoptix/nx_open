@@ -147,8 +147,9 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "",
         forcefullyDisabledFeatures,
         "[Dev] Disables UI for specific cloud features. Allows to hide UI elements related to\n"
-        "certain cloud features, marking them as disabled. Reserved for future use, no specific\n"
-        "feature flags are currently defined.\n"
+        "certain cloud features, marking them as disabled. Possible values:\n"
+        " * \"vmsClientQrCodeDeployment\" - disables QR code deployment feature.\n"
+        " * \"vmsClientCrashReporting\" - disables crash reporting feature.\n"
         "Features can be combined using space, comma or semicolon when implemented.");
 };
 
