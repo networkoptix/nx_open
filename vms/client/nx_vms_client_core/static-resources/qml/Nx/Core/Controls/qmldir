@@ -1,14 +1,15 @@
 module Nx.Core.Controls
 
-ScalableContentHolder 1.0 ScalableContentHolder.qml
-RefreshIndicator 1.0 RefreshIndicator.qml
-SpinnerBusyIndicator 1.0 SpinnerBusyIndicator.qml
-NameValueTable 1.0 NameValueTable.qml
+ClipboardCopyButton 1.0 ClipboardCopyButton.qml
+ColoredImage 1.0 ColoredImage.qml
 IconImage 1.0 IconImage.qml
+NameValueTable 1.0 NameValueTable.qml
 NxDotPreloader 1.0 NxDotPreloader.qml
 Preview 1.0 Preview.qml
 RectangularMask 1.0 RectangularMask.qml
-ColoredImage 1.0 ColoredImage.qml
-ToolTip 1.0 ToolTip.qml
 RecordingStatusIndicator 1.0 RecordingStatusIndicator.qml
-ClipboardCopyButton 1.0 ClipboardCopyButton.qml
+RefreshIndicator 1.0 RefreshIndicator.qml
+ScalableContentHolder 1.0 ScalableContentHolder.qml
+SpinnerBusyIndicator 1.0 SpinnerBusyIndicator.qml
+StripePattern 1.0 StripePattern.qml
+ToolTip 1.0 ToolTip.qml
