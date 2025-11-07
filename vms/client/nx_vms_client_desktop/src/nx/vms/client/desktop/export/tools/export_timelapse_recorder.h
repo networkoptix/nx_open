@@ -23,6 +23,7 @@ protected:
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md) override;
     virtual bool isUtcOffsetAllowed() const override;
+    virtual bool saveMotion(const QnConstMetaDataV1Ptr& /*media*/) override { return true; };
 
 private:
     const qint64 m_timeStepUsec;
