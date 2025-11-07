@@ -49,6 +49,7 @@ public:
         IsSaasUninitialized,
 
         IsPending,
+        OrganizationIdRoleId,
 
         RolesCount
     };
