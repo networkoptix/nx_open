@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Unsupported charset.</source>
-      <translation type="unfinished">Unsupported charset.</translation>
+      <translation>サポートされていない文字セットです。</translation>
     </message>
   </context>
   <context>
