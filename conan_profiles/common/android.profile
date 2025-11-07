@@ -3,7 +3,7 @@ include(common.profile)
 
 [settings]
 compiler=clang
-compiler.version=20
+compiler.version=21
 compiler.libcxx=c++_shared
 compiler.cppstd=20
 
