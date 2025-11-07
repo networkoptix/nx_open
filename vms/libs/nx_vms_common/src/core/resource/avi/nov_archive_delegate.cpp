@@ -20,6 +20,11 @@ void QnNovArchiveDelegate::setSpeed(qint64 /*displayTime*/, double value)
     m_reverseMode = value < 0;
 }
 
+bool QnNovArchiveDelegate::hasVideo() const
+{
+    return m_currentFile.hasVideo();
+}
+
 QString QnNovArchiveDelegate::getFileName(const QString &url, int64_t timestamp) const
 {
     auto filename = url;
@@ -84,6 +89,12 @@ void QnNovArchiveDelegate::findStartEndTime(const QnResourcePtr& resource)
     }
 }
 
+bool QnNovArchiveDelegate::setAudioChannel(unsigned num)
+{
+    m_audioChannel = num;
+    return m_currentFile.setAudioChannel(m_audioChannel);
+}
+
 qint64 QnNovArchiveDelegate::startTime() const
 {
     return m_startTime;
@@ -97,6 +108,24 @@ qint64 QnNovArchiveDelegate::endTime() const
 std::optional<QnAviArchiveMetadata> QnNovArchiveDelegate::metadata() const
 {
     return m_metadata;
+}
+
+QnAbstractMotionArchiveConnectionPtr QnNovArchiveDelegate::getMotionConnection(int channel)
+{
+    return m_currentFile.getMotionConnection(channel);
+}
+
+bool QnNovArchiveDelegate::providesMotionPackets() const
+{
+    if (!m_metadata)
+        return false;
+
+    return m_metadata->metadataStreamVersion >= QnAviArchiveMetadata::kMetadataStreamVersion_2;
+}
+
+bool QnNovArchiveDelegate::reopen()
+{
+    return m_currentFile.reopen();
 }
 
 qint64 QnNovArchiveDelegate::seek(qint64 time, bool findIFrame)
@@ -139,12 +168,14 @@ bool QnNovArchiveDelegate::openFile(const QString& filename)
     NX_DEBUG(this, "Open file: %1", filename);
     m_currentFile.close();
     m_currentFile.setStorage(m_storage);
+    m_currentFile.setAudioChannel(m_audioChannel);
 
     if (!m_currentFile.open(m_resource, filename))
         return false;
 
-    if (!m_startTimes.empty() && m_fileIndex < m_startTimes.size())
+    if (!m_startTimes.empty() && m_fileIndex < (int)m_startTimes.size())
         m_currentFile.setStartTimeUs(m_startTimes[m_fileIndex] * 1000);
+
     return true;
 }
 

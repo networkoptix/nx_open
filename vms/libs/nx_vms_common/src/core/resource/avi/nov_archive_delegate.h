@@ -19,7 +19,7 @@ public:
     QnNovArchiveDelegate(const QnStorageResourcePtr& storage);
 
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual qint64 seek (qint64 time, bool findIFrame) override;
+    virtual qint64 seek(qint64 time, bool findIFrame) override;
     virtual bool open(
         const QnResourcePtr& resource,
         AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher = nullptr) override;
@@ -30,10 +30,18 @@ public:
     virtual AudioLayoutConstPtr getAudioLayout() override;
     virtual void close() override;
     virtual std::optional<QnAviArchiveMetadata> metadata() const override;
+    virtual bool setAudioChannel(unsigned num) override;
+
+    virtual bool hasVideo() const override;
+    virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
+    virtual bool providesMotionPackets() const override;
+
 private:
     QString getFileName(const QString& url, int64_t timestamp) const;
     void findStartEndTime(const QnResourcePtr& resource);
     bool openFile(const QString& filename);
+
+    virtual bool reopen() override;
 
 private:
     QnTimePeriodList m_chunks;
@@ -48,6 +56,7 @@ private:
     qint64 m_skipFramesBeforeTime;
     qint64 m_startTime = 0;
     qint64 m_endTime = 0;
+    int m_audioChannel = 0;
     bool m_reverseMode;
 };
 

@@ -800,11 +800,6 @@ QnAbstractMotionArchiveConnectionPtr QnAviArchiveDelegate::getMotionConnection(i
     return QnAbstractMotionArchiveConnectionPtr(new QnLightMotionArchiveConnection(motionData, channel));
 }
 
-void QnAviArchiveDelegate::setMotionRegion(const QnMotionRegion& /*region*/)
-{
-    // Do nothing.
-}
-
 QIODevice* QnAviArchiveDelegate::ioDevice() const
 {
     return m_IOContext ? (QIODevice*) m_IOContext->opaque : nullptr;
