@@ -112,6 +112,24 @@ struct SystemList
 };
 NX_REFLECTION_INSTRUMENT(SystemList, (count)(next)(previous)(results));
 
+struct ChannelPartnerInStruct
+{
+    nx::Uuid id;
+    std::string name;
+    api::SaasState effectiveState = api::SaasState::uninitialized;
+    std::vector<Organization> organizations;
+};
+NX_REFLECTION_INSTRUMENT(ChannelPartnerInStruct, (id)(name)(effectiveState)(organizations));
+
+struct ChannelStruct
+{
+    std::vector<Organization> organizations;
+    std::vector<ChannelPartnerInStruct> channelPartners;
+
+    bool operator==(const ChannelStruct&) const = default;
+};
+NX_REFLECTION_INSTRUMENT(ChannelStruct, (organizations)(channelPartners));
+
 template<typename T>
 using CloudResult = nx::utils::expected<T, nx::cloud::db::api::ResultCode>;
 

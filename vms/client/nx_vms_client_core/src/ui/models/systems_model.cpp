@@ -57,7 +57,8 @@ const QHash<int, QByteArray> QnSystemsModel::kRoleNames{
     {QnSystemsModel::IsSaasSuspended, "isSaasSuspended"},
     {QnSystemsModel::IsSaasShutDown, "isSaasShutDown"},
     {QnSystemsModel::IsSaasUninitialized, "isSaasUninitialized"},
-    {QnSystemsModel::IsPending, "isPending"}
+    {QnSystemsModel::IsPending, "isPending"},
+    {QnSystemsModel::OrganizationIdRoleId, "organizationId"},
 };
 
 class QnSystemsModelPrivate: public QObject
@@ -283,7 +284,8 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return system->saasState() == nx::vms::api::SaasState::uninitialized;
         case IsPending:
             return system->isPending();
-
+        case OrganizationIdRoleId:
+            return system->organizationId().toQUuid();
         default:
             return QVariant();
     }
