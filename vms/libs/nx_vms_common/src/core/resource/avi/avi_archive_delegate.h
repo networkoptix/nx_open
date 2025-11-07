@@ -86,7 +86,6 @@ public:
     void setUseAbsolutePos(bool value);
     void setStorage(const QnStorageResourcePtr &storage);
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
-    virtual void setMotionRegion(const QnMotionRegion& region) override;
 
     virtual bool providesMotionPackets() const override;
 
@@ -100,6 +99,8 @@ public:
     using BeforeOpenInputCallback = std::function<void(QnAviArchiveDelegate*)>;
     void setBeforeOpenInputCallback(BeforeOpenInputCallback callback);
 
+    virtual bool reopen() override;
+
 private:
     qint64 packetTimestamp(const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
@@ -109,7 +110,6 @@ private:
 
     bool findStreams();
     CodecParametersConstPtr getCodecContext(AVStream* stream);
-    bool reopen() override;
 
     virtual bool checkStorage();
 

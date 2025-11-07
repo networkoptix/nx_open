@@ -82,6 +82,7 @@ void NovMediaExport::reportFinished()
 
 bool NovMediaExport::saveData(const QnConstAbstractMediaDataPtr& md)
 {
+    NX_VERBOSE(this, "Export media data: %1", md);
     if (!m_isLayoutsInitialised)
     {
         m_isLayoutsInitialised = true;
