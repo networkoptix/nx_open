@@ -187,6 +187,8 @@ private:
 
     // Used for licenses created from Saas service.
     QDateTime m_tmpExpirationDate;
+
+    bool m_dontCheckLicense = false;
 };
 
 /**
