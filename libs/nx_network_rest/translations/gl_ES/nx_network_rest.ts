@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Unsupported charset.</source>
-      <translation type="unfinished">Unsupported charset.</translation>
+      <translation>Conxunto de caracteres non compatible.</translation>
     </message>
   </context>
   <context>
