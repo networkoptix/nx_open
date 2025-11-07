@@ -23,6 +23,9 @@ TEST(ffmpeg, build_configuration)
 
     // Decoders
     ASSERT_TRUE(avcodec_find_decoder(AV_CODEC_ID_PNG));
+
+    // Encoders
+    ASSERT_TRUE(avcodec_find_encoder(AV_CODEC_ID_MP3));
 }
 
 
