@@ -456,7 +456,7 @@ QByteArray QnLicense::signature() const
 
 bool QnLicense::isValidSignature() const
 {
-    return m_isValid1 || m_isValid2;
+    return m_dontCheckLicense || m_isValid1 || m_isValid2;
 }
 
 QString QnLicense::xclass() const
@@ -545,7 +545,7 @@ QnLicensePtr QnLicense::createSaasLocalRecordingLicense()
     result->m_version = "2.0";
     result->m_brand = nx::branding::brand();
     // SaaS licenses don't use V1 signature.
-    result->m_isValid1 = true;
+    result->m_dontCheckLicense = true;
     return result;
 }
 
@@ -615,11 +615,7 @@ void QnLicense::parseLicenseBlock(
 
 void QnLicense::verify(const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock)
 {
-    if (type() == Qn::LC_SaasLocalRecording)
-    {
-        m_isValid1 = true;
-    }
-    else if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey3)
+    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey3)
         || isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey2)
         || isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey))
     {
