@@ -2,7 +2,20 @@
 
 #include "rtp_stream_parser.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx::rtp {
+
+void StreamParser::setFrequency(int frequency)
+{
+    if (frequency <= 0)
+    {
+        NX_WARNING(this, "Invalid frequency: %1", frequency);
+        return;
+    }
+
+    m_frequency = frequency;
+}
 
 QnAbstractMediaDataPtr VideoStreamParser::nextData()
 {
