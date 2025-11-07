@@ -41,7 +41,7 @@ NxObject
             : feedState.cloudSystemIds
 
         readonly property bool notificationsEnabled:
-            appContext.pushManager.enabledCheckState === Qt.Checked
+            appContext.pushManager.enabledCheckState !== Qt.Unchecked
                 && selectedSystems.length !== 0
 
         PushNotificationProvider
