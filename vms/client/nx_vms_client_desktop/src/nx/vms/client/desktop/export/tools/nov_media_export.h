@@ -29,6 +29,11 @@ public:
     virtual std::optional<nx::recording::Error> getLastError() const override;
     const std::vector<int64_t>& startTimestamps() { return m_startTimestamps; }
 
+    /*
+    * Export motion stream to separate file
+    */
+    void setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS]);
+
 private:
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
     virtual void setLastError(nx::recording::Error::Code code) override;
@@ -49,6 +54,8 @@ private:
     virtual bool fileStarted(
         qint64 /*startTimeMs*/, int /*timeZone*/, const QString& /*fileName*/) override  { return true; };
 
+    bool saveMotion(const QnConstMetaDataV1Ptr& media);
+
 private:
     QString m_baseFileName;
     QnStorageResourcePtr m_storage;
@@ -61,6 +68,7 @@ private:
     QString m_metadataFileName;
     std::vector<int64_t> m_startTimestamps;
     bool m_finishAllFiles = false;
+    QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
 };
 
 } // namespace nx::vms::client::desktop

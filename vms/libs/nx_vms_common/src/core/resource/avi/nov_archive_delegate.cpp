@@ -2,7 +2,9 @@
 
 #include "nov_archive_delegate.h"
 
+#include <core/resource/avi/avi_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
+#include <motion/light_motion_archive_connection.h>
 #include <nx/utils/fs/file.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
@@ -13,6 +15,7 @@ QnNovArchiveDelegate::QnNovArchiveDelegate(const QnStorageResourcePtr& storage):
     m_reverseMode(false)
 {
     m_currentFile.setStorage(storage);
+    m_flags |= Flag_CanSendMetadata;
 }
 
 void QnNovArchiveDelegate::setSpeed(qint64 /*displayTime*/, double value)
@@ -112,7 +115,12 @@ std::optional<QnAviArchiveMetadata> QnNovArchiveDelegate::metadata() const
 
 QnAbstractMotionArchiveConnectionPtr QnNovArchiveDelegate::getMotionConnection(int channel)
 {
-    return m_currentFile.getMotionConnection(channel);
+    QnAviResourcePtr aviResource = m_resource.dynamicCast<QnAviResource>();
+    if (!aviResource)
+        return QnAbstractMotionArchiveConnectionPtr();
+
+    const QnMetaDataLightVector& motionData = aviResource->getMotionBuffer(channel);
+    return QnAbstractMotionArchiveConnectionPtr(new QnLightMotionArchiveConnection(motionData, channel));
 }
 
 bool QnNovArchiveDelegate::providesMotionPackets() const

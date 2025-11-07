@@ -22,6 +22,7 @@ NovMediaExport::NovMediaExport(
     nx::StorageRecordingContext(true),
     m_mediaProvider(mediaProvider)
 {
+    memset(m_motionFileList, 0, sizeof(m_motionFileList));
 }
 
 NovMediaExport::~NovMediaExport()
@@ -74,10 +75,36 @@ void NovMediaExport::setStorage(const QString& fileName, const QnStorageResource
     m_storage = storage;
 }
 
+void NovMediaExport::setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS])
+{
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        m_motionFileList[i] = motionFileList[i];
+}
+
+bool NovMediaExport::saveMotion(const QnConstMetaDataV1Ptr& motion)
+{
+    if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
+    {
+        NX_VERBOSE(this,
+            "Saving motion, timestamp %1 us, resource: %2",
+            motion->timestamp, m_resource);
+        motion->serialize(m_motionFileList[motion->channelNumber].data());
+    }
+
+    return true;
+}
+
 void NovMediaExport::reportFinished()
 {
     if (m_finishAllFiles)
+    {
+        for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        {
+            if (m_motionFileList[i])
+                m_motionFileList[i]->close();
+        }
         emit recordingFinished(getLastError(), m_recordingContext.fileName);
+    }
 }
 
 bool NovMediaExport::saveData(const QnConstAbstractMediaDataPtr& md)

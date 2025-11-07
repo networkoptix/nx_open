@@ -41,6 +41,7 @@ public:
 protected:
     virtual void onFlush(StorageContext& context) override;
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
+    virtual bool saveMotion(const QnConstMetaDataV1Ptr& /*media*/) override { return true; };
     virtual void setLastError(nx::recording::Error::Code code) override;
 
     // Overridden to remove gaps from the stream.
