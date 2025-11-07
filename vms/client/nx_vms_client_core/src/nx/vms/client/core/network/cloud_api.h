@@ -8,6 +8,8 @@
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/coro/task.h>
+#include <nx/utils/coro/task_utils.h>
+#include <nx/utils/random.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
@@ -178,10 +180,38 @@ nx::coro::Task<CloudResult<T>> cloudGet(
         std::optional<CloudResult<T>> m_result;
     };
 
-    if (!statusWatcher->cloudConnection() || statusWatcher->status() != CloudStatusWatcher::Online)
-        co_return std::unexpected(nx::cloud::db::api::ResultCode::networkError);
+    size_t retries = 3;
 
-    co_return co_await Awaiter(statusWatcher->cloudConnection(), path, query);
+    using namespace std::chrono;
+    static constexpr auto kMinRetryDelay = 500ms;
+    static constexpr auto kMaxRetryDelay = 2000ms;
+
+    for (;;)
+    {
+        if (!statusWatcher->cloudConnection()
+            || statusWatcher->status() != CloudStatusWatcher::Online)
+        {
+            co_return std::unexpected(nx::cloud::db::api::ResultCode::networkError);
+        }
+
+        auto result = co_await Awaiter(statusWatcher->cloudConnection(), path, query);
+        if (!result
+            && result.error() == nx::cloud::db::api::ResultCode::tooManyRequests
+            && retries > 0)
+        {
+            --retries;
+
+            const auto jitter =
+                milliseconds(
+                    nx::utils::random::number<int>(
+                        duration_cast<milliseconds>(kMinRetryDelay).count(),
+                        duration_cast<milliseconds>(kMaxRetryDelay).count()));
+
+            co_await coro::qtTimer(jitter);
+            continue;
+        }
+        co_return result;
+    }
 }
 
 } // namespace nx::vms::client::core

@@ -66,6 +66,8 @@ NX_REFLECTION_ENUM_CLASS(ResultCode,
 
     notModified,
 
+    tooManyRequests,
+
     unknownError
 );
 
