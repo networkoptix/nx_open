@@ -31,7 +31,6 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev)
     m_mediaDevice(dev.dynamicCast<QnMediaResource>())
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
-    memset(m_motionFileList, 0, sizeof(m_motionFileList));
 }
 
 QnStreamRecorder::~QnStreamRecorder()
@@ -59,12 +58,6 @@ void QnStreamRecorder::close()
         0));
 
     closeRecordingContext(durationMs); //< Different actions per context (cloud, storage, etc)
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-    {
-        if (m_motionFileList[i])
-            m_motionFileList[i]->close();
-    }
-
     markNeedKeyData();
     m_firstTime = true;
     m_fileOpened = false;
@@ -441,12 +434,6 @@ void QnStreamRecorder::endOfRun()
     close();
 }
 
-void QnStreamRecorder::setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS])
-{
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionFileList[i] = motionFileList[i];
-}
-
 void QnStreamRecorder::setPrebufferingUsec(int value)
 {
     m_prebufferingUsec = value;
@@ -459,19 +446,6 @@ int QnStreamRecorder::getPrebufferingUsec() const
 
 bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& /*media*/)
 {
-    return true;
-}
-
-bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
-{
-    if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
-    {
-        NX_VERBOSE(this,
-            "Saving motion, timestamp %1 us, resource: %2",
-            motion->timestamp, m_resource);
-        motion->serialize(m_motionFileList[motion->channelNumber].data());
-    }
-
     return true;
 }
 

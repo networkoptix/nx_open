@@ -22,6 +22,8 @@ NX_VMS_COMMON_API FileInfo identifyFile(const QString& fileName, bool allowTemp 
 // Checks a layout password against pre-loaded the hash.
 NX_VMS_COMMON_API bool checkPassword(const QString& password, const FileInfo& fileInfo);
 
+
+// TODO Increase this value to some suitable value, as we now use a new file after each codec change.
 constexpr int kMaxStreams = 256;
 
 // TODO: Sync with nov_launcher_win.cpp and nov_file_launcher project.

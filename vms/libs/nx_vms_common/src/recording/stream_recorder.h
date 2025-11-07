@@ -39,10 +39,6 @@ public:
     QnStreamRecorder(const QnResourcePtr& dev);
     virtual ~QnStreamRecorder();
 
-    /*
-    * Export motion stream to separate file
-    */
-    void setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS]);
     void close();
     qint64 duration() const  { return m_endDateTimeUs - m_startDateTimeUs; }
     void setProgressBounds(qint64 bof, qint64 eof);
@@ -77,7 +73,7 @@ protected:
     void setHasVideo(bool hasVideo);
 
     virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media);
-    virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
+    virtual bool saveMotion(const QnConstMetaDataV1Ptr& media) = 0;
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
     virtual bool needToTruncate(const QnConstAbstractMediaDataPtr& md) const = 0;
     virtual void onSuccessfulWriteData(const QnConstAbstractMediaDataPtr& md) = 0;
@@ -135,7 +131,6 @@ private:
     qint64 m_eofDateTimeUs = AV_NOPTS_VALUE;
     int m_lastProgress = -1;
     bool m_needReopen = false;
-    QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
     qint64 m_lastPrimaryTime = AV_NOPTS_VALUE;
     qint64 m_nextIFrameTime = AV_NOPTS_VALUE;
     mutable nx::Mutex m_mutex;
