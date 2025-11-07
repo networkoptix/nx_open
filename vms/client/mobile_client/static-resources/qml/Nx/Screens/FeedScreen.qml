@@ -70,9 +70,9 @@ Page
 
             PropertyChanges
             {
-                search.opacity: 0
-                notifications.opacity: 0
-                filterButton.opacity: 0
+                search.visible: false
+                notifications.visible: false
+                filterButton.visible: false
 
                 placeholder.text: qsTr("Notifications Off")
                 placeholder.description: qsTr("Notifications are currently disabled for this app. "
@@ -87,9 +87,9 @@ Page
 
             PropertyChanges
             {
-                search.opacity: 0
-                notifications.opacity: 0
-                filterButton.opacity: 0
+                search.visible: false
+                notifications.visible: false
+                filterButton.visible: false
 
                 placeholder.text: qsTr("Notifications Off")
                 placeholder.description: qsTr("You disabled push notifications for this site. To "
@@ -107,7 +107,8 @@ Page
 
             PropertyChanges
             {
-                search.opacity: 0
+                search.visible: false
+                filterButton.visible: false
 
                 placeholder.text: qsTr("No Notifications")
                 placeholder.description: qsTr("No push notifications were found.")
@@ -132,7 +133,7 @@ Page
 
             PropertyChanges
             {
-                search.opacity: 0
+                search.visible: false
 
                 placeholder.text: qsTr("No New Notifications")
                 placeholder.description: qsTr("No new push notifications were found, but you can "
