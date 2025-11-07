@@ -5,13 +5,14 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <client/client_globals.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
+using namespace nx::vms::client::core;
 using NodeType = ResourceTree::NodeType;
 
 CloudCrossSystemCameraDecorator::CloudCrossSystemCameraDecorator(
@@ -26,7 +27,7 @@ CloudCrossSystemCameraDecorator::CloudCrossSystemCameraDecorator(
 
 QVariant CloudCrossSystemCameraDecorator::data(int role) const
 {
-    if (role == Qn::NodeTypeRole)
+    if (role == core::NodeTypeRole)
         return QVariant::fromValue(NodeType::resource);
 
     return m_sourceItem->data(role);

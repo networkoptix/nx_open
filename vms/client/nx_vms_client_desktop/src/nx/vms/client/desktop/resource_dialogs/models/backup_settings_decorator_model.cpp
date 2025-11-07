@@ -12,6 +12,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/utils.h>
 #include <nx/utils/scoped_change_notifier.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
@@ -19,8 +21,6 @@
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_store.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_settings.h>
@@ -244,6 +244,8 @@ void BackupSettingsDecoratorModel::Private::onRowsAboutToBeRemoved(
 std::optional<MessageTexts> BackupSettingsDecoratorModel::Private::nothingToBackupWarning(
     const QModelIndex& index) const
 {
+    using namespace nx::vms::client::core;
+
     const auto warningCaption = tr("Nothing to backup");
 
     if (index.column() != ContentTypesColumn && index.column() != WarningIconColumn)
@@ -254,7 +256,7 @@ std::optional<MessageTexts> BackupSettingsDecoratorModel::Private::nothingToBack
         return {};
 
     const auto resourceExtraStatus = q->mapToSource(index).siblingAtColumn(ResourceColumn)
-        .data(Qn::ResourceExtraStatusRole).value<ResourceExtraStatus>();
+        .data(ResourceExtraStatusRole).value<ResourceExtraStatus>();
 
     if (!resourceExtraStatus.testFlag(ResourceExtraStatusFlag::hasArchive)
         && !resourceExtraStatus.testFlag(ResourceExtraStatusFlag::scheduled)

@@ -34,7 +34,7 @@ QVariant ResourceTreeIconDecoratorModel::data(const QModelIndex& index, int role
 {
     if (role == Qt::DecorationRole)
     {
-        auto iconKeyData = sourceModel()->data(mapToSource(index), Qn::ResourceIconKeyRole);
+        auto iconKeyData = sourceModel()->data(mapToSource(index), core::ResourceIconKeyRole);
         if (!iconKeyData.isNull())
         {
             auto iconKey = static_cast<QnResourceIconCache::Key>(iconKeyData.toInt());

@@ -15,18 +15,9 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
 
         IDR_ITEM(FirstItemDataRole),
 
-        // Tree-based.
-        IDR_ITEM(NodeTypeRole),
-        IDR_ITEM(ResourceTreeScopeRole),
-
         // Resource-based.
         IDR_ITEM(UserResourceRole),
         IDR_ITEM(VideoWallResourceRole),
-
-        IDR_ITEM(ResourceFlagsRole),
-        IDR_ITEM(ResourceIconKeyRole),
-
-        IDR_ITEM(ResourceExtraStatusRole),
 
         IDR_ITEM(VideoWallGuidRole),
         IDR_ITEM(VideoWallItemGuidRole),
@@ -197,8 +188,6 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
 
         IDR_ITEM(SelectOnOpeningRole),
 
-        IDR_ITEM(ExtraInfoRole),
-
         IDR_ITEM(AnalyticsObjectTypeIdRole),
 
         IDR_ITEM(AutoExpandRole),
@@ -222,7 +211,6 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(OnlyResourceTreeSiblingsRole),
 
         IDR_ITEM(RemoteConnectionRole),
-        IDR_ITEM(ResourceLogInfoRole),
 
         IDR_ITEM(ItemDataRoleCount)
 

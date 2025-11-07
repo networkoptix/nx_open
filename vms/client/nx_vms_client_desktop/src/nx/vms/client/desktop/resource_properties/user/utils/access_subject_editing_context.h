@@ -17,7 +17,7 @@
 namespace nx::vms::common { class SystemContext; }
 namespace nx::core::access { class SubjectHierarchy; }
 
-namespace nx::vms::client::desktop::ResourceTree { enum class NodeType; }
+namespace nx::vms::client::core::ResourceTree { enum class NodeType; }
 
 class QnResourcePool;
 
@@ -74,7 +74,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ResourceAccessTreeItem
 
     Type type{};
     ResourceAccessTarget target;
-    ResourceTree::NodeType nodeType;
+    core::ResourceTree::NodeType nodeType;
     nx::Uuid outerSpecialResourceGroupId;
     nx::vms::api::AccessRights relevantAccessRights;
 
@@ -204,7 +204,7 @@ public:
     static QnResourceList getChildResources(const QModelIndex& parentTreeNodeIndex);
 
     static nx::Uuid specialResourceGroupFor(const QnResourcePtr& resource);
-    static nx::Uuid specialResourceGroup(ResourceTree::NodeType nodeType);
+    static nx::Uuid specialResourceGroup(core::ResourceTree::NodeType nodeType);
 
     static ResourceAccessTreeItem resourceAccessTreeItemInfo(
         const QModelIndex& resourceTreeModelIndex);

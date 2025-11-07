@@ -2,17 +2,17 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 
 class QnResourcePool;
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class LocalMediaSource: public AbstractResourceSource
+class LocalMediaSource: public core::entity_resource_tree::AbstractResourceSource
 {
     Q_OBJECT
-    using base_type = AbstractResourceSource;
+    using base_type = core::entity_resource_tree::AbstractResourceSource;
 
 public:
     LocalMediaSource(const QnResourcePool* resourcePool);

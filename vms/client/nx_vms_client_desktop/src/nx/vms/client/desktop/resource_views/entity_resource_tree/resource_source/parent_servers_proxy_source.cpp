@@ -8,6 +8,8 @@
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
+using namespace nx::vms::client::core::entity_resource_tree;
+
 ParentServersProxySource::ParentServersProxySource(AbstractResourceSourcePtr resourceSource):
     m_resourceSource(std::move(resourceSource))
 {

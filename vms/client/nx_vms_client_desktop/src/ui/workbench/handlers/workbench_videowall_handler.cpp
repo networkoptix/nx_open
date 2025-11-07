@@ -55,7 +55,7 @@
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -1923,11 +1923,11 @@ void QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
 {
-    using NodeType = ResourceTree::NodeType;
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 
     const auto parameters = menu()->currentParameters(sender());
 
-    const auto nodeType = parameters.argument<NodeType>(Qn::NodeTypeRole, NodeType::resource);
+    const auto nodeType = parameters.argument<NodeType>(core::NodeTypeRole, NodeType::resource);
     QString name = parameters.argument<QString>(core::ResourceNameRole).trimmed();
 
     bool valid = false;

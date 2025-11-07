@@ -7,8 +7,8 @@
 #include <QtGui/QIcon>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 
 /**
  * Cache for resource icons with overlaid status.
@@ -141,7 +141,7 @@ public:
 
     static QnResourceIconCache* instance();
 
-    static QIcon cameraRecordingStatusIcon(nx::vms::client::desktop::ResourceExtraStatus status);
+    static QIcon cameraRecordingStatusIcon(nx::vms::client::core::ResourceExtraStatus status);
 
 private:
     QString iconPathFromLegacyIcons(Key key) const;

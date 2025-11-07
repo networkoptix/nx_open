@@ -104,7 +104,7 @@ QVariant AnalyticsDialogTableModel::data(const QModelIndex& index, int role) con
             break;
         }
 
-        case Qn::ResourceIconKeyRole:
+        case core::ResourceIconKeyRole:
         {
             if (columnName == kCameraAttributeName)
                 return "20x20/Outline/device.svg";
@@ -153,7 +153,7 @@ QHash<int, QByteArray> AnalyticsDialogTableModel::roleNames() const
         roleNames = base_type::roleNames();
         roleNames.insert({
             {Qt::ForegroundRole, "colors"},
-            {Qn::ResourceIconKeyRole, "iconKey"},
+            {core::ResourceIconKeyRole, "iconKey"},
         });
     }
     return roleNames;

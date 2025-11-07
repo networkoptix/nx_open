@@ -5,13 +5,14 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <client/client_globals.h>
 
 namespace {
 
 using namespace nx::vms::api;
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 using Permissions =
@@ -105,16 +106,16 @@ MainTreeResourceItemDecorator::MainTreeResourceItemDecorator(
 
 QVariant MainTreeResourceItemDecorator::data(int role) const
 {
-    if (role == Qn::NodeTypeRole)
+    if (role == core::NodeTypeRole)
         return QVariant::fromValue(m_nodeType);
 
     if (role == Qn::ItemUuidRole && m_nodeType == NodeType::layoutItem)
         return QVariant::fromValue(*m_itemUuid);
 
-    if (role == Qn::ResourceIconKeyRole
+    if (role == core::ResourceIconKeyRole
         && (m_nodeType == NodeType::sharedResource || m_nodeType == NodeType::layoutItem))
     {
-        const auto flags = m_sourceItem->data(Qn::ResourceFlagsRole).value<Qn::ResourceFlags>();
+        const auto flags = m_sourceItem->data(core::ResourceFlagsRole).value<Qn::ResourceFlags>();
         if (flags.testFlag(Qn::server))
         {
             const auto resource = m_sourceItem->data(core::ResourceRole).value<QnResourcePtr>();

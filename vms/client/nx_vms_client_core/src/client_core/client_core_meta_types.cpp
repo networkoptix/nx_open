@@ -24,7 +24,6 @@
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
 #include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/system_context_accessor.h>
 #include <nx/vms/client/core/camera/buttons/abstract_camera_button_controller.h>
 #include <nx/vms/client/core/camera/recording_status_helper.h>
 #include <nx/vms/client/core/client_core_globals.h>
@@ -68,11 +67,13 @@
 #include <nx/vms/client/core/resource/media_dewarping_params.h>
 #include <nx/vms/client/core/resource/media_resource_helper.h>
 #include <nx/vms/client/core/resource/resource_helper.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/global_temporaries.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/font_config.h>
+#include <nx/vms/client/core/system_context_accessor.h>
 #include <nx/vms/client/core/thumbnails/abstract_resource_thumbnail.h>
 #include <nx/vms/client/core/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/core/time/calendar_model.h>
@@ -109,6 +110,7 @@ void initializeMetatypesInternal()
 
     qRegisterMetaType<nx::media::PlayerStatistics>();
     qRegisterMetaType<MotionSelection>();
+    qRegisterMetaType<ResourceTree::NodeType>();
 }
 
 void initializeMetaTypes()
@@ -219,6 +221,7 @@ void registerQmlTypesInternal()
     RecordingStatusHelper::registerQmlType();
     SystemContextAccessor::registerQmlType();
     ValuesText::registerQmlType();
+    ResourceTree::registerQmlType();
 
     qRegisterMetaType<nx::vms::client::core::ThumbnailStatus>();
 

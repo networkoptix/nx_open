@@ -8,6 +8,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/checkbox_column_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
@@ -15,7 +16,6 @@
 #include <nx/vms/client/desktop/resource_dialogs/models/invalid_resource_filter_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -167,6 +167,8 @@ ResourceSelectionWidget::ResourceSelectionWidget(
     base_type(system, columnCount, parent),
     d(new Private(this, columnCount, resourceValidator))
 {
+    using namespace nx::vms::client::core;
+
     const auto checkboxColumn = columnCount - 1;
 
     resourceViewWidget()->setItemDelegate(new ResourceDialogItemDelegate(this));
@@ -183,7 +185,7 @@ ResourceSelectionWidget::ResourceSelectionWidget(
                 if (parentResource && parentResource->hasFlags(Qn::server))
                     return true;
 
-                const auto parentNodeType = parentIndex.data(Qn::NodeTypeRole);
+                const auto parentNodeType = parentIndex.data(core::NodeTypeRole);
                 if (parentNodeType.isValid() && parentNodeType.value<ResourceTree::NodeType>()
                     == ResourceTree::NodeType::layouts)
                 {

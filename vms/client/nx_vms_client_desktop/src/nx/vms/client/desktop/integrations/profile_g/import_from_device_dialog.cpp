@@ -10,8 +10,9 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/client_core_globals.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -24,7 +25,7 @@ using namespace std::chrono;
 
 namespace nx::vms::client::desktop::integrations {
 
-using namespace entity_item_model;
+using namespace nx::vms::client::core::entity_item_model;
 using namespace entity_resource_tree;
 
 static constexpr auto kLoadingAttemptTimeout = 3s;

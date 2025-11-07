@@ -50,22 +50,9 @@ namespace Qn
     {
         FirstItemDataRole = nx::vms::client::core::CoreItemDataRoleCount,
 
-        /* Tree-based. */
-        NodeTypeRole,                               /**< Role for node type, see <tt>ResourceTree::NodeType</tt>. */
-
-        /**%apidoc
-         * %deprecated Vacant for another common Resource Tree role since 4.2.
-         */
-        ResourceTreeScopeRole,
-
         /* Resource-based. */
         UserResourceRole,                           /**< Role for QnUserResourcePtr. */
         VideoWallResourceRole,                      /**< Role for QnVideoWallResourcePtr */
-
-        ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (Qn::ResourceFlags). */
-        ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type int. */
-
-        ResourceExtraStatusRole,                    /**< Custom resource status (recording, buggy, etc). Value of ResourceExtraStatus. */
 
         VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type nx::Uuid. */
         VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type nx::Uuid. */
@@ -365,9 +352,6 @@ namespace Qn
 
         SelectOnOpeningRole,                        /**< Role for single-selecting an item (or first of multiple items) added to current layout (bool). */
 
-        ExtraInfoRole,                              /**< Role for extra resource information in the tree (QString). */
-        ForceExtraInfoRole,                         /**< Role for forcing extra resource information in the tree (bool). */
-
         AutoExpandRole,                             /**< Role for automatic expanding of tree nodes on first show (bool). */
 
         RawResourceRole,                            /**< As ResourceRole, but with QnResource* for QML. */
@@ -402,14 +386,7 @@ namespace Qn
         SortKeyRole, /**< Role for text sort key (QString). */
         FilterKeyRole, /**< Role for text filter key (QString). */
 
-        /**
-         * Role for node-controlled flattening control in the resource tree (bool).
-         * See FlatteningGroupEntity for the details.
-         */
-        FlattenedRole,
         WorkbenchStateRole,
-
-        ResourceLogInfoRole, /**< Role for extended string description of resource from resource tree. (QString) */
 
         ItemDataRoleCount,
     };

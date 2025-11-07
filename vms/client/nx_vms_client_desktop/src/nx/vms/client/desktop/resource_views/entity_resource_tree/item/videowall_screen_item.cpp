@@ -54,6 +54,8 @@ VideoWallScreenItem::VideoWallScreenItem(
 
 QVariant VideoWallScreenItem::data(int role) const
 {
+    using namespace nx::vms::client::core;
+
     switch (role)
     {
         case Qt::DisplayRole:
@@ -61,10 +63,10 @@ QVariant VideoWallScreenItem::data(int role) const
         case Qt::EditRole:
             return m_screen.name;
 
-        case Qn::ResourceIconKeyRole:
+        case core::ResourceIconKeyRole:
             return QVariant::fromValue<int>(calculateKey(m_videoWall->systemContext(), m_screen));
 
-        case Qn::NodeTypeRole:
+        case core::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::videoWallItem);
 
         case core::UuidRole:
@@ -104,7 +106,7 @@ void VideoWallScreenItem::onScreenChanged(
     if ((screen.runtimeStatus.online != oldScreen.runtimeStatus.online)
         || (screen.runtimeStatus.controlledBy != oldScreen.runtimeStatus.controlledBy))
     {
-        roles.push_back(Qn::ResourceIconKeyRole);
+        roles.push_back(core::ResourceIconKeyRole);
     }
 
     if (!roles.empty())

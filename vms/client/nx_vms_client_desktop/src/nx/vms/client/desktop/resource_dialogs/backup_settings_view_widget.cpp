@@ -36,6 +36,7 @@
 namespace {
 
 using namespace std::chrono;
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 using namespace backup_settings_view;
 

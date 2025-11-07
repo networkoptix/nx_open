@@ -21,7 +21,7 @@ namespace test {
 using namespace nx::core::access;
 using namespace nx::vms::api;
 
-using ResourceTree::NodeType;
+using nx::vms::client::core::ResourceTree::NodeType;
 
 using nx::utils::toQSet;
 

@@ -12,15 +12,15 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_list_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item_order/item_order.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/checkbox_column_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_list_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item_order/item_order.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -30,7 +30,7 @@ namespace {
 
 using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::entity_item_model;
+using namespace nx::vms::client::core::entity_item_model;
 
 AbstractItemPtr createServerItem(const QnResourcePtr& serverResource)
 {
@@ -44,9 +44,9 @@ AbstractItemPtr createServerItem(const QnResourcePtr& serverResource)
 
     return entity_item_model::GenericItemBuilder()
         .withRole(Qt::DisplayRole, serverResource->getName())
-        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Server))
+        .withRole(ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Server))
         .withRole(ResourceRole, QVariant::fromValue(serverResource))
-        .withRole(Qn::ExtraInfoRole, extraText)
+        .withRole(ExtraInfoRole, extraText)
         .withFlags({Qt::ItemNeverHasChildren, Qt::ItemIsEnabled});
 }
 
@@ -89,7 +89,7 @@ AbstractEntityPtr createServersEntity(
 
 namespace nx::vms::client::desktop {
 
-using namespace nx::vms::client::desktop::entity_item_model;
+using namespace nx::vms::client::core::entity_item_model;
 
 struct ServerSelectionDialog::Private:
     public QObject,

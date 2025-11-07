@@ -12,6 +12,7 @@
 #include <core/resource/storage_resource.h>
 #include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_space_data.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_context.h>
@@ -23,7 +24,6 @@
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_store.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -222,7 +222,8 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
             [this, cloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage]
             (const entity_resource_tree::ResourceTreeEntityBuilder* builder)
             {
-                using namespace entity_item_model;
+                using namespace nx::vms::client::core;
+                using namespace nx::vms::client::core::entity_item_model;
 
                 auto serverCamerasEntity =
                     builder->createDialogServerCamerasEntity(m_server, {});
@@ -231,11 +232,11 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
                     return serverCamerasEntity;
 
                 AbstractItemPtr newAddedCamerasItem = GenericItemBuilder()
-                    .withRole(Qn::ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Cameras))
+                    .withRole(ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Cameras))
                     .withRole(Qt::DisplayRole, tr("New added cameras"))
-                    .withRole(Qn::ExtraInfoRole, QString("\u2013 ") //< EnDash
+                    .withRole(ExtraInfoRole, QString("\u2013 ") //< EnDash
                         + tr("Applies to all servers"))
-                    .withRole(Qn::ForceExtraInfoRole, true)
+                    .withRole(ForceExtraInfoRole, true)
                     .withRole(ResourceDialogItemRole::NewAddedCamerasItemRole, true)
                     .withFlags({Qt::ItemIsEnabled, Qt::ItemNeverHasChildren});
 

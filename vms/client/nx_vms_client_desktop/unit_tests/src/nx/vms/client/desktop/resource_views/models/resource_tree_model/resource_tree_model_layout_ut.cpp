@@ -22,6 +22,7 @@ namespace test {
 
 using namespace index_condition;
 using namespace nx::vms::api;
+using namespace nx::vms::client::core;
 
 // String constants.
 static constexpr auto kUniqueLayoutName = "unique_layout_name";

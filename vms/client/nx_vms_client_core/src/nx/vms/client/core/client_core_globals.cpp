@@ -60,6 +60,18 @@ constexpr auto nxReflectVisitAllEnumItems(CoreItemDataRole*, Visitor&& visitor)
         IDR_CORE_ITEM(IsVisibleRole),
         IDR_CORE_ITEM(IsHighlightedRole),
 
+        IDR_CORE_ITEM(ObjectTitleRole),
+        IDR_CORE_ITEM(HasTitleImageRole),
+
+        IDR_CORE_ITEM(NodeTypeRole),
+        IDR_CORE_ITEM(FlattenedRole),
+        IDR_CORE_ITEM(ResourceExtraStatusRole),
+        IDR_CORE_ITEM(ResourceFlagsRole),
+        IDR_CORE_ITEM(ResourceIconKeyRole),
+        IDR_CORE_ITEM(ResourceLogInfoRole),
+        IDR_CORE_ITEM(ExtraInfoRole),
+        IDR_CORE_ITEM(ForceExtraInfoRole),
+
         IDR_CORE_ITEM(CoreItemDataRoleCount)
 
 #undef IDR_CORE_ITEM
@@ -97,6 +109,18 @@ QHash<int, QByteArray> clientCoreRoleNames()
 
     roles[IsVisibleRole] = "visible";
     roles[IsHighlightedRole] = "highlighted";
+
+    roles[ObjectTitleRole] = "objectTitle";
+    roles[HasTitleImageRole] = "hasTitleImage";
+
+    roles[NodeTypeRole] = "nodeType";
+    roles[FlattenedRole] = "flattened";
+    roles[ResourceExtraStatusRole] = "resourceExtraStatus";
+    roles[ResourceFlagsRole] = "flags";
+    roles[ResourceIconKeyRole] = "iconKey";
+    roles[ResourceLogInfoRole] = "logInfo";
+    roles[ExtraInfoRole] = "extraInfo";
+    roles[ForceExtraInfoRole] = "forceExtraInfo";
 
     return roles;
 }

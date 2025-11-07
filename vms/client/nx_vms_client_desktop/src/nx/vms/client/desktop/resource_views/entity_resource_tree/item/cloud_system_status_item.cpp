@@ -8,13 +8,12 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/system_context.h>
-
-#include "../../data/resource_tree_globals.h"
 
 namespace nx::vms::client::desktop::entity_resource_tree {
 
@@ -102,7 +101,7 @@ CloudSystemStatusItem::CloudSystemStatusItem(const QString& systemId):
     const auto notifyChanged =
         [this]
         {
-            notifyDataChanged({Qt::DisplayRole, core::DecorationPathRole, Qn::FlattenedRole});
+            notifyDataChanged({Qt::DisplayRole, core::DecorationPathRole, core::FlattenedRole});
         };
 
     d->crossSystemContextConnection.reset(QObject::connect(
@@ -137,13 +136,13 @@ QVariant CloudSystemStatusItem::data(int role) const
 
             return d->customIcon();
 
-        case Qn::NodeTypeRole:
-            return QVariant::fromValue(ResourceTree::NodeType::cloudSystemStatus);
+        case core::NodeTypeRole:
+            return QVariant::fromValue(core::ResourceTree::NodeType::cloudSystemStatus);
 
         case Qn::CloudSystemIdRole:
             return d->systemId;
 
-        case Qn::FlattenedRole:
+        case core::FlattenedRole:
             return !d->isVisible();
 
         default:

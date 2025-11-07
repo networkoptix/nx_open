@@ -19,6 +19,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -33,7 +34,6 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -1059,7 +1059,8 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
         if (resource)
         {
             menu::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
+            parameters.setArgument(nx::vms::client::core::NodeTypeRole,
+                nx::vms::client::core::ResourceTree::NodeType::resource);
 
             menu.reset(manager->newMenu(menu::TreeScope, this, parameters));
             foreach(QAction* action, menu->actions())

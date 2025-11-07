@@ -10,6 +10,8 @@ namespace nx::vms::client::desktop {
 namespace test {
 namespace index_condition {
 
+using namespace nx::vms::client::core;
+
 Condition topLevelNode()
 {
     return
@@ -129,7 +131,7 @@ Condition extraInfoEmpty()
         [](const QModelIndex& index)
         {
             return index.isValid()
-                && index.data(Qn::ExtraInfoRole).toString().isEmpty();
+                && index.data(core::ExtraInfoRole).toString().isEmpty();
         };
 }
 
@@ -142,7 +144,7 @@ Condition iconFullMatch(QnResourceIconCache::Key paramIconKey)
                 return false;
             const auto iconKey =
                 static_cast<QnResourceIconCache::Key>(
-                    index.data(Qn::ResourceIconKeyRole).toInt());
+                    index.data(core::ResourceIconKeyRole).toInt());
             return iconKey == paramIconKey;
         };
 }
@@ -156,7 +158,7 @@ Condition iconTypeMatch(QnResourceIconCache::Key paramIconKey)
                 return false;
             const auto iconKey =
                 static_cast<QnResourceIconCache::Key>(
-                    index.data(Qn::ResourceIconKeyRole).toInt());
+                    index.data(core::ResourceIconKeyRole).toInt());
 
             const auto iconType = iconKey & QnResourceIconCache::TypeMask;
             const auto paramIconType = paramIconKey & QnResourceIconCache::TypeMask;
@@ -174,7 +176,7 @@ Condition iconStatusMatch(QnResourceIconCache::Key paramIconKey)
                 return false;
             const auto iconKey =
                 static_cast<QnResourceIconCache::Key>(
-                    index.data(Qn::ResourceIconKeyRole).toInt());
+                    index.data(core::ResourceIconKeyRole).toInt());
 
             const auto iconType = iconKey & QnResourceIconCache::StatusMask;
             const auto paramIconType = paramIconKey & QnResourceIconCache::StatusMask;
@@ -206,7 +208,7 @@ Condition hasResourceExtraStatusFlag(ResourceExtraStatusFlag flag)
     return
         [flag](const QModelIndex& index)
         {
-            const auto indexData = index.data(Qn::ResourceExtraStatusRole);
+            const auto indexData = index.data(core::ResourceExtraStatusRole);
             if (indexData.isNull())
                 return false;
             auto indexExtraStatusFlags = indexData.value<ResourceExtraStatus>();
@@ -220,7 +222,7 @@ Condition resourceExtraStatusFlagsMatch(ResourceExtraStatus flags)
     return
         [flags](const QModelIndex& index)
         {
-            const auto indexData = index.data(Qn::ResourceExtraStatusRole);
+            const auto indexData = index.data(core::ResourceExtraStatusRole);
             if (indexData.isNull())
                 return false;
             auto indexExtraStatusFlags = indexData.value<ResourceExtraStatus>();
@@ -239,7 +241,7 @@ Condition dataMatch(int role, const QVariant& paramData)
 
 Condition nodeTypeDataMatch(ResourceTree::NodeType nodeType)
 {
-    return dataMatch(Qn::NodeTypeRole, QVariant::fromValue(nodeType));
+    return dataMatch(core::NodeTypeRole, QVariant::fromValue(nodeType));
 }
 
 Condition mimeDataContainsResource(const QnResourcePtr& resource)

@@ -9,7 +9,7 @@
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
@@ -44,7 +44,7 @@ bool isSearchStringValid(const QString& searchString)
 
 bool resourceGroupContainsString(const QString& searchString, const QnResourcePtr& resource)
 {
-    using namespace entity_resource_tree::resource_grouping;
+    using namespace nx::vms::client::core::entity_resource_tree::resource_grouping;
     return resourceCustomGroupId(resource).contains(searchString.trimmed(), Qt::CaseInsensitive);
 }
 

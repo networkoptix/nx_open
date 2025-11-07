@@ -5,15 +5,15 @@
 #include <client/client_globals.h>
 #include <common/common_globals.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/intercom/utils.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-using namespace entity_item_model;
+using namespace nx::vms::client::core::entity_item_model;
 
 ItemOrder serversOrder()
 {
@@ -75,7 +75,7 @@ ItemOrder layoutsOrder()
 
             return mainOrder.comp(lhs, rhs);
         },
-        {Qt::DisplayRole, Qn::ResourceIconKeyRole}
+        {Qt::DisplayRole, core::ResourceIconKeyRole}
     };
 }
 
@@ -112,10 +112,10 @@ ItemOrder layoutItemsOrder()
         [mainOrder = numericOrder(), groupIndex](const AbstractItem* lhs,
             const AbstractItem* rhs)
         {
-            const auto lhsFlags = lhs->data(Qn::ResourceFlagsRole).value<Qn::ResourceFlags>();
-            const auto lhsIconKey = lhs->data(Qn::ResourceIconKeyRole).toInt();
-            const auto rhsFlags = rhs->data(Qn::ResourceFlagsRole).value<Qn::ResourceFlags>();
-            const auto rhsIconKey = rhs->data(Qn::ResourceIconKeyRole).toInt();
+            const auto lhsFlags = lhs->data(core::ResourceFlagsRole).value<Qn::ResourceFlags>();
+            const auto lhsIconKey = lhs->data(core::ResourceIconKeyRole).toInt();
+            const auto rhsFlags = rhs->data(core::ResourceFlagsRole).value<Qn::ResourceFlags>();
+            const auto rhsIconKey = rhs->data(core::ResourceIconKeyRole).toInt();
 
             const auto lhsGroupIndex = groupIndex(lhsFlags, lhsIconKey);
             const auto rhsGroupIndex = groupIndex(rhsFlags, rhsIconKey);
@@ -126,7 +126,7 @@ ItemOrder layoutItemsOrder()
             return lhsGroupIndex < rhsGroupIndex;
 
         },
-        {Qt::DisplayRole, Qn::ResourceFlagsRole, Qn::ResourceIconKeyRole}
+        {Qt::DisplayRole, core::ResourceFlagsRole, core::ResourceIconKeyRole}
     };
 }
 
@@ -148,8 +148,8 @@ ItemOrder locaResourcesOrder()
         [mainOrder = numericOrder(), groupIndex](const AbstractItem* lhs,
             const AbstractItem* rhs)
         {
-            const auto lhsFlags = lhs->data(Qn::ResourceFlagsRole).value<Qn::ResourceFlags>();
-            const auto rhsFlags = rhs->data(Qn::ResourceFlagsRole).value<Qn::ResourceFlags>();
+            const auto lhsFlags = lhs->data(core::ResourceFlagsRole).value<Qn::ResourceFlags>();
+            const auto rhsFlags = rhs->data(core::ResourceFlagsRole).value<Qn::ResourceFlags>();
 
             const auto lhsGroupIndex = groupIndex(lhsFlags);
             const auto rhsGroupIndex = groupIndex(rhsFlags);
@@ -160,7 +160,7 @@ ItemOrder locaResourcesOrder()
             return lhsGroupIndex < rhsGroupIndex;
 
         },
-        {Qt::DisplayRole, Qn::ResourceFlagsRole}
+        {Qt::DisplayRole, core::ResourceFlagsRole}
     };
 }
 
@@ -176,8 +176,8 @@ ItemOrder serverResourcesOrder()
         [mainOrder = numericOrder()](const AbstractItem* lhs,
             const AbstractItem* rhs)
         {
-            const auto lhsFlags = lhs->data(Qn::ResourceFlagsRole).value<Qn::ResourceFlags>();
-            const auto rhsFlags = rhs->data(Qn::ResourceFlagsRole).value<Qn::ResourceFlags>();
+            const auto lhsFlags = lhs->data(core::ResourceFlagsRole).value<Qn::ResourceFlags>();
+            const auto rhsFlags = rhs->data(core::ResourceFlagsRole).value<Qn::ResourceFlags>();
 
             const auto lhsGroupIndex = groupIndex(lhsFlags);
             const auto rhsGroupIndex = groupIndex(rhsFlags);
@@ -188,7 +188,7 @@ ItemOrder serverResourcesOrder()
             return lhsGroupIndex < rhsGroupIndex;
 
         },
-        {Qt::DisplayRole, Qn::ResourceFlagsRole}
+        {Qt::DisplayRole, core::ResourceFlagsRole}
     };
 }
 

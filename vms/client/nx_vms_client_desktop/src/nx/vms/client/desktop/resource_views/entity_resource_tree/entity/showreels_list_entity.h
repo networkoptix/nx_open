@@ -4,21 +4,21 @@
 
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_list_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_list_entity.h>
 
 namespace nx::vms::common { class ShowreelManager; }
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-using ShowreelItemCreator = std::function<entity_item_model::AbstractItemPtr(const nx::Uuid&)>;
+using ShowreelItemCreator = std::function<core::entity_item_model::AbstractItemPtr(const nx::Uuid&)>;
 
 /**
  * Entity which represents list of Showreels provided by showreel manager.
  */
-class ShowreelsListEntity: public entity_item_model::UniqueKeyListEntity<nx::Uuid>
+class ShowreelsListEntity: public core::entity_item_model::UniqueKeyListEntity<nx::Uuid>
 {
-    using base_type = entity_item_model::UniqueKeyListEntity<nx::Uuid>;
+    using base_type = core::entity_item_model::UniqueKeyListEntity<nx::Uuid>;
 
 public:
     ShowreelsListEntity(

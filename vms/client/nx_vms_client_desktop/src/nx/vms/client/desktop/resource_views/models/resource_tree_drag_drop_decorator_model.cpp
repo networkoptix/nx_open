@@ -14,11 +14,11 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
@@ -27,7 +27,7 @@ namespace {
 
 using namespace nx::vms::client::core;
 
-using NodeTypeSet = QSet<nx::vms::client::desktop::ResourceTree::NodeType>;
+using NodeTypeSet = QSet<ResourceTree::NodeType>;
 
 static const QString kPureTreeResourcesOnlyMimeType =
     "application/x-pure-tree-resources-only";
@@ -52,21 +52,21 @@ QModelIndex topLevelParent(const QModelIndex& index)
 
 bool hasNodeType(
     const QModelIndex& index,
-    nx::vms::client::desktop::ResourceTree::NodeType nodeType)
+    ResourceTree::NodeType nodeType)
 {
     if (!index.isValid())
         return false;
 
-    QVariant nodeTypeData = index.data(Qn::NodeTypeRole);
+    QVariant nodeTypeData = index.data(NodeTypeRole);
     if (!NX_ASSERT(!nodeTypeData.isNull()))
         return false;
 
-    return nodeTypeData.value<nx::vms::client::desktop::ResourceTree::NodeType>() == nodeType;
+    return nodeTypeData.value<ResourceTree::NodeType>() == nodeType;
 }
 
 bool hasTopLevelNodeType(
     const QModelIndex& index,
-    nx::vms::client::desktop::ResourceTree::NodeType nodeType)
+    ResourceTree::NodeType nodeType)
 {
     return hasNodeType(topLevelParent(index), nodeType);
 }
@@ -193,8 +193,8 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
         if (auto resource = index.data(core::ResourceRole).value<QnResourcePtr>())
             resources.insert(resource);
 
-        const auto nodeTypeData = index.data(Qn::NodeTypeRole);
-        const auto topLevelParentNodeTypeData = topLevelParent(index).data(Qn::NodeTypeRole);
+        const auto nodeTypeData = index.data(core::NodeTypeRole);
+        const auto topLevelParentNodeTypeData = topLevelParent(index).data(core::NodeTypeRole);
         if (!NX_ASSERT(!nodeTypeData.isNull()))
             continue;
 
@@ -224,7 +224,7 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
 
                 auto childResourceIndexes = model->match(
                     index.model()->index(0, 0, index),
-                    Qn::NodeTypeRole,
+                    core::NodeTypeRole,
                     QVariant::fromValue<NodeType>(NodeType::resource),
                     -1,
                     {Qt::MatchRecursive, Qt::MatchExactly});

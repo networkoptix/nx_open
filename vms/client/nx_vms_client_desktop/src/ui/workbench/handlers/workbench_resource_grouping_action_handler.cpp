@@ -10,11 +10,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -65,8 +65,8 @@ ResourceGroupingActionHandler::ResourceGroupingActionHandler(QObject* parent):
 
 void ResourceGroupingActionHandler::createNewCustomResourceTreeGroup() const
 {
-    using namespace entity_resource_tree::resource_grouping;
-    using NodeType = ResourceTree::NodeType;
+    using namespace nx::vms::client::core::entity_resource_tree::resource_grouping;
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 
     const auto parameters = menu()->currentParameters(sender());
     if (!NX_ASSERT(parameters.argument(Qn::OnlyResourceTreeSiblingsRole).toBool()))
@@ -75,7 +75,7 @@ void ResourceGroupingActionHandler::createNewCustomResourceTreeGroup() const
     const auto resources = parameters.resources();
     const auto compositeGroupId = parameters.argument(Qn::ResourceTreeCustomGroupIdRole).toString();
     const auto newGroupSubId = getNewGroupSubId();
-    const auto nodeTypeArgument = parameters.argument(Qn::NodeTypeRole);
+    const auto nodeTypeArgument = parameters.argument(core::NodeTypeRole);
 
     for (const auto& resource: resources)
     {
@@ -118,7 +118,7 @@ void ResourceGroupingActionHandler::createNewCustomResourceTreeGroup() const
 
 void ResourceGroupingActionHandler::assignCustomResourceTreeGroupId() const
 {
-    using namespace entity_resource_tree::resource_grouping;
+    using namespace nx::vms::client::core::entity_resource_tree::resource_grouping;
 
     const auto parameters = menu()->currentParameters(sender());
     if (!parameters.hasArgument(Qn::ResourceTreeCustomGroupIdRole))
@@ -139,7 +139,7 @@ void ResourceGroupingActionHandler::assignCustomResourceTreeGroupId() const
 
 void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
 {
-    using namespace entity_resource_tree::resource_grouping;
+    using namespace nx::vms::client::core::entity_resource_tree::resource_grouping;
 
     const auto parameters = menu()->currentParameters(sender());
 
@@ -219,7 +219,7 @@ void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
 
 void ResourceGroupingActionHandler::moveToCustomResourceTreeGroup() const
 {
-    using namespace entity_resource_tree::resource_grouping;
+    using namespace nx::vms::client::core::entity_resource_tree::resource_grouping;
 
     const auto parameters = menu()->currentParameters(sender());
     if (!parameters.hasArgument(Qn::ResourceTreeCustomGroupIdRole))
@@ -266,7 +266,7 @@ void ResourceGroupingActionHandler::moveToCustomResourceTreeGroup() const
 
 void ResourceGroupingActionHandler::removeCustomResourceTreeGroup() const
 {
-    using namespace entity_resource_tree::resource_grouping;
+    using namespace nx::vms::client::core::entity_resource_tree::resource_grouping;
 
     const auto parameters = menu()->currentParameters(sender());
     const auto resources = parameters.resources();

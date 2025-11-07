@@ -771,7 +771,10 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     }
     else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        const auto isBuggy = getResourceExtraStatus(camera).testFlag(ResourceExtraStatusFlag::buggy);
+        using namespace nx::vms::client::core;
+
+        const auto isBuggy =
+            getResourceExtraStatus(camera).testFlag(ResourceExtraStatusFlag::buggy);
         if (status == Online && (camera->needsToChangeDefaultPassword() || isBuggy))
             status = Incompatible;
     }
@@ -782,8 +785,11 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     return Key(key | status);
 }
 
-QIcon QnResourceIconCache::cameraRecordingStatusIcon(ResourceExtraStatus status)
+QIcon QnResourceIconCache::cameraRecordingStatusIcon(
+    nx::vms::client::core::ResourceExtraStatus status)
 {
+    using namespace nx::vms::client::core;
+
     if (status.testFlag(ResourceExtraStatusFlag::recording))
         return qnSkin->icon(kRecordOnIcon);
 

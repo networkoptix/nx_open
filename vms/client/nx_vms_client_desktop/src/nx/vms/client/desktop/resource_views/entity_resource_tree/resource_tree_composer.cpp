@@ -6,12 +6,12 @@
 
 #include <client/client_globals.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/flattening_group_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_composition_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/flattening_group_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_composition_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/common/system_settings.h>
@@ -21,7 +21,7 @@ namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
 using namespace nx::vms::api;
-using namespace entity_item_model;
+using namespace nx::vms::client::core::entity_item_model;
 
 using nx::vms::common::SystemSettings;
 

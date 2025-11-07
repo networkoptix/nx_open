@@ -14,7 +14,7 @@ namespace test {
 using namespace nx::core::access;
 using namespace nx::vms::api;
 
-using ResourceTree::NodeType;
+using nx::vms::client::core::ResourceTree::NodeType;
 
 // ------------------------------------------------------------------------------------------------
 // Static utility methods tests.

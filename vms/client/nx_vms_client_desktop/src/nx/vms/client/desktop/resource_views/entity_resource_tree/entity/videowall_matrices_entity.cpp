@@ -3,7 +3,7 @@
 #include "videowall_matrices_entity.h"
 
 #include <core/resource/videowall_resource.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item_order/item_order.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item_order/item_order.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -12,7 +12,7 @@ VideowallMatricesEntity::VideowallMatricesEntity(
     const VideowallMatrixItemCreator& itemCreator,
     const QnVideoWallResourcePtr& videoWall)
     :
-    base_type(itemCreator, entity_item_model::numericOrder())
+    base_type(itemCreator, core::entity_item_model::numericOrder())
 {
     setItems(videoWall->matrices()->getItems().keys().toVector());
 

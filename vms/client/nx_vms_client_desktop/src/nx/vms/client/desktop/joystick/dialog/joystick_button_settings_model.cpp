@@ -11,9 +11,9 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 
@@ -134,13 +134,13 @@ QVector<int> setOpenLayoutParameter(
         {
             actionDescription->parameters[ActionFactory::kLayoutLogicalIdParameterName] =
                 value.toString();
-            return {Qn::ResourceIconKeyRole, JoystickButtonSettingsModel::LayoutLogicalIdRole};
+            return {core::ResourceIconKeyRole, JoystickButtonSettingsModel::LayoutLogicalIdRole};
         }
         case JoystickButtonSettingsModel::LayoutUuidRole:
         {
             actionDescription->parameters[ActionFactory::kLayoutUuidParameterName] =
                 value.toString();
-            return {Qn::ResourceIconKeyRole, JoystickButtonSettingsModel::LayoutLogicalIdRole};
+            return {core::ResourceIconKeyRole, JoystickButtonSettingsModel::LayoutLogicalIdRole};
         }
     }
 
@@ -544,7 +544,7 @@ QHash<int, QByteArray> JoystickButtonSettingsModel::roleNames() const
     roles[IsEnabledRole] = "isEnabled";
     roles[ButtonPressedRole] = "buttonPressed";
 
-    roles[Qn::ResourceIconKeyRole] = "iconKey";
+    roles[core::ResourceIconKeyRole] = "iconKey";
 
     return roles;
 }
@@ -604,7 +604,7 @@ QVariant JoystickButtonSettingsModel::data(const QModelIndex& index, int role) c
 
             break;
         }
-        case Qn::ResourceIconKeyRole:
+        case core::ResourceIconKeyRole:
         {
             if (index.column() == BaseActionParameterColumn
                 || index.column() == ModifiedActionParameterColumn)
@@ -619,7 +619,7 @@ QVariant JoystickButtonSettingsModel::data(const QModelIndex& index, int role) c
 
                 const QModelIndex resourceIndex = d->getResourceByLogicalId(layoutLogicalId);
                 if (resourceIndex.isValid())
-                    return d->resourceModel->data(resourceIndex, Qn::ResourceIconKeyRole);
+                    return d->resourceModel->data(resourceIndex, core::ResourceIconKeyRole);
 
                 return QVariant();
             }

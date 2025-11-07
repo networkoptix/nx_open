@@ -21,8 +21,8 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -341,7 +341,7 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
     if (option->icon.isNull())
         option->decorationSize = defaultDecorationSize;
 
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    const auto nodeType = index.data(core::NodeTypeRole).value<core::ResourceTree::NodeType>();
     if (isSeparatorNode(nodeType))
         option->features = QStyleOptionViewItem::None;
     else
@@ -426,6 +426,8 @@ void QnResourceItemDelegate::destroyEditor(QWidget* editor, const QModelIndex& i
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModelIndex& index) const
 {
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
+
     if (m_options.testFlag(HighlightChecked))
     {
         const auto checkState = rowCheckState(index);
@@ -436,12 +438,12 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
     if (!workbench())
         return ItemState::normal;
 
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    const auto nodeType = index.data(core::NodeTypeRole).value<NodeType>();
 
     switch (nodeType)
     {
-        case ResourceTree::NodeType::currentSystem:
-        case ResourceTree::NodeType::currentUser:
+        case NodeType::currentSystem:
+        case NodeType::currentUser:
             return ItemState::selected;
 
         /*
@@ -453,10 +455,10 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
          * Videowall is Selected when we are in videowall review or control mode.
         */
 
-        case ResourceTree::NodeType::resource:
-        case ResourceTree::NodeType::sharedLayout:
-        case ResourceTree::NodeType::edge:
-        case ResourceTree::NodeType::sharedResource:
+        case NodeType::resource:
+        case NodeType::sharedLayout:
+        case NodeType::edge:
+        case NodeType::sharedResource:
         {
             QnResourcePtr resource = index.data(core::ResourceRole).value<QnResourcePtr>();
             NX_ASSERT(resource);
@@ -472,16 +474,16 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
             return itemStateForMediaResource(index);
         }
 
-        case ResourceTree::NodeType::recorder:
+        case NodeType::recorder:
             return itemStateForRecorder(index);
 
-        case ResourceTree::NodeType::layoutItem:
+        case NodeType::layoutItem:
             return itemStateForLayoutItem(index);
 
-        case ResourceTree::NodeType::videoWallItem:
+        case NodeType::videoWallItem:
             return itemStateForVideoWallItem(index);
 
-        case ResourceTree::NodeType::showreel:
+        case NodeType::showreel:
             return itemStateForShowreel(index);
 
         default:
@@ -665,6 +667,8 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForShowreel(
 
 void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const
 {
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
+
     baseName = index.data(Qt::DisplayRole).toString();
     extInfo = QString();
 
@@ -680,13 +684,13 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     if (infoLevel == Qn::RI_NameOnly)
         return;
 
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    const auto nodeType = index.data(core::NodeTypeRole).value<NodeType>();
 
-    if (nodeType == ResourceTree::NodeType::videoWallItem)
+    if (nodeType == NodeType::videoWallItem)
     {
         // skip videowall screens
     }
-    else if (nodeType == ResourceTree::NodeType::recorder)
+    else if (nodeType == NodeType::recorder)
     {
         auto firstChild = index.model()->index(0, 0, index);
         if (!firstChild.isValid()) /* This can happen in rows deleting */
@@ -699,8 +703,8 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         if (!resource)
             return;
 
-        if ((nodeType == ResourceTree::NodeType::layoutItem
-                || nodeType == ResourceTree::NodeType::sharedResource)
+        if ((nodeType == NodeType::layoutItem
+                || nodeType == NodeType::sharedResource)
             && resource->hasFlags(Qn::server))
         {
             extInfo = QString("%1 %2").arg(nx::UnicodeChars::kEnDash, tr("Health Monitor"));
@@ -761,8 +765,9 @@ void QnResourceItemDelegate::paintExtraStatus(
     const QRect& iconRect,
     const QModelIndex& index) const
 {
-    const auto extraStatus = index.data(Qn::ResourceExtraStatusRole).value<ResourceExtraStatus>();
-    if (extraStatus == ResourceExtraStatus())
+    const auto extraStatus =
+        index.data(core::ResourceExtraStatusRole).value<core::ResourceExtraStatus>();
+    if (extraStatus == core::ResourceExtraStatus())
         return;
 
     QRect extraIconRect(iconRect);
@@ -796,7 +801,8 @@ void QnResourceItemDelegate::paintExtraStatus(
     }
 
     // Draw "locked" icon.
-    if (m_options.testFlag(LockedIcons) && extraStatus.testFlag(ResourceExtraStatusFlag::locked))
+    if (m_options.testFlag(LockedIcons)
+        && extraStatus.testFlag(core::ResourceExtraStatusFlag::locked))
     {
         if (!shiftIconLeft())
             return;

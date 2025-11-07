@@ -26,7 +26,7 @@
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -48,6 +48,8 @@ QnSharedResourcePointer<ResourceType> getResource(const QModelIndex& index)
 
 QnResourceList selectedResources(const QModelIndexList& selection)
 {
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
+
     QnResourceList result;
     QSet<QnResourcePtr> addedResources;
 
@@ -63,10 +65,10 @@ QnResourceList selectedResources(const QModelIndexList& selection)
 
     for (const QModelIndex& modelIndex: selection)
     {
-        const auto nodeType = modelIndex.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+        const auto nodeType = modelIndex.data(core::NodeTypeRole).value<NodeType>();
         switch (nodeType)
         {
-            case ResourceTree::NodeType::recorder:
+            case NodeType::recorder:
             {
                 // TODO: #vkutin #vbreus #sivanov This should be refactored to using a new data
                 // role to avoid child index access / model structure dependency.
@@ -81,11 +83,11 @@ QnResourceList selectedResources(const QModelIndexList& selection)
                 break;
             }
 
-            case ResourceTree::NodeType::resource:
-            case ResourceTree::NodeType::sharedLayout:
-            case ResourceTree::NodeType::sharedResource:
-            case ResourceTree::NodeType::edge:
-            case ResourceTree::NodeType::currentUser:
+            case NodeType::resource:
+            case NodeType::sharedLayout:
+            case NodeType::sharedResource:
+            case NodeType::edge:
+            case NodeType::currentUser:
                 addResource(modelIndex.data(core::ResourceRole).value<QnResourcePtr>());
                 break;
 
@@ -225,9 +227,9 @@ QVariant parentNodeType(const QModelIndex& index)
         return {};
 
     if (!index.parent().isValid())
-        return QVariant::fromValue<ResourceTree::NodeType>(ResourceTree::NodeType::root);
+        return QVariant::fromValue<core::ResourceTree::NodeType>(core::ResourceTree::NodeType::root);
 
-    return index.parent().data(Qn::NodeTypeRole);
+    return index.parent().data(core::NodeTypeRole);
 }
 
 QVariant topLevelParentNodeType(const QModelIndex& index)
@@ -239,14 +241,14 @@ QVariant topLevelParentNodeType(const QModelIndex& index)
     while (parent.parent().isValid())
         parent = parent.parent();
 
-    return parent.data(Qn::NodeTypeRole);
+    return parent.data(core::NodeTypeRole);
 }
 
 } // namespace
 
 struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
 {
-    using NodeType = ResourceTree::NodeType;
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 
     const std::unique_ptr<QAction> renameAction{new QAction{}};
 
@@ -259,16 +261,16 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
         const QModelIndex& index, const QModelIndexList& selection) const
     {
         if (!index.isValid())
-            return menu::Parameters{Qn::NodeTypeRole, ResourceTree::NodeType::root};
+            return menu::Parameters{core::NodeTypeRole, NodeType::root};
 
         // TODO: #sivanov #vkutin #vbreus Refactor to a simple switch by node type.
 
-        const auto nodeType = index.data(Qn::NodeTypeRole).value<NodeType>();
+        const auto nodeType = index.data(core::NodeTypeRole).value<NodeType>();
 
         const auto withNodeType =
             [nodeType](menu::Parameters parameters)
             {
-                return parameters.withArgument(Qn::NodeTypeRole, nodeType);
+                return parameters.withArgument(core::NodeTypeRole, nodeType);
             };
 
         switch (nodeType)
@@ -306,9 +308,9 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
 
         menu::Parameters result(selectedResources(selection));
 
-        const auto parentIndexNodeType = parentNodeType(index).value<ResourceTree::NodeType>();
+        const auto parentIndexNodeType = parentNodeType(index).value<NodeType>();
 
-        result.setArgument(Qn::NodeTypeRole, nodeType);
+        result.setArgument(core::NodeTypeRole, nodeType);
         result.setArgument(Qn::ParentNodeTypeRole, parentIndexNodeType);
         result.setArgument(Qn::TopLevelParentNodeTypeRole, topLevelParentNodeType(index));
 
@@ -323,7 +325,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
             [](const QModelIndex& index)
             {
                 const auto result = index.parent();
-                const auto resultType = result.data(Qn::NodeTypeRole).value<NodeType>();
+                const auto resultType = result.data(core::NodeTypeRole).value<NodeType>();
                 return resultType != NodeType::recorder ? result : result.parent();
             };
 
@@ -339,7 +341,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
             if (effectiveParent(index) != firstParentIndex)
                 onlySiblings = false;
 
-            if (index.data(Qn::NodeTypeRole).value<NodeType>() == NodeType::customResourceGroup)
+            if (index.data(core::NodeTypeRole).value<NodeType>() == NodeType::customResourceGroup)
             {
                 selectedGroupIds << index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
 
@@ -482,22 +484,26 @@ menu::Parameters ResourceTreeInteractionHandler::actionParameters(
 
 void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
     const QModelIndexList& selection,
-    const ResourceTree::ActivationType activationType,
+    const core::ResourceTree::ActivationType activationType,
     const Qt::KeyboardModifiers modifiers)
 {
-    if (activationType == ResourceTree::ActivationType::middleClick)
+    using namespace nx::vms::client::core;
+
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
+
+    if (activationType == core::ResourceTree::ActivationType::middleClick)
     {
         const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
         menu()->trigger(menu::OpenInNewTabAction, resource);
         return;
     }
 
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    const auto nodeType = index.data(core::NodeTypeRole).value<NodeType>();
     switch (nodeType)
     {
-        case ResourceTree::NodeType::currentSystem:
+        case NodeType::currentSystem:
         {
-            if (activationType != ResourceTree::ActivationType::doubleClick)
+            if (activationType != core::ResourceTree::ActivationType::doubleClick)
                 return;
 
             // System Administration window opens on double-click if current user is a member of
@@ -506,9 +512,9 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             break;
         }
 
-        case ResourceTree::NodeType::currentUser:
+        case NodeType::currentUser:
         {
-            if (activationType != ResourceTree::ActivationType::doubleClick)
+            if (activationType != core::ResourceTree::ActivationType::doubleClick)
                 return;
 
             // Opens User Settings window for current user.
@@ -516,7 +522,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             break;
         }
 
-        case ResourceTree::NodeType::cloudSystem:
+        case NodeType::cloudSystem:
         {
             const auto callback =
                 [this, cloudSystemId = index.data(Qn::CloudSystemIdRole).toString()]()
@@ -544,7 +550,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             break;
         }
 
-        case ResourceTree::NodeType::cloudSystemStatus:
+        case NodeType::cloudSystemStatus:
         {
             const auto systemId = index.data(Qn::CloudSystemIdRole).toString();
             menu()->trigger(menu::ConnectToCloudSystemWithUserInteractionAction,
@@ -553,7 +559,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             break;
         }
 
-        case ResourceTree::NodeType::videoWallItem:
+        case NodeType::videoWallItem:
         {
             const auto item =
                 resourcePool()->getVideoWallItemByUuid(index.data(core::UuidRole).value<nx::Uuid>());
@@ -564,15 +570,15 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             break;
         }
 
-        case ResourceTree::NodeType::showreel:
+        case NodeType::showreel:
         {
             menu()->triggerIfPossible(menu::ReviewShowreelAction,
                 {core::UuidRole, index.data(core::UuidRole).value<nx::Uuid>()});
             break;
         }
 
-        case ResourceTree::NodeType::customResourceGroup:
-        case ResourceTree::NodeType::recorder:
+        case NodeType::customResourceGroup:
+        case NodeType::recorder:
         {
             if (activationType == ResourceTree::ActivationType::doubleClick)
                 return;
@@ -642,8 +648,8 @@ void ResourceTreeInteractionHandler::activateSearchResults(
 
     for (const auto& index: indexes)
     {
-        const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
-        if (nodeType == ResourceTree::NodeType::showreel)
+        const auto nodeType = index.data(core::NodeTypeRole).value<core::ResourceTree::NodeType>();
+        if (nodeType == core::ResourceTree::NodeType::showreel)
         {
             const auto showreelId = index.data(core::UuidRole).value<nx::Uuid>();
             showreels.push_back(showreelId);

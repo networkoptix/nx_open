@@ -8,12 +8,12 @@
 #include <QtCore/QPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/abstract_entity.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 class QnWorkbenchContext;
 
-namespace nx::vms::client::desktop::entity_item_model { class EntityItemModel; }
+namespace nx::vms::client::core::entity_item_model { class EntityItemModel; }
 
 namespace nx::vms::client::desktop {
 
@@ -50,7 +50,7 @@ public:
      *     depending on current filter mode applied. Composer doesn't take ownership of model, and
      *     there is no constraints regarding model lifetime.
      */
-    void attachModel(entity_item_model::EntityItemModel* model);
+    void attachModel(core::entity_item_model::EntityItemModel* model);
 
     FilterMode filterMode() const;
     void setFilterMode(FilterMode filterMode);
@@ -80,17 +80,17 @@ private:
 
     void onUserChanged();
     void onTreeSettingsChanged();
-    entity_item_model::AbstractEntityPtr createDevicesEntity() const;
+    core::entity_item_model::AbstractEntityPtr createDevicesEntity() const;
     bool showHealthMonitorsGroup() const;
     void rebuildEntity();
-    entity_item_model::AbstractEntity* entityForCurrentFilterMode() const;
+    core::entity_item_model::AbstractEntity* entityForCurrentFilterMode() const;
 
 private:
     const ResourceTreeSettings* m_resourceTreeSettings;
 
     QScopedPointer<ResourceTreeEntityBuilder> m_entityBuilder;
-    std::unordered_map<FilterMode, entity_item_model::AbstractEntityPtr> m_entityByFilter;
-    QPointer<entity_item_model::EntityItemModel> m_attachedModel;
+    std::unordered_map<FilterMode, core::entity_item_model::AbstractEntityPtr> m_entityByFilter;
+    QPointer<core::entity_item_model::EntityItemModel> m_attachedModel;
 
     FilterMode m_filterMode = FilterMode::noFilter;
 };

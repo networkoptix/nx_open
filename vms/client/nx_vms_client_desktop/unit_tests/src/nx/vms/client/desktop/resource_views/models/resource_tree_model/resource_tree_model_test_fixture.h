@@ -22,10 +22,10 @@ class QnRuntimeInfoManager;
 
 namespace nx::vms::api { enum class WebPageSubtype; }
 namespace nx::vms::client::core { class AccessController; }
+namespace nx::vms::client::core::entity_item_model { class EntityItemModel; }
 
 namespace nx::vms::client::desktop {
 
-namespace entity_item_model { class EntityItemModel; }
 namespace entity_resource_tree { class ResourceTreeComposer; };
 
 namespace test {
@@ -46,7 +46,7 @@ class ResourceTreeModelTest:
     public ::testing::WithParamInterface<nx::vms::api::WebPageSubtype>
 {
 protected:
-    using NodeType = ResourceTree::NodeType;
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
     using WebPageSubtype = nx::vms::api::WebPageSubtype;
     using AccessController = nx::vms::client::core::AccessController;
 
@@ -170,7 +170,7 @@ protected:
     std::vector<QString> transformToDisplayStrings(const QModelIndexList& indexes) const;
 
 protected:
-    QSharedPointer<entity_item_model::EntityItemModel> m_newResourceTreeModel;
+    QSharedPointer<core::entity_item_model::EntityItemModel> m_newResourceTreeModel;
     QSharedPointer<entity_resource_tree::ResourceTreeComposer> m_resourceTreeComposer;
 };
 

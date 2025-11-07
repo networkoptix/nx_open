@@ -24,8 +24,8 @@
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_composer.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_drag_drop_decorator_model.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_edit_delegate.h>
@@ -49,10 +49,10 @@ namespace {
 
 static constexpr int kMaxAutoExpandedServers = 2;
 
-ResourceTree::NodeType filterNodeType(ResourceTree::FilterType filterType)
+core::ResourceTree::NodeType filterNodeType(core::ResourceTree::FilterType filterType)
 {
-    using ResourceTree::NodeType;
-    using ResourceTree::FilterType;
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
+    using FilterType = nx::vms::client::core::ResourceTree::FilterType;
 
     switch (filterType)
     {
@@ -89,10 +89,10 @@ ResourceTree::NodeType filterNodeType(ResourceTree::FilterType filterType)
     return {};
 }
 
-bool isTopLevelNodeType(ResourceTree::NodeType nodeType)
+bool isTopLevelNodeType(core::ResourceTree::NodeType nodeType)
 {
-    return nodeType > ResourceTree::NodeType::separator
-        && nodeType <= ResourceTree::NodeType::localResources;
+    return nodeType > core::ResourceTree::NodeType::separator
+        && nodeType <= core::ResourceTree::NodeType::localResources;
 }
 
 } // namespace
@@ -100,9 +100,9 @@ bool isTopLevelNodeType(ResourceTree::NodeType nodeType)
 struct ResourceTreeModelAdapter::Private
 {
     ResourceTreeModelAdapter* const q;
-    using FilterType = ResourceTree::FilterType;
+    using FilterType = nx::vms::client::core::ResourceTree::FilterType;
 
-    std::unique_ptr<entity_item_model::EntityItemModel> resourceTreeModel;
+    std::unique_ptr<nx::vms::client::core::entity_item_model::EntityItemModel> resourceTreeModel;
     std::unique_ptr<entity_resource_tree::ResourceTreeComposer> resourceTreeComposer;
     std::unique_ptr<ResourceTreeDragDropDecoratorModel> dragDropDecoratorModel;
     std::unique_ptr<QnResourceSearchProxyModel> sortFilterModel;
@@ -117,18 +117,18 @@ struct ResourceTreeModelAdapter::Private
     bool isFiltering = false;
     QPersistentModelIndex rootIndex;
 
-    QVector<ResourceTree::ShortcutHint> shortcutHints;
+    QVector<core::ResourceTree::ShortcutHint> shortcutHints;
 
     bool defaultAutoExpandedNodes = true;
-    QSet<ResourceTree::ExpandedNodeId> autoExpandedNodes;
+    QSet<core::ResourceTree::ExpandedNodeId> autoExpandedNodes;
 
     ResourceTreeModelSquishFacade* squishFacade = nullptr;
 
-    using NodeType = ResourceTree::NodeType;
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 
     Private(ResourceTreeModelAdapter* q):
         q(q),
-        resourceTreeModel(new entity_item_model::EntityItemModel()),
+        resourceTreeModel(new nx::vms::client::core::entity_item_model::EntityItemModel()),
         sortFilterModel(new QnResourceSearchProxyModel(q)),
         squishFacade(new ResourceTreeModelSquishFacade(q))
     {
@@ -205,17 +205,20 @@ struct ResourceTreeModelAdapter::Private
         emit q->shortcutHintsChanged();
     }
 
-    QVector<ResourceTree::ShortcutHint> calculateShortcutHints() const
+    QVector<core::ResourceTree::ShortcutHint> calculateShortcutHints() const
     {
+        using NodeType = nx::vms::client::core::ResourceTree::NodeType;
+        using ShortcutHint = nx::vms::client::core::ResourceTree::ShortcutHint;
+
         if (!isFiltering || q->rowCount(rootIndex) == 0)
             return {};
 
-        static const QVector<ResourceTree::ShortcutHint> kResourceHints{
-            ResourceTree::ShortcutHint(QList{Qt::Key_Enter}, tr("add to current layout")),
-            ResourceTree::ShortcutHint(QList{Qt::Key_Control, Qt::Key_Enter}, tr("open all at a new layout"))};
+        static const QVector<ShortcutHint> kResourceHints{
+            ShortcutHint(QList{Qt::Key_Enter}, tr("add to current layout")),
+            ShortcutHint(QList{Qt::Key_Control, Qt::Key_Enter}, tr("open all at a new layout"))};
 
-        static const QVector<ResourceTree::ShortcutHint> kLayoutHints{
-            ResourceTree::ShortcutHint({Qt::Key_Control, Qt::Key_Enter}, tr("open all"))};
+        static const QVector<ShortcutHint> kLayoutHints{
+            ShortcutHint({Qt::Key_Control, Qt::Key_Enter}, tr("open all"))};
 
         switch (effectiveFilterType())
         {
@@ -246,8 +249,8 @@ struct ResourceTreeModelAdapter::Private
                     if ((hasResources && hasLayoutEntities) || hasNotOpenableItems)
                         break;
 
-                    if (index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>()
-                        == ResourceTree::NodeType::showreel)
+                    if (index.data(core::NodeTypeRole).value<NodeType>()
+                        == NodeType::showreel)
                     {
                         hasLayoutEntities = true;
                         continue;
@@ -359,20 +362,22 @@ void ResourceTreeModelAdapter::setContext(WindowContext* context)
 
 QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) const
 {
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
+
     if (!d->context)
         return {};
 
     switch (role)
     {
-        case Qn::ExtraInfoRole:
+        case core::ExtraInfoRole:
         {
             const auto resource = base_type::data(index, core::ResourceRole).value<QnResourcePtr>();
             const auto resourceFlags = resource ? resource->flags() : Qn::ResourceFlags{};
             const auto nodeType = base_type::data(
-                index, Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+                index, core::NodeTypeRole).value<NodeType>();
 
-            if ((nodeType == ResourceTree::NodeType::layoutItem
-                || nodeType == ResourceTree::NodeType::sharedResource)
+            if ((nodeType == NodeType::layoutItem
+                || nodeType == NodeType::sharedResource)
                 && resourceFlags.testFlag(Qn::server))
             {
                 return QString("%1 %2").arg(nx::UnicodeChars::kEnDash, tr("Health Monitor"));
@@ -398,11 +403,11 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
             return extraInfo;
         }
 
-        case Qn::ResourceLogInfoRole:
+        case core::ResourceLogInfoRole:
         {
             const auto name = data(index, Qt::DisplayRole).toString();
             const auto nodeType = QString::fromStdString(
-                reflect::toString(data(index, Qn::NodeTypeRole).value<ResourceTree::NodeType>()));
+                reflect::toString(data(index, core::NodeTypeRole).value<NodeType>()));
             if (const auto resource = data(index, core::ResourceRole).value<QnResourcePtr>())
             {
                 return nx::format("Resource of type '%1', with name '%2'", nodeType, name)
@@ -411,8 +416,8 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
             return nx::format("Node %1 with name %2", nodeType, name).toQString();
         }
 
-        case Qn::ResourceExtraStatusRole:
-            return int(base_type::data(index, Qn::ResourceExtraStatusRole).value<ResourceExtraStatus>());
+        case core::ResourceExtraStatusRole:
+            return int(base_type::data(index, core::ResourceExtraStatusRole).value<nx::vms::client::core::ResourceExtraStatus>());
 
         case Qn::RawResourceRole:
         {
@@ -434,8 +439,7 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
                 return nodeId && d->autoExpandedNodes.contains(nodeId);
             }
 
-            using ResourceTree::NodeType;
-            switch (index.data(Qn::NodeTypeRole).value<NodeType>())
+            switch (index.data(core::NodeTypeRole).value<NodeType>())
             {
                 case NodeType::resource:
                 {
@@ -477,14 +481,14 @@ QHash<int, QByteArray> ResourceTreeModelAdapter::roleNames() const
     return roleNames;
 }
 
-bool ResourceTreeModelAdapter::isFilterRelevant(ResourceTree::FilterType type) const
+bool ResourceTreeModelAdapter::isFilterRelevant(core::ResourceTree::FilterType type) const
 {
     if (!d->context)
         return true;
 
     switch (type)
     {
-        case ResourceTree::FilterType::servers:
+        case core::ResourceTree::FilterType::servers:
             return d->context->system()->accessController()->hasPowerUserPermissions()
                 || d->context->system()->globalSettings()->showServersInTreeForNonAdmins();
 
@@ -549,12 +553,12 @@ QModelIndexList ResourceTreeModelAdapter::popState()
     return state;
 }
 
-ResourceTree::FilterType ResourceTreeModelAdapter::filterType() const
+core::ResourceTree::FilterType ResourceTreeModelAdapter::filterType() const
 {
     return d->filterType;
 }
 
-void ResourceTreeModelAdapter::setFilterType(ResourceTree::FilterType value)
+void ResourceTreeModelAdapter::setFilterType(core::ResourceTree::FilterType value)
 {
     if (d->filterType == value)
         return;
@@ -611,14 +615,14 @@ bool ResourceTreeModelAdapter::localFilesMode() const
     return d->localFilesMode;
 }
 
-QVector<ResourceTree::ShortcutHint> ResourceTreeModelAdapter::shortcutHints() const
+QVector<core::ResourceTree::ShortcutHint> ResourceTreeModelAdapter::shortcutHints() const
 {
     return d->shortcutHints;
 }
 
 void ResourceTreeModelAdapter::activateItem(const QModelIndex& index,
     const QModelIndexList& selection,
-    const ResourceTree::ActivationType activationType,
+    const core::ResourceTree::ActivationType activationType,
     const Qt::KeyboardModifiers modifiers)
 {
     if (NX_ASSERT(d->interactionHandler))
@@ -658,8 +662,8 @@ bool ResourceTreeModelAdapter::expandsOnDoubleClick(const QModelIndex& index) co
 
 bool ResourceTreeModelAdapter::activateOnSingleClick(const QModelIndex& index) const
 {
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
-    return nodeType == ResourceTree::NodeType::cloudSystemStatus;
+    const auto nodeType = index.data(core::NodeTypeRole).value<core::ResourceTree::NodeType>();
+    return nodeType == core::ResourceTree::NodeType::cloudSystemStatus;
 }
 
 bool ResourceTreeModelAdapter::isExtraInfoRequired() const
@@ -673,25 +677,28 @@ menu::Parameters ResourceTreeModelAdapter::actionParameters(
     return d->interactionHandler->actionParameters(index, selection);
 }
 
-ResourceTree::ExpandedNodeId ResourceTreeModelAdapter::expandedNodeId(
+core::ResourceTree::ExpandedNodeId ResourceTreeModelAdapter::expandedNodeId(
     const QModelIndex& index) const
 {
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
+    using ExpandedNodeId = nx::vms::client::core::ResourceTree::ExpandedNodeId;
+
+    const auto nodeType = index.data(core::NodeTypeRole).value<NodeType>();
     switch (nodeType)
     {
-        case ResourceTree::NodeType::resource:
+        case NodeType::resource:
         {
             const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
             return NX_ASSERT(resource) &&
                 (resource->hasFlags(Qn::server) || resource->hasFlags(Qn::videowall))
-                ? ResourceTree::ExpandedNodeId{nodeType, resource->getId().toSimpleString()}
-                : ResourceTree::ExpandedNodeId{};
+                ? ExpandedNodeId{nodeType, resource->getId().toSimpleString()}
+                : ExpandedNodeId{};
         }
 
-        case ResourceTree::NodeType::recorder:
-        case ResourceTree::NodeType::customResourceGroup:
+        case NodeType::recorder:
+        case NodeType::customResourceGroup:
         {
-            const auto groupId = nodeType == ResourceTree::NodeType::recorder
+            const auto groupId = nodeType == NodeType::recorder
                 ? index.data(Qn::CameraGroupIdRole).toString()
                 : index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
 
@@ -699,8 +706,8 @@ ResourceTree::ExpandedNodeId ResourceTreeModelAdapter::expandedNodeId(
 
             for (auto parent = index.parent(); parent.isValid(); parent = parent.parent())
             {
-                const auto type = parent.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
-                if (type == ResourceTree::NodeType::resource)
+                const auto type = parent.data(core::NodeTypeRole).value<NodeType>();
+                if (type == NodeType::resource)
                 {
                     const auto resource = parent.data(core::ResourceRole).value<QnResourcePtr>();
                     if (NX_ASSERT(resource))
@@ -708,27 +715,27 @@ ResourceTree::ExpandedNodeId ResourceTreeModelAdapter::expandedNodeId(
                     break;
                 }
 
-                if (type == ResourceTree::NodeType::camerasAndDevices)
+                if (type == NodeType::camerasAndDevices)
                     break;
             }
 
-            return ResourceTree::ExpandedNodeId{nodeType, groupId, parentId};
+            return ExpandedNodeId{nodeType, groupId, parentId};
         }
 
         default:
             return isTopLevelNodeType(nodeType)
-                ? ResourceTree::ExpandedNodeId{nodeType}
-                : ResourceTree::ExpandedNodeId{};
+                ? ExpandedNodeId{nodeType}
+                : ExpandedNodeId{};
     }
 }
 
 void ResourceTreeModelAdapter::setAutoExpandedNodes(
-    const std::optional<QSet<ResourceTree::ExpandedNodeId>>& value,
+    const std::optional<QSet<core::ResourceTree::ExpandedNodeId>>& value,
     bool signalModelReset)
 {
     const ScopedReset reset(this, signalModelReset);
     d->defaultAutoExpandedNodes = !value.has_value();
-    d->autoExpandedNodes = value.value_or(QSet<ResourceTree::ExpandedNodeId>());
+    d->autoExpandedNodes = value.value_or(QSet<core::ResourceTree::ExpandedNodeId>());
 }
 
 

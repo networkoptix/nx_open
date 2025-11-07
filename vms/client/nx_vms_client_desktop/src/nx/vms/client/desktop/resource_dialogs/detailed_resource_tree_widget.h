@@ -9,16 +9,16 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/abstract_entity.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 #include "resource_selection_delegate.h"
 
 namespace Ui { class DetailedResourceTreeWidget; }
+namespace nx::vms::client::core::entity_item_model { class EntityItemModel; }
 
 namespace nx::vms::client::desktop {
 
-namespace entity_item_model { class EntityItemModel; }
 namespace entity_resource_tree { class ResourceTreeEntityBuilder; }
 
 class ResourceTreeIconDecoratorModel;
@@ -31,7 +31,7 @@ class DetailedResourceTreeWidget: public QWidget, public SystemContextAware
     using base_type = QWidget;
 
 public:
-    using AbstractEntityPtr = entity_item_model::AbstractEntityPtr;
+    using AbstractEntityPtr = core::entity_item_model::AbstractEntityPtr;
     using ResourceTreeEntityBuilder = entity_resource_tree::ResourceTreeEntityBuilder;
 
     using EntityFactoryFunction = std::function<AbstractEntityPtr(const ResourceTreeEntityBuilder*)>;
@@ -100,8 +100,8 @@ private:
     const std::unique_ptr<Ui::DetailedResourceTreeWidget> ui;
     const std::unique_ptr<entity_resource_tree::ResourceTreeEntityBuilder> m_treeEntityBuilder;
     EntityFactoryFunction m_entityFactoryFunction;
-    entity_item_model::AbstractEntityPtr m_treeEntity;
-    const std::unique_ptr<entity_item_model::EntityItemModel> m_entityModel;
+    AbstractEntityPtr m_treeEntity;
+    const std::unique_ptr<core::entity_item_model::EntityItemModel> m_entityModel;
     const std::unique_ptr<ResourceTreeIconDecoratorModel> m_iconDecoratorModel;
     DetailsPanelUpdateFunction m_detailsPanelUpdateFunction;
 };

@@ -22,19 +22,21 @@ ResourceTreeModelSquishFacade::ResourceTreeModelSquishFacade(ResourceTreeModelAd
 
 QString ResourceTreeModelSquishFacade::jsonModel()
 {
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
+
     const auto itemDataToJson =
         [](const QModelIndex& index)
         {
             QJsonObject jsonItem;
             jsonItem["name"] = index.data(Qt::DisplayRole).toString();
             jsonItem["node_type"] =
-                toString(index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>());
+                toString(index.data(core::NodeTypeRole).value<NodeType>());
 
-            const auto resourceIconKeyValue = index.data(Qn::ResourceIconKeyRole).toInt();
+            const auto resourceIconKeyValue = index.data(core::ResourceIconKeyRole).toInt();
             jsonItem["icon"] = toString(
                 QMetaEnum::fromType<QnResourceIconCache::Key>().valueToKeys(resourceIconKeyValue));
 
-            if (jsonItem["node_type"] == toString(ResourceTree::NodeType::resource))
+            if (jsonItem["node_type"] == toString(NodeType::resource))
             {
                 const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
                 const auto flags = toString(resource->flags());

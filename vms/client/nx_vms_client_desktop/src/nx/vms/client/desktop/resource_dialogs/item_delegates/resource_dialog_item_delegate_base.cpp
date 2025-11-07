@@ -5,22 +5,22 @@
 #include <QtGui/QPainter>
 
 #include <client/client_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/indents.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
 
-using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
+using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 
 bool checkNodeType(const QModelIndex& index, NodeType nodeType)
 {
     if (!index.isValid())
         return false;
 
-    const auto nodeTypeData = index.siblingAtColumn(0).data(Qn::NodeTypeRole);
+    const auto nodeTypeData = index.siblingAtColumn(0).data(nx::vms::client::core::NodeTypeRole);
     if (nodeTypeData.isNull())
         return false;
 

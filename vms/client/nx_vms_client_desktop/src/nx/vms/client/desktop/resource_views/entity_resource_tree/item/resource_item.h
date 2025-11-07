@@ -4,14 +4,14 @@
 
 #include <core/resource/resource.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class ResourceItem: public entity_item_model::AbstractItem
+class ResourceItem: public core::entity_item_model::AbstractItem
 {
-    using base_type = entity_item_model::AbstractItem;
+    using base_type = core::entity_item_model::AbstractItem;
 public:
     ResourceItem(const QnResourcePtr& resource);
 

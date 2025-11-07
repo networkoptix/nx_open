@@ -33,7 +33,7 @@ class ParameterTypes
 public:
     static int size(const QVariant& items);
 
-    static nx::vms::client::desktop::menu::ActionParameterType type(const QVariant& items);
+    static ActionParameterType type(const QVariant& items);
     static QnResourceList resources(const QVariant& items);
     static LayoutItemIndexList layoutItems(const QVariant& items);
     static QnVideoWallItemIndexList videoWallItems(const QVariant& items);

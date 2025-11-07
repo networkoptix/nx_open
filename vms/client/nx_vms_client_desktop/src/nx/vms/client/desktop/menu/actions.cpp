@@ -32,6 +32,8 @@
 
 namespace nx::vms::client::desktop::menu {
 
+using namespace nx::vms::client::core;
+
 static const QColor kBasePrimaryColor = "#a5b7c0"; //< Value of light10 in default customization.
 static const QColor kLight4Color = "#E1E7EA";
 static const QColor kBaseWindowTextColor = "#698796"; //< Value of light16 ('windowText').

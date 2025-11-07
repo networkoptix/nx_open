@@ -80,7 +80,7 @@
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/scene/resource_widget/dialogs/encrypted_archive_password_dialog.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>

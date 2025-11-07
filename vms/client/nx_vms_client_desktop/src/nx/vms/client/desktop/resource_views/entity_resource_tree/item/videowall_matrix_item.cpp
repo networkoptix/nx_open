@@ -28,6 +28,8 @@ VideoWallMatrixItem::VideoWallMatrixItem(
 
 QVariant VideoWallMatrixItem::data(int role) const
 {
+    using namespace nx::vms::client::core;
+
     switch (role)
     {
         case Qt::DisplayRole:
@@ -35,10 +37,10 @@ QVariant VideoWallMatrixItem::data(int role) const
         case Qt::EditRole:
             return m_matrix.name;
 
-        case Qn::ResourceIconKeyRole:
+        case core::ResourceIconKeyRole:
             return QVariant::fromValue<int>(QnResourceIconCache::VideoWallMatrix);
 
-        case Qn::NodeTypeRole:
+        case core::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::videoWallMatrix);
 
         case core::UuidRole:

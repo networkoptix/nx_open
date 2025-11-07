@@ -6,7 +6,7 @@
 #include <core/resource/resource.h>
 
 #include <nx/utils/pending_operation.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
 
 using namespace nx::vms::client::core;
@@ -90,7 +90,7 @@ QModelIndex QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& qu
             {
                 const auto rowIndex = index(row, Qn::NameColumn);
                 const auto nodeType =
-                    rowIndex.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+                    rowIndex.data(NodeTypeRole).value<ResourceTree::NodeType>();
                 if (nodeType == m_query.allowedNode)
                     return rowIndex;
             }
@@ -132,7 +132,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     if (!isAcceptedIndex(index, allowedNode))
         return false;
 
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<NodeType>();
+    const auto nodeType = index.data(NodeTypeRole).value<NodeType>();
 
     // Filter out all nodes except allowed one if set
     static const auto searchGroupNodes = QSet<NodeType>({
@@ -172,7 +172,7 @@ bool QnResourceSearchProxyModel::isAcceptedIndex(
     QModelIndex index,
     NodeType allowedNode) const
 {
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<NodeType>();
+    const auto nodeType = index.data(NodeTypeRole).value<NodeType>();
     if (isRejectedNodeType(nodeType, allowedNode))
         return false;
 

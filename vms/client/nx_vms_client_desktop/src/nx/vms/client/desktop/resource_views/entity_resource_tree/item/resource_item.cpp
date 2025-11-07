@@ -16,13 +16,14 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/api/data/resource_property_key.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/resource/server.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/system_context.h>
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -83,7 +84,7 @@ ResourceItem::ResourceItem(const QnResourcePtr& resource):
             if (m_resource->hasFlags(Qn::removed))
                 m_connectionsGuard.reset();
             else
-                notifyDataChanged({Qn::ResourceFlagsRole});
+                notifyDataChanged({core::ResourceFlagsRole});
         }));
 
     // Item will not send notifications for the never accessed data roles. This workaround is
@@ -103,19 +104,19 @@ QVariant ResourceItem::data(int role) const
         case Qt::EditRole:
             return displayData();
 
-        case Qn::ResourceIconKeyRole:
+        case core::ResourceIconKeyRole:
             return resourceIconKeyData();
 
         case core::ResourceRole:
             return QVariant::fromValue(m_resource);
 
-        case Qn::ResourceFlagsRole:
+        case core::ResourceFlagsRole:
             return QVariant::fromValue(m_resource->flags());
 
         case core::ResourceStatusRole:
             return resourceStatusData();
 
-        case Qn::ResourceExtraStatusRole:
+        case core::ResourceExtraStatusRole:
             return resourceExtraStatusData();
 
         case Qn::HelpTopicIdRole:
@@ -130,7 +131,7 @@ QVariant ResourceItem::data(int role) const
         case Qn::ResourceTreeCustomGroupIdRole:
             return customGroupIdData();
 
-        case Qn::ExtraInfoRole:
+        case core::ExtraInfoRole:
             return resourceExtraInfoData();
     }
     return QVariant();
@@ -201,7 +202,7 @@ QVariant ResourceItem::resourceIconKeyData() const
         [this]
         {
             const auto discardIconCache =
-                [this] { discardCache(m_resourceIconKeyCache, {Qn::ResourceIconKeyRole}); };
+                [this] { discardCache(m_resourceIconKeyCache, {core::ResourceIconKeyRole}); };
 
             m_connectionsGuard.add(resource()->connect(resource(), &QnResource::flagsChanged,
                 discardIconCache));
@@ -245,7 +246,7 @@ QVariant ResourceItem::resourceIconKeyData() const
                     m_resource->connect(m_resource.get(), &QnResource::propertyChanged,
                         [this]
                         {
-                            discardCache(m_resourceIconKeyCache, {Qn::ResourceIconKeyRole});
+                            discardCache(m_resourceIconKeyCache, {core::ResourceIconKeyRole});
                         }));
             }
         };
@@ -267,7 +268,7 @@ QVariant ResourceItem::resourceExtraStatusData() const
         [this]
         {
             const auto discardExtraStatusCache =
-                [this] { discardCache(m_resourceExtraStatusCache, {Qn::ResourceExtraStatusRole}); };
+                [this] { discardCache(m_resourceExtraStatusCache, {core::ResourceExtraStatusRole}); };
 
             if (m_isLayout)
             {
@@ -297,7 +298,7 @@ QVariant ResourceItem::resourceExtraStatusData() const
                         [this, cameraId = camera->getId()](const QnVirtualCameraResourcePtr& securityCamera)
                         {
                             if (securityCamera->getId() == cameraId)
-                                discardCache(m_resourceExtraStatusCache, {Qn::ResourceExtraStatusRole});
+                                discardCache(m_resourceExtraStatusCache, {core::ResourceExtraStatusRole});
                         }));
             }
             else
@@ -320,7 +321,7 @@ QVariant ResourceItem::resourceExtraInfoData() const
         [this]
         {
             const auto discardExtraInfo =
-                [this] { discardCache(m_resourceExtraInfoCache, {Qn::ExtraInfoRole}); };
+                [this] { discardCache(m_resourceExtraInfoCache, {core::ExtraInfoRole}); };
 
             if (auto userResource = m_resource.objectCast<QnUserResource>())
             {
@@ -398,7 +399,10 @@ QVariant ResourceItem::customGroupIdData() const
         return QVariant();
 
     if (m_customGroupIdCache.isNull())
-        m_customGroupIdCache = resource_grouping::resourceCustomGroupId(m_resource);
+    {
+        m_customGroupIdCache =
+            core::entity_resource_tree::resource_grouping::resourceCustomGroupId(m_resource);
+    }
 
     return m_customGroupIdCache;
 }

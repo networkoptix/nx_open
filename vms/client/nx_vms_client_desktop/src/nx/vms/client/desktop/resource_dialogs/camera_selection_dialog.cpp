@@ -14,7 +14,7 @@
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -39,7 +39,7 @@ CameraSelectionDialog::CameraSelectionDialog(
     ResourceSelectionWidget::EntityFactoryFunction createTreeEntity =
         [=, this](const entity_resource_tree::ResourceTreeEntityBuilder* builder)
         {
-            using namespace entity_item_model;
+            using namespace nx::vms::client::core::entity_item_model;
 
             auto camerasEntity = builder->createDialogAllCamerasEntity(
                 showServersInTree(), resourceFilter, permissionsHandledByFilter);
@@ -48,7 +48,7 @@ CameraSelectionDialog::CameraSelectionDialog(
                 return camerasEntity;
 
             AbstractItemPtr pinnedItem = GenericItemBuilder()
-                .withRole(Qn::ResourceIconKeyRole, static_cast<int>(pinnedItemDescription->iconKey))
+                .withRole(core::ResourceIconKeyRole, static_cast<int>(pinnedItemDescription->iconKey))
                 .withRole(Qt::DisplayRole, pinnedItemDescription->displayText)
                 .withRole(ResourceDialogItemRole::IsPinnedItemRole, true)
                 .withFlags({Qt::ItemIsEnabled, Qt::ItemNeverHasChildren});

@@ -4,9 +4,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
-
-#include "../abstract_resource_source.h"
 
 namespace nx::vms::client::desktop {
 
@@ -21,17 +20,17 @@ namespace entity_resource_tree {
  *    - redundancy is turned off.
  */
 class EdgeServerReducerProxySource:
-    public AbstractResourceSource,
+    public core::entity_resource_tree::AbstractResourceSource,
     public SystemContextAware
 {
     Q_OBJECT
-    using base_type = AbstractResourceSource;
+    using base_type = core::entity_resource_tree::AbstractResourceSource;
 
 public:
     explicit EdgeServerReducerProxySource(
         SystemContext* systemContext,
         const QnResourceAccessSubject& subject,
-        std::unique_ptr<AbstractResourceSource> serversSource);
+        std::unique_ptr<core::entity_resource_tree::AbstractResourceSource> serversSource);
 
     virtual QVector<QnResourcePtr> getResources() override;
 
@@ -42,7 +41,7 @@ private:
     bool hasAccess(const QnResourcePtr& resource) const;
 
 private:
-    const std::unique_ptr<AbstractResourceSource> m_serversSource;
+    const std::unique_ptr<core::entity_resource_tree::AbstractResourceSource> m_serversSource;
     const QnResourceAccessSubject m_subject;
     QHash<QnMediaServerResourcePtr, QnVirtualCameraResourcePtr> m_reducedServerCameras;
 };

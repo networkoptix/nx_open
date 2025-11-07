@@ -5,7 +5,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_source.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_source.h>
 
 namespace nx::vms::client::desktop {
 
@@ -19,7 +19,7 @@ namespace entity_resource_tree {
 
 class NX_VMS_CLIENT_DESKTOP_API OtherServersSource:
     public QObject,
-    public entity_item_model::UniqueKeySource<nx::Uuid>
+    public core::entity_item_model::UniqueKeySource<nx::Uuid>
 {
     Q_OBJECT
 
@@ -32,7 +32,7 @@ private:
     nx::utils::ScopedConnections m_connectionsGuard;
 };
 
-using UniqueUuidSourcePtr = std::shared_ptr<entity_item_model::UniqueKeySource<nx::Uuid>>;
+using UniqueUuidSourcePtr = std::shared_ptr<core::entity_item_model::UniqueKeySource<nx::Uuid>>;
 
 } // namespace entity_resource_tree
 } // namespace nx::vms::client::desktop

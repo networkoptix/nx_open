@@ -4,17 +4,17 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_list_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_list_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-using LayoutItemCreator = std::function<entity_item_model::AbstractItemPtr(const nx::Uuid&)>;
+using LayoutItemCreator = std::function<core::entity_item_model::AbstractItemPtr(const nx::Uuid&)>;
 
-class LayoutItemListEntity: public entity_item_model::UniqueKeyListEntity<nx::Uuid>
+class LayoutItemListEntity: public core::entity_item_model::UniqueKeyListEntity<nx::Uuid>
 {
-    using base_type = entity_item_model::UniqueKeyListEntity<nx::Uuid>;
+    using base_type = core::entity_item_model::UniqueKeyListEntity<nx::Uuid>;
 
 public:
     LayoutItemListEntity(

@@ -303,7 +303,7 @@ void ResourceBrowserWrapper::beforeGroupProcessing()
         return;
 
     // If explicitly selected a recorder's child.
-    if (level == 0 && index.parent().data(Qn::NodeTypeRole).value<ResourceTree::NodeType>()
+    if (level == 0 && index.parent().data(core::NodeTypeRole).value<ResourceTree::NodeType>()
         == ResourceTree::NodeType::recorder)
     {
         ++level;
@@ -368,7 +368,7 @@ void ResourceBrowserWrapper::saveGroupExpandedState(const QModelIndexList& withi
         [this, &expandedGroupIndexes](
             auto processIndexRecursively, const QModelIndex& index) -> bool
         {
-            const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+            const auto nodeType = index.data(core::NodeTypeRole).value<ResourceTree::NodeType>();
             if ((nodeType != ResourceTree::NodeType::customResourceGroup
                 && nodeType != ResourceTree::NodeType::recorder)
                 || !invokeQmlMethod<bool>(tree, "isExpanded", index))

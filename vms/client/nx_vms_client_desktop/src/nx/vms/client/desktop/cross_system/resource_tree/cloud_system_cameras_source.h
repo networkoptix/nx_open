@@ -5,13 +5,12 @@
 #include <memory>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_source.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_source.h>
 
 namespace nx::vms::client::desktop {
-
 namespace entity_resource_tree {
 
-class CloudSystemCamerasSource: public entity_item_model::UniqueResourceSource
+class CloudSystemCamerasSource: public core::entity_item_model::UniqueResourceSource
 {
 public:
     CloudSystemCamerasSource(const QString& systemId);
