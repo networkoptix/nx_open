@@ -39,11 +39,11 @@ public:
     void setLogId(const std::string& id) { m_id = id; }
 
 protected:
-    void setFrequency(int frequency) { m_frequency = frequency; }
+    void setFrequency(int frequency);
     const std::string& logId() const { return m_id; }
 
 private:
-    int m_frequency = 0;
+    int m_frequency = 90000;
     std::string m_id;
 };
 
