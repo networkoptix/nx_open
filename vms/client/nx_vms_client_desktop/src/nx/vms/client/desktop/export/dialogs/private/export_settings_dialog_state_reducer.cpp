@@ -236,12 +236,7 @@ State ExportSettingsDialogStateReducer::setTimestampTimeZone(
 
 std::pair<bool, State> ExportSettingsDialogStateReducer::setApplyFilters(State state, bool filters, bool pixelation)
 {
-    bool transcode = false;
-    if (state.exportMediaPersistentSettings.areFiltersForced())
-        transcode = true;
-    else
-        transcode = filters || pixelation;
-
+    bool transcode = filters || state.exportMediaPersistentSettings.areFiltersForced();
     if (state.exportMediaPersistentSettings.setTranscoding(transcode)
         || state.exportMediaPersistentSettings.pixelate != pixelation)
     {
@@ -495,11 +490,10 @@ State ExportSettingsDialogStateReducer::setMediaFilename(State state, const File
 
     bool needTranscoding = state.exportMediaSettings.transcodingSettings.watermark.visible()
         || state.exportMediaPersistentSettings.applyFilters
-        || state.exportMediaPersistentSettings.pixelate
         || state.exportMediaPersistentSettings.areFiltersForced();
 
-    if (state.exportMediaPersistentSettings.setTranscoding(needTranscoding))
-        state.applyTranscodingSettings();
+    state.exportMediaPersistentSettings.setTranscoding(needTranscoding);
+    state.applyTranscodingSettings();
 
     return state;
 }
