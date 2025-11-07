@@ -64,6 +64,8 @@ NX_REFLECTION_ENUM_CLASS(ResultCode,
     /** Data constraints violation */
     updateConflict,
 
+    tooManyRequests,
+
     unknownError
 );
 

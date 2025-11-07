@@ -66,6 +66,9 @@ nx::network::http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resul
 
         case ResultCode::updateConflict:
             return nx::network::http::StatusCode::conflict;
+
+        case ResultCode::tooManyRequests:
+            return nx::network::http::StatusCode::tooManyRequests;
     }
 
     return nx::network::http::StatusCode::internalServerError;
@@ -97,6 +100,8 @@ ResultCode httpStatusCodeToResultCode(nx::network::http::StatusCode::Value statu
             return ResultCode::serviceUnavailable;
         case nx::network::http::StatusCode::conflict:
             return ResultCode::updateConflict;
+        case nx::network::http::StatusCode::tooManyRequests:
+            return ResultCode::tooManyRequests;
         default:
             return ResultCode::unknownError;
     }
