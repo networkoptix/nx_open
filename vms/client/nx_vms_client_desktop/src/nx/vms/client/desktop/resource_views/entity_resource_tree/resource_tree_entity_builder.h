@@ -8,9 +8,9 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/api/types/access_rights_types.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/abstract_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
@@ -28,8 +28,8 @@ class NX_VMS_CLIENT_DESKTOP_API ResourceTreeEntityBuilder:
 {
     Q_OBJECT
     using base_type = QObject;
-    using AbstractEntityPtr = entity_item_model::AbstractEntityPtr;
-    using AbstractItemPtr = entity_item_model::AbstractItemPtr;
+    using AbstractEntityPtr = core::entity_item_model::AbstractEntityPtr;
+    using AbstractItemPtr = core::entity_item_model::AbstractItemPtr;
 
 
 public:
@@ -92,7 +92,7 @@ public:
     AbstractEntityPtr createVideowallsEntity() const;
     AbstractEntityPtr createLayoutItemListEntity(const QnResourcePtr& layoutResource) const;
 
-    AbstractEntityPtr createDialogEntities(ResourceTree::ResourceFilters resourceTypes,
+    AbstractEntityPtr createDialogEntities(core::ResourceTree::ResourceFilters resourceTypes,
         bool alwaysCreateGroupElements = false, bool combineWebPagesAndIntegrations = false) const;
 
     AbstractEntityPtr addPinnedItem(

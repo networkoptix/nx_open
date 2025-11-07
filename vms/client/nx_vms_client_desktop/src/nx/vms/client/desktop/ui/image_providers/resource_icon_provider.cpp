@@ -6,7 +6,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
 
@@ -14,17 +14,17 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-QIcon::Mode iconMode(ResourceTree::ItemState itemState)
+QIcon::Mode iconMode(core::ResourceTree::ItemState itemState)
 {
     switch (itemState)
     {
-        case ResourceTree::ItemState::normal:
+        case core::ResourceTree::ItemState::normal:
             return QIcon::Normal;
 
-        case ResourceTree::ItemState::selected:
+        case core::ResourceTree::ItemState::selected:
             return QIcon::Selected;
 
-        case ResourceTree::ItemState::accented:
+        case core::ResourceTree::ItemState::accented:
             return QIcon::Active;
 
         default:
@@ -47,8 +47,9 @@ QPixmap ResourceIconProvider::requestPixmap(
     if (!NX_ASSERT(keyInt, "Incorrect id"))
         return {};
 
-    const auto mode = iconMode(path.empty() ? ResourceTree::ItemState::normal
-                                            : ResourceTree::ItemState(path.takeFirst().toInt()));
+    const auto mode = iconMode(path.empty()
+        ? core::ResourceTree::ItemState::normal
+        : core::ResourceTree::ItemState(path.takeFirst().toInt()));
 
     core::SvgIconColorer::ThemeSubstitutions overriddenColors;
     for (const auto& queryValue: queryItems)

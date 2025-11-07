@@ -15,12 +15,12 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/models/camera_list_model.h>
 #include <ui/models/resource_search_proxy_model.h>
@@ -248,7 +248,8 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint&
     if (!resources.isEmpty())
     {
         menu::Parameters parameters(resources);
-        parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
+        parameters.setArgument(nx::vms::client::core::NodeTypeRole,
+            nx::vms::client::core::ResourceTree::NodeType::resource);
 
         // We'll be changing hotkeys, so we cannot reuse global actions.
         menu.reset(this->menu()->newMenu(

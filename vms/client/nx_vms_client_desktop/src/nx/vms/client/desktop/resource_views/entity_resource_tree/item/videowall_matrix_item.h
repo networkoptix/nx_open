@@ -5,14 +5,14 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_matrix.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class VideoWallMatrixItem: public entity_item_model::AbstractItem
+class VideoWallMatrixItem: public core::entity_item_model::AbstractItem
 {
-    using base_type = entity_item_model::AbstractItem;
+    using base_type = core::entity_item_model::AbstractItem;
 public:
     VideoWallMatrixItem(const QnVideoWallResourcePtr& videoWall, const nx::Uuid& matrixId);
 

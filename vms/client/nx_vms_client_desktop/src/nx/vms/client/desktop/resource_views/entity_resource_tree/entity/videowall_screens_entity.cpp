@@ -3,7 +3,7 @@
 #include "videowall_screens_entity.h"
 
 #include <core/resource/videowall_resource.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item_order/item_order.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item_order/item_order.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -12,7 +12,7 @@ VideoWallScreensEntity::VideoWallScreensEntity(
     const VideoWallScreenItemCreator& itemCreator,
     const QnVideoWallResourcePtr& videoWall)
     :
-    base_type(itemCreator, entity_item_model::numericOrder())
+    base_type(itemCreator, core::entity_item_model::numericOrder())
 {
     setItems(videoWall->items()->getItems().keys().toVector());
 

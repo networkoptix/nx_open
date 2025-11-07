@@ -8,15 +8,15 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_model_adapter.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 
 namespace nx::vms::client::desktop {
@@ -55,9 +55,9 @@ public:
         return findIndexRecursively({}, core::ResourceRole, QVariant::fromValue(resource));
     }
 
-    QModelIndex indexOf(ResourceTree::NodeType nodeType) const
+    QModelIndex indexOf(core::ResourceTree::NodeType nodeType) const
     {
-        return findIndexRecursively({}, Qn::NodeTypeRole, QVariant::fromValue(nodeType));
+        return findIndexRecursively({}, core::NodeTypeRole, QVariant::fromValue(nodeType));
     }
 
     QModelIndex indexOf(const QString& displayedName) const
@@ -106,10 +106,10 @@ private:
         addTestResource(addVideoWall(), "VideoWall1");
         addTestResource(addVideoWall(), "VideoWall2");
 
-        entity_resource_tree::resource_grouping::setResourceCustomGroupId(
+        core::entity_resource_tree::resource_grouping::setResourceCustomGroupId(
             testResources.value("Camera1"), "Group1");
 
-        entity_resource_tree::resource_grouping::setResourceCustomGroupId(
+        core::entity_resource_tree::resource_grouping::setResourceCustomGroupId(
             testResources.value("Camera2"), "Group1");
     }
 
@@ -122,6 +122,8 @@ private:
 
     void createResourceTreeModel()
     {
+        using namespace nx::vms::client::core;
+
         resourceTreeModel.reset(new ResourceSelectionModelAdapter());
 
         resourceTreeModel->setResourceTypes(

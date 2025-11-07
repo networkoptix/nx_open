@@ -21,6 +21,7 @@
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/log_strings_format.h>
@@ -34,7 +35,6 @@
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -942,17 +942,19 @@ void EventLogDialog::at_filterAction_triggered()
 
 void EventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 {
+    using namespace nx::vms::client::core;
+
     QScopedPointer<QMenu> menu;
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid())
     {
-        QnResourcePtr resource = m_model->data(idx, core::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr resource = m_model->data(idx, ResourceRole).value<QnResourcePtr>();
         auto manager = this->menu();
         if (resource && systemContext()->accessController()->hasPermissions(resource,
             Qn::ViewContentPermission))
         {
             menu::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
+            parameters.setArgument(NodeTypeRole, ResourceTree::NodeType::resource);
 
             menu.reset(manager->newMenu(menu::TreeScope, this, parameters));
             for (QAction* action: menu->actions())

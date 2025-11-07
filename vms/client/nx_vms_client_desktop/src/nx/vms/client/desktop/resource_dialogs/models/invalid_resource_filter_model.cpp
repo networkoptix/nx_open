@@ -3,7 +3,7 @@
 #include "invalid_resource_filter_model.h"
 
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 
 namespace nx::vms::client::desktop {
 

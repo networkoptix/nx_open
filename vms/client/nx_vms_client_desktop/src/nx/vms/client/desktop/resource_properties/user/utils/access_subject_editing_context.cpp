@@ -24,8 +24,8 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/common/system_context.h>
 
 #include "proxy_access_rights_manager.h"
@@ -103,7 +103,9 @@ void fetchChildResourcesRecursively(const QModelIndex& parentIndex, QSet<QnResou
 
 ResourceAccessTarget accessTarget(const QModelIndex& resourceTreeModelIndex)
 {
-    const auto nodeTypeVar = resourceTreeModelIndex.data(Qn::NodeTypeRole);
+    using namespace nx::vms::client::core;
+
+    const auto nodeTypeVar = resourceTreeModelIndex.data(NodeTypeRole);
     if (nodeTypeVar.isValid())
     {
         const auto nodeType = nodeTypeVar.value<ResourceTree::NodeType>();
@@ -111,7 +113,7 @@ ResourceAccessTarget accessTarget(const QModelIndex& resourceTreeModelIndex)
             return ResourceAccessTarget(AccessSubjectEditingContext::specialResourceGroup(nodeType));
     }
 
-    const auto resource = resourceTreeModelIndex.data(core::ResourceRole).value<QnResourcePtr>();
+    const auto resource = resourceTreeModelIndex.data(ResourceRole).value<QnResourcePtr>();
     return ResourceAccessTarget(resource);
 }
 
@@ -756,8 +758,11 @@ nx::Uuid AccessSubjectEditingContext::specialResourceGroupFor(const QnResourcePt
     return {};
 }
 
-nx::Uuid AccessSubjectEditingContext::specialResourceGroup(ResourceTree::NodeType nodeType)
+nx::Uuid AccessSubjectEditingContext::specialResourceGroup(
+    nx::vms::client::core::ResourceTree::NodeType nodeType)
 {
+    using namespace nx::vms::client::core;
+
     switch (nodeType)
     {
         case ResourceTree::NodeType::camerasAndDevices:
@@ -879,6 +884,8 @@ Qt::CheckState AccessSubjectEditingContext::combinedOwnCheckState(
 QnResourceList AccessSubjectEditingContext::selectionLayouts(
     const QModelIndexList& selection) const
 {
+    using namespace nx::vms::client::core;
+
     const auto currentUser = accessController()->user();
     if (!NX_ASSERT(currentUser))
         return {};
@@ -888,11 +895,11 @@ QnResourceList AccessSubjectEditingContext::selectionLayouts(
     QnLayoutResourceList result;
     for (const auto& index: selection)
     {
-        const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+        const auto nodeType = index.data(NodeTypeRole).value<ResourceTree::NodeType>();
         if (nodeType == ResourceTree::NodeType::layouts)
         {
-            return resourcePool()->getResources<core::LayoutResource>(
-                [this, &currentUserId](const core::LayoutResourcePtr& layout) -> bool
+            return resourcePool()->getResources<LayoutResource>(
+                [this, &currentUserId](const LayoutResourcePtr& layout) -> bool
                 {
                     if (layout->isFile())
                         return false;
@@ -902,7 +909,7 @@ QnResourceList AccessSubjectEditingContext::selectionLayouts(
                 });
         }
 
-        if (const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>())
+        if (const auto resource = index.data(ResourceRole).value<QnResourcePtr>())
         {
             if (const auto layout = resource.objectCast<QnLayoutResource>())
                 result.push_back(layout);
@@ -1004,10 +1011,12 @@ bool AccessSubjectEditingContext::isRequiredFor(int /*AccessRight*/ what, Access
 ResourceAccessTreeItem AccessSubjectEditingContext::resourceAccessTreeItemInfo(
     const QModelIndex& resourceTreeModelIndex)
 {
+    using namespace nx::vms::client::core;
+
     if (!resourceTreeModelIndex.isValid())
         return {};
 
-    const auto resource = resourceTreeModelIndex.data(core::ResourceRole).value<QnResourcePtr>();
+    const auto resource = resourceTreeModelIndex.data(ResourceRole).value<QnResourcePtr>();
 
     if (resource)
     {
@@ -1020,7 +1029,7 @@ ResourceAccessTreeItem AccessSubjectEditingContext::resourceAccessTreeItemInfo(
     }
 
     const auto nodeType =
-        resourceTreeModelIndex.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+        resourceTreeModelIndex.data(NodeTypeRole).value<ResourceTree::NodeType>();
 
     const auto specialResourceGroupId = specialResourceGroup(nodeType);
     if (!specialResourceGroupId.isNull())
@@ -1033,7 +1042,7 @@ ResourceAccessTreeItem AccessSubjectEditingContext::resourceAccessTreeItemInfo(
     }
 
     const auto topLevel = topLevelIndex(resourceTreeModelIndex);
-    const auto topLevelNodeType = topLevel.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    const auto topLevelNodeType = topLevel.data(NodeTypeRole).value<ResourceTree::NodeType>();
 
     if (topLevelNodeType == ResourceTree::NodeType::layouts)
     {

@@ -7,11 +7,11 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -20,7 +20,7 @@
 
 namespace {
 
-using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
+using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 
 } // namespace
 
@@ -104,7 +104,7 @@ void ResourceDialogItemDelegate::initStyleOption(
 
         const auto itemIsSelected = option->state.testFlag(QStyle::State_Selected);
         option->palette.setColor(QPalette::PlaceholderText,
-            itemIsSelected || index.data(Qn::ForceExtraInfoRole).toBool() ? kSelectedExtraTextColor
+            itemIsSelected || index.data(core::ForceExtraInfoRole).toBool() ? kSelectedExtraTextColor
                                                                           : kExtraTextColor);
     }
 
@@ -155,7 +155,7 @@ void ResourceDialogItemDelegate::paintItemText(
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget)
         .adjusted(textPadding, 0, -textPadding, 0);
 
-    const auto showExtraInfo = index.data(Qn::ForceExtraInfoRole).toBool()
+    const auto showExtraInfo = index.data(core::ForceExtraInfoRole).toBool()
         || appContext()->localSettings()->resourceInfoLevel() == Qn::RI_FullInfo;
 
     // Draw background.
@@ -188,7 +188,7 @@ void ResourceDialogItemDelegate::paintItemText(
         return;
 
     // Draw extra text.
-    if (auto extraText = showExtraInfo ? index.data(Qn::ExtraInfoRole).toString() : QString();
+    if (auto extraText = showExtraInfo ? index.data(core::ExtraInfoRole).toString() : QString();
         !extraText.isEmpty())
     {
         QnScopedPainterPenRollback penRollback(painter, extraTextColor);
@@ -252,9 +252,9 @@ void ResourceDialogItemDelegate::paintRecordingIndicator(
     if (!index.model())
         return;
 
-    const auto extraStatus = index.data(Qn::ResourceExtraStatusRole).value<ResourceExtraStatus>();
+    const auto extraStatus = index.data(core::ResourceExtraStatusRole).value<core::ResourceExtraStatus>();
 
-    if (extraStatus == ResourceExtraStatus())
+    if (extraStatus == core::ResourceExtraStatus())
         return;
 
     const auto nodeHasChildren =

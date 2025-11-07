@@ -58,7 +58,7 @@ struct TableViewColumnsCalculator::Private
                 QModelIndex index = model->index(row, col);
                 QVariantMap modelData = {
                     {"display", index.data(Qt::DisplayRole)},
-                    {"iconKey", index.data(Qn::ResourceIconKeyRole)},
+                    {"iconKey", index.data(core::ResourceIconKeyRole)},
                     {"colors", index.data(Qt::ForegroundRole)},
                     };
                 QVariantMap properties = {

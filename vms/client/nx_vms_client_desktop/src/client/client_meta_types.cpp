@@ -54,7 +54,6 @@
 #include <nx/vms/client/desktop/resource_properties/user/models/resource_access_rights_model.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_rights_list.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/limited_model.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/item_view_drag_and_drop_scroll_assist.h>
 #include <nx/vms/client/desktop/rules/model_view/key_value_model.h>
 #include <nx/vms/client/desktop/rules/model_view/rules_sort_filter_proxy_model.h>
@@ -179,7 +178,6 @@ void initializeMetatypesInternal()
     qRegisterMetaType<Qt::KeyboardModifiers>();
     qRegisterMetaType<QVector<QColor> >();
     qRegisterMetaType<QValidator::State>();
-    qRegisterMetaType<ResourceTree::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<Qn::ItemDataRole>();
     qRegisterMetaType<workbench::timeline::ThumbnailPtr>();
@@ -242,7 +240,6 @@ void registerQmlTypesInternal()
     ResourceTreeModelAdapter::registerQmlType();
     ResourceStatusHelper::registerQmlType();
     RightPanel::registerQmlType();
-    ResourceTree::registerQmlType();
     ItemModelUtils::registerQmlType();
     ListNavigationHelper::registerQmlType();
     ItemGrabber::registerQmlType();

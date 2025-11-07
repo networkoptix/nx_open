@@ -5,14 +5,13 @@
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <utils/common/checked_cast.h>
 
 using namespace nx::vms::client::core;
-using namespace nx::vms::client::desktop;
 
-QnResourceListModel::QnResourceListModel(QObject *parent) :
+QnResourceListModel::QnResourceListModel(QObject* parent):
     base_type(parent)
 {
 }
@@ -241,11 +240,11 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
 
         case ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(resource);
-        case Qn::ResourceFlagsRole:
+        case ResourceFlagsRole:
             return static_cast<int>(resource->flags());
         case ResourceStatusRole:
             return static_cast<int>(resource->getStatus());
-        case Qn::NodeTypeRole:
+        case NodeTypeRole:
             return m_options.testFlag(ServerAsHealthMonitorOption)
                 ? QVariant::fromValue(ResourceTree::NodeType::layoutItem)
                 : QVariant::fromValue(ResourceTree::NodeType::resource);

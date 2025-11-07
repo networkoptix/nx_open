@@ -15,8 +15,8 @@ namespace nx::vms::client::desktop { class Workbench; }
  * Delegate for displaying resources in resource tree.
  * It uses the following roles from the model:
  *  - Qt::DisplayRole base name for resource
- *  - core::ResourceRole resource pointer, QnResourcePtr
- *  - Qn::NodeTypeRole type of the node in resource tree, ResourceTree::NodeType
+ *  - ResourceRole resource pointer, QnResourcePtr
+ *  - NodeTypeRole type of the node in resource tree, ResourceTree::NodeType
  */
 class QnResourceItemDelegate: public QStyledItemDelegate
 {

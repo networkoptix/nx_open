@@ -3,8 +3,8 @@
 #include "workbench_action_handler.h"
 
 #include <QtCore/QProcess>
-#include <QtCore/QScopeGuard>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QScopeGuard>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImage>
 #include <QtGui/QImageWriter>
@@ -69,6 +69,8 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/cloud_service_checker.h>
@@ -99,8 +101,6 @@
 #include <nx/vms/client/desktop/resource_properties/camera/dialogs/camera_credentials_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/media_file/media_file_settings_dialog.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
@@ -2685,10 +2685,10 @@ bool ActionHandler::validateResourceName(const QnResourcePtr& resource, const QS
 
 void ActionHandler::at_renameAction_triggered()
 {
-    using NodeType = ResourceTree::NodeType;
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 
     const auto parameters = menu()->currentParameters(sender());
-    const auto nodeType = parameters.argument<NodeType>(Qn::NodeTypeRole, NodeType::resource);
+    const auto nodeType = parameters.argument<NodeType>(core::NodeTypeRole, NodeType::resource);
 
     QnResourcePtr resource;
     switch (nodeType)

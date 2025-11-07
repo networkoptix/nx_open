@@ -14,6 +14,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
@@ -25,7 +26,6 @@
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <storage/server_storage_manager.h>
@@ -413,8 +413,8 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
     {
         for (auto index: selectedIndexes)
         {
-            if (auto resource =
-                table->model()->data(index, nx::vms::client::core::ResourceRole).value<QnResourcePtr>())
+            if (auto resource = table->model()->data(index, nx::vms::client::core::ResourceRole)
+                .value<QnResourcePtr>())
             {
                 selectedResources.append(resource);
             }
@@ -424,7 +424,8 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
     if (!selectedResources.empty())
     {
         menu::Parameters parameters(selectedResources);
-        parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
+        parameters.setArgument(nx::vms::client::core::NodeTypeRole,
+            nx::vms::client::core::ResourceTree::NodeType::resource);
         auto manager = this->menu();
         menu.reset(manager->newMenu(
             menu::TreeScope,

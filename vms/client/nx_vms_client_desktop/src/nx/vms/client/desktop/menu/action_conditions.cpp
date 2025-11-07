@@ -39,6 +39,8 @@
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -50,8 +52,6 @@
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
@@ -652,8 +652,10 @@ ActionVisibility ResourceRemovalCondition::check(
     const Parameters& parameters,
     WindowContext* context)
 {
+    using namespace nx::vms::client::core;
+
     const auto nodeType = parameters.argument<ResourceTree::NodeType>(
-        Qn::NodeTypeRole,
+        core::NodeTypeRole,
         ResourceTree::NodeType::resource);
 
     if (nodeType == ResourceTree::NodeType::sharedLayout
@@ -723,7 +725,9 @@ ActionVisibility ResourceRemovalCondition::check(
 
 ActionVisibility RenameResourceCondition::check(const Parameters& parameters, WindowContext* /*context*/)
 {
-    const auto nodeType = parameters.argument<ResourceTree::NodeType>(Qn::NodeTypeRole,
+    using namespace nx::vms::client::core;
+
+    const auto nodeType = parameters.argument<ResourceTree::NodeType>(core::NodeTypeRole,
         ResourceTree::NodeType::resource);
 
     switch (nodeType)
@@ -1140,10 +1144,12 @@ ActionVisibility CreateZoomWindowCondition::check(const QnResourceWidgetList& wi
 
 ActionVisibility NewUserLayoutCondition::check(const Parameters& parameters, WindowContext* context)
 {
-    if (!parameters.hasArgument(Qn::NodeTypeRole))
+    using namespace nx::vms::client::core;
+
+    if (!parameters.hasArgument(core::NodeTypeRole))
         return InvisibleAction;
 
-    const auto nodeType = parameters.argument(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    const auto nodeType = parameters.argument(core::NodeTypeRole).value<ResourceTree::NodeType>();
 
     /* Create layout for self. */
     if (nodeType == ResourceTree::NodeType::layouts)
@@ -1715,14 +1721,16 @@ ActionVisibility ReachableServerCondition::check(
 ActionVisibility HideServersInTreeCondition::check(
     const Parameters& parameters, WindowContext* context)
 {
+    using namespace nx::vms::client::core;
+
     const bool isLoggedIn = !context->system()->accessController()->user().isNull();
     if (!isLoggedIn)
         return InvisibleAction;
 
-    if (!parameters.hasArgument(Qn::NodeTypeRole))
+    if (!parameters.hasArgument(core::NodeTypeRole))
         return InvisibleAction;
 
-    const auto nodeType = parameters.argument(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    const auto nodeType = parameters.argument(core::NodeTypeRole).value<ResourceTree::NodeType>();
     if (nodeType == ResourceTree::NodeType::servers)
         return EnabledAction;
 
@@ -1744,14 +1752,16 @@ ActionVisibility ToggleProxiedResourcesCondition::check(
     const Parameters& parameters,
     WindowContext* context)
 {
+    using namespace nx::vms::client::core;
+
     const bool isLoggedIn = !context->system()->accessController()->user().isNull();
     if (!isLoggedIn)
         return InvisibleAction;
 
-    if (!parameters.hasArgument(Qn::NodeTypeRole))
+    if (!parameters.hasArgument(core::NodeTypeRole))
         return InvisibleAction;
 
-    const auto nodeType = parameters.argument(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    const auto nodeType = parameters.argument(core::NodeTypeRole).value<ResourceTree::NodeType>();
     if (nodeType == ResourceTree::NodeType::servers
         || nodeType == ResourceTree::NodeType::camerasAndDevices)
     {
@@ -1823,7 +1833,8 @@ ActionVisibility CreateNewResourceTreeGroupCondition::check(
     const Parameters& parameters,
     WindowContext* /*context*/)
 {
-    using namespace entity_resource_tree::resource_grouping;
+    using namespace nx::vms::client::core;
+    using namespace nx::vms::client::core::entity_resource_tree::resource_grouping;
 
     const auto resources = parameters.resources();
     if (resources.empty())
@@ -2026,18 +2037,18 @@ ConditionWrapper hasVideo(MatchMode matchMode, bool value)
         }, matchMode);
 }
 
-ConditionWrapper treeNodeType(QSet<ResourceTree::NodeType> types)
+ConditionWrapper treeNodeType(QSet<core::ResourceTree::NodeType> types)
 {
     return new CustomBoolCondition(
         [types](const Parameters& parameters, WindowContext* /*context*/)
         {
             // Actions, triggered manually or from scene, must not check node type
-            return !parameters.hasArgument(Qn::NodeTypeRole)
-                || types.contains(parameters.argument(Qn::NodeTypeRole).value<ResourceTree::NodeType>());
+            return !parameters.hasArgument(core::NodeTypeRole)
+                || types.contains(parameters.argument(core::NodeTypeRole).value<core::ResourceTree::NodeType>());
         });
 }
 
-ConditionWrapper parentTreeNodeType(ResourceTree::NodeType type)
+ConditionWrapper parentTreeNodeType(core::ResourceTree::NodeType type)
 {
     return new CustomBoolCondition(
         [type](const Parameters& parameters, WindowContext* /*context*/)
@@ -2046,7 +2057,7 @@ ConditionWrapper parentTreeNodeType(ResourceTree::NodeType type)
                 return false;
 
             return type
-                == parameters.argument(Qn::ParentNodeTypeRole).value<ResourceTree::NodeType>();
+                == parameters.argument(Qn::ParentNodeTypeRole).value<core::ResourceTree::NodeType>();
         });
 }
 

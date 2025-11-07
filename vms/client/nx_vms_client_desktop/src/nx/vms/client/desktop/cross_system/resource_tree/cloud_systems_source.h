@@ -3,12 +3,12 @@
 #pragma once
 
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_source.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_source.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class CloudSystemsSource: public nx::vms::client::desktop::entity_item_model::UniqueStringSource
+class CloudSystemsSource: public core::entity_item_model::UniqueStringSource
 {
 public:
     CloudSystemsSource();

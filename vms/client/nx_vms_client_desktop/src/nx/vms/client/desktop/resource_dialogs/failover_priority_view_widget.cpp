@@ -16,7 +16,7 @@
 
 namespace {
 
-using AbstractEntityPtr = nx::vms::client::desktop::entity_item_model::AbstractEntityPtr;
+using AbstractEntityPtr = nx::vms::client::core::entity_item_model::AbstractEntityPtr;
 using ResourceTreeEntityBuilder =
     nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder;
 

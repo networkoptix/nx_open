@@ -6,10 +6,12 @@
 #include <core/resource/resource.h>
 #include <core/resource/webpage_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/webpage/web_page_data_cache.h>
 
 namespace nx::vms::client::desktop::entity_resource_tree {
+
+using namespace nx::vms::client::core;
 
 WebPageDecorator::WebPageDecorator(
     entity_item_model::AbstractItemPtr sourceItem,
@@ -56,13 +58,13 @@ QVariant WebPageDecorator::data(int role) const
             return iconPath ? iconPath->toString() : QVariant{};
         }
 
-        case Qn::NodeTypeRole:
+        case core::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::resource);
 
-        case Qn::ForceExtraInfoRole:
+        case core::ForceExtraInfoRole:
             return m_hasPowerUserPermissions;
 
-        case Qn::ExtraInfoRole:
+        case core::ExtraInfoRole:
         {
             if (!m_hasPowerUserPermissions)
                 return {};

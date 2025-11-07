@@ -8,15 +8,15 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/access_rights_types.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class MainTreeResourceItemDecorator: public entity_item_model::AbstractItem
+class MainTreeResourceItemDecorator: public core::entity_item_model::AbstractItem
 {
-    using base_type = entity_item_model::AbstractItem;
+    using base_type = core::entity_item_model::AbstractItem;
 
 public:
     struct Permissions
@@ -27,9 +27,9 @@ public:
 
 public:
     MainTreeResourceItemDecorator(
-        entity_item_model::AbstractItemPtr sourceItem,
+        core::entity_item_model::AbstractItemPtr sourceItem,
         Permissions permissions,
-        ResourceTree::NodeType nodeType,
+        core::ResourceTree::NodeType nodeType,
         const std::optional<nx::Uuid>& itemUuid = std::optional<nx::Uuid>());
 
     virtual QVariant data(int role) const override;
@@ -41,9 +41,9 @@ public:
     void setPermissions(Permissions permissions);
 
 private:
-    entity_item_model::AbstractItemPtr m_sourceItem;
+    core::entity_item_model::AbstractItemPtr m_sourceItem;
     Permissions m_permissions;
-    ResourceTree::NodeType m_nodeType;
+    core::ResourceTree::NodeType m_nodeType;
     std::optional<nx::Uuid> m_itemUuid;
     nx::utils::ScopedConnections m_connections;
 };

@@ -10,11 +10,11 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/composition_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_drag_drop_decorator_model.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -22,6 +22,8 @@
 #include <ui/workbench/handlers/workbench_action_handler.h>
 
 namespace nx::vms::client::desktop {
+
+using namespace nx::vms::client::core;
 
 struct ResourceSelectionModelAdapter::Private
 {
@@ -101,7 +103,7 @@ struct ResourceSelectionModelAdapter::Private
 
         if (isExtraInfoRequired)
         {
-            const auto extraInfo = sourceIndex.data(Qn::ExtraInfoRole).toString();
+            const auto extraInfo = sourceIndex.data(core::ExtraInfoRole).toString();
             return extraInfo.contains(filterText, Qt::CaseInsensitive);
         }
 
@@ -320,7 +322,7 @@ QVariant ResourceSelectionModelAdapter::data(const QModelIndex& index, int role)
 
     switch (role)
     {
-        case Qn::ResourceExtraStatusRole:
+        case core::ResourceExtraStatusRole:
             return (int) base_type::data(index, role).value<ResourceExtraStatus>();
 
         case Qn::RawResourceRole:
@@ -379,7 +381,7 @@ void ResourceSelectionModelAdapter::registerQmlType()
     qmlRegisterType<ResourceSelectionModelAdapter>(
         "nx.vms.client.desktop", 1, 0, "ResourceSelectionModel");
     qRegisterMetaType<IsIndexAccepted>();
-    qRegisterMetaType<QSet<nx::vms::client::desktop::ResourceTree::NodeType>>();
+    qRegisterMetaType<QSet<nx::vms::client::core::ResourceTree::NodeType>>();
 }
 
 } // namespace nx::vms::client::desktop

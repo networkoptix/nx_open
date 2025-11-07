@@ -72,7 +72,17 @@ enum CoreItemDataRole
     HasTitleImageRole,              /** Role for analytics object title image presence (bool). */
     ObjectTypeIdRole,
 
-    CoreItemDataRoleCount
+    /* Tree-based. */
+    NodeTypeRole,                   /**< Role for node type, see <tt>ResourceTree::NodeType</tt>. */
+    FlattenedRole,                  /**< Role for node-controlled flattening control in the resource tree (bool). See FlatteningGroupEntity for the details. */
+    ResourceExtraStatusRole,        /**< Custom resource status (recording, buggy, etc). Value of ResourceExtraStatus. */
+    ResourceFlagsRole,              /**< Role for resource flags. Value of type int (Qn::ResourceFlags). */
+    ResourceIconKeyRole,            /**< Role for resource custom icon key. Value of type int. */
+    ResourceLogInfoRole,            /**< Role for extended string description of resource from resource tree. (QString) */
+    ExtraInfoRole,                  /**< Role for extra resource information in the tree (QString). */
+    ForceExtraInfoRole,             /**< Role for forcing extra resource information in the tree (bool). */
+
+    CoreItemDataRoleCount,
 };
 
 //** Returns role id to text name mapping for the some roles. */

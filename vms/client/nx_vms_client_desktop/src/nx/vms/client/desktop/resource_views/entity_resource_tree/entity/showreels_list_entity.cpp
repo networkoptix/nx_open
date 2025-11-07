@@ -3,7 +3,7 @@
 #include "showreels_list_entity.h"
 
 #include <nx/vms/api/data/showreel_data.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item_order/item_order.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item_order/item_order.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 
 namespace nx::vms::client::desktop {
@@ -15,7 +15,7 @@ ShowreelsListEntity::ShowreelsListEntity(
     const ShowreelItemCreator& showreelItemCreator,
     const common::ShowreelManager* showreelManager)
     :
-    base_type(showreelItemCreator, entity_item_model::numericOrder())
+    base_type(showreelItemCreator, core::entity_item_model::numericOrder())
 {
     const auto showreels = showreelManager->showreels();
 

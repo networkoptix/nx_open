@@ -14,19 +14,20 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/base_notification_observer.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/composition_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/flattening_group_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/group_grouping_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/grouping_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/single_item_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_group_list_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_list_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/base_notification_observer.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/flattening_group_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/group_grouping_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/grouping_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/single_item_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_group_list_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_list_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/camera_resource_index.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/entity/layout_item_list_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/entity/showreels_list_entity.h>
@@ -38,7 +39,6 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/web_page_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item_order/resource_tree_item_order.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/recorder_item_data_helper.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_tree_item_key_source_pool.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_item_factory.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/user_layout_resource_index.h>
@@ -46,11 +46,13 @@
 #include <nx/vms/common/system_settings.h>
 
 using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 namespace {
 
-using namespace entity_item_model;
-using namespace entity_resource_tree;
+using namespace nx::vms::client::core::entity_item_model;
+using namespace nx::vms::client::core::entity_resource_tree;
+using namespace nx::vms::client::desktop::entity_resource_tree;
 using namespace nx::vms::api;
 
 using NodeType = ResourceTree::NodeType;

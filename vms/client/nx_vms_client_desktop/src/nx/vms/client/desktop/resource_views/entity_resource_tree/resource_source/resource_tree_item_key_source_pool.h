@@ -3,7 +3,7 @@
 #pragma once
 
 #include <core/resource_access/resource_access_subject.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_source.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_source.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
@@ -16,9 +16,9 @@ class WebPageResourceIndex;
 
 class NX_VMS_CLIENT_DESKTOP_API ResourceTreeItemKeySourcePool: public SystemContextAware
 {
-    using UniqueResourceSourcePtr = entity_item_model::UniqueResourceSourcePtr;
-    using UniqueUuidSourcePtr = entity_item_model::UniqueUuidSourcePtr;
-    using UniqueStringSourcePtr = entity_item_model::UniqueStringSourcePtr;
+    using UniqueResourceSourcePtr = core::entity_item_model::UniqueResourceSourcePtr;
+    using UniqueUuidSourcePtr = core::entity_item_model::UniqueUuidSourcePtr;
+    using UniqueStringSourcePtr = core::entity_item_model::UniqueStringSourcePtr;
 
 public:
     ResourceTreeItemKeySourcePool(

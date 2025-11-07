@@ -10,7 +10,7 @@
 #include <core/ptz/ptz_constants.h>
 #include <core/ptz/ptz_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 
 #include "action_fwd.h"
 #include "action_parameter_types.h"
@@ -647,13 +647,13 @@ ConditionWrapper hasFlags(Qn::ResourceFlags includeFlags, Qn::ResourceFlags excl
 /** Target resources have the video stream. */
 ConditionWrapper hasVideo(MatchMode matchMode, bool value = true);
 
-ConditionWrapper treeNodeType(QSet<ResourceTree::NodeType> types);
-inline ConditionWrapper treeNodeType(ResourceTree::NodeType type)
+ConditionWrapper treeNodeType(QSet<core::ResourceTree::NodeType> types);
+inline ConditionWrapper treeNodeType(core::ResourceTree::NodeType type)
 {
-    return treeNodeType(QSet<ResourceTree::NodeType>{type});
+    return treeNodeType(QSet<core::ResourceTree::NodeType>{type});
 }
 
-ConditionWrapper parentTreeNodeType(ResourceTree::NodeType type);
+ConditionWrapper parentTreeNodeType(core::ResourceTree::NodeType type);
 
 /** Visible in Showreel preview mode only. */
 ConditionWrapper isShowreelReviewMode();

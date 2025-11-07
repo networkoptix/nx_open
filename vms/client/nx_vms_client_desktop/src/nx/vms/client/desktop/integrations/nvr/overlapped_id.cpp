@@ -86,7 +86,7 @@ void OverlappedIdIntegration::registerActions(menu::MenuFactory* factory)
         .text(tr("Overlapped ID..."))
         .requiredTargetPermissions(Qn::Permission::ViewFootagePermission)
         .condition(condition::hasFlags(Qn::live_cam, /*exclude*/ Qn::removed, MatchMode::any)
-            && condition::treeNodeType(ResourceTree::NodeType::recorder)
+            && condition::treeNodeType(core::ResourceTree::NodeType::recorder)
             && ConditionWrapper(new IsNvrNodeCondition())
         )
         .action();

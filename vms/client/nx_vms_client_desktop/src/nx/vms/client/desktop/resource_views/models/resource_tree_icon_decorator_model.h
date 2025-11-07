@@ -10,7 +10,7 @@ namespace nx::vms::client::desktop {
 
 /**
 * Decorator model which provides icon by Qt::DecorationRole if source model provides valid data
-* by Qn::ResourceIconKeyRole. Any testable model shouldn't provide icons itself, since
+* by ResourceIconKeyRole. Any testable model shouldn't provide icons itself, since
 * QnResourceIconCache class isn't and shouldn't be instantiated within testing environment.
 */
 class ResourceTreeIconDecoratorModel: public QIdentityProxyModel

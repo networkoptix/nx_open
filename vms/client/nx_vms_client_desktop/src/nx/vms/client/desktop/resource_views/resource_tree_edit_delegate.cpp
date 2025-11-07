@@ -11,14 +11,14 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 
 using namespace nx::vms::client;
-using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
+using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 using ActionId = nx::vms::client::desktop::menu::IDType;
 using ActionParameters = nx::vms::client::desktop::menu::Parameters;
 
@@ -30,7 +30,7 @@ QnResourceList childIndexesResources(const QModelIndex& index, bool recursive)
     if (recursive)
         matchFlags.setFlag(Qt::MatchRecursive);
 
-    auto childResourceIndexes = index.model()->match(index.model()->index(0, 0, index), Qn::NodeTypeRole,
+    auto childResourceIndexes = index.model()->match(index.model()->index(0, 0, index), core::NodeTypeRole,
         QVariant::fromValue<NodeType>(NodeType::resource), -1, matchFlags);
 
     QnResourceList result;
@@ -144,6 +144,8 @@ namespace nx::vms::client::desktop {
 
 TreeEditDelegate createResourceTreeEditDelegate(WindowContext* context)
 {
+    using namespace nx::vms::client::core;
+
     return
         [context](const QModelIndex& index, const QVariant& value)
         {
@@ -154,7 +156,7 @@ TreeEditDelegate createResourceTreeEditDelegate(WindowContext* context)
             if (!NX_ASSERT(!stringValue.isEmpty(), "Value with non-empty string representation expected"))
                 return false;
 
-            QVariant nodeTypeData = index.data(Qn::NodeTypeRole);
+            QVariant nodeTypeData = index.data(core::NodeTypeRole);
             if (!NX_ASSERT(!nodeTypeData.isNull(), "Model should provide node type"))
                 return false;
 
@@ -169,7 +171,7 @@ TreeEditDelegate createResourceTreeEditDelegate(WindowContext* context)
                 nodeType,
                 context->system()->resourcePool());
             parameters.setArgument(core::ResourceNameRole, stringValue);
-            parameters.setArgument(Qn::NodeTypeRole, nodeType);
+            parameters.setArgument(core::NodeTypeRole, nodeType);
 
             // View state should be updated before triggering any actions if item editor was closed
             // by interaction with tree view.

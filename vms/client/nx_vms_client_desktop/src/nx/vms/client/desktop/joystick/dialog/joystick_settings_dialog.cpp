@@ -11,14 +11,14 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/core/utils/qml_property.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -36,7 +36,7 @@
 
 namespace nx::vms::client::desktop {
 
-using namespace entity_item_model;
+using namespace nx::vms::client::core::entity_item_model;
 using namespace entity_resource_tree;
 using namespace joystick;
 

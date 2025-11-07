@@ -13,6 +13,7 @@ namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
 using namespace nx::vms::api;
+using namespace nx::vms::client::core;
 
 ShowreelItem::ShowreelItem(const common::ShowreelManager* showreelManager, const nx::Uuid& id):
     base_type()
@@ -32,10 +33,10 @@ QVariant ShowreelItem::data(int role) const
         case Qt::EditRole:
             return m_showreel.name;
 
-        case Qn::ResourceIconKeyRole:
+        case core::ResourceIconKeyRole:
             return QVariant::fromValue<int>(QnResourceIconCache::Showreel);
 
-        case Qn::NodeTypeRole:
+        case core::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::showreel);
 
         case core::UuidRole:

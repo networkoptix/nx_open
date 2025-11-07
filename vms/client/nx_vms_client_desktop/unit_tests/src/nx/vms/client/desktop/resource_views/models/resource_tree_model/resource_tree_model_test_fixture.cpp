@@ -23,8 +23,8 @@
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/client_camera_resource_stub.h>
 #include <nx/vms/client/desktop/test_support/message_processor_mock.h>
@@ -41,6 +41,7 @@ namespace test {
 
 using namespace nx::vms::api;
 using namespace index_condition;
+using namespace nx::vms::client::core;
 
 void ResourceTreeModelTest::SetUp()
 {

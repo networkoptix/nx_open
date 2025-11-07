@@ -8,7 +8,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 #include "../details/node/view_node.h"
@@ -86,7 +86,7 @@ ViewNodeData getResourceNodeData(
         .withText(resourceColumn, resource->getName())
         .withIcon(resourceColumn, icon)
         .withData(resourceColumn, resourceExtraStatusRole,
-            QVariant::fromValue(getResourceExtraStatus(resource)))
+            QVariant::fromValue(core::getResourceExtraStatus(resource)))
         .data();
 
     if (!extraText.isEmpty())

@@ -4,18 +4,20 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 #include "resource_tree_model_test_fixture.h"
 
 using namespace nx::vms::api;
+using namespace nx::vms::client::core;
 
 namespace nx::vms::client::desktop {
 namespace test {
 
 using namespace index_condition;
+using nx::vms::client::core::ResourceTree::NodeType;
 
 // String constants.
 static constexpr auto kUniqueCameraName = "unique_camera_name";

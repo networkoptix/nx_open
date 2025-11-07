@@ -9,13 +9,13 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/core/common/models/filter_proxy_model.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 
 namespace nx::utils { class PendingOperation; }
 
 struct QnResourceSearchQuery
 {
-    using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 
     static constexpr NodeType kAllowAllNodeTypes = NodeType::root;
 
@@ -55,7 +55,7 @@ class QnResourceSearchProxyModel: public nx::vms::client::core::FilterProxyModel
 {
     Q_OBJECT
     using base_type = nx::vms::client::core::FilterProxyModel;
-    using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
+    using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 
 public:
     explicit QnResourceSearchProxyModel(QObject* parent = nullptr);

@@ -10,6 +10,8 @@
 
 class QPoint;
 
+namespace nx::vms::client::core::ResourceTree { enum class ActivationType; }
+
 namespace nx::vms::client::desktop {
 
 namespace menu {
@@ -18,8 +20,6 @@ class Manager;
 class Parameters;
 
 } // namespace menu
-
-namespace ResourceTree { enum class ActivationType; }
 
 class ResourceTreeInteractionHandler: public QObject, public QnWorkbenchContextAware
 {
@@ -55,7 +55,7 @@ public:
      */
     void activateItem(const QModelIndex& index,
         const QModelIndexList& selection,
-        const ResourceTree::ActivationType activationType,
+        const nx::vms::client::core::ResourceTree::ActivationType activationType,
         const Qt::KeyboardModifiers modifiers = Qt::NoModifier);
 
     /**

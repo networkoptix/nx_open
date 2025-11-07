@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "abstract_resource_source.h"
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -11,13 +11,13 @@ namespace entity_resource_tree {
  * Resource source which provides set of corresponding parent server resources deduced from set of
  * resources provided by encapsulated resource source.
  */
-class ParentServersProxySource: public AbstractResourceSource
+class ParentServersProxySource: public core::entity_resource_tree::AbstractResourceSource
 {
     Q_OBJECT
-    using base_type = AbstractResourceSource;
+    using base_type = core::entity_resource_tree::AbstractResourceSource;
 
 public:
-    ParentServersProxySource(AbstractResourceSourcePtr resourceSource);
+    ParentServersProxySource(core::entity_resource_tree::AbstractResourceSourcePtr resourceSource);
 
     virtual QVector<QnResourcePtr> getResources() override;
 
@@ -27,7 +27,7 @@ private:
     void onResourceParentIdChanged(const QnResourcePtr& resource, const nx::Uuid& previousParentId);
 
 private:
-    std::unique_ptr<AbstractResourceSource> m_resourceSource;
+    std::unique_ptr<core::entity_resource_tree::AbstractResourceSource> m_resourceSource;
     QHash<QnMediaServerResourcePtr, QSet<QnResourcePtr>> m_resourcesByServer;
 };
 

@@ -4,16 +4,16 @@
 
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/data/showreel_data.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::common { class ShowreelManager; }
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class ShowreelItem: public entity_item_model::AbstractItem
+class ShowreelItem: public core::entity_item_model::AbstractItem
 {
-    using base_type = entity_item_model::AbstractItem;
+    using base_type = core::entity_item_model::AbstractItem;
 
 public:
     ShowreelItem(const common::ShowreelManager* showreelManager, const nx::Uuid& id);

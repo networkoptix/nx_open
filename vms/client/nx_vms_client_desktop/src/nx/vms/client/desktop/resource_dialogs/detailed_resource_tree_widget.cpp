@@ -7,13 +7,13 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <ui/delegates/resource_item_delegate.h>
@@ -78,7 +78,7 @@ bool isIndexWithinRange(
 
 } //namespace
 
-using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
+using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 
 DetailedResourceTreeWidget::DetailedResourceTreeWidget(
     SystemContext* system, int columnCount, QWidget* parent)
@@ -87,7 +87,7 @@ DetailedResourceTreeWidget::DetailedResourceTreeWidget(
     SystemContextAware(system),
     ui(new Ui::DetailedResourceTreeWidget()),
     m_treeEntityBuilder(new entity_resource_tree::ResourceTreeEntityBuilder(systemContext())),
-    m_entityModel(new entity_item_model::EntityItemModel(columnCount)),
+    m_entityModel(new core::entity_item_model::EntityItemModel(columnCount)),
     m_iconDecoratorModel(new ResourceTreeIconDecoratorModel()),
     m_detailsPanelUpdateFunction(defaultDetailsPanelUpdateFunction)
 {

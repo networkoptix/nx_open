@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/common/models/filter_proxy_model.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 class QnResource;
@@ -26,9 +26,9 @@ public:
 private:
     Q_PROPERTY(nx::vms::client::desktop::SystemContext* context
         READ context WRITE setContext NOTIFY contextChanged)
-    Q_PROPERTY(nx::vms::client::desktop::ResourceTree::ResourceFilters resourceTypes
+    Q_PROPERTY(nx::vms::client::core::ResourceTree::ResourceFilters resourceTypes
         READ resourceTypes WRITE setResourceTypes NOTIFY resourceTypesChanged)
-    Q_PROPERTY(nx::vms::client::desktop::ResourceTree::ResourceSelection selectionMode
+    Q_PROPERTY(nx::vms::client::core::ResourceTree::ResourceSelection selectionMode
         READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(QString filterText READ filterText WRITE setFilterText NOTIFY filterTextChanged)
     Q_PROPERTY(IsIndexAccepted externalFilter READ externalFilter WRITE setExternalFilter
@@ -54,11 +54,11 @@ public:
     SystemContext* context() const;
     void setContext(SystemContext* context);
 
-    ResourceTree::ResourceFilters resourceTypes() const;
-    void setResourceTypes(ResourceTree::ResourceFilters value);
+    core::ResourceTree::ResourceFilters resourceTypes() const;
+    void setResourceTypes(core::ResourceTree::ResourceFilters value);
 
-    ResourceTree::ResourceSelection selectionMode() const;
-    void setSelectionMode(ResourceTree::ResourceSelection value);
+    core::ResourceTree::ResourceSelection selectionMode() const;
+    void setSelectionMode(core::ResourceTree::ResourceSelection value);
 
     QString filterText() const;
     void setFilterText(const QString& value);

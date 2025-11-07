@@ -7,8 +7,8 @@
 #include <QtCore/QSharedPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/shared_item/shared_item.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/shared_item/shared_item.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
@@ -22,7 +22,7 @@ class ResourceTreeItemFactory:
 {
     Q_OBJECT
     using base_type = QObject;
-    using AbstractItemPtr = entity_item_model::AbstractItemPtr;
+    using AbstractItemPtr = core::entity_item_model::AbstractItemPtr;
 
 public:
     ResourceTreeItemFactory(SystemContext* systemContext);
@@ -95,7 +95,7 @@ public:
     AbstractItemPtr createOtherServerItem(const nx::Uuid& serverId);
 
 private:
-    QHash<QnResourcePtr, entity_item_model::SharedItemOriginPtr> m_resourceItemCache;
+    QHash<QnResourcePtr, core::entity_item_model::SharedItemOriginPtr> m_resourceItemCache;
 };
 
 } // namespace entity_resource_tree
