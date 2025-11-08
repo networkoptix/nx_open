@@ -12276,17 +12276,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
-    <message>
-      <source>New Group</source>
-      <translation>Yeni Grup</translation>
-    </message>
-    <message>
-      <source>New Group %1</source>
-      <translation>Yeni Grup %1</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
     <message>
       <source>No data</source>

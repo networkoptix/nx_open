@@ -12281,17 +12281,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
-    <message>
-      <source>New Group</source>
-      <translation>Ny grupp</translation>
-    </message>
-    <message>
-      <source>New Group %1</source>
-      <translation>Ny grupp %1</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
     <message>
       <source>No data</source>

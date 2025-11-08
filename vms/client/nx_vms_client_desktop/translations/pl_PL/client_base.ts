@@ -12636,17 +12636,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
-    <message>
-      <source>New Group</source>
-      <translation>Nowa grupa</translation>
-    </message>
-    <message>
-      <source>New Group %1</source>
-      <translation>Nowa grupa %1</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
     <message>
       <source>No data</source>

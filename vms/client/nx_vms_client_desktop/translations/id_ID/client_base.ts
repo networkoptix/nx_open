@@ -12103,17 +12103,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
-    <message>
-      <source>New Group</source>
-      <translation>Grup Baru</translation>
-    </message>
-    <message>
-      <source>New Group %1</source>
-      <translation>Grup Baru %1</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
     <message>
       <source>No data</source>
