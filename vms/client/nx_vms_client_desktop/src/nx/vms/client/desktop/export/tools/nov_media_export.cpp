@@ -161,10 +161,13 @@ void NovMediaExport::endOfRun()
     const auto systemContext = SystemContext::fromResource(m_resource);
     auto signature = m_signer.buildSignature(
         systemContext->licensePool(), systemContext->currentServerId());
-    if (!updateSignatureInFile(
-        m_recordingContext.storage, m_metadataFileName, m_recordingContext.fileFormat, signature))
+    if (m_recordingContext.storage) //< Is file created.
     {
-        NX_WARNING(this, "SignVideo: metadata tag was not updated");
+        if (!updateSignatureInFile(
+            m_recordingContext.storage, m_metadataFileName, m_recordingContext.fileFormat, signature))
+        {
+            NX_WARNING(this, "SignVideo: metadata tag was not updated");
+        }
     }
 }
 
