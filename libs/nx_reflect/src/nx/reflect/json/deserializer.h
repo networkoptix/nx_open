@@ -443,6 +443,20 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, std::o
     return result;
 }
 
+template<typename T>
+DeserializationResult deserializeValue(const DeserializationContext& ctx, std::shared_ptr<T>* data)
+{
+    if (*data)
+        return deserializeValue(ctx, (*data).get());
+
+    auto val = std::make_shared<T>();
+    auto result = deserializeValue(ctx, val.get());
+    if (result)
+        *data = std::move(val);
+    return result;
+}
+
+
 template<typename Data>
 class Deserializer:
     public nx::reflect::GenericVisitor<Deserializer<Data>>
