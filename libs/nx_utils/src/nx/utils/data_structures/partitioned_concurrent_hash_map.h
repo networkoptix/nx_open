@@ -60,6 +60,14 @@ public:
     void modify(const Key& key, Func func);
 
     /**
+     * Invokes func on the value associated with the given key.
+     * If no such element exists, it returns false.
+     */
+    template<typename Func>
+    // requires std::is_invocable_v<Func, mapped_type>
+    bool modifyExisting(const Key& key, Func func);
+
+    /**
      * Invokes func for every element.
      * func is invoked with internal mutex locked.
      * Each partition's mutex is locked once for each partition, not per element!
@@ -79,7 +87,7 @@ private:
     struct HashMapCtx
     {
         HashMap dict;
-        mutable nx::Mutex mtx;
+        mutable nx::ReadWriteLock mtx;
     };
 
     std::vector<HashMapCtx> m_partitions;
@@ -110,7 +118,7 @@ template<typename Key, typename T, typename Hash>
 bool PartitionedConcurrentHashMap<Key, T, Hash>::insert(const value_type& value)
 {
     auto& ctx = m_partitions[partition(value.first)];
-    NX_MUTEX_LOCKER locker(&ctx.mtx);
+    NX_WRITE_LOCKER locker(&ctx.mtx);
 
     const bool inserted = ctx.dict.insert(value).second;
     if (inserted)
@@ -122,7 +130,7 @@ template<typename Key, typename T, typename Hash>
 bool PartitionedConcurrentHashMap<Key, T, Hash>::insert(value_type&& value)
 {
     auto& ctx = m_partitions[partition(value.first)];
-    NX_MUTEX_LOCKER locker(&ctx.mtx);
+    NX_WRITE_LOCKER locker(&ctx.mtx);
 
     const bool inserted = ctx.dict.insert(std::move(value)).second;
     if (inserted)
@@ -136,7 +144,7 @@ bool PartitionedConcurrentHashMap<Key, T, Hash>::emplace(Args&&... args)
 {
     value_type val(std::forward<Args>(args)...);
     auto& ctx = m_partitions[partition(val.first)];
-    NX_MUTEX_LOCKER locker(&ctx.mtx);
+    NX_WRITE_LOCKER locker(&ctx.mtx);
 
     const bool inserted = ctx.dict.insert(std::move(val)).second;
     if (inserted)
@@ -149,7 +157,7 @@ typename PartitionedConcurrentHashMap<Key, T, Hash>::size_type
     PartitionedConcurrentHashMap<Key, T, Hash>::erase(const Key& key)
 {
     auto& ctx = m_partitions[partition(key)];
-    NX_MUTEX_LOCKER locker(&ctx.mtx);
+    NX_WRITE_LOCKER locker(&ctx.mtx);
 
     const auto erasedCount = ctx.dict.erase(key);
     m_size -= erasedCount;
@@ -160,7 +168,7 @@ template<typename Key, typename T, typename Hash>
 std::optional<T> PartitionedConcurrentHashMap<Key, T, Hash>::take(const Key& key)
 {
     auto& ctx = m_partitions[partition(key)];
-    NX_MUTEX_LOCKER locker(&ctx.mtx);
+    NX_WRITE_LOCKER locker(&ctx.mtx);
 
     auto it = ctx.dict.find(key);
     if (it == ctx.dict.end())
@@ -179,7 +187,7 @@ typename PartitionedConcurrentHashMap<Key, T, Hash>::HashMap
     HashMap all;
     for (auto& ctx: m_partitions)
     {
-        NX_MUTEX_LOCKER locker(&ctx.mtx);
+        NX_WRITE_LOCKER locker(&ctx.mtx);
         std::move(ctx.dict.begin(), ctx.dict.end(), std::inserter(all, all.end()));
         m_size -= ctx.dict.size();
         ctx.dict.clear();
@@ -192,10 +200,11 @@ template<typename Key, typename T, typename Hash>
 void PartitionedConcurrentHashMap<Key, T, Hash>::clear()
 {
     std::for_each(
-        m_partitions.begin(), m_partitions.end(),
+        m_partitions.begin(),
+        m_partitions.end(),
         [this](auto& ctx)
         {
-            NX_MUTEX_LOCKER locker(&ctx.mtx);
+            NX_WRITE_LOCKER locker(&ctx.mtx);
             m_size -= ctx.dict.size();
             ctx.dict.clear();
         });
@@ -205,7 +214,7 @@ template<typename Key, typename T, typename Hash>
 std::optional<T> PartitionedConcurrentHashMap<Key, T, Hash>::find(const Key& key) const
 {
     const auto& ctx = m_partitions[partition(key)];
-    NX_MUTEX_LOCKER locker(&ctx.mtx);
+    NX_READ_LOCKER locker(&ctx.mtx);
 
     auto it = ctx.dict.find(key);
     if (it != ctx.dict.end())
@@ -217,7 +226,7 @@ template<typename Key, typename T, typename Hash>
 bool PartitionedConcurrentHashMap<Key, T, Hash>::contains(const Key& key) const
 {
     const auto& ctx = m_partitions[partition(key)];
-    NX_MUTEX_LOCKER locker(&ctx.mtx);
+    NX_READ_LOCKER locker(&ctx.mtx);
 
     return ctx.dict.contains(key);
 }
@@ -227,9 +236,23 @@ template<typename Func>
 void PartitionedConcurrentHashMap<Key, T, Hash>::modify(const Key& key, Func func)
 {
     auto& ctx = m_partitions[partition(key)];
-    NX_MUTEX_LOCKER locker(&ctx.mtx);
+    NX_WRITE_LOCKER locker(&ctx.mtx);
 
     func(ctx.dict[key]);
+}
+
+template<typename Key, typename T, typename Hash>
+template<typename Func>
+bool PartitionedConcurrentHashMap<Key, T, Hash>::modifyExisting(const Key& key, Func func)
+{
+    auto& ctx = m_partitions[partition(key)];
+    NX_WRITE_LOCKER locker(&ctx.mtx);
+
+    auto it = ctx.dict.find(key);
+    if (it == ctx.dict.end())
+        return false;
+    func(it->second);
+    return true;
 }
 
 template<typename Key, typename T, typename Hash>
@@ -237,10 +260,11 @@ template<typename Func>
 void PartitionedConcurrentHashMap<Key, T, Hash>::forEach(Func func)
 {
     std::for_each(
-        m_partitions.begin(), m_partitions.end(),
+        m_partitions.begin(),
+        m_partitions.end(),
         [&func](auto& ctx)
         {
-            NX_MUTEX_LOCKER locker(&ctx.mtx);
+            NX_WRITE_LOCKER locker(&ctx.mtx);
             std::for_each(ctx.dict.begin(), ctx.dict.end(), func);
         });
 }
@@ -250,10 +274,11 @@ template<typename Func>
 void PartitionedConcurrentHashMap<Key, T, Hash>::forEach(Func func) const
 {
     std::for_each(
-        m_partitions.begin(), m_partitions.end(),
+        m_partitions.begin(),
+        m_partitions.end(),
         [&func](const auto& ctx)
         {
-            NX_MUTEX_LOCKER locker(&ctx.mtx);
+            NX_READ_LOCKER locker(&ctx.mtx);
             std::for_each(ctx.dict.cbegin(), ctx.dict.cend(), func);
         });
 }
