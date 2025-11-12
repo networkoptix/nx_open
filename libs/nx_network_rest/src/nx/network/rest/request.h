@@ -416,7 +416,7 @@ T Request::parseContentByFusionOrThrow(NxFusionContent* content) const
             }
             deserialize(std::move(object));
         }
-        else if (m_content->type == http::header::ContentType::kJson)
+        else if (m_content->type.value == http::header::ContentType::kJson.value)
         {
             QJsonValue parsedContent;
             QString error;
@@ -545,7 +545,7 @@ std::tuple<T, Request::NxReflectFields> Request::parseContentByReflectOrThrow() 
                 copy.postprocessFields(&fields);
             return {std::move(data), merge(&copy, std::move(result.fields))};
         }
-        else if (m_content->type == nx::network::http::header::ContentType::kJson)
+        else if (m_content->type.value == nx::network::http::header::ContentType::kJson.value)
         {
             return {std::move(data),
                 deserializeWithMerge(
