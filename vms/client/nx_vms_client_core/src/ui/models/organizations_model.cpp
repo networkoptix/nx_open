@@ -1246,10 +1246,32 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
         // Fill in ownRolesIds/channelPartnerAccessLevel from the above cache as those fields are
         // missing from API response.
         fillOrgInfo(channelPartnerStruct->organizations, organizationsCache);
-        for (auto& partner: channelPartnerStruct->channelPartners)
-            fillOrgInfo(partner.organizations, organizationsCache);
 
-        // Fill in organisations access cache.
+        // /v3/channel_partners/channel_structure/ does not privide a flat list of partners,
+        // but contains organizations informatios. So make a list from /v3/channel_partners/
+        // and fill partners organization lists.
+        QHash<nx::Uuid, std::shared_ptr<ChannelPartnerInStruct>> visiblePartners;
+        for (const auto &partner: channelPartnerList->results)
+            visiblePartners[partner.id] = nullptr;
+
+        const auto fillRecursive =
+            nx::utils::y_combinator([&organizationsCache, &visiblePartners](
+                const auto fillRecursive,
+                std::shared_ptr<ChannelPartnerInStruct> partner) -> void
+            {
+                fillOrgInfo(partner->organizations, organizationsCache);
+                for (auto& subPartner: partner->subChannels)
+                    fillRecursive(subPartner);
+
+                auto it = visiblePartners.find(partner->id);
+                if (it != visiblePartners.end())
+                    *it = partner;
+            });
+
+        for (auto& partner: channelPartnerStruct->channelPartners)
+            fillRecursive(partner);
+
+        // Fill in organizations access cache.
         const auto isAccessible =
             [&channelPartnersCache](const nx::vms::client::core::Organization& org)
             {
@@ -1277,17 +1299,20 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
         setTopLevelLoading(false);
 
         // Set organizations for each channel partner.
-        for (auto& partner: channelPartnerStruct->channelPartners)
+        for (const auto& [partnerId, partner]: visiblePartners.asKeyValueRange())
         {
-            setOrganizations(partner.organizations, partner.id);
+            if (!partner)
+                continue;
 
-            auto it = channelPartnersCache.find(partner.id);
+            setOrganizations(partner->organizations, partnerId);
+
+            auto it = channelPartnersCache.find(partnerId);
 
             // Show inaccessible organizations but don't load them.
             if (it != channelPartnersCache.end())
-                removeInaccessibleItems(&partner.organizations, it.value());
+                removeInaccessibleItems(&partner->organizations, it.value());
 
-            if (auto node = nodes.find(partner.id); node && node->loading)
+            if (auto node = nodes.find(partnerId); node && node->loading)
             {
                 node->loading = false;
                 notifyNodeUpdate(node, {OrganizationsModel::IsLoadingRole});

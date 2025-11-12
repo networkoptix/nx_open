@@ -118,13 +118,14 @@ struct ChannelPartnerInStruct
     std::string name;
     api::SaasState effectiveState = api::SaasState::uninitialized;
     std::vector<Organization> organizations;
+    std::vector<std::shared_ptr<ChannelPartnerInStruct>> subChannels;
 };
-NX_REFLECTION_INSTRUMENT(ChannelPartnerInStruct, (id)(name)(effectiveState)(organizations));
+NX_REFLECTION_INSTRUMENT(ChannelPartnerInStruct, (id)(name)(effectiveState)(organizations)(subChannels));
 
 struct ChannelStruct
 {
     std::vector<Organization> organizations;
-    std::vector<ChannelPartnerInStruct> channelPartners;
+    std::vector<std::shared_ptr<ChannelPartnerInStruct>> channelPartners;
 
     bool operator==(const ChannelStruct&) const = default;
 };
