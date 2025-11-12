@@ -61,7 +61,7 @@
     </message>
     <message>
       <source>Cannot change notifications settings</source>
-      <translation type="unfinished">Cannot change notifications settings</translation>
+      <translation>Det går inte att ändra aviseringsinställningarna</translation>
     </message>
   </context>
   <context>
