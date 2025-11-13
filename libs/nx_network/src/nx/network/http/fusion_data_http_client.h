@@ -64,7 +64,10 @@ public:
         NX_ASSERT(m_httpClient);
 
         m_httpClient->setCredentials(std::move(credentials));
-        bindToAioThread(getAioThread());
+        // NOTE: Not calling bindToAioThread here because:
+        // 1. The httpClient might already be bound to an AIO thread (from connection pool)
+        // 2. The caller (GenericApiClient::createHttpClient) will call bindToAioThread
+        //    with the correct thread after construction
     }
 
     BaseFusionDataHttpClient(
@@ -351,6 +354,17 @@ public:
     }
 
     FusionDataHttpClient(
+        Qn::SerializationFormat sfmt,
+        Url url,
+        Credentials credentials,
+        base_type::HttpClientPtr httpClient,
+        const InputData& input):
+        base_type(std::move(url), std::move(credentials), std::move(httpClient))
+    {
+        init(input, sfmt);
+    }
+
+    FusionDataHttpClient(
         nx::Url url,
         AuthInfo info,
         ssl::AdapterFunc adapterFunc,
@@ -364,11 +378,13 @@ public:
     }
 
 private:
-    void init(const InputData& input)
+    void init(const InputData& input, Qn::SerializationFormat sfmt = Qn::SerializationFormat::json)
     {
         bool ok = false;
-        std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serializeToJson(input);
-        this->m_requestContentType = "application/json";
+        std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serialize(sfmt, input);
+        this->m_requestContentType = sfmt == Qn::SerializationFormat::json
+            ? "application/json"
+            : "application/x-www-form-urlencoded";
     }
 
     virtual void requestDone(nx::network::http::AsyncClient* client) override
@@ -416,6 +432,15 @@ public:
 
     FusionDataHttpClient(
         Url url, Credentials credentials, base_type::HttpClientPtr httpClient):
+        base_type(std::move(url), std::move(credentials), std::move(httpClient))
+    {
+    }
+
+    FusionDataHttpClient(
+        Qn::SerializationFormat /*sfmt*/,
+        Url url,
+        Credentials credentials,
+        base_type::HttpClientPtr httpClient):
         base_type(std::move(url), std::move(credentials), std::move(httpClient))
     {
     }
@@ -481,8 +506,19 @@ public:
         init(input);
     }
 
+    FusionDataHttpClient(
+        Qn::SerializationFormat sfmt,
+        Url url,
+        Credentials credentials,
+        base_type::HttpClientPtr httpClient,
+        const InputData& input):
+        base_type(std::move(url), std::move(credentials), std::move(httpClient))
+    {
+        init(input, sfmt);
+    }
+
 private:
-    void init(const InputData& input)
+    void init(const InputData& input, Qn::SerializationFormat sfmt = Qn::SerializationFormat::json)
     {
         if constexpr (std::is_same_v<InputData, std::string>)
         {
@@ -491,10 +527,12 @@ private:
         else
         {
             bool ok = false;
-            std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serializeToJson(input);
+            std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serialize(sfmt, input);
         }
 
-        this->m_requestContentType = "application/json";
+        this->m_requestContentType = sfmt == Qn::SerializationFormat::json
+            ? "application/json"
+            : "application/x-www-form-urlencoded";
     }
 
 private:
@@ -546,6 +584,15 @@ public:
     }
 
     FusionDataHttpClient(Url url, Credentials credentials, base_type::HttpClientPtr httpClient):
+        base_type(std::move(url), std::move(credentials), std::move(httpClient))
+    {
+    }
+
+    FusionDataHttpClient(
+        Qn::SerializationFormat /*sfmt*/,
+        Url url,
+        Credentials credentials,
+        base_type::HttpClientPtr httpClient):
         base_type(std::move(url), std::move(credentials), std::move(httpClient))
     {
     }
