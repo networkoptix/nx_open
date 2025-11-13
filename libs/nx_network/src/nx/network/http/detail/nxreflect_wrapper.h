@@ -21,17 +21,16 @@ public:
     static std::tuple<nx::Buffer, bool /*result*/> serialize(
         Qn::SerializationFormat format, const T& data)
     {
-        switch (format)
+        if (format == Qn::SerializationFormat::json)
+            return serializeToJson(data);
+
+        if constexpr (nx::reflect::IsInstrumentedV<T>)
         {
-            case Qn::SerializationFormat::json:
-                return serializeToJson(data);
-
-            case Qn::SerializationFormat::urlEncoded:
+            if (format == Qn::SerializationFormat::urlEncoded)
                 return std::make_tuple(nx::Buffer(nx::reflect::urlencoded::serialize(data)), true);
-
-            default:
-                return std::make_tuple(nx::Buffer(), false);
         }
+
+        return std::make_tuple(nx::Buffer(), false);
     }
 
     template<typename T>
