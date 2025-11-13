@@ -140,7 +140,7 @@ bool TextMatcher::matchAttributes(const nx::common::metadata::Attributes& attrib
     return allConditionMatched(mask);
 }
 
-bool TextMatcher::matchText(const QString& text) const
+bool TextMatcher::matchText(const QString& text, MatchType match) const
 {
     uint64_t result = 0;
     for (std::size_t i = 0; i < m_conditions.size(); ++i)
@@ -148,10 +148,14 @@ bool TextMatcher::matchText(const QString& text) const
         const auto& condition = m_conditions[i];
         if (condition.type != ConditionType::textMatch)
             continue;
-        if (text.startsWith(condition.text, Qt::CaseInsensitive))
+
+        if (match == MatchType::Partial && text.contains(condition.text, Qt::CaseInsensitive))
+            return true;
+        else if (text.startsWith(condition.text, Qt::CaseInsensitive))
             result |= (1ull << i);
     }
-    return allConditionMatched(result);
+
+    return (match == MatchType::Full) ? allConditionMatched(result) : (result != 0);
 }
 
 bool TextMatcher::allConditionMatched(uint64_t result) const

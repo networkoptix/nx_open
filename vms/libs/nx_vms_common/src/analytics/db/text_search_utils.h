@@ -46,6 +46,12 @@ enum class ConditionType
     numericRangeMatch,
 };
 
+enum class MatchType
+{
+    Full, //< Match all search tokens.
+    Partial, //< Match at lease one search token.
+};
+
 struct TokenData
 {
     QString value;
@@ -182,12 +188,8 @@ public:
 
     bool matchAttributes(const nx::common::metadata::Attributes& attributes) const;
 
-    /**
-     * @return true If all tokens of the filter were matched
-     * by calls to matchAttributes or matchText().
-     */
-    bool matchText(const QString& text) const;
-
+    /** Search for text match conditions in the given text. */
+    bool matchText(const QString& text, MatchType match = MatchType::Full) const;
 
     bool hasShortTokens() const;
 
