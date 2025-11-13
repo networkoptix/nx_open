@@ -603,6 +603,31 @@ struct OrganizationsModel::Private
         }
     }
 
+    void removeInactiveSystems(std::vector<nx::vms::client::core::SystemInOrganization>& systems)
+    {
+        const auto isActivatedOrPending =
+            [this](const auto& system) -> bool
+            {
+                if (system.system_state == cloud::db::api::SystemStatus::activated)
+                    return true;
+
+                const auto id = system.systemId.toSimpleString();
+
+                const bool isPending =
+                    system.system_state == cloud::db::api::SystemStatus::notActivated
+                    && q->indexFromSystemId(id).data(QnSystemsModel::IsPending).toBool();
+
+                return isPending;
+            };
+
+        systems.erase(
+            std::remove_if(
+                systems.begin(),
+                systems.end(),
+                [&](const auto& system) { return !isActivatedOrPending(system); }),
+            systems.end());
+    }
+
     void clearCloudData();
 
     void notifyNodeUpdate(
@@ -1057,7 +1082,10 @@ coro::Task<bool> OrganizationsModel::Private::loadOrgAsync(struct Organization o
     if (groupStructure)
         setOrgStructure(org.id, *groupStructure);
     if (systems)
+    {
+        removeInactiveSystems(systems->results);
         setOrgSystems(org.id, systems->results);
+    }
 
     if (groupStructure || systems)
     {
