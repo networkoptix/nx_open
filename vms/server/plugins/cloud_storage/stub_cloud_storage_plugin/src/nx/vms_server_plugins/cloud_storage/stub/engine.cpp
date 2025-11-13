@@ -294,57 +294,6 @@ void Engine::doQueryMotionTimePeriods(
     }
 }
 
-void Engine::doQueryAnalytics(
-    const char* filter,
-    nx::sdk::Result<nx::sdk::IString*>* outResult)
-{
-    try
-    {
-        NX_OUTPUT << __func__ << ": Querying analytics with filter '" << filter << "'";
-        std::lock_guard lock(m_mutex);
-        if (!m_dataManager)
-            throw std::logic_error("Plugin has not been properly initialized");
-
-        const auto analyticsData =
-            m_dataManager->queryAnalytics(nx::sdk::cloud_storage::AnalyticsFilter(filter));
-        *outResult = nx::sdk::Result<nx::sdk::IString*>(new nx::sdk::String(analyticsData));
-        NX_OUTPUT << __func__ << ": Successfully fetched analytics data: '" << analyticsData << "'";
-    }
-    catch (const std::exception& e)
-    {
-        NX_OUTPUT << __func__ << ": Failed to fetch analytics. Error: '" << e.what() << "'";
-        *outResult = nx::sdk::Result<nx::sdk::IString*>(nx::sdk::Error(
-            nx::sdk::ErrorCode::internalError,
-            new nx::sdk::String(e.what())));
-    }
-}
-
-void Engine::doQueryAnalyticsTimePeriods(
-    const char* filter,
-    nx::sdk::Result<nx::sdk::IString*>* outResult)
-{
-    try
-    {
-        NX_OUTPUT << __func__ << ": Querying analytics periods with filter '" << filter;
-        std::lock_guard lock(m_mutex);
-        if (!m_dataManager)
-            throw std::logic_error("Plugin has not been properly initialized");
-
-        const auto analyticsPeriodData =
-            m_dataManager->queryAnalyticsPeriods(nx::sdk::cloud_storage::AnalyticsFilter(filter));
-        *outResult = nx::sdk::Result<nx::sdk::IString*>(new nx::sdk::String(analyticsPeriodData));
-        NX_OUTPUT << __func__ << ": Successfully fetched analytics periods: '"
-            << analyticsPeriodData << "'";
-    }
-    catch (const std::exception& e)
-    {
-        NX_OUTPUT << __func__ << ": Failed to fetch analytics periods. Error: '" << e.what() << "'";
-        *outResult = nx::sdk::Result<nx::sdk::IString*>(nx::sdk::Error(
-            nx::sdk::ErrorCode::internalError,
-            new nx::sdk::String(e.what())));
-    }
-}
-
 void Engine::flushMetadata(nx::sdk::cloud_storage::MetadataType type)
 {
     m_dataManager->flushMetadata(type);
@@ -371,9 +320,6 @@ nx::sdk::ErrorCode Engine::saveMetadata(
             case sdk::cloud_storage::MetadataType::motion:
                 result = m_dataManager->saveMotion(nx::sdk::cloud_storage::Motion(data));
                 break;
-            case sdk::cloud_storage::MetadataType::analytics:
-                result = m_dataManager->saveObjectTrack(nx::sdk::cloud_storage::ObjectTrack(data));
-                break;
         }
 
         NX_OUTPUT
@@ -399,25 +345,6 @@ nx::sdk::ErrorCode Engine::storageSpace(nx::sdk::cloud_storage::StorageSpace* st
     storageSpace->freeSpace = 1000 * 1024 * 1024 * 1024LL;
     storageSpace->totalSpace = 1000 * 1024 * 1024 * 1024LL;
     return nx::sdk::ErrorCode::noError;
-}
-
-void Engine::doFetchTrackImage(
-    const char* objectTrackId,
-    nx::sdk::cloud_storage::TrackImageType type,
-    nx::sdk::Result<nx::sdk::IString*>* outResult) const
-{
-    try
-    {
-        std::lock_guard lock(m_mutex);
-        const auto image64 = m_dataManager->fetchTrackImage(objectTrackId, type);
-        *outResult = nx::sdk::Result<nx::sdk::IString*>(new nx::sdk::String(image64));
-    }
-    catch (const std::exception& e)
-    {
-        NX_OUTPUT << __func__ << ": Failed to fetch BestShot image: " << e.what();
-        *outResult = nx::sdk::Result<nx::sdk::IString*>(
-            nx::sdk::Error(nx::sdk::ErrorCode::noData, new nx::sdk::String(e.what())));
-    }
 }
 
 } // nx::vms_server_plugins::cloud_storage::stub

@@ -49,23 +49,10 @@ protected:
         const char* filter,
         nx::sdk::Result<nx::sdk::IString*>* outResult) override;
 
-    virtual void doQueryAnalytics(
-        const char* filter,
-        nx::sdk::Result<nx::sdk::IString*>* outResult) override;
-
-    virtual void doQueryAnalyticsTimePeriods(
-        const char* filter,
-        nx::sdk::Result<nx::sdk::IString*>* outResult) override;
-
         virtual void doQueryBookmarks(
         const char* filter,
         nx::sdk::Result<nx::sdk::IString*>* outResult) override;
-
     virtual nx::sdk::ErrorCode deleteBookmark(const char* bookmarkId) override;
-    virtual void doFetchTrackImage(
-        const char* objectTrackId,
-        nx::sdk::cloud_storage::TrackImageType type,
-        nx::sdk::Result<nx::sdk::IString*>* outResult) const override;
 
 private:
     nx::sdk::Ptr<const nx::sdk::cloud_storage::IAsyncOperationHandler> m_handler;

@@ -54,24 +54,6 @@ void Engine::doQueryMotionTimePeriods(
         new nx::sdk::String("Not implemented")));
 }
 
-void Engine::doQueryAnalytics(
-    const char* /*filter*/,
-    nx::sdk::Result<nx::sdk::IString*>* outResult)
-{
-    *outResult = nx::sdk::Result<nx::sdk::IString*>(nx::sdk::Error(
-        nx::sdk::ErrorCode::internalError,
-        new nx::sdk::String("Not implemented")));
-}
-
-void Engine::doQueryAnalyticsTimePeriods(
-    const char* /*filter*/,
-    nx::sdk::Result<nx::sdk::IString*>* outResult)
-{
-    *outResult = nx::sdk::Result<nx::sdk::IString*>(nx::sdk::Error(
-        nx::sdk::ErrorCode::notImplemented,
-        new nx::sdk::String("Not implemented")));
-}
-
 nx::sdk::ErrorCode Engine::saveMetadata(
     const char* /*deviceId*/,
     nx::sdk::cloud_storage::MetadataType /*type*/,
@@ -89,15 +71,6 @@ nx::sdk::ErrorCode Engine::storageSpace(
     nx::sdk::cloud_storage::StorageSpace* /*storageSpace*/) const
 {
     return nx::sdk::ErrorCode::notImplemented;
-}
-
-void Engine::doFetchTrackImage(
-    const char* /*objectTrackId*/,
-    nx::sdk::cloud_storage::TrackImageType /*type*/,
-    nx::sdk::Result<nx::sdk::IString*>* outResult) const
-{
-    *outResult = nx::sdk::Result<nx::sdk::IString*>(nx::sdk::Error(
-        nx::sdk::ErrorCode::notImplemented, new nx::sdk::String("Not implemented")));
 }
 
 } // nx::vms_server_plugins::cloud_storage::sample

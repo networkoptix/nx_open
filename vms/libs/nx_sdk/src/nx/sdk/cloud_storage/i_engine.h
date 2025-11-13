@@ -17,7 +17,6 @@ namespace nx::sdk::cloud_storage {
 enum class MetadataType
 {
     motion,
-    analytics,
     bookmark,
 };
 
@@ -91,34 +90,7 @@ public:
         return result;
     }
 
-    protected: virtual void doQueryAnalytics(const char* filter, Result<IString*>* outResult) = 0;
-
-    /**
-     * Query object tracks accordingly to the given filter.
-     * `filter` is the JSON representation of the `AnalyticsFilter`.
-     * `result` should be the JSON representation of the `AnalyticsLookupResult`.
-     */
-    public: Result<IString*> queryAnalytics(const char* filter)
-    {
-        Result<IString*> result;
-        doQueryAnalytics(filter, &result);
-        return result;
-    }
-
-    protected: virtual void doQueryAnalyticsTimePeriods(
-        const char* filter, Result<IString*>* outResult) = 0;
-
-    /**
-     * Query analytics time periods (extracted from object tracks) accordingly to the given filter.
-     * `filter` is the JSON representation of the `AnalyticsFilter`.
-     * `result` should be the JSON representation of the `TimePeriodList`.
-     */
-    public: Result<IString*> queryAnalyticsTimePeriods(const char* filter)
-    {
-        Result<IString*> result;
-        doQueryAnalyticsTimePeriods(filter, &result);
-        return result;
-    }
+    protected:
 
     /**
      * @param data A null-terminated string containing the JSON of the corresponding metadata object.
@@ -136,20 +108,6 @@ public:
      * `noError` result.
      */
     public: virtual void flushMetadata(MetadataType type) = 0;
-
-    /**
-     * Fetch a best shot image associated with the given objectTrackId. Result string should
-     * contain the JSON representation of the nx::sdk::cloud_storage::Image struct.
-     */
-    public: Result<IString*> fetchTrackImage(const char* objectTrackId, TrackImageType type) const
-    {
-        Result<IString*> result;
-        doFetchTrackImage(objectTrackId, type, &result);
-        return result;
-    }
-
-    protected: virtual void doFetchTrackImage(
-        const char* objectTrackId, TrackImageType type, Result<IString*>* outResult) const = 0;
 
     /**
      * No async handlers should be called by the plugin before this function has been called.

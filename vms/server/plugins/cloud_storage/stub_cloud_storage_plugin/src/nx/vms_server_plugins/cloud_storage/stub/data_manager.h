@@ -121,10 +121,6 @@ public:
     nx::sdk::ErrorCode saveMotion(const nx::sdk::cloud_storage::Motion& data);
     std::string queryMotion(const nx::sdk::cloud_storage::MotionFilter& filter) const;
 
-    nx::sdk::ErrorCode saveObjectTrack(const nx::sdk::cloud_storage::ObjectTrack& data);
-    std::string queryAnalytics(const nx::sdk::cloud_storage::AnalyticsFilter& filter) const;
-    std::string queryAnalyticsPeriods(const nx::sdk::cloud_storage::AnalyticsFilter& filter) const;
-
     void addDevice(const nx::sdk::cloud_storage::DeviceDescription& deviceDescription);
     std::unique_ptr<WritableMediaFile> writableMediaFile(
         const std::string& deviceId,
@@ -141,10 +137,6 @@ public:
         int64_t durationMs) const;
 
     ArchiveIndex getArchive(std::optional<int64_t> startTime) const;
-    void saveTrackImage(
-        const char* data,
-        nx::sdk::cloud_storage::TrackImageType type);
-    std::string fetchTrackImage(const char* objectTrackId, nx::sdk::cloud_storage::TrackImageType type);
 
     void run();
     void flushMetadata(nx::sdk::cloud_storage::MetadataType type);
@@ -156,17 +148,14 @@ private:
     std::shared_ptr<std::mutex> m_mutex{std::make_shared<std::mutex>()};
     std::vector<nx::sdk::cloud_storage::Bookmark> m_cloudBookmarks;
     std::vector<nx::sdk::cloud_storage::Motion> m_cloudMotion;
-    std::vector<nx::sdk::cloud_storage::ObjectTrack> m_cloudAnalytics;
     std::queue<nx::sdk::cloud_storage::Bookmark> m_bookmarksToSend;
     std::queue<nx::sdk::cloud_storage::Motion> m_motionToSend;
-    std::queue<nx::sdk::cloud_storage::ObjectTrack> m_analyticsToSend;
     SaveHandler m_saveHandler;
     std::thread m_workThread;
     std::atomic<bool> m_needToStop{false};
     std::condition_variable m_cond;
     bool m_needToFlushBookmarks{false};
     bool m_needToFlushMotion{false};
-    bool m_needToFlushAnalytics{false};
     std::pair<std::string, int> m_bucketUrlToId;
 
 private:

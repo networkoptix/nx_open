@@ -41,19 +41,6 @@ protected:
     virtual void doQueryMotionTimePeriods(
         const char* filter,
         nx::sdk::Result<nx::sdk::IString*>* outResult) override;
-
-    virtual void doQueryAnalytics(
-        const char* filter,
-        nx::sdk::Result<nx::sdk::IString*>* outResult) override;
-
-    virtual void doQueryAnalyticsTimePeriods(
-        const char* filter,
-        nx::sdk::Result<nx::sdk::IString*>* outResult) override;
-
-    virtual void doFetchTrackImage(
-        const char* objectTrackId,
-        nx::sdk::cloud_storage::TrackImageType type,
-        nx::sdk::Result<nx::sdk::IString*>* outResult) const override;
 };
 
 } // nx::vms_server_plugins::cloud_storage::sample

@@ -502,7 +502,6 @@ std::string toString(sdk::cloud_storage::MetadataType metadataType)
 {
     switch (metadataType)
     {
-        case sdk::cloud_storage::MetadataType::analytics: return "analytics";
         case sdk::cloud_storage::MetadataType::motion: return "motion";
         case sdk::cloud_storage::MetadataType::bookmark: return "bookmark";
     }
