@@ -71,7 +71,10 @@ nx::json_rpc::Response to(nx::json_rpc::ResponseId id, nx::network::rest::Respon
     else
     {
         nx::json_rpc::Error error{
-            nx::json_rpc::Error::applicationError, "Failed to execute API request"};
+            response.statusCode == nx::network::http::StatusCode::unprocessableEntity
+                ? nx::json_rpc::Error::invalidParams
+                : nx::json_rpc::Error::applicationError,
+            "Failed to execute API request"};
         if (body)
             error.data = std::move(body->Move());
         result.error = std::move(error);

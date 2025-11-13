@@ -246,7 +246,7 @@ static void registerSystemRestHandlers(
      * %ingroup Site
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
-     * %permissions Any User.
+     * %permissions Authorization is not required.
      * %return:{MergeStatusReply}
      *
      **%apidoc DELETE /rest/v3/system/merge
@@ -275,7 +275,7 @@ static void registerSystemRestHandlers(
      * %ingroup Site
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
-     * %permissions Any User.
+     * %permissions Authorization is not required.
      * %return:{MergeStatusReply}
      *
      **%apidoc DELETE /rest/v{4-}/site/merge
