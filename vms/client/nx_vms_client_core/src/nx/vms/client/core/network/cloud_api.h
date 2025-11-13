@@ -4,6 +4,7 @@
 
 #include <QtCore/QCoreApplication>
 
+#include <nx/cloud/db/client/data/system_data.h>
 #include <nx/cloud/db/client/cdb_connection.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/url/url_builder.h>
@@ -98,10 +99,12 @@ struct SystemInOrganization
     std::string state;
     nx::Uuid groupId;
     api::SaasState effectiveState = api::SaasState::uninitialized;
+    cloud::db::api::SystemStatus system_state = cloud::db::api::SystemStatus::invalid;
 
     bool operator==(const SystemInOrganization& other) const = default;
 };
-NX_REFLECTION_INSTRUMENT(SystemInOrganization, (systemId)(name)(state)(groupId)(effectiveState));
+NX_REFLECTION_INSTRUMENT(SystemInOrganization, \
+    (systemId)(name)(state)(groupId)(effectiveState)(system_state));
 
 struct SystemList
 {
