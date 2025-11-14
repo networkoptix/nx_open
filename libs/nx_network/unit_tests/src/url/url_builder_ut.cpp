@@ -303,10 +303,10 @@ protected:
     {
         const auto url = builder.toUrl();
         EXPECT_TRUE(urlIsValid(url));
-        EXPECT_EQ(url.query(), expectedQuery);
+        EXPECT_EQ(url.query(QUrl::EncodeSpaces), expectedQuery);
 
         const auto querySuffix = expectedQuery.isEmpty() ? QString() : ("?" + expectedQuery);
-        EXPECT_EQ(url.toString(), kSampleUrl.toString() + querySuffix);
+        EXPECT_EQ(url.toString(QUrl::EncodeSpaces), kSampleUrl.toString() + querySuffix);
     }
 };
 
@@ -323,6 +323,9 @@ TEST_F(UrlBuilderQuery, addItem)
 
     builder.addQueryItem("status", (int) http::StatusCode::notFound);
     expectQuery(builder, "string=stringValue&number=42&status=404");
+
+    builder.addQueryItem("special symbol", "value's+test");
+    expectQuery(builder, "string=stringValue&number=42&status=404&special%20symbol=value%27s%2Btest");
 }
 
 TEST_F(UrlBuilderQuery, escapedQuery)

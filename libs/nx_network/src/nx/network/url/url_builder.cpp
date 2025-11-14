@@ -146,16 +146,17 @@ Builder& Builder::addQueryItem(const QString& name, const QString& value)
 {
     // TODO: Optimize by QUrlQuery field in Builder.
     nx::UrlQuery query(m_url.query());
-    query.addQueryItem(name, value);
+    query.addQueryItem(QUrl::toPercentEncoding(name), QUrl::toPercentEncoding(value));
     return setQuery(query);
 }
 
 Builder& Builder::removeQueryItem(const QString& name)
 {
     nx::UrlQuery query(m_url.query());
-    if (query.hasQueryItem(name))
+    const auto encodedName = QUrl::toPercentEncoding(name);
+    if (query.hasQueryItem(encodedName))
     {
-        query.removeQueryItem(name);
+        query.removeQueryItem(encodedName);
         m_url.setQuery(query);
     }
     return *this;
