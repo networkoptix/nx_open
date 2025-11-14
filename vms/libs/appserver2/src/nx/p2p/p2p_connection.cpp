@@ -84,7 +84,6 @@ Connection::Connection(
     m_unauthorizedWatcher(std::move(unauthorizedWatcher))
 {
     systemContext->metrics()->tcpConnections().p2p()++;
-    watchForUnauthorize();
 }
 
 Connection::~Connection()
@@ -139,8 +138,14 @@ void Connection::watchForUnauthorize()
     if (!remotePeer().isClient())
         return;
 
-    m_scopeGuards = m_unauthorizedWatcher(
-        m_userAccessData, [this]() { setState(State::Unauthorized, "Unauthorized"); });
+    auto weakPointer = this->weakPointer();
+    NX_ASSERT(weakPointer);
+    m_scopeGuards = m_unauthorizedWatcher(m_userAccessData,
+        [weakPointer = std::move(weakPointer)]()
+        {
+            if (auto lock = weakPointer.lock())
+                lock->setState(State::Unauthorized, "Unauthorized");
+        });
 }
 
 } // namespace p2p

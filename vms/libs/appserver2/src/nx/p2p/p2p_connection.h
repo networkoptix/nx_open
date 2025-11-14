@@ -48,12 +48,10 @@ public:
     const nx::network::rest::UserAccessData& userAccessData() const { return m_userAccessData; }
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& peer) const override;
     virtual void updateCredentials(nx::network::http::Credentials credentials);
+    void watchForUnauthorize();
 
 protected:
     virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient) override;
-
-private:
-    void watchForUnauthorize();
 
 private:
     nx::network::rest::UserAccessData m_userAccessData = nx::network::rest::kSystemAccess;
