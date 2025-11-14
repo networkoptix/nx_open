@@ -9206,6 +9206,14 @@ Les performances du client sont dégradées.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::LookupListModel</name>
+    <message>
+      <source>Value</source>
+      <comment>A value of some attribute</comment>
+      <translation type="unfinished">Value</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
