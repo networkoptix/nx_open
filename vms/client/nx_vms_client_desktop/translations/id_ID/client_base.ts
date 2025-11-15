@@ -9068,7 +9068,7 @@ Performa Site menurun.</translation>
     <message>
       <source>Value</source>
       <comment>A value of some attribute</comment>
-      <translation type="unfinished">Value</translation>
+      <translation>Nilai</translation>
     </message>
   </context>
   <context>

@@ -9068,7 +9068,7 @@ Site performance is degraded.</source>
     <message>
       <source>Value</source>
       <comment>A value of some attribute</comment>
-      <translation type="unfinished">Value</translation>
+      <translation>數值</translation>
     </message>
   </context>
   <context>
