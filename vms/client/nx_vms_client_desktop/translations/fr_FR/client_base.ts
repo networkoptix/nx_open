@@ -9210,7 +9210,7 @@ Les performances du client sont dégradées.</translation>
     <message>
       <source>Value</source>
       <comment>A value of some attribute</comment>
-      <translation type="unfinished">Value</translation>
+      <translation>Valeur</translation>
     </message>
   </context>
   <context>

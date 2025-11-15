@@ -9210,7 +9210,7 @@ Webstedets ydeevne er forringet.</translation>
     <message>
       <source>Value</source>
       <comment>A value of some attribute</comment>
-      <translation type="unfinished">Value</translation>
+      <translation>Værdi</translation>
     </message>
   </context>
   <context>

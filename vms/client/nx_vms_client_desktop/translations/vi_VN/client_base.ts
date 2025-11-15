@@ -9068,7 +9068,7 @@ Hiệu suất Chi nhánh bị giảm.</translation>
     <message>
       <source>Value</source>
       <comment>A value of some attribute</comment>
-      <translation type="unfinished">Value</translation>
+      <translation>Giá trị</translation>
     </message>
   </context>
   <context>
