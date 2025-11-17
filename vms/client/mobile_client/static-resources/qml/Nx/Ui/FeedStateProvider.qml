@@ -49,7 +49,7 @@ NxObject
             id: notifications
 
             user: appContext.cloudStatusWatcher.cloudLogin
-            cloudSystemIds: windowContext.sessionManager.hasConnectedSession
+            cloudSystemIds: windowContext.sessionManager.hasActiveSession
                 ? [windowContext.mainSystemContext.cloudSystemId]
                 : []
         }
