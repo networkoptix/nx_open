@@ -216,7 +216,7 @@ Page
             Layout.preferredHeight: 36
 
             readonly property var regExp:
-                new RegExp(`(${NxGlobals.makeSearchRegExpNoAnchors(text)})`, 'i')
+                new RegExp(`(${matchAnySpace(NxGlobals.makeSearchRegExpNoAnchors(text))})`, 'i')
 
             property string text: ""
 
@@ -224,6 +224,11 @@ Page
             {
                 source: search.displayText
                 minimumIntervalMs: 250
+            }
+
+            function matchAnySpace(str)
+            {
+                return str.replace(/\\ /g, "\\s")
             }
         }
 
