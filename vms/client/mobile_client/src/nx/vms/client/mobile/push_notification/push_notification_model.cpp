@@ -66,7 +66,9 @@ QVariant PushNotificationModel::data(const QModelIndex& index, int role) const
 
             const auto result = HumanReadable::timeSpan(
                 elapsed,
-                HumanReadable::AllTimeUnits,
+                HumanReadable::Seconds | HumanReadable::Minutes | HumanReadable::Hours
+                    | HumanReadable::Days | HumanReadable::Weeks | HumanReadable::Months
+                    | HumanReadable::Years,
                 HumanReadable::SuffixFormat::Long,
                 /*separator*/ {},
                 HumanReadable::kAlwaysSuppressSecondUnit);
