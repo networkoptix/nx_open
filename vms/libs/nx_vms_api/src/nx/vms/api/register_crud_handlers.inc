@@ -168,8 +168,8 @@ static void registerSystemRestHandlers(
      * %caption Get info about other Sites
      * %ingroup Site
      * %struct OtherSiteRequest
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_with
-     * %permissions Authorization is not required.
+     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_with,_ticket
+     * %permissions Any User.
      * %return:{SiteInformationList} List of records about other Sites.
      *     %param servers Filled only for the info(s) from `endpoint` requested.
      *     %param devices Filled only for the info(s) from `endpoint` requested.
@@ -182,8 +182,8 @@ static void registerSystemRestHandlers(
      * %caption Get info about other Sites
      * %ingroup Site
      * %struct OtherSiteRequest
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_with
-     * %permissions Authorization is not required.
+     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_with,_ticket
+     * %permissions Any User.
      * %return:{SiteInformationList} List of records about other Sites.
      *     %param servers Filled only for the info(s) from `endpoint` requested.
      *     %param devices Filled only for the info(s) from `endpoint` requested.
