@@ -3,15 +3,16 @@
 #include "site_information.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/rest/api_versions.h>
 
 #include "module_information.h"
-#include "rest_api_versions.h"
 
 namespace nx::vms::api {
 
 RestApiVersions RestApiVersions::current()
 {
-    return {std::string(kRestApiVersions.front()), std::string(kRestApiVersions.back())};
+    using namespace nx::network::rest;
+    return {std::string(kApiVersions.front()), std::string(kApiVersions.back())};
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(RestApiVersions, (json), RestApiVersions_Fields)

@@ -246,6 +246,7 @@ public:
 
     static std::optional<size_t> apiVersionOrThrow(const QString& path);
     std::optional<size_t> apiVersion() const { return m_apiVersion; }
+    void setApiVersion(size_t version) { m_apiVersion = version; }
     bool isApiVersionOlder(size_t version) const
     {
         return !m_apiVersion || *m_apiVersion < version;
