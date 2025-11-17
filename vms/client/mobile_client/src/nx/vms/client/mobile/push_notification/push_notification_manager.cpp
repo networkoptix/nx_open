@@ -372,19 +372,20 @@ int PushNotificationManager::usedSystemsCount() const
 
 int PushNotificationManager::lastUsedFilter() const
 {
-    return d->remotePushController.confirmedSettings()->lastUsedFilter;
+    const auto user = QString::fromStdString(d->remotePushController.credentials().username);
+    return settingsForUser(this, user).value_or(LocalPushSettings{}).lastUsedFilter;
 }
 
 void PushNotificationManager::setLastUsedFilter(int value)
 {
     if (auto settings = d->remotePushController.confirmedSettings())
     {
-        const auto userName = d->remotePushController.credentials().username;
+        const auto user = d->remotePushController.credentials().username;
         if (settings->lastUsedFilter == value)
             return;
 
         settings->lastUsedFilter = value;
-        updateUserSettings(this, QString::fromStdString(userName), settings);
+        updateUserSettings(this, QString::fromStdString(user), settings);
     }
 }
 

@@ -245,6 +245,9 @@ Page
             {
                 id: filterModel
 
+                filter: appContext.pushManager.lastUsedFilter
+                filterRegularExpression: search.regExp
+
                 sourceModel: PushNotificationModel
                 {
                     id: sourceModel
@@ -253,8 +256,6 @@ Page
 
                     Component.onCompleted: update()
                 }
-
-                filterRegularExpression: search.regExp
             }
 
             delegate: SwipeControl
@@ -443,8 +444,6 @@ Page
         property: "lastUsedFilter"
         value: filterModel.filter
     }
-
-    Component.onCompleted: filterModel.filter = appContext.pushManager.lastUsedFilter
 
     function highlightMatchingText(text)
     {
