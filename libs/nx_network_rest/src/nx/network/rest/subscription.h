@@ -12,6 +12,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/scope_guard.h>
 
+#include "api_versions.h"
 #include "crud_handler.h"
 #include "json_rpc/client_extensions.h"
 #include "open_api_schema.h"
@@ -95,36 +96,45 @@ public:
         m_addMonitor = std::move(addMonitor);
     }
 
-    static nx::network::rest::Request payloadRequest(
-        const QString& subscriptionId, const nx::Uuid& userId, json_rpc::WeakConnection connection = {})
+    static Request payloadRequest(
+        const QString& subscriptionId,
+        const nx::Uuid& userId,
+        size_t apiVersion = kLatestApiVersion,
+        json_rpc::WeakConnection connection = {})
     {
         using namespace nx::network::rest;
         auto userAccessData = UserAccessData{userId};
         if (userId == kCloudServiceUserAccess.userId || userId == kVideowallUserAccess.userId)
             userAccessData.access = UserAccessData::Access::ReadAllResources;
-        return {
+        Request r{
             json_rpc::Context{
                 .connection = std::move(connection),
                 .subscribed = true,
                 .subscriptionId = subscriptionId},
             {.session = AuthSession{nx::Uuid{}}, .access = std::move(userAccessData)}};
+        r.setApiVersion(apiVersion);
+        return r;
     }
 
 protected:
     using Callback = std::shared_ptr<SubscriptionCallback>;
     using Connection = json_rpc::WeakConnection;
 
-    std::map<nx::Uuid,
-        std::map<Connection, std::vector<std::tuple<QString, Callback, PostProcessContext>>>
-    >
+    struct UpdateCallBack
+    {
+        size_t apiVersion = kLatestApiVersion;
+        QString subscriptionId;
+        Callback callback;
+        PostProcessContext postProcess;
+    };
+
+    std::map<nx::Uuid, std::map<Connection, std::vector<UpdateCallBack>>>
         callbacks(
             const QString& id,
             std::optional<nx::Uuid> user,
             nx::MoveOnlyFunc<PostProcessContext(const Request&)> makePostProcess) const
     {
-        std::map<nx::Uuid,
-            std::map<Connection, std::vector<std::tuple<QString, Callback, PostProcessContext>>>>
-            result;
+        std::map<nx::Uuid, std::map<Connection, std::vector<UpdateCallBack>>> result;
         auto fillResult =
             [this, &result, user = std::move(user), makePostProcess = std::move(makePostProcess)](
                 const auto& id, const auto& callbacks)
@@ -136,7 +146,7 @@ protected:
                     if (!user || *user == userId)
                     {
                         result[userId][request.jsonRpcContext()->connection].push_back(
-                            {id, callback, makePostProcess(request)});
+                            {*request.apiVersion(), id, callback, makePostProcess(request)});
                     }
                 }
             };

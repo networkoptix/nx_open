@@ -2,12 +2,12 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/rest/api_versions.h>
 #include <nx/network/rest/crud_handler.h>
 #include <nx/network/rest/open_api_schema.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/api/data/device_model.h>
-#include <nx/vms/api/data/rest_api_versions.h>
 
 namespace nx::network::rest::test {
 
@@ -80,7 +80,7 @@ static const QString kJsonTemplateV4 = R"json({
 
 static const QString& jsonTemplate(std::string_view version)
 {
-    return version == *kRestApiV3 ? kJsonTemplateV3 : kJsonTemplateV4;
+    return version == *kApiV3 ? kJsonTemplateV3 : kJsonTemplateV4;
 }
 
 class AnalyticsObjectTracksHandler: public CrudHandler<AnalyticsObjectTracksHandler>
@@ -124,7 +124,7 @@ TEST_P(CrudHandlerTest, BookmarkPatch)
     json.replace(
         "        \"password\": \"8c1a3fc80f3607db0c6dbf47ff96e60f7cc26ad385d178c5c79be094531c979f\"\n",
         "");
-    if (GetParam() == *kRestApiV3)
+    if (GetParam() == *kApiV3)
     {
         json.replace("    },\n", "");
     }
@@ -168,7 +168,7 @@ TEST_P(CrudHandlerTest, BookmarkPatch)
     json.replace(
         "        \"password\": \"913a9615ba626dec634e88007bb8ecebdcc399d8b9eabfbe5aad77b905431668\"\n",
         "");
-    if (GetParam() == *kRestApiV3)
+    if (GetParam() == *kApiV3)
     {
         json.replace("    \"share\": {\n", "    \"share\": null,\n");
         json.replace("    },\n", "");
@@ -184,14 +184,14 @@ TEST_P(CrudHandlerTest, BookmarkPatch)
     NX_INFO(this, "eventRuleId");
     response = handler.executePatch(
         request(R"json({"eventRuleId": "{3771fd64-9b41-4216-8800-9610d40b9c16}"})json"));
-    ASSERT_TRUE(response.content->body.contains(GetParam() == *kRestApiV3
+    ASSERT_TRUE(response.content->body.contains(GetParam() == *kApiV3
             ? R"json("eventRuleId":"{3771fd64-9b41-4216-8800-9610d40b9c16}")json"
             : R"json("eventRuleId":"3771fd64-9b41-4216-8800-9610d40b9c16")json"));
 }
 
 TEST_P(CrudHandlerTest, ObjectTrackGet)
 {
-    if (GetParam() == *kRestApiV3)
+    if (GetParam() == *kApiV3)
         return;
 
     AnalyticsObjectTracksHandler handler;
@@ -282,7 +282,7 @@ TEST_P(CrudHandlerTest, DevicePatch)
             }
         })json"));
     DeviceModelV3 received;
-    if (GetParam() == *kRestApiV3)
+    if (GetParam() == *kApiV3)
     {
         received = QJson::deserialized(response.content->body, DeviceModelV3{});
     }
@@ -303,7 +303,7 @@ TEST_P(CrudHandlerTest, DevicePatch)
         R"json({"url2":"stream2"})json");
 }
 
-INSTANTIATE_TEST_SUITE_P(Rest, CrudHandlerTest, ::testing::ValuesIn(kRestApiV3, kRestApiEnd),
+INSTANTIATE_TEST_SUITE_P(Rest, CrudHandlerTest, ::testing::ValuesIn(kApiV3, kApiEnd),
     [](auto info) { return std::string(info.param); });
 
 } // namespace nx::network::rest::test

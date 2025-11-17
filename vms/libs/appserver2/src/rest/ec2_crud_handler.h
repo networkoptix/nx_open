@@ -430,26 +430,13 @@ protected:
                     [this](const auto& request) { return makePostProcessContext(request); });
                 for (auto& [user, connections]: callbacks)
                 {
-                    nx::network::rest::json_rpc::Payload<Data> payload;
                     for (auto& [connection, callbacks]: connections)
                     {
                         const int ignore_ = ignore(connection.id);
                         if (ignore_ == kBoth)
                             continue;
 
-                        if (!payload.data)
-                        {
-                            payload = payloadForUpdate<Data>(id, user, noEtag, connection);
-                            if (!payload.data)
-                                continue;
-                        }
-                        rapidjson::Document extensions;
-                        if (payload.extensions)
-                        {
-                            extensions =
-                                nx::json::serialized(*payload.extensions, /*stripDefault*/ false);
-                        }
-                        for (auto& [subscriptionId, callback, postProcess]: callbacks)
+                        for (auto& [apiVersion, subscriptionId, callback, postProcess]: callbacks)
                         {
                             if ((ignore_ == kOne && subscriptionId != "*")
                                 || (ignore_ == kAll && subscriptionId == "*"))
@@ -457,6 +444,17 @@ protected:
                                 continue;
                             }
 
+                            auto payload =
+                                payloadForUpdate<Data>(apiVersion, id, user, noEtag, connection);
+                            if (!payload.data)
+                                continue;
+
+                            rapidjson::Document extensions;
+                            if (payload.extensions)
+                            {
+                                extensions = nx::json::serialized(
+                                    *payload.extensions, /*stripDefault*/ false);
+                            }
                             auto& data = *payload.data;
                             nx::network::rest::detail::filter(&data, postProcess.filters);
                             nx::network::rest::detail::orderBy(&data, postProcess.filters);
@@ -531,6 +529,7 @@ private:
 
     template<typename T>
     nx::network::rest::json_rpc::Payload<T> payloadForUpdate(
+        size_t apiVersion,
         const QString& id,
         const nx::Uuid& user,
         bool noEtag,
@@ -541,8 +540,9 @@ private:
         try
         {
             ResponseAttributes responseAttributes;
-            auto list = static_cast<Derived*>(this)->read(
-                {id}, payloadRequest(id, user, std::move(connection)), &responseAttributes);
+            auto list = static_cast<Derived*>(this)->read({id},
+                payloadRequest(id, user, apiVersion, std::move(connection)),
+                &responseAttributes);
             if (!list.empty())
             {
                 result.data = std::move(list.front());

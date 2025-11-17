@@ -7,6 +7,7 @@
 #include <nx/branding.h>
 #include <nx/utils/json/qjson.h>
 
+#include "api_versions.h"
 #include "audit.h"
 #include "json_rpc/client_extensions.h"
 
@@ -171,6 +172,10 @@ Request::Request(
         }
         return;
     }
+
+    // It is the latest API version by default for JSON RPC subscription notifications.
+    if (m_jsonRpcContext->subs)
+        m_apiVersion = kLatestApiVersion;
 
     // Fill m_content for legacy and deprecated api.
     if (!m_jsonRpcContext->request.params)

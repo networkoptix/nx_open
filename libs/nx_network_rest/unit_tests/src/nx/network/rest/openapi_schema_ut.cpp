@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/rest/api_versions.h>
 #include <nx/network/rest/crud_handler.h>
 #include <nx/network/rest/handler_pool.h>
 #include <nx/network/rest/open_api_schema.h>
@@ -16,7 +17,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/reflect.h>
 #include <nx/vms/api/data/layout_data.h>
-#include <nx/vms/api/data/rest_api_versions.h>
 
 namespace nx::utils { NX_UTILS_API std::string sha3_256(const std::string_view& data); }
 
@@ -608,7 +608,7 @@ TEST_P(OpenApiSchemaTest, Postprocess)
     devices[0].attributes = nx::vms::api::CameraAttributesData();
     devices[0].attributes->cameraId = nx::Uuid::createUuid();
     const auto request{restRequest({"GET /rest/{version}/devices HTTP/1.1"})};
-    if (GetParam() == *kRestApiV3)
+    if (GetParam() == *kApiV3)
     {
         using namespace nx::utils::json;
         QJsonValue json;
@@ -630,7 +630,7 @@ TEST_P(OpenApiSchemaTest, ArrayOrdererVariant)
     ArrayOrdererTestResponse data{{{"key", {{{2}, {1}}}}}};
     const auto request{
         restRequest({"GET /rest/{version}/orderer?_orderBy=map.*[].id.%231 HTTP/1.1"})};
-    if (GetParam() == *kRestApiV3)
+    if (GetParam() == *kApiV3)
     {
         using namespace nx::utils::json;
         QJsonValue json;
@@ -660,7 +660,7 @@ TEST_P(OpenApiSchemaTest, ArrayOrdererVariantNested)
         {{"key", {{{ArrayOrderedTestNested{"2"}}, {ArrayOrderedTestNested{"1"}}}}}}};
     const auto request{
         restRequest({"GET /rest/{version}/orderer?_orderBy=map.*[].id.%232.name HTTP/1.1"})};
-    if (GetParam() == *kRestApiV3)
+    if (GetParam() == *kApiV3)
     {
         using namespace nx::utils::json;
         QJsonValue json;
@@ -697,7 +697,7 @@ static const char* kTestJson = R"json([
 TEST_P(OpenApiSchemaTest, EmptyOrderBy)
 {
     const auto request{restRequest({"GET /rest/{version}/test?_orderBy= HTTP/1.1"})};
-    if (GetParam() == *kRestApiV3)
+    if (GetParam() == *kApiV3)
     {
         using namespace nx::utils::json;
         QJsonValue json;
@@ -731,7 +731,7 @@ TEST_P(OpenApiSchemaTest, OrderByNameAndListName)
 {
     const auto request{
         restRequest({"GET /rest/{version}/test?_orderBy=name&_orderBy=list[].name HTTP/1.1"})};
-    if (GetParam() == *kRestApiV3)
+    if (GetParam() == *kApiV3)
     {
         using namespace nx::utils::json;
         QJsonValue json;
@@ -824,7 +824,7 @@ TEST_P(OpenApiSchemaTest, XmlResponse)
     ASSERT_EQ(response.statusCode, http::StatusCode::ok);
     ASSERT_EQ(Qn::serializationFormatFromHttpContentType(response.content->type.toString()),
         Qn::SerializationFormat::xml);
-    const QByteArray expected = GetParam() == *kRestApiV3
+    const QByteArray expected = GetParam() == *kApiV3
         ?
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 "<reply>"
@@ -883,7 +883,7 @@ TEST_P(OpenApiSchemaTest, CsvResponse)
     ASSERT_EQ(response.statusCode, http::StatusCode::ok);
     ASSERT_EQ(Qn::serializationFormatFromHttpContentType(response.content->type.toString()),
         Qn::SerializationFormat::csv);
-    const QByteArray expected = GetParam() == *kRestApiV3
+    const QByteArray expected = GetParam() == *kApiV3
         ?
             "backgroundHeight,"
             "backgroundImageFilename,"
@@ -959,7 +959,7 @@ TEST_P(OpenApiSchemaTest, PrettyResponse)
     ASSERT_TRUE(response.content);
     ASSERT_EQ(
         response.content->body.toStdString(),
-        GetParam() == *kRestApiV3
+        GetParam() == *kApiV3
             ?
                 R"json([
     {
@@ -1018,7 +1018,7 @@ TEST_P(OpenApiSchemaTest, Base64)
 
 TEST_P(OpenApiSchemaTest, Map)
 {
-    auto [possibleLeftBrace, possibleRightBrace] = GetParam() == *kRestApiV3
+    auto [possibleLeftBrace, possibleRightBrace] = GetParam() == *kApiV3
         ? std::make_pair(QString{"{"}, QString{"}"})
         : std::make_pair(QString{}, QString{});
     HandlerPool pool;
@@ -1109,7 +1109,7 @@ TEST_P(OpenApiSchemaTest, Map)
 })json", possibleLeftBrace, possibleRightBrace).toStdString());
 }
 
-INSTANTIATE_TEST_SUITE_P(Rest, OpenApiSchemaTest, ::testing::ValuesIn(kRestApiV3, kRestApiEnd),
+INSTANTIATE_TEST_SUITE_P(Rest, OpenApiSchemaTest, ::testing::ValuesIn(kApiV3, kApiEnd),
     [](auto info) { return std::string(info.param); });
 
 } // namespace nx::network::rest::json::test
