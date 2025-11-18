@@ -3033,6 +3033,19 @@ nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(nx::Uuid 
     return result;
 }
 
+std::set<nx::vms::api::StreamIndex> QnVirtualCameraResource::analyzedStreamIndexes() const
+{
+    std::set<nx::vms::api::StreamIndex> result;
+
+    const auto indexes = m_cachedAnalyzedStreamIndex.lock();
+    for ([[maybe_unused]] const auto& [engineId, index]: *indexes)
+        result.insert(index);
+    if (result.empty())
+        result.insert(defaultAnalyzedStreamIndex());
+
+    return result;
+}
+
 nx::vms::api::StreamIndex QnVirtualCameraResource::defaultAnalyzedStreamIndex() const
 {
     return hasDualStreaming() ? nx::vms::api::StreamIndex::secondary : nx::vms::api::StreamIndex::primary;
