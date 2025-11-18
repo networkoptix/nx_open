@@ -30,6 +30,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/bookmark/bookmark_helpers.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/helpers.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
@@ -141,6 +142,11 @@ NotificationActionHandler::NotificationActionHandler(
         &nx::vms::client::core::ServerRuntimeEventConnector::siteHealthMessage,
         this,
         &NotificationActionHandler::onSystemHealthMessage);
+
+    connect(systemContext->saasServiceManager(),
+        &nx::vms::common::saas::ServiceManager::dataChanged,
+        this,
+        &NotificationActionHandler::at_saasDataChanged);
 }
 
 NotificationActionHandler::~NotificationActionHandler()
@@ -190,6 +196,21 @@ void NotificationActionHandler::at_serviceDisabled(
     message.resourceIds.assign(deviceIds.cbegin(), deviceIds.cend());
 
     onSystemHealthMessage(message);
+}
+
+void NotificationActionHandler::at_saasDataChanged()
+{
+    const auto saasManager = system()->saasServiceManager();
+    const auto status = saasManager->serviceStatus(
+        nx::vms::api::SaasService::kCloudRecordingType);
+
+    if (status.status != nx::vms::api::UseStatus::overUse)
+    {
+        SiteHealthMessage message;
+        message.type = SiteHealthMessageType::cloudServiceDisabled;
+        message.active = false;
+        removeNotification(message);
+    }
 }
 
 void NotificationActionHandler::onSystemHealthMessage(const SiteHealthMessage& message)
