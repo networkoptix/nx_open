@@ -2637,7 +2637,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %permissions Power User.
      * %return:{IntegrationInfo} Integration record.
      */
-    reg("rest/v{4-}/integrations/:id?", GlobalPermission::none,
+    reg("rest/v{4-}/integrations/:id?", GlobalPermission::powerUser,
         std::make_unique<IntegrationsHandler>(serverModule, serverConnector));
 
     /**%apidoc POST /rest/v{4-}/analytics/integrations/%2A/requests
