@@ -549,6 +549,7 @@ bool QnWorkbenchNavigator::setLive(bool live)
     {
         m_timeSlider->setValue(m_timeSlider->maximum() - 1ms, false);
     }
+    updateLive();
     return true;
 }
 
