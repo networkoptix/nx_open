@@ -139,18 +139,22 @@ function(nx_add_functional_test target)
     set(copy_deps ${FT_TEST_FILES})
 
     set(copy_cmds "")
+    set(dest_generated_files "")
 
     foreach(src IN LISTS FT_TEST_FILES)
         get_filename_component(name "${src}" NAME)
         list(APPEND copy_cmds
             COMMAND ${CMAKE_COMMAND} -E copy "${src}" "${dest_dir}/${name}"
         )
+        list(APPEND dest_generated_files "${dest_dir}/${name}")
     endforeach()
 
     foreach(src IN LISTS FT_TEST_BINARIES)
         list(APPEND copy_cmds
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${src}" "${dest_dir}/${src}"
         )
+        list(APPEND copy_deps "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${src}")
+        list(APPEND dest_generated_files "${dest_dir}/${src}")
     endforeach()
 
     # Add a final step that creates/updates the stamp file
@@ -161,9 +165,10 @@ function(nx_add_functional_test target)
     # Custom command that produces the stamp file and depends on all input files
     add_custom_command(
         OUTPUT "${stamp_file}"
+        BYPRODUCTS ${dest_generated_files}
         COMMAND ${CMAKE_COMMAND} -E make_directory "${dest_dir}"
         ${copy_cmds}
-        DEPENDS ${copy_deps}
+        DEPENDS ${copy_deps} ${FT_TEST_DEPENDS}
         COMMENT "Copying functional test files into ${dest_dir}"
         VERBATIM
     )
