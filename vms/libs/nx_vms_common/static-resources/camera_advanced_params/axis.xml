@@ -4,6 +4,36 @@
     version="1"
     unique_id="A6CC59F4-A1EE-4BB9-921D-971F4254B4A5">
     <parameters>
+        <group name="Metadata Configuration">
+            <group name="Primary Stream">
+                <param id="internal.object_meta.primary"
+                    name="Fetch Objects"
+                    dataType="Enumeration"
+                    range="Auto,Force Enabled,Force Disabled"
+                    internalRange="auto,forceEnabled,forceDisabled"
+                    aux="reopenStreams"/>
+                <param id="internal.event_meta.primary"
+                    name="Fetch Events"
+                    dataType="Enumeration"
+                    range="Auto,Force Enabled,Force Disabled"
+                    internalRange="auto,forceEnabled,forceDisabled"
+                    aux="reopenStreams"/>
+            </group>
+            <group name="Secondary Stream">
+                <param id="internal.object_meta.secondary"
+                    name="Fetch Objects"
+                    dataType="Enumeration"
+                    range="Auto,Force Enabled,Force Disabled"
+                    internalRange="auto,forceEnabled,forceDisabled"
+                    aux="reopenStreams"/>
+                <param id="internal.event_meta.secondary"
+                    name="Fetch Events"
+                    dataType="Enumeration"
+                    range="Auto,Force Enabled,Force Disabled"
+                    internalRange="auto,forceEnabled,forceDisabled"
+                    aux="reopenStreams"/>
+            </group>
+        </group>
         <group name="Imaging">
             <group name="Image Appearance">
                 <param id="root.ImageSource.I0.Sensor.ColorLevel"

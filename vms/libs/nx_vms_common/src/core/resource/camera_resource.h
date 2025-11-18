@@ -808,6 +808,7 @@ public:
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
     nx::vms::api::StreamIndex analyzedStreamIndex(nx::Uuid engineId) const;
+    std::set<nx::vms::api::StreamIndex> analyzedStreamIndexes() const;
 
     nx::vms::api::StreamIndex defaultAnalyzedStreamIndex() const;
 
