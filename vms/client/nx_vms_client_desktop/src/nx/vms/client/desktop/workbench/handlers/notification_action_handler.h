@@ -44,6 +44,7 @@ private:
     void onSystemHealthMessage(const nx::vms::api::SiteHealthMessage& message);
     void at_serviceDisabled(
         nx::vms::api::EventReason reason, const std::set<nx::Uuid>& deviceIds);
+    void at_saasDataChanged();
 };
 
 } // namespace nx::vms::client::desktop
