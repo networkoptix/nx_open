@@ -29,6 +29,7 @@ StartupParameters StartupParameters::fromCommandLineParams(const QnStartupParame
     result.noFullScreen = params.fullScreenDisabled;
     result.screen = params.screen;
     result.windowGeometry = params.windowGeometry;
+    result.hidePanelsOnStartup = params.hidePanelsOnStartup;
 
     return result;
 }

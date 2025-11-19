@@ -32,6 +32,7 @@
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/state/startup_parameters.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/performance_info_widget.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
@@ -158,7 +159,7 @@ public:
     virtual bool loadState(
         const DelegateState& state,
         SubstateFlags flags,
-        const StartupParameters& /*params*/) override
+        const StartupParameters& params) override
     {
         if (!flags.testFlag(ClientStateDelegate::Substate::systemIndependentParameters))
             return false;
@@ -183,6 +184,15 @@ public:
         }
         m_ui->m_settings = settings;
         m_ui->loadSettings(false, false);
+
+        if (params.hidePanelsOnStartup)
+        {
+            // Close all the panels. Their size, however, is derived from the original state.
+            m_ui->setOpenedPanels({}, false);
+
+            // Save the panels' state in settings to avoid weird Free Space action behavior.
+            m_ui->storeSettings();
+        }
 
         reportStatistics("left_panel_visible", m_ui->isLeftPanelOpened());
         reportStatistics("notifications_panel_visible", m_ui->isNotificationsOpened());

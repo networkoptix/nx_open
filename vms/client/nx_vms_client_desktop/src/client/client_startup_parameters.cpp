@@ -86,6 +86,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.delayedDrop, "--delayed-drop");
     addParserParam(commandLineParser, &result.instantDrop, "--instant-drop");
     addParserParam(commandLineParser, &result.layoutRef, "--layout-name");
+    addParserParam(commandLineParser, &result.hidePanelsOnStartup, "--hide-panels");
 
     /* Development options */
     addParserParam(commandLineParser, &result.softwareYuv,          "--soft-yuv");
