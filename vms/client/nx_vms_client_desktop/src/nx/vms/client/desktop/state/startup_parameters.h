@@ -34,6 +34,8 @@ struct StartupParameters
     int screen = -1; //< Negative, since 0 is a valid screen index.
     QRect windowGeometry;
 
+    bool hidePanelsOnStartup = false;
+
     static StartupParameters fromCommandLineParams(const QnStartupParameters& params);
     QStringList toCommandLineParams() const;
     bool allowMultipleClientInstances = false;

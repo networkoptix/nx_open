@@ -70,6 +70,8 @@ struct QnStartupParameters
     QRect windowGeometry;
     const static QString kWindowGeometryKey;
 
+    bool hidePanelsOnStartup = false;
+
     bool skipAutoLogin = false;
     const static QString kSkipAutoLoginKey;
 
