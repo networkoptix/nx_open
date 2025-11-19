@@ -424,8 +424,11 @@ Page
 
         view: notifications
 
-        onUpdateRequested:
+        onUpdateRequested: (type) =>
         {
+            if (type !== ViewUpdateWatcher.FullRefresh)
+                return
+
             sourceModel.update()
             feedState.update()
         }
