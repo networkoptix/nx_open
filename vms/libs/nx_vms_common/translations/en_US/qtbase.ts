@@ -587,40 +587,8 @@ Do you want to delete it anyway?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Drive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 File</source>
         <extracomment>%1 is a file name suffix, for example txt</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>File Folder</source>
-        <comment>Match Windows Explorer</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Folder</source>
-        <comment>All other platforms</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alias</source>
-        <comment>OS X Finder</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Shortcut</source>
-        <comment>All other platforms</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1166,6 +1134,41 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Select All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+        <source>Drive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Folder</source>
+        <comment>Match Windows Explorer</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <comment>All other platforms</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alias</source>
+        <comment>OS X Finder</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shortcut</source>
+        <comment>All other platforms</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
