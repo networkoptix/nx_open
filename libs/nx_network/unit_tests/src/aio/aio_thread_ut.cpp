@@ -5,11 +5,11 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/aio/pollset_wrapper.h>
-#include <nx/network/aio/pollset.h>
-#include <nx/network/aio/aio_thread.h>
 #include <nx/network/aio/aio_event_handler.h>
 #include <nx/network/aio/aio_task_queue.h>
+#include <nx/network/aio/aio_thread.h>
+#include <nx/network/aio/pollset_wrapper.h>
+#include <nx/network/aio/pollset.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -148,6 +148,8 @@ TEST_F(AioThread, duplicate_start_polling)
 TEST_F(AioThread, socket_polled_notification)
 {
     UDPSocket socket(AF_INET);
+    socket.bindToAioThread(&m_aioThread);
+
     std::atomic<bool> handlerCalledFlag(false);
     DummyEventHandler evHandler(
         [&handlerCalledFlag](Pollable*, aio::EventType)
