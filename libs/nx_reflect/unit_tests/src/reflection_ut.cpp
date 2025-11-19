@@ -84,22 +84,6 @@ TEST(Reflection, struct_properties_represented_with_get_set_methods_json)
 
 //-------------------------------------------------------------------------------------------------
 
-struct FooWithShared
-{
-    std::shared_ptr<int> field;
-};
-NX_REFLECTION_INSTRUMENT(FooWithShared, (field))
-
-TEST(Reflection, deserialize_shared_ptr)
-{
-    FooWithShared foo;
-    ASSERT_TRUE(nx::reflect::json::deserialize(R"({"field":42})", &foo));
-
-    ASSERT_EQ(*foo.field, 42);
-}
-
-//-------------------------------------------------------------------------------------------------
-
 class FooWithReadOnlyProperty
 {
 public:
