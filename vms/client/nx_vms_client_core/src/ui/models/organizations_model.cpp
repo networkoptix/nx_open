@@ -688,6 +688,21 @@ struct OrganizationsModel::Private
                 }),
             items->end());
     }
+
+    template <typename T, typename... P>
+        requires ((std::is_same_v<T, struct ChannelPartner>
+                || std::is_same_v<T, struct Organization>)
+            && (sizeof...(P) == 0
+                || std::is_same_v<std::tuple<P...>, std::tuple<struct ChannelPartner>>))
+    void updateItemsAccess(const std::vector<T>& items, P... params)
+    {
+        for (const auto& item: items)
+        {
+            const bool accessible = canAccess(item, params...);
+            if (auto node = this->nodes.find(item.id))
+                updateNodeAccess(node, accessible);
+        }
+    }
 };
 
 OrganizationsModel::OrganizationsModel(QObject* parent):
@@ -1254,28 +1269,29 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
         fillOrgInfo(channelPartnerStruct->organizations, organizationsCache);
 
         // /v3/channel_partners/channel_structure/ does not privide a flat list of partners,
-        // but contains organizations informatios. So make a list from /v3/channel_partners/
+        // but contains organizations information. So make a list from /v3/channel_partners/
         // and fill partners organization lists.
-        QHash<nx::Uuid, std::shared_ptr<ChannelPartnerInStruct>> visiblePartners;
+        QHash<nx::Uuid, ChannelPartnerInStruct> visiblePartners;
         for (const auto &partner: channelPartnerList->results)
-            visiblePartners[partner.id] = nullptr;
+            visiblePartners[partner.id] = {};
 
-        const auto fillRecursive =
+        const auto fillOrgsRecursive =
             nx::utils::y_combinator([&organizationsCache, &visiblePartners](
-                const auto fillRecursive,
-                std::shared_ptr<ChannelPartnerInStruct> partner) -> void
+                const auto fillOrgsRecursive,
+                const ChannelPartnerInStruct& partner) -> void
             {
-                fillOrgInfo(partner->organizations, organizationsCache);
-                for (auto& subPartner: partner->subChannels)
-                    fillRecursive(subPartner);
-
-                auto it = visiblePartners.find(partner->id);
-                if (it != visiblePartners.end())
+                if (auto it = visiblePartners.find(partner.id); it != visiblePartners.end())
+                {
                     *it = partner;
+                    fillOrgInfo(it->organizations, organizationsCache);
+                }
+
+                for (auto& subPartner: partner.subChannels)
+                    fillOrgsRecursive(subPartner);
             });
 
         for (auto& partner: channelPartnerStruct->channelPartners)
-            fillRecursive(partner);
+            fillOrgsRecursive(partner);
 
         // Fill in organizations access cache.
         const auto isAccessible =
@@ -1298,7 +1314,7 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
 
         // Show inaccessible organizations but don't load them.
         setOrganizations(channelPartnerStruct->organizations, root->id);
-        removeInaccessibleItems(&channelPartnerStruct->organizations);
+        updateItemsAccess(channelPartnerStruct->organizations);
 
         // At this point we know all accessible channel partners and organizations and can show the
         // tab bar.
@@ -1307,16 +1323,16 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
         // Set organizations for each channel partner.
         for (const auto& [partnerId, partner]: visiblePartners.asKeyValueRange())
         {
-            if (!partner)
+            if (partner.id.isNull())
                 continue;
 
-            setOrganizations(partner->organizations, partnerId);
+            setOrganizations(partner.organizations, partnerId);
 
             auto it = channelPartnersCache.find(partnerId);
 
             // Show inaccessible organizations but don't load them.
             if (it != channelPartnersCache.end())
-                removeInaccessibleItems(&partner->organizations, it.value());
+                updateItemsAccess(partner.organizations, it.value());
 
             if (auto node = nodes.find(partnerId); node && node->loading)
             {
