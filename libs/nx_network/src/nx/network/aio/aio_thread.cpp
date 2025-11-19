@@ -5,6 +5,7 @@
 #include <chrono>
 #include <thread>
 
+#include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>
 
 #include "aio_task_queue.h"
@@ -62,6 +63,8 @@ void AioThread::startMonitoring(
     std::optional<std::chrono::milliseconds> timeout,
     nx::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
+    NX_ASSERT(sock->getAioThread() == this, "Socket %1 thread %2", sock, sock->getAioThread());
+
     if (!timeout)
     {
         timeout = std::chrono::milliseconds::zero();
@@ -118,10 +121,12 @@ void AioThread::stopMonitoring(
 
 void AioThread::post(Pollable* const sock, nx::MoveOnlyFunc<void()> functor)
 {
-    unsigned int dummy;
-    NX_ASSERT_HEAVY_CONDITION(
-        !sock || sock->getRecvTimeout(&dummy),
-        "socket probably closed or corrupted!");
+    if (sock)
+    {
+        NX_ASSERT(sock->getAioThread() == this, "Socket %1 thread %2", sock, sock->getAioThread());
+        unsigned int dummy;
+        NX_ASSERT_HEAVY_CONDITION(sock->getRecvTimeout(&dummy), "Socket %1 is closed or corrupted", sock);
+    }
 
     m_taskQueue->addTask(
         detail::PostAsyncCallTask(sock, std::move(functor)));
@@ -145,6 +150,8 @@ void AioThread::dispatch(Pollable* const sock, nx::MoveOnlyFunc<void()> functor)
 
 void AioThread::cancelPostedCalls(Pollable* const sock)
 {
+    NX_ASSERT(sock->getAioThread() == this, "Socket %1 thread %2", sock, sock->getAioThread());
+
     const bool inAIOThread = currentThreadSystemId() == systemThreadId();
     if (inAIOThread)
     {
@@ -203,6 +210,11 @@ bool AioThread::isSocketBeingMonitored(Pollable* sock) const
 const detail::AioTaskQueue& AioThread::taskQueue() const
 {
     return *m_taskQueue;
+}
+
+std::string AioThread::idForToStringFromPtr() const
+{
+    return nx::kit::utils::format("%p", m_systemThreadId);
 }
 
 static constexpr std::chrono::milliseconds kErrorResetTimeout(1);
@@ -313,6 +325,8 @@ bool AioThread::getSocketTimeout(
 
 void AioThread::stopMonitoringInternal(Pollable* sock, aio::EventType eventType)
 {
+    NX_ASSERT(sock->getAioThread() == this, "Socket %1 thread %2", sock, sock->getAioThread());
+
     // Checking queue for reverse task for sock.
     if (m_taskQueue->removeReverseTask(
             sock, eventType, detail::TaskType::tRemoving,

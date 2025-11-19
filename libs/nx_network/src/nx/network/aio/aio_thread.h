@@ -43,6 +43,8 @@ public:
     virtual void cancelPostedCalls(Pollable* const sock) = 0;
 
     virtual bool isSocketBeingMonitored(Pollable* sock) const = 0;
+
+    virtual std::string idForToStringFromPtr() const = 0;
 };
 
 /**
@@ -103,6 +105,8 @@ public:
     virtual bool isSocketBeingMonitored(Pollable* sock) const override;
 
     const detail::AioTaskQueue& taskQueue() const;
+
+    virtual std::string idForToStringFromPtr() const override;
 
 protected:
     virtual void run() override;
