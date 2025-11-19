@@ -266,7 +266,7 @@ void Settings::renamePreviousSettings()
     AbstractBackend* backend = this->backend();
 
     const std::vector<std::pair<QString, QString>> oldNewName{
-        {"enableHadrWareDecoding", "enableHardwareDecoding"}}; //< A typo in prev name.
+        {"enableHadrwareDecoding", "enableHardwareDecoding"}}; //< A typo in prev name.
 
     // Do a low-level transfer of properties.
     for (const auto& [oldName, newName]: oldNewName)
