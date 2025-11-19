@@ -7,6 +7,8 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/time.h>
 
+#include "aio_thread.h"
+
 namespace nx::network::aio::detail {
 
 AioTaskQueue::AioTaskQueue(AbstractPollSet* pollSet):
@@ -369,8 +371,9 @@ void AioTaskQueue::processPostedCalls()
     {
         auto postHandler = std::move(m_postedCalls.begin()->postHandler);
         auto span = m_postedCalls.begin()->telemetrySpan;
-        NX_ASSERT(!m_postedCalls.front().socket ||
-            m_postedCalls.front().socket->isInSelfAioThread());
+        auto socket = m_postedCalls.front().socket;
+        NX_ASSERT(!socket || socket->isInSelfAioThread(), "Socket %1 thread %2",
+            socket, socket->getAioThread());
         m_postedCalls.erase(m_postedCalls.begin());
 
         // NOTE: User handler may cancel some calls, so m_postedCalls may change.
