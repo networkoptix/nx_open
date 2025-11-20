@@ -6,6 +6,7 @@ else()
     set(ext "tar.gz")
 endif()
 set(package_file ${distribution_output_dir}/${unit_tests_distribution_name}.${ext})
+set(ft_package_file ${distribution_output_dir}/${functional_tests_distribution_name}.${ext})
 
 nx_configure_file(build_distribution_conf.py.in
     ${CMAKE_CURRENT_BINARY_DIR}/build_distribution_conf.py @ONLY)

@@ -172,6 +172,32 @@ def archiveSdkUnitTests(archiver, conf, src_bin_dir):
         target_dir / "analytics_plugin_ut.cfg")
 
 
+def archiveFunctionalTests(conf):
+    logging.info("Archiving functional tests")
+    src_dir = Path(conf.BUILD_DIR) / "functional_tests"
+    if not src_dir.exists():
+        return
+    directories = [p.name for p in src_dir.iterdir() if p.is_dir()]
+    logging.info(f'Found {len(directories)} functional tests')
+    if not directories:
+        return
+    limit_to_targets = None
+    if conf.AFFECTED_TARGETS_LIST_FILE_NAME:
+        with open(Path(conf.BUILD_DIR) / conf.AFFECTED_TARGETS_LIST_FILE_NAME) as f:
+            limit_to_targets = set(f.read().splitlines())
+
+    if limit_to_targets:
+        directories = [d for d in directories if d in limit_to_targets]
+
+    logging.info(f'Archive {len(directories)} functional tests')
+
+    # Creates empty archive if nothing changed.
+    with archiver.Archiver(conf.FT_PACKAGE_FILE, conf=conf) as a:
+        for target in directories:
+            test_dir = src_dir / target
+            archiveByGlob(a, target, target, test_dir,"*", recursive=True)
+
+
 def main():
     isWindows = conf.CMAKE_SYSTEM_NAME == "Windows"
     isMac = conf.CMAKE_SYSTEM_NAME == "Darwin"
@@ -190,6 +216,9 @@ def main():
         "Darwin": ["*.dylib"]
     }[conf.CMAKE_SYSTEM_NAME]
     test_info = load_unit_test_info()
+
+    if isLinux:
+        archiveFunctionalTests(conf)
 
     with archiver.Archiver(conf.PACKAGE_FILE, conf=conf) as a:
         # Fill up unneeded files filter in the archiver.
@@ -216,10 +245,6 @@ def main():
         if not isMac:
             logging.info("Archiving standalone server_plugin_sdk unit tests")
             archiveSdkUnitTests(a, conf, src_bin_dir)
-
-        if isLinux:
-            archiveByGlob(a, "functional tests", "functional_tests",
-                join(conf.BUILD_DIR, "functional_tests"), "*", recursive=True)
 
         logging.info("Archiving unit test executables")
         if not archiveFiles(a, bin_dir, src_bin_dir, get_list_of_binaries(test_info)):

@@ -81,6 +81,8 @@ function(set_distribution_names)
         "${prefix}-testcamera-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(unit_tests_distribution_name
         "${prefix}-unit_tests-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(functional_tests_distribution_name
+        "${prefix}-functional_tests-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(mobile_client_distribution_name
         "${prefix}-client-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
     set(mobile_client_aab_distribution_name
