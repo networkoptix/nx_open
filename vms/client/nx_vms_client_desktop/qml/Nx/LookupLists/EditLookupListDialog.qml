@@ -143,7 +143,7 @@ ModalDialog
         // objectTypeId must be initialized before attributes names,
         // since attributeNames changes processing requires correct objectTypeId state.
         objectTypeId: sourceModel ? sourceModel.objectTypeId : ""
-        attributeNames: sourceModel ? sourceModel.attributeNames : ["Value"]
+        attributeNames: sourceModel ? sourceModel.attributeNames : [qsTr("Value")]
         name: sourceModel ? sourceModel.name : qsTr("New List")
 
         property Analytics.ObjectType listType: taxonomy ? taxonomy.objectTypeById(objectTypeId) : null

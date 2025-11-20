@@ -98,7 +98,7 @@ Control
                 return control.value
             }
 
-            placeholderText: qsTr("Any %1").arg(attribute ? attribute.name : "value")
+            placeholderText: qsTr("Any %1").arg(attribute ? attribute.name : qsTr("value"))
 
             Connections
             {
