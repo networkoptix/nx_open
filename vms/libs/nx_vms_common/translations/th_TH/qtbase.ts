@@ -592,41 +592,9 @@ Do you want to delete it anyway?</source>
       <translation>คอมพิวเตอร์ของฉัน</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>ที่อยู่ข้อมูล</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>%1 ไฟล์</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>ไฟล์</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>โฟลเดอร์ ไฟล์</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>โฟลเดอร์</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>นามแฝง</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>ทางลัด</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>ม่รู้จัก</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1172,6 +1140,41 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Select All</source>
       <translation>เลือกทั้งหมด</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation>ที่อยู่ข้อมูล</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation>ไฟล์</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>โฟลเดอร์ ไฟล์</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>โฟลเดอร์</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>นามแฝง</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>ทางลัด</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>ม่รู้จัก</translation>
     </message>
   </context>
 </TS>

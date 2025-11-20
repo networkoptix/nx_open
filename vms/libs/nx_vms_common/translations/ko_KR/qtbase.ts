@@ -592,41 +592,9 @@ Do you want to delete it anyway?</source>
       <translation>내 컴퓨터</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>드라이브</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>%1 파일</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>파일</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>파일 폴더</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>폴더</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>별명</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>바로 가기</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>알 수 없음</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1172,6 +1140,41 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Select All</source>
       <translation>모두 선택</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation>드라이브</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation>파일</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>파일 폴더</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>폴더</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>별명</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>바로 가기</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>알 수 없음</translation>
     </message>
   </context>
 </TS>
