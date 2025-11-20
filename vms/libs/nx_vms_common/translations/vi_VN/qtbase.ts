@@ -592,41 +592,9 @@ Do you want to delete it anyway?</source>
       <translation>Máy tính của tôi</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>Ổ cứng</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>%1 Tập tin</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>Tập tin</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>Thư mục tập tin</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>Thư mục</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>Tên ghi chú</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>Lối tắt</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>Không xác định</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1172,6 +1140,41 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Select All</source>
       <translation>Chọn tất cả</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation>Ổ cứng</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation>Tập tin</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>Thư mục tập tin</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>thư mục</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>tên giả</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>Lối tắt</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Không xác định</translation>
     </message>
   </context>
 </TS>

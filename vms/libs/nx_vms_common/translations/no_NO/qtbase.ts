@@ -594,41 +594,9 @@ Do you want to delete it anyway?</source>
       <translation>Min datamaskin</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>Disk</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>%1 Fil</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>Fil</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>Fil mappe</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>Mappe</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>Alias</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>Snarvei</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>Ukjent</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1174,6 +1142,41 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Select All</source>
       <translation>Velg alle</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation>Disk</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation>Fil</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>Fil mappe</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>Mappe</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>Alias</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>Snarvei</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation type="unfinished">Unknown</translation>
     </message>
   </context>
 </TS>

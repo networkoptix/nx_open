@@ -594,41 +594,9 @@ Do you want to delete it anyway?</source>
       <translation>Мой компьютер</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>Диск</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>Файл %1</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>Файл</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>Папка с файлами</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>Папка</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>Псевдоним</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>Ярлык</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>Неизвестный</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1174,6 +1142,41 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Select All</source>
       <translation>Выделить всё</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation>Диск</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation>Файл</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>Папка с файлами</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>Папка</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>Псевдоним</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>Ярлык</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Неизвестный</translation>
     </message>
   </context>
 </TS>

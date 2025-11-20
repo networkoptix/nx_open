@@ -594,41 +594,9 @@ Quer apagar mesmo assim?</translation>
       <translation>O Meu Computador</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>Unidade</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>Ficheiro %1</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>Ficheiro</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>Pasta de Ficheiros</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>Pasta</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>Alias</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>Atalho</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>Desconhecido</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1174,6 +1142,41 @@ Quer apagar mesmo assim?</translation>
     <message>
       <source>Select All</source>
       <translation>Seleccionar Tudo</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation>Unidade</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation>Ficheiro</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>Pasta de Ficheiros</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>Pasta</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>Alias</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>Atalho</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Desconhecido</translation>
     </message>
   </context>
 </TS>

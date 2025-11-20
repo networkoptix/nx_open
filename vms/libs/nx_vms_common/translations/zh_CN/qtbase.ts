@@ -592,41 +592,9 @@ Do you want to delete it anyway?</source>
       <translation>我的计算机</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>驱动器</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>%1 文件</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>文件</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>文件夹</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>目录</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>Alias</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>捷径</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>未知的</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1172,6 +1140,41 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Select All</source>
       <translation>选择全部</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation type="unfinished">Drive</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation type="unfinished">File</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation type="unfinished">File Folder</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation type="unfinished">Folder</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation type="unfinished">Alias</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation type="unfinished">Shortcut</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation type="unfinished">Unknown</translation>
     </message>
   </context>
 </TS>

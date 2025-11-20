@@ -593,41 +593,9 @@ Chcete ho smazat?</translation>
       <translation>Tento počítač</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>Disk</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>%1 Soubor</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>Soubor</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>Složka souborů</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>Složka</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>Přezdívka</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>Klávesová zkratka</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>Neznámý</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1173,6 +1141,41 @@ Chcete ho smazat?</translation>
     <message>
       <source>Select All</source>
       <translation>Vybrat vše</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation>Disk</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation>Soubor</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation type="unfinished">File Folder</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation type="unfinished">Folder</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation type="unfinished">Alias</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation type="unfinished">Shortcut</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation type="unfinished">Unknown</translation>
     </message>
   </context>
 </TS>
