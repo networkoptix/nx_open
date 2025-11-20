@@ -676,16 +676,22 @@ private:
             f.wait();
         }
 
-        auto response = nx::network::rest::json_rpc::to(
-            request.jsonRpcContext()->request.responseId(), this->executeGet(request));
-
         // Add subscription - start collection of notifications instead of sending them to
         // connection.
-        auto guard =
-            static_cast<Derived*>(this)->addSubscription(std::move(request), std::move(callback));
+        auto guard = static_cast<Derived*>(this)->addSubscription(
+            {json_rpc::Context{
+                request.jsonRpcContext()->request.copy(),
+                request.jsonRpcContext()->connection,
+                request.jsonRpcContext()->subscribed,
+                request.jsonRpcContext()->subscriptionId,
+                request.jsonRpcContext()->crud,
+                request.jsonRpcContext()->subs},
+                request.userSession},
+            std::move(callback));
 
-        // Send subscribe response to connection.
-        handler(std::move(response));
+        // Send subscribe response to connection. NOTE: executeGet must be after addSubscription.
+        handler(nx::network::rest::json_rpc::to(
+            request.jsonRpcContext()->request.responseId(), this->executeGet(request)));
 
         // Send collected notifications if any and switch to usual notification processing.
         processor.processCustomUpdateAsync(ApiCommand::NotDefined,
