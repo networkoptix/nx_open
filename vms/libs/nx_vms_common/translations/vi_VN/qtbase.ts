@@ -612,12 +612,12 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Folder</source>
       <comment>All other platforms</comment>
-      <translation>Thư mục</translation>
+      <translation>thư mục</translation>
     </message>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation>Tên ghi chú</translation>
+      <translation>tên giả</translation>
     </message>
     <message>
       <source>Shortcut</source>
