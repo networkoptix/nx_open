@@ -3,6 +3,7 @@
 #pragma once
 
 #include <thread>
+#include <source_location>
 
 #include <boost/container/small_vector.hpp>
 
@@ -56,13 +57,17 @@ public:
      */
     void interrupt();
 
+    std::string toString() const;
+
     /**
      * NOTE: Multiple objects using same InterruptionFlag instance can be stacked.
      */
     class NX_UTILS_API Watcher
     {
     public:
-        Watcher(InterruptionFlag* const flag);
+        Watcher(
+            InterruptionFlag* const flag,
+            std::source_location location = std::source_location::current());
         ~Watcher();
 
         Watcher(const Watcher&) = delete;
@@ -72,20 +77,24 @@ public:
 
         bool interrupted() const;
 
+        std::string toString() const;
+
     private:
-        bool m_interrupted = false;
+        friend class InterruptionFlag;
         InterruptionFlag* const m_objectDestructionFlag;
+        std::source_location m_location;
+        bool m_interrupted = false;
     };
 
 private:
     // The number of elements in this array is very low (e.g., one) at most times.
     // Using 15 elements on all platforms - previously the MSVC implementation of std::basic_string
     // was used and it's in-place storage was 15 elements.
-    boost::container::small_vector<bool*, 15> m_watcherStates;
+    boost::container::small_vector<Watcher*, 15> m_watchers;
     std::thread::id m_lastWatchingThreadId;
 
-    void pushWatcherState(bool* watcherState);
-    void popWatcherState(bool* watcherState);
+    void push(Watcher* watcher);
+    void pop(Watcher* watcher);
 };
 
 } // namespace nx::utils

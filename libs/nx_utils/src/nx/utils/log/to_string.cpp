@@ -274,6 +274,13 @@ QString toString(const std::chrono::steady_clock::time_point& value)
     return "steady: " + toString(duration_cast<milliseconds>(value.time_since_epoch()));
 }
 
+QString toString(const std::thread::id& threadId)
+{
+    std::stringstream ss;
+    ss << threadId;
+    return QString::fromStdString(ss.str());
+}
+
 } // namespace detail
 
 QString pointerTypeName(const void* /*value*/)

@@ -6,6 +6,7 @@
 #include <chrono>
 #include <memory>
 #include <optional>
+#include <thread>
 #include <type_traits>
 #include <variant>
 
@@ -185,6 +186,8 @@ NX_UTILS_API QString toString(const std::chrono::nanoseconds& value);
 
 NX_UTILS_API QString toString(const std::chrono::system_clock::time_point& value);
 NX_UTILS_API QString toString(const std::chrono::steady_clock::time_point& value);
+
+NX_UTILS_API QString toString(const std::thread::id& threadId);
 
 template<typename T>
 QString toString(const T* value)
