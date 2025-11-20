@@ -70,7 +70,7 @@ bool PortMapper::enableMapping(
     if (m_isEnabled)
     {
         // Ask to map this port on all known devices.
-        for (auto& device: m_devices)
+        for (const auto& device: m_devices)
             ensureMapping(device.second.get(), port, protocol);
     }
 
@@ -179,23 +179,16 @@ void PortMapper::onTimer(const quint64& /*timerId*/)
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_isEnabled)
     {
-        for (auto& device: m_devices)
+        for (const auto& device: m_devices)
         {
             updateExternalIp(device.second.get());
-            for (const auto& request : m_mapRequests)
+            for ([[maybe_unused]] const auto& [portId, _] : m_mapRequests)
             {
-                const auto it = device.second->mapped.find(request.first);
+                const auto it = device.second->mapped.find(portId);
                 if (it != device.second->mapped.end())
-                {
-                    checkMapping(
-                        device.second.get(), it->first.port,
-                        it->second, it->first.protocol);
-                }
+                    checkMapping(device.second.get(), portId.port, it->second, portId.protocol);
                 else
-                {
-                    const auto& portId = request.first;
                     ensureMapping(device.second.get(), portId.port, portId.protocol);
-                }
             }
         }
     }
@@ -243,20 +236,20 @@ void PortMapper::addNewDevice(
 
 void PortMapper::removeMapping(PortId portId)
 {
-    for (auto& device: m_devices)
+    for (const auto& device: m_devices)
     {
         const auto mapping = device.second->mapped.find(portId);
         if (mapping != device.second->mapped.end())
         {
             m_upnpClient->deleteMapping(
                 device.second->url, mapping->second, mapping->first.protocol,
-                [this, device = device.second.get(), mapping, portId](bool success)
+                [this, device = device.second.get(), portId](bool success)
                 {
                     if (!success)
                         return;
 
                     NX_MUTEX_LOCKER lk(&m_mutex);
-                    device->mapped.erase(mapping);
+                    device->mapped.erase(portId);
 
                     const auto request = m_mapRequests.find(portId);
                     if (request == m_mapRequests.end())
@@ -289,7 +282,7 @@ void PortMapper::updateExternalIp(Device* device)
             // All mappings with old IPs are not valid.
             if (device->externalIp != externalIp && device->externalIp != HostAddress())
             {
-                for (auto& map: device->mapped)
+                for (const auto& map: device->mapped)
                 {
                     const auto it = m_mapRequests.find(map.first);
                     if (it != m_mapRequests.end())
@@ -345,7 +338,7 @@ void PortMapper::checkMapping(
 
             PortId portId(inPort, protocol);
             if (!stillMapped)
-                device->mapped.erase(device->mapped.find(portId));
+                device->mapped.erase(portId);
 
             const auto request = m_mapRequests.find(portId);
             if (request == m_mapRequests.end())
@@ -395,8 +388,10 @@ void PortMapper::ensureMapping(Device* device, quint16 inPort, Protocol protocol
                 return;
             }
 
+            const auto externalIp = device->externalIp;
             const auto callback = request->second;
             for (const auto& mapping : mappings)
+            {
                 if (mapping.internalIp == device->internalIp && mapping.internalPort == inPort
                     && mapping.protocol == protocol
                     && (mapping.duration == std::chrono::milliseconds::zero()
@@ -411,28 +406,25 @@ void PortMapper::ensureMapping(Device* device, quint16 inPort, Protocol protocol
                         device->mapped[PortId(inPort, protocol)] = mapping.externalPort;
 
                         lk.unlock();
-                        if (device->externalIp != HostAddress())
-                            callback(SocketAddress(device->externalIp, mapping.externalPort));
+                        if (externalIp != HostAddress())
+                            callback(SocketAddress(externalIp, mapping.externalPort));
                     }
 
                     return;
                 }
+            }
 
             // to ensure mapping we should create it from scratch
             makeMapping(device, inPort, protocol);
 
             if (deviceMap != device->mapped.end())
             {
-                const auto invalid = device->externalIp == HostAddress()
-                    ? SocketAddress()
-                    : SocketAddress(device->externalIp, 0);
-
                 // address lose should be saved and reported
                 device->mapped.erase(deviceMap);
 
                 lk.unlock();
-                if (invalid.address != HostAddress())
-                    callback(invalid);
+                if (externalIp != HostAddress())
+                    callback(SocketAddress(externalIp, 0));
             }
         });
 }
