@@ -628,7 +628,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Невідомий</translation>
+      <translation>Невідомо</translation>
     </message>
     <message>
       <source>Sidebar</source>

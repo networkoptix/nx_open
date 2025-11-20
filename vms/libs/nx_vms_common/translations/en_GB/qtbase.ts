@@ -595,7 +595,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Drive</source>
-      <translation>Drive</translation>
+      <translation type="unfinished">Drive</translation>
     </message>
     <message>
       <source>%1 File</source>
@@ -604,12 +604,12 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>File</source>
-      <translation>File</translation>
+      <translation type="unfinished">File</translation>
     </message>
     <message>
       <source>File Folder</source>
       <comment>Match Windows Explorer</comment>
-      <translation>File Folder</translation>
+      <translation type="unfinished">File Folder</translation>
     </message>
     <message>
       <source>Folder</source>
@@ -619,12 +619,12 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation>Alias</translation>
+      <translation type="unfinished">Alias</translation>
     </message>
     <message>
       <source>Shortcut</source>
       <comment>All other platforms</comment>
-      <translation>Shortcut</translation>
+      <translation type="unfinished">Shortcut</translation>
     </message>
     <message>
       <source>Unknown</source>
