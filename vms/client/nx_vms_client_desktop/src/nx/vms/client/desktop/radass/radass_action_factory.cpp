@@ -10,6 +10,8 @@
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -28,7 +30,7 @@ QList<QAction*> RadassActionFactory::newActions(const Parameters& parameters,
     auto actionGroup = new QActionGroup(parent);
     actionGroup->setExclusive(true);
 
-    const auto manager = workbenchContext()->instance<RadassResourceManager>();
+    const auto manager = windowContext()->system()->radassResourceManager();
 
     // If no layout items are provided, using current layout.
     auto items = parameters.layoutItems();

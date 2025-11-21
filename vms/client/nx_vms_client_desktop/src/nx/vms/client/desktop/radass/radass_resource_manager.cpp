@@ -2,46 +2,35 @@
 
 #include "radass_resource_manager.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-
 #include <core/resource_management/resource_pool.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/reflect/enum_instrument.h>
-#include <nx/reflect/enum_string_conversion.h>
 #include <nx/utils/algorithm/same.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/utils/uuid.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
-#include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
+#include <nx/vms/client/desktop/settings/user_specific_settings.h>
 
 namespace nx::vms::client::desktop {
-
-using ModeByIdHash = QHash<nx::Uuid, RadassMode>;
-
-NX_REFLECTION_INSTRUMENT_ENUM(RadassMode, Auto, High, Low)
 
 static const RadassMode kDefaultResolution = nx::reflect::fromString(ini().defaultResolution,
     RadassMode::Auto);
 
 namespace {
 
-ModeByIdHash filtered(ModeByIdHash source, QnResourcePool* resourcePool)
+RadassModeByLayoutItemIdHash removeNonexistentItems(
+    RadassModeByLayoutItemIdHash source, QnResourcePool* resourcePool)
 {
-    QSet<nx::Uuid> existingItems;
-    for (const auto& layout: resourcePool->getResources<QnLayoutResource>())
-        existingItems.unite(nx::utils::toQSet(layout->getItems().keys()));
+    if (!NX_ASSERT(resourcePool))
+        return source;
 
-    for (const auto& cloudLayout: nx::vms::client::core::appContext()
-        ->cloudLayoutsPool()->getResources<core::CrossSystemLayoutResource>())
-    {
-        existingItems.unite(nx::utils::toQSet(cloudLayout->getItems().keys()));
-    }
+    UuidSet existingItems;
+    for (const auto& layout: resourcePool->getResources<core::LayoutResource>())
+        existingItems.unite(nx::utils::toQSet(layout->getItems().keys()));
 
     const auto storedItems = nx::utils::toQSet(source.keys());
 
@@ -54,66 +43,25 @@ ModeByIdHash filtered(ModeByIdHash source, QnResourcePool* resourcePool)
 
 } // namespace
 
-struct RadassResourceManager::Private
-{
-    RadassMode mode(const LayoutItemIndex& index) const
-    {
-        return m_modes.value(index.uuid(), kDefaultResolution);
-    }
-
-    void setMode(const LayoutItemIndex& index, RadassMode value)
-    {
-        NX_ASSERT(value != RadassMode::Custom);
-        if (value == RadassMode::Auto && kDefaultResolution == RadassMode::Auto)
-        {
-            m_modes.remove(index.uuid());
-        }
-        else
-        {
-            m_modes[index.uuid()] = value;
-        }
-    }
-
-    void loadFromFile(const QString& filename)
-    {
-        m_modes.clear();
-
-        QDir dir(cacheDirectory);
-        if (!dir.exists())
-            return;
-
-        QFile data(dir.absoluteFilePath(filename));
-        if (!data.open(QIODevice::ReadOnly))
-            return;
-
-        m_modes = QnUbjson::deserialized<QHash<nx::Uuid, RadassMode>>(data.readAll());
-        data.close();
-    }
-
-    void saveToFile(const QString& filename, QnResourcePool* resourcePool) const
-    {
-        QDir dir(cacheDirectory);
-        dir.mkpath(cacheDirectory);
-
-        QFile data(dir.absoluteFilePath(filename));
-        if (!data.open(QIODevice::WriteOnly))
-            return;
-
-        data.write(QnUbjson::serialized(filtered(m_modes, resourcePool)));
-        data.close();
-    }
-
-    QString cacheDirectory;
-
-private:
-    // Mode by layout item uuid.
-    ModeByIdHash m_modes;
-};
-
-RadassResourceManager::RadassResourceManager(QObject* parent):
+RadassResourceManager::RadassResourceManager(SystemContext* systemContext, QObject* parent):
     base_type(parent),
-    d(new Private())
+    SystemContextAware(systemContext)
 {
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    connect(systemContext, &SystemContext::remoteIdChanged, this,
+        [this, systemContext]()
+        {
+            auto crossSiteItemModes =
+                systemContext->userSettings()->crossSiteLayoutItemRadassModes();
+            systemContext->userSettings()->crossSiteLayoutItemRadassModes = removeNonexistentItems(
+                crossSiteItemModes, nx::vms::client::core::appContext()->cloudLayoutsPool());
+
+            auto localItemModes = systemContext->localSettings()->localLayoutItemRadassModes();
+            systemContext->localSettings()->localLayoutItemRadassModes = removeNonexistentItems(
+                localItemModes, systemContext->resourcePool());
+        });
 }
 
 RadassResourceManager::~RadassResourceManager()
@@ -171,7 +119,13 @@ RadassMode RadassResourceManager::mode(const LayoutItemIndexList& items) const
     if (nx::utils::algorithm::same(validItems.cbegin(), validItems.cend(),
         [this](const LayoutItemIndex& index)
         {
-            return d->mode(index);
+            const bool isCloudLayout =
+                (bool) index.layout().dynamicCast<core::CrossSystemLayoutResource>();
+            RadassModeByLayoutItemIdHash modes = isCloudLayout
+                ? systemContext()->userSettings()->crossSiteLayoutItemRadassModes()
+                : systemContext()->localSettings()->localLayoutItemRadassModes();
+
+            return modes.value(index.uuid(), kDefaultResolution);
         },
         &value))
     {
@@ -192,32 +146,35 @@ void RadassResourceManager::setMode(const LayoutItemIndexList& items, RadassMode
         if (!isRadassSupported(item))
             continue;
 
-        auto oldMode = d->mode(item);
-        d->setMode(item, value);
+        auto oldMode = mode(item);
+
+        const bool isCloudLayout =
+            (bool) item.layout().dynamicCast<core::CrossSystemLayoutResource>();
+        const bool removeIfAuto =
+            value == RadassMode::Auto && kDefaultResolution == RadassMode::Auto;
+
+        if (isCloudLayout)
+        {
+            auto itemModes = systemContext()->userSettings()->crossSiteLayoutItemRadassModes();
+            if (removeIfAuto)
+                itemModes.remove(item.uuid());
+            else
+                itemModes[item.uuid()] = value;
+            systemContext()->userSettings()->crossSiteLayoutItemRadassModes = itemModes;
+        }
+        else
+        {
+            auto itemModes = systemContext()->localSettings()->localLayoutItemRadassModes();
+            if (removeIfAuto)
+                itemModes.remove(item.uuid());
+            else
+                itemModes[item.uuid()] = value;
+            systemContext()->localSettings()->localLayoutItemRadassModes = itemModes;
+        }
+
         if (oldMode != value)
             emit modeChanged(item, value);
     }
-}
-
-QString RadassResourceManager::cacheDirectory() const
-{
-    return d->cacheDirectory;
-}
-
-void RadassResourceManager::setCacheDirectory(const QString& value)
-{
-    d->cacheDirectory = value;
-}
-
-void RadassResourceManager::switchLocalSystemId(const nx::Uuid& localSystemId)
-{
-    d->loadFromFile(localSystemId.toString(QUuid::WithBraces));
-}
-
-void RadassResourceManager::saveData(const nx::Uuid& localSystemId,
-    QnResourcePool* resourcePool) const
-{
-    d->saveToFile(localSystemId.toString(QUuid::WithBraces), resourcePool);
 }
 
 } // namespace nx::vms::client::desktop

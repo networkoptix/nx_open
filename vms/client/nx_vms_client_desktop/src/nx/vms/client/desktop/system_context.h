@@ -37,6 +37,7 @@ class VideoCache;
 class VideoWallOnlineScreensWatcher;
 class VirtualCameraManager;
 class StorageLocationCameraController;
+class RadassResourceManager;
 
 class NX_VMS_CLIENT_DESKTOP_API SystemContext: public core::SystemContext
 {
@@ -98,6 +99,7 @@ public:
     ServerNotificationCache* serverNotificationCache() const;
     UserNotificationSettingsManager* userNotificationSettingsManager() const;
     StorageLocationCameraController* storageLocationCameraController() const;
+    RadassResourceManager* radassResourceManager() const;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;

@@ -9,6 +9,7 @@
 
 #include <nx/utils/property_storage/storage.h>
 #include <nx/utils/software_version.h>
+#include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 
@@ -57,6 +58,9 @@ public:
     /** Notification of Channel Partner User on a site was closed by user */
     Property<bool> channelPartnerUserNotificationClosed{this,
         "channelPartnerUserNotificationClosed"};
+
+    Property<RadassModeByLayoutItemIdHash> localLayoutItemRadassModes{this,
+        "localLayoutItemRadassModes"};
 
     void resetWarningsForAllSystems();
 };
