@@ -81,7 +81,8 @@ nx::vms::api::RtpTransportType RtspStreamProvider::s_defaultTransportToUse =
 
 RtspStreamProvider::RtspStreamProvider(
     const nx::vms::common::SystemSettings* systemSetting,
-    const nx::streaming::rtp::TimeOffsetPtr& timeOffset)
+    const nx::streaming::rtp::TimeOffsetPtr& timeOffset,
+    bool forceCameraTime)
 :
     m_RtpSession(QnRtspClient::Config{}),
     m_timeOffset(timeOffset),
@@ -90,7 +91,8 @@ RtspStreamProvider::RtspStreamProvider(
     m_role(Qn::CR_Default),
     m_gotData(false),
     m_preferredAuthScheme(nx::network::http::header::AuthScheme::digest),
-    m_rtpTransport(nx::vms::api::RtpTransportType::automatic)
+    m_rtpTransport(nx::vms::api::RtpTransportType::automatic),
+    m_forceCameraTime(forceCameraTime)
 {
     m_rtpFrameTimeoutMs = systemSetting->rtpFrameTimeoutMs();
     m_maxRtpRetryCount = systemSetting->maxRtpRetryCount();
@@ -304,14 +306,14 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataInternal()
             if (!m_ignoreRtcpReports && track.ioDevice)
             {
                 rtcpReport = track.ioDevice->getSenderReport();
-                if (rtcpReport.ntpTimestamp != 0)
+                if (rtcpReport.ntpTimestamp != 0 && track.timeHelper)
                     track.timeHelper->stopWaitingSenderReport();
             }
 
             QnAbstractMediaDataPtr result = parser->nextData(rtcpReport);
             if (!result)
                 continue;
-            if (!m_forceCameraTime)
+            if (track.timeHelper)
             {
                 result->timestamp = track.timeHelper->getTime(
                     qnSyncTime->currentTimePoint(),
@@ -716,8 +718,8 @@ std::chrono::microseconds RtspStreamProvider::translateTimestampFromCameraToVmsS
 
     {
         NX_MUTEX_LOCKER lock(&m_tracksMutex);
-        result = m_tracks.empty()
-            ? microseconds::zero()
+        result = m_tracks.empty() || !m_tracks[0].timeHelper
+            ? timestamp
             : m_tracks[0].timeHelper->replayAdjustmentFromHistory(timestamp);
     }
 
@@ -935,8 +937,11 @@ void RtspStreamProvider::createTrackParsers()
         trackInfo.ioDevice = track.ioDevice.get();
         trackInfo.rtcpChannelNumber = track.interleaved.second;
         trackInfo.ioDevice->setForceRtcpReports(isRtcpReportsForced());
-        trackInfo.timeHelper = std::make_unique<nx::streaming::rtp::CameraTimeHelper>(
-            track.sdpMedia.mediaType, timeHelperKey(), m_timeOffset);
+        if (!m_forceCameraTime)
+        {
+            trackInfo.timeHelper = std::make_unique<nx::streaming::rtp::CameraTimeHelper>(
+                track.sdpMedia.mediaType, timeHelperKey(), m_timeOffset);
+        }
 
         // Force camera time for NVR archives
         if (m_role == Qn::ConnectionRole::CR_Archive)
@@ -1114,7 +1119,10 @@ void RtspResourceStreamProvider::updateTimePolicy()
     {
         NX_MUTEX_LOCKER lock(&m_tracksMutex);
         for (auto& track: m_tracks)
-            track.timeHelper->setTimePolicy(getTimePolicy());
+        {
+            if (track.timeHelper)
+                track.timeHelper->setTimePolicy(getTimePolicy());
+        }
     }
 }
 
@@ -1216,11 +1224,6 @@ bool RtspStreamProvider::isRtcpReportsForced() const
 std::string RtspStreamProvider::timeHelperKey() const
 {
     return m_url.toStdString();
-}
-
-void RtspStreamProvider::setForceCameraTime(bool value)
-{
-    m_forceCameraTime = value;
 }
 
 // ------------------------- RtspResourceStreamProvider -------------------
