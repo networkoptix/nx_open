@@ -552,21 +552,6 @@ void LayoutActionHandler::saveRemoteLayoutAs(const core::LayoutResourcePtr& layo
 
     newLayout->saveAsync();
 
-    const auto radassManager = workbenchContext()->instance<RadassResourceManager>();
-    for (auto it = newUuidByOldUuid.begin(); it != newUuidByOldUuid.end(); ++it)
-    {
-        const auto mode = radassManager->mode(LayoutItemIndex(layout, it.key()));
-        const auto newItemIndex = LayoutItemIndex(newLayout, it.value());
-        radassManager->setMode(newItemIndex, mode);
-    }
-
-    if (!system()->globalSettings()->localSystemId().isNull())
-    {
-        radassManager->saveData(
-            system()->globalSettings()->localSystemId(),
-            system()->resourcePool());
-    }
-
     if (shouldDelete)
         removeLayouts(core::LayoutResourceList() << layout);
 }

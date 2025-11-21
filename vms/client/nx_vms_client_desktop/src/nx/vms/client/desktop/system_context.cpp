@@ -112,6 +112,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->userNotificationSettingsManager =
                 std::make_unique<UserNotificationSettingsManager>(this);
             d->storageLocationCameraController = std::make_unique<StorageLocationCameraController>(this);
+            d->radassResourceManager = std::make_unique<RadassResourceManager>(this);
             break;
 
         case Mode::crossSystem:
@@ -266,6 +267,11 @@ UserNotificationSettingsManager* SystemContext::userNotificationSettingsManager(
 StorageLocationCameraController* SystemContext::storageLocationCameraController() const
 {
     return d->storageLocationCameraController.get();
+}
+
+RadassResourceManager* SystemContext::radassResourceManager() const
+{
+    return d->radassResourceManager.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)

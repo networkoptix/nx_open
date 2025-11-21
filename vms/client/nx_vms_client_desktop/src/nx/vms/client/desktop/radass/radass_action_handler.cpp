@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
@@ -47,7 +48,6 @@ namespace nx::vms::client::desktop {
 struct RadassActionHandler::Private
 {
     RadassController* controller = nullptr;
-    RadassResourceManager* manager = nullptr;
 
     bool notifiedAboutPerformanceLoss = false;
     QPointer<SceneBanner> performanceHintLabel;
@@ -59,14 +59,11 @@ RadassActionHandler::RadassActionHandler(QObject* parent):
     d(new Private)
 {
     d->controller = appContext()->radassController();
-    // Manager must be available from actions factory.
-    d->manager = context()->instance<RadassResourceManager>();
-    d->manager->setCacheDirectory(getCacheDirectory());
 
     connect(action(menu::RadassAction), &QAction::triggered, this,
         &RadassActionHandler::at_radassAction_triggered);
 
-    connect(d->manager, &RadassResourceManager::modeChanged, this,
+    connect(systemContext()->radassResourceManager(), &RadassResourceManager::modeChanged, this,
         &RadassActionHandler::handleItemModeChanged);
 
     connect(d->controller, &RadassController::performanceCanBeImproved, this,
@@ -85,7 +82,6 @@ RadassActionHandler::RadassActionHandler(QObject* parent):
 
 RadassActionHandler::~RadassActionHandler()
 {
-
 }
 
 void RadassActionHandler::at_radassAction_triggered()
@@ -98,13 +94,11 @@ void RadassActionHandler::at_radassAction_triggered()
 
     // If empty, means apply to the current layout.
     auto layoutItems = parameters.layoutItems();
+    auto manager = systemContext()->radassResourceManager();
     if (layoutItems.empty())
-        d->manager->setMode(workbench()->currentLayoutResource(), mode);
+        manager->setMode(workbench()->currentLayoutResource(), mode);
     else
-        d->manager->setMode(layoutItems, mode);
-
-    if (!systemSettings()->localSystemId().isNull())
-        d->manager->saveData(systemSettings()->localSystemId(), resourcePool());
+        manager->setMode(layoutItems, mode);
 }
 
 void RadassActionHandler::handleItemModeChanged(const LayoutItemIndex& item, RadassMode mode)
@@ -154,7 +148,11 @@ void RadassActionHandler::handleCurrentLayoutChanged()
         {
             auto camDisplay = mediaWidget->camDisplay();
             if (NX_ASSERT(camDisplay))
-                d->controller->setMode(camDisplay, d->manager->mode(index));
+            {
+                d->controller->setMode(
+                    camDisplay,
+                    systemContext()->radassResourceManager()->mode(index));
+            }
         }
     }
 
@@ -170,7 +168,6 @@ void RadassActionHandler::handleCurrentLayoutChanged()
 
 void RadassActionHandler::handleLocalSystemIdChanged()
 {
-    d->manager->switchLocalSystemId(systemSettings()->localSystemId());
     handleCurrentLayoutChanged();
 }
 
@@ -194,7 +191,7 @@ void RadassActionHandler::handleItemAdded(QnWorkbenchItem *item)
             display && display->isRadassSupported()
             && !mediaWidget->isZoomWindow())
         {
-            d->controller->setMode(display, d->manager->mode(index));
+            d->controller->setMode(display, systemContext()->radassResourceManager()->mode(index));
         }
     }
 }

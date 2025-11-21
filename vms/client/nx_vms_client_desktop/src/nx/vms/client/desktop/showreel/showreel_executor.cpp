@@ -190,7 +190,7 @@ void ShowreelExecutor::resumeCurrentShowreel()
 
 void ShowreelExecutor::resetShowreelItems(const nx::vms::api::ShowreelItemDataList& items)
 {
-    const auto radassManager = context()->instance<RadassResourceManager>();
+    auto radassManager = systemContext()->radassResourceManager();
     auto mutedItemIds = systemContext()->localSettings()->mutedItemIds();
 
     m_showreel.items.clear();

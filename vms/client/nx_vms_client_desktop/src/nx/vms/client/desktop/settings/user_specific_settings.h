@@ -5,6 +5,7 @@
 #include <nx/utils/json/qt_geometry_reflect.h>
 #include <nx/utils/property_storage/storage.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
+#include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <recording/time_period.h>
 
@@ -49,6 +50,9 @@ public:
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(ObjectSearchDisplayMode, tiles, table)
     Property<ObjectSearchDisplayMode> objectSearchDisplayMode{this, "objectSearchDisplayMode",
         ObjectSearchDisplayMode::tiles};
+
+    Property<RadassModeByLayoutItemIdHash> crossSiteLayoutItemRadassModes{this,
+        "crossSiteLayoutItemRadassModes"};
 
 signals:
     void loaded();

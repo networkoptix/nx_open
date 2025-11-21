@@ -9,6 +9,7 @@
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/network/server_port_watcher.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
+#include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/resource/local_resources_initializer.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
@@ -67,6 +68,7 @@ struct SystemContext::Private
     std::unique_ptr<ServerPortWatcher> serverPortWatcher;
     std::unique_ptr<UserNotificationSettingsManager> userNotificationSettingsManager;
     std::unique_ptr<StorageLocationCameraController> storageLocationCameraController;
+    std::unique_ptr<RadassResourceManager> radassResourceManager;
 };
 
 } // namespace nx::vms::client::desktop
