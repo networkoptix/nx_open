@@ -765,6 +765,10 @@ Vælg en Integration for at begynde at konfigurere dens parametre.</translation>
         <numerusform>Denne liste er tilknyttet %n Hændelses regler. Er du sikker på, at du vil slette den?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
+    </message>
   </context>
   <context>
     <name>EventTestDialog</name>
@@ -1547,6 +1551,10 @@ Vælg en Integration for at begynde at konfigurere dens parametre.</translation>
     <message>
       <source>Absent</source>
       <translation>Fraværende</translation>
+    </message>
+    <message>
+      <source>value</source>
+      <translation type="unfinished">value</translation>
     </message>
   </context>
   <context>

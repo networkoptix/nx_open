@@ -1162,7 +1162,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Folder</source>
       <comment>All other platforms</comment>
-      <translation>フォルダ</translation>
+      <translation>フォルダー</translation>
     </message>
     <message>
       <source>Alias</source>
@@ -1176,7 +1176,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>未知の値</translation>
+      <translation>不明</translation>
     </message>
   </context>
 </TS>

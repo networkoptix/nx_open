@@ -765,6 +765,10 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
         <numerusform>Cette liste est associée à %n Règles d'événement. Êtes-vous sûr de vouloir la supprimer ?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
+    </message>
   </context>
   <context>
     <name>EventTestDialog</name>
@@ -1547,6 +1551,10 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     <message>
       <source>Absent</source>
       <translation>Absence</translation>
+    </message>
+    <message>
+      <source>value</source>
+      <translation type="unfinished">value</translation>
     </message>
   </context>
   <context>

@@ -760,6 +760,10 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
         <numerusform>Daftar ini dikaitkan dengan Aturan Event %n. Apakah Anda yakin ingin menghapusnya?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
+    </message>
   </context>
   <context>
     <name>EventTestDialog</name>
@@ -1539,6 +1543,10 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     <message>
       <source>Absent</source>
       <translation>Absen</translation>
+    </message>
+    <message>
+      <source>value</source>
+      <translation type="unfinished">value</translation>
     </message>
   </context>
   <context>
