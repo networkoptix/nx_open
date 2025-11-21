@@ -775,6 +775,10 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
         <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
+    </message>
   </context>
   <context>
     <name>EventTestDialog</name>
@@ -1563,6 +1567,10 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <message>
       <source>Absent</source>
       <translation>Nieobecny</translation>
+    </message>
+    <message>
+      <source>value</source>
+      <translation type="unfinished">value</translation>
     </message>
   </context>
   <context>

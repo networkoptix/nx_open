@@ -761,6 +761,10 @@ Select an Integration to begin configuring its parameters.</source>
         <numerusform>このリストは %n 個のイベントルールに関連付けられています。削除してもよろしいですか?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
+    </message>
   </context>
   <context>
     <name>EventTestDialog</name>
@@ -1541,6 +1545,10 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
       <source>Absent</source>
       <translation>なし</translation>
+    </message>
+    <message>
+      <source>value</source>
+      <translation type="unfinished">value</translation>
     </message>
   </context>
   <context>

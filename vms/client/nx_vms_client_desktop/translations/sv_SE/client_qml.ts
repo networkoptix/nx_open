@@ -765,6 +765,10 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
         <numerusform>Den här listan är associerad med %n händelseregler. Är du säker på att du vill ta bort den?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
+    </message>
   </context>
   <context>
     <name>EventTestDialog</name>
@@ -1547,6 +1551,10 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
     <message>
       <source>Absent</source>
       <translation>Frånvarande</translation>
+    </message>
+    <message>
+      <source>value</source>
+      <translation type="unfinished">value</translation>
     </message>
   </context>
   <context>

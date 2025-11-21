@@ -760,6 +760,10 @@ Select an Integration to begin configuring its parameters.</source>
         <numerusform>此清單與 %n 個事件規則相關。您確定要刪除它嗎？</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
+    </message>
   </context>
   <context>
     <name>EventTestDialog</name>
@@ -1539,6 +1543,10 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
       <source>Absent</source>
       <translation>不存在</translation>
+    </message>
+    <message>
+      <source>value</source>
+      <translation type="unfinished">value</translation>
     </message>
   </context>
   <context>

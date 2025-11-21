@@ -760,6 +760,10 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
         <numerusform>Danh sách này liên quan đến %n Quy tắc sự kiện. Bạn có chắc chắn muốn xóa nó không?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
+    </message>
   </context>
   <context>
     <name>EventTestDialog</name>
@@ -1539,6 +1543,10 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     <message>
       <source>Absent</source>
       <translation>Không</translation>
+    </message>
+    <message>
+      <source>value</source>
+      <translation type="unfinished">value</translation>
     </message>
   </context>
   <context>
