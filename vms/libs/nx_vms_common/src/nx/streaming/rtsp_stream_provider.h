@@ -71,9 +71,13 @@ class NX_VMS_COMMON_API RtspStreamProvider:
 public:
     using OnSocketReadTimeoutCallback = nx::MoveOnlyFunc<QnAbstractMediaDataPtr()>;
 
+    /*
+     * forceCameraTime - Never correct RTSP time, trust RTSP source.
+     */
     RtspStreamProvider(
         const nx::vms::common::SystemSettings* systemSetting,
-        const nx::streaming::rtp::TimeOffsetPtr& timeOffset);
+        const nx::streaming::rtp::TimeOffsetPtr& timeOffset,
+        bool forceCameraTime = false);
     virtual ~RtspStreamProvider();
 
     /** Implementation of QnAbstractMediaStreamProvider::getNextData. */
@@ -145,11 +149,6 @@ public:
     std::chrono::microseconds translateTimestampFromCameraToVmsSystem(
         std::chrono::microseconds timestamp,
         int channelNumber);
-
-    /*
-     * Never correct RTSP time, trust RTSP source.
-     */
-    void setForceCameraTime(bool value);
 
     void setUrl(const nx::Url& url);
 
@@ -241,7 +240,7 @@ protected:
 
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
-    bool m_forceCameraTime = false;
+    const bool m_forceCameraTime = false;
 
     PlaybackRange m_playbackRange;
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
