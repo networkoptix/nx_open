@@ -11,12 +11,14 @@
                     dataType="Enumeration"
                     range="Auto,Force Enabled,Force Disabled"
                     internalRange="auto,forceEnabled,forceDisabled"
+                    availableInOffline="true"
                     aux="reopenStreams"/>
                 <param id="internal.event_meta.primary"
                     name="Fetch Events"
                     dataType="Enumeration"
                     range="Auto,Force Enabled,Force Disabled"
                     internalRange="auto,forceEnabled,forceDisabled"
+                    availableInOffline="true"
                     aux="reopenStreams"/>
             </group>
             <group name="Secondary Stream">
@@ -25,12 +27,14 @@
                     dataType="Enumeration"
                     range="Auto,Force Enabled,Force Disabled"
                     internalRange="auto,forceEnabled,forceDisabled"
+                    availableInOffline="true"
                     aux="reopenStreams"/>
                 <param id="internal.event_meta.secondary"
                     name="Fetch Events"
                     dataType="Enumeration"
                     range="Auto,Force Enabled,Force Disabled"
                     internalRange="auto,forceEnabled,forceDisabled"
+                    availableInOffline="true"
                     aux="reopenStreams"/>
             </group>
         </group>
