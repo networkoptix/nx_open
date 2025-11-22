@@ -763,7 +763,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>値</translation>
     </message>
   </context>
   <context>
@@ -1548,7 +1548,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>値</translation>
     </message>
   </context>
   <context>

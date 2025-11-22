@@ -767,7 +767,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Verdi</translation>
     </message>
   </context>
   <context>
@@ -1554,7 +1554,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>verdi</translation>
     </message>
   </context>
   <context>

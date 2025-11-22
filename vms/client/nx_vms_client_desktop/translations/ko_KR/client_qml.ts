@@ -762,7 +762,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>값</translation>
     </message>
   </context>
   <context>
@@ -1546,7 +1546,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>값</translation>
     </message>
   </context>
   <context>

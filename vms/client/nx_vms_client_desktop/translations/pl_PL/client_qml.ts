@@ -777,7 +777,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Wartość</translation>
     </message>
   </context>
   <context>
@@ -1570,7 +1570,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>wartość</translation>
     </message>
   </context>
   <context>

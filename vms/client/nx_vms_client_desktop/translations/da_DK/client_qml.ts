@@ -767,7 +767,7 @@ Vælg en Integration for at begynde at konfigurere dens parametre.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Værdi</translation>
     </message>
   </context>
   <context>
@@ -1554,7 +1554,7 @@ Vælg en Integration for at begynde at konfigurere dens parametre.</translation>
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>værdi</translation>
     </message>
   </context>
   <context>

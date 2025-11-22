@@ -762,7 +762,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Giá trị</translation>
     </message>
   </context>
   <context>
@@ -1546,7 +1546,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>giá trị</translation>
     </message>
   </context>
   <context>
