@@ -767,7 +767,7 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valeur</translation>
     </message>
   </context>
   <context>
@@ -1554,7 +1554,7 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>valeur</translation>
     </message>
   </context>
   <context>

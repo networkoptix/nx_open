@@ -762,7 +762,7 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Nilai</translation>
     </message>
   </context>
   <context>
@@ -1546,7 +1546,7 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>nilai</translation>
     </message>
   </context>
   <context>
