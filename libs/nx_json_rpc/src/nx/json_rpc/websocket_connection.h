@@ -56,6 +56,7 @@ private:
     void send(std::string data);
 
 private:
+    std::atomic_bool m_stopped = false;
     std::unordered_map<QString, nx::utils::Guard> m_guards;
     OnDone m_onDone;
     nx::network::SocketAddress m_address;
