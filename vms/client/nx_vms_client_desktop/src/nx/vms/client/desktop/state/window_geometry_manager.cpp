@@ -14,6 +14,10 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <utils/common/delayed.h>
 
+#if defined(Q_OS_LINUX)
+    #include <ui/workaround/x11_launcher_workaround.h>
+#endif
+
 namespace nx::vms::client::desktop {
 
 namespace {
@@ -39,6 +43,31 @@ DelegateState serializeState(const WindowGeometryState& geometry)
         QString::fromStdString(nx::reflect::json::serialize(geometry)),
         &state[kWindowGeometryKey]);
     return state;
+}
+
+void setFullscreenFlags(WindowGeometryState* target, bool fullscreen)
+{
+    // On macOS, a window can be maximized, full-screen, or both. For simplicity, we only switch
+    // between full-screen and normal modes using command line parameters, although restoring a
+    // maximized window is also possible when loading a state.
+    //
+    // On Windows, switching only occurs between full-screen and normal modes. Attempting to
+    // maximize a window results in a slightly incorrect rendering of the client interface.
+    //
+    // Finally, on Linux, a "full-screen" window can be achieved either by switching it to
+    // full-screen mode or by maximizing the window, depending on the environment.
+    // Look at setupUnityLauncherWorkaround() method in WindowContext class and usages of
+    // EffectiveMaximizeAction for additional information.
+    target->isFullscreen = fullscreen;
+    target->isMaximized = false;
+
+    #if defined Q_OS_LINUX
+    if (QnX11LauncherWorkaround::isUnity3DSession())
+    {
+        target->isFullscreen = false;
+        target->isMaximized = fullscreen;
+    }
+    #endif
 }
 
 } // namespace
@@ -79,41 +108,46 @@ bool WindowGeometryManager::loadState(
         success = nx::reflect::json::deserialize(
             QJson::serialized(state.value(kWindowGeometryKey)).toStdString(), &geometry);
 
-        if (params.noFullScreen)
-            geometry.isFullscreen = geometry.isMaximized = false;
-
-        if (!params.windowGeometry.isNull())
-            geometry.geometry = params.windowGeometry;
-
-        if (params.screen >= 0)
+        const auto surface = d->control->suitableSurface();
+        if (params.screen >= 0 && params.screen < surface.size())
         {
-            // If screen is passed using command line, client is supposed to run in fullscreen.
-            if (!params.noFullScreen)
-                geometry.isFullscreen = geometry.isMaximized = true;
+            const auto screenRect = surface.at(params.screen);
 
-            const auto surface = d->control->suitableSurface();
-            if (params.screen < surface.size())
+            if (params.windowGeometry.isValid())
             {
-                const auto screenRect = surface.at(params.screen);
-                if (!screenRect.contains(geometry.geometry))
-                {
-                    // Put the window into the screen rect.
-                    geometry.geometry.setWidth(qMax(
-                        kMinWindowWidth,
-                        (int)(kWindowScreenRatioX * surface[params.screen].width())));
-                    geometry.geometry.setHeight(qMax(
-                        kMinWindowHeight,
-                        (int)(kWindowScreenRatioY * surface[params.screen].height())));
-                    geometry.geometry.moveCenter(screenRect.center());
-                }
+                // Ignore the stored state, show a normalized window.
+                setFullscreenFlags(&geometry, false);
+
+                // Place the window using relative screen coordinates.
+                geometry.geometry = params.windowGeometry.translated(screenRect.topLeft());
+            }
+            else
+            {
+                // If only a --screen parameter is passed, Client supposed to run in fullscreen.
+                setFullscreenFlags(&geometry, !params.noFullScreen);
+
+                // Put the window into the screen rect.
+                geometry.geometry.setWidth(qMax(
+                    kMinWindowWidth,
+                    (int)(kWindowScreenRatioX * surface[params.screen].width())));
+                geometry.geometry.setHeight(qMax(
+                    kMinWindowHeight,
+                    (int)(kWindowScreenRatioY * surface[params.screen].height())));
+                geometry.geometry.moveCenter(screenRect.center());
             }
         }
         else
         {
-            fixWindowGeometryIfNeeded(&geometry);
+            if (params.noFullScreen)
+                setFullscreenFlags(&geometry, false);
+
+            if (params.windowGeometry.isValid())
+                geometry.geometry = params.windowGeometry;
         }
 
+        fixWindowGeometryIfNeeded(&geometry);
         setWindowGeometry(geometry);
+
         // Developer builds have an issue when console window is placed onto screen with another
         // dpi value. Restored state is incorrect in this case and requires additional fix.
         if (ini().doubleGeometrySet)
@@ -233,8 +267,7 @@ WindowGeometryState WindowGeometryManager::calculateDefaultGeometry() const
         window.geometry.moveCenter(screenRect.center());
 
     // Show normalized window on Mac, show fullscreen window on Windows/Linux.
-    window.isMaximized = false;
-    window.isFullscreen = !nx::build_info::isMacOsX();
+    setFullscreenFlags(&window, !nx::build_info::isMacOsX());
 
     return window;
 }
@@ -303,11 +336,11 @@ void WindowGeometryManager::fixWindowGeometryIfNeeded(WindowGeometryState* state
     const QRect headerGeometry(state->geometry.topLeft(), headerSize);
 
     QRect boundingGeometry;
-    for (const QScreen* screen: QGuiApplication::screens())
+    for (const auto& screenRect: d->control->suitableSurface())
     {
-        boundingGeometry |= screen->geometry();
+        boundingGeometry |= screenRect;
 
-        if (screen->geometry().intersects(headerGeometry))
+        if (screenRect.intersects(headerGeometry))
             onScreen = true;
     }
 

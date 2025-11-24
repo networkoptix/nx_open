@@ -39,7 +39,7 @@ public:
 
     virtual QList<QRect> suitableSurface() const override
     {
-        return QList<QRect>() << QRect{0, 0, 1920, 1080};
+        return {{0, 0, 1920, 1080}, {1920, 0, 1920, 1080}};
     }
 
     virtual int windowScreen() const override
