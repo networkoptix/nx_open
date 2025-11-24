@@ -98,6 +98,8 @@ public:
 
     virtual ~AsyncSocketImplHelper()
     {
+        NX_ASSERT(!m_addressResolverIsInUse.load());
+
         // NOTE eventTriggered can be down the stack because socket
         // is allowed to be removed from I/O completion handler.
     }
@@ -125,7 +127,10 @@ public:
                 return;
 
             if (m_addressResolverIsInUse.load())
+            {
                 m_addressResolver->cancel(this);
+                m_addressResolverIsInUse = false;
+            }
 
             if (this->m_socket->impl()->aioThread->load())
             {
@@ -743,7 +748,10 @@ private:
     void stopPollingSocket(const aio::EventType eventType)
     {
         if (m_addressResolverIsInUse.load())
+        {
             m_addressResolver->cancel(this);
+            m_addressResolverIsInUse = false;
+        }
 
         if (eventType == aio::EventType::etNone)
         {
