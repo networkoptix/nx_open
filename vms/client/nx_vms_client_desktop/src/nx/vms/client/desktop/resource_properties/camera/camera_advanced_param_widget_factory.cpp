@@ -262,7 +262,8 @@ public:
             {
                 if (!confirmation.isEmpty())
                 {
-                    QnMessageBox box(QnMessageBoxIcon::Question, confirmation, {}, {}, {}, this);
+                    QnMessageBox box(
+                        QnMessageBoxIcon::Question, confirmation, {}, {}, {}, nullptr);
                     const auto name = actionName.isEmpty() ? "Yes" : actionName;
                     box.addButton(name, QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
                     box.addButton("Cancel", QDialogButtonBox::RejectRole);
