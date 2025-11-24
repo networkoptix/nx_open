@@ -81,6 +81,9 @@ void WebSocketConnection::setRequestHandler(RequestHandler requestHandler)
                 std::move(request),
                 [this, handler = std::move(responseHandler)](auto response) mutable
                 {
+                    if (m_stopped)
+                        return;
+
                     dispatch(
                         [response = std::move(response), handler = std::move(handler)]() mutable
                         {
@@ -111,6 +114,10 @@ void WebSocketConnection::bindToAioThread(nx::network::aio::AbstractAioThread* a
 
 void WebSocketConnection::stopWhileInAioThread()
 {
+    if (m_stopped)
+        return;
+
+    m_stopped = true;
     base_type::stopWhileInAioThread();
 
     m_guards.clear();
