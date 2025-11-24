@@ -378,14 +378,14 @@ int PushNotificationManager::lastUsedFilter() const
 
 void PushNotificationManager::setLastUsedFilter(int value)
 {
-    if (auto settings = d->remotePushController.confirmedSettings())
+    const auto user = QString::fromStdString(d->remotePushController.credentials().username);
+    if (auto settings = settingsForUser(this, user))
     {
-        const auto user = d->remotePushController.credentials().username;
         if (settings->lastUsedFilter == value)
             return;
 
         settings->lastUsedFilter = value;
-        updateUserSettings(this, QString::fromStdString(user), settings);
+        updateUserSettings(this, user, settings);
     }
 }
 
