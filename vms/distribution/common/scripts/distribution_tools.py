@@ -136,11 +136,12 @@ def hidapi_files(source_dir):
 
 
 def openal_files(source_dir):
-    yield os.path.join(source_dir, f'OpenAL32{_dynamic_library_extension()}')
+    template = 'OpenAL32' if is_windows() else 'openal'
+    yield os.path.join(source_dir, dynamic_library_filename(template, version='1'))
 
 
 def quazip_files_to(source_dir):
-    yield os.path.join(source_dir, f'quazip{_dynamic_library_extension()}')
+    yield os.path.join(source_dir, dynamic_library_filename('quazip'))
 
 
 def icu_files(source_dir):
@@ -199,8 +200,8 @@ def zip_files_to(zip, files, rel_path, target_path='.'):
         zip.write(file, target_filename)
 
 
-def zip_all_files(zip, directory):
-    zip_files_to(zip, find_all_files(directory), directory)
+def zip_all_files(zip, directory, target_path='.'):
+    zip_files_to(zip, find_all_files(directory), directory, target_path)
 
 
 def shell_like_parse(infile):
