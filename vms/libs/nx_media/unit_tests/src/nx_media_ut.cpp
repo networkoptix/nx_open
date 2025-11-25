@@ -18,6 +18,23 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/test_context.h>
 
+#include <QImageReader>
+#include <nx/media/ffmpeg/frame_info.h>
+#include <nx/media/yuvconvert.h>
+
+extern "C" {
+#ifdef WIN32
+#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#endif
+#include <libavutil/imgutils.h>
+#include <libavutil/pixdesc.h>
+#include <libavutil/rational.h>
+#include <libswscale/swscale.h>
+#ifdef WIN32
+#undef AVPixFmtDescriptor
+#endif
+};
+
 // TODO: #dklychkov Move mock classes to a separate file.
 // TODO: #dklychkov Rename this test to something like quality_chooser_ut.
 // TODO: #dklychkov Implement Player test.
@@ -506,6 +523,61 @@ protected:
     }
 };
 
+
+double calculateMSE(const float* r1, const float* g1, const float* b1,
+    const float* r2, const float* g2, const float* b2, int width, int height)
+{
+    double meanDifference = 0.0;
+    for (int i = 0; i < height; ++i)
+    {
+        for (int j = 0; j < width; ++j)
+        {
+            const auto point = i*width + j;
+            const auto rDiff = pow(r1[point] - r2[point], 2);
+            const auto bDiff = pow(b1[point] - b2[point], 2);
+            const auto gDiff = pow(g1[point] - g2[point], 2);
+
+            meanDifference += rDiff + bDiff + gDiff;
+        }
+    }
+
+    return meanDifference/width/height/3.0;
+}
+
+// // This function maybe useful during debug of RGB32FP images.
+// QImage RGB32FPtoQimage(const float* r, const float* g, const float* b,
+//     int width, int height)
+// {
+//     QImage img(width, height, QImage::Format_ARGB32);
+//     uint8_t* dst = img.bits();
+//     const int stride = img.bytesPerLine();
+
+//     auto toSrgb8 = [](float c)->uint8_t
+//     {
+//         // If your floats are linear, apply sRGB EOTF; if already sRGB, skip
+//         int v = int(std::lround(c * 255.f));
+//         return (uint8_t)qBound(0, v, 255);
+//     };
+
+//     for (int y = 0; y < height; ++y) {
+//         uint8_t* row = dst + y * stride;
+//         for (int x = 0; x < width; ++x) {
+//             const int i = y * width + x;
+//             const uint8_t dstR = toSrgb8(r[i]);
+//             const uint8_t dstG = toSrgb8(g[i]);
+//             const uint8_t dstB = toSrgb8(b[i]);
+
+//             // Format_ARGB32 stores 0xAARRGGBB logically, but in memory (little-endian)
+//             // bytes are BGRA. QImage handles that; just write as BGRA here:
+//             row[4 * x + 0] = dstB;
+//             row[4 * x + 1] = dstG;
+//             row[4 * x + 2] = dstR;
+//             row[4 * x + 3] = 0xFF;  // opaque alpha
+//         }
+//     }
+//     return img;
+// }
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -586,6 +658,180 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     T                        .high(4096, 2160).max(1920, 1080).req(1080) >> QSize(1920, 1012);
 
 #undef T
+}
+
+TEST(yuvConvert, yuv420ToRgbPlanarNoScale)
+{
+    static const QString defaultImgPath = ":/yuv-test.jpeg";
+    QImage testImage;
+    ASSERT_TRUE(testImage.load(defaultImgPath));
+    testImage = testImage.scaled(640, 480);
+    const QSize dstSize = testImage.size();
+    CLVideoDecoderOutput frame(testImage);
+    YuvToRgbScaleContext context;
+    context.init(testImage.width(), testImage.height(), dstSize.width(), dstSize.height(),
+                 frame.linesize[0], frame.linesize[1],
+                 static_cast<int>(AVPixelFormat::AV_PIX_FMT_YUV420P));
+
+    std::vector<float> rp(context.dstWidth * context.dstHeight);
+    std::vector<float> gp(context.dstWidth * context.dstHeight);
+    std::vector<float> bp(context.dstWidth * context.dstHeight);
+
+    yuv_to_rgb_planarfp32(
+        &context,
+        frame.data[0], frame.data[1], frame.data[2],
+        rp.data(), gp.data(), bp.data());
+
+    // Convert image with intrinsics.
+    const auto expectedFrame =
+        frame.scaled(dstSize, AV_PIX_FMT_GBRPF32, /*keepAspectRatio=*/ false, SWS_BILINEAR);
+    const float* expectedR = (float*) expectedFrame->data[2];
+    const float* expectedG = (float*) expectedFrame->data[0];
+    const float* expectedB = (float*) expectedFrame->data[1];
+
+    const double error = calculateMSE(
+        rp.data(), gp.data(), bp.data(),
+        expectedR, expectedG, expectedB,
+        dstSize.width(), dstSize.height());
+    const double acceptedError = 0.013;
+    EXPECT_LE(error, acceptedError);
+
+    // Maybe useful during debug.
+    // auto converted = RGB32FPtoQimage(rp.data(), gp.data(), bp.data(), context.dstWidth, context.dstHeight);
+    // converted.save("/home/xfirefly/yolo_test_img-result.png");
+}
+
+TEST(yuvConvert, yuv420ToRgbPlanarUpscale)
+{
+    static const QString defaultImgPath = ":/yuv-test.jpeg";
+    QImage testImage;
+    ASSERT_TRUE(testImage.load(defaultImgPath));
+    testImage = testImage.scaled(320, 240);
+    const QSize dstSize = {800, 600};
+    CLVideoDecoderOutput frame(testImage);
+    YuvToRgbScaleContext context;
+    context.init(testImage.width(), testImage.height(), dstSize.width(), dstSize.height(),
+                 frame.linesize[0], frame.linesize[1],
+                 static_cast<int>(AVPixelFormat::AV_PIX_FMT_YUV420P));
+
+    std::vector<float> rp(context.dstWidth * context.dstHeight);
+    std::vector<float> gp(context.dstWidth * context.dstHeight);
+    std::vector<float> bp(context.dstWidth * context.dstHeight);
+
+    yuv_to_rgb_planarfp32(
+        &context,
+        frame.data[0], frame.data[1], frame.data[2],
+        rp.data(), gp.data(), bp.data());
+
+    // Convert image with intrinsics.
+    const auto expectedFrame =
+        frame.scaled(dstSize, AV_PIX_FMT_GBRPF32, /*keepAspectRatio=*/ false, SWS_BILINEAR);
+    const float* expectedR = (float*) expectedFrame->data[2];
+    const float* expectedG = (float*) expectedFrame->data[0];
+    const float* expectedB = (float*) expectedFrame->data[1];
+
+    const double error = calculateMSE(
+        rp.data(), gp.data(), bp.data(),
+        expectedR, expectedG, expectedB,
+        dstSize.width(), dstSize.height());
+    const double acceptedError = 0.006;
+    EXPECT_LE(error, acceptedError);
+
+    // Maybe useful during debug.
+    // auto converted = RGB32FPtoQimage(rp.data(), gp.data(), bp.data(), context.dstWidth, context.dstHeight);
+    // converted.save("/home/xfirefly/yolo_test_img-result.png");
+}
+
+TEST(yuvConvert, yuv420ToRgbPlanar)
+{
+    static const QString defaultImgPath = ":/yuv-test.jpeg";
+    QImageReader reader(defaultImgPath);
+    if (!reader.canRead())
+    {
+        NX_ERROR(NX_SCOPE_TAG, "Cannot read image: %1. Error: %2", defaultImgPath, reader.errorString());
+        NX_ERROR(NX_SCOPE_TAG, "Supported formats: %1", QImageReader::supportedImageFormats());
+        ASSERT_TRUE(false);
+    }
+    QImage testImage = reader.read();
+    ASSERT_TRUE(testImage.load(defaultImgPath));
+    testImage = testImage.scaled({1920, 1280});
+    const QSize dstSize = {1024, 480};
+    CLVideoDecoderOutput frame(testImage);
+    YuvToRgbScaleContext context;
+    context.init(testImage.width(), testImage.height(), dstSize.width(), dstSize.height(),
+                 frame.linesize[0], frame.linesize[1],
+                 static_cast<int>(AVPixelFormat::AV_PIX_FMT_YUV420P));
+
+    std::vector<float> rp(context.dstWidth * context.dstHeight);
+    std::vector<float> gp(context.dstWidth * context.dstHeight);
+    std::vector<float> bp(context.dstWidth * context.dstHeight);
+
+    yuv_to_rgb_planarfp32(
+        &context,
+        frame.data[0], frame.data[1], frame.data[2],
+        rp.data(), gp.data(), bp.data());
+
+    // Convert image with intrinsics.
+    const auto expectedFrame =
+        frame.scaled(dstSize, AV_PIX_FMT_GBRPF32, /*keepAspectRatio=*/ false, SWS_FAST_BILINEAR);
+    const float* expectedR = (float*) expectedFrame->data[2];
+    const float* expectedG = (float*) expectedFrame->data[0];
+    const float* expectedB = (float*) expectedFrame->data[1];
+
+    const double error = calculateMSE(
+        rp.data(), gp.data(), bp.data(),
+        expectedR, expectedG, expectedB,
+        dstSize.width(), dstSize.height());
+    const double acceptedError = 0.015;
+    EXPECT_LE(error, acceptedError);
+
+    // Maybe useful during debug.
+    // auto converted = RGB32FPtoQimage(rp.data(), gp.data(), bp.data(), context.dstWidth, context.dstHeight);
+    // converted.save("/home/xfirefly/yolo_test_img-result.png");
+}
+
+TEST(yuvConvert, yuv422ToRgbPlanar)
+{
+    static const QString defaultImgPath = ":/yuv-test.jpeg";
+    QImage testImage;
+    ASSERT_TRUE(testImage.load(defaultImgPath));
+    testImage = testImage.scaled({1920, 1280});
+
+    // Convert yuv420 to yuv422.
+    CLVideoDecoderOutput yuv420frame(testImage);
+    const auto srcFormat = AVPixelFormat::AV_PIX_FMT_YUV422P;
+    const auto framePtr = yuv420frame.scaled(yuv420frame.size(), srcFormat);
+    const auto& frame = *framePtr;
+
+    // Convert image with intrinsics.
+    const QSize dstSize = {640, 480};
+    YuvToRgbScaleContext context;
+    context.init(frame.width, frame.height, dstSize.width(), dstSize.height(),
+                 frame.linesize[0], frame.linesize[1],
+                 static_cast<int>(srcFormat));
+
+    std::vector<float> rp(context.dstWidth * context.dstHeight);
+    std::vector<float> gp(context.dstWidth * context.dstHeight);
+    std::vector<float> bp(context.dstWidth * context.dstHeight);
+
+    yuv_to_rgb_planarfp32(
+        &context,
+        frame.data[0], frame.data[1], frame.data[2],
+        rp.data(), gp.data(), bp.data());
+
+    // Check results.
+    const auto expectedFrame =
+        frame.scaled(dstSize, AV_PIX_FMT_GBRPF32, /*keepAspectRatio=*/ false, SWS_FAST_BILINEAR);
+    const float* expectedR = (float*) expectedFrame->data[2];
+    const float* expectedG = (float*) expectedFrame->data[0];
+    const float* expectedB = (float*) expectedFrame->data[1];
+
+    const double error = calculateMSE(
+        rp.data(), gp.data(), bp.data(),
+        expectedR, expectedG, expectedB,
+        dstSize.width(), dstSize.height());
+    const double acceptedError = 0.016;
+    EXPECT_LE(error, acceptedError);
 }
 
 } // namespace test

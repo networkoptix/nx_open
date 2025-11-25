@@ -2,14 +2,18 @@
 
 #include "yuvconvert.h"
 
+#include <QtCore/private/qsimd_p.h>
 #include <nx/media/sse_helper.h>
+
+extern "C" {
+#include <libavutil/pixdesc.h>
+#include <libswscale/swscale.h>
+}
 
 #if defined(NX_SSE2_SUPPORTED)
 
     #include <cstdio>
     #include <cstdlib>
-
-    #include <QtCore/QtGlobal>
 
     #include <nx/utils/math/math.h>
 
@@ -533,3 +537,244 @@ void bgra_to_yva12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8*
 }
 
 #endif
+
+#if QT_COMPILER_SUPPORTS_HERE(AVX2)
+
+// /*
+// Equations:
+// R = Y + 1.5748 * (Cr - 128)
+// G = Y - 0.187324* (Cb - 128) - 0.468124*(Cr - 128)
+// B = Y + 1.8556 * (Cb - 128)
+// */
+
+QT_FUNCTION_TARGET(AVX2)
+static inline __m128i  pick16Bytes(const uint8_t* base, const Shuffle16& data)
+{
+    __m128i value = _mm_loadu_si128(reinterpret_cast<const __m128i*>(base + data.offsets[0]));
+    const __m128i mask = _mm_load_si128(reinterpret_cast<const __m128i*>(&data.masks[0]));
+    value = _mm_shuffle_epi8(value, mask);
+    for (int i = 1; i < (int) data.offsets.size(); i++)
+    {
+        __m128i value2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(base + data.offsets[i]));
+        const __m128i mask2 = _mm_load_si128(reinterpret_cast<const __m128i*>(&data.masks[i]));
+        value2 = _mm_shuffle_epi8(value2, mask2);
+        value = _mm_or_si128(value2, value);
+    }
+    return value;
+}
+
+static inline __m256i loadPixelsToI16(const uint8_t* base, const Shuffle16& data)
+{
+    return _mm256_cvtepu8_epi16(pick16Bytes(base, data));  // AVX2: zero-extend to 16-bit
+}
+
+// Center chroma: (0..255) -> (-128..127) in 16-bit
+QT_FUNCTION_TARGET(AVX2)
+static inline __m256i centerChromaU16(__m256i x_u16)
+{
+    return _mm256_sub_epi16(x_u16, _mm256_set1_epi16(128));
+}
+
+// r16/g16/b16 -> 16x f32 in [0,1], with saturation to [0,255]
+QT_FUNCTION_TARGET(AVX2)
+static inline void store_u8unit_from_i16(float* dst, __m256i v16)
+{
+    // Extract lanes and pack with unsigned saturation (per 128b lane)
+    const __m128i lo16 = _mm256_castsi256_si128(v16);
+    const __m128i hi16 = _mm256_extracti128_si256(v16, 1);
+    const __m128i u8x16 = _mm_packus_epi16(lo16, hi16);  // 16 x u8 (lower 16 bytes)
+
+    // AVX2 fallback: widen 8+8 bytes separately
+    const __m256i lo32 = _mm256_cvtepu8_epi32(u8x16);                 // bytes 0..7
+    const __m256i hi32 = _mm256_cvtepu8_epi32(_mm_srli_si128(u8x16, 8)); // 8..15
+    const __m256  scale = _mm256_set1_ps(1.0f / 255.0f);
+    _mm256_storeu_ps(dst, _mm256_mul_ps(_mm256_cvtepi32_ps(lo32), scale));
+    _mm256_storeu_ps(dst + 8, _mm256_mul_ps(_mm256_cvtepi32_ps(hi32), scale));
+}
+
+QT_FUNCTION_TARGET(AVX2)
+void yuv_to_rgb_planarfp32_avx(
+    const YuvToRgbScaleContext* context,
+    const uint8_t* yp,
+    const uint8_t* up,
+    const uint8_t* vp,
+    float* rp,
+    float* gp,
+    float* bp)
+{
+    // BT.601 full-range, Q14
+    const __m256i kCrR = _mm256_set1_epi16(22970); // 1.4020 * 16384
+    const __m256i kCbB = _mm256_set1_epi16(29032); // 1.7720 * 16384
+    const __m256i kCbG = _mm256_set1_epi16(5638); // 0.344136 * 16384
+    const __m256i kCrG = _mm256_set1_epi16(11698); // 0.714136 * 16384
+
+    for (int row = 0; row < context->dstHeight; ++row)
+    {
+        for (int x = 0; x < context->dstWidth/16; ++x)
+        {
+            const __m256i y16 = loadPixelsToI16(yp, context->xShufleY[x]);           // 0..255 in i16
+            const __m256i cb16 = centerChromaU16(loadPixelsToI16(up, context->xShufleUV[x])); // [-128..127]
+            const __m256i cr16 = centerChromaU16(loadPixelsToI16(vp, context->xShufleUV[x]));
+
+            // 1) Scale chroma by 2 to compensate for mulhrs >> 15 with Q14 coeffs
+            const __m256i cb2 = _mm256_slli_epi16(cb16, 1);
+            const __m256i cr2 = _mm256_slli_epi16(cr16, 1);
+
+            // 2) Products in 16-bit with rounding (mulhrs does (a*b + 0x4000) >> 15, sat)
+            const __m256i cr_r = _mm256_mulhrs_epi16(cr2, kCrR); //< ~ 1.402 * Cr
+            const __m256i cb_b = _mm256_mulhrs_epi16(cb2, kCbB); //< ~ 1.772 * Cb
+            const __m256i cr_g = _mm256_mulhrs_epi16(cr2, kCrG); //< ~ 0.714 * Cr
+            const __m256i cb_g = _mm256_mulhrs_epi16(cb2, kCbG); //< ~ 0.344 * Cb
+
+            // combine with Y
+            const __m256i r16 = _mm256_add_epi16(y16, cr_r);
+            const __m256i b16 = _mm256_add_epi16(y16, cb_b);
+            const __m256i g16 = _mm256_sub_epi16(y16, _mm256_add_epi16(cb_g, cr_g));
+
+            // saturate->float[0,1] and store
+            store_u8unit_from_i16(rp, r16);
+            store_u8unit_from_i16(gp, g16);
+            store_u8unit_from_i16(bp, b16);
+
+            rp += 16; gp += 16; bp += 16;
+        }
+        yp += context->lineStepY[row];
+        up += context->lineStepUV[row];
+        vp += context->lineStepUV[row];
+    }
+}
+
+#endif
+
+void YuvToRgbScaleContext::init(
+    int srcWidth, int srcHeight,
+    int dstWidth, int dstHeight,
+    int yLineSize, int uvLineSize,
+    int srcFormat)
+{
+    this->srcWidth = srcWidth;
+    this->srcHeight = srcHeight;
+    this->dstWidth = dstWidth;
+    this->dstHeight = dstHeight;
+    this->srcFormat = srcFormat;
+
+    float xStep = (float)srcWidth / dstWidth;
+    float yStep = (float)srcHeight / dstHeight;
+
+    float xDownscale = 2.0;
+    float yDownscale = 2.0;
+
+    const auto pixelFormat = static_cast<AVPixelFormat>(srcFormat);
+    const AVPixFmtDescriptor *desc =
+        av_pix_fmt_desc_get(pixelFormat);
+    if (desc) {
+        xDownscale = static_cast<float>(1 << desc->log2_chroma_w);
+        yDownscale = static_cast<float>(1 << desc->log2_chroma_h);
+    }
+
+    auto makeShufle = [](int dstWidth, float xStep,  auto& shufleData)
+        {
+            const float kBias = 0.4999f;
+            if(!NX_ASSERT(dstWidth%16 == 0))
+            {
+                dstWidth = dstWidth - (dstWidth%16);
+            }
+            shufleData.resize(dstWidth / 16);
+            for (int x = 0; x < dstWidth; x += 16)
+            {
+                for (int k = 0; k < 16;)
+                {
+                    std::array<uint8_t, 16> maskY;
+                    memset(maskY.data(), 128, 16); // zero mask
+                    int baseSrcX = int(xStep * (x + k) + kBias);
+                    for (; k < 16; ++k)
+                    {
+                        int srcX = int(xStep * (x + k) + kBias);
+                        if (srcX - baseSrcX >= 16)
+                            break; // next mm128 register filled.
+                        maskY[k] = srcX - baseSrcX;
+                    }
+                    shufleData[x/16].offsets.push_back(baseSrcX);
+                    shufleData[x/16].masks.push_back(maskY);
+                }
+            }
+        };
+    makeShufle(dstWidth, xStep, xShufleY);
+    makeShufle(dstWidth, xStep/xDownscale, xShufleUV);
+
+    int prevY = 0, prevUV = 0;
+    lineStepY.resize(dstHeight);
+    lineStepUV.resize(dstHeight);
+    for (int i = 0; i < dstHeight; ++i)
+    {
+        const auto y = std::lround(i* yStep);
+        const auto uv = std::lround(i * yStep / yDownscale);
+        lineStepY[i] = (y - prevY) * yLineSize;
+        lineStepUV[i] = (uv - prevUV) * uvLineSize;
+        prevY = y;
+        prevUV = uv;
+    }
+}
+
+
+void yuv_to_rgb_planarfp32_no_avx(
+    const YuvToRgbScaleContext* context,
+    const uint8_t* yp,
+    const uint8_t* up,
+    const uint8_t* vp,
+    float* rp,
+    float* gp,
+    float* bp)
+{
+    int xDownscale = 2;
+    // int yDownscale = 2;
+
+    const auto pixelFormat = static_cast<AVPixelFormat>(context->srcFormat);
+    const AVPixFmtDescriptor *desc =
+        av_pix_fmt_desc_get(pixelFormat);
+    if (desc) {
+        xDownscale = static_cast<int>(1 << desc->log2_chroma_w);
+        // yDownscale = static_cast<int>(1 << desc->log2_chroma_h);
+    }
+
+    // Set up pointers and strides for YUV420p (FFmpeg expects: Y, U, V order)
+    const uint8_t* srcData[3] = { yp, up, vp };
+    const int srcStride[3] = { context->srcWidth, context->srcWidth / xDownscale, context->srcWidth / xDownscale };
+
+    // Set up pointers and strides for planar RGB32F (FFmpeg pixel format: AV_PIX_FMT_GBRPF32)
+    uint8_t *dstData[3] = {reinterpret_cast<uint8_t*>(gp),
+                           reinterpret_cast<uint8_t*>(bp),
+                           reinterpret_cast<uint8_t*>(rp)};
+    const int dstStride[3] = {context->dstWidth * 4, context->dstWidth * 4,
+                              context->dstWidth * 4};
+
+    SwsContext *ctx =
+        sws_getContext(context->srcWidth, context->srcHeight,
+                       (AVPixelFormat)context->srcFormat, context->dstWidth,
+                       context->dstHeight, AV_PIX_FMT_GBRPF32,
+                       SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
+
+    if (!ctx)
+      return;
+
+    sws_scale(ctx, srcData, srcStride, 0, context->srcHeight, dstData, dstStride);
+
+    sws_freeContext(ctx);
+}
+
+void yuv_to_rgb_planarfp32(
+    const YuvToRgbScaleContext* context,
+    const uint8_t* yp,
+    const uint8_t* up,
+    const uint8_t* vp,
+    float* rp,
+    float* gp,
+    float* bp)
+{
+    static_assert(sizeof(float) == 4);
+#if QT_COMPILER_SUPPORTS_HERE(AVX2)
+    if (qCpuHasFeature(AVX2))
+        return yuv_to_rgb_planarfp32_avx(context, yp, up, vp, rp, gp, bp);
+#endif
+    yuv_to_rgb_planarfp32_no_avx(context, yp, up, vp, rp, gp, bp);
+}

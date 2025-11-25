@@ -1,9 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef __YUV_CONVERT_H
-#define __YUV_CONVERT_H
+#pragma once
 
-#include <QtCore/QtGlobal>
+#include <QtCore/qtypes.h>
+#include <array>
+#include <vector>
 
 static const unsigned int X_STRIDE_FOR_SSE_CONVERT_UTILS = 32;
 
@@ -51,5 +52,40 @@ NX_MEDIA_CORE_API void bgra_to_yva12_simd_intr(
     const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, quint8* a,
     int yStride, int uvStride, int aStride, int width, int height, bool flip);
 
+struct Shuffle16
+{
+    std::vector<std::array<uint8_t, 16>> masks;
+    std::vector<int> offsets;
+};
 
-#endif
+struct NX_MEDIA_CORE_API YuvToRgbScaleContext
+{
+    int srcWidth = 0;
+    int srcHeight = 0;
+    int dstWidth = 0;
+    int dstHeight = 0;
+    int srcFormat = 0;
+
+    std::vector<Shuffle16> xShufleY;
+    std::vector<Shuffle16> xShufleUV;
+
+    std::vector<int>  lineStepY;
+    std::vector<int>  lineStepUV;
+
+
+    // Parameter srcFormat is AVPixelFormat.
+    void init(
+        int srcWidth, int srcHeight,
+        int dstWidth, int dstHeight,
+        int yLineSize, int uvLineSize,
+        int srcFormat);
+};
+
+NX_MEDIA_CORE_API  void yuv_to_rgb_planarfp32(
+    const YuvToRgbScaleContext* context,
+    const uint8_t* yp,
+    const uint8_t* up,
+    const uint8_t* vp,
+    float* rp,
+    float* gp,
+    float* bp);

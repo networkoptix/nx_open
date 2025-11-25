@@ -24,6 +24,14 @@ if("${arch}" STREQUAL "arm" OR "${arch}" STREQUAL "arm64")
     target_link_libraries(nx_media_core PUBLIC sse2neon::sse2neon)
 endif()
 
+include(CheckCXXCompilerFlag)
+
+check_cxx_compiler_flag("-march=x86-64-v3" COMPILER_SUPPORTS_X86_64_V3)
+
+if(COMPILER_SUPPORTS_X86_64_V3)
+    target_compile_options(nx_media_core PRIVATE -march=x86-64-v3)
+endif()
+
 target_include_directories(nx_media_core
     PRIVATE
         ${Qt6Core_PRIVATE_INCLUDE_DIRS}
