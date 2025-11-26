@@ -5,7 +5,6 @@
 #include <memory>
 
 #include <QtCore/QStringList>
-#include <QtCore/QtGlobal>
 
 namespace nx::vms::client::desktop {
 
@@ -24,6 +23,7 @@ public:
     virtual PidType runClient(const QStringList& arguments) const = 0;
     virtual PidType runClient(const StartupParameters& parameters) const = 0;
 };
+
 using ClientProcessExecutionInterfacePtr = std::unique_ptr<ClientProcessExecutionInterface>;
 
 } // namespace nx::vms::client::desktop

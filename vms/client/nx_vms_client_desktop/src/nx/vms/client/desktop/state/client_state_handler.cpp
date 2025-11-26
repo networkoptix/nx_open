@@ -119,7 +119,7 @@ void ClientStateHandler::unregisterDelegate(const QString& id)
     d->delegates.erase(id);
 }
 
-void ClientStateHandler::clientStarted(StartupParameters parameters)
+void ClientStateHandler::clientStarted(const StartupParameters& parameters)
 {
     if (!qnRuntime->isDesktopMode())
         return;
@@ -410,9 +410,11 @@ SessionState ClientStateHandler::serializeState(ClientStateDelegate::SubstateFla
     SessionState result;
     for (const auto& [delegateId, delegate]: d->delegates)
     {
-        DelegateState value;
-        delegate->saveState(&value, flags);
-        result.insert(delegateId, value);
+        DelegateState state;
+        delegate->saveState(&state, flags);
+
+        if (!state.empty())
+            result.insert(delegateId, state);
     }
     return result;
 }
@@ -430,19 +432,19 @@ void ClientStateHandler::loadClientState(
     if (d->statisticsModule)
         d->statisticsModule->startCapturing(applyState);
 
+    // Startup parameters are used to override window geometry.
+    // They should be used only on client startup, not on windows restore.
+    // Note: d->startupParams is cleaned up after the first disconnect, but that's ok.
+    const auto& startupParams = applyState ? StartupParameters() : d->startupParameters;
+
     for (const auto& [delegateId, delegate]: d->delegates)
     {
-        // Startup parameters are used to override window geometry.
-        // They should be used only on client startup, not on windows restore.
-        // Note: d->startupParams is cleaned up after the first disconnect, but that's ok.
-        const StartupParameters params = applyState ? StartupParameters() : d->startupParameters;
-
         const auto it = state.find(delegateId);
         const DelegateState& delegateState = (it == state.end())
             ? delegate->defaultState()
             : it.value();
 
-        delegate->loadState(delegateState, flags, params);
+        delegate->loadState(delegateState, flags, startupParams);
         if (applyState)
             delegate->forceLoad();
     }
