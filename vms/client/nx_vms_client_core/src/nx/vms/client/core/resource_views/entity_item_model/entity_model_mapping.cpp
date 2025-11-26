@@ -190,6 +190,8 @@ void EntityModelMapping::dataChanged(int first, int last, const QVector<int>& ro
 
 void EntityModelMapping::beginInsertRows(int first, int last)
 {
+    NX_ASSERT(!qtModelMoveOperationIsInProgress);
+
     const auto model = entityItemModel();
     const auto thisOffset = entityOffset();
 
@@ -214,6 +216,8 @@ void EntityModelMapping::beginInsertRows(int first, int last)
 
 void EntityModelMapping::endInsertRows()
 {
+    NX_ASSERT(!qtModelMoveOperationIsInProgress);
+
     const auto model = entityItemModel();
     if (model)
         model->endInsertRows();
@@ -233,6 +237,8 @@ void EntityModelMapping::endInsertRows()
 
 void EntityModelMapping::beginRemoveRows(int first, int last)
 {
+    NX_ASSERT(!qtModelMoveOperationIsInProgress);
+
     const auto model = entityItemModel();
     const auto thisOffset = entityOffset();
 
@@ -257,6 +263,8 @@ void EntityModelMapping::beginRemoveRows(int first, int last)
 
 void EntityModelMapping::endRemoveRows()
 {
+    NX_ASSERT(!qtModelMoveOperationIsInProgress);
+
     const auto model = entityItemModel();
     if (model)
         model->endRemoveRows();
@@ -278,6 +286,8 @@ void EntityModelMapping::beginMoveRows(
     const AbstractEntity* source, int start, int end,
     const AbstractEntity* destination, int row)
 {
+    NX_ASSERT(!qtModelMoveOperationIsInProgress);
+
     const auto model = entityItemModel();
 
     if (model)
@@ -299,7 +309,7 @@ void EntityModelMapping::beginMoveRows(
             destinationOffset = 0;
         }
 
-        model->beginMoveRows(
+        qtModelMoveOperationIsInProgress = model->beginMoveRows(
             sourceParentIndex, start + sourceOffset, end + sourceOffset,
             destinationParentIndex, row + destinationOffset);
     }
@@ -321,8 +331,9 @@ void EntityModelMapping::endMoveRows()
 {
     const auto model = entityItemModel();
 
-    if (model)
+    if (model && qtModelMoveOperationIsInProgress)
         model->endMoveRows();
+    qtModelMoveOperationIsInProgress = false;
 
     auto mapping = this;
     while (true)
@@ -339,6 +350,8 @@ void EntityModelMapping::endMoveRows()
 
 void EntityModelMapping::layoutAboutToBeChanged(const std::vector<int>& indexPermutation)
 {
+    NX_ASSERT(!qtModelMoveOperationIsInProgress);
+
     const auto model = entityItemModel();
 
     if (!model)
@@ -358,6 +371,8 @@ void EntityModelMapping::layoutAboutToBeChanged(const std::vector<int>& indexPer
 
 void EntityModelMapping::layoutChanged()
 {
+    NX_ASSERT(!qtModelMoveOperationIsInProgress);
+
     const auto model = entityItemModel();
 
     if (model)

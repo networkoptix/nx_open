@@ -189,6 +189,8 @@ private:
     OffsetEvaluator m_offsetEvaluator;
 
     std::unique_ptr<BaseNotificatonObserver> m_notificationObserver;
+
+    bool qtModelMoveOperationIsInProgress = false;
 };
 
 } // namespace entity_item_model

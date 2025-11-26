@@ -52,7 +52,7 @@ ItemOrder layoutsOrder()
             const auto rhsLayout = rhsResource.objectCast<core::LayoutResource>();
 
             const bool lhsIsSharedLayout = (lhsLayout->isShared() && !lhsLayout->isCrossSystem());
-            const bool rhsIsSharedLayout = (rhsLayout->isShared() && !lhsLayout->isCrossSystem());
+            const bool rhsIsSharedLayout = (rhsLayout->isShared() && !rhsLayout->isCrossSystem());
 
             // Shared layouts are located first.
             if (lhsIsSharedLayout != rhsIsSharedLayout)
