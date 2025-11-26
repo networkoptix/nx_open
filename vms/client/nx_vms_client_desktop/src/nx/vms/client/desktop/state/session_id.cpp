@@ -85,10 +85,10 @@ QString SessionId::legacyIdString() const
             .toBase64(QByteArray::Base64UrlEncoding));
 }
 
-SessionId SessionId::fromString(const std::string& value)
+SessionId SessionId::fromString(std::string_view value)
 {
-    return SessionId::deserialized(
-        QByteArray::fromBase64(QByteArray::fromStdString(value), QByteArray::Base64UrlEncoding));
+    return SessionId::deserialized(QByteArray::fromBase64(
+        QByteArray::fromRawData(value.data(), value.size()), QByteArray::Base64UrlEncoding));
 }
 
 QString SessionId::toLogString() const

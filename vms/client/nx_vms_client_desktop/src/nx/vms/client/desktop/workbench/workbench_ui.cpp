@@ -83,9 +83,11 @@ using namespace ui;
 
 namespace {
 
-Qn::PaneState makePaneState(bool opened, bool pinned = true)
+Qn::PaneState makePaneState(bool opened, bool pinned)
 {
-    return pinned ? (opened ? Qn::PaneState::Opened : Qn::PaneState::Closed) : Qn::PaneState::Unpinned;
+    return pinned
+        ? (opened ? Qn::PaneState::Opened : Qn::PaneState::Closed)
+        : Qn::PaneState::Unpinned;
 }
 
 constexpr int kHideControlsTimeoutMs = 2000;
@@ -167,23 +169,24 @@ public:
         bool success = true;
         QnPaneSettingsMap settings;
 
-        for (auto it = state.begin(); it != state.end(); ++it)
+        for (const auto& [key, value]: state.asKeyValueRange())
         {
-            bool parseOk = false;
-            auto pane = nx::reflect::fromString<Qn::WorkbenchPane>(it.key().toStdString(), &parseOk);
+            Qn::WorkbenchPane pane;
             QnPaneSettings paneSettings;
 
-            if (parseOk && QJson::deserialize(it.value(), &paneSettings))
+            if (nx::reflect::fromString(key.toStdString(), &pane)
+                && QJson::deserialize(value, &paneSettings))
             {
-                settings[pane] = paneSettings;
+                settings[pane] = std::move(paneSettings);
             }
             else
             {
                 success = false;
             }
         }
-        m_ui->m_settings = settings;
-        m_ui->loadSettings(false, false);
+
+        m_ui->m_settings = std::move(settings);
+        m_ui->loadSettings(/*animated*/ false, /*useDefault*/ false);
 
         if (params.hidePanelsOnStartup)
         {
@@ -291,7 +294,7 @@ WorkbenchUi::WorkbenchUi(WindowContext* windowContext, QObject *parent):
     /* Make timeline panel aware of calendar panel. */
     m_timeline->setCalendarPanel(m_calendar);
 
-    loadSettings(false, true);
+    loadSettings(/*animated*/ false, /*useDefault*/ true);
 
     /* Windowed title shadow. */
     auto windowedTitleShadow = new QnEdgeShadowWidget(m_controlsWidget,
@@ -438,7 +441,7 @@ void WorkbenchUi::storeSettings()
     m_settings.clear();
 
     QnPaneSettings& title = m_settings[Qn::WorkbenchPane::Title];
-    title.state = makePaneState(isTitleOpened());
+    title.state = makePaneState(isTitleOpened(), /*pinned*/ true);
     title.expanded = ini().enableMultiSystemTabBar
         ? mainWindow()->titleBarStateStore()->state().expanded
         : false;
@@ -458,13 +461,13 @@ void WorkbenchUi::storeSettings()
     }
 
     QnPaneSettings& navigation = m_settings[Qn::WorkbenchPane::Navigation];
-    navigation.state = makePaneState(isTimelineOpened(), true);
+    navigation.state = makePaneState(isTimelineOpened(), /*pinned*/ true);
 
     QnPaneSettings& calendar = m_settings[Qn::WorkbenchPane::Calendar];
-    calendar.state = makePaneState(isCalendarOpened());
+    calendar.state = makePaneState(isCalendarOpened(), /*pinned*/ true);
 
     QnPaneSettings& thumbnails = m_settings[Qn::WorkbenchPane::Thumbnails];
-    thumbnails.state = makePaneState(m_timeline->isThumbnailsVisible());
+    thumbnails.state = makePaneState(m_timeline->isThumbnailsVisible(), /*pinned*/ true);
     thumbnails.span = m_timeline->thumbnailsHeight();
 }
 
@@ -812,7 +815,7 @@ void WorkbenchUi::at_freespaceAction_triggered()
     }
     else
     {
-        loadSettings(/*animated*/isFullscreen, false);
+        loadSettings(/*animated*/ isFullscreen, /*useDefault*/ false);
         m_inFreespace = false;
     }
 }
@@ -857,12 +860,12 @@ void WorkbenchUi::at_fullscreenResourceAction_triggered()
         if (workbench()->item(Qn::ZoomedRole))
             workbench()->setItem(Qn::ZoomedRole, nullptr);
 
-        loadSettings(/*animated*/isFullscreen, false);
+        loadSettings(/*animated*/ isFullscreen, /*useDefault*/ false);
         m_inFreespace = false;
     }
 }
 
-void WorkbenchUi::loadSettings(bool animated, bool useDefault /*unused?*/)
+void WorkbenchUi::loadSettings(bool animated, bool useDefault)
 {
     if (useDefault)
         m_settings = Qn::defaultPaneSettings();

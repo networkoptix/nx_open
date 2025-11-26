@@ -8,30 +8,20 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 
-/**
-Workbench pane appearance
-*/
+/** Workbench pane appearance */
+// FIXME: Refactor pinned, opened & expanded to traditional flags.
 struct QnPaneSettings
 {
     /** Pane state. */
-    Qn::PaneState state;
+    Qn::PaneState state = Qn::PaneState::Opened;
 
     /** Horizontal pane height or vertical pane width, if applicable. */
-    qreal span;
+    qreal span = 0.0;
 
     /** Whether pane is expanded or collapsed, if applicable. */
-    bool expanded;
+    bool expanded = false;
 
-    QnPaneSettings(
-        Qn::PaneState paneState = Qn::PaneState::Opened,
-        qreal paneSpan = 0.0)
-        :
-        state(paneState),
-        span(paneSpan)
-    {
-    }
-
-    bool operator==(const QnPaneSettings& other) const;
+    bool operator==(const QnPaneSettings& other) const = default;
 };
 
 #define QnPaneSettings_Fields (state)(span)(expanded)

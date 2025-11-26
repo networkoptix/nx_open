@@ -10,11 +10,6 @@ using nx::vms::client::desktop::workbench::timeline::ThumbnailLoadingManager;
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPaneSettings, (json), QnPaneSettings_Fields)
 
-bool QnPaneSettings::operator==(const QnPaneSettings& other) const
-{
-    return nx::reflect::equals(*this, other);
-}
-
 namespace Qn
 {
     const QnPaneSettingsMap& defaultPaneSettings()

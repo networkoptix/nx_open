@@ -116,7 +116,7 @@ public:
      * load system-specific parameters. If client was run without additional parameters, common
      * system-independent state is used for initialization.
      */
-    void clientStarted(StartupParameters parameters);
+    void clientStarted(const StartupParameters& parameters);
 
     /**
      * Common system-independent state will be updated.

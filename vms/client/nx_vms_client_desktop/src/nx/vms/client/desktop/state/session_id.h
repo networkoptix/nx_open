@@ -44,7 +44,7 @@ struct NX_VMS_CLIENT_DESKTOP_API SessionId
      */
     QString legacyIdString() const;
 
-    static SessionId fromString(const std::string& value);
+    static SessionId fromString(std::string_view value);
 
     QString toLogString() const;
 
