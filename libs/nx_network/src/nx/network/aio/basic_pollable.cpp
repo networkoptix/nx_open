@@ -5,6 +5,7 @@
 #include <future>
 
 #include <nx/network/aio/aio_service.h>
+#include <nx/network/nx_network_ini.h>
 
 #include "../common_socket_impl.h"
 #include "../socket_global.h"
@@ -26,7 +27,11 @@ BasicPollable::BasicPollable(
             if (!aioThread)
                 aioThread = aioService->getCurrentAioThread();
             if (!aioThread)
-                aioThread = aioService->findLeastUsedAioThread();
+            {
+                aioThread = ini().useRandomAioThreadForNewSockets
+                    ? aioService->getRandomAioThread()
+                    : aioService->findLeastUsedAioThread();
+            }
             return aioThread;
         }(),
         AbstractSocket::kInvalidSocket),

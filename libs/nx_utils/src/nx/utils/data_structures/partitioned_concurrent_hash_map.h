@@ -16,11 +16,15 @@ namespace nx::utils {
  * Using multiple mutexes helps to reduce waits by threads accessing this hashmap.
  * Internally, a collection of fixed number of hash maps each protected by its own mutex.
  */
-template<typename Key, typename T, typename Hash = std::hash<Key>>
+template<
+    typename Key,
+    typename T,
+    typename Hash = std::hash<Key>,
+    typename KeyEqual = std::equal_to<Key>>
 class PartitionedConcurrentHashMap
 {
 public:
-    using HashMap = std::unordered_map<Key, T, Hash>;
+    using HashMap = std::unordered_map<Key, T, Hash, KeyEqual>;
     using key_type = typename HashMap::key_type;
     using mapped_type = typename HashMap::mapped_type;
     using value_type = typename HashMap::value_type;
@@ -37,6 +41,8 @@ public:
 
     bool insert(const value_type& value);
     bool insert(value_type&& value);
+    bool insert_or_assign(const Key& key, const T& value);
+    bool insert_or_assign(Key&& key, T&& value);
     template<typename... Args> bool emplace(Args&&... args);
     size_type erase(const Key& key);
 
@@ -94,28 +100,29 @@ private:
     std::atomic<size_type> m_size{0};
 };
 
-template<typename Key, typename T, typename Hash>
-PartitionedConcurrentHashMap<Key, T, Hash>::PartitionedConcurrentHashMap(unsigned int partitionCount)
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::PartitionedConcurrentHashMap(
+    unsigned int partitionCount)
 {
     m_partitions.resize(
         partitionCount > 0 ? partitionCount : 2 * std::thread::hardware_concurrency());
 }
 
-template<typename Key, typename T, typename Hash>
-bool PartitionedConcurrentHashMap<Key, T, Hash>::empty() const
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+bool PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::empty() const
 {
     return size() == 0;
 }
 
-template<typename Key, typename T, typename Hash>
-typename PartitionedConcurrentHashMap<Key, T, Hash>::size_type
-    PartitionedConcurrentHashMap<Key, T, Hash>::size() const
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+typename PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::size_type
+    PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::size() const
 {
     return m_size.load();
 }
 
-template<typename Key, typename T, typename Hash>
-bool PartitionedConcurrentHashMap<Key, T, Hash>::insert(const value_type& value)
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+bool PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::insert(const value_type& value)
 {
     auto& ctx = m_partitions[partition(value.first)];
     NX_WRITE_LOCKER locker(&ctx.mtx);
@@ -126,8 +133,8 @@ bool PartitionedConcurrentHashMap<Key, T, Hash>::insert(const value_type& value)
     return inserted;
 }
 
-template<typename Key, typename T, typename Hash>
-bool PartitionedConcurrentHashMap<Key, T, Hash>::insert(value_type&& value)
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+bool PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::insert(value_type&& value)
 {
     auto& ctx = m_partitions[partition(value.first)];
     NX_WRITE_LOCKER locker(&ctx.mtx);
@@ -138,9 +145,35 @@ bool PartitionedConcurrentHashMap<Key, T, Hash>::insert(value_type&& value)
     return inserted;
 }
 
-template<typename Key, typename T, typename Hash>
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+bool PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::insert_or_assign(
+    const Key& key,
+    const T& value)
+{
+    auto& ctx = m_partitions[partition(key)];
+    NX_WRITE_LOCKER locker(&ctx.mtx);
+
+    const bool inserted = ctx.dict.insert_or_assign(key, value).second;
+    if (inserted)
+        ++m_size;
+    return inserted;
+}
+
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+bool PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::insert_or_assign(Key&& key, T&& value)
+{
+    auto& ctx = m_partitions[partition(key)];
+    NX_WRITE_LOCKER locker(&ctx.mtx);
+
+    const bool inserted = ctx.dict.insert_or_assign(std::move(key), std::move(value)).second;
+    if (inserted)
+        ++m_size;
+    return inserted;
+}
+
+template<typename Key, typename T, typename Hash, typename KeyEqual>
 template<typename... Args>
-bool PartitionedConcurrentHashMap<Key, T, Hash>::emplace(Args&&... args)
+bool PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::emplace(Args&&... args)
 {
     value_type val(std::forward<Args>(args)...);
     auto& ctx = m_partitions[partition(val.first)];
@@ -152,9 +185,9 @@ bool PartitionedConcurrentHashMap<Key, T, Hash>::emplace(Args&&... args)
     return inserted;
 }
 
-template<typename Key, typename T, typename Hash>
-typename PartitionedConcurrentHashMap<Key, T, Hash>::size_type
-    PartitionedConcurrentHashMap<Key, T, Hash>::erase(const Key& key)
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+typename PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::size_type
+    PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::erase(const Key& key)
 {
     auto& ctx = m_partitions[partition(key)];
     NX_WRITE_LOCKER locker(&ctx.mtx);
@@ -164,8 +197,8 @@ typename PartitionedConcurrentHashMap<Key, T, Hash>::size_type
     return erasedCount;
 }
 
-template<typename Key, typename T, typename Hash>
-std::optional<T> PartitionedConcurrentHashMap<Key, T, Hash>::take(const Key& key)
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+std::optional<T> PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::take(const Key& key)
 {
     auto& ctx = m_partitions[partition(key)];
     NX_WRITE_LOCKER locker(&ctx.mtx);
@@ -180,9 +213,9 @@ std::optional<T> PartitionedConcurrentHashMap<Key, T, Hash>::take(const Key& key
     return val;
 }
 
-template<typename Key, typename T, typename Hash>
-typename PartitionedConcurrentHashMap<Key, T, Hash>::HashMap
-    PartitionedConcurrentHashMap<Key, T, Hash>::takeAll()
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+typename PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::HashMap
+    PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::takeAll()
 {
     HashMap all;
     for (auto& ctx: m_partitions)
@@ -196,8 +229,8 @@ typename PartitionedConcurrentHashMap<Key, T, Hash>::HashMap
     return all;
 }
 
-template<typename Key, typename T, typename Hash>
-void PartitionedConcurrentHashMap<Key, T, Hash>::clear()
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+void PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::clear()
 {
     std::for_each(
         m_partitions.begin(),
@@ -210,8 +243,8 @@ void PartitionedConcurrentHashMap<Key, T, Hash>::clear()
         });
 }
 
-template<typename Key, typename T, typename Hash>
-std::optional<T> PartitionedConcurrentHashMap<Key, T, Hash>::find(const Key& key) const
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+std::optional<T> PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::find(const Key& key) const
 {
     const auto& ctx = m_partitions[partition(key)];
     NX_READ_LOCKER locker(&ctx.mtx);
@@ -222,8 +255,8 @@ std::optional<T> PartitionedConcurrentHashMap<Key, T, Hash>::find(const Key& key
     return std::nullopt;
 }
 
-template<typename Key, typename T, typename Hash>
-bool PartitionedConcurrentHashMap<Key, T, Hash>::contains(const Key& key) const
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+bool PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::contains(const Key& key) const
 {
     const auto& ctx = m_partitions[partition(key)];
     NX_READ_LOCKER locker(&ctx.mtx);
@@ -231,9 +264,9 @@ bool PartitionedConcurrentHashMap<Key, T, Hash>::contains(const Key& key) const
     return ctx.dict.contains(key);
 }
 
-template<typename Key, typename T, typename Hash>
+template<typename Key, typename T, typename Hash, typename KeyEqual>
 template<typename Func>
-void PartitionedConcurrentHashMap<Key, T, Hash>::modify(const Key& key, Func func)
+void PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::modify(const Key& key, Func func)
 {
     auto& ctx = m_partitions[partition(key)];
     NX_WRITE_LOCKER locker(&ctx.mtx);
@@ -241,9 +274,11 @@ void PartitionedConcurrentHashMap<Key, T, Hash>::modify(const Key& key, Func fun
     func(ctx.dict[key]);
 }
 
-template<typename Key, typename T, typename Hash>
+template<typename Key, typename T, typename Hash, typename KeyEqual>
 template<typename Func>
-bool PartitionedConcurrentHashMap<Key, T, Hash>::modifyExisting(const Key& key, Func func)
+bool PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::modifyExisting(
+    const Key& key,
+    Func func)
 {
     auto& ctx = m_partitions[partition(key)];
     NX_WRITE_LOCKER locker(&ctx.mtx);
@@ -255,9 +290,9 @@ bool PartitionedConcurrentHashMap<Key, T, Hash>::modifyExisting(const Key& key, 
     return true;
 }
 
-template<typename Key, typename T, typename Hash>
+template<typename Key, typename T, typename Hash, typename KeyEqual>
 template<typename Func>
-void PartitionedConcurrentHashMap<Key, T, Hash>::forEach(Func func)
+void PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::forEach(Func func)
 {
     std::for_each(
         m_partitions.begin(),
@@ -269,9 +304,9 @@ void PartitionedConcurrentHashMap<Key, T, Hash>::forEach(Func func)
         });
 }
 
-template<typename Key, typename T, typename Hash>
+template<typename Key, typename T, typename Hash, typename KeyEqual>
 template<typename Func>
-void PartitionedConcurrentHashMap<Key, T, Hash>::forEach(Func func) const
+void PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::forEach(Func func) const
 {
     std::for_each(
         m_partitions.begin(),
@@ -283,9 +318,9 @@ void PartitionedConcurrentHashMap<Key, T, Hash>::forEach(Func func) const
         });
 }
 
-template<typename Key, typename T, typename Hash>
-typename PartitionedConcurrentHashMap<Key, T, Hash>::size_type
-    PartitionedConcurrentHashMap<Key, T, Hash>::partition(const key_type& key) const
+template<typename Key, typename T, typename Hash, typename KeyEqual>
+typename PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::size_type
+    PartitionedConcurrentHashMap<Key, T, Hash, KeyEqual>::partition(const key_type& key) const
 {
     return hasher()(key) % m_partitions.size();
 }
