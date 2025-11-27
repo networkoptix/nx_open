@@ -53,7 +53,7 @@ void ObjectMetadataPacket::addItem(Ptr<const IObjectMetadata> objectMetadata)
 {
     if (!NX_KIT_ASSERT(objectMetadata))
         return;
-    m_objects.push_back(objectMetadata);
+    m_objects.push_back(std::move(objectMetadata));
 }
 
 void ObjectMetadataPacket::clear()
