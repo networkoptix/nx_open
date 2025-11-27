@@ -13,7 +13,7 @@
     <name>QnSystemsModel</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nuevo Sitio</translation>
     </message>
   </context>
   <context>
@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>Invalid certificate</source>
-      <translation>Certificado invalido</translation>
+      <translation>Certificado inválido</translation>
     </message>
     <message>
       <source>Restore the connection to %1 and try again</source>
@@ -133,21 +133,21 @@
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
+      <translation>El certificado servidor&apos;s ha sido rechazado.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your site administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+      <translation>Si este error persiste, por favor contacte al administrador del sitio.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>Registrarse como %1 un usuario del sitio en estado de apagado está prohibido. Usted puede conectarse como usuario local.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>Registrarse como %1 usuario del sitio en modo suspendido está prohibido. Usted puede conectarse como usuario local.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this site with %2 user</source>
