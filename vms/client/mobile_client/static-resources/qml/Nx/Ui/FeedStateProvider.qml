@@ -47,11 +47,12 @@ NxObject
         PushNotificationProvider
         {
             id: notifications
+            
+            readonly property bool activeSession: windowContext.sessionManager.hasActiveSession
+                || windowContext.sessionManager.hasReconnectingSession
 
             user: appContext.cloudStatusWatcher.cloudLogin
-            cloudSystemIds: windowContext.sessionManager.hasActiveSession
-                ? [windowContext.mainSystemContext.cloudSystemId]
-                : []
+            cloudSystemIds: activeSession ? [windowContext.mainSystemContext.cloudSystemId] : []
         }
 
         Timer
