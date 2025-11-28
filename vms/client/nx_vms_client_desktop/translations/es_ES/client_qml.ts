@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Agregar Entrada</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - Ajustes Avanzados</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,19 +24,19 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Atributos de inicio de sesión</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Membresía</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Tiempo de espera de búsqueda</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
