@@ -7821,7 +7821,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nuevo Sitio</translation>
     </message>
   </context>
   <context>
@@ -9360,7 +9360,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nuevo Sitio</translation>
     </message>
     <message>
       <source>Site was not found.</source>
@@ -12179,7 +12179,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nuevo Sitio</translation>
     </message>
   </context>
   <context>
