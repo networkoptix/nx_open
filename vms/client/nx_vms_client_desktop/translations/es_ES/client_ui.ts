@@ -2417,7 +2417,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
   </context>
   <context>
