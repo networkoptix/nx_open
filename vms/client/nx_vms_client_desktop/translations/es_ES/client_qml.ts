@@ -1025,7 +1025,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1075,7 +1075,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1106,7 +1106,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Members</source>
@@ -1145,7 +1145,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>No members</source>
@@ -1442,7 +1442,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Last Sync</source>
@@ -2839,7 +2839,7 @@ Presione Alt + Clic para seguir el objeto</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2941,7 +2941,7 @@ Presione Alt + Clic para seguir el objeto</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Resources</source>
