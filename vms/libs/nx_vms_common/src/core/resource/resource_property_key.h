@@ -182,6 +182,11 @@ NX_VMS_COMMON_API extern const QString kReRequestOnvifRecordingEventsIfAllEvents
 // use these parameters.
 NX_VMS_COMMON_API extern const QString kOnvifFindEventsRequestSupportsTimeRangeParameters;
 
+// Some devices may fail to process Recording Search requests that have their StartPoint set to
+// Unix Epoch time, yet work perfectly fine if it some other "workaround" date. This date is
+// stored as string in ISO 8601 format.
+NX_VMS_COMMON_API extern const QString kOnvifFindEventsRequestEpochStart;
+
 // Prefer native protocol for remote archive synchronization instead of Onvif Profile-G if available.
 NX_VMS_COMMON_API extern const QString kPreferNativeApiForRemoteArchiveSynchronization;
 

@@ -130,6 +130,9 @@ const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime(
 const QString kOnvifFindEventsRequestSupportsTimeRangeParameters(
     "onvifFindEventsRequestSupportsTimeRangeParameters");
 
+const QString kOnvifFindEventsRequestEpochStart(
+    "onvifFindEventsRequestEpochStart");
+
 const QString kPreferNativeApiForRemoteArchiveSynchronization(
     "preferNativeApiForRemoteArchiveSynchronization");
 
