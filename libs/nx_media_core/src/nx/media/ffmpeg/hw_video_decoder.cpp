@@ -148,6 +148,13 @@ bool HwVideoDecoder::initializeSoftware(const QnConstCompressedVideoDataPtr& dat
     if (data->context)
         data->context->toAvCodecContext(m_decoderContext);
 
+    if (m_mtDecodingPolicy != MultiThreadDecodePolicy::disabled)
+    {
+        m_decoderContext->thread_count = std::min(kMaxDecodeThread, av_cpu_count());
+        NX_DEBUG(this, "Hardware decoder thread_count: %1(used in case of software fallback)",
+            m_decoderContext->thread_count);
+    }
+
     int status = avcodec_open2(m_decoderContext, codec, NULL);
     if (status < 0)
     {
@@ -238,13 +245,6 @@ bool HwVideoDecoder::initializeHardware(const QnConstCompressedVideoDataPtr& dat
             return false;
         }
         m_decoderContext->hw_device_ctx = av_buffer_ref(m_hwDeviceContext);
-    }
-
-    if (m_mtDecodingPolicy != MultiThreadDecodePolicy::disabled)
-    {
-        m_decoderContext->thread_count = std::min(kMaxDecodeThread, av_cpu_count());
-        NX_DEBUG(this, "Hardware decoder thread_count: %1(used in case of software fallback)",
-            m_decoderContext->thread_count);
     }
 
     if ((status = avcodec_open2(m_decoderContext, decoder, NULL)) < 0)

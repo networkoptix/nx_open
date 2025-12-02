@@ -46,13 +46,13 @@ public:
     virtual int getWidth() const override { return m_context->width;  }
     virtual int getHeight() const override { return m_context->height; }
     double getSampleAspectRatio() const override;
-    void determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data);
     void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy) override;
     virtual bool resetDecoder(const QnConstCompressedVideoDataPtr& data) override;
     int getLastDecodeResult() const override { return m_lastDecodeResult; }
     void setGreyOnlyMode(bool value) override;
 
 private:
+    void determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data);
     bool openDecoder(const QnConstCompressedVideoDataPtr& data);
     bool initFFmpegDecoder();
     void processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height);

@@ -699,9 +699,9 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
         int isLQ = vd->flags & QnAbstractMediaData::MediaFlags_LowQuality;
         bool qualityChanged = m_prevLQ != -1 && isLQ != m_prevLQ;
-        if (qualityChanged && m_speed >= 0)
+        if (qualityChanged && m_speed >= 0 || m_display[channel]->isRecreateDecoderRequired(vd))
         {
-            m_lastFrameDisplayed = m_display[channel]->flushFrame(vd->channelNumber, scaleFactor);
+            m_lastFrameDisplayed = m_display[channel]->flushFrame(scaleFactor);
             if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
                 doProcessPacket = false;
         }
