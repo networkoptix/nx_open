@@ -62,6 +62,7 @@ public:
     virtual int getWidth() const  { return 0; }
     //!Returns output picture height in pixels (after scaling if it is present)
     virtual int getHeight() const { return 0; }
+    virtual AVCodecID codec() const = 0;
     virtual double getSampleAspectRatio() const { return 1; };
     //!Reset decoder state (e.g. to reposition source stream)
     /*!

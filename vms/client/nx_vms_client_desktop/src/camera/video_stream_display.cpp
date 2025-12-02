@@ -97,7 +97,7 @@ QnVideoStreamDisplay::~QnVideoStreamDisplay()
 
 void QnVideoStreamDisplay::endOfRun()
 {
-    m_decoderData.decoder.reset();
+    m_decoder.reset();
 }
 
 int QnVideoStreamDisplay::addRenderer(QnResourceWidgetRenderer* renderer)
@@ -385,10 +385,10 @@ bool QnVideoStreamDisplay::shouldUpdateDecoder(
     const QnConstCompressedVideoDataPtr& data,
     bool reverseMode)
 {
-    if (!m_decoderData.decoder)
+    if (!m_decoder)
         return false;
 
-    if (m_decoderData.decoder->hardwareDecoder())
+    if (m_decoder->hardwareDecoder())
     {
         if (!appContext()->localSettings()->hardwareDecodingEnabled())
             return true; // Decoder should be changed to software
@@ -475,8 +475,8 @@ bool QnVideoStreamDisplay::isRecreateDecoderRequired(QnCompressedVideoDataPtr da
 
     // Check can we use one more HW decoder or HW acceleration is disabled.
     return shouldUpdateDecoder(data, m_reverseMode)
-        || !m_decoderData.decoder
-        || m_decoderData.compressionType != data->compressionType;
+        || !m_decoder
+        || m_decoder->codec() != data->compressionType;
 }
 
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
@@ -507,8 +507,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
     if (needReinitDecoders)
     {
-        if (m_decoderData.decoder)
-            m_decoderData.decoder->setMultiThreadDecodePolicy(toEncoderPolicy(m_mtDecoding));
+        if (m_decoder)
+            m_decoder->setMultiThreadDecodePolicy(toEncoderPolicy(m_mtDecoding));
     }
 
     if (data->compressionType == AV_CODEC_ID_NONE)
@@ -521,36 +521,33 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     {
         clearReverseQueue();
         if (reverseMode != m_prevReverseMode)
-            m_decoderData.decoder.reset();
+            m_decoder.reset();
 
         m_prevReverseMode = reverseMode;
     }
 
-    if (m_decoderData.decoder
-        && m_decoderData.compressionType != data->compressionType
+    if (m_decoder
+        && m_decoder->codec() != data->compressionType
         && !data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
     {
         NX_DEBUG(this, "Skip media data with codec: %1, while decoder codec: %2",
-            data->compressionType, m_decoderData.compressionType);
+            data->compressionType, m_decoder->codec());
         return Status_Skipped;
     }
 
-    QnAbstractVideoDecoder* dec = m_decoderData.decoder.get();
     if (isRecreateDecoderRequired(data))
     {
         NX_DEBUG(this, "Reset video decoder, resolution: codec: %1, exist: %2",
-            data->compressionType, dec != nullptr);
+            data->compressionType, m_decoder != nullptr);
 
-        m_decoderData.decoder.reset();
-        dec = createVideoDecoder(data, m_mtDecoding);
-        m_decoderData.decoder.reset(dec);
-        m_decoderData.compressionType = data->compressionType;
+        m_decoder.reset();
+        m_decoder.reset(createVideoDecoder(data, m_mtDecoding));
         m_needResetDecoder = false;
     }
 
     if (m_needResetDecoder)
     {
-        m_decoderData.decoder->resetDecoder(data);
+        m_decoder->resetDecoder(data);
         m_needResetDecoder = false;
     }
 
@@ -558,13 +555,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     {
         for (const auto& render: m_renderList)
             render->waitForFrameDisplayed(0);
-        dec->resetDecoder(data);
+        m_decoder->resetDecoder(data);
     }
 
     if (data->flags.testFlag(QnAbstractMediaData::MediaFlags_ReverseBlockStart)
         && m_decodeMode != QnAbstractVideoDecoder::DecodeMode_Fastest)
     {
-        flushReverseBlock(dec, data, forceScaleFactor);
+        flushReverseBlock(m_decoder.get(), data, forceScaleFactor);
     }
 
     CLVideoDecoderOutputPtr decodedFrame(new CLVideoDecoderOutput());
@@ -572,12 +569,12 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     decodedFrame->channel = data->channelNumber;
     decodedFrame->flags = {};
     double decoderSar = 1.0;
-    if (!dec->decode(data, &decodedFrame))
+    if (!m_decoder->decode(data, &decodedFrame))
     {
-        decoderSar = dec->getSampleAspectRatio();
-        if (dec->getLastDecodeResult() < 0 && dec->hardwareDecoder())
+        decoderSar = m_decoder->getSampleAspectRatio();
+        if (m_decoder->getLastDecodeResult() < 0 && m_decoder->hardwareDecoder())
         {
-            m_decoderData.decoder.reset();
+            m_decoder.reset();
             return Status_Skipped;
         }
 
@@ -598,13 +595,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
                 return Status_Buffered;
         }
 
-        auto lastError = dec->getLastDecodeResult();
+        auto lastError = m_decoder->getLastDecodeResult();
         if (lastError < 0)
             return Status_Skipped;
         else
             return Status_Buffered;
     }
-    decoderSar = dec->getSampleAspectRatio();
+    decoderSar = m_decoder->getSampleAspectRatio();
     {
         NX_MUTEX_LOCKER lock(&m_lastDisplayedFrameMutex);
         m_lastDisplayedFrame = decodedFrame;
@@ -728,16 +725,16 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(
     }
 
     // use only 1 frame for non selected video
-    if (m_reverseMode || !m_decoderData.decoder || m_needResetDecoder)
+    if (m_reverseMode || !m_decoder || m_needResetDecoder)
         return Status_Skipped;
 
     CLVideoDecoderOutputPtr decodedFrame(new CLVideoDecoderOutput());
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     double decoderSar = 1.0;
-    if (!m_decoderData.decoder->decode(QnCompressedVideoDataPtr(), &decodedFrame))
+    if (!m_decoder->decode(QnCompressedVideoDataPtr(), &decodedFrame))
         return Status_Skipped;
 
-    decoderSar = m_decoderData.decoder->getSampleAspectRatio();
+    decoderSar = m_decoder->getSampleAspectRatio();
 
     for (auto& render: m_renderList)
         render->finishPostedFramesRender(decodedFrame->channel);
@@ -829,8 +826,8 @@ bool QnVideoStreamDisplay::rescaleFrame(
 void QnVideoStreamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
 {
     m_decodeMode = val;
-    if (m_decoderData.decoder)
-        m_decoderData.decoder->setLightCpuMode(val);
+    if (m_decoder)
+        m_decoder->setLightCpuMode(val);
 }
 
 void QnVideoStreamDisplay::setMTDecoding(bool value)

@@ -386,5 +386,9 @@ void HwVideoDecoder::setMultiThreadDecodePolicy(MultiThreadDecodePolicy policy)
 
 int HwVideoDecoder::getWidth() const { return m_decoderContext ? m_decoderContext->width : 0; }
 int HwVideoDecoder::getHeight() const { return m_decoderContext ? m_decoderContext->height : 0; }
+AVCodecID HwVideoDecoder::codec() const
+{
+    return m_decoderContext ? m_decoderContext->codec_id : AV_CODEC_ID_NONE;
+};
 
 } // namespace nx::media::ffmpeg

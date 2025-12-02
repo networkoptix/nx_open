@@ -25,6 +25,7 @@ public:
 
     virtual int getWidth() const override;
     virtual int getHeight() const override;
+    AVCodecID codec() const override;
     virtual bool hardwareDecoder() const override;
     virtual double getSampleAspectRatio() const override;
 

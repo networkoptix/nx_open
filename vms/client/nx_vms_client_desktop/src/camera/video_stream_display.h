@@ -89,13 +89,7 @@ public: // used only by QnCamDisplay
     MultiThreadDecodePolicy toEncoderPolicy(bool useMtDecoding) const;
 
 private:
-    struct Decoder
-    {
-        AVCodecID compressionType = AVCodecID::AV_CODEC_ID_NONE;
-        std::unique_ptr<QnAbstractVideoDecoder> decoder;
-    };
-    Decoder m_decoderData;
-
+    std::unique_ptr<QnAbstractVideoDecoder> m_decoder;
     std::set<QnResourceWidgetRenderer*> m_newList;
     std::set<QnResourceWidgetRenderer*> m_renderList;
     bool m_renderListModified;

@@ -253,6 +253,11 @@ int HwVideoDecoderOldPlayer::getHeight() const
     return m_resolution.height();
 }
 
+AVCodecID HwVideoDecoderOldPlayer::codec() const
+{
+    return m_impl ? m_impl->codec() : AV_CODEC_ID_NONE;
+}
+
 bool HwVideoDecoderOldPlayer::hardwareDecoder() const
 {
     return true;

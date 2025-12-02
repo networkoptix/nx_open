@@ -45,6 +45,7 @@ public:
     bool hardwareDecoder() const override;
     virtual int getWidth() const override { return m_context->width;  }
     virtual int getHeight() const override { return m_context->height; }
+    virtual AVCodecID codec() const override { return m_context->codec_id; }
     double getSampleAspectRatio() const override;
     void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy) override;
     virtual bool resetDecoder(const QnConstCompressedVideoDataPtr& data) override;

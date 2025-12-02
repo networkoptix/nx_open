@@ -42,6 +42,7 @@ public:
     void setMultiThreadDecodePolicy(MultiThreadDecodePolicy policy) override;
     int getWidth() const override;
     int getHeight() const override;
+    AVCodecID codec() const override;
     bool resetDecoder(const QnConstCompressedVideoDataPtr& data) override;
     int getLastDecodeResult() const override;
     void setGreyOnlyMode(bool value) override;
