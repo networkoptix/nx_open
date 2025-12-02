@@ -488,7 +488,10 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     if (canAddFFmpegHW(data, m_reverseMode))
     {
         if (auto rhi = appContext()->mainWindowContext()->rhi())
+        {
+            NX_DEBUG(this, "Create HW video decoder: %1", data->compressionType);
             decoder = new nx::media::HwVideoDecoderOldPlayer(rhi);
+        }
         decoder->setMultiThreadDecodePolicy(toEncoderPolicy(mtDecoding));
     }
 
@@ -502,6 +505,7 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
             !appContext()->mainWindowContext()->rhi()
                 || appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::software
                 || appContext()->runtimeSettings()->isSoftwareYuv();
+        NX_DEBUG(this, "Create video decoder: %1", data->compressionType);
         decoder = new QnFfmpegVideoDecoder(config, /*metrics*/ nullptr, data);
     }
     decoder->setLightCpuMode(m_decodeMode);
@@ -538,6 +542,17 @@ void QnVideoStreamDisplay::flushReverseBlock(
     dec->resetDecoder(data);
 }
 
+bool QnVideoStreamDisplay::isRecreateDecoderRequired(QnCompressedVideoDataPtr data)
+{
+    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+        return false;
+
+    // Check can we use one more HW decoder or HW acceleration is disabled.
+    return shouldUpdateDecoder(data, m_reverseMode)
+        || !m_decoderData.decoder
+        || m_decoderData.compressionType != data->compressionType;
+}
+
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::DownscaleFactor forceScaleFactor)
 {
@@ -560,6 +575,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     else if (!draw)
         m_lastIgnoreTime = data->timestamp;
 
+    NX_VERBOSE(this, "Display frame: %1", data);
     m_isLive = data->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE);
     const bool needReinitDecoders = m_needReinitDecoders.exchange(false);
 
@@ -584,35 +600,26 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         m_prevReverseMode = reverseMode;
     }
 
-    QnAbstractVideoDecoder* dec = nullptr;
+    if (m_decoderData.decoder
+        && m_decoderData.compressionType != data->compressionType
+        && !data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
     {
-        // Check can we use one more HW decoder or HW acceleration is disabled.
-        if (data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
-        {
-            if (shouldUpdateDecoder(data, m_reverseMode))
-                m_decoderData.decoder.reset();
-        }
+        NX_DEBUG(this, "Skip media data with codec: %1, while decoder codec: %2",
+            data->compressionType, m_decoderData.compressionType);
+        return Status_Skipped;
+    }
 
-        dec = m_decoderData.decoder.get();
-        auto frameResolution = data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey)
-            ? nx::media::getFrameSize(data.get())
-            : QSize();
+    QnAbstractVideoDecoder* dec = m_decoderData.decoder.get();
+    if (isRecreateDecoderRequired(data))
+    {
+        NX_DEBUG(this, "Reset video decoder, resolution: codec: %1, exist: %2",
+            data->compressionType, dec != nullptr);
 
-        auto decoderResolution = dec ? QSize(dec->getWidth(), dec->getHeight()) : QSize();
-        bool resolutionChanged = !frameResolution.isEmpty() && decoderResolution != frameResolution;
-
-        if (!dec || resolutionChanged || m_decoderData.compressionType != data->compressionType)
-        {
-            if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
-                return Status_Skipped;
-            NX_DEBUG(this, "Reset video decoder, resolution: %1(previous: %2), codec: %3, exist: %4",
-                frameResolution, decoderResolution, data->compressionType, dec != nullptr);
-            m_decoderData.decoder.reset();
-            dec = createVideoDecoder(data, m_mtDecoding);
-            m_decoderData.decoder.reset(dec);
-            m_decoderData.compressionType = data->compressionType;
-            m_needResetDecoder = false;
-        }
+        m_decoderData.decoder.reset();
+        dec = createVideoDecoder(data, m_mtDecoding);
+        m_decoderData.decoder.reset(dec);
+        m_decoderData.compressionType = data->compressionType;
+        m_needResetDecoder = false;
     }
 
     if (m_needResetDecoder)
@@ -785,7 +792,6 @@ bool QnVideoStreamDisplay::downscaleOrForward(
 }
 
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(
-    int channel,
     QnFrameScaler::DownscaleFactor forceScaleFactor)
 {
     {
@@ -801,15 +807,14 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(
 
     CLVideoDecoderOutputPtr decodedFrame(new CLVideoDecoderOutput());
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
-    for (auto& render: m_renderList)
-        render->finishPostedFramesRender(channel);
-    outFrame->channel = channel;
     double decoderSar = 1.0;
-    {
-        if (!m_decoderData.decoder->decode(QnCompressedVideoDataPtr(), &decodedFrame))
-            return Status_Skipped;
-        decoderSar = m_decoderData.decoder->getSampleAspectRatio();
-    }
+    if (!m_decoderData.decoder->decode(QnCompressedVideoDataPtr(), &decodedFrame))
+        return Status_Skipped;
+
+    decoderSar = m_decoderData.decoder->getSampleAspectRatio();
+
+    for (auto& render: m_renderList)
+        render->finishPostedFramesRender(decodedFrame->channel);
 
     if (!downscaleOrForward(decodedFrame, outFrame, forceScaleFactor))
         return Status_Displayed;

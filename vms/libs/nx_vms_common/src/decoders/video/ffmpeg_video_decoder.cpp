@@ -49,14 +49,13 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     m_prevTimestamp(AV_NOPTS_VALUE),
     m_spsFound(false),
     m_mtDecodingPolicy(config.mtDecodePolicy),
-    m_useMtDecoding(false),
+    m_useMtDecoding(config.mtDecodePolicy == MultiThreadDecodePolicy::enabled),
     m_needRecreate(false),
     m_metrics(metrics),
     m_config(config)
 {
     if (m_metrics)
         m_metrics->decoders()++;
-    setMultiThreadDecoding(m_mtDecodingPolicy == MultiThreadDecodePolicy::enabled);
     m_opened = openDecoder(data);
 }
 
@@ -164,6 +163,7 @@ bool QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 
 bool QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& data)
 {
+    NX_DEBUG(this, "Reset video decoder: %1", data);
     if (!data || !(data->flags & AV_PKT_FLAG_KEY))
     {
         m_needRecreate = true;
@@ -173,6 +173,7 @@ bool QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     avcodec_free_context(&m_context);
     m_spsFound = false;
     m_opened = openDecoder(data);
+    m_needRecreate = false;
     return m_opened;
 }
 
@@ -186,7 +187,6 @@ void QnFfmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressed
     {
         m_currentWidth = width;
         m_currentHeight = height;
-        m_needRecreate = false;
         resetDecoder(data);
     }
     if (data->flags.testFlag(QnAbstractMediaData::MediaFlags_newCodecParams))
@@ -197,6 +197,7 @@ void QnFfmpegVideoDecoder::setMultiThreadDecoding(bool value)
 {
     if (value != m_useMtDecoding)
     {
+        NX_DEBUG(this, "Set multithreaded decoding: %1", value);
         m_useMtDecoding = value;
         m_needRecreate = true;
     }
@@ -302,7 +303,6 @@ bool QnFfmpegVideoDecoder::decode(
 
         if (m_needRecreate && (data->flags & AV_PKT_FLAG_KEY))
         {
-            m_needRecreate = false;
             if (!resetDecoder(data))
                 return false;
         }

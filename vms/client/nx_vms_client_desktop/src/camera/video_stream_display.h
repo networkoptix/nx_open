@@ -67,8 +67,9 @@ public: // used only by QnCamDisplay
     void waitForFramesDisplayed();
     QSize getMaxScreenSizeUnsafe() const;
 
+    bool isRecreateDecoderRequired(QnCompressedVideoDataPtr data);
     QnVideoStreamDisplay::FrameDisplayStatus flushFrame(
-        int channel, QnFrameScaler::DownscaleFactor force_factor);
+        QnFrameScaler::DownscaleFactor force_factor);
     //!Blocks until all frames passed to \a display have been rendered
     void flushFramesToRenderer();
     void overrideTimestampOfNextFrameToRender(qint64 value);
