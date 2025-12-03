@@ -114,9 +114,6 @@ public:
     ~DataManager();
 
     void setSaveHandler(SaveHandler handler);
-    nx::sdk::ErrorCode saveBookmark(const nx::sdk::cloud_storage::Bookmark& data);
-    void deleteBookmark(const char* id);
-    std::string queryBookmarks(const nx::sdk::cloud_storage::BookmarkFilter& filter) const;
 
     nx::sdk::ErrorCode saveMotion(const nx::sdk::cloud_storage::Motion& data);
     std::string queryMotion(const nx::sdk::cloud_storage::MotionFilter& filter) const;
@@ -146,9 +143,7 @@ public:
 private:
     std::string m_workDir;
     std::shared_ptr<std::mutex> m_mutex{std::make_shared<std::mutex>()};
-    std::vector<nx::sdk::cloud_storage::Bookmark> m_cloudBookmarks;
     std::vector<nx::sdk::cloud_storage::Motion> m_cloudMotion;
-    std::queue<nx::sdk::cloud_storage::Bookmark> m_bookmarksToSend;
     std::queue<nx::sdk::cloud_storage::Motion> m_motionToSend;
     SaveHandler m_saveHandler;
     std::thread m_workThread;

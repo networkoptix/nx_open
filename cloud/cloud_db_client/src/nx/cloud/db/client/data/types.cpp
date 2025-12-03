@@ -82,6 +82,7 @@ ResultCode httpStatusCodeToResultCode(nx::network::http::StatusCode::Value statu
     switch (statusCode)
     {
         case nx::network::http::StatusCode::ok:
+        case nx::network::http::StatusCode::accepted:
             return ResultCode::ok;
         case nx::network::http::StatusCode::created:
             return ResultCode::created;

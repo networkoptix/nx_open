@@ -15,6 +15,7 @@
 #include "analytics_db_manager.h"
 #include "auth_provider.h"
 #include "batch_user_processing_manager.h"
+#include "bookmark_manager.h"
 #include "maintenance_manager.h"
 #include "module_info.h"
 #include "oauth_manager.h"
@@ -81,6 +82,7 @@ public:
     virtual api::AuthProvider* authProvider() = 0;
 
     virtual api::AnalyticsDbManager* analyticsDbManager() = 0;
+    virtual api::BookmarkManager* bookmarkManager() = 0;
 
     /**
      * Maintenance manager is for accessing cloud internal data for maintenance/debug purposes.

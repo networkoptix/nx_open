@@ -9,6 +9,7 @@
 #include "async_http_requests_executor.h"
 #include "auth_provider.h"
 #include "batch_user_processing_manager.h"
+#include "bookmark_manager.h"
 #include "maintenance_manager.h"
 #include "oauth_manager.h"
 #include "organization_manager.h"
@@ -30,6 +31,7 @@ public:
     virtual api::SystemManager* systemManager() override;
     virtual api::OrganizationManager* organizationManager() override;
     virtual api::AnalyticsDbManager* analyticsDbManager() override;
+    virtual api::BookmarkManager* bookmarkManager() override;
     virtual api::AuthProvider* authProvider() override;
     virtual api::MaintenanceManager* maintenanceManager() override;
     virtual api::OauthManager* oauthManager() override;
@@ -75,6 +77,7 @@ private:
     OauthManager m_oauthManager;
     TwoFactorAuthManager m_twoFactorAuthManager;
     BatchUserProcessingManager m_batchUserProcessingManager;
+    BookmarkManager m_bookmarkManager;
 };
 
 } // namespace nx::cloud::db::client

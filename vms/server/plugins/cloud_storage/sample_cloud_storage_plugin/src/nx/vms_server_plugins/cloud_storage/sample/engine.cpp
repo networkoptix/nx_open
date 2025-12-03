@@ -31,20 +31,6 @@ void Engine::doObtainDeviceAgent(
         new nx::sdk::String("Not implemented")));
 }
 
-void Engine::doQueryBookmarks(
-    const char* /*filter*/,
-    nx::sdk::Result<nx::sdk::IString*>* outResult)
-{
-    *outResult = nx::sdk::Result<nx::sdk::IString*>(nx::sdk::Error(
-        nx::sdk::ErrorCode::notImplemented,
-        new nx::sdk::String("Not implemented")));
-}
-
-nx::sdk::ErrorCode Engine::deleteBookmark(const char* /*bookmarkId*/)
-{
-    return nx::sdk::ErrorCode::notImplemented;
-}
-
 void Engine::doQueryMotionTimePeriods(
     const char* /*filter*/,
     nx::sdk::Result<nx::sdk::IString*>* outResult)

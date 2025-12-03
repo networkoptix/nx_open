@@ -55,11 +55,6 @@ Engine::Engine(
 {
     m_handler.reset(asyncOperationHandler);
     m_handler->addRef();
-    m_dataManager->setSaveHandler(
-        [this](nx::sdk::cloud_storage::MetadataType type, nx::sdk::ErrorCode result)
-        {
-            m_handler->onSaveOperationCompleted(m_integrationId.data(), type, result);
-        });
 }
 
 void Engine::stopAsyncTasks()
@@ -224,51 +219,6 @@ nx::sdk::cloud_storage::IDeviceAgent* Engine::findDeviceAgentById(
     return resultIt->get();
 }
 
-void Engine::doQueryBookmarks(
-    const char* filter,
-    nx::sdk::Result<nx::sdk::IString*>* outResult)
-{
-    try
-    {
-        NX_OUTPUT << __func__ << ": Querying bookmarks with filter '" << filter << "'";
-        std::lock_guard lock(m_mutex);
-        if (!m_dataManager)
-            throw std::logic_error("Plugin has not been properly initialized");
-
-        const auto bookmarksData =
-            m_dataManager->queryBookmarks(nx::sdk::cloud_storage::BookmarkFilter(filter));
-        *outResult = nx::sdk::Result<nx::sdk::IString*>(new nx::sdk::String(bookmarksData));
-        NX_OUTPUT << __func__ << ": Successfully fetched some bookmarks: '" << bookmarksData << "'";
-    }
-    catch (const std::exception& e)
-    {
-        NX_OUTPUT << __func__ << ": Failed to fetch bookmarks. Error: '" << e.what() << "'";
-        *outResult = nx::sdk::Result<nx::sdk::IString*>(nx::sdk::Error(
-            nx::sdk::ErrorCode::internalError,
-            new nx::sdk::String(e.what())));
-    }
-}
-
-nx::sdk::ErrorCode Engine::deleteBookmark(const char* bookmarkId)
-{
-    try
-    {
-        NX_OUTPUT << __func__ << ": Deleting bookmark with id '" << bookmarkId;
-        std::lock_guard lock(m_mutex);
-        if (!m_dataManager)
-            throw std::logic_error("Plugin has not been properly initialized");
-
-        m_dataManager->deleteBookmark(bookmarkId);
-    }
-    catch (const std::exception& e)
-    {
-        NX_OUTPUT << __func__ << ": Failed to delete bookmark. Error: '" << e.what() << "'";
-        return nx::sdk::ErrorCode::internalError;
-    }
-
-    return nx::sdk::ErrorCode::noError;
-}
-
 void Engine::doQueryMotionTimePeriods(
     const char* filter,
     nx::sdk::Result<nx::sdk::IString*>* outResult)
@@ -314,9 +264,6 @@ nx::sdk::ErrorCode Engine::saveMetadata(
         nx::sdk::ErrorCode result = nx::sdk::ErrorCode::otherError;
         switch (type)
         {
-            case sdk::cloud_storage::MetadataType::bookmark:
-                result = m_dataManager->saveBookmark(nx::sdk::cloud_storage::Bookmark(data));
-                break;
             case sdk::cloud_storage::MetadataType::motion:
                 result = m_dataManager->saveMotion(nx::sdk::cloud_storage::Motion(data));
                 break;

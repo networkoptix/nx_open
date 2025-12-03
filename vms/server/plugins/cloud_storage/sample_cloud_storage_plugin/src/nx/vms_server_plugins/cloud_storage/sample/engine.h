@@ -19,11 +19,6 @@ public:
     virtual void startAsyncTasks(const char* lastSequenceId) override;
     virtual void stopAsyncTasks() override;
 
-    virtual void doQueryBookmarks(
-        const char* filter,
-        nx::sdk::Result<nx::sdk::IString*>* outResult) override;
-
-    virtual nx::sdk::ErrorCode deleteBookmark(const char* bookmarkId) override;
     virtual nx::sdk::ErrorCode saveMetadata(
         const char* deviceId,
         nx::sdk::cloud_storage::MetadataType type,

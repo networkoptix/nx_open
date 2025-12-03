@@ -16,8 +16,7 @@ namespace nx::sdk::cloud_storage {
 
 enum class MetadataType
 {
-    motion,
-    bookmark,
+    motion
 };
 
 struct StorageSpace
@@ -59,22 +58,6 @@ public:
         return result;
     }
 
-    protected: virtual void doQueryBookmarks(const char* filter, Result<IString*>* outResult) = 0;
-
-    /**
-     * Query bookmarks accordingly to the given filter.
-     * `filter` is the JSON representation of the `BookmarkFilter`.
-     * The result should contain a JSON representation of a list of the `Bookmark`.
-     */
-    public: Result<IString*> queryBookmarks(const char* filter)
-    {
-        Result<IString*> result;
-        doQueryBookmarks(filter, &result);
-        return result;
-    }
-
-    public: virtual ErrorCode deleteBookmark(const char* bookmarkId) = 0;
-
     protected: virtual void doQueryMotionTimePeriods(
         const char* filter, Result<IString*>* outResult) = 0;
 
@@ -94,7 +77,7 @@ public:
 
     /**
      * @param data A null-terminated string containing the JSON of the corresponding metadata object.
-     * Refer to `Bookmark`, `ObjectTrack` and `Motion` objects in the
+     * Refer to `ObjectTrack` and `Motion` objects in the
      * sdk/cloud_storage/helpers/data.h for details.
      * @note If `saveMetadata` returned `inProgress` VMS Server won't call it again until the
      * onSaveOperationCompleted is called by the plugin.

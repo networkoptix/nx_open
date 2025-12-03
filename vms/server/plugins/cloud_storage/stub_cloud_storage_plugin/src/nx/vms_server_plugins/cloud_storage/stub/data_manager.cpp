@@ -888,7 +888,6 @@ std::string toString(sdk::cloud_storage::MetadataType metadataType)
     switch (metadataType)
     {
         case MetadataType::motion: return "motion";
-        case MetadataType::bookmark: return "bookmark";
     }
 
     throw std::logic_error("Unexpected metadataType");
@@ -910,7 +909,6 @@ DataManager::DataManager(const std::string& workDir):
     ensureDir(joinPath(m_workDir, kImageFolderName));
     using namespace nx::sdk::cloud_storage;
     m_cloudMotion = load<Motion>(joinPath(m_workDir, kMotionFileName));
-    m_cloudBookmarks = load<Bookmark>(joinPath(m_workDir, kBookmarkFileName));
     m_workThread = std::thread([this](){ run(); });
 }
 
@@ -920,9 +918,7 @@ void DataManager::run()
     {
         std::unique_lock<std::mutex> lock(*m_mutex);
         bool needToWait =
-            !*needToFlush<nx::sdk::cloud_storage::Bookmark>()
-            && dataQueue<nx::sdk::cloud_storage::Bookmark>()->size() < kMaxSendBufferSize
-            && !*needToFlush<nx::sdk::cloud_storage::Motion>()
+            !*needToFlush<nx::sdk::cloud_storage::Motion>()
             && dataQueue<nx::sdk::cloud_storage::Motion>()->size() < kMaxSendBufferSize;
 
         if (needToWait)
@@ -932,16 +928,12 @@ void DataManager::run()
             return;
 
         processQueue(m_motionToSend, lock);
-        processQueue(m_bookmarksToSend, lock);
     }
 }
 
 template<typename Data>
 std::queue<Data>* DataManager::dataQueue()
 {
-    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Bookmark>)
-        return &m_bookmarksToSend;
-
     if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
         return &m_motionToSend;
 }
@@ -949,9 +941,6 @@ std::queue<Data>* DataManager::dataQueue()
 template<typename Data>
 bool*  DataManager::needToFlush()
 {
-    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Bookmark>)
-        return &m_needToFlushBookmarks;
-
     if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
         return &m_needToFlushMotion;
 }
@@ -959,9 +948,6 @@ bool*  DataManager::needToFlush()
 template<typename Data>
 nx::sdk::cloud_storage::MetadataType DataManager::metadataType() const
 {
-    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Bookmark>)
-        return nx::sdk::cloud_storage::MetadataType::bookmark;;
-
     if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
         return nx::sdk::cloud_storage::MetadataType::motion;;
 }
@@ -969,9 +955,6 @@ nx::sdk::cloud_storage::MetadataType DataManager::metadataType() const
 template<typename Data>
 std::vector<Data>* DataManager::cloudData()
 {
-    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Bookmark>)
-        return &m_cloudBookmarks;
-
     if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
         return &m_cloudMotion;
 }
@@ -986,16 +969,6 @@ void DataManager::processQueue(std::queue<Data>& dataQueue, std::unique_lock<std
     while (!dataQueue.empty())
     {
         const auto& data = dataQueue.front();
-        if constexpr (std::is_same_v<nx::sdk::cloud_storage::Bookmark, Data>)
-        {
-            for (auto it = pCloudData->begin(); it != pCloudData->end();)
-            {
-                if (it->id == data.id)
-                    it = pCloudData->erase(it);
-                else
-                    ++it;
-            }
-        }
         pCloudData->push_back(data);
         dataQueue.pop();
     }
@@ -1019,9 +992,6 @@ void DataManager::flushMetadata(nx::sdk::cloud_storage::MetadataType type)
         case nx::sdk::cloud_storage::MetadataType::motion:
             m_needToFlushMotion = true;
             break;
-        case nx::sdk::cloud_storage::MetadataType::bookmark:
-            m_needToFlushBookmarks = true;
-            break;
     }
 
     m_cond.notify_one();
@@ -1033,24 +1003,6 @@ DataManager::~DataManager()
     m_cond.notify_one();
     m_workThread.join();
     flushToFile(m_cloudMotion, joinPath(m_workDir, kMotionFileName));
-    flushToFile(m_cloudBookmarks, joinPath(m_workDir, kBookmarkFileName));
-}
-
-nx::sdk::ErrorCode DataManager::saveBookmark(const nx::sdk::cloud_storage::Bookmark& data)
-{
-    return saveMetadataImpl(data);
-}
-
-void DataManager::deleteBookmark(const char* id)
-{
-    std::lock_guard<std::mutex> lock(*m_mutex);
-    const auto fileName = joinPath(m_workDir, kBookmarkFileName);
-    auto bookmarks = allObjectsNoLock<nx::sdk::cloud_storage::Bookmark>(fileName);
-    bookmarks.erase(
-        std::remove_if(bookmarks.begin(), bookmarks.end(),
-        [id](const auto& entry) { return entry.id == id; }), bookmarks.end());
-
-    File(fileName).writeAll(nx::kit::Json(bookmarks).dump(), /*replaceContents*/ true);
 }
 
 template<typename Data>
@@ -1163,21 +1115,6 @@ std::vector<Data> DataManager::allObjectsNoLock(const std::string& fileName) con
         result.push_back(Data(entryJson));
 
     return result;
-}
-
-std::string DataManager::queryBookmarks(const nx::sdk::cloud_storage::BookmarkFilter& filter) const
-{
-    using namespace nx::sdk::cloud_storage;
-    std::vector<Bookmark> result;
-    std::lock_guard<std::mutex> lock(*m_mutex);
-    for (const auto& candidate: m_cloudBookmarks)
-    {
-        if (bookmarkMatches(candidate, filter))
-            result.push_back(candidate);
-    }
-
-    sortAndLimitBookmarks(filter, &result);
-    return dumpObjects(result);
 }
 
 nx::sdk::ErrorCode DataManager::saveMotion(const nx::sdk::cloud_storage::Motion& data)

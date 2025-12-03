@@ -6,9 +6,6 @@
 
 namespace nx::sdk::cloud_storage {
 
-bool bookmarkMatches(const Bookmark& bookmark, const BookmarkFilter& filter);
-void sortAndLimitBookmarks(const BookmarkFilter& filter, std::vector<Bookmark>* outBookmarks);
-
 bool motionMaches(const Motion& motion, const MotionFilter& filter);
 
 bool objectTrackMatches(const ObjectTrack& objectTrack, const AnalyticsFilter& filter);

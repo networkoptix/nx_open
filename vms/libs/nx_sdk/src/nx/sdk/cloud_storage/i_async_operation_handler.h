@@ -76,11 +76,6 @@ public:
         const char* lastSequenceId,
         nx::sdk::ErrorCode errorCode,
         const IList<IDeviceArchive>* deviceArchive) const = 0;
-
-    virtual void onSaveOperationCompleted(
-        const char* engineId,
-        MetadataType metadataType,
-        nx::sdk::ErrorCode errorCode) const = 0;
 };
 
 } // namespace nx::sdk::cloud_storage

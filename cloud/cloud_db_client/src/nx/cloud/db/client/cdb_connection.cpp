@@ -23,7 +23,8 @@ Connection::Connection(
     m_maintenanceManager(&m_requestExecutor),
     m_oauthManager(&m_requestExecutor),
     m_twoFactorAuthManager(&m_requestExecutor),
-    m_batchUserProcessingManager(&m_requestExecutor)
+    m_batchUserProcessingManager(&m_requestExecutor),
+    m_bookmarkManager(&m_requestExecutor)
 {
     m_requestExecutor.setCacheEnabled(true);
 
@@ -48,6 +49,11 @@ api::OrganizationManager* Connection::organizationManager()
 api::AnalyticsDbManager* Connection::analyticsDbManager()
 {
     return &m_analyticsDbManager;
+}
+
+api::BookmarkManager* Connection::bookmarkManager()
+{
+    return &m_bookmarkManager;
 }
 
 api::AuthProvider* Connection::authProvider()

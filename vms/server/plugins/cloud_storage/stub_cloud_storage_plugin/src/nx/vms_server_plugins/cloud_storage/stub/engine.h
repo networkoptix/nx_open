@@ -49,10 +49,6 @@ protected:
         const char* filter,
         nx::sdk::Result<nx::sdk::IString*>* outResult) override;
 
-        virtual void doQueryBookmarks(
-        const char* filter,
-        nx::sdk::Result<nx::sdk::IString*>* outResult) override;
-    virtual nx::sdk::ErrorCode deleteBookmark(const char* bookmarkId) override;
 
 private:
     nx::sdk::Ptr<const nx::sdk::cloud_storage::IAsyncOperationHandler> m_handler;
