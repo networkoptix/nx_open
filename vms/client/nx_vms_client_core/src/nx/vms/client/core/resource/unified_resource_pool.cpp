@@ -2,9 +2,17 @@
 
 #include "unified_resource_pool.h"
 
+#include <QtCore/QEventLoop>
+
 #include <core/resource_management/resource_pool.h>
+#include <nx/build_info.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 
 namespace nx::vms::client::core {
 
@@ -73,9 +81,38 @@ QnResourcePtr UnifiedResourcePool::resource(
             return systemContext->localSystemId() == localSystemId;
         });
 
-    return systemContext != systemContexts.end()
-        ? (*systemContext)->resourcePool()->getResourceById(resourceId)
-        : QnResourcePtr{};
+    if (systemContext != systemContexts.end())
+        return (*systemContext)->resourcePool()->getResourceById(resourceId);
+
+    for (const auto& cloudId: appContext()->cloudCrossSystemManager()->cloudSystems())
+    {
+        auto cloudSystem = appContext()->cloudCrossSystemManager()->systemContext(cloudId);
+        if (cloudSystem->systemDescription()->localId() == localSystemId)
+        {
+            // Here we need to suspend the execution of the method so that the scheduler can
+            // asynchronously, outside the GUI thread, initiate a connection to the system,
+            // which will then request the user confirmation in the GUI thread.
+            //
+            // This outcomes from the fact that this method is sync and initializeConnection works
+            // in async manner and we have to wait for the connection to be completed to get
+            // the resource.
+            QEventLoop loop;
+            QnResourcePtr result;
+
+            cloudSystem->initializeConnection(/*allowUserInteraction*/ true);
+
+            connect(cloudSystem, &CloudCrossSystemContext::statusChanged, this,
+                [&loop, &result, &cloudSystem, &resourceId]
+                {
+                    result =
+                        cloudSystem->systemContext()->resourcePool()->getResourceById(resourceId);
+                    loop.quit();
+                });
+            loop.exec();
+            return result;
+        }
+    }
+    return QnResourcePtr();
 }
 
 } // namespace nx::vms::client::core
