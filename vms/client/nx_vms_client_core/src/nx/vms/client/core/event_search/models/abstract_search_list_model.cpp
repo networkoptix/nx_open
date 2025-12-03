@@ -123,32 +123,35 @@ void AbstractSearchListModel::setSystemContext(SystemContext* systemContext)
     if (systemContext == this->systemContext())
         return;
 
+    d->userWatcherChangedConnection.reset();
+    d->cameraSet.setResourcePool(nullptr);
+
+    {
+        const QSignalBlocker blocker(this);
+        base_type::setSystemContext(systemContext);
+    }
+
     clear();
 
-    d->userWatcherChangedConnection.reset();
-    base_type::setSystemContext(systemContext);
-
-    d->cameraSet.setResourcePool(nullptr);
-    d->userWatcherChangedConnection.reset();
-
-    if (systemContext)
-    {
-        d->cameraSet.setResourcePool(systemContext->resourcePool());
-
-        const auto watcher = systemContext->userWatcher();
-        d->userWatcherChangedConnection.reset(
-            connect(watcher, &UserWatcher::userChanged, this,
-                [this](const QnUserResourcePtr& user)
-                {
-                    onOnlineChanged(/*isOnline*/ !user.isNull());
-                }));
-
-        onOnlineChanged(!watcher->user().isNull());
-    }
-    else
+    if (!systemContext || !systemContext->userWatcher())
     {
         onOnlineChanged(/*isOnline*/ false);
+        return;
     }
+
+    const auto watcher = systemContext->userWatcher();
+    d->cameraSet.setResourcePool(systemContext->resourcePool());
+    d->userWatcherChangedConnection.reset(connect(
+        watcher,
+        &UserWatcher::userChanged,
+        this,
+        [this](const QnUserResourcePtr& user)
+        {
+            onOnlineChanged(/*isOnline*/ !user.isNull());
+        }));
+
+    const auto user = watcher->user();
+    onOnlineChanged(/*isOnline*/ !user.isNull());
 }
 
 void AbstractSearchListModel::onOnlineChanged(bool isOnline)
