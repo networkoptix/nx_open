@@ -6,6 +6,7 @@ compiler=clang
 compiler.version=21
 compiler.libcxx=c++_shared
 compiler.cppstd=20
+build_type=RelWithDebInfo
 
 os=Android
 os.api_level=26

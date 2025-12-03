@@ -4,10 +4,10 @@ include(common.profile)
 [settings]
 os=iOS
 os.version=16.0
-os.sdk=iphoneos
 compiler=apple-clang
 compiler.libcxx=libc++
 compiler.cppstd=20
+build_type=RelWithDebInfo
 
 [options]
 zlib/*:shared=False
