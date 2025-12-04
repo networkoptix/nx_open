@@ -5,10 +5,15 @@
 #include <nx/utils/url.h>
 #include <utils/common/util.h>
 
-QnAbstractStorageResource::FileInfo::FileInfo(const QString& uri, qint64 size, bool isDir):
+QnAbstractStorageResource::FileInfo::FileInfo(
+    const QString& uri,
+    qint64 size,
+    bool isDir,
+    bool isSymLink):
     m_fpath(uri),
     m_size(size),
-    m_isDir(isDir)
+    m_isDir(isDir),
+    m_isSymLink(isSymLink)
 {
 }
 
@@ -32,6 +37,11 @@ QnAbstractStorageResource::FileInfo QnAbstractStorageResource::FileInfo::fromQFi
 bool QnAbstractStorageResource::FileInfo::isDir() const
 {
     return m_qFileInfo ? m_qFileInfo->isDir() : m_isDir;
+}
+
+bool QnAbstractStorageResource::FileInfo::isSymLink() const
+{
+    return m_qFileInfo ? m_qFileInfo->isSymLink() : m_isSymLink;
 }
 
 QString QnAbstractStorageResource::FileInfo::absoluteFilePath() const
@@ -107,12 +117,14 @@ QString QnAbstractStorageResource::FileInfo::toString() const
 void QnAbstractStorageResource::FileInfo::setPath(const QString& path)
 {
     m_fpath = path;
+    m_qFileInfo.reset();
 }
 
 QnAbstractStorageResource::FileInfoList QnAbstractStorageResource::FIListFromQFIList(
     const QFileInfoList& list)
 {
     FileInfoList ret;
+    ret.reserve(list.size());
     for (const auto& info: list)
         ret.append(FileInfo(info));
     return ret;
