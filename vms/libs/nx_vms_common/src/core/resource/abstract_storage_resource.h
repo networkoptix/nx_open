@@ -24,45 +24,50 @@ public:
         DBReady         = 0x0010                    // capable of DB hosting
     };
 
-    class NX_VMS_COMMON_API FileInfo
-    {
-    public:
-        explicit FileInfo(const QString& uri, qint64 size, bool isDir = false);
+class NX_VMS_COMMON_API FileInfo
+{
+public:
+    explicit FileInfo(
+        const QString& uri,
+        qint64 size,
+        bool isDir = false,
+        bool isSymLink = false);
 
-        explicit FileInfo(const QFileInfo& qfi);
-        FileInfo() = default;
+    explicit FileInfo(const QFileInfo& qfi);
+    FileInfo() = default;
 
-        bool operator==(const FileInfo& other) const;
-        bool operator!=(const FileInfo& other) const;
+    bool operator==(const FileInfo& other) const;
 
-        static FileInfo fromQFileInfo(const QFileInfo &fi);
+    static FileInfo fromQFileInfo(const QFileInfo &fi);
 
-        bool isDir() const;
+    bool isDir() const;
+    bool isSymLink() const;
 
-        QString absoluteFilePath() const;
-        QString absoluteDirPath() const;
+    QString absoluteFilePath() const;
+    QString absoluteDirPath() const;
 
-        QString fileName() const;
-        QString baseName() const;
+    QString fileName() const;
+    QString baseName() const;
 
-        qint64 size() const;
-        QDateTime created() const;
-        QString extension() const;
+    qint64 size() const;
+    QDateTime created() const;
+    QString extension() const;
 
-        QString toString() const;
+    QString toString() const;
 
-        void setPath(const QString& path);
+    void setPath(const QString& path);
 
-    private:
-        QString m_fpath;
-        qint64 m_size = 0;
-        bool m_isDir = false;
-        std::shared_ptr<QFileInfo> m_qFileInfo;
-    };
+private:
+    QString m_fpath;
+    qint64 m_size = 0;
+    bool m_isDir = false;
+    bool m_isSymLink = false;
+    std::shared_ptr<QFileInfo> m_qFileInfo;
+};
 
-    typedef QList<FileInfo> FileInfoList;
+typedef QList<FileInfo> FileInfoList;
 
-    static FileInfoList FIListFromQFIList(const QFileInfoList& list);
+static FileInfoList FIListFromQFIList(const QFileInfoList& list);
 
 public:
     static const qint64 kUnknownSize = -1;                  /**< Size of the storage cannot be calculated. */
