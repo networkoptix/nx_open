@@ -10228,7 +10228,7 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation>Powiadomienia witryny</translation>
+      <translation>Powiadomienia sieciowe</translation>
     </message>
   </context>
   <context>
