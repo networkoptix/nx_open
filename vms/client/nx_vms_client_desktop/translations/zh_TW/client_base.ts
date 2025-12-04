@@ -5668,7 +5668,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>RestErrorStrings</name>
     <message>
       <source>Error code: %1</source>
-      <translation type="unfinished">Error code: %1</translation>
+      <translation>錯誤代碼：%1</translation>
     </message>
   </context>
   <context>
