@@ -219,69 +219,6 @@ nx::sdk::cloud_storage::IDeviceAgent* Engine::findDeviceAgentById(
     return resultIt->get();
 }
 
-void Engine::doQueryMotionTimePeriods(
-    const char* filter,
-    nx::sdk::Result<nx::sdk::IString*>* outResult)
-{
-    try
-    {
-        NX_OUTPUT << __func__ << ": Querying motion with filter '" << filter;
-        std::lock_guard lock(m_mutex);
-        if (!m_dataManager)
-            throw std::logic_error("Plugin has not been properly initialized");
-
-        const auto motionData =
-            m_dataManager->queryMotion(nx::sdk::cloud_storage::MotionFilter::fromUrlQuery(filter).value());
-        *outResult = nx::sdk::Result<nx::sdk::IString*>(new nx::sdk::String(motionData));
-        NX_OUTPUT << __func__ << ": Successfully fetched some motion: '" << motionData << "'";
-    }
-    catch (const std::exception& e)
-    {
-        NX_OUTPUT << __func__ << ": Failed to fetch motion. Error: '" << e.what() << "'";
-        *outResult = nx::sdk::Result<nx::sdk::IString*>(nx::sdk::Error(
-            nx::sdk::ErrorCode::internalError,
-            new nx::sdk::String(e.what())));
-    }
-}
-
-void Engine::flushMetadata(nx::sdk::cloud_storage::MetadataType type)
-{
-    m_dataManager->flushMetadata(type);
-}
-
-nx::sdk::ErrorCode Engine::saveMetadata(
-    const char* /*deviceId*/,
-    nx::sdk::cloud_storage::MetadataType type,
-    const char* data)
-{
-    NX_OUTPUT << __func__  << ", type: " << toString(type) << ", data: " << data;
-    try
-    {
-        std::lock_guard lock(m_mutex);
-        if (!m_dataManager)
-            throw std::logic_error("Plugin has not been properly initialized");
-
-        nx::sdk::ErrorCode result = nx::sdk::ErrorCode::otherError;
-        switch (type)
-        {
-            case sdk::cloud_storage::MetadataType::motion:
-                result = m_dataManager->saveMotion(nx::sdk::cloud_storage::Motion(data));
-                break;
-        }
-
-        NX_OUTPUT
-            << __func__ << ", type: " << toString(type)
-            << ". Result: " << nx::sdk::toString(result);
-
-        return result;
-    }
-    catch (const std::exception& e)
-    {
-        NX_OUTPUT << __func__ << ", type: " << toString(type) << ". Fail. Error: " << e.what();
-        return nx::sdk::ErrorCode::internalError;
-    }
-}
-
 bool Engine::isOnline() const
 {
     return true;

@@ -113,11 +113,6 @@ public:
     DataManager(const std::string& workDir);
     ~DataManager();
 
-    void setSaveHandler(SaveHandler handler);
-
-    nx::sdk::ErrorCode saveMotion(const nx::sdk::cloud_storage::Motion& data);
-    std::string queryMotion(const nx::sdk::cloud_storage::MotionFilter& filter) const;
-
     void addDevice(const nx::sdk::cloud_storage::DeviceDescription& deviceDescription);
     std::unique_ptr<WritableMediaFile> writableMediaFile(
         const std::string& deviceId,
@@ -135,44 +130,15 @@ public:
 
     ArchiveIndex getArchive(std::optional<int64_t> startTime) const;
 
-    void run();
-    void flushMetadata(nx::sdk::cloud_storage::MetadataType type);
-
     std::pair<std::string, int> bucketUrlAndId() const;
 
 private:
     std::string m_workDir;
     std::shared_ptr<std::mutex> m_mutex{std::make_shared<std::mutex>()};
-    std::vector<nx::sdk::cloud_storage::Motion> m_cloudMotion;
-    std::queue<nx::sdk::cloud_storage::Motion> m_motionToSend;
-    SaveHandler m_saveHandler;
-    std::thread m_workThread;
-    std::atomic<bool> m_needToStop{false};
-    std::condition_variable m_cond;
-    bool m_needToFlushBookmarks{false};
-    bool m_needToFlushMotion{false};
     std::pair<std::string, int> m_bucketUrlToId;
 
 private:
     std::string devicePath(const std::string& deviceId) const;
-
-    template<typename Data>
-    std::queue<Data>* dataQueue();
-
-    template<typename Data>
-    std::vector<Data>* cloudData();
-
-    template<typename Data>
-    bool* needToFlush();
-
-    template<typename Data>
-    nx::sdk::cloud_storage::MetadataType metadataType() const;
-
-    template<typename Data>
-    void processQueue(std::queue<Data>& dataQueue, std::unique_lock<std::mutex>& lock);
-
-    template<typename Data>
-    nx::sdk::ErrorCode saveMetadataImpl(const Data& data);
 
     template<typename Data>
     void saveObject(const Data& data, const std::string& fileName);

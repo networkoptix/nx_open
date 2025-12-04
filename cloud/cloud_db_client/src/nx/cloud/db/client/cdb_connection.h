@@ -6,6 +6,7 @@
 
 #include "account_manager.h"
 #include "analytics_db_manager.h"
+#include "motion_db_manager.h"
 #include "async_http_requests_executor.h"
 #include "auth_provider.h"
 #include "batch_user_processing_manager.h"
@@ -30,8 +31,11 @@ public:
     virtual api::AccountManager* accountManager() override;
     virtual api::SystemManager* systemManager() override;
     virtual api::OrganizationManager* organizationManager() override;
+
     virtual api::AnalyticsDbManager* analyticsDbManager() override;
     virtual api::BookmarkManager* bookmarkManager() override;
+    virtual api::MotionDbManager* motionDbManager() override;
+
     virtual api::AuthProvider* authProvider() override;
     virtual api::MaintenanceManager* maintenanceManager() override;
     virtual api::OauthManager* oauthManager() override;
@@ -72,6 +76,7 @@ private:
     SystemManager m_systemManager;
     OrganizationManager m_organizationManager;
     AnalyticsDbManager m_analyticsDbManager;
+    MotionDbManager m_motionDbManager;
     AuthProvider m_authProvider;
     MaintenanceManager m_maintenanceManager;
     OauthManager m_oauthManager;

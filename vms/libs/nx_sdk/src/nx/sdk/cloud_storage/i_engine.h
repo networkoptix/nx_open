@@ -58,39 +58,7 @@ public:
         return result;
     }
 
-    protected: virtual void doQueryMotionTimePeriods(
-        const char* filter, Result<IString*>* outResult) = 0;
-
-    /**
-     * Query motion time periods accordingly to the given filter.
-     * `filter` is the JSON representation of the `MotionFilter`
-     * `result` should be the JSON representation of the `TimePeriodList`.
-     */
-    public: Result<IString*> queryMotionTimePeriods(const char* filter)
-    {
-        Result<IString*> result;
-        doQueryMotionTimePeriods(filter, &result);
-        return result;
-    }
-
     protected:
-
-    /**
-     * @param data A null-terminated string containing the JSON of the corresponding metadata object.
-     * Refer to `ObjectTrack` and `Motion` objects in the
-     * sdk/cloud_storage/helpers/data.h for details.
-     * @note If `saveMetadata` returned `inProgress` VMS Server won't call it again until the
-     * onSaveOperationCompleted is called by the plugin.
-     */
-    public: virtual ErrorCode saveMetadata(
-        const char* deviceId, MetadataType type, const char* data) = 0;
-
-    /**
-     * Plugin must send all pending buffered data of the given type immediately when this function
-     * is called. If there's nothing to send `onSaveOperationCompleted` should be called with the
-     * `noError` result.
-     */
-    public: virtual void flushMetadata(MetadataType type) = 0;
 
     /**
      * No async handlers should be called by the plugin before this function has been called.

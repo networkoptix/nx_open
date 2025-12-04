@@ -19,6 +19,7 @@ Connection::Connection(
     m_systemManager(&m_requestExecutor),
     m_organizationManager(&m_requestExecutor),
     m_analyticsDbManager(&m_requestExecutor),
+    m_motionDbManager(&m_requestExecutor),
     m_authProvider(&m_requestExecutor),
     m_maintenanceManager(&m_requestExecutor),
     m_oauthManager(&m_requestExecutor),
@@ -54,6 +55,11 @@ api::AnalyticsDbManager* Connection::analyticsDbManager()
 api::BookmarkManager* Connection::bookmarkManager()
 {
     return &m_bookmarkManager;
+}
+
+api::MotionDbManager* Connection::motionDbManager()
+{
+    return &m_motionDbManager;
 }
 
 api::AuthProvider* Connection::authProvider()

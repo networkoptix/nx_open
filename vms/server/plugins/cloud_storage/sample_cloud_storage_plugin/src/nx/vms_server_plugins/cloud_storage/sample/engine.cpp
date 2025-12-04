@@ -31,23 +31,6 @@ void Engine::doObtainDeviceAgent(
         new nx::sdk::String("Not implemented")));
 }
 
-void Engine::doQueryMotionTimePeriods(
-    const char* /*filter*/,
-    nx::sdk::Result<nx::sdk::IString*>* outResult)
-{
-    *outResult = nx::sdk::Result<nx::sdk::IString*>(nx::sdk::Error(
-        nx::sdk::ErrorCode::notImplemented,
-        new nx::sdk::String("Not implemented")));
-}
-
-nx::sdk::ErrorCode Engine::saveMetadata(
-    const char* /*deviceId*/,
-    nx::sdk::cloud_storage::MetadataType /*type*/,
-    const char* /*data*/)
-{
-    return nx::sdk::ErrorCode::notImplemented;
-}
-
 bool Engine::isOnline() const
 {
     return true;

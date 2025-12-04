@@ -29,25 +29,15 @@ public:
     virtual ~Engine() override;
     virtual void startAsyncTasks(const char* lastSequenceId) override;
     virtual void stopAsyncTasks() override;
-    virtual nx::sdk::ErrorCode saveMetadata(
-        const char* deviceId,
-        nx::sdk::cloud_storage::MetadataType type,
-        const char* data) override;
 
     virtual bool isOnline() const override;
     virtual nx::sdk::ErrorCode storageSpace(
         nx::sdk::cloud_storage::StorageSpace* storageSpace) const override;
 
-    virtual void flushMetadata(nx::sdk::cloud_storage::MetadataType type) override;
-
 protected:
     virtual void doObtainDeviceAgent(
         nx::sdk::Result<nx::sdk::cloud_storage::IDeviceAgent*>* outResult,
         const nx::sdk::IDeviceInfo* deviceInfo) override;
-
-    virtual void doQueryMotionTimePeriods(
-        const char* filter,
-        nx::sdk::Result<nx::sdk::IString*>* outResult) override;
 
 
 private:

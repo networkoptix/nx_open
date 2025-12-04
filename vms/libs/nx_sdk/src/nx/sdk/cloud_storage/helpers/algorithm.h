@@ -6,10 +6,6 @@
 
 namespace nx::sdk::cloud_storage {
 
-bool motionMaches(const Motion& motion, const MotionFilter& filter);
-
-bool objectTrackMatches(const ObjectTrack& objectTrack, const AnalyticsFilter& filter);
-
 std::vector<uint8_t> fromBase64(const std::string& data);
 std::string toBase64(const std::vector<uint8_t>& data);
 std::string toBase64(const uint8_t* data, int size);

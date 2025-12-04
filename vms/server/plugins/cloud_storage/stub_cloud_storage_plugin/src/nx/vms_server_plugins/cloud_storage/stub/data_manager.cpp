@@ -35,8 +35,6 @@
 
 namespace nx::vms_server_plugins::cloud_storage::stub {
 
-const char* kBookmarkFileName = "bookmarks.txt";
-const char* kMotionFileName = "motion.txt";
 const char* kDeviceDescriptionFileName = "device_description.txt";
 const char* kMediaFileExtenstion = ".dat";
 const char* kImageFolderName = "images";
@@ -114,15 +112,6 @@ nx::sdk::cloud_storage::MediaPacketData mediaPacketData(
 std::string joinPath(const std::string& p1, const std::string& p2)
 {
     return p1 + "/" + p2;
-}
-
-std::string pathToImage(
-    const std::string& workDir,
-    const std::string& imageName,
-    nx::sdk::cloud_storage::TrackImageType type)
-{
-    return sdk::cloud_storage::trackImageTypeToString(type)
-        + "_" + joinPath(joinPath(workDir, kImageFolderName), imageName) + kImageExtension;
 }
 
 std::vector<uint8_t> mediaPacketDataToByteArray(
@@ -908,101 +897,10 @@ DataManager::DataManager(const std::string& workDir):
     NX_OUTPUT << __func__ << ": Work dir: '" << m_workDir << "'";
     ensureDir(joinPath(m_workDir, kImageFolderName));
     using namespace nx::sdk::cloud_storage;
-    m_cloudMotion = load<Motion>(joinPath(m_workDir, kMotionFileName));
-    m_workThread = std::thread([this](){ run(); });
-}
-
-void DataManager::run()
-{
-    while (!m_needToStop)
-    {
-        std::unique_lock<std::mutex> lock(*m_mutex);
-        bool needToWait =
-            !*needToFlush<nx::sdk::cloud_storage::Motion>()
-            && dataQueue<nx::sdk::cloud_storage::Motion>()->size() < kMaxSendBufferSize;
-
-        if (needToWait)
-            m_cond.wait(lock);
-
-        if (m_needToStop)
-            return;
-
-        processQueue(m_motionToSend, lock);
-    }
-}
-
-template<typename Data>
-std::queue<Data>* DataManager::dataQueue()
-{
-    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
-        return &m_motionToSend;
-}
-
-template<typename Data>
-bool*  DataManager::needToFlush()
-{
-    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
-        return &m_needToFlushMotion;
-}
-
-template<typename Data>
-nx::sdk::cloud_storage::MetadataType DataManager::metadataType() const
-{
-    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
-        return nx::sdk::cloud_storage::MetadataType::motion;;
-}
-
-template<typename Data>
-std::vector<Data>* DataManager::cloudData()
-{
-    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
-        return &m_cloudMotion;
-}
-
-template<typename Data>
-void DataManager::processQueue(std::queue<Data>& dataQueue, std::unique_lock<std::mutex>& lock)
-{
-    auto* pCloudData = cloudData<Data>();
-    if (!*needToFlush<Data>() && dataQueue.size() < kMaxSendBufferSize)
-        return;
-
-    while (!dataQueue.empty())
-    {
-        const auto& data = dataQueue.front();
-        pCloudData->push_back(data);
-        dataQueue.pop();
-    }
-
-    *needToFlush<Data>() = false;
-    lock.unlock();
-    m_saveHandler(metadataType<Data>(), nx::sdk::ErrorCode::noError);
-    lock.lock();
-}
-
-void DataManager::setSaveHandler(SaveHandler handler)
-{
-    m_saveHandler = std::move(handler);
-}
-
-void DataManager::flushMetadata(nx::sdk::cloud_storage::MetadataType type)
-{
-    std::lock_guard<std::mutex> lock(*m_mutex);
-    switch (type)
-    {
-        case nx::sdk::cloud_storage::MetadataType::motion:
-            m_needToFlushMotion = true;
-            break;
-    }
-
-    m_cond.notify_one();
 }
 
 DataManager::~DataManager()
 {
-    m_needToStop = true;
-    m_cond.notify_one();
-    m_workThread.join();
-    flushToFile(m_cloudMotion, joinPath(m_workDir, kMotionFileName));
 }
 
 template<typename Data>
@@ -1115,48 +1013,6 @@ std::vector<Data> DataManager::allObjectsNoLock(const std::string& fileName) con
         result.push_back(Data(entryJson));
 
     return result;
-}
-
-nx::sdk::ErrorCode DataManager::saveMotion(const nx::sdk::cloud_storage::Motion& data)
-{
-    return saveMetadataImpl(data);
-}
-
-template<typename Data>
-nx::sdk::ErrorCode DataManager::saveMetadataImpl(const Data& data)
-{
-    std::lock_guard<std::mutex> lock(*m_mutex);
-    auto* pQueue = dataQueue<Data>();
-    pQueue->push(data);
-    if (pQueue->size() >= kMaxSendBufferSize)
-    {
-        m_cond.notify_one();
-        return nx::sdk::ErrorCode::inProgress;
-    }
-
-    return nx::sdk::ErrorCode::needMoreData;
-}
-
-std::string DataManager::queryMotion(const nx::sdk::cloud_storage::MotionFilter& filter) const
-{
-    using namespace nx::sdk::cloud_storage;
-    std::vector<TimePeriod> filtered;
-    {
-        std::lock_guard<std::mutex> lock(*m_mutex);
-        for (const auto& candidate: m_cloudMotion)
-        {
-            if (motionMaches(candidate, filter))
-                filtered.push_back({candidate.startTimeMs, candidate.durationMs});
-        }
-    }
-    if (filter.order == nx::sdk::cloud_storage::SortOrder::descending)
-        std::reverse(filtered.begin(), filtered.end());
-    if (filter.limit && filtered.size() > filter.limit)
-        filtered.resize(*filter.limit);
-
-    using namespace nx::sdk::cloud_storage;
-    auto result = DeltaTimePeriods::pack(filtered, filter.order);
-    return result.to_json().dump();
 }
 
 void ArchiveIndex::sort()

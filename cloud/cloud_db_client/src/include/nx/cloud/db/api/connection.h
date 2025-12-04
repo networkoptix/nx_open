@@ -18,6 +18,7 @@
 #include "bookmark_manager.h"
 #include "maintenance_manager.h"
 #include "module_info.h"
+#include "motion_db_manager.h"
 #include "oauth_manager.h"
 #include "organization_manager.h"
 #include "result_code.h"
@@ -83,6 +84,7 @@ public:
 
     virtual api::AnalyticsDbManager* analyticsDbManager() = 0;
     virtual api::BookmarkManager* bookmarkManager() = 0;
+    virtual api::MotionDbManager* motionDbManager() = 0;
 
     /**
      * Maintenance manager is for accessing cloud internal data for maintenance/debug purposes.
