@@ -169,6 +169,11 @@ struct TreeNode
         return parentNode() && parentNode()->hasOrganizationRole(id);
     }
 
+    bool hasChildren() const
+    {
+        return !children.empty();
+    }
+
     nx::Uuid id;
     QString name;
     int systemCount = -1;
@@ -973,7 +978,11 @@ bool OrganizationsModel::hasChildren(const QModelIndex &parent) const
         ? static_cast<TreeNode*>(parent.internalPointer())
         : d->root.get();
 
-    return parentNode && parentNode->type != OrganizationsModel::System;
+    // SitesNode delegates to sitesModel, check its row count instead of physical children
+    if (parentNode && parentNode->type == OrganizationsModel::SitesNode)
+        return d->sitesModelRowCount > 0;
+
+    return parentNode && parentNode->hasChildren();
 }
 
 QStringList OrganizationsModel::childSystemIds(const QModelIndex& parent) const
