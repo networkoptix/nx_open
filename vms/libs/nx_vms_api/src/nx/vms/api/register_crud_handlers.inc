@@ -2553,6 +2553,7 @@ static void registerLdapRestHandlers(
      * %return:{UserModelV3}
      *     %param[unused] password
      *     %param[unused] resourceAccessRights
+     *     %param[unused] etag
      */
     reg("rest/v{3-}/ldap/authenticate", GlobalPermission::none,
         std::make_unique<LdapAuthenticateHandler>(authenticator));

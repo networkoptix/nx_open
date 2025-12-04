@@ -6,6 +6,7 @@
 
 #include <nx/reflect/instrument.h>
 
+#include "../data_with_etag.h"
 #include "id_data.h"
 
 namespace nx::vms::api {
@@ -56,5 +57,10 @@ struct NX_VMS_API ShowreelData: IdData
 #define ShowreelData_Fields IdData_Fields (parentId)(name)(items)(settings)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ShowreelData)
 NX_REFLECTION_INSTRUMENT(ShowreelData, ShowreelData_Fields)
+
+/* Hiding from apidoctool comment. */ using ShowreelModel = DataWithEtag<ShowreelData>;
+#define ShowreelModel_Fields ShowreelData_Fields(etag)
+QN_FUSION_DECLARE_FUNCTIONS(ShowreelModel, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(ShowreelModel, ShowreelModel_Fields)
 
 } // namespace nx::vms::api

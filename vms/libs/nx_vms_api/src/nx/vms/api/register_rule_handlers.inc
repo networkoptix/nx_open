@@ -181,6 +181,7 @@ void registerRuleHandlers(
      * %ingroup Events
      * %struct RuleV4
      *     %param[unused] id
+     *     %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User.
      * %return:{RuleV4}
@@ -192,6 +193,7 @@ void registerRuleHandlers(
      * %struct RuleV4
      * %param:uuid id Event Rule id. Can be obtained from "id" field via
      *     `GET /rest/v{4-}/events/rules`.
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User.
      * %return:{RuleV4}
@@ -203,6 +205,7 @@ void registerRuleHandlers(
      * %struct[opt] RuleV4
      * %param:uuid id Event Rule id. Can be obtained from "id" field via
      *     `GET /rest/v{4-}/events/rules`.
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User.
      * %return:{RuleV4}

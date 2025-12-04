@@ -111,6 +111,7 @@ void registerRestHandlers(
      * %struct ServerModelV4
      * %param[unused] id
      * %param[unused] storages
+     * %param[unused] etag
      * %param:{std::variant<int, QString>} backupBitrateBytesPerSecond[].value
      * %param[ref] _strict,_ticket
      * %permissions Administrator with a fresh session.
@@ -142,6 +143,7 @@ void registerRestHandlers(
      *     %example this
      * %param:{std::variant<int, QString>} backupBitrateBytesPerSecond[].value
      * %param[unused] storages
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User with a fresh session.
      * %return:{ServerModelV4} Server record.
@@ -158,6 +160,7 @@ void registerRestHandlers(
      *     %example this
      * %param:{std::variant<int, QString>} backupBitrateBytesPerSecond[].value
      * %param[unused] storages
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User with a fresh session.
      * %return:{ServerModelV4} Server record.
@@ -411,6 +414,7 @@ void registerRestHandlers(
      * %ingroup Devices
      * %struct DeviceModelV4
      *     %param[unused] id
+     *     %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{DeviceModelV4} Device record that was created.
@@ -433,6 +437,7 @@ void registerRestHandlers(
      * %struct DeviceModelV4
      * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
      *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{DeviceModelV4} Device record.
@@ -444,6 +449,7 @@ void registerRestHandlers(
      * %struct [opt] DeviceModelV4
      * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
      *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{DeviceModelV4} Device record.
@@ -535,6 +541,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{DeviceModelV4} Device record that was created.
+     *     %param[unused] etag
      *
      * %apidoc GET /rest/v{4-}/devices/%2A/virtual
      * Retrieves a list of virtual Devices.
@@ -544,6 +551,7 @@ void registerRestHandlers(
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Depends on Resource access rights.
      * %return:{std::vector<DeviceModelV4>}
+     *     %param[unused] etag
      *
      * %apidoc GET /rest/v{4-}/devices/{id}/virtual
      * Retrieves a virtual device by id.
@@ -555,6 +563,7 @@ void registerRestHandlers(
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Depends on Resource access rights.
      * %return:{DeviceModelV4}
+     *     %param[unused] etag
      *
      * %apidoc PATCH /rest/v{4-}/devices/{id}/virtual
      * Modifies a virtual Device by id.
@@ -566,6 +575,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{DeviceModelV4} Device record that was created.
+     *     %param[unused] etag
      *
      * %apidoc DELETE /rest/v{4-}/devices/{id}/virtual
      * Deletes a virtual Device by id.
@@ -676,6 +686,7 @@ void registerRestHandlers(
      * %param[unused] externalId
      * %param[unused] settings
      * %param[unused] orgGroupIds
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User with a fresh session.
      * %return:{UserModelV3} User record that was created.
@@ -709,6 +720,7 @@ void registerRestHandlers(
      * %param[unused] isOwner
      * %param[unused] settings
      * %param[unused] orgGroupIds
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User or the user themselves with a fresh session.
      * %return:{UserModelV3} User record.
@@ -729,6 +741,7 @@ void registerRestHandlers(
      * %param[unused] isOwner
      * %param[unused] settings
      * %param[unused] orgGroupIds
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User or the user themselves with a fresh session.
      * %return:{UserModelV3} User record.
@@ -763,6 +776,7 @@ void registerRestHandlers(
      * %struct UserModelV3
      * %param[unused] id
      * %param[unused] externalId
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User with a fresh session.
      * %return:{UserModelV3} User record that was created.
@@ -791,6 +805,7 @@ void registerRestHandlers(
      *     %example admin
      * %param[unused] externalId
      * %param[unused] isOwner
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User or the user themselves with a fresh session.
      * %return:{UserModelV3} User record.
@@ -807,6 +822,7 @@ void registerRestHandlers(
      * %param[unused] externalId
      * %param[unused] type
      * %param[unused] isOwner
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User or the user themselves with a fresh session.
      * %return:{UserModelV3} User record.
@@ -992,6 +1008,7 @@ void registerRestHandlers(
      * %struct UserGroupModel
      * %param[unused] id
      * %param[unused] externalId
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User with a fresh session.
      * %return:{UserGroupModel} User Group record that was created.
@@ -1015,6 +1032,7 @@ void registerRestHandlers(
      * %param id User Group id (can be obtained from "id" field via
      *     `GET /rest/v{3-}/userGroups`).
      * %param[unused] externalId
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Power User with a fresh session.
      * %return:{UserGroupModel} User Group record.
@@ -1027,6 +1045,7 @@ void registerRestHandlers(
      * %param id User Group id (can be obtained from "id" field via
      *     `GET /rest/v{3-}/userGroups`).
      * %param[unused] externalId
+     * %param[unused] etag
      * %param[unused] type
      * %param[ref] _strict,_ticket
      * %permissions Power User with a fresh session.
@@ -1053,6 +1072,7 @@ void registerRestHandlers(
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Depends on Resource access rights.
      * %return:{LayoutDataList} List of all Layout records.
+     *     %param[proprietary]:string etag
      *
      **%apidoc POST /rest/v{1-}/layouts
      * Creates a record in the Site about the new Layout.
@@ -1063,6 +1083,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{LayoutData} Layout record that was created.
+     *     %param[proprietary]:string etag
      *
      **%apidoc GET /rest/v{1-}/layouts/{id}
      * Retrieves the specified Layout record stored in the Site.
@@ -1073,6 +1094,7 @@ void registerRestHandlers(
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Depends on Resource access rights.
      * %return:{LayoutData} Layout record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc PUT /rest/v{1-}/layouts/{id}
      * Replaces all fields of the specified Layout record stored in the Site.
@@ -1083,6 +1105,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{LayoutData} Layout record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc PATCH /rest/v{1-}/layouts/{id}
      * Modifies certain fields of the specified Layout record stored in the Site.
@@ -1093,6 +1116,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{LayoutData} Layout record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc DELETE /rest/v{1-}/layouts/{id}
      * Deletes the specified Layout record from the Site.
@@ -1180,6 +1204,7 @@ void registerRestHandlers(
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Depends on Resource access rights.
      * %return:{ShowreelDataList} List of all Showreel records.
+     *     %param[proprietary]:string etag
      *
      **%apidoc POST /rest/v1/layoutTours
      * Creates a record in the Site for the new Showreel.
@@ -1190,6 +1215,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{ShowreelData} Showreel record that was created.
+     *     %param[proprietary]:string etag
      *
      **%apidoc GET /rest/v1/layoutTours/{id}
      * Retrieves the specified Showreel record stored in the Site.
@@ -1199,6 +1225,7 @@ void registerRestHandlers(
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Depends on Resource access rights.
      * %return:{ShowreelData} Showreel record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc PUT /rest/v1/layoutTours/{id}
      * Replaces all fields of the specified Showreel record stored in the Site.
@@ -1209,6 +1236,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{ShowreelData} Showreel record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc PATCH /rest/v1/layoutTours/{id}
      * Modifies certain fields of the specified Showreel record stored in the Site.
@@ -1219,6 +1247,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{ShowreelData} Showreel record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc DELETE /rest/v1/layoutTours/{id}
      * Deletes the specified Showreel record from the Site.
@@ -1239,6 +1268,7 @@ void registerRestHandlers(
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Depends on Resource access rights.
      * %return:{ShowreelDataList} List of all Showreel records.
+     *     %param[proprietary]:string etag
      *
      **%apidoc POST /rest/v{2-}/showreels
      * Creates a record in the Site for the new Showreel.
@@ -1249,6 +1279,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{ShowreelData} Showreel record that was created.
+     *     %param[proprietary]:string etag
      *
      **%apidoc GET /rest/v{2-}/showreels/{id}
      * Retrieves the specified Showreel record stored in the Site.
@@ -1259,6 +1290,7 @@ void registerRestHandlers(
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Depends on Resource access rights.
      * %return:{ShowreelData} Showreel record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc PUT /rest/v{2-}/showreels/{id}
      * Replaces all fields of the specified Showreel record stored in the Site.
@@ -1269,6 +1301,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{ShowreelData} Showreel record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc PATCH /rest/v{2-}/showreels/{id}
      * Modifies certain fields of the specified Showreel record stored in the Site.
@@ -1279,6 +1312,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{ShowreelData} Showreel record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc DELETE /rest/v{2-}/showreels/{id}
      * Deletes the specified Showreel record from the Site.
@@ -1299,6 +1333,7 @@ void registerRestHandlers(
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
      * %return:{LookupListDataList} List of all Lookup List records.
+     *     %param[proprietary]:string etag
      *
      **%apidoc POST /rest/v{3-}/lookupLists
      * Creates a record in the Site for the new Lookup List.
@@ -1309,6 +1344,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Power User.
      * %return:{LookupListData} Lookup List record that was created.
+     *     %param[proprietary]:string etag
      *
      **%apidoc GET /rest/v{3-}/lookupLists/{id}
      * Retrieves the specified Lookup List record stored in the Site.
@@ -1319,6 +1355,7 @@ void registerRestHandlers(
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
      * %return:{LookupListData} Lookup List record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc PUT /rest/v{3-}/lookupLists/{id}
      * Replaces all fields of the specified Lookup List record stored in the Site.
@@ -1329,6 +1366,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Power User.
      * %return:{LookupListData} Lookup List record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc PATCH /rest/v{3-}/lookupLists/{id}
      * Modifies certain fields of the specified Lookup List record stored in the Site.
@@ -1339,6 +1377,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Power User.
      * %return:{LookupListData} Lookup List record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc DELETE /rest/v{3-}/lookupLists/{id}
      * Deletes the specified Lookup List record from the Site.
@@ -1361,6 +1400,7 @@ void registerRestHandlers(
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Depends on Resource access rights.
      * %return:{VideowallDataList} List of all Video Wall records.
+     *     %param[proprietary]:string etag
      *
      **%apidoc POST /rest/v{1-}/videoWalls
      * Creates a record in the Site for the new Video Wall.
@@ -1371,6 +1411,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{VideowallData} Video Wall record that was created.
+     *     %param[proprietary]:string etag
      *
      **%apidoc GET /rest/v{1-}/videoWalls/{id}
      * Retrieves the specified Video Wall record stored in the Site.
@@ -1381,6 +1422,7 @@ void registerRestHandlers(
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Depends on Resource access rights.
      * %return:{VideowallData} Video Wall record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc PUT /rest/v{1-}/videoWalls/{id}
      * Replaces all fields of the specified Video Wall record stored in the Site.
@@ -1391,6 +1433,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{VideowallData} Video Wall record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc PATCH /rest/v{1-}/videoWalls/{id}
      * Modifies certain fields of the specified Video Wall record stored in the Site.
@@ -1401,6 +1444,7 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{VideowallData} Video Wall record.
+     *     %param[proprietary]:string etag
      *
      **%apidoc DELETE /rest/v{1-}/videoWalls/{id}
      * Deletes the specified Video Wall record from the Site.
@@ -1489,7 +1533,8 @@ void registerRestHandlers(
      * %caption Create Web Page
      * %ingroup Web Pages
      * %struct WebPageModelV3
-     * %param [unused] id
+     * %param[unused] id
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{WebPageModelV3} Web Page record that was created.
@@ -1510,6 +1555,7 @@ void registerRestHandlers(
      * %ingroup Web Pages
      * %struct WebPageModelV3
      * %param:uuid id Web Page unique id.
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{WebPageModelV3} Web Page record.
@@ -1518,8 +1564,9 @@ void registerRestHandlers(
      * Modifies certain fields of the specified Web Page record stored in the Site.
      * %caption Modify Web Page
      * %ingroup Web Pages
-     * %struct [opt] WebPageModelV3
+     * %struct[opt] WebPageModelV3
      * %param:uuid id Web Page unique id.
+     * %param[unused] etag
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{WebPageModelV3} Web Page record.

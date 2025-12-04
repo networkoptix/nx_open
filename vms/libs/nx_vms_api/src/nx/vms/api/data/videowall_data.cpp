@@ -22,6 +22,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VideowallMatrixData,
     (ubjson)(xml)(json)(sql_record)(csv_record), VideowallMatrixData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     VideowallData, (ubjson)(xml)(json)(sql_record)(csv_record), VideowallData_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VideoWallModel, (json), VideoWallModel_Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     VideowallControlMessageData, (ubjson)(json), VideowallControlMessageData_Fields)

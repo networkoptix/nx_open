@@ -240,12 +240,14 @@ struct NX_VMS_API ServerModelV4: ServerModelBase
     /**%apidoc[readonly] */
     std::optional<ServerRuntimeInfo> runtimeInformation;
 
+    /**%apidoc[proprietary] */
+    std::optional<std::string> etag;
+
     DbUpdateTypes toDbTypes() &&;
     static std::vector<ServerModelV4> fromDbTypes(DbListTypes data);
 };
-#define ServerModelV4_Fields \
-    ServerModelBase_Fields \
-    (flags)(network)(settings)(runtimeInformation)
+#define ServerModelV4_Fields ServerModelBase_Fields \
+    (flags)(network)(settings)(runtimeInformation)(etag)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerModelV4, (json))
 NX_REFLECTION_INSTRUMENT(ServerModelV4, ServerModelV4_Fields);
 

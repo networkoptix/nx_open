@@ -9,6 +9,7 @@
 
 #include <nx/reflect/instrument.h>
 
+#include "../data_with_etag.h"
 #include "id_data.h"
 #include "resource_data.h"
 
@@ -141,6 +142,11 @@ struct NX_VMS_API VideowallData: ResourceData
 #define VideowallData_Fields ResourceData_Fields (autorun)(items)(screens)(matrices)(timeline)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallData)
 NX_REFLECTION_INSTRUMENT(VideowallData, VideowallData_Fields)
+
+/* Hiding from apidoctool comment. */ using VideoWallModel = DataWithEtag<VideowallData>;
+#define VideoWallModel_Fields VideowallData_Fields(etag)
+QN_FUSION_DECLARE_FUNCTIONS(VideoWallModel, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(VideoWallModel, VideoWallModel_Fields)
 
 struct NX_VMS_API VideowallControlMessageData
 {

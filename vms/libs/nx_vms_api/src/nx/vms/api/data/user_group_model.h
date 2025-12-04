@@ -55,6 +55,9 @@ struct NX_VMS_API UserGroupModel
     /**%apidoc[readonly] */
     nx::vms::api::UserAttributes attributes{};
 
+    /**%apidoc[proprietary] */
+    std::optional<std::string> etag;
+
     bool operator==(const UserGroupModel& other) const = default;
 
     using DbReadTypes = std::tuple<UserGroupData>;
@@ -73,7 +76,8 @@ struct NX_VMS_API UserGroupModel
     (parentGroupIds) \
     (resourceAccessRights) \
     (attributes) \
-    (externalId)
+    (externalId) \
+    (etag)
 QN_FUSION_DECLARE_FUNCTIONS(UserGroupModel, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserGroupModel, UserGroupModel_Fields)
 

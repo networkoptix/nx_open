@@ -12,6 +12,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     ShowreelData, (ubjson)(xml)(json)(sql_record)(csv_record), ShowreelData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     ShowreelSettings, (ubjson)(xml)(json)(csv_record), ShowreelSettings_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ShowreelModel, (json), ShowreelModel_Fields)
 
 } // namespace nx::vms::api
 

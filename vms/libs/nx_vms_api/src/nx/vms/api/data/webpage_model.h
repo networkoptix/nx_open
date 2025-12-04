@@ -42,10 +42,13 @@ struct NX_VMS_API WebPageModelV3: WebPageModelV1
     bool certificateCheck = false;
     std::vector<QString> proxyDomainAllowList{};
 
+    /**%apidoc[proprietary] */
+    std::optional<std::string> etag;
+
     DbUpdateTypes toDbTypes() &&;
     static std::vector<WebPageModelV3> fromDbTypes(DbListTypes data);
 };
-#define WebPageModelV3_Fields WebPageModelV1_Fields (certificateCheck)(proxyDomainAllowList)
+#define WebPageModelV3_Fields WebPageModelV1_Fields (certificateCheck)(proxyDomainAllowList)(etag)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(WebPageModelV3, (json))
 NX_REFLECTION_INSTRUMENT(WebPageModelV3, WebPageModelV3_Fields)
 

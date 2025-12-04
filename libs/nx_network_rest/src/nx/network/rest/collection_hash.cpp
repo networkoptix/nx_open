@@ -80,6 +80,13 @@ CollectionHash::Value CollectionHash::remove(const ItemId& id)
     return m_combinedHash;
 }
 
+CollectionHash::Value CollectionHash::hash(const ItemId& id) const
+{
+    if (auto it = m_hashes.find(id); it != m_hashes.end())
+        return m_combinedHash + it->second;
+    return m_combinedHash;
+}
+
 bool CollectionHash::check(Check check, ValueView in, ValueView out)
 {
     if (in.size() != out.size())

@@ -7,5 +7,6 @@
 namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LookupListData, (ubjson) (json), LookupListData_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LookupListModel, (json), LookupListModel_Fields)
 
 } // namespace nx::vms::api
