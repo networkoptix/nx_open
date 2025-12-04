@@ -1935,7 +1935,7 @@
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
-      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+      <translation>從雲端更新公鑰的間隔時間。</translation>
     </message>
   </context>
 </TS>
