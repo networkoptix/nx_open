@@ -210,6 +210,9 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
      */
     std::optional<UserSettings> settings;
 
+    /**%apidoc[proprietary] */
+    std::optional<std::string> etag;
+
     bool operator==(const UserModelV3& other) const = default;
 
     using DbReadTypes = std::tuple<UserData, ResourceParamWithRefDataList>;
@@ -226,7 +229,7 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
     UserModelBase_Fields \
     ResourceWithParameters_Fields \
     (groupIds)(orgGroupIds)(permissions)(resourceAccessRights)(temporaryToken)(attributes) \
-    (account2faEnabled)(settings)
+    (account2faEnabled)(settings)(etag)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)

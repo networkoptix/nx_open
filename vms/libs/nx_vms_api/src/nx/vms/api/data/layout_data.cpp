@@ -19,6 +19,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     LayoutItemFilter, (json), LayoutItemFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     LayoutItemModel, (json), LayoutItemModel_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LayoutModel, (json), LayoutModel_Fields)
 
 bool LayoutItemData::operator==(const LayoutItemData& other) const
 {

@@ -29,6 +29,7 @@ public:
     std::pair<Value, bool /*changed*/> calculate(Item item);
     Value calculate(std::vector<Item> list);
     Value remove(const ItemId& id);
+    Value hash(const ItemId& id) const;
     const Value& combinedHash() const { return m_combinedHash; }
 
     enum Check { item, list };

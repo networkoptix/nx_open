@@ -537,11 +537,14 @@ struct NX_VMS_API DeviceModelV4: DeviceModelV3Base
 {
     std::optional<DevicePtzOptions> ptz;
 
+    /**%apidoc[proprietary] */
+    std::optional<std::string> etag;
+
     DbUpdateTypes toDbTypes() &&;
     static std::vector<DeviceModelV4> fromDbTypes(DbListTypes data);
 };
 #define DeviceModelV4_Fields DeviceModelV3Base_Fields \
-    (ptz)
+    (ptz)(etag)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV4, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceModelV4, DeviceModelV4_Fields);
 

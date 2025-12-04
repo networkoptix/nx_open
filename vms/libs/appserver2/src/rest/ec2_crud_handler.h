@@ -226,16 +226,25 @@ public:
 
 protected:
     template<typename Data>
-    nx::network::rest::CollectionHash calculateEtags(const std::vector<Data>& list) {
+    nx::network::rest::CollectionHash calculateEtags(std::vector<Data>* list) {
         auto d = static_cast<Derived*>(this);
         std::vector<nx::network::rest::CollectionHash::Item> data;
-        data.reserve(list.size());
-        for (const auto& item: list)
+        data.reserve(list->size());
+        for (const auto& item: *list)
         {
             data.emplace_back(d->subscriptionId(nx::utils::model::getId(item)),
                 nx::reflect::json::serialize(item));
         }
-        return nx::network::rest::CollectionHash{std::move(data)};
+        auto result = nx::network::rest::CollectionHash{std::move(data)};
+        if constexpr (requires { Data::etag; })
+        {
+            for (auto& item: *list)
+            {
+                item.etag = nx::utils::toHex(
+                    result.hash(d->subscriptionId(nx::utils::model::getId(item))));
+            }
+        }
+        return result;
     }
 
     template<typename Id, typename Data>
@@ -252,7 +261,7 @@ protected:
         auto d = static_cast<Derived*>(this);
         if (id == Id{})
         {
-            auto etags = calculateEtags(result);
+            auto etags = calculateEtags(&result);
             etag = etags.combinedHash();
             if (processJsonRpcEtag)
             {
@@ -288,7 +297,14 @@ protected:
                     // Initial subscription request for single item always sends item in response
                     // because of current limitations.
                     if (!changed && request.jsonRpcContext()->subscribed)
+                    {
                         result.clear();
+                    }
+                    else
+                    {
+                        if constexpr (requires { Data::etag; })
+                            result.front().etag = nx::utils::toHex(etag);
+                    }
                 }
                 else
                 {

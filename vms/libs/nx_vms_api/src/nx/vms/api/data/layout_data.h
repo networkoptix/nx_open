@@ -7,6 +7,7 @@
 
 #include <nx/reflect/instrument.h>
 
+#include "../data_with_etag.h"
 #include "dewarping_data.h"
 #include "id_data.h"
 #include "image_correction_data.h"
@@ -165,6 +166,11 @@ struct NX_VMS_API LayoutData: ResourceData
     (fixedWidth)(fixedHeight)(logicalId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(LayoutData)
 NX_REFLECTION_INSTRUMENT(LayoutData, LayoutData_Fields)
+
+/* Hiding from apidoctool comment. */ using LayoutModel = DataWithEtag<LayoutData>;
+#define LayoutModel_Fields LayoutData_Fields(etag)
+QN_FUSION_DECLARE_FUNCTIONS(LayoutModel, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(LayoutModel, LayoutModel_Fields)
 
 class NX_VMS_API LayoutItemId: public nx::Uuid
 {

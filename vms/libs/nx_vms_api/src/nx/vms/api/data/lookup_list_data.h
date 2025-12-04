@@ -10,6 +10,7 @@
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
+#include "../data_with_etag.h"
 #include "id_data.h"
 
 namespace nx::vms::api {
@@ -72,10 +73,13 @@ private:
     Q_PROPERTY(std::vector<QString> attributeNames MEMBER attributeNames)
     Q_PROPERTY(std::vector<std::map<QString, QString>> entries MEMBER entries)
 };
-#define LookupListData_Fields IdData_Fields(name)(objectTypeId)(attributeNames) (entries)
+#define LookupListData_Fields IdData_Fields(name)(objectTypeId)(attributeNames)(entries)
 NX_REFLECTION_INSTRUMENT(LookupListData, LookupListData_Fields)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(LookupListData, (ubjson)(json))
 
-using LookupListDataList = std::vector<LookupListData>;
-NX_VMS_API_DECLARE_STRUCT_EX(LookupListData, (ubjson)(json))
+/* Hiding from apidoctool comment. */ using LookupListModel = DataWithEtag<LookupListData>;
+#define LookupListModel_Fields LookupListData_Fields(etag)
+QN_FUSION_DECLARE_FUNCTIONS(LookupListModel, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(LookupListModel, LookupListModel_Fields)
 
 } // namespace nx::vms::api
