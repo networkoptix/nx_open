@@ -20,10 +20,4 @@ public:
      */
     static QString codecIdToString(AVCodecID codecId);
     static AVCodecID codecIdFromString(const QString& codecId);
-
-    /**
-     * Length of AVCodecContext's intra_matrix and inter_matrix; defined by
-     * ffmpeg impl.
-     */
-    static const int kMatrixLength = 64;
 };
