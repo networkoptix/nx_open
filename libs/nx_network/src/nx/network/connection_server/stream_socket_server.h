@@ -145,6 +145,8 @@ public:
             NX_MUTEX_LOCKER lk(&m_mutex);
             connections.swap(m_connections);
         }
+        NX_DEBUG(this, "Closing %1 connections", connections.size());
+
         for (auto& connection: connections)
         {
             connection.first->executeInAioThreadSync(
@@ -161,11 +163,15 @@ public:
         // Waiting connections being cancelled through closeConnection call to finish...
         NX_MUTEX_LOCKER lk(&m_mutex);
         while (m_connectionsBeingClosedCount > 0)
+        {
+            NX_VERBOSE(this, "Waiting for %1 connections to close", m_connectionsBeingClosedCount);
             m_cond.wait(lk.mutex());
+        }
+
+        NX_DEBUG(this, "All connections closed");
     }
 
 private:
-
     mutable nx::Mutex m_mutex;
     nx::WaitCondition m_cond;
     int m_connectionsBeingClosedCount = 0;

@@ -9,6 +9,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::utils::test {
@@ -28,6 +29,7 @@ public:
     {
         stop();
         clearArgs();
+        NX_INFO(this, "Destroyed");
     }
 
     ModuleLauncher(ModuleLauncher&&) = default;
@@ -35,6 +37,8 @@ public:
 
     void start()
     {
+        NX_INFO(this, "Starting with args: %1", containerString(m_args));
+
         std::promise<void> moduleInstantiatedCreatedPromise;
         auto moduleInstantiatedCreatedFuture = moduleInstantiatedCreatedPromise.get_future();
 
@@ -43,6 +47,7 @@ public:
         m_moduleProcessThread = std::thread(
             [this, &moduleInstantiatedCreatedPromise]()->int
             {
+                NX_DEBUG(this, "Starting thread");
                 beforeModuleCreation();
 
                 m_moduleInstance = std::make_unique<ModuleProcessType>(
@@ -54,10 +59,19 @@ public:
                     [this](bool isStarted)
                     {
                         if (isStarted)
+                        {
+                            NX_DEBUG(this, "Module succesfuly started");
                             afterModuleStart();
+                        }
+                        else
+                        {
+                            NX_ERROR(this, "Module was unable to start");
+                        }
                         m_moduleStartedPromise->set_value(isStarted);
                     });
+
                 moduleInstantiatedCreatedPromise.set_value();
+                NX_DEBUG(this, "Module created, starting event loop");
                 auto result = m_moduleInstance->exec();
 
                 {
@@ -103,14 +117,22 @@ public:
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             if (m_moduleInstance)
+            {
+                NX_DEBUG(this, "Requesting module to stop");
                 m_moduleInstance->pleaseStop();
+            }
         }
 
         m_started = false;
 
         if (m_moduleProcessThread.joinable())
+        {
+            NX_DEBUG(this, "Joining module thread");
             m_moduleProcessThread.join();
+        }
+
         m_moduleInstance.reset();
+        NX_DEBUG(this, "Module succesfuly stopped");
     }
 
     //!restarts process
