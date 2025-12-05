@@ -5,12 +5,12 @@
 #include <nx/network/rest/collection_hash.h>
 #include <nx/network/rest/crud_handler.h>
 #include <nx/network/rest/subscription.h>
+#include <nx/utils/base64.h>
 #include <nx/utils/crud_model.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/i18n/scoped_locale.h>
 #include <nx/utils/lockable.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/std_string_utils.h>
 #include <transaction/fix_transaction_input_from_api.h>
 #include <transaction/transaction_descriptor.h>
 
@@ -221,7 +221,7 @@ public:
     {
         using Checker = nx::network::rest::CollectionHash;
         return Checker::check(useId ? Checker::item : Checker::list,
-            nx::utils::fromHex(etagIn), nx::utils::fromHex(etagOut));
+            nx::utils::fromBase64Url(etagIn), nx::utils::fromBase64Url(etagOut));
     }
 
 protected:
@@ -240,7 +240,7 @@ protected:
         {
             for (auto& item: *list)
             {
-                item.etag = nx::utils::toHex(
+                item.etag = nx::utils::toBase64Url(
                     result.hash(d->subscriptionId(nx::utils::model::getId(item))));
             }
         }
@@ -274,7 +274,7 @@ protected:
                 if (!providedEtag.empty()
                     && nx::network::rest::CollectionHash::check(
                         nx::network::rest::CollectionHash::Check::list,
-                        nx::utils::fromHex(providedEtag),
+                        nx::utils::fromBase64Url(providedEtag),
                         etag))
                 {
                     result.clear();
@@ -303,7 +303,7 @@ protected:
                     else
                     {
                         if constexpr (requires { Data::etag; })
-                            result.front().etag = nx::utils::toHex(etag);
+                            result.front().etag = nx::utils::toBase64Url(etag);
                     }
                 }
                 else
@@ -321,7 +321,7 @@ protected:
         if (!etag.empty())
         {
             nx::network::http::insertOrReplaceHeader(
-                &responseAttributes->httpHeaders, {"ETag", nx::utils::toHex(etag)});
+                &responseAttributes->httpHeaders, {"ETag", nx::utils::toBase64Url(etag)});
         }
         return result;
     }
@@ -508,7 +508,7 @@ protected:
                                 {
                                     extensions = nx::json::serialized(
                                         nx::network::rest::json_rpc::ClientExtensions{
-                                            nx::utils::toHex(etag)},
+                                            nx::utils::toBase64Url(etag)},
                                         /*stripDefault*/ false);
                                 }
                             }

@@ -36,7 +36,7 @@ public:
     static bool check(Check check, ValueView in, ValueView out);
 
 private:
-    using Hash = std::string; //< std::array<char, 16>
+    using Hash = std::string; //< std::array<char, kHashSize>
     using HashById = std::map<ItemId, Hash>;
 
 private:
