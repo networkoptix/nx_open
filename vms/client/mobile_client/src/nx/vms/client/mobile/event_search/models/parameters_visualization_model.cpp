@@ -167,26 +167,15 @@ void ParametersVisualizationModel::Private::addObjectTypeFilterValue(Items& resu
             if (!filterModel)
                 return {};
 
-            const auto& types = filterModel->filteredObjectTypes();
-            switch (types.size())
-            {
-                case 0:
-                    return {};
-                case 1:
-                {
-                    const auto currentContext = q->mainSystemContext();
-                    if (!currentContext)
-                        return {};
+            const auto currentContext = q->mainSystemContext();
+            if (!currentContext)
+                return {};
 
-                    const auto taxonomy = currentContext->taxonomyManager()->currentTaxonomy();
-                    const auto objectType = taxonomy->objectTypeById(*types.begin());
-                    return objectType
-                        ? Item{objectType->name(), objectType->icon()}
-                        : Item{};
-                }
-                default:
-                    return Item{tr("%n Object Types", "%n is number of types", types.size()), ""};
-            }
+            const auto taxonomy = currentContext->taxonomyManager()->currentTaxonomy();
+            const auto objectType = taxonomy->objectTypeById(filterModel->selectedObjectType());
+            return objectType
+                ? Item{objectType->name(), objectType->icon()}
+                : Item{};
         }();
 
     if (!objectTypesValue.value.isEmpty())
@@ -254,7 +243,7 @@ void ParametersVisualizationModel::setAnalyticsSearchSetup(AnalyticsSearchSetup*
     {
         const auto update = [this]() { d->update(); };
         d->analyticsConnections.add(connect(
-            d->analyticsSetup, &AnalyticsSearchSetup::objectTypesChanged,this, update));
+            d->analyticsSetup, &AnalyticsSearchSetup::objectTypeChanged,this, update));
         d->analyticsConnections.add(connect(
             d->analyticsSetup, &AnalyticsSearchSetup::attributeFiltersChanged,this, update));
         d->analyticsConnections.add(connect(

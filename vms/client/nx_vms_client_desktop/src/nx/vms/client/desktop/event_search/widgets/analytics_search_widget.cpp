@@ -148,7 +148,7 @@ private:
     QAction* addObjectMenuAction(
         QMenu* menu,
         const QString& title,
-        const QStringList& objectTypeIds);
+        const QString& objectTypeId);
 
 private:
     AnalyticsSearchListModel* const m_model = qobject_cast<AnalyticsSearchListModel*>(q->model());
@@ -465,28 +465,28 @@ void AnalyticsSearchWidget::Private::setupTypeSelection()
     connect(m_objectTypeMenu, &ItemModelMenu::itemTriggered, this,
         [this](const QModelIndex& index)
         {
-            QStringList typeIds = index.isValid()
-                ? index.data(DetectableObjectTypeModel::IdsRole).toStringList()
-                : QStringList();
+            QString typeId = index.isValid()
+                ? index.data(DetectableObjectTypeModel::MainIdRole).toString()
+                : QString();
 
-            m_analyticsSetup->setObjectTypes(typeIds);
+            m_analyticsSetup->setObjectType(typeId);
         });
 
     connect(m_typeSelectionButton, &SelectableTextButton::stateChanged, this,
         [this](SelectableTextButton::State state)
         {
             if (state == SelectableTextButton::State::deactivated)
-                m_analyticsSetup->setObjectTypes({});
+                m_analyticsSetup->setObjectType({});
         });
 
-    connect(m_analyticsSetup.get(), &core::AnalyticsSearchSetup::objectTypesChanged,
+    connect(m_analyticsSetup.get(), &core::AnalyticsSearchSetup::objectTypeChanged,
         this, &Private::updateTypeButton);
 }
 
 void AnalyticsSearchWidget::Private::updateTypeButton()
 {
-    const auto objectTypeIds = m_analyticsSetup->objectTypes();
-    ObjectType* objectType = m_objectTypeModel->sourceModel()->findFilterObjectType(objectTypeIds);
+    const auto objectTypeId = m_analyticsSetup->objectType();
+    ObjectType* objectType = m_objectTypeModel->sourceModel()->objectTypeById(objectTypeId);
 
     const auto engine = engineById(m_analyticsSetup->engine());
     m_objectTypeModel->setEngine(engine);
@@ -655,11 +655,11 @@ QAction* AnalyticsSearchWidget::Private::addEngineMenuAction(
 }
 
 QAction* AnalyticsSearchWidget::Private::addObjectMenuAction(
-    QMenu* menu, const QString& title, const QStringList& objectTypeIds)
+    QMenu* menu, const QString& title, const QString& objectTypeId)
 {
     auto action = menu->addAction(title);
     connect(action, &QAction::triggered, this,
-        [this, objectTypeIds]() { m_analyticsSetup->setObjectTypes(objectTypeIds); });
+        [this, objectTypeId]() { m_analyticsSetup->setObjectType(objectTypeId); });
 
     return action;
 }

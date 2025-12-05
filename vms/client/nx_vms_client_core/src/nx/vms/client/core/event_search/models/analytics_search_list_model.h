@@ -44,9 +44,8 @@ public:
     nx::Uuid selectedEngine() const;
     void setSelectedEngine(const nx::Uuid& value);
 
-    std::set<QString> filteredObjectTypes() const;
-    QStringList selectedObjectTypes() const;
-    void setSelectedObjectTypes(const QStringList& value);
+    QString selectedObjectType() const;
+    void setSelectedObjectType(const QString& value);
 
     QStringList attributeFilters() const;
     void setAttributeFilters(const QStringList& value);
@@ -111,7 +110,7 @@ protected:
 signals:
     void filterRectChanged();
     void selectedEngineChanged();
-    void selectedObjectTypesChanged();
+    void selectedObjectTypeChanged();
     void availableNewTracksChanged();
     void attributeFiltersChanged();
     void combinedTextFilterChanged();

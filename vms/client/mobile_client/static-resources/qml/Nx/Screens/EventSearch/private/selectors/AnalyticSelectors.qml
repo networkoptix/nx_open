@@ -86,10 +86,10 @@ Column
 
             // Object type selector setup.
             objectTypeSelector.value = Qt.binding(
-                () => d.model.findFilterObjectType(control.analyticsSearchSetup.objectTypes))
+                () => d.model.objectTypeById(control.analyticsSearchSetup.objectType))
 
-            control.analyticsSearchSetup.objectTypes = Qt.binding(
-                () => d.model.getAnalyticsObjectTypeIds(objectTypeSelector.value))
+            control.analyticsSearchSetup.objectType = Qt.binding(
+                () => objectTypeSelector.value?.id ?? "")
 
             // Object attributes selector setup.
             objectAttributes.value = Qt.binding(() =>

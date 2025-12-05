@@ -89,6 +89,11 @@ bool lessByTimestamp(
     return metadataTimestamp(left) < metadataTimestamp(right);
 }
 
+std::set<QString> convertToSet(const QString& id)
+{
+    return id.isEmpty() ? std::set<QString>{} : std::set<QString>{id};
+}
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -117,9 +122,7 @@ public:
 
     QRectF filterRect;
     QStringList attributeFilters;
-    QStringList selectedObjectTypeList;
-    std::set<QString> filteredObjectTypes;
-    std::set<QString> selectedObjectTypes;
+    QString selectedObjectType;
     mutable QHash<QString, bool> objectTypeAcceptanceCache;
 
     const QScopedPointer<nx::utils::PendingOperation> emitDataChanged;
@@ -479,7 +482,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(
     filter.analyticsEngineId = selectedEngine;
     filter.sortOrder = EventSearch::sortOrderFromDirection(request.direction);
     filter.timePeriod = request.period(q->interestTimePeriod());
-    filter.objectTypeId = q->filteredObjectTypes();
+    filter.objectTypeId = convertToSet(q->selectedObjectType());
 
     if (q->cameraSet().type() == ManagedCameraSet::Type::single && filterRect.isValid())
         filter.boundingBox = filterRect;
@@ -737,7 +740,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     nx::analytics::db::Filter filter;
     filter.freeText = q->combinedTextFilter();
-    filter.objectTypeId = selectedObjectTypes;
+    filter.objectTypeId = convertToSet(selectedObjectType);
     filter.analyticsEngineId = selectedEngine;
 
     if (filterRect.isValid())
@@ -1312,44 +1315,21 @@ void AnalyticsSearchListModel::setSelectedEngine(const nx::Uuid& value)
     emit selectedEngineChanged();
 }
 
-std::set<QString> AnalyticsSearchListModel::filteredObjectTypes() const
+QString AnalyticsSearchListModel::selectedObjectType() const
 {
-    return d->filteredObjectTypes;
+    return d->selectedObjectType;
 }
 
-QStringList AnalyticsSearchListModel::selectedObjectTypes() const
+void AnalyticsSearchListModel::setSelectedObjectType(const QString& value)
 {
-    return d->selectedObjectTypeList;
-}
-
-void AnalyticsSearchListModel::setSelectedObjectTypes(const QStringList& value)
-{
-    std::set<QString> newObjectTypes{value.cbegin(), value.cend()};
-    if (d->selectedObjectTypes == newObjectTypes)
-        return;
+    if (d->selectedObjectType == value)
+         return;
 
     clear();
-    d->selectedObjectTypes = std::move(newObjectTypes);
-    d->selectedObjectTypeList = {d->selectedObjectTypes.cbegin(), d->selectedObjectTypes.cend()};
-    d->filteredObjectTypes = d->selectedObjectTypes;
-    NX_VERBOSE(this, "Set selected object type to \"%1\"", d->selectedObjectTypeList);
+    d->selectedObjectType = value;
+    NX_VERBOSE(this, "Set selected object type to \"%1\"", value);
 
-    // Filter out excessive object types.
-    if (!d->filteredObjectTypes.empty())
-    {
-        auto currentObjectType = d->objectTypeById(d->selectedObjectTypeList.first());
-        auto prevObjectType = currentObjectType;
-        while (currentObjectType && d->selectedObjectTypeList.contains(currentObjectType->id()))
-        {
-            prevObjectType = currentObjectType;
-            currentObjectType = currentObjectType->base();
-        }
-
-        if (prevObjectType)
-            d->filteredObjectTypes = std::set<QString>{prevObjectType->id()};
-    }
-
-    emit selectedObjectTypesChanged();
+    emit selectedObjectTypeChanged();
 }
 
 QStringList AnalyticsSearchListModel::attributeFilters() const
@@ -1392,10 +1372,12 @@ QString AnalyticsSearchListModel::combinedTextFilter() const
     QString attributesText = attributes.join(" ");
     if (!freeText.isEmpty())
         attributesText.append(" " + freeText);
+
+    const auto set = convertToSet(selectedObjectType());
     return analytics::taxonomy::makeEnumValuesExact(
         attributesText,
         systemContext()->analyticsAttributeHelper(),
-        selectedObjectTypes());
+        {set.begin(), set.end()});
 }
 
 TextScope AnalyticsSearchListModel::textSearchScope() const
@@ -1435,7 +1417,7 @@ bool AnalyticsSearchListModel::isConstrained() const
     return filterRect().isValid()
         || !d->textFilter->text().isEmpty()
         || !selectedEngine().isNull()
-        || !selectedObjectTypes().empty()
+        || !selectedObjectType().isEmpty()
         || !attributeFilters().empty()
         || base_type::isConstrained();
 }

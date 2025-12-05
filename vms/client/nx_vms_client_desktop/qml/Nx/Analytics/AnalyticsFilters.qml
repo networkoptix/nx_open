@@ -21,8 +21,7 @@ Column
 
     property var engine: null
 
-    readonly property var selectedObjectTypeIds:
-        model?.getAnalyticsObjectTypeIds(impl.selectedObjectType) ?? []
+    readonly property var selectedObjectTypeId: model && impl.selectedObjectType ? impl.selectedObjectType.id : ""
 
     readonly property var selectedAttributeFilters: objectTypeSelector.selectedObjectType
         ? impl.selectedAttributeFilters
@@ -35,9 +34,9 @@ Column
         objectTypeSelector.clear()
     }
 
-    function setSelectedObjectTypeIds(ids)
+    function setSelectedObjectTypeId(id)
     {
-        impl.setSelectedObjectTypeIds(ids)
+        impl.setSelectedObjectTypeId(id)
     }
 
     function setSelectedAttributeFilters(filters)
@@ -45,9 +44,9 @@ Column
         impl.setSelectedAttributeFilters(filters)
     }
 
-    function setSelected(engine, objectTypeIds, attributeFilters)
+    function setSelected(engine, objectTypeId, attributeFilters)
     {
-        impl.setup(engine, objectTypeIds,
+        impl.setup(engine, objectTypeId,
             EventSearchHelpers.attributeValuesFromFilters(attributeFilters))
     }
 
@@ -63,7 +62,7 @@ Column
 
         // Update UI from data.
 
-        function setup(engine, objectTypeIds, attributeValues)
+        function setup(engine, selectedObjectTypeId, attributeValues)
         {
             if (model == null)
                 return
@@ -76,7 +75,7 @@ Column
             analyticsFilters.engine = engine
 
             objectTypeSelector.objectTypes = model.objectTypes
-            const filterType = findFilterObjectType(objectTypeIds)
+            const filterType = model.objectTypeById(selectedObjectTypeId)
             objectTypeSelector.setSelectedObjectType(filterType)
 
             objectAttributes.attributes = objectTypeSelector.selectedObjectType
@@ -107,17 +106,10 @@ Column
             }
         }
 
-        function findFilterObjectType(ids)
-        {
-            return ids && ids.length
-                ? model.findFilterObjectType(ids)
-                : null
-        }
-
-        function setSelectedObjectTypeIds(ids)
+        function setSelectedObjectTypeId(id)
         {
             if (!updating)
-                setSelectedObjectType(findFilterObjectType(ids))
+                setSelectedObjectType(model?.objectTypeById(id) ?? null)
         }
 
         function setSelectedAttributeFilters(filters)
@@ -125,7 +117,7 @@ Column
             if (JSON.stringify(selectedAttributeFilters) === JSON.stringify(filters))
                 return
 
-            setup(engine, selectedObjectTypeIds,
+            setup(engine, selectedObjectTypeId,
                 EventSearchHelpers.attributeValuesFromFilters(filters))
         }
 
@@ -137,7 +129,7 @@ Column
             {
                 impl.setup(
                     analyticsFilters.engine,
-                    analyticsFilters.selectedObjectTypeIds,
+                    analyticsFilters.selectedObjectTypeId,
                     /*attributeValues*/ {})
             }
         }
@@ -169,7 +161,7 @@ Column
             {
                 impl.setup(
                     analyticsFilters.engine,
-                    analyticsFilters.selectedObjectTypeIds,
+                    analyticsFilters.selectedObjectTypeId,
                     objectAttributes.selectedAttributeValues)
             }
         }
@@ -182,14 +174,14 @@ Column
             {
                 impl.setup(
                     analyticsFilters.engine,
-                    model.getAnalyticsObjectTypeIds(objectTypeSelector.selectedObjectType),
+                    objectTypeSelector.selectedObjectTypeId,
                     /*attributeValues*/ {})
             }
         }
     }
 
     onModelChanged:
-        impl.setup(engine, selectedObjectTypeIds, /*attributeValues*/ {})
+        impl.setup(engine, selectedObjectTypeId, /*attributeValues*/ {})
 
     onVisibleChanged:
     {

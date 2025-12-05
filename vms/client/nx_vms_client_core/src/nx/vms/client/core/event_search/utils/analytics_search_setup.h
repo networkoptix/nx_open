@@ -17,8 +17,8 @@ class NX_VMS_CLIENT_CORE_API AnalyticsSearchSetup: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(nx::Uuid engine READ engine WRITE setEngine NOTIFY engineChanged)
-    Q_PROPERTY(QStringList objectTypes
-        READ objectTypes WRITE setObjectTypes NOTIFY objectTypesChanged)
+    Q_PROPERTY(QString objectType
+        READ objectType WRITE setObjectType NOTIFY objectTypeChanged)
 
     Q_PROPERTY(QStringList attributeFilters READ attributeFilters WRITE setAttributeFilters
         NOTIFY attributeFiltersChanged)
@@ -49,8 +49,8 @@ public:
     nx::Uuid engine() const;
     void setEngine(const nx::Uuid& value);
 
-    QStringList objectTypes() const;
-    void setObjectTypes(const QStringList& value);
+    QString objectType() const;
+    void setObjectType(const QString& value);
 
     QStringList attributeFilters() const;
     void setAttributeFilters(const QStringList& value);
@@ -83,7 +83,7 @@ public:
     Q_INVOKABLE void commitAvailableNewTracks();
 
 signals:
-    void objectTypesChanged();
+    void objectTypeChanged();
     void combinedTextFilterChanged();
     void textSearchScopeChanged();
     void referenceTrackIdChanged();

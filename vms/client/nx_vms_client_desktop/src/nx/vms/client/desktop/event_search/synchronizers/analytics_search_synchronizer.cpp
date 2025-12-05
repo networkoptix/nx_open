@@ -192,7 +192,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::engineChanged,
         this, &AnalyticsSearchSynchronizer::updateWorkbench);
 
-    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypesChanged,
+    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypeChanged,
             this, &AnalyticsSearchSynchronizer::updateWorkbench);
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::areaChanged, this,
@@ -348,8 +348,10 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
 
     m_filter.referenceBestShotId = m_analyticsSetup->referenceTrackId();
 
-    const auto objectTypes = m_analyticsSetup->objectTypes();
-    m_filter.objectTypeId = {objectTypes.cbegin(), objectTypes.cend()};
+    auto convertToSet =
+        [](const QString& id){ return id.isEmpty() ? std::set<QString>{} : std::set<QString>{id}; };
+    const auto objectType = m_analyticsSetup->objectType();
+    m_filter.objectTypeId = convertToSet(objectType);
 
     for (const auto widget: display()->widgets())
     {
@@ -410,7 +412,11 @@ void AnalyticsSearchSynchronizer::updateObjectTypesFromSettings()
 {
     const QStringList& objectTypeIds = system()->userSettings()->objectSearchObjectTypeIds();
 
-    if (m_updating || m_analyticsSetup->objectTypes() == objectTypeIds)
+    // Old settings may contain multiple types stored as a list.
+    const bool sameType =
+        objectTypeIds.size() == 1 && m_analyticsSetup->objectType() == objectTypeIds.first();
+
+    if (m_updating || sameType)
         return;
 
     const std::unique_ptr<core::analytics::taxonomy::AnalyticsFilterModel> filterModel{
@@ -419,10 +425,10 @@ void AnalyticsSearchSynchronizer::updateObjectTypesFromSettings()
     filterModel->setSelectedEngine(filterModel->findEngine(m_analyticsSetup->engine()));
     filterModel->setSelectedDevices(commonSetup()->selectedCameras());
 
-    if (filterModel->findFilterObjectType(objectTypeIds))
-        m_analyticsSetup->setObjectTypes(objectTypeIds);
+    if (auto objectType = filterModel->findFilterObjectType(objectTypeIds))
+        m_analyticsSetup->setObjectType(objectType->id());
     else
-        m_analyticsSetup->setObjectTypes({});
+        m_analyticsSetup->setObjectType({});
 }
 
 void AnalyticsSearchSynchronizer::updateTimeSelectionFromSettings()
@@ -613,12 +619,12 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
                 instance->m_analyticsSetup->setEngine(engineId);
         });
 
-    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypesChanged, this,
+    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypeChanged, this,
         [this]()
         {
-            const auto objectTypes = m_analyticsSetup->objectTypes();
+            const auto objectType = m_analyticsSetup->objectType();
             for (auto instance: instancesToNotify())
-                instance->m_analyticsSetup->setObjectTypes(objectTypes);
+                instance->m_analyticsSetup->setObjectType(objectType);
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::textSearchScopeChanged, this,
@@ -679,7 +685,7 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
         commonSetup()->setSelectedCameras(master->commonSetup()->selectedCameras());
 
     m_analyticsSetup->setEngine(master->m_analyticsSetup->engine());
-    m_analyticsSetup->setObjectTypes(master->m_analyticsSetup->objectTypes());
+    m_analyticsSetup->setObjectType(master->m_analyticsSetup->objectType());
     m_analyticsSetup->setAttributeFilters(master->m_analyticsSetup->attributeFilters());
     m_analyticsSetup->setArea(master->m_analyticsSetup->area());
     m_analyticsSetup->setAreaSelectionActive(master->m_analyticsSetup->areaSelectionActive());
@@ -748,10 +754,10 @@ void AnalyticsSearchSynchronizer::setupSettingsStorage()
         });
 
     m_settingsSyncConnections << connect(
-        m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypesChanged, this,
+        m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypeChanged, this,
         [this]()
         {
-            system()->userSettings()->objectSearchObjectTypeIds = m_analyticsSetup->objectTypes();
+            system()->userSettings()->objectSearchObjectTypeIds = {m_analyticsSetup->objectType()}; // TODO: check.
         });
 
     m_settingsSyncConnections << connect(

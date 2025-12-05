@@ -96,6 +96,11 @@ public:
     Q_INVOKABLE void setLiveTypesExcluded(bool value);
 
     /**
+     * Finds the filter object type by its id.
+     */
+    Q_INVOKABLE ObjectType* objectTypeById(const QString& id) const;
+
+    /**
      * Finds the filter object type corresponding to analytics object type ids.
      */
     Q_INVOKABLE nx::vms::client::core::analytics::taxonomy::ObjectType* findFilterObjectType(
@@ -139,7 +144,6 @@ protected:
     void setObjectTypes(const std::vector<ObjectType*>& objectTypes);
 
 private:
-    ObjectType* objectTypeById(const QString& id) const;
     void setEngines(const std::vector<nx::analytics::taxonomy::AbstractEngine*>& engines);
     void rebuild();
     void update(

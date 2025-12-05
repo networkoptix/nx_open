@@ -254,8 +254,8 @@ Window
                             if (!model)
                                 return
 
-                            setSelectedObjectTypeIds(
-                                eventModel.analyticsSetup.objectTypes)
+                            setSelectedObjectTypeId(
+                                eventModel.analyticsSetup.objectType)
 
                             setSelectedAttributeFilters(
                                 eventModel.analyticsSetup.attributeFilters)
@@ -695,7 +695,7 @@ Window
                             id: tableModel
                             sourceModel: eventModel
                             attributeManager: d.tableViewAttributeManager
-                            objectTypeIds: analyticsFilters.selectedObjectTypeIds ?? []
+                            objectTypeIds: analyticsFilters.selectedObjectTypeId ?? []
                         }
 
                         columnWidthProvider: function(index)
@@ -1049,7 +1049,7 @@ Window
             eventModel.analyticsFilterModel?.engines.length > 1 ?? false
 
         readonly property bool objectTypeSelected:
-            analyticsFilters.selectedObjectTypeIds?.length > 0 ?? false
+            analyticsFilters.selectedObjectTypeId?.length > 0 ?? false
 
         PropertyUpdateFilter on delayedAttributesFilter
         {
@@ -1093,17 +1093,17 @@ Window
             target: analyticsFilters
             enabled: eventModel.analyticsSetup
 
-            function onSelectedObjectTypeIdsChanged()
+            function onSelectedObjectTypeIdChanged()
             {
-                eventModel.analyticsSetup.objectTypes =
-                    analyticsFilters.selectedObjectTypeIds
+                eventModel.analyticsSetup.objectType =
+                    analyticsFilters.selectedObjectTypeId
             }
         }
 
         function storeCurrentEngineFilterState()
         {
             analyticsFiltersByEngine[analyticsFilters.engine] = {
-                objectTypeIds: analyticsFilters.selectedObjectTypeIds,
+                objectTypeId: analyticsFilters.selectedObjectTypeId,
                 attributeFilters: analyticsFilters.selectedAttributeFilters
             }
         }
@@ -1114,7 +1114,7 @@ Window
 
             analyticsFilters.setSelected(
                 engine,
-                savedData ? savedData.objectTypeIds : null,
+                savedData ? savedData.objectTypeId : null,
                 savedData ? savedData.attributeFilters : {})
         }
 
@@ -1122,10 +1122,10 @@ Window
         {
             target: eventModel.analyticsSetup
 
-            function onObjectTypesChanged()
+            function onObjectTypeChanged()
             {
-                analyticsFilters.setSelectedObjectTypeIds(
-                    eventModel.analyticsSetup.objectTypes)
+                analyticsFilters.setSelectedObjectTypeId(
+                    eventModel.analyticsSetup.objectType)
             }
 
             function onAttributeFiltersChanged()
@@ -1169,8 +1169,8 @@ Window
             const engineId = analyticsSetup.engine
             tabBar.selectEngine(engineId)
 
-            analyticsFilters.setSelectedObjectTypeIds(
-                analyticsSetup.objectTypes)
+            analyticsFilters.setSelectedObjectTypeId(
+                analyticsSetup.objectType)
 
             analyticsFilters.setSelectedAttributeFilters(
                 analyticsSetup.attributeFilters)
@@ -1190,7 +1190,7 @@ Window
 
         title: qsTr("Tile Settings")
         attributeManager: d.tileViewAttributeManager
-        objectTypeIds: analyticsFilters.selectedObjectTypeIds
+        objectTypeIds: [] + analyticsFilters.selectedObjectTypeId
     }
 
     FilterSettingsDialog
@@ -1199,7 +1199,7 @@ Window
 
         title: qsTr("Table Settings")
         attributeManager: d.tableViewAttributeManager
-        objectTypeIds: analyticsFilters.selectedObjectTypeIds
+        objectTypeIds: [] + analyticsFilters.selectedObjectTypeId
     }
 
     InformationBubble
