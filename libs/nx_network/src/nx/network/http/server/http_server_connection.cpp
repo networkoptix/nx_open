@@ -10,6 +10,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/telemetry/http_span.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::network::http {
 
@@ -45,6 +46,8 @@ HttpServerConnection::~HttpServerConnection()
 
     --SocketGlobals::instance().debugCounters().httpServerConnectionCount;
     SocketGlobals::instance().allocationAnalyzer().recordObjectDestruction(this);
+
+    NX_VERBOSE(this, "Destroyed");
 }
 
 std::unique_ptr<AbstractStreamSocket> HttpServerConnection::takeSocket()
@@ -217,6 +220,8 @@ void HttpServerConnection::stopWhileInAioThread()
 
     m_currentMsgBody.reset();
     m_bridge.reset();
+
+    NX_VERBOSE(this, "Stopped");
 }
 
 std::unique_ptr<HttpServerConnection::RequestAuthContext>
