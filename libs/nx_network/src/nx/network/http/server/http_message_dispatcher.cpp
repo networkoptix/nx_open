@@ -6,6 +6,8 @@
 
 #include <nx/utils/string.h>
 
+#include "handler/http_server_handler_redirect.h"
+
 namespace nx::network::http {
 
 AbstractMessageDispatcher::AbstractMessageDispatcher():
@@ -67,30 +69,20 @@ bool AbstractMessageDispatcher::waitUntilAllRequestsCompleted(
     }
 }
 
-std::map<int, int> AbstractMessageDispatcher::statusCodesReported() const
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-
-    std::map<int, int> result;
-    for (const auto& [httpStatusCode, counter]: m_statusCodesPerMinute)
-        result.emplace(httpStatusCode, counter.getSumPerLastPeriod());
-
-    return result;
-}
-
 std::map<std::string, server::RequestStatistics>
-    AbstractMessageDispatcher::requestPathStatistics() const
+    AbstractMessageDispatcher::requestLineStatistics() const
 {
-    std::map</*path*/ std::string, server::RequestStatistics> stats;
-    m_requestPathStatsCalculators.forEach(
-        [&stats](const auto& value)
+    std::map</*requestLine*/ std::string, server::RequestStatistics> result;
+    m_requestStatisticsCalculators.forEach(
+        [&result](
+            const std::pair<const std::string, server::RequestStatisticsCalculator>& item)
         {
-            auto requestPathStats = value.second.requestStatistics();
-            if (requestPathStats.requestsServedPerMinute > 0)
-                stats.emplace(value.first, std::move(requestPathStats));
+            auto requestStatistics = item.second.statistics();
+            if (requestStatistics.requestsServedPerMinute > 0)
+                result.emplace(item.first, std::move(requestStatistics));
         });
 
-    return stats;
+    return result;
 }
 
 void AbstractMessageDispatcher::setLinger(
@@ -99,23 +91,18 @@ void AbstractMessageDispatcher::setLinger(
     m_linger = timeout;
 }
 
-void AbstractMessageDispatcher::recordDispatchFailure() const
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_statusCodesPerMinute[StatusCode::notFound].add(1);
-}
-
 void AbstractMessageDispatcher::recordStatistics(
     const RequestResult& result,
     const std::string& requestPathTemplate,
     std::chrono::microseconds processingTime) const
 {
-    m_requestPathStatsCalculators.modify(
+    m_requestStatisticsCalculators.modify(
         requestPathTemplate,
-        [processingTime](auto& val) { val.processedRequest(processingTime); });
-
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_statusCodesPerMinute[result.statusCode].add(1);
+        [processingTime, statusCode = result.statusCode](
+            server::RequestStatisticsCalculator& val)
+        {
+            val.processedRequest(processingTime, statusCode);
+        });
 }
 
 void AbstractMessageDispatcher::printActiveRequests() const

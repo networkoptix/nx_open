@@ -3,48 +3,56 @@
 #pragma once
 
 #include <nx/network/connection_server/server_statistics.h>
+#include <nx/network/http/http_status.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/data_structures/partitioned_concurrent_hash_map.h>
 #include <nx/utils/math/average_per_period.h>
 #include <nx/utils/math/max_per_period.h>
 #include <nx/utils/math/percentile_per_period.h>
 
 namespace nx::network::http::server {
 
+/**
+ * Statistics per request method and URL path, e.g. GET /servers/{serverId}/client_session
+ */
 struct NX_NETWORK_API RequestStatistics
 {
     std::chrono::microseconds maxRequestProcessingTimeUsec{0};
     std::chrono::microseconds averageRequestProcessingTimeUsec{0};
-    std::map<std::string /* percent */, std::chrono::microseconds> requestProcessingTimePercentilesUsec;
+    std::map<int /* percentile */, std::chrono::microseconds> requestProcessingTimePercentilesUsec;
     int requestsServedPerMinute = 0;
+    std::map<int /*HTTP status*/, int /*count*/> statuses;
 };
 
 #define RequestStatistics_server_Fields\
     (maxRequestProcessingTimeUsec)\
     (averageRequestProcessingTimeUsec)\
     (requestProcessingTimePercentilesUsec)\
-    (requestsServedPerMinute)
+    (requestsServedPerMinute)\
+    (statuses)
 
 NX_REFLECTION_INSTRUMENT(RequestStatistics, RequestStatistics_server_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
+/**
+ * General HTTP statistics reported by a server.
+ * NOTE: Inheritance from network::server::Statistics and RequestStatistics are for aggregating
+ * statistics for all HTTP requests.
+ */
 struct NX_NETWORK_API HttpStatistics:
     public network::server::Statistics,
     public RequestStatistics
 {
-    // Inherited fields are aggregate statistics
+    std::map<std::string /*requestLine*/, RequestStatistics> requests;
 
-    std::map<int /*HTTP status code*/, int /*count*/> statuses;
-    std::map<std::string /*requestPathTemplate*/, RequestStatistics> requests;
-
-    using network::server::Statistics::operator=;
     using RequestStatistics::operator=;
 };
 
 #define HttpStatistics_server_Fields\
     Statistics_server_Fields\
     RequestStatistics_server_Fields\
-    (statuses)(requests)
+    (requests)
 
 NX_REFLECTION_INSTRUMENT(HttpStatistics, HttpStatistics_server_Fields)
 
@@ -62,14 +70,18 @@ public:
 //-------------------------------------------------------------------------------------------------
 // RequestStatisticsCalculator
 
+/**
+ * Calculates statistics per request i.e. one instance for one request line:
+ * GET /servers/{serverId}/client_sessions
+ */
 class NX_NETWORK_API RequestStatisticsCalculator
 {
 public:
     RequestStatisticsCalculator();
 
-    void processedRequest(std::chrono::microseconds duration);
+    void processedRequest(std::chrono::microseconds duration, StatusCode::Value status);
 
-    RequestStatistics requestStatistics() const;
+    RequestStatistics statistics() const;
 
 private:
     using PercentilePerPeriod = nx::utils::math::PercentilePerPeriod<std::chrono::microseconds>;
@@ -79,8 +91,9 @@ private:
         m_averageRequestProcessingTime;
 
     nx::utils::math::MaxPerMinute<std::chrono::microseconds> m_maxRequestProcessingTime;
-    std::map<double, PercentilePerPeriod> m_requestProcessingTimePercentiles;
+    std::map<int, PercentilePerPeriod> m_requestProcessingTimePercentiles;
     nx::utils::math::SumPerMinute<int> m_requestsServedPerMinute;
+    std::map<StatusCode::Value, nx::utils::math::SumPerMinute<int>> m_statusesPerMinute;
 };
 
 //-------------------------------------------------------------------------------------------------

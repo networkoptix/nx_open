@@ -66,6 +66,10 @@ class NX_NETWORK_API HttpServerConnection:
     using base_type = BaseConnection<HttpServerConnection>;
 
 public:
+    using OnResponseSentHandler = nx::MoveOnlyFunc<void(
+        std::chrono::microseconds /*requestProcessingTime*/,
+        StatusCode::Value)>;
+
     HttpServerConnection(
         std::unique_ptr<AbstractStreamSocket> sock,
         nx::network::http::AbstractRequestHandler* requestHandler,
@@ -106,8 +110,7 @@ public:
     /**
      * @param handler Invoked just after sending the response headers.
      */
-    void setOnResponseSent(
-        nx::MoveOnlyFunc<void(std::chrono::microseconds /*request processing time*/)> handler);
+    void setOnResponseSent(OnResponseSentHandler handler);
 
     /**
      * Establishes two-way bridge between underlying connection and `targetConnection`.
@@ -193,7 +196,7 @@ private:
     std::optional<SocketAddress> m_clientEndpoint;
     std::atomic<std::int64_t> m_lastRequestSequence{0};
     std::map<std::int64_t /*sequence*/, std::unique_ptr<ResponseMessageContext>> m_requestsBeingProcessed;
-    nx::MoveOnlyFunc<void(std::chrono::microseconds)> m_responseSentHandler;
+    OnResponseSentHandler m_responseSentHandler;
     std::shared_ptr<MessageBodyWriter> m_currentRequestBodyWriter;
     int m_closeHandlerSubscriptionId = -1;
     std::optional<SystemError::ErrorCode> m_markedForClosure;
@@ -235,7 +238,7 @@ private:
     RequestContext buildRequestContext(RequestAuthContext requestAuthContext);
 
     void sendNextResponse();
-    void responseSent(const time_point& requestReceivedTime);
+    void responseSent(const time_point& requestReceivedTime, StatusCode::Value statusCode);
     void someMsgBodyRead(SystemError::ErrorCode, nx::Buffer buf);
     void readMoreMessageBodyData();
     void fullMessageHasBeenSent();

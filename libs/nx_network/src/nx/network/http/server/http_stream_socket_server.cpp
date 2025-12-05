@@ -27,18 +27,17 @@ void HttpStreamSocketServer::redirectAllRequestsTo(SocketAddress addressToRedire
 
 server::HttpStatistics HttpStreamSocketServer::httpStatistics() const
 {
-    server::HttpStatistics httpStats;
-    httpStats.operator=(statistics());
+    server::HttpStatistics httpStatistics{statistics()};
     NX_MUTEX_LOCKER lock(&m_mutex);
-    httpStats.operator=(m_statsCalculator.requestStatistics());
+    httpStatistics.operator=(m_statisticsCalculator.statistics());
 
-    // TODO: #akolesnikov Refactor fetching statistics from the dispatcher.
+    // TODO: #akolesnikov Refactor fetching statistics from the dispatcher. Currently we have to
+    // check all AbstractRequestHandlers to find the dispatcher.
     for (AbstractRequestHandler* handler = m_requestHandler; handler != nullptr;)
     {
         if (auto dispatcher = dynamic_cast<AbstractMessageDispatcher*>(handler); dispatcher)
         {
-            httpStats.statuses = dispatcher->statusCodesReported();
-            httpStats.requests = dispatcher->requestPathStatistics();
+            httpStatistics.requests = dispatcher->requestLineStatistics();
             break;
         }
 
@@ -48,7 +47,7 @@ server::HttpStatistics HttpStreamSocketServer::httpStatistics() const
             break;
     }
 
-    return httpStats;
+    return httpStatistics;
 }
 
 std::shared_ptr<HttpServerConnection> HttpStreamSocketServer::createConnection(
@@ -61,10 +60,10 @@ std::shared_ptr<HttpServerConnection> HttpStreamSocketServer::createConnection(
     result->setPersistentConnectionEnabled(m_persistentConnectionEnabled);
     result->setExtraSuccessResponseHeaders(m_extraSuccessResponseHeaders);
     result->setOnResponseSent(
-        [this](const auto& requestProcessingTime)
+        [this](const auto& requestProcessingTime, auto statusCode)
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
-            m_statsCalculator.processedRequest(requestProcessingTime);
+            m_statisticsCalculator.processedRequest(requestProcessingTime, statusCode);
         });
     return result;
 }
