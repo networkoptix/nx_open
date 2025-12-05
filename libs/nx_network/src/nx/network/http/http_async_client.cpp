@@ -199,7 +199,19 @@ ClientOptions::Timeouts ClientOptions::timeouts() const
 void ClientOptions::addAdditionalHeader(const std::string& key, const std::string& value)
 {
     NX_WRITE_LOCKER lock(&m_mutex);
-    m_additionalHeaders.emplace(key, value);
+    if (std::find(
+        header::kNonRepeatableHeaders.cbegin(),
+        header::kNonRepeatableHeaders.cend(),
+        key)
+        != header::kNonRepeatableHeaders.cend())
+    {
+        m_additionalHeaders.erase(key);
+        m_additionalHeaders.emplace(key, value);
+    }
+    else
+    {
+        m_additionalHeaders.emplace(key, value);
+    }
 }
 
 void ClientOptions::removeAdditionalHeader(const std::string& key)
@@ -1441,7 +1453,8 @@ void AsyncClient::prepareRequestHeaders(
     bool useHttp11,
     const Method& httpMethod)
 {
-    nx::network::http::insertOrReplaceHeader(&m_request.headers,
+    nx::network::http::insertOrReplaceHeader(
+        &m_request.headers,
         HttpHeader(
             "Date", nx::utils::formatDateTimeLockFree(nx::utils::utcTime().time_since_epoch())));
 

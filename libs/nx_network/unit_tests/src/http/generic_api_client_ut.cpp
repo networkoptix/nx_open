@@ -146,6 +146,16 @@ protected:
             m_client->httpClientOptions().addAdditionalHeader(h.first, h.second);
     }
 
+    void thanRequestContainedHeader(const HttpHeader& expectedHeader)
+    {
+        Request request;
+        ASSERT_TRUE(request.parse(std::get<1>(*m_lastResult).httpRequest));
+        const auto headers = request.headers;
+        ASSERT_EQ(headers.count(expectedHeader.first), 1);
+        auto it = headers.lower_bound(expectedHeader.first);
+        ASSERT_EQ(it->second, expectedHeader.second);
+    }
+
 protected:
     std::unique_ptr<Client> m_client;
     nx::network::http::TestHttpServer m_server;
@@ -221,6 +231,22 @@ TEST_F(GenericApiClient, custom_headers_are_added_to_request)
 
     thenApiCallSucceeded();
     andHttpRequestContainedHeaders({{"X-Custom-Test", "foo"}});
+}
+
+TEST_F(GenericApiClient, non_reapetable_headers_do_not_accumulate_in_request)
+{
+    setCustomHeaders({{header::kAuthorization, "foo1"}});
+    setCustomHeaders({{header::kAuthorization, "foo2"}});
+    whenPerformApiCall();
+    thenApiCallSucceeded();
+    // The last added Authorization header and only it should be present in the request.
+    thanRequestContainedHeader({header::kAuthorization, "foo2"});
+
+    setCustomHeaders({{header::kAuthorization, "foo3"}});
+    whenPerformApiCall();
+    thenApiCallSucceeded();
+    // The last added Authorization header and only it should be present in the request.
+    thanRequestContainedHeader({header::kAuthorization, "foo3"});
 }
 
 //-------------------------------------------------------------------------------------------------
