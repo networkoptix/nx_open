@@ -67,7 +67,8 @@ private:
     HttpHeaders m_extraSuccessResponseHeaders;
 
     mutable nx::Mutex m_mutex;
-    nx::network::http::server::RequestStatisticsCalculator m_statsCalculator;
+    /** Calculates HttpStatistics aggregate statistics that live in its parent, RequestStatistics */
+    nx::network::http::server::RequestStatisticsCalculator m_statisticsCalculator;
     std::optional<SocketAddress> m_addressToRedirect;
 };
 

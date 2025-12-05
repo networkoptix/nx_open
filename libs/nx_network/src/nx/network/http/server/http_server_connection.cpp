@@ -82,8 +82,7 @@ void HttpServerConnection::setExtraSuccessResponseHeaders(HttpHeaders responseHe
     m_extraSuccessResponseHeaders = std::move(responseHeaders);
 }
 
-void HttpServerConnection::setOnResponseSent(
-    nx::MoveOnlyFunc<void(std::chrono::microseconds)> handler)
+void HttpServerConnection::setOnResponseSent(OnResponseSentHandler handler)
 {
     m_responseSentHandler = std::move(handler);
 }
@@ -494,16 +493,18 @@ void HttpServerConnection::sendNextResponse()
         m_chunkedBodyParser = ChunkedStreamParser();
     }
 
-    m_telemetrySpan.setStatusCode(m_responseQueue.front()->msg.response->statusLine.statusCode);
+    const auto statusCode = m_responseQueue.front()->msg.response->statusLine.statusCode;
+    m_telemetrySpan.setStatusCode(statusCode);
 
     sendMessage(
         std::exchange(m_responseQueue.front()->msg, {}),
         std::bind(
             &HttpServerConnection::responseSent, this,
-            m_responseQueue.front()->requestReceivedTime));
+            m_responseQueue.front()->requestReceivedTime, statusCode));
 }
 
-void HttpServerConnection::responseSent(const time_point& requestReceivedTime)
+void HttpServerConnection::responseSent(
+    const time_point& requestReceivedTime, StatusCode::Value statusCode)
 {
     auto spanScope = m_telemetrySpan.activate();
 
@@ -511,7 +512,8 @@ void HttpServerConnection::responseSent(const time_point& requestReceivedTime)
     {
         using namespace std::chrono;
         m_responseSentHandler(
-            duration_cast<microseconds>(clock_type::now() - requestReceivedTime));
+            duration_cast<microseconds>(clock_type::now() - requestReceivedTime),
+            statusCode);
     }
 
     // TODO: #akolesnikov check sendData error code.

@@ -12,9 +12,9 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/reflect/json.h>
-#include <nx/utils/time.h>
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/utils.h>
+#include <nx/utils/time.h>
 
 namespace nx::network::http::server::test {
 
@@ -219,9 +219,11 @@ class MultiEndpointServerHttpStatistics: public testing::Test
 public:
     struct RequestHandlerData
     {
-        std::string requestPath;
+        std::string urlPath;
         StatusCode::Value responseCode = StatusCode::ok;
         std::string_view method = http::Method::get;
+
+        std::string requestLine() const { return std::string(method) + " " + urlPath; }
     };
 
     void SetUp()
@@ -232,10 +234,10 @@ public:
         ASSERT_TRUE(m_httpServer->listen());
     }
 
-    void givenGetRequestPaths(std::vector<std::string> requestPaths)
+    void givenGetRequestHandlers(std::vector<std::string> urlPaths)
     {
-        for (const auto& path: requestPaths)
-            registerRequestHandler({.requestPath = path});
+        for (const auto& path: urlPaths)
+            registerRequestHandler({.urlPath = path, .method = Method::get});
     }
 
     void givenRequestHandlers(std::vector<RequestHandlerData> requestHandlers)
@@ -248,7 +250,7 @@ public:
     {
         m_httpDispatcher.registerRequestProcessorFunc(
             data.method,
-            data.requestPath,
+            data.urlPath,
             [statusCode = data.responseCode](auto /* requestContext */, auto handler)
             {
                 handler(statusCode);
@@ -334,7 +336,7 @@ private:
 
 TEST_F(MultiEndpointServerHttpStatistics, RequestPathStatistics_present_if_requestsServedPerMinute_is_not_0)
 {
-    givenGetRequestPaths({"/0", "/1"});
+    givenGetRequestHandlers({"/0", "/1"});
 
     whenMakeGetRequest("/0");
 
@@ -360,7 +362,7 @@ TEST_F(
     MultiEndpointServerHttpStatistics,
     RequestPathStatistics_requestsServedPerMinute_matches_aggregate_requestsServerPerMinute_while_connections_are_open)
 {
-    givenGetRequestPaths({"/0", "/1"});
+    givenGetRequestHandlers({"/0", "/1"});
 
     auto socket = makeHttpClientSocket();
     std::thread t{
@@ -391,7 +393,7 @@ TEST_F(
 
 TEST_F(MultiEndpointServerHttpStatistics, percentiles_present)
 {
-    givenGetRequestPaths({"/0"});
+    givenGetRequestHandlers({"/0"});
 
     nx::utils::test::ScopedSyntheticMonotonicTime fixedTime{};
 
@@ -413,9 +415,9 @@ TEST_F(MultiEndpointServerHttpStatistics, percentiles_present)
     auto stats = whenRequestHttpStatistics();
 
     const auto zero = std::chrono::microseconds::zero();
-    ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at("50"));
-    ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at("95"));
-    ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at("99"));
+    ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at(50));
+    ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at(95));
+    ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at(99));
 }
 
 TEST_F(MultiEndpointServerHttpStatistics, http_status_codes)
@@ -431,29 +433,44 @@ TEST_F(MultiEndpointServerHttpStatistics, http_status_codes)
     givenRequestHandlers(requestHandlers);
 
     std::vector<std::unique_ptr<AsyncMessagePipeline>> clients;
-    for (std::size_t i = 0; i < requestHandlers.size(); ++i)
+    auto deferred = nx::utils::makeScopeGuard([&clients]()
+    {
+        for (auto& client: clients)
+            client->pleaseStopSync();
+    });
+
+    for (size_t i = 0; i < requestHandlers.size(); ++i)
     {
         auto& socket = clients.emplace_back(makeHttpClientSocket());
-        doGetRequestsOnOneSocket(socket.get(), requestHandlers[i].requestPath, i + 1);
+        doGetRequestsOnOneSocket(socket.get(), requestHandlers[i].urlPath, i + 1);
 
         // testing dispatch failure. It is also considered to be 404
-        if (requestHandlers[i].requestPath == "/404")
+        if (requestHandlers[i].urlPath == "/404")
             doGetRequestsOnOneSocket(socket.get(), "/404-unregistered", 1);
     }
 
     auto stats = whenRequestHttpStatistics();
 
-    for (std::size_t i = 0; i < requestHandlers.size(); ++i)
+    for (size_t i = 0; i < requestHandlers.size(); ++i)
     {
+        const auto& handler = requestHandlers[i];
         int expectedCount = (int) i + 1;
-        if (requestHandlers[i].requestPath == "/404")
+        if (handler.urlPath == "/404")
             ++expectedCount;
 
-        ASSERT_EQ(expectedCount, stats.statuses.at(requestHandlers[i].responseCode));
-    }
+        // Testing summed statuse counts for all requests lines.
+        ASSERT_EQ(expectedCount, stats.statuses.at(handler.responseCode));
 
-    for (auto& client: clients)
-        client->pleaseStopSync();
+        // Decrementing 404 path because it contains dispatch failure count which should not
+        // be included in the expected statuses count.
+        if (handler.urlPath == "/404")
+            --expectedCount;
+
+        // Testing status counts per request line
+        ASSERT_EQ(
+            expectedCount,
+            stats.requests.at(handler.requestLine()).statuses.at(handler.responseCode));
+    }
 }
 
 } // namespace nx::network::http::server::test

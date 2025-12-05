@@ -14,7 +14,6 @@
 
 #include "abstract_http_request_handler.h"
 #include "handler/http_server_handler_custom.h"
-#include "handler/http_server_handler_redirect.h"
 #include "http_server_connection.h"
 #include "http_server_exact_path_matcher.h"
 #include "http_statistics.h"
@@ -112,10 +111,7 @@ public:
             requestContext.request.requestLine.method,
             requestContext.request.requestLine.url.path(QUrl::EncodeReserved).toStdString());
         if (!handlerContext)
-        {
-            recordDispatchFailure();
             return false;
-        }
 
         requestContext.pathTemplate = handlerContext->pathTemplate;
         if (!requestContext.pathTemplate.empty())
@@ -166,14 +162,9 @@ public:
     bool waitUntilAllRequestsCompleted(
         std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
-    /**
-     * Get the frequency per minute with which each HTTP Status code is occurring.
-     */
-    std::map<int /*http status*/, int /*count*/> statusCodesReported() const;
-
-    // NOTE: RequestPathStatistics values that have requestsServedPerMinute == 0 are not
+    // NOTE: If RequestStatistics::requestsServedPerMinute == 0 it is not
     // included to avoid empty values in statistics reports.
-    std::map<std::string, server::RequestStatistics> requestPathStatistics() const;
+    std::map<std::string, server::RequestStatistics> requestLineStatistics() const;
 
     static constexpr auto kDefaultLinger = std::chrono::seconds(17);
 
@@ -209,7 +200,6 @@ protected:
         const std::string& path) const = 0;
 
 private:
-    void recordDispatchFailure() const;
     void recordStatistics(
         const RequestResult& result,
         const std::string& requestPathTemplate,
@@ -223,12 +213,9 @@ private:
      */
     std::shared_ptr<nx::utils::Counter> m_runningRequestCounter;
 
-    mutable nx::Mutex m_mutex;
-    mutable std::map <StatusCode::Value, nx::utils::math::SumPerMinute<int>> m_statusCodesPerMinute;
-
     mutable nx::utils::PartitionedConcurrentHashMap<
         std::string, server::RequestStatisticsCalculator
-    > m_requestPathStatsCalculators;
+    > m_requestStatisticsCalculators;
 
     mutable nx::utils::PartitionedConcurrentHashMap<int /*sequence*/, ActiveRequest>
         m_activeRequests;

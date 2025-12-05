@@ -2,10 +2,7 @@
 
 #include "http_statistics.h"
 
-#include <iomanip>
-
 namespace nx::network::http::server {
-
 
 //-------------------------------------------------------------------------------------------------
 // RequestStatisticsCalculator
@@ -13,46 +10,43 @@ namespace nx::network::http::server {
 RequestStatisticsCalculator::RequestStatisticsCalculator():
     m_averageRequestProcessingTime(std::chrono::minutes(1))
 {
-    static constexpr std::array<double, 3> percentiles = {0.5, 0.95, 0.99};
-    for (const auto& p: percentiles)
-    {
-        m_requestProcessingTimePercentiles.emplace(
-            p,
-            PercentilePerPeriod{p, std::chrono::minutes(1), 2});
-    }
+    m_requestProcessingTimePercentiles.emplace(
+        50, PercentilePerPeriod{0.5, std::chrono::minutes(1), 2});
+    m_requestProcessingTimePercentiles.emplace(
+        95, PercentilePerPeriod{0.95, std::chrono::minutes(1), 2});
+    m_requestProcessingTimePercentiles.emplace(
+        99, PercentilePerPeriod{0.99, std::chrono::minutes(1), 2});
 }
 
-void RequestStatisticsCalculator::processedRequest(std::chrono::microseconds duration)
+void RequestStatisticsCalculator::processedRequest(
+    std::chrono::microseconds duration,
+    StatusCode::Value status)
 {
     m_averageRequestProcessingTime.add(duration.count());
     m_maxRequestProcessingTime.add(duration);
     for (auto& p: m_requestProcessingTimePercentiles)
         p.second.add(duration);
     m_requestsServedPerMinute.add(1);
+    m_statusesPerMinute[status].add(1);
 }
 
-RequestStatistics RequestStatisticsCalculator::requestStatistics() const
+RequestStatistics RequestStatisticsCalculator::statistics() const
 {
     RequestStatistics stats;
     stats.averageRequestProcessingTimeUsec =
         std::chrono::microseconds(m_averageRequestProcessingTime.getAveragePerLastPeriod());
     stats.maxRequestProcessingTimeUsec = m_maxRequestProcessingTime.getMaxPerLastPeriod();
 
-    for (const auto& [key, calculator]: m_requestProcessingTimePercentiles)
-    {
-        std::ostringstream ss;
-        ss << std::setprecision(2) << std::fixed << key * 100;
-        auto k = ss.str();
-
-        while (k.back() == '0') //< Drop trailing zeros after the decimal.
-            k.pop_back();
-        while (k.back() == '.') //< If all decimals points were 0, then drop the decimal.
-            k.pop_back();
-
-        stats.requestProcessingTimePercentilesUsec[std::move(k)] = calculator.get();
-    }
+    for (const auto& [percentile, calculator]: m_requestProcessingTimePercentiles)
+        stats.requestProcessingTimePercentilesUsec[percentile] = calculator.get();
 
     stats.requestsServedPerMinute = m_requestsServedPerMinute.getSumPerLastPeriod();
+
+    for (const auto& [status, calculator]: m_statusesPerMinute)
+    {
+        if (const auto count = calculator.getSumPerLastPeriod(); count)
+            stats.statuses[status] = count;
+    }
 
     return stats;
 }
@@ -69,77 +63,51 @@ SummingStatisticsProvider::SummingStatisticsProvider(
 
 HttpStatistics SummingStatisticsProvider::httpStatistics() const
 {
-    std::chrono::microseconds requestAverageProcessingTimeSum(0);
-    HttpStatistics accumulatedStats;
-
-    // NOTE: declaring this map outside of providers loop because it is possible that multiple
-    // providers have the statistics for the same path.
-    std::map<
-        std::string,
-        std::pair<
-            int /*count*/,
-            std::chrono::microseconds /*averageRequestProcessingTimeUsecSum*/>
-    > pathToAverageContext;
+    HttpStatistics total;
 
     for (const auto& provider: m_providers)
     {
         HttpStatistics httpStats = provider->httpStatistics();
-        accumulatedStats.add(httpStats);
+        total.add(httpStats);
 
-        requestAverageProcessingTimeSum += httpStats.averageRequestProcessingTimeUsec;
-
-        accumulatedStats.maxRequestProcessingTimeUsec = std::max(
-            accumulatedStats.maxRequestProcessingTimeUsec,
+        total.maxRequestProcessingTimeUsec = std::max(
+            total.maxRequestProcessingTimeUsec,
             httpStats.maxRequestProcessingTimeUsec);
 
-        for (const auto& [statusCode, count] : httpStats.statuses)
-        {
-            if (!accumulatedStats.statuses.contains(statusCode))
-                accumulatedStats.statuses[statusCode] = 0;
-            accumulatedStats.statuses[statusCode] += count;
-        }
-
-        accumulatedStats.requestsServedPerMinute += httpStats.requestsServedPerMinute;
+        total.averageRequestProcessingTimeUsec = std::max(
+            total.averageRequestProcessingTimeUsec,
+            httpStats.averageRequestProcessingTimeUsec);
 
         for (const auto& [key, value]: httpStats.requestProcessingTimePercentilesUsec)
         {
-            auto& percentile = accumulatedStats.requestProcessingTimePercentilesUsec[key];
+            auto& percentile = total.requestProcessingTimePercentilesUsec[key];
             percentile = std::max(percentile, value);
         }
 
+        total.requestsServedPerMinute += httpStats.requestsServedPerMinute;
+
+        for (const auto& [status, count]: httpStats.statuses)
+            total.statuses[status] += count;
+
         for (const auto& [path, stats]: httpStats.requests)
         {
-            auto& accumulatedPathStats = accumulatedStats.requests[path];
-            accumulatedPathStats.maxRequestProcessingTimeUsec = std::max(
-                accumulatedPathStats.maxRequestProcessingTimeUsec,
+            auto& totalPathStats = total.requests[path];
+            totalPathStats.maxRequestProcessingTimeUsec = std::max(
+                totalPathStats.maxRequestProcessingTimeUsec,
                 stats.maxRequestProcessingTimeUsec);
 
-            accumulatedPathStats.requestsServedPerMinute += stats.requestsServedPerMinute;
+            totalPathStats.averageRequestProcessingTimeUsec = std::max(
+                totalPathStats.averageRequestProcessingTimeUsec,
+                stats.averageRequestProcessingTimeUsec);
 
-            auto& averageContext = pathToAverageContext[path];
-            ++averageContext.first;
-            averageContext.second += stats.averageRequestProcessingTimeUsec;
+            totalPathStats.requestsServedPerMinute += stats.requestsServedPerMinute;
+
+            for (const auto& [status, count]: stats.statuses)
+                totalPathStats.statuses[status] += count;
         }
     }
 
-    // TODO: #akolesnikov Averages should be summed up taking into account each value's weight.
-
-    for (const auto& [path, averageContext]: pathToAverageContext)
-    {
-        if (averageContext.first)
-        {
-            accumulatedStats.requests[path].averageRequestProcessingTimeUsec =
-                averageContext.second / averageContext.first;
-        }
-    }
-
-    if (m_providers.size() > 0)
-    {
-        accumulatedStats.averageRequestProcessingTimeUsec =
-            requestAverageProcessingTimeSum / m_providers.size();
-    }
-
-    return accumulatedStats;
+    return total;
 }
 
 } // namespace nx::network::http::server

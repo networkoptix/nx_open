@@ -16,8 +16,7 @@ AggregateStatisticsProvider::AggregateStatisticsProvider(
 HttpStatistics AggregateStatisticsProvider::httpStatistics() const
 {
     auto stats = m_statsProvider.httpStatistics();
-    stats.statuses = m_dispatcher.statusCodesReported();
-    stats.requests = m_dispatcher.requestPathStatistics();
+    stats.requests = m_dispatcher.requestLineStatistics();
     return stats;
 }
 
