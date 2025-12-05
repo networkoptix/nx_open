@@ -542,6 +542,13 @@ static constexpr char kContentDisposition[] = "Content-Disposition";
 static constexpr char kContentType[] = "Content-Type";
 static constexpr char kContentLength[] = "Content-Length";
 static constexpr char kUserAgent[] = "User-Agent";
+static constexpr char kAuthorization[] = "Authorization";
+static constexpr char kHost[] = "Host";
+static constexpr char kConnection[] = "Connection";
+static constexpr char kRequestId[] = "X-Request-Id";
+
+static constexpr std::array<std::string_view, 7> kNonRepeatableHeaders =
+    {kAuthorization, kHost, kContentLength, kContentType, kUserAgent, kConnection, kRequestId};
 
 //!Http authentication scheme enumeration
 namespace AuthScheme {
