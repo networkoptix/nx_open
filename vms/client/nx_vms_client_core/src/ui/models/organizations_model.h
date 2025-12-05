@@ -148,6 +148,19 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
+// Simple sorting proxy for organizations tree - sorts folders by name using natural sorting.
+class NX_VMS_CLIENT_CORE_API OrganizationsSortModel: public QSortFilterProxyModel
+{
+    Q_OBJECT
+    using base_type = QSortFilterProxyModel;
+
+public:
+    OrganizationsSortModel(QObject* parent = nullptr);
+
+protected:
+    bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
+};
+
 // Hides 'SitesNode' root node and places its children last, optionally hiding SaaS systems.
 class NX_VMS_CLIENT_CORE_API OrganizationsFilterModel: public QSortFilterProxyModel
 {

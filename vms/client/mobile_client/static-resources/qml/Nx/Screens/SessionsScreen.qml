@@ -28,6 +28,10 @@ Page
 
     property var rootIndex: NxGlobals.invalidModelIndex()
     property var rootType
+    property bool landscapeMode: false
+
+    // Shared state for selected tab - controls both sidebar and horizontal tabs
+    property int selectedTab: OrganizationsModel.SitesTab
 
     titleUnderlineVisible: rootIndex.parent !== NxGlobals.invalidModelIndex()
 
@@ -42,7 +46,7 @@ Page
 
     readonly property bool searching: !!siteList.searchText
     readonly property bool localSitesVisible: state !== "inPartnerOrOrg"
-        && (sitesTabButton.checked || !cloudUserProfileWatcher.isOrgUser)
+        && (selectedTab === OrganizationsModel.SitesTab || !cloudUserProfileWatcher.isOrgUser)
 
     StackView.onActivated: forceActiveFocus()
 
@@ -275,11 +279,67 @@ Page
         cloudSystemIds: organizationsModel.childSystemIds(sessionsScreen.rootIndex)
     }
 
+    // Left navigation sidebar
+    LeftNavigationSidebar
+    {
+        id: leftNavigationSidebar
+
+        width: visible ? 330 : 0
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+
+        visible: sessionsScreen.landscapeMode
+            && !organizationsModel.topLevelLoading
+            && cloudUserProfileWatcher.isOrgUser
+            && (organizationsModel.hasChannelPartners
+                || organizationsModel.hasOrganizations)
+
+        hasChannelPartners: organizationsModel.hasChannelPartners
+        hasOrganizations: organizationsModel.hasOrganizations
+        currentTab: sessionsScreen.selectedTab
+        onTabSelected: (selectedTabValue) => sessionsScreen.selectedTab = selectedTabValue
+
+        organizationsModel: organizationsModel
+        searchText: siteList.searchText
+        selectedOrganizationIndex: {
+            if (sessionsScreen.state !== "inPartnerOrOrg")
+                return null
+
+            var idx = sessionsScreen.rootIndex
+            while (idx && idx !== NxGlobals.invalidModelIndex())
+            {
+                const t = accessor.getData(idx, "type")
+                if (t === OrganizationsModel.Organization)
+                    return idx
+
+                idx = idx.parent
+            }
+            return null
+        }
+
+        onOrganizationNodeClicked: (nodeId) =>
+        {
+            const nodeIndex = organizationsModel.indexFromNodeId(nodeId)
+            if (nodeIndex !== NxGlobals.invalidModelIndex())
+            {
+                const nodeType = accessor.getData(nodeIndex, "type")
+                if (nodeType === OrganizationsModel.System)
+                    sessionsScreen.openSystem(nodeIndex)
+                else
+                    goInto(nodeIndex)
+            }
+        }
+    }
+
     HorizontalSlide
     {
         id: siteListContainer
 
-        anchors.fill: parent
+        anchors.left: leftNavigationSidebar.right
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
 
         RectangularShadow
         {
@@ -306,24 +366,6 @@ Page
                 && cloudUserProfileWatcher.isOrgUser
                 && (organizationsModel.hasChannelPartners
                     || organizationsModel.hasOrganizations)
-
-            readonly property var selectedTab:
-            {
-                if (tabGroup.checkedButton === partnersTabButton)
-                    return OrganizationsModel.ChannelPartnersTab
-                if (tabGroup.checkedButton === organizationsTabButton)
-                    return OrganizationsModel.OrganizationsTab
-                if (tabGroup.checkedButton === sitesTabButton)
-                    return OrganizationsModel.SitesTab
-
-                return OrganizationsModel.SitesTab
-            }
-
-            ButtonGroup
-            {
-                id: tabGroup
-                buttons: systemTabsRow.children
-            }
 
             component TabButton: AbstractButton
             {
@@ -364,6 +406,8 @@ Page
                     id: partnersTabButton
                     text: qsTr("Partners")
                     visible: organizationsModel.hasChannelPartners
+                    checked: sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab
+                    onClicked: sessionsScreen.selectedTab = OrganizationsModel.ChannelPartnersTab
                 }
 
                 TabButton
@@ -371,12 +415,16 @@ Page
                     id: organizationsTabButton
                     text: qsTr("Organizations")
                     visible: organizationsModel.hasOrganizations
+                    checked: sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab
+                    onClicked: sessionsScreen.selectedTab = OrganizationsModel.OrganizationsTab
                 }
 
                 TabButton
                 {
                     id: sitesTabButton
                     text: qsTr("Sites")
+                    checked: sessionsScreen.selectedTab === OrganizationsModel.SitesTab
+                    onClicked: sessionsScreen.selectedTab = OrganizationsModel.SitesTab
                 }
             }
 
@@ -391,13 +439,18 @@ Page
                     if (!organizationsModel.hasChannelPartners
                         && !organizationsModel.hasOrganizations)
                     {
-                        sitesTabButton.checked = true
+                        sessionsScreen.selectedTab = OrganizationsModel.SitesTab
                     }
                     return
                 }
 
                 // Avoid switching tabs when selected tab is already visible.
-                if (tabGroup.checkedButton?.visible && !force)
+                const currentTabVisible =
+                    (sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab && partnersTabButton.visible) ||
+                    (sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab && organizationsTabButton.visible) ||
+                    (sessionsScreen.selectedTab === OrganizationsModel.SitesTab)
+
+                if (currentTabVisible && !force)
                     return
 
                 // Select appropriate tab based on the current state.
@@ -405,17 +458,17 @@ Page
                 {
                     if (organizationsModel.hasChannelPartners)
                     {
-                        partnersTabButton.checked = true
+                        sessionsScreen.selectedTab = OrganizationsModel.ChannelPartnersTab
                         return
                     }
                     if (organizationsModel.hasOrganizations)
                     {
-                        organizationsTabButton.checked = true
+                        sessionsScreen.selectedTab = OrganizationsModel.OrganizationsTab
                         return
                     }
                 }
 
-                sitesTabButton.checked = true
+                sessionsScreen.selectedTab = OrganizationsModel.SitesTab
             }
 
             Connections
@@ -463,7 +516,7 @@ Page
             visible: !loadingIndicator.visible
             siteModel: linearizationListModel
             hideOrgSystemsFromSites: cloudUserProfileWatcher.isOrgUser
-            currentTab: systemTabs.selectedTab
+            currentTab: sessionsScreen.selectedTab
             showOnly:
             {
                 if (!systemTabsRow.visible)
@@ -493,6 +546,10 @@ Page
                 }
 
                 const current = organizationsModel.indexFromNodeId(nodeId)
+
+                // Synchronize tree selection with right panel
+                if (leftNavigationSidebar.visible && nodeId)
+                    leftNavigationSidebar.selectNodeById(nodeId)
 
                 if (accessor.getData(current, "type") === OrganizationsModel.System)
                     sessionsScreen.openSystem(current)
@@ -785,6 +842,11 @@ Page
         }
 
         newIndex = NxGlobals.toPersistent(newIndex)
+
+        // Synchronize tree selection when navigating into a node
+        const nodeId = accessor.getData(newIndex, "nodeId")
+        if (leftNavigationSidebar.visible && nodeId)
+            leftNavigationSidebar.selectNodeById(nodeId)
 
         const update = () =>
             {

@@ -14,3 +14,4 @@ DownloadMediaButton 1.0 DownloadMediaButton.qml
 Breadcrumb 1.0 Breadcrumb.qml
 SiteList 1.0 SiteList.qml
 HorizontalSlide 1.0 HorizontalSlide.qml
+LeftNavigationSidebar 1.0 LeftNavigationSidebar.qml

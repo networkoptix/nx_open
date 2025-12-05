@@ -1583,6 +1583,41 @@ void OrganizationsModel::setSystemsModel(QAbstractItemModel* systemsModel)
         [this]() { d->notifyNodeUpdate(d->root.get(), {SectionRole}, /*recursively*/ true); });
 }
 
+// ------------------------------------------------------------------------------------------------
+// OrganizationsSortModel
+
+OrganizationsSortModel::OrganizationsSortModel(QObject* parent): base_type(parent)
+{
+    sort(0);
+}
+
+bool OrganizationsSortModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
+{
+    // Sort folders and systems by name using natural string comparison
+    const auto leftType = left.data(OrganizationsModel::TypeRole)
+        .value<OrganizationsModel::NodeType>();
+    const auto rightType = right.data(OrganizationsModel::TypeRole)
+        .value<OrganizationsModel::NodeType>();
+
+    // Organizations and Partners are not sorted (keep original order)
+    if (leftType == OrganizationsModel::Organization
+        || leftType == OrganizationsModel::ChannelPartner
+        || rightType == OrganizationsModel::Organization
+        || rightType == OrganizationsModel::ChannelPartner)
+    {
+        return left.row() < right.row();
+    }
+
+    // Sort folders and systems by name
+    const QString leftName = left.data(Qt::DisplayRole).toString();
+    const QString rightName = right.data(Qt::DisplayRole).toString();
+
+    return nx::utils::naturalStringCompare(leftName, rightName, Qt::CaseInsensitive) < 0;
+}
+
+// ------------------------------------------------------------------------------------------------
+// OrganizationsFilterModel
+
 OrganizationsFilterModel::OrganizationsFilterModel(QObject* parent): base_type(parent)
 {
     sort(0);

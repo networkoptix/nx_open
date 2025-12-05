@@ -137,6 +137,7 @@ void registerQmlTypesInternal()
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");
     qmlRegisterType<SectionColumnModel>("Nx.Models", 1, 0, "SectionColumnModel");
     qmlRegisterType<nx::vms::client::core::OrganizationsModel>("Nx.Models", 1, 0, "OrganizationsModel");
+    qmlRegisterType<nx::vms::client::core::OrganizationsSortModel>("Nx.Models", 1, 0, "OrganizationsSortModel");
     qmlRegisterType<nx::vms::client::core::OrganizationsFilterModel>("Nx.Models", 1, 0, "OrganizationsFilterModel");
 
     qmlRegisterType<CloudUserProfileWatcher>("Nx.Core", 1, 0, "CloudUserProfileWatcher");
