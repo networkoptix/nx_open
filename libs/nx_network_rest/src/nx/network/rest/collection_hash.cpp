@@ -8,10 +8,10 @@ namespace nx::network::rest {
 
 namespace {
 
-using Hash = std::string; //< std::array<char, 16>
-
-static constexpr auto kHashSize = 16;
+static constexpr auto kHashSize = 12;
 static const auto kEmptyHash = nx::utils::sha3_256(std::string_view{}).substr(0, kHashSize);
+
+using Hash = std::string; //< std::array<char, kHashSize>
 
 static Hash calculateHash(std::string_view raw)
 {
