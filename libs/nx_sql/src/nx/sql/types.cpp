@@ -6,8 +6,8 @@
 #include <thread>
 
 #include <nx/reflect/to_string.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/utils/deprecated_settings.h>
+#include <nx/utils/timer_manager.h>
 
 namespace nx::sql {
 
@@ -109,6 +109,7 @@ static constexpr char kDbConnectOptions[] = "connectOptions";
 static constexpr char kDbEncoding[] = "encoding";
 static constexpr char kDbMaxConnections[] = "maxConnections";
 static constexpr char kDbInactivityTimeout[] = "inactivityTimeout";
+static constexpr char kExecDDLStatements[] = "execDDLStatements";
 
 static constexpr char kDbMaxPeriodQueryWaitsForAvailableConnection[] =
     "maxPeriodQueryWaitsForAvailableConnection";
@@ -160,6 +161,9 @@ void ConnectionOptions::loadFromSettings(const QnSettings& settings, const QStri
 
     if (settingsReader.contains(kDbEncoding))
         encoding = settingsReader.value(kDbEncoding).toString();
+
+    if (settingsReader.contains(kExecDDLStatements))
+        execDDLStatements = settingsReader.value(kExecDDLStatements).toBool();
 
     if (settingsReader.contains(kDbMaxConnections))
     {

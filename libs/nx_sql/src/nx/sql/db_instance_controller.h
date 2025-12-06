@@ -21,7 +21,7 @@ public:
 
     const StatisticsCollector& statisticsCollector() const;
 
-    bool initialize();
+    bool initialize(bool runUpdateScripts = true);
 
     void stop();
 

@@ -80,6 +80,7 @@ public:
     QString connectOptions;
     QString encoding;
     int maxConnectionCount = 1;
+    bool execDDLStatements = true;
 
     /** Connection is closed if not used for this interval. */
     std::chrono::seconds inactivityTimeout = std::chrono::minutes(10);
@@ -122,7 +123,7 @@ public:
 NX_REFLECTION_INSTRUMENT(ConnectionOptions, (driverType)(hostName)(port)(dbName)(userName) \
     (password)(connectOptions)(encoding)(maxConnectionCount)(inactivityTimeout) \
     (maxPeriodQueryWaitsForAvailableConnection)(maxErrorsInARowBeforeClosingConnection) \
-    (failOnDbTuneError)(concurrentModificationQueryLimit))
+    (failOnDbTuneError)(concurrentModificationQueryLimit)(execDDLStatements))
 
 NX_REFLECTION_ENUM_CLASS(QueryType,
     lookup,
