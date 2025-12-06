@@ -2,16 +2,15 @@
 
 #include "db_instance_controller.h"
 
-#include <thread>
 #include <string>
+#include <thread>
 
-#include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
-
-#include "test_support/query_executor_factory.h"
+#include <QtSql/QSqlQuery>
 
 #include <nx/utils/log/log.h>
 
+#include "test_support/query_executor_factory.h"
 namespace nx::sql {
 
 static const std::string kCdbStructureName = "cdb_BF58C070-B0E6-4327-BB2E-417A68AAA53D";
@@ -23,7 +22,7 @@ InstanceController::InstanceController(const ConnectionOptions& dbConnectionOpti
 {
 }
 
-bool InstanceController::initialize()
+bool InstanceController::initialize(bool runUpdateScripts)
 {
     NX_DEBUG(this, "Initializing DB %1", m_dbConnectionOptions.dbName);
     if (!m_queryExecutor->init())
@@ -41,7 +40,7 @@ bool InstanceController::initialize()
     }
 
     NX_DEBUG(this, "Updating DB structure %1", m_dbConnectionOptions.dbName);
-    if (!updateDbStructure())
+    if (runUpdateScripts && !updateDbStructure())
     {
         NX_ERROR(this, "Could not update DB %1 to current version", m_dbConnectionOptions.dbName);
         return false;
