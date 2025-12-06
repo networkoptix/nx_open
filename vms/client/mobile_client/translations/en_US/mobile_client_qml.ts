@@ -610,6 +610,21 @@
     </message>
 </context>
 <context>
+    <name>NavigationListView</name>
+    <message>
+        <source>Partners</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Organizations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sites</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Notification</name>
     <message>
         <source>Show more</source>
