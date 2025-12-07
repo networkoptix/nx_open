@@ -613,15 +613,15 @@
     <name>NavigationListView</name>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Partners</translation>
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organisationer</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Platser</translation>
     </message>
   </context>
   <context>

@@ -612,15 +612,15 @@
     <name>NavigationListView</name>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Đối tác</translation>
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Tổ chức</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Các chi nhánh</translation>
     </message>
   </context>
   <context>

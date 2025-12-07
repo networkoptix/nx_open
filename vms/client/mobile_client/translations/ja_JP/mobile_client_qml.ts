@@ -612,15 +612,15 @@
     <name>NavigationListView</name>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>パートナー</translation>
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>組織</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>サイト</translation>
     </message>
   </context>
   <context>

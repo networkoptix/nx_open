@@ -617,11 +617,11 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organisaties</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Locaties</translation>
     </message>
   </context>
   <context>

@@ -612,7 +612,7 @@
     <name>NavigationListView</name>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>พาร์ทเนอร์</translation>
     </message>
     <message>
       <source>Organizations</source>
@@ -620,7 +620,7 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>ไซต์</translation>
     </message>
   </context>
   <context>
