@@ -4,14 +4,14 @@
 
 #include <QtCore/QIdentityProxyModel>
 
-class QnResourceIconCache;
+namespace nx::vms::client::core { class ResourceIconCache; }
 
 namespace nx::vms::client::desktop {
 
 /**
 * Decorator model which provides icon by Qt::DecorationRole if source model provides valid data
 * by ResourceIconKeyRole. Any testable model shouldn't provide icons itself, since
-* QnResourceIconCache class isn't and shouldn't be instantiated within testing environment.
+* ResourceIconCache class isn't and shouldn't be instantiated within testing environment.
 */
 class ResourceTreeIconDecoratorModel: public QIdentityProxyModel
 {
@@ -35,7 +35,7 @@ public:
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
 private:
-    QnResourceIconCache* m_resourceIconCache;
+    core::ResourceIconCache* m_resourceIconCache;
     bool m_displayResourceStatus = true;
 };
 

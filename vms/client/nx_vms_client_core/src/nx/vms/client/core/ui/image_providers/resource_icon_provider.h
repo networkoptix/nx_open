@@ -4,7 +4,7 @@
 
 #include <QtQuick/QQuickImageProvider>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 /**
  * This is a temporary solution to pass Qt icon pixmaps from QnResourceItemCache to QML.
@@ -13,7 +13,7 @@ namespace nx::vms::client::desktop {
  *     <key> is a combination of QnResourceItemCache::Key flags.
  *     <state> is an optional value of ResourceTreeModelAdapter::ItemState type.
  */
-class ResourceIconProvider: public QQuickImageProvider
+class NX_VMS_CLIENT_CORE_API ResourceIconProvider: public QQuickImageProvider
 {
 public:
     ResourceIconProvider(): QQuickImageProvider(ImageType::Pixmap) {}
@@ -22,4 +22,4 @@ public:
         const QString& idAndParams, QSize* size, const QSize& requestedSize) override;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

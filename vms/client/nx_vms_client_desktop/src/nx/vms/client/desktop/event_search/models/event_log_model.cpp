@@ -16,13 +16,13 @@
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/rules/helpers/help_id.h>
 #include <nx/vms/client/desktop/rules/utils/strings.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
@@ -52,6 +52,7 @@ namespace nx::vms::client::desktop {
 using namespace std::chrono;
 using namespace nx::vms::rules;
 using namespace nx::vms::rules::utils;
+using nx::vms::client::core::ResourceIconCache;
 
 namespace {
 
@@ -171,12 +172,12 @@ QString resourceName(const QnResourcePtr& resource)
     return vms::rules::Strings::resource(resource, detailLevel());
 }
 
-QIcon resourceIcon(QnResourceIconCache::Key key)
+QIcon resourceIcon(ResourceIconCache::Key key)
 {
-    if ((key & QnResourceIconCache::TypeMask) == QnResourceIconCache::Unknown)
+    if ((key & ResourceIconCache::TypeMask) == ResourceIconCache::Unknown)
         return {};
 
-    return qnResIconCache->icon(key);
+    return appContext()->resourceIconCache()->icon(key);
 }
 
 QString actionTargetText(SystemContext* context, const EventLogModelData& data)
@@ -252,9 +253,9 @@ QString actionTargetTooltip(SystemContext* context, const EventLogModelData& dat
     return targets.join(", ");
 }
 
-QnResourceIconCache::Key resourceIconKey(ResourceType type, bool multiple)
+ResourceIconCache::Key resourceIconKey(ResourceType type, bool multiple)
 {
-    using Key = QnResourceIconCache::KeyPart;
+    using Key = ResourceIconCache::KeyPart;
 
     static const std::map<ResourceType, std::pair<Key, Key>> iconMap = {
         {ResourceType::server, {Key::Server, Key::Servers}},
@@ -270,14 +271,14 @@ QnResourceIconCache::Key resourceIconKey(ResourceType type, bool multiple)
     return Key::Unknown;
 }
 
-QnResourceIconCache::Key actionTargetIcon(SystemContext* context, const EventLogModelData& data)
+ResourceIconCache::Key actionTargetIcon(SystemContext* context, const EventLogModelData& data)
 {
-    using Key = QnResourceIconCache::KeyPart;
+    using Key = ResourceIconCache::KeyPart;
 
     const auto resourceMap = actionResourceMap(context, data);
 
     if (resourceMap.empty() || resourceMap.size() > 1)
-        return QnResourceIconCache::Unknown; // No icon in case of multiple resource types.
+        return ResourceIconCache::Unknown; // No icon in case of multiple resource types.
 
     const auto& resourceData = resourceMap.begin()->second;
     const bool multiple = resourceData.all || !resourceData.groups.empty()

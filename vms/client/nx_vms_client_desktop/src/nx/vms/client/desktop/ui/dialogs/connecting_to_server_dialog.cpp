@@ -5,9 +5,9 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 namespace nx::vms::client::desktop {
 
@@ -37,7 +37,8 @@ void ConnectingToServerDialog::setDisplayedServer(const QnMediaServerResourcePtr
         const auto text = QnResourceDisplayInfo(server).toString(
             appContext()->localSettings()->resourceInfoLevel());
         ui->nameLabel->setText(fontMetrics().elidedText(text, Qt::ElideMiddle, kMaxLabelWidth));
-        ui->iconLabel->setPixmap(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(18, 18));
+        ui->iconLabel->setPixmap(
+            appContext()->resourceIconCache()->icon(core::ResourceIconCache::Server).pixmap(18, 18));
     }
     else
     {

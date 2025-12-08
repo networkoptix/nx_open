@@ -155,8 +155,6 @@ QByteArray substituteColors(
 
 } // namespace
 
-const QString SvgIconColorer::kInvalidColor = "invalidColor";
-
 static const SvgIconColorer::ThemeColorsRemapData kUnspecified;
 
 const SvgIconColorer::IconSubstitutions SvgIconColorer::kTreeIconSubstitutions = {

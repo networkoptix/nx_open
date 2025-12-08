@@ -15,11 +15,11 @@
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/rules/utils/strings.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
@@ -56,7 +56,9 @@ constexpr auto kAttentionIconPath = "20x20/Solid/attention.svg?primary=yellow";
 constexpr auto kEnabledForegroundColor = "light10";
 constexpr auto kDisabledForegroundColor = "dark16";
 
-QString iconPath(QnResourceIconCache::Key iconKey, bool enabled)
+using nx::vms::client::core::ResourceIconCache;
+
+QString iconPath(ResourceIconCache::Key iconKey, bool enabled)
 {
     return QString{"image://resource/%1?primary=%2"}
         .arg(QString::number(iconKey))
@@ -523,15 +525,16 @@ QVariant RulesTableModel::sourceCameraData(const ConstRulePtr& rule, int role) c
             return kAttentionIconPath;
 
         if (sourceCameraField->acceptAll() || resources.size() > 1)
-            return iconPath(QnResourceIconCache::Cameras, rule->enabled() && isRuleValid(rule));
+            return iconPath(ResourceIconCache::Cameras, rule->enabled() && isRuleValid(rule));
 
         if (resources.size() == 1)
         {
             return iconPath(
-                qnResIconCache->key(resources.first()), rule->enabled() && isRuleValid(rule));
+                appContext()->resourceIconCache()->key(resources.first()),
+                rule->enabled() && isRuleValid(rule));
         }
 
-        return iconPath(QnResourceIconCache::Camera, rule->enabled() && isRuleValid(rule));
+        return iconPath(ResourceIconCache::Camera, rule->enabled() && isRuleValid(rule));
     }
 
     return {};
@@ -581,15 +584,16 @@ QVariant RulesTableModel::sourceServerData(const ConstRulePtr& rule, int role) c
             return kAttentionIconPath;
 
         if (sourceServerField->acceptAll() || resources.size() > 1)
-            return iconPath(QnResourceIconCache::Servers, rule->enabled() && isRuleValid(rule));
+            return iconPath(ResourceIconCache::Servers, rule->enabled() && isRuleValid(rule));
 
         if (resources.size() == 1)
         {
             return iconPath(
-                qnResIconCache->key(resources.first()), rule->enabled() && isRuleValid(rule));
+                appContext()->resourceIconCache()->key(resources.first()),
+                rule->enabled() && isRuleValid(rule));
         }
 
-        return iconPath(QnResourceIconCache::Server, rule->enabled() && isRuleValid(rule));
+        return iconPath(ResourceIconCache::Server, rule->enabled() && isRuleValid(rule));
     }
 
     return {};
@@ -739,10 +743,10 @@ QVariant RulesTableModel::targetCameraData(const ConstRulePtr& rule, int role) c
         const auto targetCamerasCount = resources.size() + (useSource ? 1 : 0);
 
         if (acceptAll || targetCamerasCount > 1)
-            return iconPath(QnResourceIconCache::Cameras, rule->enabled() && isRuleValid(rule));
+            return iconPath(ResourceIconCache::Cameras, rule->enabled() && isRuleValid(rule));
 
         if (targetCamerasCount == 1)
-            return iconPath(QnResourceIconCache::Camera, rule->enabled() && isRuleValid(rule));
+            return iconPath(ResourceIconCache::Camera, rule->enabled() && isRuleValid(rule));
 
         return {};
     }
@@ -803,8 +807,8 @@ QVariant RulesTableModel::targetLayoutData(const ConstRulePtr& rule, int role) c
             return kAttentionIconPath;
 
         return layouts.size() > 1
-            ? iconPath(QnResourceIconCache::Layouts, rule->enabled() && isRuleValid(rule))
-            : iconPath(QnResourceIconCache::Layout, rule->enabled() && isRuleValid(rule));
+            ? iconPath(ResourceIconCache::Layouts, rule->enabled() && isRuleValid(rule))
+            : iconPath(ResourceIconCache::Layout, rule->enabled() && isRuleValid(rule));
     }
 
     return {};
@@ -868,8 +872,8 @@ QVariant RulesTableModel::targetUserData(const ConstRulePtr& rule, int role) con
         const auto totalRecipientsCount = users.size() + additionalRecipients.size();
 
         return (targetUserField->acceptAll() || totalRecipientsCount > 1 || !groups.empty())
-            ? iconPath(QnResourceIconCache::Users, rule->enabled() && isRuleValid(rule))
-            : iconPath(QnResourceIconCache::User, rule->enabled() && isRuleValid(rule));
+            ? iconPath(ResourceIconCache::Users, rule->enabled() && isRuleValid(rule))
+            : iconPath(ResourceIconCache::User, rule->enabled() && isRuleValid(rule));
     }
 
     return {};
@@ -921,8 +925,8 @@ QVariant RulesTableModel::targetServerData(const ConstRulePtr& rule, int role) c
         const auto targetServerCount =
                 targetServers.size() + (targetServerField->useSource() ? 1 : 0);
         return targetServerField->acceptAll() || targetServerCount > 1
-            ? iconPath(QnResourceIconCache::Servers, rule->enabled() && isRuleValid(rule))
-            : iconPath(QnResourceIconCache::Server, rule->enabled() && isRuleValid(rule));
+            ? iconPath(ResourceIconCache::Servers, rule->enabled() && isRuleValid(rule))
+            : iconPath(ResourceIconCache::Server, rule->enabled() && isRuleValid(rule));
     }
 
     return {};
@@ -934,7 +938,7 @@ QVariant RulesTableModel::systemData(const ConstRulePtr& rule, int role) const
         return tr("Site");
 
     if (role == Qt::DecorationRole)
-        return iconPath(QnResourceIconCache::CurrentSystem, rule->enabled() && isRuleValid(rule));
+        return iconPath(ResourceIconCache::CurrentSystem, rule->enabled() && isRuleValid(rule));
 
     return {};
 }

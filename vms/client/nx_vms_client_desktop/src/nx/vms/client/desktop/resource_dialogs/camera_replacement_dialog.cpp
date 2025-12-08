@@ -15,7 +15,9 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
@@ -25,7 +27,6 @@
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
@@ -36,6 +37,7 @@ namespace {
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
+using nx::vms::client::core::ResourceIconCache;
 
 constexpr int kDialogFixedWidth = 640;
 constexpr int kHeaderCaptionTextPixelSize = 24;
@@ -548,7 +550,7 @@ void CameraReplacementDialog::updateDataTransferReportPage()
 void CameraReplacementDialog::updateReplacementSummaryPage()
 {
     static const auto kCaptionTextColor = core::colorTheme()->color("light10");
-    static const auto kCameraPixmap = qnResIconCache->icon(QnResourceIconCache::Camera)
+    static const auto kCameraPixmap = appContext()->resourceIconCache()->icon(ResourceIconCache::Camera)
         .pixmap(nx::style::Metrics::kDefaultIconSize, QIcon::Selected);
 
     setPaletteColor(ui->replacedCameraCaptionLabel, QPalette::WindowText, kCaptionTextColor);

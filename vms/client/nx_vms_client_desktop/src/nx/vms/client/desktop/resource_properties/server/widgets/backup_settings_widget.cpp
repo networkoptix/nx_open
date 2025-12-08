@@ -14,6 +14,7 @@
 #include <nx/vms/api/data/storage_space_data.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/desktop/common/widgets/message_bar.h>
@@ -29,7 +30,6 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_settings.h>
@@ -240,7 +240,7 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
                     return serverCamerasEntity;
 
                 AbstractItemPtr newAddedCamerasItem = GenericItemBuilder()
-                    .withRole(ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Cameras))
+                    .withRole(ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Cameras))
                     .withRole(Qt::DisplayRole, tr("New added cameras"))
                     .withRole(ExtraInfoRole, QString("\u2013 ") //< EnDash
                         + tr("Applies to all servers"))

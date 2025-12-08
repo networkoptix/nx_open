@@ -10,12 +10,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/common/palette.h>
 
@@ -107,6 +107,7 @@ void AudioRedirectPickerWidget::loadState(const CameraSettingsDialogState& state
     const auto device = pool->getResourceById<QnVirtualCameraResource>(m_deviceId);
     const auto redirectDevice =
         pool->getResourceById<QnVirtualCameraResource>(m_audioRedirectDeviceId);
+    const auto resourceIconCache = appContext()->resourceIconCache();
 
     ui->redirectOptionDropdownWidget->setVisible(capabilityCheck(device));
     ui->redirectOptionLabel->setVisible(!capabilityCheck(device));
@@ -117,7 +118,7 @@ void AudioRedirectPickerWidget::loadState(const CameraSettingsDialogState& state
         ui->redirectOptionLabel->setText(activeRedirectLabelText());
         ui->devicePickerButton->setText(redirectDevice->getName());
         ui->devicePickerButton->setIcon(
-            qnResIconCache->icon(redirectDevice).pixmap(nx::style::Metrics::kDefaultIconSize));
+            resourceIconCache->icon(redirectDevice).pixmap(nx::style::Metrics::kDefaultIconSize));
         setWarningStyleOn(ui->devicePickerButton,
             !capabilityCheck(redirectDevice) || !sameServerCheck(redirectDevice));
         if (!capabilityCheck(redirectDevice))
@@ -132,7 +133,7 @@ void AudioRedirectPickerWidget::loadState(const CameraSettingsDialogState& state
     {
         ui->redirectOptionLabel->setText(requiredRedirectLabelText());
         ui->devicePickerButton->setText(tr("Select Device..."));
-        ui->devicePickerButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Cameras)
+        ui->devicePickerButton->setIcon(resourceIconCache->icon(core::ResourceIconCache::Cameras)
             .pixmap(nx::style::Metrics::kDefaultIconSize));
         setWarningStyleOn(ui->devicePickerButton, false);
         ui->errorLabel->setVisible(false);

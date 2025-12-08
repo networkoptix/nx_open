@@ -9,8 +9,8 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 #include "resource_tree_model_test_fixture.h"
 
@@ -18,6 +18,7 @@ namespace nx::vms::client::desktop {
 namespace test {
 
 using namespace index_condition;
+using core::ResourceIconCache;
 
 TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
 {
@@ -33,21 +34,21 @@ TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             displayFullMatch(kSystemName),
-            iconFullMatch(QnResourceIconCache::CurrentSystem),
+            iconFullMatch(ResourceIconCache::CurrentSystem),
             topLevelNode(),
             atRow(0))));
 
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             displayFullMatch(kUserName),
-            iconFullMatch(QnResourceIconCache::LocalUser),
+            iconFullMatch(ResourceIconCache::LocalUser),
             topLevelNode(),
             atRow(1))));
 
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             displayEmpty(),
-            iconFullMatch(QnResourceIconCache::Unknown),
+            iconFullMatch(ResourceIconCache::Unknown),
             topLevelNode(),
             atRow(2))));
 }

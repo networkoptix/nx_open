@@ -16,9 +16,10 @@
 #include <core/resource/webpage_resource.h>
 #include <nx/branding.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <ui/dialogs/common/message_box.h>
@@ -378,7 +379,8 @@ bool Resources::deleteVideoWallItems(QWidget* parent, const QnVideoWallItemIndex
                 case Qt::DisplayRole:
                     return resource->getName();
                 case Qt::DecorationRole:
-                    return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+                    return appContext()->resourceIconCache()->icon(
+                        core::ResourceIconCache::VideoWallItem);
                 default:
                     return QVariant();
             }
@@ -421,7 +423,8 @@ bool Resources::deleteVideoWallMatrices(QWidget* parent, const QnVideoWallMatrix
                 case Qt::DisplayRole:
                     return resource->getName();
                 case Qt::DecorationRole:
-                    return qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
+                    return appContext()->resourceIconCache()->icon(
+                        core::ResourceIconCache::VideoWallMatrix);
                 default:
                     return QVariant();
             }

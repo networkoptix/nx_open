@@ -18,7 +18,7 @@ namespace nx::vms::client::core {
 class NX_VMS_CLIENT_CORE_API SvgIconColorer
 {
 public:
-    static const QString kInvalidColor;
+    static constexpr auto kInvalidColor = "invalidColor";
 
     struct ThemeColorsRemapData
     {

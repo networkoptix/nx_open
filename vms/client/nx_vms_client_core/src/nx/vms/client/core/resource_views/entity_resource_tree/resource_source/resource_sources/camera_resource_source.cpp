@@ -4,10 +4,10 @@
 
 #include <core/resource/media_server_resource.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/camera_resource_index.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/camera_resource_index.h>
+#include <nx/vms/client/core/system_context.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace entity_resource_tree {
 
 CameraResourceSource::CameraResourceSource(
@@ -74,4 +74,4 @@ QVector<QnResourcePtr> CameraResourceSource::getResources()
 }
 
 } // namespace entity_resource_tree
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

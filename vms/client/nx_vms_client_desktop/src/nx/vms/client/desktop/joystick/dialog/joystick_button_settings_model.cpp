@@ -12,9 +12,10 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 #include "../settings/action_factory.h"
@@ -155,7 +156,7 @@ struct JoystickButtonSettingsModel::Private
     JoystickButtonSettingsModel* const q;
 
     FilteredResourceProxyModel* const resourceModel = nullptr;
-    QnResourceIconCache* const resourceIconCache = nullptr;
+    core::ResourceIconCache* const resourceIconCache = nullptr;
 
     JoystickDescriptor description;
 
@@ -176,7 +177,7 @@ public:
     Private(JoystickButtonSettingsModel* parent, FilteredResourceProxyModel* resourceModel):
         q(parent),
         resourceModel(resourceModel),
-        resourceIconCache(qnResIconCache),
+        resourceIconCache(appContext()->resourceIconCache()),
         connectedToServer(q->system()->user())
     {
         scopedConnections.add(connect(q->system(),

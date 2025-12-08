@@ -14,10 +14,10 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/event_search/utils/bookmark_search_utils.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/bookmarks/bookmark_utils.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/bookmark/bookmark_helpers.h>
 #include <nx/vms/common/bookmark/bookmark_sort.h>
@@ -312,18 +312,20 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
         return QVariant::fromValue(bookmark);
 
 
+    const auto resourceIconCache = nx::vms::client::desktop::appContext()->resourceIconCache();
+
     if (role == Qt::DecorationRole)
     {
         if (index.column() == QnSearchBookmarksModel::kCamera)
-            return qnResIconCache->icon(QnResourceIconCache::Camera);
+            return resourceIconCache->icon(ResourceIconCache::Camera);
         if (index.column() == QnSearchBookmarksModel::kCreator)
         {
             if (bookmark.creatorId.isNull())
                 return QVariant();
 
             return bookmark.createdBySystem()
-                ? qnResIconCache->icon(QnResourceIconCache::CurrentSystem)
-                : qnResIconCache->icon(QnResourceIconCache::User);
+                ? resourceIconCache->icon(ResourceIconCache::CurrentSystem)
+                : resourceIconCache->icon(ResourceIconCache::User);
         }
 
         return QVariant();

@@ -9,12 +9,12 @@
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/common/indents.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -275,7 +275,7 @@ void ResourceDialogItemDelegate::paintRecordingIndicator(
         shiftIconLeft();
 
     // Draw recording status icon.
-    const auto recordingIcon = QnResourceIconCache::cameraRecordingStatusIcon(extraStatus);
+    const auto recordingIcon = appContext()->resourceIconCache()->cameraRecordingStatusIcon(extraStatus);
     if (!recordingIcon.isNull() && shiftIconLeft())
         recordingIcon.paint(painter, indicatorRect);
 }

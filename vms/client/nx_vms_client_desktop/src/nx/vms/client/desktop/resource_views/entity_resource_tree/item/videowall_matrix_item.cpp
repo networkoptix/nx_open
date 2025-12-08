@@ -6,8 +6,8 @@
 
 #include <client/client_globals.h>
 #include <core/resource/videowall_resource.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -38,7 +38,7 @@ QVariant VideoWallMatrixItem::data(int role) const
             return m_matrix.name;
 
         case core::ResourceIconKeyRole:
-            return QVariant::fromValue<int>(QnResourceIconCache::VideoWallMatrix);
+            return QVariant::fromValue<int>(ResourceIconCache::VideoWallMatrix);
 
         case core::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::videoWallMatrix);

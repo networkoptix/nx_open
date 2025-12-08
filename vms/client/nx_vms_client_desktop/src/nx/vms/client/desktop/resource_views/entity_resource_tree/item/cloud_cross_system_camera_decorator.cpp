@@ -2,12 +2,12 @@
 
 #include "cloud_cross_system_camera_decorator.h"
 
-#include <core/resource/resource.h>
+#include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/resource.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <client/client_globals.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {

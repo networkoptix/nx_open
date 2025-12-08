@@ -9,7 +9,6 @@
 #include <QtGui/QPixmap>
 #include <QtWidgets/QApplication>
 
-#include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -17,6 +16,8 @@
 #include <core/resource/webpage_resource.h>
 #include <network/system_helpers.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/cross_system/cross_system_camera_resource.h>
@@ -26,28 +27,21 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <nx/vms/client/core/skin/svg_loader.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource/layout_password_management.h>
-#include <nx/vms/client/desktop/resource/layout_resource_helpers.h>
-#include <nx/vms/client/desktop/resource/server.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx_ec/abstract_ec_connection.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 using nx::vms::client::core::CloudCrossSystemContext;
 using nx::vms::client::core::LayoutResource;
 
-Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
-
 namespace {
 
-const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTreeThemeSubstitutions = {
+const SvgIconColorer::ThemeSubstitutions kTreeThemeSubstitutions = {
     {QnIcon::Disabled, {.primary = "light10", .secondary = "light4", .alpha=0.3}},
     {QnIcon::Selected, {.primary = "light4", .secondary = "light2"}},
     {QnIcon::Active, {.primary = "brand_core", .secondary= "light4"}},
@@ -55,7 +49,7 @@ const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTreeThemeSubsti
     {QnIcon::Error, {.primary = "red", .secondary = "red"}},
     {QnIcon::Pressed, {.primary = "light4", .secondary = "light2"}}};
 
-const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kWarningTheme = {
+const SvgIconColorer::ThemeSubstitutions kWarningTheme = {
     {QnIcon::Disabled, {.primary = "light10", .secondary = "yellow", .alpha=0.3}},
     {QnIcon::Selected, {.primary = "light4", .secondary = "yellow"}},
     {QnIcon::Active, {.primary = "brand_core", .secondary= "yellow"}},
@@ -63,21 +57,19 @@ const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kWarningTheme = 
     {QnIcon::Error, {.primary = "red", .secondary = "red"}},
     {QnIcon::Pressed, {.primary = "light4", .secondary = "yellow"}}};
 
-const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kYellowTheme = {
-    {QnIcon::Normal, {.primary = "yellow",}}
-};
+const SvgIconColorer::ThemeSubstitutions kYellowTheme = {
+    {QnIcon::Normal, {.primary = "yellow",}}};
 
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions
-    kTreeThemeOfflineSubstitutions = {
-        {QnIcon::Disabled, {.primary = "light10", .secondary = "red", .alpha = 0.3}},
-        {QnIcon::Selected, {.primary = "light4", .secondary = "red", .alpha = 0.3}},
-        {QnIcon::Active, {.primary = "brand_core", .secondary = "red", .alpha = 0.3}},
-        {QnIcon::Normal, {.primary = "light10", .secondary = "red", .alpha = 0.3}},
-        {QnIcon::Error, {.primary = "red", .secondary = "red", .alpha = 0.3}},
-        {QnIcon::Pressed, {.primary = "light4", .secondary = "red", .alpha = 0.3}}};
+const SvgIconColorer::ThemeSubstitutions kTreeThemeOfflineSubstitutions = {
+    {QnIcon::Disabled, {.primary = "light10", .secondary = "red", .alpha = 0.3}},
+    {QnIcon::Selected, {.primary = "light4", .secondary = "red", .alpha = 0.3}},
+    {QnIcon::Active, {.primary = "brand_core", .secondary = "red", .alpha = 0.3}},
+    {QnIcon::Normal, {.primary = "light10", .secondary = "red", .alpha = 0.3}},
+    {QnIcon::Error, {.primary = "red", .secondary = "red", .alpha = 0.3}},
+    {QnIcon::Pressed, {.primary = "light4", .secondary = "red", .alpha = 0.3}}};
 
 NX_DECLARE_COLORIZED_ICON(kHasArchiveIcon, "20x20/Solid/archive.svg",\
-    nx::vms::client::core::kEmptySubstitutions)
+    kEmptySubstitutions)
 NX_DECLARE_COLORIZED_ICON(kRecordOnIcon, "20x20/Solid/record_on.svg",\
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kRecordPartIcon, "20x20/Solid/record_part.svg",\
@@ -253,42 +245,11 @@ bool isCurrentlyConnectedServer(const QnResourcePtr& resource)
         && appContext()->currentSystemContext()->currentServerId() == server->getId();
 }
 
-bool isCompatibleServer(const QnResourcePtr& resource)
-{
-    auto server = resource.dynamicCast<ServerResource>();
-    return NX_ASSERT(server) && server->isCompatible();
-}
-
-bool isDetachedServer(const QnResourcePtr& resource)
-{
-    auto server = resource.dynamicCast<ServerResource>();
-    return NX_ASSERT(server) && server->isDetached();
-}
-
-QIcon loadIcon(const QString& name,
-    const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions& themeSubstitutions = {})
-{
-    static const QnIcon::Suffixes kResourceIconSuffixes({
-        {QnIcon::Active,   "accented"},
-        {QnIcon::Disabled, "disabled"},
-        {QnIcon::Selected, "selected"},
-    });
-
-    return qnSkin->icon(name,
-        /* checkedName */ QString(),
-        &kResourceIconSuffixes,
-        name.endsWith(".svg")
-            ? nx::vms::client::core::SvgIconColorer::kTreeIconSubstitutions
-            : nx::vms::client::core::SvgIconColorer::kDefaultIconSubstitutions,
-        /* svgCheckedColorSubstitutions */ {},
-        themeSubstitutions);
-}
-
-using Key = QnResourceIconCache::Key;
+using Key = ResourceIconCache::Key;
 Key calculateStatus(Key key, const QnResourcePtr& resource)
 {
-    using Key = QnResourceIconCache::KeyPart;
-    using Status = QnResourceIconCache::KeyPart;
+    using Key = ResourceIconCache::KeyPart;
+    using Status = ResourceIconCache::KeyPart;
 
     switch (resource->getStatus())
     {
@@ -301,12 +262,7 @@ Key calculateStatus(Key key, const QnResourcePtr& resource)
             return Status::Online;
         }
         case nx::vms::api::ResourceStatus::offline:
-        {
-            if (key == Key::Server && !isCompatibleServer(resource) && !isDetachedServer(resource))
-                return Status::Incompatible;
-
             return Status::Offline;
-        }
 
         case nx::vms::api::ResourceStatus::unauthorized:
             return Status::Unauthorized;
@@ -325,16 +281,17 @@ Key calculateStatus(Key key, const QnResourcePtr& resource)
 
 } //namespace
 
-QnResourceIconCache::IconWithDescription::IconWithDescription(
-    const nx::vms::client::core::ColorizedIconDeclaration& colorizedIconDeclaration):
+namespace nx::vms::client::core {
+
+ResourceIconCache::IconWithDescription::IconWithDescription(
+    const ColorizedIconDeclaration& colorizedIconDeclaration):
     iconDescription(colorizedIconDeclaration)
 {
-
-    icon = loadIcon(
+    icon = ResourceIconCache::loadIcon(
         colorizedIconDeclaration.iconPath(), colorizedIconDeclaration.themeSubstitutions());
 }
 
-QnResourceIconCache::QnResourceIconCache(QObject* parent):
+ResourceIconCache::ResourceIconCache(QObject* parent):
     QObject(parent)
 {
     // Systems.
@@ -382,8 +339,6 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(VirtualCamera | Offline, IconWithDescription(kVirtualCamerasOfflineIcon));
     m_cache.insert(VirtualCamera | NotificationMode, IconWithDescription(kVirtualCamerasNotificationIcon));
     m_cache.insert(CrossSystemStatus | Unauthorized, IconWithDescription(kAlertYellowIcon));
-    m_legacyIconsPaths.insert(CrossSystemStatus | Control, "20x20/Outline/loaders.svg.gen"); //< The Control uses to describe loading state.
-    m_legacyIconsPaths.insert(CrossSystemStatus | Offline, "cloud/cloud_20_disabled.png");
     m_cache.insert(IOModule, IconWithDescription(kIOIcon));
     m_cache.insert(IOModule | NotificationMode, IconWithDescription(kIONotificationIcon));
     m_cache.insert(IOModule | Offline, IconWithDescription(kIOOfflineIcon));
@@ -403,7 +358,6 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Media | Offline, IconWithDescription(kMediaOfflineIcon));
 
     // Users.
-
     m_cache.insert(Users, IconWithDescription(kGroupIcon));
     m_cache.insert(User, IconWithDescription(kUserIcon));
     m_cache.insert(User | NotificationMode, IconWithDescription(kUserNotificationIcon));
@@ -448,56 +402,18 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(CloudSystem | Incompatible, IconWithDescription(kSystemCloudUnauthIcon));
 
     m_cache.insert(Unknown, {});
-
-    // TODO: #vbutkevich must be removed when m_legacyIconsPaths will be changed to svg icons.
-    for (const auto& [flag, path]: std::as_const(m_legacyIconsPaths).asKeyValueRange())
-    {
-        IconWithDescription value;
-        const auto substitutions =
-            flag.testFlag(Offline) ? kTreeThemeOfflineSubstitutions : kTreeThemeSubstitutions;
-        if (path.endsWith(".gen"))
-        {
-            value.icon = qnSkin->pixmap(path);
-        }
-        else
-        {
-            value.icon = loadIcon(path, substitutions);
-            value.iconDescription = nx::vms::client::core::ColorizedIconDeclaration(
-                "resource_icon_cache.cpp", path, substitutions);
-        }
-        m_cache.insert(flag, value);
-    }
 }
 
-QnResourceIconCache::~QnResourceIconCache()
+ResourceIconCache::~ResourceIconCache()
 {
 }
 
-QnResourceIconCache* QnResourceIconCache::instance()
-{
-    return qn_resourceIconCache();
-}
-
-QString QnResourceIconCache::iconPathFromLegacyIcons(Key key) const
-{
-    auto it = m_legacyIconsPaths.find(key);
-    if (it != m_legacyIconsPaths.cend())
-        return *it;
-
-    it = m_legacyIconsPaths.find(key & (TypeMask | StatusMask));
-    if (it != m_legacyIconsPaths.cend())
-        return *it;
-
-    it = m_legacyIconsPaths.find(key & TypeMask);
-    return it != m_legacyIconsPaths.cend() ? (*it) : QString{};
-}
-
-QColor QnResourceIconCache::iconColor(const QnResourcePtr& resource) const
+QColor ResourceIconCache::iconColor(const QnResourcePtr& resource) const
 {
     return iconColor(key(resource));
 }
 
-QColor QnResourceIconCache::iconColor(Key key, QnIcon::Mode mode) const
+QColor ResourceIconCache::iconColor(Key key, QnIcon::Mode mode) const
 {
     auto it = m_cache.find(key);
     if (it == m_cache.end())
@@ -509,15 +425,11 @@ QColor QnResourceIconCache::iconColor(Key key, QnIcon::Mode mode) const
     if (substitution == substitutions.end())
         return {}; //< Incorrect mode or icon without ColorizedIconDeclaration.
 
-    return nx::vms::client::core::colorTheme()->color(substitution->primary);
+    return colorTheme()->color(substitution->primary);
 }
 
-QString QnResourceIconCache::iconPath(Key key) const
+QString ResourceIconCache::iconPath(Key key) const
 {
-    const auto legacyIconPath = iconPathFromLegacyIcons(key);
-    if (!legacyIconPath.isEmpty())
-        return legacyIconPath;
-
     auto it = m_cache.find(key);
     if (it != m_cache.cend())
         return it->iconDescription.iconPath();
@@ -538,17 +450,16 @@ QString QnResourceIconCache::iconPath(Key key) const
     return NX_ASSERT(it != m_cache.cend()) ? it->iconDescription.iconPath() : QString{};
 }
 
-QString QnResourceIconCache::iconPath(const QnResourcePtr& resource) const
+QString ResourceIconCache::iconPath(const QnResourcePtr& resource) const
 {
     return iconPath(key(resource));
 }
 
-QPixmap QnResourceIconCache::iconPixmap(Key key,
+QPixmap ResourceIconCache::iconPixmap(Key key,
     const QSize& requestedSize,
-    const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions& svgColorSubstitutions,
+    const SvgIconColorer::ThemeSubstitutions& svgColorSubstitutions,
     QnIcon::Mode mode)
 {
-    using namespace nx::vms::client::core;
     const auto& [icon, desc] = iconDescription(key);
 
     if (desc.iconPath().isEmpty()) //< Use preloaded legacy icons.
@@ -578,7 +489,7 @@ QPixmap QnResourceIconCache::iconPixmap(Key key,
     return loadSvgImage(path, customization, requestedSize, qApp->devicePixelRatio());
 }
 
-QnResourceIconCache::IconWithDescription QnResourceIconCache::searchIconOutsideCache(Key key)
+ResourceIconCache::IconWithDescription ResourceIconCache::searchIconOutsideCache(Key key)
 {
     IconWithDescription data;
 
@@ -600,7 +511,7 @@ QnResourceIconCache::IconWithDescription QnResourceIconCache::searchIconOutsideC
         const auto base = key & TypeMask;
         const auto status = key & StatusMask;
 
-        if (!NX_ASSERT(status == QnResourceIconCache::Online))
+        if (!NX_ASSERT(status == ResourceIconCache::Online))
             return {};
 
         data = m_cache.value(base);
@@ -610,7 +521,7 @@ QnResourceIconCache::IconWithDescription QnResourceIconCache::searchIconOutsideC
     return data;
 }
 
-QnResourceIconCache::IconWithDescription QnResourceIconCache::iconDescription(Key key)
+ResourceIconCache::IconWithDescription ResourceIconCache::iconDescription(Key key)
 {
     if ((key & TypeMask) == Unknown)
         key = Unknown;
@@ -621,20 +532,21 @@ QnResourceIconCache::IconWithDescription QnResourceIconCache::iconDescription(Ke
     return searchIconOutsideCache(key);
 }
 
-QIcon QnResourceIconCache::icon(Key key)
+QIcon ResourceIconCache::icon(Key key)
 {
     /* This function will be called from GUI thread only,
      * so no synchronization is needed. */
     return iconDescription(key).icon;
 }
 
-QIcon QnResourceIconCache::icon(const QnResourcePtr& resource)
+QIcon ResourceIconCache::icon(const QnResourcePtr& resource)
 {
     if (!resource)
         return QIcon();
     return icon(key(resource));
 }
-QnResourceIconCache::Key QnResourceIconCache::userKey(const QnUserResourcePtr& user)
+
+ResourceIconCache::Key ResourceIconCache::userKey(const QnUserResourcePtr& user) const
 {
     if (!NX_ASSERT(user))
         return User;
@@ -660,7 +572,7 @@ QnResourceIconCache::Key QnResourceIconCache::userKey(const QnUserResourcePtr& u
     return User;
 }
 
-QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
+ResourceIconCache::Key ResourceIconCache::key(const QnResourcePtr& resource) const
 {
     Key key = Unknown;
 
@@ -712,10 +624,6 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             return Key(WebPage);
 
         QnWebPageResource::Options options = webPage->getOptions();
-
-        if (!ini().webPagesAndIntegrations)
-            options.setFlag(QnWebPageResource::Integration, false); //< Use regular Web Page icon.
-
         switch (options)
         {
             case QnWebPageResource::WebPage: return Key(WebPage);
@@ -730,7 +638,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     Key status = calculateStatus(key, resource);
 
-    if (auto csCamera = resource.dynamicCast<nx::vms::client::core::CrossSystemCameraResource>();
+    if (auto csCamera = resource.dynamicCast<CrossSystemCameraResource>();
         csCamera && flags.testFlag(Qn::fake))
     {
         const auto systemId = csCamera->systemId();
@@ -741,27 +649,23 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             if (systemStatus == CloudCrossSystemContext::Status::connecting)
             {
                 key = CrossSystemStatus;
-                status = QnResourceIconCache::Control;
+                status = ResourceIconCache::Control;
             }
             else if (systemStatus == CloudCrossSystemContext::Status::connectionFailure
                 && context->systemDescription()->isOnline())
             {
-                status = QnResourceIconCache::Unauthorized;
+                status = ResourceIconCache::Unauthorized;
             }
         }
     }
     else if (const auto layout = resource.dynamicCast<LayoutResource>())
     {
-        if (isVideoWallReviewLayout(layout))
-            key = VideoWall;
-        else if (layout->layoutType() == LayoutResource::LayoutType::intercom)
+        if (layout->layoutType() == LayoutResource::LayoutType::intercom)
             key = IntercomLayout;
         else if (layout->isCrossSystem())
             key = CloudLayout;
         else if (layout->isShared())
             key = SharedLayout;
-        else if (layout::isEncrypted(layout))
-            key = ExportedEncryptedLayout;
         else if (layout->isFile())
             key = ExportedLayout;
         else
@@ -771,8 +675,6 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     }
     else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        using namespace nx::vms::client::core;
-
         const auto isBuggy =
             getResourceExtraStatus(camera).testFlag(ResourceExtraStatusFlag::buggy);
         if (status == Online && (camera->needsToChangeDefaultPassword() || isBuggy))
@@ -785,11 +687,8 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     return Key(key | status);
 }
 
-QIcon QnResourceIconCache::cameraRecordingStatusIcon(
-    nx::vms::client::core::ResourceExtraStatus status)
+QIcon ResourceIconCache::cameraRecordingStatusIcon(ResourceExtraStatus status) const
 {
-    using namespace nx::vms::client::core;
-
     if (status.testFlag(ResourceExtraStatusFlag::recording))
         return qnSkin->icon(kRecordOnIcon);
 
@@ -801,3 +700,34 @@ QIcon QnResourceIconCache::cameraRecordingStatusIcon(
 
     return QIcon();
 }
+
+QIcon ResourceIconCache::loadIcon(const QString& name,
+    const SvgIconColorer::ThemeSubstitutions& themeSubstitutions)
+{
+    static const QnIcon::Suffixes kResourceIconSuffixes({
+        {QnIcon::Active,   "accented"},
+        {QnIcon::Disabled, "disabled"},
+        {QnIcon::Selected, "selected"},
+        });
+
+    return qnSkin->icon(name,
+        /* checkedName */ QString(),
+        &kResourceIconSuffixes,
+        name.endsWith(".svg")
+            ? SvgIconColorer::kTreeIconSubstitutions
+            : SvgIconColorer::kDefaultIconSubstitutions,
+        /* svgCheckedColorSubstitutions */ {},
+        themeSubstitutions);
+}
+
+SvgIconColorer::ThemeSubstitutions ResourceIconCache::treeThemeSubstitutions()
+{
+    return kTreeThemeSubstitutions;
+}
+
+SvgIconColorer::ThemeSubstitutions ResourceIconCache::treeThemeOfflineSubstitutions()
+{
+    return kTreeThemeOfflineSubstitutions;
+}
+
+} // namespace nx::vms::client::core

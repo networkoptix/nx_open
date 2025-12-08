@@ -14,8 +14,8 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/license/validator.h>
 #include <nx/vms/time/formatter.h>
@@ -84,7 +84,7 @@ QVariant QnLicenseListModel::data(const QModelIndex& index, int role) const
             if (index.column() != ServerColumn)
                 break;
             if (auto server = serverByLicense(license(index)))
-                return qnResIconCache->icon(server);
+                return appContext()->resourceIconCache()->icon(server);
             break;
         }
 

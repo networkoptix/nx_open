@@ -5,8 +5,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 #include "resource_tree_model_test_fixture.h"
 
@@ -79,7 +79,7 @@ TEST_F(ResourceTreeModelTest, cameraIconType)
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // And it have camera icon type.
-    iconTypeMatch(QnResourceIconCache::Camera)(cameraIndex);
+    iconTypeMatch(ResourceIconCache::Camera)(cameraIndex);
 }
 
 TEST_F(ResourceTreeModelTest, ioModuleIconType)
@@ -97,7 +97,7 @@ TEST_F(ResourceTreeModelTest, ioModuleIconType)
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // And it have IO module icon type.
-    iconTypeMatch(QnResourceIconCache::IOModule)(cameraIndex);
+    iconTypeMatch(ResourceIconCache::IOModule)(cameraIndex);
 }
 
 TEST_F(ResourceTreeModelTest, multisensorCameraIconType)
@@ -115,7 +115,7 @@ TEST_F(ResourceTreeModelTest, multisensorCameraIconType)
     const auto multisensorCameraIndex = uniqueMatchingIndex(kUniqueGroupNameCondition);
 
     // And it have multisensor camera icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::MultisensorCamera)(multisensorCameraIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::MultisensorCamera)(multisensorCameraIndex));
 }
 
 TEST_F(ResourceTreeModelTest, recorderIconType)
@@ -133,7 +133,7 @@ TEST_F(ResourceTreeModelTest, recorderIconType)
     const auto recorderIndex = uniqueMatchingIndex(kUniqueGroupNameCondition);
 
     // And it have recorder icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::Recorder)(recorderIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::Recorder)(recorderIndex));
 }
 
 TEST_F(ResourceTreeModelTest, recorderNameIsNotDefaultIfUserDefinedNameExists)
@@ -191,7 +191,7 @@ TEST_F(ResourceTreeModelTest, virtualCameraIconType)
     const auto virtualCameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // And it have virtual camera icon type.
-    iconTypeMatch(QnResourceIconCache::VirtualCamera)(virtualCameraIndex);
+    iconTypeMatch(ResourceIconCache::VirtualCamera)(virtualCameraIndex);
 }
 
 TEST_F(ResourceTreeModelTest, cameraIconStatus)
@@ -213,19 +213,19 @@ TEST_F(ResourceTreeModelTest, cameraIconStatus)
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // Then camera icon has Offline decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Offline)(cameraIndex));
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Offline)(cameraIndex));
 
     // When Unauthorized status is set to the camera resource.
     camera->setStatus(nx::vms::api::ResourceStatus::unauthorized);
 
     // Then camera icon has Unauthorized decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Unauthorized)(cameraIndex));
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Unauthorized)(cameraIndex));
 
     // When Incompatible status is set to the camera resource.
     camera->setStatus(nx::vms::api::ResourceStatus::incompatible);
 
     // Then camera icon has Incompatible decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Incompatible)(cameraIndex));
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Incompatible)(cameraIndex));
 
     // When Offline status is set to the camera resource.
     camera->setStatus(nx::vms::api::ResourceStatus::offline);
@@ -233,17 +233,17 @@ TEST_F(ResourceTreeModelTest, cameraIconStatus)
     camera->addStatusFlags(CameraStatusFlag::CSF_HasIssuesFlag);
 
     // Than camera icon has Offline decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Offline)(cameraIndex));
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Offline)(cameraIndex));
 
     // When status is changed to Online.
     camera->setStatus(nx::vms::api::ResourceStatus::online);
     // Than camera icon has Incompatible decoration
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Incompatible)(cameraIndex));
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Incompatible)(cameraIndex));
 
     // When there is no more issue on the camera.
     camera->removeStatusFlags(CameraStatusFlag::CSF_HasIssuesFlag);
     // Than camera icon has Online decoration
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Online)(cameraIndex));
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Online)(cameraIndex));
 }
 
 TEST_F(ResourceTreeModelTest, cameraScheduledExtraStatus)
@@ -608,7 +608,7 @@ TEST_F(ResourceTreeModelTest, cameraIsTopLevelNodeOnHiddenEdgeServer)
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // And that node have camera icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::Camera)(cameraIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::Camera)(cameraIndex));
 
     // And that node is top level node.
     ASSERT_TRUE(topLevelNode()(cameraIndex));
@@ -651,7 +651,7 @@ TEST_F(ResourceTreeModelTest, expandedEdgeCameraNodeType)
 
     // Then exactly one camera node with corresponding display text appears in the resource tree.
     const auto cameraIndex = uniqueMatchingIndex(allOf(
-        iconTypeMatch(QnResourceIconCache::Camera),
+        iconTypeMatch(ResourceIconCache::Camera),
         kUniqueCameraNameCondition));
 
     // And that node have 'resource' node type.
@@ -679,10 +679,10 @@ TEST_F(ResourceTreeModelTest, edgeServerWithVirtualCameraIsNotHidden)
     const auto virtualCameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // And that node have virtual camera icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::VirtualCamera)(virtualCameraIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::VirtualCamera)(virtualCameraIndex));
 
     // And that node is child of the server node.
-    ASSERT_TRUE(directChildOf(iconTypeMatch(QnResourceIconCache::Server))(virtualCameraIndex));
+    ASSERT_TRUE(directChildOf(iconTypeMatch(ResourceIconCache::Server))(virtualCameraIndex));
 }
 
 TEST_F(ResourceTreeModelTest, virtualCameraOnExpandedEdgeServerIsChildOfServerNodeForAdmin)
@@ -706,10 +706,10 @@ TEST_F(ResourceTreeModelTest, virtualCameraOnExpandedEdgeServerIsChildOfServerNo
     const auto virtualCameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // And that node have virtual camera icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::VirtualCamera)(virtualCameraIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::VirtualCamera)(virtualCameraIndex));
 
     // And that node is child of server node.
-    ASSERT_TRUE(directChildOf(iconTypeMatch(QnResourceIconCache::Server))(virtualCameraIndex));
+    ASSERT_TRUE(directChildOf(iconTypeMatch(ResourceIconCache::Server))(virtualCameraIndex));
 }
 
 TEST_F(ResourceTreeModelTest, cameraIsChildOfServerNodeForAdmin)
@@ -974,7 +974,7 @@ TEST_F(ResourceTreeModelTest, recorderDisplayNameMapping)
     // Then recorder node have group ID as display text.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            iconTypeMatch(QnResourceIconCache::Recorder),
+            iconTypeMatch(ResourceIconCache::Recorder),
             displayFullMatch(recorderCamera->getGroupId()))));
 
     // When user defined group name is set to the recorder camera.
@@ -983,7 +983,7 @@ TEST_F(ResourceTreeModelTest, recorderDisplayNameMapping)
     // Then recorder node have user defined group name as display text.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            iconTypeMatch(QnResourceIconCache::Recorder),
+            iconTypeMatch(ResourceIconCache::Recorder),
             displayFullMatch(kUserDefinedGroupName))));
 }
 
@@ -1014,7 +1014,7 @@ TEST_F(ResourceTreeModelTest, recorderGroupRenamedWhenGroupNameSetToTheLastAdded
     // Then recorder node have user defined group name as display text.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-        iconTypeMatch(QnResourceIconCache::Recorder),
+        iconTypeMatch(ResourceIconCache::Recorder),
         displayFullMatch(kUserDefinedGroupName))));
 }
 
@@ -1039,7 +1039,7 @@ TEST_F(ResourceTreeModelTest, multisensorCameraDisplayNameMapping)
     // Then multisensor camera node have group ID as display text.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            iconTypeMatch(QnResourceIconCache::MultisensorCamera),
+            iconTypeMatch(ResourceIconCache::MultisensorCamera),
             displayFullMatch(multisensorSubCamera->getGroupId()))));
 
     // When user defined group name is set to the multisensor camera.
@@ -1048,7 +1048,7 @@ TEST_F(ResourceTreeModelTest, multisensorCameraDisplayNameMapping)
     // Then multisensor camera node have user defined group name as display text.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            iconTypeMatch(QnResourceIconCache::MultisensorCamera),
+            iconTypeMatch(ResourceIconCache::MultisensorCamera),
             displayFullMatch(multisensorSubCamera->getUserDefinedGroupName()))));
 }
 

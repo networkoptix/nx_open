@@ -8,12 +8,12 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace entity_resource_tree {
 
 class CameraResourceIndex;
 
-class RecorderItemDataHelper: public QObject
+class NX_VMS_CLIENT_CORE_API RecorderItemDataHelper: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -48,4 +48,4 @@ private:
 };
 
 } // namespace entity_resource_tree
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

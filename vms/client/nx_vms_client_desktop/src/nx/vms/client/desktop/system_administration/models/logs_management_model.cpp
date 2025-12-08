@@ -5,9 +5,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 
 namespace nx::vms::client::desktop {
@@ -29,9 +30,10 @@ NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/check.svg", kGreenSubstit
 
 QIcon icon(LogsManagementUnitPtr unit)
 {
+    const auto resourceIconCache = appContext()->resourceIconCache();
     return unit->server()
-        ? qnResIconCache->icon(unit->server())
-        : qnResIconCache->icon(QnResourceIconCache::Client);
+        ? resourceIconCache->icon(unit->server())
+        : resourceIconCache->icon(core::ResourceIconCache::Client);
 }
 
 QVariant statusIcon(LogsManagementUnitPtr unit)

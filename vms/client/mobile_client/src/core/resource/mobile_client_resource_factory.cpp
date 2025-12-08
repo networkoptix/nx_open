@@ -5,6 +5,7 @@
 #include <core/resource/resource_type.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 
@@ -29,4 +30,9 @@ QnResourcePtr QnMobileClientResourceFactory::createResource(
         return QnResourcePtr();
 
     return QnResourcePtr(new QnMobileClientCamera(resourceTypeId));
+}
+
+QnLayoutResourcePtr QnMobileClientResourceFactory::createLayout() const
+{
+    return QnLayoutResourcePtr(new nx::vms::client::core::LayoutResource());
 }

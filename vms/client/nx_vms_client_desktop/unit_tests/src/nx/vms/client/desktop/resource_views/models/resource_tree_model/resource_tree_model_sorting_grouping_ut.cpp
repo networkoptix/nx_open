@@ -11,76 +11,77 @@
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::test;
 using namespace nx::vms::client::desktop::test::index_condition;
+using nx::vms::client::core::ResourceIconCache;
 
 // Set of predefined conditions for lookup of interested groups of model indexes. Based mostly on
 // icon match, thus the icon mapping are supposed to be correct (relevant tests pass).
 
 static const auto kCompatibleServerCondition =
     allOf(
-        iconTypeMatch(QnResourceIconCache::Server),
+        iconTypeMatch(ResourceIconCache::Server),
         anyOf(directChildOf(serversNodeCondition()), topLevelNode()),
-        non(iconStatusMatch(QnResourceIconCache::Incompatible)));
+        non(iconStatusMatch(ResourceIconCache::Incompatible)));
 
 static const auto kIncompatibleServerCondition =
     allOf(
-        iconTypeMatch(QnResourceIconCache::Server),
+        iconTypeMatch(ResourceIconCache::Server),
         anyOf(directChildOf(serversNodeCondition()), topLevelNode()),
-        iconStatusMatch(QnResourceIconCache::Incompatible));
+        iconStatusMatch(ResourceIconCache::Incompatible));
 
-static const auto kWebPageCondition = iconTypeMatch(QnResourceIconCache::WebPage);
-static const auto kIntegrationCondition = iconTypeMatch(QnResourceIconCache::Integration);
+static const auto kWebPageCondition = iconTypeMatch(ResourceIconCache::WebPage);
+static const auto kIntegrationCondition = iconTypeMatch(ResourceIconCache::Integration);
 
-static const auto kProxiedWebResourceCondition = iconTypeMatch(QnResourceIconCache::WebPageProxied);
+static const auto kProxiedWebResourceCondition = iconTypeMatch(ResourceIconCache::WebPageProxied);
 static const auto kProxiedIntegrationCondition =
-    iconTypeMatch(QnResourceIconCache::IntegrationProxied);
+    iconTypeMatch(ResourceIconCache::IntegrationProxied);
 
 static const auto kLocalVideoCondition =
     allOf(
         directChildOf(localFilesNodeCondition()),
-        iconTypeMatch(QnResourceIconCache::Media));
+        iconTypeMatch(ResourceIconCache::Media));
 
 static const auto kLocalImageCondition =
     allOf(
         directChildOf(localFilesNodeCondition()),
-        iconTypeMatch(QnResourceIconCache::Image));
+        iconTypeMatch(ResourceIconCache::Image));
 
 static const auto kFileLayoutCondition =
     allOf(
         directChildOf(localFilesNodeCondition()),
         anyOf(
-            iconTypeMatch(QnResourceIconCache::ExportedLayout),
-            iconTypeMatch(QnResourceIconCache::ExportedEncryptedLayout)));
+            iconTypeMatch(ResourceIconCache::ExportedLayout),
+            iconTypeMatch(ResourceIconCache::ExportedEncryptedLayout)));
 
 static const auto kLayoutCondition =
     allOf(
         directChildOf(layoutsNodeCondition()),
-        iconTypeMatch(QnResourceIconCache::Layout));
+        iconTypeMatch(ResourceIconCache::Layout));
 
 static const auto kSharedLayoutCondition =
     allOf(
         directChildOf(layoutsNodeCondition()),
-        iconTypeMatch(QnResourceIconCache::Layout));
+        iconTypeMatch(ResourceIconCache::Layout));
 
-static const auto kVideoWallScreenCondition = iconTypeMatch(QnResourceIconCache::VideoWallItem);
-static const auto kVideoWallMatrixCondition = iconTypeMatch(QnResourceIconCache::VideoWallMatrix);
+static const auto kVideoWallScreenCondition = iconTypeMatch(ResourceIconCache::VideoWallItem);
+static const auto kVideoWallMatrixCondition = iconTypeMatch(ResourceIconCache::VideoWallMatrix);
 
-const auto kRecorderCondition = iconTypeMatch(QnResourceIconCache::Recorder);
-const auto kMulisensorCameraCondition = iconTypeMatch(QnResourceIconCache::MultisensorCamera);
+const auto kRecorderCondition = iconTypeMatch(ResourceIconCache::Recorder);
+const auto kMulisensorCameraCondition = iconTypeMatch(ResourceIconCache::MultisensorCamera);
 const auto kRecorderOrMulisensorCameraCondition =
     anyOf(
         kRecorderCondition,
         kMulisensorCameraCondition);
 
-const auto kCameraCondition = iconTypeMatch(QnResourceIconCache::Camera);
-const auto kIoModuleCondition = iconTypeMatch(QnResourceIconCache::IOModule);
-const auto kVirtualCameraCondition = iconTypeMatch(QnResourceIconCache::VirtualCamera);
+const auto kCameraCondition = iconTypeMatch(ResourceIconCache::Camera);
+const auto kIoModuleCondition = iconTypeMatch(ResourceIconCache::IOModule);
+const auto kVirtualCameraCondition = iconTypeMatch(ResourceIconCache::VirtualCamera);
 const auto kCameraOrIoModuleOrVirtualCameraCondition =
     anyOf(
         kCameraCondition,
         kIoModuleCondition,
         kVirtualCameraCondition);
 
-const auto kServerMonitorCondition = iconTypeMatch(QnResourceIconCache::HealthMonitor);
+const auto kServerMonitorCondition = iconTypeMatch(ResourceIconCache::HealthMonitor);
 
 TEST_F(ResourceTreeModelSortingGroupingTest, compatibleServersSorting)
 {
@@ -255,12 +256,12 @@ TEST_F(ResourceTreeModelSortingGroupingTest, videoWallChildrenGrouping)
     const auto kVideoWallScreenCondition =
         allOf(
             directChildOf(videoWallIndex),
-            iconTypeMatch(QnResourceIconCache::VideoWallItem));
+            iconTypeMatch(ResourceIconCache::VideoWallItem));
 
     const auto kVideoWallMatrixCondition =
         allOf(
             directChildOf(videoWallIndex),
-            iconTypeMatch(QnResourceIconCache::VideoWallMatrix));
+            iconTypeMatch(ResourceIconCache::VideoWallMatrix));
 
     // Check that Video Wall children are grouped exactly in the following order:
     // 1. Video Wall Screens

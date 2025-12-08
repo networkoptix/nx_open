@@ -18,6 +18,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -25,7 +26,6 @@
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/indents.h>
@@ -38,6 +38,7 @@ using namespace nx::vms::client::desktop;
 
 using nx::vms::client::core::LayoutResource;
 using nx::vms::client::core::LayoutResourcePtr;
+using nx::vms::client::core::ResourceIconCache;
 
 namespace {
 
@@ -272,12 +273,14 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
     if (!layoutIcon.isNull())
         return layoutIcon;
 
+    const auto iconCache = appContext()->resourceIconCache();
+
     // TODO: #ynikitenkov #high refactor code below to use only layout->icon()
 
     // TODO: #sivanov Refactor this logic as in Alarm Layout. Tab bar should not know layout
     // internal structure.
     if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
-        return qnResIconCache->icon(QnResourceIconCache::VideoWall);
+        return iconCache->icon(ResourceIconCache::VideoWall);
 
     // videowall control mode
     nx::Uuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<nx::Uuid>();
@@ -290,12 +293,12 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
         if (idx.item().runtimeStatus.online)
         {
             if (idx.item().runtimeStatus.controlledBy.isNull())
-                return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+                return iconCache->icon(ResourceIconCache::VideoWallItem);
             if (idx.item().runtimeStatus.controlledBy == system()->peerId())
-                return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Control);
-            return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Locked);
+                return iconCache->icon(ResourceIconCache::VideoWallItem | ResourceIconCache::Control);
+            return iconCache->icon(ResourceIconCache::VideoWallItem | ResourceIconCache::Locked);
         }
-        return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
+        return iconCache->icon(ResourceIconCache::VideoWallItem | ResourceIconCache::Offline);
     }
 
     return QIcon();

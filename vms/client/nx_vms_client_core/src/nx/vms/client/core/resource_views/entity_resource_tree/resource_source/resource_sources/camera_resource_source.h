@@ -5,15 +5,15 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace entity_resource_tree {
 
 class CameraResourceIndex;
 
-class CameraResourceSource: public core::entity_resource_tree::AbstractResourceSource
+class NX_VMS_CLIENT_CORE_API CameraResourceSource: public AbstractResourceSource
 {
     Q_OBJECT
-    using base_type = core::entity_resource_tree::AbstractResourceSource;
+    using base_type = AbstractResourceSource;
 
 public:
     CameraResourceSource(
@@ -28,4 +28,4 @@ private:
 };
 
 } // namespace entity_resource_tree
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

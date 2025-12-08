@@ -5,8 +5,8 @@
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 #include "resource_tree_model_test_fixture.h"
 
@@ -14,6 +14,7 @@ namespace nx::vms::client::desktop {
 namespace test {
 
 using namespace index_condition;
+using core::ResourceIconCache;
 
 // String constants.
 static constexpr auto kUniqueImageUrl = "unique_image_url.png";
@@ -137,14 +138,14 @@ TEST_F(ResourceTreeModelTest, mediaResourcesIcons)
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             displayFullMatch(imageResource->getName()),
-            iconTypeMatch(QnResourceIconCache::Image))));
+            iconTypeMatch(ResourceIconCache::Image))));
 
     // Then there is exactly one node with corresponding display text and video icon type appears
     // in the Resource Tree.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             displayFullMatch(videoResource->getName()),
-            iconTypeMatch(QnResourceIconCache::Media))));
+            iconTypeMatch(ResourceIconCache::Media))));
 }
 
 TEST_F(ResourceTreeModelTest, fileLayoutResourcesIcons)
@@ -161,14 +162,14 @@ TEST_F(ResourceTreeModelTest, fileLayoutResourcesIcons)
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             displayFullMatch(fileLayoutResource->getName()),
-            iconTypeMatch(QnResourceIconCache::ExportedLayout))));
+            iconTypeMatch(ResourceIconCache::ExportedLayout))));
 
     // Then there is exactly one node with corresponding display text and encrypted file layout
     // icon type appears in the Resource Tree.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             displayFullMatch(encryptedFileLayoutResource->getName()),
-            iconTypeMatch(QnResourceIconCache::ExportedEncryptedLayout))));
+            iconTypeMatch(ResourceIconCache::ExportedEncryptedLayout))));
 }
 
 TEST_F(ResourceTreeModelTest, mediaResourcesAreChildrenOfCorrespondingTopLevelNodeWhenLoggedIn)

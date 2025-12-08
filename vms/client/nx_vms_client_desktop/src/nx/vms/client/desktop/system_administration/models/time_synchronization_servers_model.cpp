@@ -6,7 +6,8 @@
 
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/unicode_chars.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/text/time_strings.h>
 #include <nx/vms/time/formatter.h>
@@ -88,6 +89,8 @@ QVariant TimeSynchronizationServersModel::headerData(
 
 QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int role) const
 {
+    using nx::vms::client::core::ResourceIconCache;
+
     if (!isValid(index))
         return QVariant();
 
@@ -153,10 +156,10 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
         case Qt::DecorationRole:
             if (column == NameColumn)
             {
-                QnResourceIconCache::Key key = QnResourceIconCache::Server;
+                ResourceIconCache::Key key = ResourceIconCache::Server;
                 if (!server.online)
-                    key |= QnResourceIconCache::Offline;
-                return qnResIconCache->icon(key);
+                    key |= ResourceIconCache::Offline;
+                return appContext()->resourceIconCache()->icon(key);
             }
             break;
 

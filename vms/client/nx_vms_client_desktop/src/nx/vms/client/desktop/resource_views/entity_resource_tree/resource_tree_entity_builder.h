@@ -13,12 +13,17 @@
 #include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
+namespace nx::vms::client::core::entity_resource_tree {
+
+class CameraResourceIndex;
+class RecorderItemDataHelper;
+
+} // namespace nx::vms::client::core::entity_resource_tree
+
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class CameraResourceIndex;
 class UserLayoutResourceIndex;
-class RecorderItemDataHelper;
 class ResourceTreeItemFactory;
 class ResourceTreeItemKeySourcePool;
 
@@ -30,7 +35,6 @@ class NX_VMS_CLIENT_DESKTOP_API ResourceTreeEntityBuilder:
     using base_type = QObject;
     using AbstractEntityPtr = core::entity_item_model::AbstractEntityPtr;
     using AbstractItemPtr = core::entity_item_model::AbstractItemPtr;
-
 
 public:
     ResourceTreeEntityBuilder(SystemContext* systemContext);
@@ -104,9 +108,9 @@ private:
     bool hasPowerUserPermissions() const;
 
 private:
-    QScopedPointer<CameraResourceIndex> m_cameraResourceIndex;
+    QScopedPointer<core::entity_resource_tree::CameraResourceIndex> m_cameraResourceIndex;
     QScopedPointer<UserLayoutResourceIndex> m_userLayoutResourceIndex;
-    QSharedPointer<RecorderItemDataHelper> m_recorderItemDataHelper;
+    QSharedPointer<core::entity_resource_tree::RecorderItemDataHelper> m_recorderItemDataHelper;
     QScopedPointer<ResourceTreeItemFactory> m_itemFactory;
     QScopedPointer<ResourceTreeItemKeySourcePool> m_itemKeySourcePool;
     QnUserResourcePtr m_user;

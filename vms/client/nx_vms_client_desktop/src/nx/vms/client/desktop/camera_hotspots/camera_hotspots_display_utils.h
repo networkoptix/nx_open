@@ -7,7 +7,7 @@
 #include <QtGui/QPainterPath>
 #include <QtGui/QPixmap>
 
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
 
 namespace nx::vms::client::desktop {

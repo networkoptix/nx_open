@@ -9,7 +9,8 @@
 #include <nx/utils/string.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -83,6 +84,8 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
 
     int column = index.column();
 
+    const auto resourceIconCache = appContext()->resourceIconCache();
+
     switch (role)
     {
         case Qt::ForegroundRole:
@@ -99,8 +102,8 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
             else if (column == NameColumn && item->offline)
             {
                 return server
-                    ? qnResIconCache->iconColor(server)
-                    : qnResIconCache->iconColor(QnResourceIconCache::Server, QnIcon::Disabled);
+                    ? resourceIconCache->iconColor(server)
+                    : resourceIconCache->iconColor(core::ResourceIconCache::Server, QnIcon::Disabled);
             }
             break;
 
@@ -144,7 +147,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
 
             case Qt::DecorationRole:
                 if (column == NameColumn)
-                    return qnResIconCache->icon(server);
+                    return resourceIconCache->icon(server);
                 break;
         }
     }
@@ -154,7 +157,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
         {
             case Qt::DecorationRole:
                 if (column == NameColumn)
-                    return qnResIconCache->icon(QnResourceIconCache::Client);
+                    return resourceIconCache->icon(core::ResourceIconCache::Client);
                 break;
             default:
                 break;

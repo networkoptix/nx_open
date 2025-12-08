@@ -344,7 +344,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
 
             if (index.data(core::NodeTypeRole).value<NodeType>() == NodeType::customResourceGroup)
             {
-                selectedGroupIds << index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
+                selectedGroupIds << index.data(core::ResourceTreeCustomGroupIdRole).toString();
 
                 const auto childLayouts = childLayoutsRecursive(index);
                 if (!childLayouts.empty())
@@ -374,10 +374,10 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
         result.setArgument(Qn::SelectedGroupIdsRole, selectedGroupIds);
 
         const auto compositeGroupId = nodeType == NodeType::recorder
-            ? index.model()->index(0, 0, index).data(Qn::ResourceTreeCustomGroupIdRole)
-            : index.data(Qn::ResourceTreeCustomGroupIdRole);
+            ? index.model()->index(0, 0, index).data(core::ResourceTreeCustomGroupIdRole)
+            : index.data(core::ResourceTreeCustomGroupIdRole);
 
-        result.setArgument(Qn::ResourceTreeCustomGroupIdRole, compositeGroupId);
+        result.setArgument(core::ResourceTreeCustomGroupIdRole, compositeGroupId);
 
         if (nodeType == NodeType::customResourceGroup)
         {

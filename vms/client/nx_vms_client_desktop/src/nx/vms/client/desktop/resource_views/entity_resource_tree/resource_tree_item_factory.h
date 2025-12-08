@@ -11,10 +11,10 @@
 #include <nx/vms/client/core/resource_views/entity_item_model/item/shared_item/shared_item.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
+namespace nx::vms::client::core::entity_resource_tree { class RecorderItemDataHelper; }
+
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
-
-class RecorderItemDataHelper;
 
 class ResourceTreeItemFactory:
     public QObject,
@@ -66,7 +66,7 @@ public:
     // Resource Tree recorder / multi-sensor camera group item.
     AbstractItemPtr createRecorderItem(
         const QString& cameraGroupId,
-        const QSharedPointer<RecorderItemDataHelper>& recorderItemDataHelper,
+        const QSharedPointer<core::entity_resource_tree::RecorderItemDataHelper>& recorderItemDataHelper,
         Qt::ItemFlags itemFlags);
 
     // Resource Tree other system group item.

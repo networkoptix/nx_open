@@ -13,7 +13,10 @@
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/item/generic_item_data.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/recorder_item_data_helper.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -24,8 +27,6 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/showreel_item.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/videowall_matrix_item.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/videowall_screen_item.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/recorder_item_data_helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 
@@ -37,6 +38,8 @@ using namespace nx::vms::client::desktop::entity_resource_tree;
 
 using nx::vms::common::SystemSettings;
 using nx::vms::client::core::CloudCrossSystemContext;
+using nx::vms::client::core::entity_resource_tree::RecorderItemDataHelper;
+using nx::vms::client::core::ResourceIconCache;
 
 //-------------------------------------------------------------------------------------------------
 // Provider and invalidator pair factory functions for the header system name generic item.
@@ -53,83 +56,6 @@ InvalidatorPtr systemNameInvalidator(const SystemSettings* globalSettings)
     result->connections()->add(globalSettings->connect(
         globalSettings, &SystemSettings::systemNameChanged, globalSettings,
         [invalidator = result.get()] { invalidator->invalidate(); }));
-
-    return result;
-}
-
-//-------------------------------------------------------------------------------------------------
-// Provider and invalidator pair factory functions for the header resource name generic item.
-//-------------------------------------------------------------------------------------------------
-GenericItem::DataProvider resourceNameProvider(const QnResourcePtr& resource)
-{
-    return [resource] { return resource->getName(); };
-}
-
-InvalidatorPtr resourceNameInvalidator(const QnResourcePtr& resource)
-{
-    auto result = std::make_shared<Invalidator>();
-
-    result->connections()->add(resource->connect(
-        resource.get(), &QnResource::nameChanged,
-        [invalidator = result.get()] { invalidator->invalidate(); }));
-
-    return result;
-}
-
-//-------------------------------------------------------------------------------------------------
-// Provider and invalidator pair factory functions for a recorder group name generic item.
-//-------------------------------------------------------------------------------------------------
-GenericItem::DataProvider recorderNameProvider(
-    const QString& groupId,
-    const QSharedPointer<RecorderItemDataHelper>& recorderItemDataHelper)
-{
-    return [groupId, recorderItemDataHelper]
-    {
-        return recorderItemDataHelper->groupedDeviceName(groupId);
-    };
-}
-
-InvalidatorPtr recorderNameInvalidator(
-    const QString& groupId,
-    const QSharedPointer<RecorderItemDataHelper>& recorderItemDataHelper)
-{
-    auto result = std::make_shared<Invalidator>();
-
-    result->connections()->add(recorderItemDataHelper->connect(
-        recorderItemDataHelper.get(), &RecorderItemDataHelper::groupedDeviceNameChanged,
-        [groupId, invalidator = result.get()](const QString& changedGroupId)
-        {
-            if (groupId == changedGroupId)
-                invalidator->invalidate();
-        }));
-
-    return result;
-}
-
-GenericItem::DataProvider recorderIconProvider(
-    const QString& groupId,
-    const QSharedPointer<RecorderItemDataHelper>& recorderItemDataHelper)
-{
-    return
-        [groupId, recorderItemDataHelper]()
-        {
-            return recorderItemDataHelper->iconKey(groupId);
-        };
-}
-
-InvalidatorPtr recorderIconInvalidator(
-    const QString& groupId,
-    const QSharedPointer<RecorderItemDataHelper>& recorderItemDataHelper)
-{
-    auto result = std::make_shared<Invalidator>();
-
-    result->connections()->add(recorderItemDataHelper->connect(
-        recorderItemDataHelper.get(), &RecorderItemDataHelper::groupedDeviceStatusChanged,
-        [groupId, invalidator = result.get()](const QString& changedGroupId)
-        {
-            if (groupId == changedGroupId)
-                invalidator->invalidate();
-        }));
 
     return result;
 }
@@ -182,23 +108,23 @@ GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
                 || context->status() == CloudCrossSystemContext::Status::uninitialized)
             {
                 return static_cast<int>(
-                    QnResourceIconCache::CloudSystem | QnResourceIconCache::Offline);
+                    ResourceIconCache::CloudSystem | ResourceIconCache::Offline);
             }
 
             const auto status = context->status();
             if (status == CloudCrossSystemContext::Status::connectionFailure)
             {
                 return static_cast<int>(
-                    QnResourceIconCache::CloudSystem | QnResourceIconCache::Locked);
+                    ResourceIconCache::CloudSystem | ResourceIconCache::Locked);
             }
 
             if (status == CloudCrossSystemContext::Status::unsupportedTemporary)
             {
                 return static_cast<int>(
-                    QnResourceIconCache::CloudSystem | QnResourceIconCache::Incompatible);
+                    ResourceIconCache::CloudSystem | ResourceIconCache::Incompatible);
             }
 
-            return static_cast<int>(QnResourceIconCache::CloudSystem);
+            return static_cast<int>(ResourceIconCache::CloudSystem);
         };
 }
 
@@ -278,84 +204,6 @@ GenericItem::FlagsProvider cloudSystemFlagsProvider(const QString& systemId)
         };
 }
 
-//-------------------------------------------------------------------------------------------------
-// Icon data provider / invalidator and flags provider factory functions for the cloud layout item.
-//-------------------------------------------------------------------------------------------------
-GenericItem::DataProvider cloudLayoutIconProvider(const QnLayoutResourcePtr& layout)
-{
-    return
-        []() -> int { return QnResourceIconCache::CloudLayout; };
-}
-
-InvalidatorPtr cloudLayoutIconInvalidator(const QnLayoutResourcePtr& layout)
-{
-    auto result = std::make_shared<Invalidator>();
-
-    result->connections()->add(QObject::connect(
-        layout.get(),
-        &QnLayoutResource::lockedChanged,
-        [invalidator = result.get()]
-        {
-            invalidator->invalidate();
-        }));
-
-    return result;
-}
-
-GenericItem::DataProvider cloudLayoutExtraStatusProvider(const QnLayoutResourcePtr& layout)
-{
-    using namespace nx::vms::client::core;
-    return
-        [layout]
-        {
-            return layout->locked()
-                ? static_cast<int>(ResourceExtraStatusFlag::locked)
-                : static_cast<int>(ResourceExtraStatusFlag::empty);
-        };
-}
-
-InvalidatorPtr cloudLayoutExtraStatusInvalidator(const QnLayoutResourcePtr& layout)
-{
-    auto result = std::make_shared<Invalidator>();
-
-    result->connections()->add(QObject::connect(
-        layout.get(),
-        &QnLayoutResource::lockedChanged,
-        [invalidator = result.get()]
-        {
-            invalidator->invalidate();
-        }));
-
-    return result;
-}
-
-GenericItem::DataProvider cloudLayoutGroupIdProvider(const QnLayoutResourcePtr& layout)
-{
-    using namespace nx::vms::client::core::entity_resource_tree::resource_grouping;
-
-    return
-        [layout]
-        {
-            return resourceCustomGroupId(layout);
-        };
-}
-
-InvalidatorPtr cloudLayoutGroupIdInvalidator(const QnLayoutResourcePtr& layout)
-{
-    auto result = std::make_shared<Invalidator>();
-
-    result->connections()->add(QObject::connect(
-        layout.get(),
-        &QnLayoutResource::propertyChanged,
-        [invalidator = result.get()](const QnResourcePtr&, const QString& key)
-        {
-            if (key == nx::vms::api::resource_properties::kCustomGroupIdPropertyKey)
-                invalidator->invalidate();
-        }));
-
-    return result;
-}
-
 GenericItem::FlagsProvider cloudLayoutFlagsProvider(const QnLayoutResourcePtr& layout)
 {
     return
@@ -407,7 +255,7 @@ GenericItem::DataProvider otherServerIconProvider()
 {
     return []
         {
-            return static_cast<int>(QnResourceIconCache::Server);
+            return static_cast<int>(ResourceIconCache::Server);
         };
 }
 
@@ -421,8 +269,8 @@ InvalidatorPtr otherServerIconInvalidator()
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
+using namespace nx::vms::client::core::entity_resource_tree;
 using NodeType = nx::vms::client::core::ResourceTree::NodeType;
-using IconCache = QnResourceIconCache;
 
 ResourceTreeItemFactory::ResourceTreeItemFactory(SystemContext* systemContext):
     base_type(),
@@ -437,7 +285,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCurrentSystemItem() const
 
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::CurrentSystem))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::CurrentSystem))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::currentSystem))
         .withFlags({Qt::ItemIsEnabled, Qt::ItemIsSelectable, Qt::ItemNeverHasChildren});
 }
@@ -450,7 +298,9 @@ AbstractItemPtr ResourceTreeItemFactory::createCurrentUserItem(const QnUserResou
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
         .withRole(core::ResourceRole, QVariant::fromValue(user.staticCast<QnResource>()))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::userKey(user)))
+        .withRole(
+            core::ResourceIconKeyRole,
+            static_cast<int>(appContext()->resourceIconCache()->userKey(user)))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::currentUser))
         .withRole(core::ExtraInfoRole, QnResourceDisplayInfo(user).extraInfo())
         .withFlags({Qt::ItemIsEnabled, Qt::ItemIsSelectable, Qt::ItemNeverHasChildren});
@@ -474,7 +324,7 @@ AbstractItemPtr ResourceTreeItemFactory::createServersItem() const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Servers"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::Servers))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Servers))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::servers))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Servers));
 }
@@ -483,7 +333,7 @@ AbstractItemPtr ResourceTreeItemFactory::createHealthMonitorsItem() const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Health Monitors"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::HealthMonitors))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::HealthMonitors))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::healthMonitors));
 }
 
@@ -493,7 +343,7 @@ AbstractItemPtr ResourceTreeItemFactory::createVideoWallsItem(QString customName
 
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, name)
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::VideoWall))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::VideoWall))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::videoWalls));
 }
 
@@ -501,7 +351,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCamerasAndDevicesItem(Qt::ItemFla
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Cameras & Devices"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::Cameras))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Cameras))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::camerasAndDevices))
         .withFlags(flags);
 }
@@ -510,7 +360,7 @@ AbstractItemPtr ResourceTreeItemFactory::createLayoutsItem(Qt::ItemFlags flags) 
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Layouts"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::Layouts))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Layouts))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::layouts))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Layouts))
         .withFlags(flags);
@@ -520,7 +370,7 @@ AbstractItemPtr ResourceTreeItemFactory::createShowreelsItem() const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Showreels"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::Showreels))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Showreels))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::showreels))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::Showreel));
 }
@@ -529,7 +379,7 @@ AbstractItemPtr ResourceTreeItemFactory::createIntegrationsItem(Qt::ItemFlags fl
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Integrations"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::Integrations))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Integrations))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::integrations))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_WebPage))
         .withFlags(flags);
@@ -539,7 +389,7 @@ AbstractItemPtr ResourceTreeItemFactory::createWebPagesItem(Qt::ItemFlags flags)
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Web Pages"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::WebPages))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::WebPages))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::webPages))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_WebPage))
         .withFlags(flags);
@@ -550,7 +400,7 @@ AbstractItemPtr ResourceTreeItemFactory::createWebPagesAndIntegrationsItem(
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Web Pages & Integrations"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::WebPages))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::WebPages))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::webPages))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_WebPage))
         .withFlags(flags);
@@ -560,7 +410,7 @@ AbstractItemPtr ResourceTreeItemFactory::createUsersItem() const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Users"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::Users))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Users))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::users))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Users));
 }
@@ -569,7 +419,7 @@ AbstractItemPtr ResourceTreeItemFactory::createOtherSystemsItem() const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Other Sites"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::OtherSystems))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::OtherSystems))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::otherSystems))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::OtherSystems));
 }
@@ -578,7 +428,7 @@ AbstractItemPtr ResourceTreeItemFactory::createLocalFilesItem() const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Local Files"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::LocalResources))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::LocalResources))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::localResources))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MediaFolders));
 }
@@ -587,7 +437,7 @@ AbstractItemPtr ResourceTreeItemFactory::createAllCamerasAndResourcesItem() cons
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("All Cameras & Resources"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::Cameras))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Cameras))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::allCamerasAccess))
         .withFlags({Qt::ItemNeverHasChildren});
 }
@@ -596,7 +446,7 @@ AbstractItemPtr ResourceTreeItemFactory::createAllSharedLayoutsItem() const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("All Shared Layouts"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::SharedLayouts))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::SharedLayouts))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::allLayoutsAccess))
         .withFlags({Qt::ItemNeverHasChildren});
 }
@@ -605,7 +455,7 @@ AbstractItemPtr ResourceTreeItemFactory::createSharedResourcesItem() const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Cameras & Resources"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::Cameras))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Cameras))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::sharedResources));
 }
 
@@ -616,8 +466,8 @@ AbstractItemPtr ResourceTreeItemFactory::createSharedLayoutsItem(bool useRegular
         : tr("Shared Layouts");
 
    const auto iconKey = useRegularAppearance
-       ? static_cast<int>(IconCache::Layouts)
-       : static_cast<int>(IconCache::SharedLayouts);
+       ? static_cast<int>(ResourceIconCache::Layouts)
+       : static_cast<int>(ResourceIconCache::SharedLayouts);
 
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, displayText)
@@ -657,15 +507,15 @@ AbstractItemPtr ResourceTreeItemFactory::createResourceGroupItem(
         .withRole(Qt::DisplayRole, displayText)
         .withRole(Qt::ToolTipRole, displayText)
         .withRole(Qt::EditRole, displayText)
-        .withRole(Qn::ResourceTreeCustomGroupIdRole, compositeGroupId)
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::LocalResources))
+        .withRole(core::ResourceTreeCustomGroupIdRole, compositeGroupId)
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::LocalResources))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::customResourceGroup))
         .withFlags(itemFlags);
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createRecorderItem(
     const QString& cameraGroupId,
-    const QSharedPointer<RecorderItemDataHelper>& recorderItemDataHelper,
+    const QSharedPointer<core::entity_resource_tree::RecorderItemDataHelper>& recorderItemDataHelper,
     Qt::ItemFlags itemFlags)
 {
     const auto nameProvider = recorderNameProvider(cameraGroupId, recorderItemDataHelper);
@@ -680,7 +530,7 @@ AbstractItemPtr ResourceTreeItemFactory::createRecorderItem(
         .withRole(core::ResourceIconKeyRole, iconProvider, iconInvalidator)
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::recorder))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Recorder))
-        .withRole(Qn::CameraGroupIdRole, cameraGroupId)
+        .withRole(core::CameraGroupIdRole, cameraGroupId)
         .withFlags(itemFlags);
 }
 
@@ -688,7 +538,7 @@ AbstractItemPtr ResourceTreeItemFactory::createOtherSystemItem(const QString& sy
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, systemId)
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(IconCache::OtherSystem))
+        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::OtherSystem))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::localSystem))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::OtherSystems));
 }
@@ -754,7 +604,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudLayoutItem(const QnLayoutRes
         .withRole(core::ResourceIconKeyRole, iconProvider, iconInvalidator)
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::resource))
         .withRole(core::ResourceExtraStatusRole, extraStatusProvider, extraStatusInvalidator)
-        .withRole(Qn::ResourceTreeCustomGroupIdRole, groupIdProvider, groupIdInvalidator)
+        .withRole(core::ResourceTreeCustomGroupIdRole, groupIdProvider, groupIdInvalidator)
         .withFlags(flagsProvider);
 }
 

@@ -42,7 +42,6 @@ using namespace nx::vms::client::desktop;
 using namespace backup_settings_view;
 
 using AbstractEntityPtr = entity_item_model::AbstractEntityPtr;
-using ResourceTreeEntityBuilder = entity_resource_tree::ResourceTreeEntityBuilder;
 
 static constexpr auto kCloudStorageInfoUpdateInterval = 1min;
 

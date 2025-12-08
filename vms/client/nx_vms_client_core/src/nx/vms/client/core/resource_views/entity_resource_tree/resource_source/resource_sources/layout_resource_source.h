@@ -2,18 +2,18 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 
 class QnResourcePool;
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace entity_resource_tree {
 
-class LayoutResourceSource: public core::entity_resource_tree::AbstractResourceSource
+class NX_VMS_CLIENT_CORE_API LayoutResourceSource: public AbstractResourceSource
 {
     Q_OBJECT
-    using base_type = core::entity_resource_tree::AbstractResourceSource;
+    using base_type = AbstractResourceSource;
 
 public:
     LayoutResourceSource(
@@ -38,4 +38,4 @@ private:
 };
 
 } // namespace entity_resource_tree
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

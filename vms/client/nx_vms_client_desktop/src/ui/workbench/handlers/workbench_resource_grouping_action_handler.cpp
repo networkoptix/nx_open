@@ -71,7 +71,7 @@ void ResourceGroupingActionHandler::createNewCustomResourceTreeGroup() const
         return;
 
     const auto resources = parameters.resources();
-    const auto compositeGroupId = parameters.argument(Qn::ResourceTreeCustomGroupIdRole).toString();
+    const auto compositeGroupId = parameters.argument(core::ResourceTreeCustomGroupIdRole).toString();
     const auto newGroupSubId = getNewGroupSubId();
     const auto nodeTypeArgument = parameters.argument(core::NodeTypeRole);
 
@@ -111,7 +111,7 @@ void ResourceGroupingActionHandler::createNewCustomResourceTreeGroup() const
     saveResources(resources);
 
     menu()->trigger(menu::NewCustomGroupCreatedEvent,
-        menu::Parameters(Qn::ResourceTreeCustomGroupIdRole, newCompositeGroupId));
+        menu::Parameters(core::ResourceTreeCustomGroupIdRole, newCompositeGroupId));
 }
 
 void ResourceGroupingActionHandler::assignCustomResourceTreeGroupId() const
@@ -119,11 +119,11 @@ void ResourceGroupingActionHandler::assignCustomResourceTreeGroupId() const
     using namespace nx::vms::client::core::entity_resource_tree::resource_grouping;
 
     const auto parameters = menu()->currentParameters(sender());
-    if (!parameters.hasArgument(Qn::ResourceTreeCustomGroupIdRole))
+    if (!parameters.hasArgument(core::ResourceTreeCustomGroupIdRole))
         return;
 
     const auto newGroupCompositeId =
-        parameters.argument(Qn::ResourceTreeCustomGroupIdRole).toString();
+        parameters.argument(core::ResourceTreeCustomGroupIdRole).toString();
 
     const QnResourceList resources = menu()->currentParameters(sender()).resources();
 
@@ -142,7 +142,7 @@ void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
     const auto parameters = menu()->currentParameters(sender());
 
     const auto resources = parameters.resources();
-    const auto groupCompositeId = parameters.argument(Qn::ResourceTreeCustomGroupIdRole).toString();
+    const auto groupCompositeId = parameters.argument(core::ResourceTreeCustomGroupIdRole).toString();
     const auto groupCompositeIdDimension = compositeIdDimension(groupCompositeId);
     const auto changedSubIdOrder = groupCompositeIdDimension - 1;
 
@@ -220,10 +220,10 @@ void ResourceGroupingActionHandler::moveToCustomResourceTreeGroup() const
     using namespace nx::vms::client::core::entity_resource_tree::resource_grouping;
 
     const auto parameters = menu()->currentParameters(sender());
-    if (!parameters.hasArgument(Qn::ResourceTreeCustomGroupIdRole))
+    if (!parameters.hasArgument(core::ResourceTreeCustomGroupIdRole))
         return;
 
-    const auto sourceGroupId = parameters.argument(Qn::ResourceTreeCustomGroupIdRole).toString();
+    const auto sourceGroupId = parameters.argument(core::ResourceTreeCustomGroupIdRole).toString();
     const auto destinationGroupId =
         parameters.argument(Qn::TargetResourceTreeCustomGroupIdRole).toString();
 
@@ -269,7 +269,7 @@ void ResourceGroupingActionHandler::removeCustomResourceTreeGroup() const
     const auto parameters = menu()->currentParameters(sender());
     const auto resources = parameters.resources();
 
-    const auto currentGroupId = parameters.argument(Qn::ResourceTreeCustomGroupIdRole).toString();
+    const auto currentGroupId = parameters.argument(core::ResourceTreeCustomGroupIdRole).toString();
     const auto currentGroupIdDimension = compositeIdDimension(currentGroupId);
 
     if (!NX_ASSERT(!currentGroupId.isEmpty(), "Invalid parameter"))

@@ -10,9 +10,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
-#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/intercom/utils.h>
 
 #include "resource_tree_model_test_fixture.h"
@@ -72,7 +72,7 @@ TEST_F(ResourceTreeModelTest, layoutIconType)
     const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
 
     // And that node have layout icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::Layout)(layoutIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::Layout)(layoutIndex));
 }
 
 TEST_F(ResourceTreeModelTest, sharedLayoutIconType)
@@ -87,7 +87,7 @@ TEST_F(ResourceTreeModelTest, sharedLayoutIconType)
     const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
 
     // And that node have shared layout icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::SharedLayout)(layoutIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::SharedLayout)(layoutIndex));
 }
 
 TEST_F(ResourceTreeModelTest, lockedLayoutIconType)
@@ -102,7 +102,7 @@ TEST_F(ResourceTreeModelTest, lockedLayoutIconType)
     const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
 
     const auto regularLayoutIconCondition = allOf(
-        iconStatusMatch(QnResourceIconCache::Unknown), iconTypeMatch(QnResourceIconCache::Layout));
+        iconStatusMatch(ResourceIconCache::Unknown), iconTypeMatch(ResourceIconCache::Layout));
 
     // After layout locking...
     layout->setLocked(true);

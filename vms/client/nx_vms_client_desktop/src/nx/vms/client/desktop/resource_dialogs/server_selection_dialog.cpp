@@ -16,6 +16,7 @@
 #include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/item_order/item_order.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/checkbox_column_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
@@ -23,7 +24,6 @@
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace {
@@ -44,7 +44,7 @@ AbstractItemPtr createServerItem(const QnResourcePtr& serverResource)
 
     return entity_item_model::GenericItemBuilder()
         .withRole(Qt::DisplayRole, serverResource->getName())
-        .withRole(ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Server))
+        .withRole(ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Server))
         .withRole(ResourceRole, QVariant::fromValue(serverResource))
         .withRole(ExtraInfoRole, extraText)
         .withFlags({Qt::ItemNeverHasChildren, Qt::ItemIsEnabled});

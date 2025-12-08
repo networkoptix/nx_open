@@ -12,12 +12,12 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/utils/grid_walker.h>
-#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -200,7 +200,8 @@ void ShowreelReviewController::reviewShowreel(const nx::vms::api::ShowreelData& 
     layout->setParentId(showreel.id);
     layout->setName(showreel.name);
     layout->setData(Qn::IsSpecialLayoutRole, true);
-    layout->setData(Qn::LayoutIconRole, qnResIconCache->icon(QnResourceIconCache::Showreel));
+    layout->setData(Qn::LayoutIconRole,
+        appContext()->resourceIconCache()->icon(core::ResourceIconCache::Showreel));
     layout->setData(Qn::LayoutFlagsRole, QVariant::fromValue(QnLayoutFlag::FixedViewport
         | QnLayoutFlag::NoResize
         | QnLayoutFlag::NoTimeline

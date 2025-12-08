@@ -10,10 +10,8 @@
 
 namespace {
 
-using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::core;
-using namespace entity_item_model;
-using namespace entity_resource_tree;
+using namespace nx::vms::client::core::entity_item_model;
+using namespace nx::vms::client::desktop::entity_resource_tree;
 
 AbstractEntityPtr createTreeEntity(const ResourceTreeEntityBuilder* builder)
 {

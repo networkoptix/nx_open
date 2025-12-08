@@ -124,10 +124,10 @@ ActionParameters getActionParameters(
 
         if (!childResources.isEmpty())
         {
-            const auto groupId = index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
+            const auto groupId = index.data(core::ResourceTreeCustomGroupIdRole).toString();
             ActionParameters parameters(childResources);
             parameters.setArgument(Qn::SelectedGroupIdsRole, QStringList({groupId}));
-            parameters.setArgument(Qn::ResourceTreeCustomGroupIdRole, groupId);
+            parameters.setArgument(core::ResourceTreeCustomGroupIdRole, groupId);
             return parameters;
         }
     }

@@ -58,6 +58,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
@@ -77,6 +78,7 @@
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
+#include <nx/vms/client/desktop/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/fallback_shared_memory.h>
@@ -90,7 +92,6 @@
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
-#include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
 #include <nx/vms/client/desktop/utils/local_proxy_server.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
@@ -653,7 +654,7 @@ struct ApplicationContext::Private
         static const QString kQmlRoot = QStringLiteral("qrc:///qml");
 
         const auto qmlEngine = q->qmlEngine();
-        qmlEngine->addImageProvider("resource", new ResourceIconProvider());
+        qmlEngine->addImageProvider("resource", new core::ResourceIconProvider());
 
         auto qmlRoot = startupParameters.qmlRoot.isEmpty() ? kQmlRoot : startupParameters.qmlRoot;
         if (!qmlRoot.endsWith('/'))
@@ -736,6 +737,7 @@ ApplicationContext::ApplicationContext(
         registerQmlTypes();
 
     d->initSkin();
+    resetResourceIconCache(new desktop::ResourceIconCache());
     storeFontConfig(
         new FontConfig(initializeBaseFont(), ":/skin/basic_fonts.json", ini().fontConfigPath));
     initializeDefaultApplicationFont();

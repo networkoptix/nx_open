@@ -7,7 +7,7 @@
 #include <QtCore/QModelIndex>
 
 #include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -33,9 +33,9 @@ Condition displayEmpty();
 Condition extraInfoEmpty();
 
 // Icon conditions.
-Condition iconFullMatch(QnResourceIconCache::Key paramIconKey);
-Condition iconTypeMatch(QnResourceIconCache::Key paramIconKey);
-Condition iconStatusMatch(QnResourceIconCache::Key paramIconKey);
+Condition iconFullMatch(core::ResourceIconCache::Key paramIconKey);
+Condition iconTypeMatch(core::ResourceIconCache::Key paramIconKey);
+Condition iconStatusMatch(core::ResourceIconCache::Key paramIconKey);
 
 // Flags conditions.
 Condition hasFlag(Qt::ItemFlag flag);

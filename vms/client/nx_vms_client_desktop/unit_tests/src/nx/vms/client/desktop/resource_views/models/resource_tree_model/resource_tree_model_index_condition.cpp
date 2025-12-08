@@ -135,7 +135,7 @@ Condition extraInfoEmpty()
         };
 }
 
-Condition iconFullMatch(QnResourceIconCache::Key paramIconKey)
+Condition iconFullMatch(ResourceIconCache::Key paramIconKey)
 {
     return
         [paramIconKey](const QModelIndex& index)
@@ -143,13 +143,13 @@ Condition iconFullMatch(QnResourceIconCache::Key paramIconKey)
             if (!index.isValid())
                 return false;
             const auto iconKey =
-                static_cast<QnResourceIconCache::Key>(
+                static_cast<ResourceIconCache::Key>(
                     index.data(core::ResourceIconKeyRole).toInt());
             return iconKey == paramIconKey;
         };
 }
 
-Condition iconTypeMatch(QnResourceIconCache::Key paramIconKey)
+Condition iconTypeMatch(ResourceIconCache::Key paramIconKey)
 {
     return
         [paramIconKey](const QModelIndex& index)
@@ -157,17 +157,17 @@ Condition iconTypeMatch(QnResourceIconCache::Key paramIconKey)
             if (!index.isValid())
                 return false;
             const auto iconKey =
-                static_cast<QnResourceIconCache::Key>(
+                static_cast<ResourceIconCache::Key>(
                     index.data(core::ResourceIconKeyRole).toInt());
 
-            const auto iconType = iconKey & QnResourceIconCache::TypeMask;
-            const auto paramIconType = paramIconKey & QnResourceIconCache::TypeMask;
+            const auto iconType = iconKey & ResourceIconCache::TypeMask;
+            const auto paramIconType = paramIconKey & ResourceIconCache::TypeMask;
 
             return iconType == paramIconType;
         };
 }
 
-Condition iconStatusMatch(QnResourceIconCache::Key paramIconKey)
+Condition iconStatusMatch(ResourceIconCache::Key paramIconKey)
 {
     return
         [paramIconKey](const QModelIndex& index)
@@ -175,11 +175,11 @@ Condition iconStatusMatch(QnResourceIconCache::Key paramIconKey)
             if (!index.isValid())
                 return false;
             const auto iconKey =
-                static_cast<QnResourceIconCache::Key>(
+                static_cast<ResourceIconCache::Key>(
                     index.data(core::ResourceIconKeyRole).toInt());
 
-            const auto iconType = iconKey & QnResourceIconCache::StatusMask;
-            const auto paramIconType = paramIconKey & QnResourceIconCache::StatusMask;
+            const auto iconType = iconKey & ResourceIconCache::StatusMask;
+            const auto paramIconType = paramIconKey & ResourceIconCache::StatusMask;
 
             return iconType == paramIconType;
         };
@@ -272,12 +272,12 @@ Condition mimeDataContainsEntity(const nx::Uuid& entityId)
 
 Condition serverIconTypeCondition()
 {
-    return iconTypeMatch(QnResourceIconCache::Server);
+    return iconTypeMatch(ResourceIconCache::Server);
 }
 
 Condition cameraIconTypeCondition()
 {
-    return iconTypeMatch(QnResourceIconCache::Camera);
+    return iconTypeMatch(ResourceIconCache::Camera);
 }
 
 Condition reducedEdgeCameraCondition()
@@ -293,14 +293,14 @@ Condition localFilesNodeCondition()
 {
     return allOf(
         displayFullMatch("Local Files"),
-        iconFullMatch(QnResourceIconCache::LocalResources),
+        iconFullMatch(ResourceIconCache::LocalResources),
         topLevelNode());
 }
 
 Condition videoWallNodeCondition()
 {
     return allOf(
-        iconTypeMatch(QnResourceIconCache::VideoWall),
+        iconTypeMatch(ResourceIconCache::VideoWall),
         topLevelNode());
 }
 
@@ -308,7 +308,7 @@ Condition showreelsNodeCondition()
 {
     return allOf(
         displayFullMatch("Showreels"),
-        iconFullMatch(QnResourceIconCache::Showreels),
+        iconFullMatch(ResourceIconCache::Showreels),
         topLevelNode());
 }
 
@@ -316,7 +316,7 @@ Condition layoutsNodeCondition()
 {
     return allOf(
         displayFullMatch("Layouts"),
-        iconFullMatch(QnResourceIconCache::Layouts),
+        iconFullMatch(ResourceIconCache::Layouts),
         topLevelNode());
 }
 
@@ -324,7 +324,7 @@ Condition integrationsNodeCondition()
 {
     return allOf(
         displayFullMatch("Integrations"),
-        iconFullMatch(QnResourceIconCache::Integrations),
+        iconFullMatch(ResourceIconCache::Integrations),
         topLevelNode());
 }
 
@@ -332,7 +332,7 @@ Condition webPagesNodeCondition()
 {
     return allOf(
         displayFullMatch("Web Pages"),
-        iconFullMatch(QnResourceIconCache::WebPages),
+        iconFullMatch(ResourceIconCache::WebPages),
         topLevelNode());
 }
 
@@ -340,7 +340,7 @@ Condition serversNodeCondition()
 {
     return allOf(
         displayFullMatch("Servers"),
-        iconFullMatch(QnResourceIconCache::Servers),
+        iconFullMatch(ResourceIconCache::Servers),
         topLevelNode());
 }
 
@@ -348,7 +348,7 @@ Condition sharedResourcesNodeCondition()
 {
     return allOf(
         displayFullMatch("Cameras & Resources"),
-        iconFullMatch(QnResourceIconCache::Cameras),
+        iconFullMatch(ResourceIconCache::Cameras),
         nodeTypeDataMatch(ResourceTree::NodeType::sharedResources),
         hasFlag(Qt::ItemIsEnabled),
         non(topLevelNode()));
@@ -358,7 +358,7 @@ Condition sharedLayoutsNodeCondition()
 {
     return allOf(
         displayFullMatch("Shared Layouts"),
-        iconFullMatch(QnResourceIconCache::SharedLayouts),
+        iconFullMatch(ResourceIconCache::SharedLayouts),
         nodeTypeDataMatch(ResourceTree::NodeType::sharedLayouts),
         hasFlag(Qt::ItemIsEnabled),
         non(topLevelNode()));
@@ -368,7 +368,7 @@ Condition mixedLayoutsNodeCondition()
 {
     return allOf(
         displayFullMatch("Layouts"),
-        iconFullMatch(QnResourceIconCache::Layouts),
+        iconFullMatch(ResourceIconCache::Layouts),
         nodeTypeDataMatch(ResourceTree::NodeType::sharedLayouts),
         hasFlag(Qt::ItemIsEnabled),
         non(topLevelNode()));
@@ -378,7 +378,7 @@ Condition allCamerasAndResourcesNodeCondition()
 {
     return allOf(
         displayFullMatch("All Cameras & Resources"),
-        iconFullMatch(QnResourceIconCache::Cameras),
+        iconFullMatch(ResourceIconCache::Cameras),
         nodeTypeDataMatch(ResourceTree::NodeType::allCamerasAccess),
         non(hasFlag(Qt::ItemIsEnabled)),
         non(topLevelNode()));
@@ -388,7 +388,7 @@ Condition allSharedLayoutsNodeCondition()
 {
     return allOf(
         displayFullMatch("All Shared Layouts"),
-        iconFullMatch(QnResourceIconCache::SharedLayouts),
+        iconFullMatch(ResourceIconCache::SharedLayouts),
         nodeTypeDataMatch(ResourceTree::NodeType::allLayoutsAccess),
         non(hasFlag(Qt::ItemIsEnabled)),
         non(topLevelNode()));

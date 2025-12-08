@@ -73,6 +73,9 @@ enum CoreItemDataRole
     ObjectTypeIdRole,
 
     /* Tree-based. */
+    CameraGroupIdRole,              /**< Role for camera group ID, related to recorders and multisensor cameras (QString). */
+    ResourceTreeCustomGroupIdRole,  /**< Role for user defined group ID, used for the custom cameras grouping within Resource Tree (QString). */
+    ParentResourceRole,             /**< Role for parent resource if such exists (QnResourcePtr). */
     NodeTypeRole,                   /**< Role for node type, see <tt>ResourceTree::NodeType</tt>. */
     FlattenedRole,                  /**< Role for node-controlled flattening control in the resource tree (bool). See FlatteningGroupEntity for the details. */
     ResourceExtraStatusRole,        /**< Custom resource status (recording, buggy, etc). Value of ResourceExtraStatus. */

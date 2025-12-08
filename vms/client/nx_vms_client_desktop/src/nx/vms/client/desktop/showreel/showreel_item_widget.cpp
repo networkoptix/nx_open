@@ -18,10 +18,11 @@
 #include <nx/vms/client/core/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/graphics/painters/layout_preview_painter.h>
 #include <nx/vms/text/time_strings.h>
@@ -163,7 +164,7 @@ void ShowreelItemWidget::initOverlay()
 
     auto updateIcon = [this, icon]
         {
-            auto pixmap = qnResIconCache->icon(resource())
+            auto pixmap = appContext()->resourceIconCache()->icon(resource())
                 .pixmap(1024, 1024, QIcon::Normal, QIcon::On);
             pixmap.setDevicePixelRatio(qApp->devicePixelRatio());
             icon->setPixmap(pixmap);

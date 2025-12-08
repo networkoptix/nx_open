@@ -37,6 +37,7 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
@@ -49,7 +50,6 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
@@ -710,7 +710,9 @@ QPixmap TileInteractionHandler::createDragPixmap(const QnResourceList& resources
 
     static constexpr int kTextFlags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine;
 
-    const auto iconSize = qnSkin->maximumSize(qnResIconCache->icon(QnResourceIconCache::Camera));
+    const auto resourceIconCache = appContext()->resourceIconCache();
+    const auto iconSize = qnSkin->maximumSize(
+        resourceIconCache->icon(core::ResourceIconCache::Camera));
 
     const int overflow = qMax(resources.size() - kMaximumRows, 0);
     const int resourceRows = resources.size() - overflow;
@@ -740,7 +742,7 @@ QPixmap TileInteractionHandler::createDragPixmap(const QnResourceList& resources
     QRect rect(style::Metrics::kStandardPadding, 0, width, iconSize.height());
     for (int i = 0; i < resourceRows; ++i)
     {
-        const auto icon = qnResIconCache->icon(resources[i]);
+        const auto icon = resourceIconCache->icon(resources[i]);
         icon.paint(&painter, rect, {Qt::AlignLeft | Qt::AlignVCenter}, QIcon::Selected);
 
         const auto text = QnResourceDisplayInfo(resources[i]).name();

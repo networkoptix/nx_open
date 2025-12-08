@@ -5,8 +5,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 #include "resource_tree_model_test_fixture.h"
 
@@ -14,6 +14,7 @@ namespace nx::vms::client::desktop {
 namespace test {
 
 using namespace index_condition;
+using core::ResourceIconCache;
 
 // String constants.
 static constexpr auto kUniqueServerName = "unique_server_name";
@@ -120,35 +121,35 @@ TEST_F(ResourceTreeModelTest, serverIconStatus)
     server->setStatus(nx::vms::api::ResourceStatus::offline);
 
     // Then server icon has Offline decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Offline)(
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Offline)(
         uniqueMatchingIndex(kUniqueServerNameCondition)));
 
     // When server is offline, it is marked as incompatible.
     server->setCompatible(false);
 
     // Then server icon has Incompatible decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Incompatible)(
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Incompatible)(
         uniqueMatchingIndex(kUniqueServerNameCondition)));
 
     // When Unauthorized status is set to the server resource.
     server->setStatus(nx::vms::api::ResourceStatus::unauthorized);
 
     // Then server icon has Unauthorized decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Unauthorized)(
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Unauthorized)(
         uniqueMatchingIndex(kUniqueServerNameCondition)));
 
     // When Incompatible status is set to the server resource.
     server->setStatus(nx::vms::api::ResourceStatus::incompatible);
 
     // Then server icon has Incompatible decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Incompatible)(
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Incompatible)(
         uniqueMatchingIndex(kUniqueServerNameCondition)));
 
     // When Online status is set to the server resource.
     server->setStatus(nx::vms::api::ResourceStatus::online);
 
     // Then server icon has Online decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Online)(
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Online)(
         uniqueMatchingIndex(kUniqueServerNameCondition)));
 }
 
@@ -166,7 +167,7 @@ TEST_F(ResourceTreeModelTest, DISABLED_serverControlIconStatus)
     loginAsPowerUser("power_user");
 
     // Then server icon has Control decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Control)
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Control)
         (uniqueMatchingIndex(kUniqueServerNameCondition)));
 }
 
