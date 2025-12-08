@@ -12,6 +12,7 @@
                     range="Auto,Force Enabled,Force Disabled"
                     internalRange="auto,forceEnabled,forceDisabled"
                     availableInOffline="true"
+                    writeCmd="custom_axis"
                     aux="reopenStreams"/>
                 <param id="internal.event_meta.primary"
                     name="Fetch Events"
@@ -19,6 +20,7 @@
                     range="Auto,Force Enabled,Force Disabled"
                     internalRange="auto,forceEnabled,forceDisabled"
                     availableInOffline="true"
+                    writeCmd="custom_axis"
                     aux="reopenStreams"/>
             </group>
             <group name="Secondary Stream">
@@ -28,6 +30,7 @@
                     range="Auto,Force Enabled,Force Disabled"
                     internalRange="auto,forceEnabled,forceDisabled"
                     availableInOffline="true"
+                    writeCmd="custom_axis"
                     aux="reopenStreams"/>
                 <param id="internal.event_meta.secondary"
                     name="Fetch Events"
@@ -35,6 +38,7 @@
                     range="Auto,Force Enabled,Force Disabled"
                     internalRange="auto,forceEnabled,forceDisabled"
                     availableInOffline="true"
+                    writeCmd="custom_axis"
                     aux="reopenStreams"/>
             </group>
         </group>

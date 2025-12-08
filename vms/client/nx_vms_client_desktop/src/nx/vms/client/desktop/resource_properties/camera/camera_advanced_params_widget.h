@@ -52,6 +52,9 @@ private:
     void sendCustomParameterCommand(
         const QnCameraAdvancedParameter& parameter, const QString& value);
 
+    void sendCustomPtzCommand(
+        const QnCameraAdvancedParameter& parameter, const QString& value);
+
     void updateButtonsState();
     void updateParametersVisibility();
 
