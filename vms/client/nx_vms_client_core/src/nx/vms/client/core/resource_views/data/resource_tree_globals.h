@@ -114,15 +114,6 @@ enum class FilterType
 };
 Q_ENUM_NS(FilterType);
 
-enum class ActivationType
-{
-    enterKey,
-    singleClick,
-    doubleClick,
-    middleClick
-};
-Q_ENUM_NS(ActivationType);
-
 enum class ResourceSelection
 {
     single,

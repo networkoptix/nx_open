@@ -10,7 +10,7 @@
 
 class QPoint;
 
-namespace nx::vms::client::core::ResourceTree { enum class ActivationType; }
+namespace nx::vms::client::core { enum class ActivationType; }
 
 namespace nx::vms::client::desktop {
 
@@ -55,7 +55,7 @@ public:
      */
     void activateItem(const QModelIndex& index,
         const QModelIndexList& selection,
-        const nx::vms::client::core::ResourceTree::ActivationType activationType,
+        const nx::vms::client::core::ActivationType activationType,
         const Qt::KeyboardModifiers modifiers = Qt::NoModifier);
 
     /**

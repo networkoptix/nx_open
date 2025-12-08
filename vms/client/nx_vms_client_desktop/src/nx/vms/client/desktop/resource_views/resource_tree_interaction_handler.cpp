@@ -19,6 +19,7 @@
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/common/models/filter_proxy_model.h>
+#include <nx/vms/client/core/enums.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
@@ -484,14 +485,14 @@ menu::Parameters ResourceTreeInteractionHandler::actionParameters(
 
 void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
     const QModelIndexList& selection,
-    const core::ResourceTree::ActivationType activationType,
+    const core::ActivationType activationType,
     const Qt::KeyboardModifiers modifiers)
 {
     using namespace nx::vms::client::core;
 
     using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 
-    if (activationType == core::ResourceTree::ActivationType::middleClick)
+    if (activationType == ActivationType::middleClick)
     {
         const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
         menu()->trigger(menu::OpenInNewTabAction, resource);
@@ -503,7 +504,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
     {
         case NodeType::currentSystem:
         {
-            if (activationType != core::ResourceTree::ActivationType::doubleClick)
+            if (activationType != ActivationType::doubleClick)
                 return;
 
             // System Administration window opens on double-click if current user is a member of
@@ -514,7 +515,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
 
         case NodeType::currentUser:
         {
-            if (activationType != core::ResourceTree::ActivationType::doubleClick)
+            if (activationType != ActivationType::doubleClick)
                 return;
 
             // Opens User Settings window for current user.
@@ -580,7 +581,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
         case NodeType::customResourceGroup:
         case NodeType::recorder:
         {
-            if (activationType == ResourceTree::ActivationType::doubleClick)
+            if (activationType == ActivationType::doubleClick)
                 return;
 
             QnResourceList resources;
@@ -606,7 +607,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             // Do not open servers of admin.
             if (nodeType == ResourceTree::NodeType::resource
                 && resource->hasFlags(Qn::server)
-                && activationType == ResourceTree::ActivationType::doubleClick)
+                && activationType == ActivationType::doubleClick)
             {
                 break;
             }
@@ -625,7 +626,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
                 ? menu::OpenInNewTabAction
                 : menu::DropResourcesAction;
 
-            if (activationType == ResourceTree::ActivationType::enterKey)
+            if (activationType == ActivationType::enterKey)
                 menu()->trigger(actionId, d->actionParameters(index, selection));
             else
                 menu()->trigger(actionId, resource);

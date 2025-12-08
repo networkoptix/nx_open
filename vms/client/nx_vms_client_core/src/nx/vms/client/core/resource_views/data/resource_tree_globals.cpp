@@ -78,7 +78,6 @@ void registerQmlType()
     qRegisterMetaType<ResourceExtraStatusFlag>();
     qRegisterMetaType<FilterType>();
     qRegisterMetaType<ShortcutHint>();
-    qRegisterMetaType<ActivationType>();
 }
 
 } // namespace ResourceTree

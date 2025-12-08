@@ -9,6 +9,7 @@
 // Squish does not handle forward declarations well, so resource_tree_squish_facade.h is included.
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/vms/client/core/enums.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_squish_facade.h>
@@ -56,7 +57,7 @@ public:
 
     Q_INVOKABLE void activateItem(const QModelIndex& index,
         const QModelIndexList& selection,
-        const nx::vms::client::core::ResourceTree::ActivationType activationType,
+        const nx::vms::client::core::ActivationType activationType,
         const Qt::KeyboardModifiers modifiers);
 
     Q_INVOKABLE void showContextMenu(

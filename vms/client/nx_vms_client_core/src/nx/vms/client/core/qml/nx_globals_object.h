@@ -23,7 +23,11 @@ namespace nx::vms::client::core {
 class NX_VMS_CLIENT_CORE_API NxGlobalsObject: public QObject
 {
     Q_OBJECT
-    Q_ENUMS(nx::vms::client::core::Enums::ResourceFlags)
+    Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
+
+    Q_ENUMS(
+        nx::vms::client::core::Enums::ResourceFlags
+        nx::vms::client::core::ActivationType)
 
 public:
     NxGlobalsObject(QObject* parent = nullptr);

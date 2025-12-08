@@ -221,7 +221,7 @@ FocusScope
         return result
     }
 
-    signal activated(var modelIndex, var selection, var activationType, var modifiers)
+    signal activated(var modelIndex, var selection, int activationType, var modifiers)
     signal contextMenuRequested(point globalPos, var modelIndex, var selection)
     signal selectionChanged()
 
@@ -616,7 +616,7 @@ FocusScope
                         else
                         {
                             activated(listItem.sourceIndex, selection(),
-                                ResourceTree.ActivationType.doubleClick,
+                                NxGlobals.ActivationType.doubleClick,
                                 Qt.NoModifier)
                         }
                     }
@@ -651,8 +651,8 @@ FocusScope
                                 activated(modelIndex,
                                     selection(),
                                     (mouse.button == Qt.MiddleButton)
-                                        ? ResourceTree.ActivationType.middleClick
-                                        : ResourceTree.ActivationType.singleClick,
+                                        ? NxGlobals.ActivationType.middleClick
+                                        : NxGlobals.ActivationType.singleClick,
                                     Qt.NoModifier);
                             }
                             else
@@ -937,7 +937,7 @@ FocusScope
                 if (treeView.currentIndex.valid)
                     activated(treeView.currentIndex,
                         selection(),
-                        ResourceTree.ActivationType.enterKey,
+                        NxGlobals.ActivationType.enterKey,
                         event.modifiers)
                 break
 

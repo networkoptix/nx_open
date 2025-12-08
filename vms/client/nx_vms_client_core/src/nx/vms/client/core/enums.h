@@ -8,6 +8,8 @@
 
 namespace nx::vms::client::core {
 
+Q_NAMESPACE_EXPORT(NX_VMS_CLIENT_CORE_API)
+
 class Enums: public QObject
 {
     Q_OBJECT
@@ -21,5 +23,14 @@ public:
     };
     Q_ENUM(ResourceFlag)
 };
+
+enum class ActivationType
+{
+    enterKey,
+    singleClick,
+    doubleClick,
+    middleClick
+};
+Q_ENUM_NS(ActivationType)
 
 } // namespace nx::vms::client::core

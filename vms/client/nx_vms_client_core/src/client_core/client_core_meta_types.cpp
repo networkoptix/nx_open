@@ -38,6 +38,7 @@
 #include <nx/vms/client/core/common/utils/row_count_watcher.h>
 #include <nx/vms/client/core/common/utils/validators.h>
 #include <nx/vms/client/core/common/utils/velocity_meter.h>
+#include <nx/vms/client/core/enums.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/models/event_search_model_adapter.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
@@ -109,8 +110,8 @@ void initializeMetatypesInternal()
     QnJsonSerializer::registerSerializer<EncodedCredentials>();
 
     qRegisterMetaType<nx::media::PlayerStatistics>();
+    qRegisterMetaType<ActivationType>();
     qRegisterMetaType<MotionSelection>();
-    qRegisterMetaType<ResourceTree::NodeType>();
 }
 
 void initializeMetaTypes()

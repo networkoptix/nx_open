@@ -622,7 +622,7 @@ QVector<core::ResourceTree::ShortcutHint> ResourceTreeModelAdapter::shortcutHint
 
 void ResourceTreeModelAdapter::activateItem(const QModelIndex& index,
     const QModelIndexList& selection,
-    const core::ResourceTree::ActivationType activationType,
+    const core::ActivationType activationType,
     const Qt::KeyboardModifiers modifiers)
 {
     if (NX_ASSERT(d->interactionHandler))
