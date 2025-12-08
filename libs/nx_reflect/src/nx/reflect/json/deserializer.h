@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <expected>
 #include <optional>
 #include <string_view>
 #include <tuple>
@@ -701,6 +702,17 @@ std::tuple<Data, DeserializationResult> deserialize(
     Data data = createDefault<Data>();
     auto result = deserialize<Data>(json, &data, skipErrors);
     return std::make_tuple(std::move(data), std::move(result));
+}
+
+template<typename Data>
+std::expected<Data, DeserializationResult> deserializeOrError(const std::string_view& json,
+    json::DeserializationFlag skipErrors = json::DeserializationFlag::none)
+{
+    std::expected<Data, DeserializationResult> data = createDefault<Data>();
+    if (DeserializationResult result = deserialize<Data>(json, std::addressof(*data), skipErrors))
+        return data;
+    else
+        return std::unexpected(std::move(result));
 }
 
 } // namespace json

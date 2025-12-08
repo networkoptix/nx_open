@@ -2433,7 +2433,8 @@ static void registerDeviceHandlers(
     reg("rest/v{4-}/devices/:id/webrtc-camera", GlobalPermission::none,
         std::make_unique<WebRtcCameraTrackerHandler>(authenticator, serverModule, serverConnector));
 
-    /**%apidoc GET /rest/v{3-}/devices/{id}/virtual/status
+    /**%apidoc GET /rest/v{3-4}/devices/{id}/virtual/status
+     * %deprecated Use <b>/rest/v{3-}/devices/{deviceId}/virtual/uploads/{uploadId}</b> endpoint instead.
      * Returns virtual Device status.
      * %caption Get virtual Device status
      * %ingroup Virtual Devices
@@ -2442,13 +2443,13 @@ static void registerDeviceHandlers(
      * %param[ref] _keepDefault
      * %permissions Depends on Resource access rights.
      * %return:{VirtualDeviceStatus} Virtual Device status.
-     * %// TODO: Consider removing /extend and using /lock.
      */
-    reg("rest/v{3-}/devices/:id/virtual/status",
+    reg("rest/v{3-4}/devices/:id/virtual/status",
         GlobalPermission::none,
         std::make_unique<VirtualDeviceReadStatus>(*serverModule, *serverConnector));
 
-    /**%apidoc PATCH /rest/v{3-}/devices/{id}/virtual/prepare
+    /**%apidoc PATCH /rest/v{3-4}/devices/{id}/virtual/prepare
+     * %deprecated Use <b>/rest/v{3-}/devices/{deviceId}/virtual/uploads/{uploadId}</b> endpoint instead.
      * Returns Device footage preparation result.
      * %caption Virtual Device preparation
      * %ingroup Virtual Devices
@@ -2457,11 +2458,12 @@ static void registerDeviceHandlers(
      * %permissions Depends on Resource access rights.
      * %return:{VirtualDeviceStatus} Virtual Device status.
      */
-    reg("rest/v{3-}/devices/:id/virtual/prepare",
+    reg("rest/v{3-4}/devices/:id/virtual/prepare",
         GlobalPermission::none,
         std::make_unique<VirtualDeviceReadPrepare>(*serverModule, *serverConnector));
 
-    /**%apidoc PATCH /rest/v{3-}/devices/{id}/virtual/consume
+    /**%apidoc PATCH /rest/v{3-4}/devices/{id}/virtual/consume
+     * %deprecated Use <b>/rest/v{3-}/devices/{deviceId}/virtual/uploads/{uploadId}</b> endpoint instead.
      * Starts a consume operation, importing already uploaded file as camera footage.
      * %caption Start Virtual Device Consume
      * %ingroup Virtual Devices
@@ -2470,11 +2472,12 @@ static void registerDeviceHandlers(
      * %permissions Depends on Resource access rights.
      * %return:{VirtualDeviceStatus} Virtual device status.
      */
-    reg("rest/v{3-}/devices/:id/virtual/consume",
+    reg("rest/v{3-4}/devices/:id/virtual/consume",
         GlobalPermission::none,
         std::make_unique<VirtualDeviceUpdateConsume>(*serverModule, *serverConnector));
 
-    /**%apidoc PATCH /rest/v{3-}/devices/{id}/virtual/lock
+    /**%apidoc PATCH /rest/v{3-4}/devices/{id}/virtual/lock
+     * %deprecated Use <b>/rest/v{3-}/devices/{deviceId}/virtual/uploads/{uploadId}</b> endpoint instead.
      * Locks virtual device.
      * %caption Lock Virtual Device
      * %ingroup Virtual Devices
@@ -2483,11 +2486,11 @@ static void registerDeviceHandlers(
      * %permissions Depends on Resource access rights.
      * %return:{VirtualDeviceStatus} Virtual device status.
      */
-    reg("rest/v{3-}/devices/:id/virtual/lock",
+    reg("rest/v{3-4}/devices/:id/virtual/lock",
         GlobalPermission::none,
         std::make_unique<VirtualDeviceUpdateLock>(*serverModule, *serverConnector));
 
-    /**%apidoc PATCH /rest/v{3-}/devices/{id}/virtual/extend
+    /**%apidoc PATCH /rest/v{3-4}/devices/{id}/virtual/extend
      * Extends virtual device lock.
      * %caption Extend Virtual Device Lock
      * %ingroup Virtual Devices
@@ -2500,7 +2503,7 @@ static void registerDeviceHandlers(
         GlobalPermission::none,
         std::make_unique<VirtualDeviceUpdateExtend>(*serverModule, *serverConnector));
 
-    /**%apidoc PATCH /rest/v{3-}/devices/{id}/virtual/release
+    /**%apidoc PATCH /rest/v{3-4}/devices/{id}/virtual/release
      * Releases virtual device lock.
      * %caption Release Virtual Device Lock
      * %ingroup Virtual Devices
@@ -2512,6 +2515,59 @@ static void registerDeviceHandlers(
     reg("rest/v{3-}/devices/:id/virtual/release",
         GlobalPermission::none,
         std::make_unique<VirtualDeviceUpdateRelease>(*serverModule, *serverConnector));
+
+    // TODO: #skolesnik GET for server sent events
+    /**%apidoc POST /rest/v{4-}/devices/{deviceId}/virtual/uploads
+     * Creates Video Uploads for Virtual Device to be used for chunk uploading.
+     * %caption Create Upload
+     * %ingroup Virtual Devices
+     * %permissions Depends on Resource access rights.
+     * %struct VirtualDeviceCreateUploads
+     * %param[ref] _local,_strict,_ticket
+     * %return:{std::vector<std::variant<ResultForVirtualDeviceCreateUpload, Result>>} Upload Ids.
+     *
+     * %apidoc PUT /rest/v{4-}/devices/{deviceId}/virtual/uploads/{uploadId}
+     * Upload a Video file chunk for Virtual Device.
+     * The chunk index must be provided as the `chunk` query parameter.
+     * Request body must contain raw binary data with content type
+     * <code>application/octet-stream</code>.
+     * %caption Upload Video Chunk
+     * %ingroup Virtual Devices
+     * %permissions Depends on Resource access rights.
+     * %struct VirtualDeviceUploadId
+     * %param:integer chunk (Query Parameter) Index of Video File chunk to upload
+     * %param[ref] _local,_strict,_ticket
+     * %return:{StatusForVirtualDeviceUpload} Updated status on success.
+     *
+     * %apidoc GET /rest/v{4-}/devices/{deviceId}/virtual/uploads/{uploadId}
+     * Returns current upload status for a file using its upload ID.
+     * %caption Video Chunk upload status
+     * %ingroup Virtual Devices
+     * %permissions Depends on Resource access rights.
+     * %struct VirtualDeviceUploadId
+     * %param[ref] _local,_strict,_ticket,_stripDefault
+     * %return:{StatusForVirtualDeviceUpload}
+     *
+     * %apidoc GET /rest/v{4-}/devices/{deviceId}/virtual/uploads
+     * Returns current status for all video files being uploaded for the Virtual Device.
+     * %caption Video Chunk upload status
+     * %ingroup Virtual Devices
+     * %permissions Depends on Resource access rights.
+     * %struct VirtualDeviceUploadId
+     * %param[ref] _local,_strict,_ticket,_stripDefault
+     * %return:{std::vector<StatusForVirtualDeviceUpload>}
+     *
+     * %apidoc DELETE /rest/v{4-}/devices/{deviceId}/virtual/uploads/{uploadId}
+     * Deletes an existing upload in an uploading or consuming state.
+     * %caption Cancel Upload
+     * %ingroup Virtual Devices
+     * %permissions Depends on Resource access rights.
+     * %struct VirtualDeviceUploadId
+     * %param[ref] _local,_strict,_ticket
+     */
+    reg("rest/v{3-}/devices/:deviceId/virtual/uploads/:uploadId?",
+        GlobalPermission::none,
+        std::make_unique<VirtualDeviceUpload>(serverModule, serverConnector));
 }
 
 static void registerLdapRestHandlers(

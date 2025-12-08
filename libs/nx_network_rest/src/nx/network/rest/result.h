@@ -32,10 +32,11 @@ NX_REFLECTION_ENUM_CLASS(ErrorId,
         sessionTruncated = 15,
         gone = 16,
         notAllowed = 17,
-        serviceUnauthorized = 18
+        serviceUnauthorized = 18,
+        insufficientStorage = 19
 )
 
-/**%apidoc JSON object including the error status.
+/**%apidoc:object JSON object including the error status.
  * %param:string error Numeric string representation of `errorId`.
  *     %deprecated Use `errorId` instead.
  *     %value "0" ok
@@ -57,6 +58,7 @@ NX_REFLECTION_ENUM_CLASS(ErrorId,
  *     %value "16" gone
  *     %value "17" notAllowed
  *     %value "18" serviceUnauthorized
+ *     %value "19" insufficientStorage
  *
  * %// The typical apidoc comment for the result of a function looks like (without `//`):
  * %//return
@@ -72,7 +74,6 @@ struct NX_NETWORK_REST_API Result
     static QString invalidParameterTemplate();
 
 public:
-
     static nx::network::http::StatusCode::Value toHttpStatus(ErrorId code);
     static ErrorId errorFromHttpStatus(int status);
 
@@ -100,14 +101,20 @@ public:
     static Result sessionRequired(std::optional<QString> customMessage = std::nullopt);
     static Result sessionTruncated(std::optional<QString> customMessage = std::nullopt);
     static Result gone(std::optional<QString> customMessage = std::nullopt);
+    static Result insufficientStorage(std::optional<QString> customMessage = std::nullopt);
 
     template<typename Value>
     static Result invalidParameter(const QString& name, const Value& value)
     {
-        return Result{ErrorId::invalidParameter,
-            format(invalidParameterTemplate(), name, value)};
+        return Result{ErrorId::invalidParameter, format(invalidParameterTemplate(), name, value)};
     }
 };
+
+inline bool operator<(const Result& rhs, const Result& lhs) noexcept
+{
+    const auto tieFields = [](const Result& r) { return std::tie(r.errorId, r.errorString); };
+    return tieFields(rhs) < tieFields(lhs);
+}
 
 NX_NETWORK_REST_API void serialize(
     QnJsonContext* context, const Result& value, QJsonValue* outTarget);

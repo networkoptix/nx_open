@@ -41,6 +41,7 @@ public:
     NX_REST_EXCEPTION_METHOD(sessionRequired)
     // NX_REST_EXCEPTION_METHOD(sessionTruncated) - Use UnauthorizedException::sessionTruncated.
     NX_REST_EXCEPTION_METHOD(gone)
+    NX_REST_EXCEPTION_METHOD(insufficientStorage)
     #undef NX_REST_EXCEPTION_METHOD
 
 private:

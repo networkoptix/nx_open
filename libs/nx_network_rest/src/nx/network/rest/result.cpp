@@ -53,6 +53,9 @@ nx::network::http::StatusCode::Value Result::toHttpStatus(ErrorId code)
         case ErrorId::gone:
             return http::StatusCode::gone;
 
+        case ErrorId::insufficientStorage:
+            return http::StatusCode::insufficientStorage;
+
         default:
             return http::StatusCode::badRequest;
     }
@@ -95,6 +98,9 @@ ErrorId Result::errorFromHttpStatus(int status)
 
         case StatusCode::unauthorized:
             return ErrorId::unauthorized;
+
+        case StatusCode::insufficientStorage:
+            return ErrorId::insufficientStorage;
 
         default:
             return ErrorId::badRequest;
@@ -213,6 +219,12 @@ Result Result::gone(std::optional<QString> customMessage)
 {
     return Result{ErrorId::gone,
         customMessage ? *customMessage : tr("Resource no longer present on server.")};
+}
+
+Result Result::insufficientStorage(std::optional<QString> customMessage)
+{
+    return {ErrorId::insufficientStorage,
+        customMessage.value_or(tr("Insufficient storage."))};
 }
 
 void serialize(QnJsonContext* /*context*/, const Result& value, QJsonValue* outTarget)

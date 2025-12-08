@@ -12,7 +12,7 @@ void registerRestHandlers(
     nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
 {
     const auto reg = processorPool->createRegisterHandlerFunctor();
-    nx::vms::common::SystemContext* const systemContext = connection->systemContext();
+    auto* const systemContext = connection->systemContext();
     QueryProcessor* const queryProcessor = connection->queryProcessor();
 
     /**%apidoc GET /rest/v{1-3}/servers
