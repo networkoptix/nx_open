@@ -114,6 +114,8 @@ std::string toString(Value val)
             return "Service Unavailable";
         case gatewayTimeOut:
             return "Gateway Timeout";
+        case insufficientStorage:
+            return "Insufficient Storage";
     }
     return nx::utils::buildString("Unknown_", (int) val);
 }

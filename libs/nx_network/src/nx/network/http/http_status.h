@@ -65,6 +65,7 @@ enum Value: int
     badGateway = 502,
     serviceUnavailable = 503,
     gatewayTimeOut = 504,
+    insufficientStorage = 507,
 };
 
 NX_NETWORK_API std::string toString(Value);

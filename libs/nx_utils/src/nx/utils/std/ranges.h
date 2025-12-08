@@ -17,6 +17,7 @@
 #include <vector>
 
 #include <nx/utils/std/functional.h>
+#include <nx/utils/type_traits.h>
 
 namespace nx {
 
@@ -32,6 +33,13 @@ struct AlwaysFalse
     template<typename... T>
     constexpr bool operator()(const T&...) const noexcept { return false; }
 } constexpr alwaysFalse{};
+
+template <TimePeriodLike Left, TimePeriodLike Right>
+struct TimePeriodsIntersection
+{
+    Left first;
+    Right second;
+};
 
 // TODO: #skolesnik
 // Some of the adapted for piping std::ranges operations, are available out-of-the box in
@@ -141,6 +149,10 @@ constexpr decltype(auto) operator|(T&& v, Closure<F>&& f)
 namespace ranges {
 
 template<typename Range, typename Element>
+concept RangeOf =
+    std::ranges::range<Range> && std::same_as<std::ranges::range_value_t<Range>, Element>;
+
+template<typename Range, typename Element>
 concept ViewOf =
     std::ranges::view<Range>
     && std::same_as<std::ranges::range_value_t<Range>, Element>;
@@ -152,7 +164,39 @@ concept PairLikeRange = std::ranges::range<R>
     { std::get<1>(*std::ranges::begin(r)) };
 };
 
+template<typename R>
+concept KeyValueRange = std::ranges::input_range<R> && requires {
+    typename std::ranges::range_value_t<R>::first_type;
+    typename std::ranges::range_value_t<R>::second_type;
+};
+
+template<KeyValueRange R>
+using RangeKeyType = typename std::ranges::range_value_t<R>::first_type;
+
+template<KeyValueRange R>
+using RangeValue = typename std::ranges::range_value_t<R>::second_type;
+
+// Concept: K can be used as a key for range R (heterogeneous lookup via ==).
+template<typename K, typename R>
+concept RangeKey = KeyValueRange<R> && std::equality_comparable_with<K, RangeKeyType<R>>;
+
+template<KeyValueRange R>
+constexpr const RangeValue<R>& value_or(const R& keyValueRange,
+    const RangeKey<R> auto& key,
+    const RangeValue<R>& orValue)
+{
+    const auto it =
+        std::ranges::find_if(keyValueRange, [&key](const auto& kv) { return kv.first == key; });
+
+    return (it != std::ranges::end(keyValueRange)) ? it->second : orValue;
 }
+
+// Deleted rvalue overload: prevents passing a temporary as orValue.
+template<KeyValueRange R>
+constexpr const RangeValue<R>& value_or(
+    const R&, const RangeKey<R> auto&, const RangeValue<R>&&) = delete;
+
+} // namespace ranges
 
 // -- Operations with Lazy evaluation, returning a View -----------------------------------------
 namespace views {
@@ -166,6 +210,196 @@ constexpr Closure split =
             | std::views::transform(
                 []<typename T>(T&& v) { return std::string_view(std::forward<T>(v)); });
     };
+
+struct indexed_t {
+    std::size_t from;
+
+    template<class R>
+    auto operator()(R&& r) const
+    {
+        return std::views::zip(std::views::iota(from), std::views::all(std::forward<R>(r)));
+    }
+
+    template <class R>
+    friend auto operator|(R&& range, indexed_t self) {
+        return self(std::forward<R>(range));
+    }
+};
+
+constexpr indexed_t indexed(std::size_t from = 0) {
+    return {from};
+}
+
+// TODO: #skolesnik Comment + example
+template<std::ranges::view RangeFirst, std::ranges::view RangeSecond>
+    requires TimePeriodLike<std::ranges::range_value_t<RangeFirst>>
+    && TimePeriodLike<std::ranges::range_value_t<RangeSecond>>
+class Intersections:
+    public std::ranges::view_interface<Intersections<RangeFirst, RangeSecond>>
+{
+    using SubrangeFirst = std::ranges::subrange<
+        std::ranges::iterator_t<RangeFirst>,
+        std::ranges::sentinel_t<RangeFirst>>;
+
+    using SubrangeSecond = std::ranges::subrange<
+        std::ranges::iterator_t<RangeSecond>,
+        std::ranges::sentinel_t<RangeSecond>>;
+
+    using LeftPeriod = std::ranges::range_value_t<RangeFirst>;
+    using RightPeriod = std::ranges::range_value_t<RangeSecond>;
+    using Intersection = nx::TimePeriodsIntersection<LeftPeriod, RightPeriod>;
+
+    struct Iterator
+    {
+        SubrangeFirst firstRemaining;
+        SubrangeSecond secondRemaining;
+        std::optional<Intersection> nextIntersection;
+
+        using iterator_concept = std::input_iterator_tag;
+        using iterator_category = std::input_iterator_tag;
+        using value_type = Intersection;
+        using difference_type = std::ptrdiff_t;
+
+        constexpr const value_type& operator*() const noexcept
+        {
+            return *nextIntersection;
+        }
+
+        constexpr Iterator& operator++()
+        {
+            *this = Intersections::computeNextIntersection(firstRemaining, secondRemaining);
+            return *this;
+        }
+
+        constexpr void operator++(int)
+        {
+            ++(*this);
+        }
+
+        constexpr bool operator==(std::default_sentinel_t) const noexcept
+        {
+            return !nextIntersection.has_value();
+        }
+    };
+
+    static constexpr Iterator computeNextIntersection(
+        SubrangeFirst firstRemaining, SubrangeSecond secondRemaining)
+    {
+        while (firstRemaining.begin() != firstRemaining.end()
+            && secondRemaining.begin() != secondRemaining.end())
+        {
+            const auto firstIterator = firstRemaining.begin();
+            const auto secondIterator = secondRemaining.begin();
+
+            const auto& firstPeriod = *firstIterator;
+            const auto& secondPeriod = *secondIterator;
+
+            const std::chrono::milliseconds firstStart{firstPeriod.startTimeMs};
+            const std::chrono::milliseconds firstEnd = firstStart + firstPeriod.durationMs;
+            const std::chrono::milliseconds secondStart{secondPeriod.startTimeMs};
+            const std::chrono::milliseconds secondEnd = secondStart + secondPeriod.durationMs;
+
+            if (firstEnd <= secondStart)
+            {
+                firstRemaining = SubrangeFirst{std::next(firstIterator), firstRemaining.end()};
+                continue;
+            }
+
+            if (secondEnd <= firstStart)
+            {
+                secondRemaining = SubrangeSecond{std::next(secondIterator), secondRemaining.end()};
+                continue;
+            }
+
+            const bool advanceFirst = firstEnd <= secondEnd;
+            const bool advanceSecond = secondEnd <= firstEnd;
+
+            return {
+                .firstRemaining = advanceFirst
+                    ? SubrangeFirst{std::next(firstIterator), firstRemaining.end()}
+                    : std::move(firstRemaining),
+                .secondRemaining = advanceSecond
+                    ? SubrangeSecond{std::next(secondIterator), secondRemaining.end()}
+                    : std::move(secondRemaining),
+                .nextIntersection =
+                    Intersection{
+                        .first = firstPeriod,
+                        .second = secondPeriod,
+                    },
+            };
+        }
+
+        return {
+            .firstRemaining = std::move(firstRemaining),
+            .secondRemaining = std::move(secondRemaining),
+            .nextIntersection = std::nullopt,
+        };
+    }
+
+public:
+    constexpr Intersections(RangeFirst firstView, RangeSecond secondView):
+        storedFirstView(std::move(firstView)),
+        storedSecondView(std::move(secondView))
+    {
+    }
+
+    constexpr Iterator begin()
+    {
+        SubrangeFirst firstRemaining{
+            std::ranges::begin(storedFirstView),
+            std::ranges::end(storedFirstView)};
+        SubrangeSecond secondRemaining{
+            std::ranges::begin(storedSecondView),
+            std::ranges::end(storedSecondView)};
+
+        return computeNextIntersection(std::move(firstRemaining), std::move(secondRemaining));
+    }
+
+    constexpr std::default_sentinel_t end() const noexcept
+    {
+        return {};
+    }
+
+private:
+    RangeFirst storedFirstView;
+    RangeSecond storedSecondView;
+};
+
+// Example:
+//   std::ranges::ref_view v1{c1};
+//   std::ranges::ref_view v2{c2};
+//   nx::views::Intersections x{v1, v2};
+template<std::ranges::view V1, std::ranges::view V2>
+Intersections(V1, V2) -> Intersections<V1, V2>;
+
+// Example:
+//   nx::views::Intersections x{c1, c2};
+//   for (auto p : x) { ... }
+template<std::ranges::range R1, std::ranges::range R2>
+    requires TimePeriodLike<std::ranges::range_value_t<R1>>
+    && TimePeriodLike<std::ranges::range_value_t<R2>>
+Intersections(R1&, R2&) -> Intersections<std::ranges::ref_view<R1>, std::ranges::ref_view<R2>>;
+
+struct self_intersections_t
+{
+    template<std::ranges::view V>
+    constexpr auto operator()(V v) const
+    {
+        const auto n = std::ranges::distance(v);
+        return Intersections{
+            v | std::views::take(n > 0 ? n - 1 : n), //< all but last
+            v | std::views::drop(1), //< all but first
+        };
+    }
+
+    template<std::ranges::view V>
+    friend constexpr auto operator|(V v, self_intersections_t self)
+    {
+        return self(std::move(v));
+    }
+};
+
+constexpr self_intersections_t self_intersections{};
 
 } // namespace nx::views
 
@@ -515,6 +749,7 @@ constexpr Closure partition =
         };
     };
 
+// TODO: #skolesnik Support std::expected
 /**
  * Partitions std::vector<std::variant<T...>> into std::tuple<std::vector<T>...>. Moves each
  * element to its matching bucket; per-type order is preserved.
