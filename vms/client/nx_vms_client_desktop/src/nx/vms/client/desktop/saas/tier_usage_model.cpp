@@ -9,9 +9,10 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/saas/tier_usage_common.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 
@@ -100,7 +101,7 @@ QList<QStandardItem*> TierUsageModel::Private::createTierLimitRow(
         const auto resource = resourcePool->getResourceById(it->first);
 
         auto resourceNameItem = new QStandardItem(resource->getName());
-        resourceNameItem->setData(qnResIconCache->icon(resource), Qt::DecorationRole);
+        resourceNameItem->setData(appContext()->resourceIconCache()->icon(resource), Qt::DecorationRole);
 
         auto tierLimitAllowedItem = new QStandardItem(QString::number(overuseData.allowed));
         auto tierLimitUsedItem = new QStandardItem(QString::number(it->second));

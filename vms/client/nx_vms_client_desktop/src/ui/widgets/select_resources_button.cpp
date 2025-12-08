@@ -7,22 +7,24 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
+using nx::vms::client::core::ResourceIconCache;
+
 namespace {
 
 static const int kDefaultMaximumWidth = 300;
 
-QIcon iconHelper(QnResourceIconCache::Key key)
+QIcon iconHelper(ResourceIconCache::Key key)
 {
-    return QIcon(core::Skin::maximumSizePixmap(qnResIconCache->icon(key),
+    return QIcon(core::Skin::maximumSizePixmap(appContext()->resourceIconCache()->icon(key),
         QIcon::Selected, QIcon::Off, false));
 }
 
@@ -85,9 +87,9 @@ QnSelectResourcesButton::Appearance QnSelectResourcesButton::appearanceForResour
     if (!resource)
         return appearanceForSelected(0);
 
-    auto key = qnResIconCache->key(resource);
+    auto key = appContext()->resourceIconCache()->key(resource);
     if (!m_singleSelectionParameters.showState)
-        key &= QnResourceIconCache::TypeMask;
+        key &= ResourceIconCache::TypeMask;
 
     return {
         iconHelper(key),
@@ -117,7 +119,7 @@ void QnSelectDevicesButton::selectDevices(const QnVirtualCameraResourceList& dev
 QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAny() const
 {
     return {
-        iconHelper(QnResourceIconCache::Camera),
+        iconHelper(ResourceIconCache::Camera),
         QnDeviceDependentStrings::getDefaultNameFromSet(
             appContext()->currentSystemContext()->resourcePool(),
             tr("Any Device"),
@@ -127,7 +129,7 @@ QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAny() co
 QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAll() const
 {
     return {
-        iconHelper(QnResourceIconCache::Cameras),
+        iconHelper(ResourceIconCache::Cameras),
         QnDeviceDependentStrings::getDefaultNameFromSet(
             appContext()->currentSystemContext()->resourcePool(),
             tr("All Devices"),
@@ -147,7 +149,7 @@ QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForSelected
     }
 
     return {
-        iconHelper(count == 1 ? QnResourceIconCache::Camera : QnResourceIconCache::Cameras),
+        iconHelper(count == 1 ? ResourceIconCache::Camera : ResourceIconCache::Cameras),
         "<Internal Error>" };
 }
 
@@ -164,12 +166,12 @@ void QnSelectUsersButton::selectUsers(const QnUserResourceList& users)
 
 QnSelectResourcesButton::Appearance QnSelectUsersButton::appearanceForAny() const
 {
-    return { iconHelper(QnResourceIconCache::User), tr("Any User") };
+    return { iconHelper(ResourceIconCache::User), tr("Any User") };
 }
 
 QnSelectResourcesButton::Appearance QnSelectUsersButton::appearanceForAll() const
 {
-    return { iconHelper(QnResourceIconCache::Users), tr("All Users") };
+    return { iconHelper(ResourceIconCache::Users), tr("All Users") };
 }
 
 QnSelectResourcesButton::Appearance QnSelectUsersButton::appearanceForSelected(int count) const
@@ -178,7 +180,7 @@ QnSelectResourcesButton::Appearance QnSelectUsersButton::appearanceForSelected(i
         return{ QIcon(), tr("Select Users...") };
 
     return{
-        iconHelper(count == 1 ? QnResourceIconCache::User : QnResourceIconCache::Users),
+        iconHelper(count == 1 ? ResourceIconCache::User : ResourceIconCache::Users),
         tr("%n Users", "", count) };
 }
 
@@ -195,12 +197,12 @@ void QnSelectServersButton::selectServers(const QnMediaServerResourceList& serve
 
 QnSelectResourcesButton::Appearance QnSelectServersButton::appearanceForAny() const
 {
-    return { iconHelper(QnResourceIconCache::Server), tr("Any Server") };
+    return { iconHelper(ResourceIconCache::Server), tr("Any Server") };
 }
 
 QnSelectResourcesButton::Appearance QnSelectServersButton::appearanceForAll() const
 {
-    return { iconHelper(QnResourceIconCache::Servers), tr("All Servers") };
+    return { iconHelper(ResourceIconCache::Servers), tr("All Servers") };
 }
 
 QnSelectResourcesButton::Appearance QnSelectServersButton::appearanceForSelected(int count) const
@@ -209,7 +211,7 @@ QnSelectResourcesButton::Appearance QnSelectServersButton::appearanceForSelected
         return{ QIcon(), tr("Select Servers...") };
 
     return {
-        iconHelper(count == 1 ? QnResourceIconCache::Server : QnResourceIconCache::Servers),
+        iconHelper(count == 1 ? ResourceIconCache::Server : ResourceIconCache::Servers),
         tr("%n Servers", "", count) };
 }
 
@@ -224,12 +226,12 @@ void QnSelectLayoutsButton::selectLayouts(const QnLayoutResourceList& layouts)
 
 QnSelectLayoutsButton::Appearance QnSelectLayoutsButton::appearanceForAny() const
 {
-    return { iconHelper(QnResourceIconCache::Layout), tr("Any Layout") };
+    return { iconHelper(ResourceIconCache::Layout), tr("Any Layout") };
 }
 
 QnSelectLayoutsButton::Appearance QnSelectLayoutsButton::appearanceForAll() const
 {
-    return { iconHelper(QnResourceIconCache::Layouts), tr("All Layouts") };
+    return { iconHelper(ResourceIconCache::Layouts), tr("All Layouts") };
 }
 
 QnSelectLayoutsButton::Appearance QnSelectLayoutsButton::appearanceForSelected(int count) const
@@ -238,6 +240,6 @@ QnSelectLayoutsButton::Appearance QnSelectLayoutsButton::appearanceForSelected(i
         return{ QIcon(), tr("Select Layouts...") };
 
     return {
-        iconHelper(count == 1 ? QnResourceIconCache::Layout : QnResourceIconCache::Layouts),
+        iconHelper(count == 1 ? ResourceIconCache::Layout : ResourceIconCache::Layouts),
         tr("%n Layouts", "", count) };
 }

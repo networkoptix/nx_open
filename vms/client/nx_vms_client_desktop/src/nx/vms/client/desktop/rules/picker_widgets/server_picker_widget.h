@@ -4,9 +4,9 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/resource_dialogs/server_selection_dialog.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/rules/action_builder_fields/target_devices_field.h>
 #include <nx/vms/rules/action_builder_fields/target_servers_field.h>
 #include <nx/vms/rules/event_filter_fields/source_server_field.h>

@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/camera_hotspots/camera_hotspots_display_utils.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameter_types.h>
@@ -39,6 +40,7 @@
 namespace nx::vms::client::desktop {
 
 using namespace camera_hotspots;
+using nx::vms::client::core::ResourceIconCache;
 
 namespace {
 
@@ -86,7 +88,7 @@ struct CameraHotspotItem::Private
     // Optimized hotspot painting routines.
     void setDevicePixelRatio(qreal value);
     void setHovered(bool value);
-    void setDecorationIconKey(QnResourceIconCache::Key value);
+    void setDecorationIconKey(ResourceIconCache::Key value);
 
     CameraHotspotDisplayOption hotspotDisplayOption() const;
     void updateHotspotPixmapIfNeeded() const;
@@ -98,7 +100,7 @@ private:
 
     qreal devicePixelRatio = qGuiApp->devicePixelRatio();
     bool hovered = false;
-    QnResourceIconCache::Key decorationIconKey;
+    ResourceIconCache::Key decorationIconKey;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -337,7 +339,7 @@ void CameraHotspotItem::Private::setHovered(bool value)
     hotspotPixmapItem->setData(kInvalidPixmapRole, true);
 }
 
-void CameraHotspotItem::Private::setDecorationIconKey(QnResourceIconCache::Key value)
+void CameraHotspotItem::Private::setDecorationIconKey(ResourceIconCache::Key value)
 {
     if (decorationIconKey == value)
         return;
@@ -357,7 +359,7 @@ CameraHotspotDisplayOption CameraHotspotItem::Private::hotspotDisplayOption() co
     hotspotOption.state = q->isUnderMouse()
         ? CameraHotspotDisplayOption::State::hovered
         : CameraHotspotDisplayOption::State::none;
-    hotspotOption.decoration = qnResIconCache->icon(decorationIconKey);
+    hotspotOption.decoration = appContext()->resourceIconCache()->icon(decorationIconKey);
 
     return hotspotOption;
 }
@@ -437,7 +439,7 @@ void CameraHotspotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
 {
     d->setDevicePixelRatio(painter->device()->devicePixelRatioF());
     d->setHovered(isUnderMouse());
-    d->setDecorationIconKey(qnResIconCache->key(d->hotspotResource()));
+    d->setDecorationIconKey(appContext()->resourceIconCache()->key(d->hotspotResource()));
 
     d->updateHotspotPixmapIfNeeded();
     d->updateHotspotDecorationPixmapIfNeeded();

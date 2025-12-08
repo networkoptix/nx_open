@@ -10,8 +10,8 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 namespace nx::vms::client::desktop {
 
@@ -34,7 +34,7 @@ QString ResourceTreeModelSquishFacade::jsonModel()
 
             const auto resourceIconKeyValue = index.data(core::ResourceIconKeyRole).toInt();
             jsonItem["icon"] = toString(
-                QMetaEnum::fromType<QnResourceIconCache::Key>().valueToKeys(resourceIconKeyValue));
+                QMetaEnum::fromType<core::ResourceIconCache::Key>().valueToKeys(resourceIconKeyValue));
 
             if (jsonItem["node_type"] == toString(NodeType::resource))
             {

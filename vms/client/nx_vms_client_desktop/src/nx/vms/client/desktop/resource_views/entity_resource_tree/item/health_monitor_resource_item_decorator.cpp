@@ -2,10 +2,10 @@
 
 #include "health_monitor_resource_item_decorator.h"
 
+#include <client/client_globals.h>
 #include <core/resource/resource.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <client/client_globals.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -30,9 +30,9 @@ QVariant HealthMonitorResourceItemDecorator::data(int role) const
         const auto flags = m_sourceItem->data(core::ResourceFlagsRole).value<Qn::ResourceFlags>();
         if (flags.testFlag(Qn::server))
         {
-            auto iconKey = static_cast<QnResourceIconCache::Key>(m_sourceItem->data(role).toInt());
-            iconKey &= !QnResourceIconCache::TypeMask;
-            iconKey |= QnResourceIconCache::HealthMonitor;
+            auto iconKey = static_cast<ResourceIconCache::Key>(m_sourceItem->data(role).toInt());
+            iconKey &= !ResourceIconCache::TypeMask;
+            iconKey |= ResourceIconCache::HealthMonitor;
             return QVariant::fromValue<int>(iconKey);
         }
     }

@@ -4,9 +4,9 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 #include "resource_tree_model_test_fixture.h"
 
@@ -15,6 +15,7 @@ namespace test {
 
 using namespace nx::vms::api;
 using namespace index_condition;
+using core::ResourceIconCache;
 
 namespace {
 
@@ -96,7 +97,7 @@ TEST_F(ResourceTreeModelTest, webPageIconTypes)
     const auto regularWebPageIndex = uniqueMatchingIndex(displayFullMatch(kRegularWebPageName));
 
     // And that node has plain web page icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::WebPage)(regularWebPageIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::WebPage)(regularWebPageIndex));
 
     // Then exactly one node with Client API web page display text appears in the resource tree.
     const auto clientApiWebPageIndex = uniqueMatchingIndex(displayFullMatch(kClientApiWebPageName));
@@ -104,12 +105,12 @@ TEST_F(ResourceTreeModelTest, webPageIconTypes)
     if (ini().webPagesAndIntegrations)
     {
         // And that node has integration icon type.
-        ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::Integration)(clientApiWebPageIndex));
+        ASSERT_TRUE(iconTypeMatch(ResourceIconCache::Integration)(clientApiWebPageIndex));
     }
     else
     {
         // And that node still has web page icon type.
-        ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::WebPage)(clientApiWebPageIndex));
+        ASSERT_TRUE(iconTypeMatch(ResourceIconCache::WebPage)(clientApiWebPageIndex));
     }
 }
 
@@ -172,7 +173,7 @@ TEST_P(ResourceTreeModelTest, webPageIsNotDisplayedIfNotLoggedIn)
     ASSERT_TRUE(noneMatches(displayFullMatch(kUniqueWebPageName)));
 
     // Then no more nodes with any possible web page icon found in the resource tree.
-    ASSERT_TRUE(noneMatches(iconTypeMatch(QnResourceIconCache::WebPage)));
+    ASSERT_TRUE(noneMatches(iconTypeMatch(ResourceIconCache::WebPage)));
 }
 
 TEST_P(ResourceTreeModelTest, webPageHelpTopic)

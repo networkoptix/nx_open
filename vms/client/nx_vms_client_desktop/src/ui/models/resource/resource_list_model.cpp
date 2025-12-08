@@ -6,7 +6,8 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <utils/common/checked_cast.h>
 
 using namespace nx::vms::client::core;
@@ -339,20 +340,22 @@ void QnResourceListModel::at_resource_resourceChanged(const QnResourcePtr &resou
 
 QIcon QnResourceListModel::resourceIcon(const QnResourcePtr& resource) const
 {
-    QnResourceIconCache::Key addionalKey;
+    const auto resourceIconCache = appContext()->resourceIconCache();
+
+    ResourceIconCache::Key addionalKey;
     if (m_options.testFlag(AlwaysSelectedOption))
-        addionalKey = QnResourceIconCache::AlwaysSelected;
+        addionalKey = ResourceIconCache::AlwaysSelected;
 
     if (resource->hasFlags(Qn::server) && m_options.testFlag(ServerAsHealthMonitorOption))
-        return qnResIconCache->icon(QnResourceIconCache::HealthMonitor | addionalKey);
+        return resourceIconCache->icon(ResourceIconCache::HealthMonitor | addionalKey);
 
     if (m_options.testFlag(HideStatusOption))
     {
-        QnResourceIconCache::Key key = qnResIconCache->key(resource);
-        key &= ~QnResourceIconCache::StatusMask;
-        key |= QnResourceIconCache::Online;
-        return qnResIconCache->icon(key | addionalKey);
+        ResourceIconCache::Key key = resourceIconCache->key(resource);
+        key &= ~ResourceIconCache::StatusMask;
+        key |= ResourceIconCache::Online;
+        return resourceIconCache->icon(key | addionalKey);
     }
 
-    return qnResIconCache->icon(qnResIconCache->key(resource) | addionalKey);
+    return resourceIconCache->icon(resourceIconCache->key(resource) | addionalKey);
 }

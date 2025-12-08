@@ -21,6 +21,8 @@
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/core/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/mobile/mobile_client_meta_types.h>
 #include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
 #include <nx/vms/client/mobile/push_notification/details/secure_storage.h>
@@ -186,6 +188,8 @@ void ApplicationContext::Private::initializeEngine(
 
     cameraThumbnailProvider = new QnCameraThumbnailProvider();
     engine->addImageProvider("thumbnail", cameraThumbnailProvider);
+
+    engine->addImageProvider("resource", new core::ResourceIconProvider());
 }
 
 void ApplicationContext::Private::initializeMainWindowContext()
@@ -278,6 +282,7 @@ ApplicationContext::ApplicationContext(
     initializeNetworkModules();
     initializeMetaTypes();
     d->initializeTranslations();
+    resetResourceIconCache(new core::ResourceIconCache());
     d->initializeEngine(startupParams);
     d->initializePushManager();
     d->initializePushNotificationStorage();

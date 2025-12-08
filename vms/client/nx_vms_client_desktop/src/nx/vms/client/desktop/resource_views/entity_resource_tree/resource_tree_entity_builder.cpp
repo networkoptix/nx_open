@@ -23,12 +23,15 @@
 #include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_group_list_entity.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_list_entity.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/camera_resource_index.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/item_order/resource_tree_item_order.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/recorder_item_data_helper.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping_data.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/camera_resource_index.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/entity/layout_item_list_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/entity/showreels_list_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/entity/videowall_matrices_entity.h>
@@ -37,8 +40,6 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/health_monitor_resource_item_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/main_tree_resource_item_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/web_page_decorator.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/item_order/resource_tree_item_order.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/recorder_item_data_helper.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_tree_item_key_source_pool.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_item_factory.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/user_layout_resource_index.h>
@@ -59,11 +60,7 @@ using NodeType = ResourceTree::NodeType;
 using ResourceItemCreator = std::function<AbstractItemPtr(const QnResourcePtr&)>;
 using UuidItemCreator = std::function<AbstractItemPtr(const nx::Uuid&)>;
 
-using UserdDefinedGroupIdGetter = std::function<QString(const QnResourcePtr&, int)>;
-using UserdDefinedGroupItemCreator = std::function<AbstractItemPtr(const QString&)>;
-
-using RecorderCameraGroupIdGetter = std::function<QString(const QnResourcePtr&, int)>;
-using RecorderGroupItemCreator = std::function<AbstractItemPtr(const QString&)>;
+using GroupItemCreator = std::function<AbstractItemPtr(const QString&)>;
 
 MainTreeResourceItemDecorator::Permissions permissionsSummary(
     const QnUserResourcePtr& user,
@@ -190,18 +187,7 @@ UuidItemCreator otherServerItemCreator(
 // Function wrapper providers related to Recorders and Multisensor cameras.
 //-------------------------------------------------------------------------------------------------
 
-RecorderCameraGroupIdGetter recorderCameraGroupIdGetter()
-{
-    return
-        [](const QnResourcePtr& resource, int /*order*/)
-        {
-            if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-                return camera->getGroupId();
-            return QString();
-        };
-}
-
-RecorderGroupItemCreator recorderGroupItemCreator(
+GroupItemCreator recorderGroupItemCreator(
     ResourceTreeItemFactory* factory,
     const QSharedPointer<RecorderItemDataHelper>& recorderResourceIndex,
     const QnUserResourcePtr& user)
@@ -225,21 +211,7 @@ RecorderGroupItemCreator recorderGroupItemCreator(
 // Function wrapper providers related to the custom grouping within Resource Tree
 //-------------------------------------------------------------------------------------------------
 
-UserdDefinedGroupIdGetter userDefinedGroupIdGetter()
-{
-    return
-        [](const QnResourcePtr& resource, int order)
-        {
-            const auto compositeGroupId = resource_grouping::resourceCustomGroupId(resource);
-
-            if (resource_grouping::compositeIdDimension(compositeGroupId) <= order)
-                return QString();
-
-            return resource_grouping::trimCompositeId(compositeGroupId, order + 1);
-        };
-}
-
-UserdDefinedGroupItemCreator userDefinedGroupItemCreator(
+GroupItemCreator userDefinedGroupItemCreator(
     ResourceTreeItemFactory* factory,
     bool hasPowerUserPermissions)
 {
@@ -291,9 +263,9 @@ using namespace nx::vms::api;
 ResourceTreeEntityBuilder::ResourceTreeEntityBuilder(SystemContext* systemContext):
     base_type(),
     SystemContextAware(systemContext),
-    m_cameraResourceIndex(new CameraResourceIndex(resourcePool())),
+    m_cameraResourceIndex(new core::entity_resource_tree::CameraResourceIndex(resourcePool())),
     m_userLayoutResourceIndex(new UserLayoutResourceIndex(resourcePool())),
-    m_recorderItemDataHelper(new RecorderItemDataHelper(m_cameraResourceIndex.get())),
+    m_recorderItemDataHelper(new core::entity_resource_tree::RecorderItemDataHelper(m_cameraResourceIndex.get())),
     m_itemFactory(new ResourceTreeItemFactory(systemContext)),
     m_itemKeySourcePool(new ResourceTreeItemKeySourcePool(
         systemContext, m_cameraResourceIndex.get(), m_userLayoutResourceIndex.get()))
@@ -426,22 +398,22 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasEntity(
         groupingRuleStack.push_back(
             {parentServerIdGetter(),
             parentServerItemCreator(resourcePool(), m_itemFactory.get()),
-            Qn::ParentResourceRole,
+            core::ParentResourceRole,
             1,
             numericOrder()});
     }
 
     groupingRuleStack.push_back(
-        {userDefinedGroupIdGetter(),
+        {resource_grouping::getUserDefinedGroupId,
         userDefinedGroupItemCreator(m_itemFactory.get(), /*hasPowerUserPermissions*/ false),
-        Qn::ResourceTreeCustomGroupIdRole,
+        core::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
 
     const GroupingRule recordersGroupingRule =
-        {recorderCameraGroupIdGetter(),
+        {resource_grouping::getRecorderCameraGroupId,
         recorderGroupCreator,
-        Qn::CameraGroupIdRole,
+        core::CameraGroupIdRole,
         1, //< Dimension.
         numericOrder()};
     groupingRuleStack.push_back(recordersGroupingRule);
@@ -473,16 +445,16 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasAndResourcesE
     GroupingRuleStack groupingRuleStack;
 
     groupingRuleStack.push_back(
-        {userDefinedGroupIdGetter(),
+        {resource_grouping::getUserDefinedGroupId,
         userDefinedGroupItemCreator(m_itemFactory.get(), /*hasPowerUserPermissions*/ false),
-        Qn::ResourceTreeCustomGroupIdRole,
+        core::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
 
     const GroupingRule recordersGroupingRule =
-        {recorderCameraGroupIdGetter(),
+        {resource_grouping::getRecorderCameraGroupId,
         recorderGroupCreator,
-        Qn::CameraGroupIdRole,
+        core::CameraGroupIdRole,
         1, //< Dimension.
         numericOrder()};
     groupingRuleStack.push_back(recordersGroupingRule);
@@ -526,16 +498,16 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogServerCamerasEntity(
     GroupingRuleStack groupingRuleStack;
 
     groupingRuleStack.push_back(
-        {userDefinedGroupIdGetter(),
+        {resource_grouping::getUserDefinedGroupId,
         userDefinedGroupItemCreator(m_itemFactory.get(), /*hasPowerUserPermissions*/ false),
-        Qn::ResourceTreeCustomGroupIdRole,
+        core::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
 
     const GroupingRule recordersGroupingRule =
-        {recorderCameraGroupIdGetter(),
+        {resource_grouping::getRecorderCameraGroupId,
         recorderGroupCreator,
-        Qn::CameraGroupIdRole,
+        core::CameraGroupIdRole,
         1, //< Dimension.
         numericOrder()};
     groupingRuleStack.push_back(recordersGroupingRule);
@@ -624,9 +596,9 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createAllCamerasEntity() const
         user());
 
     const GroupingRule recordersGroupingRule =
-        {recorderCameraGroupIdGetter(),
+        {resource_grouping::getRecorderCameraGroupId,
         recorderGroupCreator,
-        Qn::CameraGroupIdRole,
+        core::CameraGroupIdRole,
         1, //< Dimension.
         numericOrder()};
 
@@ -678,16 +650,16 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServerCamerasEntity(
     GroupingRuleStack groupingRuleStack;
 
     groupingRuleStack.push_back(
-        {userDefinedGroupIdGetter(),
+        {resource_grouping::getUserDefinedGroupId,
         userDefinedGroupItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
-        Qn::ResourceTreeCustomGroupIdRole,
+        core::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
 
     const GroupingRule recordersGroupingRule =
-        {recorderCameraGroupIdGetter(),
+        {resource_grouping::getRecorderCameraGroupId,
         recorderGroupCreator,
-        Qn::CameraGroupIdRole,
+        core::CameraGroupIdRole,
         1, //< Dimension.
         numericOrder()};
     groupingRuleStack.push_back(recordersGroupingRule);
@@ -769,9 +741,9 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
     {
         GroupingRuleStack groupingRuleStack;
 
-        groupingRuleStack.push_back({userDefinedGroupIdGetter(),
+        groupingRuleStack.push_back({resource_grouping::getUserDefinedGroupId,
             userDefinedGroupItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
-            Qn::ResourceTreeCustomGroupIdRole,
+            core::ResourceTreeCustomGroupIdRole,
             resource_grouping::kUserDefinedGroupingDepth,
             numericOrder()});
 
@@ -1070,9 +1042,9 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
                 GroupGroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
 
             GroupingRuleStack groupingRuleStack;
-            groupingRuleStack.push_back({userDefinedGroupIdGetter(),
+            groupingRuleStack.push_back({resource_grouping::getUserDefinedGroupId,
                 userDefinedGroupItemCreator(m_itemFactory.get(), /*hasPowerUserPermissions*/ false),
-                Qn::ResourceTreeCustomGroupIdRole,
+                core::ResourceTreeCustomGroupIdRole,
                 resource_grouping::kUserDefinedGroupingDepth,
                 numericOrder()});
 

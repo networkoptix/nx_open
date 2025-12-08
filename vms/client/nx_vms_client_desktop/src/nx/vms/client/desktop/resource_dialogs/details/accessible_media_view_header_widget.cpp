@@ -7,11 +7,12 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
 
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/checkbox_column_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/common/indents.h>
 
 namespace {
@@ -35,7 +36,7 @@ AccessibleMediaViewHeaderWidget::AccessibleMediaViewHeaderWidget(QWidget* parent
     ui->setupUi(this);
 
     const auto allMediaTextItem = new QStandardItem(
-        qnResIconCache->icon(QnResourceIconCache::Cameras),
+        appContext()->resourceIconCache()->icon(core::ResourceIconCache::Cameras),
         tr("All Cameras & Resources"));
     allMediaTextItem->setFlags({Qt::ItemIsEnabled});
 

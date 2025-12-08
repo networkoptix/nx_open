@@ -229,9 +229,9 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
                     -1,
                     {Qt::MatchRecursive, Qt::MatchExactly});
 
-                const auto customGroupId = index.data(Qn::ResourceTreeCustomGroupIdRole);
+                const auto customGroupId = index.data(core::ResourceTreeCustomGroupIdRole);
                 if (!customGroupId.isNull())
-                    arguments.insert(Qn::ResourceTreeCustomGroupIdRole, customGroupId);
+                    arguments.insert(core::ResourceTreeCustomGroupIdRole, customGroupId);
 
                 for (const auto& resourceIndex: childResourceIndexes)
                 {
@@ -401,17 +401,17 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
             return true;
 
         const auto dragGroupId =
-            data.arguments().value(Qn::ResourceTreeCustomGroupIdRole).toString();
+            data.arguments().value(core::ResourceTreeCustomGroupIdRole).toString();
 
         if (dragGroupId.isEmpty())
         {
             actionManager()->trigger(AssignCustomGroupIdAction, Parameters(sourceResources)
-                .withArgument(Qn::ResourceTreeCustomGroupIdRole, QString()));
+                .withArgument(core::ResourceTreeCustomGroupIdRole, QString()));
         }
         else
         {
             actionManager()->trigger(MoveToCustomGroupAction, Parameters(sourceResources)
-                .withArgument(Qn::ResourceTreeCustomGroupIdRole, dragGroupId)
+                .withArgument(core::ResourceTreeCustomGroupIdRole, dragGroupId)
                 .withArgument(Qn::TargetResourceTreeCustomGroupIdRole, QString()));
         }
     }
@@ -424,10 +424,10 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         // Parent server as displayed, i.e it will be null if server nodes aren't displayed in the
         // resource tree.
         const auto dragGroupId =
-            data.arguments().value(Qn::ResourceTreeCustomGroupIdRole).toString();
+            data.arguments().value(core::ResourceTreeCustomGroupIdRole).toString();
 
         const auto dropParentServer = parentServer(index);
-        const auto dropGroupId = index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
+        const auto dropGroupId = index.data(core::ResourceTreeCustomGroupIdRole).toString();
 
         // Dropping cameras or web pages into group within "Layouts" node has no effect.
         if (hasTopLevelNodeType(index, NodeType::layouts))
@@ -453,7 +453,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         const auto layouts = data.resources().filtered<QnLayoutResource>();
 
         const auto dragGroupId =
-            data.arguments().value(Qn::ResourceTreeCustomGroupIdRole).toString();
+            data.arguments().value(core::ResourceTreeCustomGroupIdRole).toString();
 
         moveResources({}, {}, layouts, dragGroupId, QString(), {});
         return true;
@@ -500,9 +500,9 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         const auto webPages = data.resources().filtered<QnWebPageResource>();
 
         const auto dragGroupId =
-            data.arguments().value(Qn::ResourceTreeCustomGroupIdRole).toString();
+            data.arguments().value(core::ResourceTreeCustomGroupIdRole).toString();
 
-        const auto dropGroupId = index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
+        const auto dropGroupId = index.data(core::ResourceTreeCustomGroupIdRole).toString();
 
         moveResources(cameras, webPages, /*layouts*/ {}, dragGroupId, dropGroupId, server);
         return true;
@@ -524,7 +524,7 @@ void ResourceTreeDragDropDecoratorModel::moveCustomGroup(
     if (dragGroupId.isEmpty())
     {
         actionManager()->trigger(AssignCustomGroupIdAction, Parameters(sourceResources)
-            .withArgument(Qn::ResourceTreeCustomGroupIdRole, dropGroupId));
+            .withArgument(core::ResourceTreeCustomGroupIdRole, dropGroupId));
         return;
     }
 
@@ -533,7 +533,7 @@ void ResourceTreeDragDropDecoratorModel::moveCustomGroup(
     if (trimCompositeId(dropGroupId, dragDimension) != dragGroupId)
     {
         actionManager()->trigger(MoveToCustomGroupAction, Parameters(sourceResources)
-            .withArgument(Qn::ResourceTreeCustomGroupIdRole, dragGroupId)
+            .withArgument(core::ResourceTreeCustomGroupIdRole, dragGroupId)
             .withArgument(Qn::TargetResourceTreeCustomGroupIdRole, dropGroupId));
     }
 }

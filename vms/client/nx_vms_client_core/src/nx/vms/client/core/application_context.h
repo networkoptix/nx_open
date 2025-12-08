@@ -37,6 +37,7 @@ class ThreadPool;
 class UnifiedResourcePool;
 class VoiceSpectrumAnalyzer;
 class SessionTokenTerminator;
+class ResourceIconCache;
 
 namespace watchers { class KnownServerConnections; }
 
@@ -213,6 +214,8 @@ public:
 
     CloudFeaturesWatcher* cloudFeaturesWatcher() const;
 
+    ResourceIconCache* resourceIconCache() const;
+
     void resetEngine();
 
 signals:
@@ -243,6 +246,8 @@ protected:
 
     /** Destroy cross-system-related modules early from descendants. */
     void destroyCrossSystemModules();
+
+    void resetResourceIconCache(ResourceIconCache* iconCache);
 
 private:
     struct Private;

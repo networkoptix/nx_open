@@ -10,6 +10,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -20,7 +21,6 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/utils/camera_hotspots_support.h>
 #include <ui/common/palette.h>

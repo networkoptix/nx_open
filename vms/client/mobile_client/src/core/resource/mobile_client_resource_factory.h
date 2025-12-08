@@ -18,4 +18,6 @@ public:
 
     virtual QnResourcePtr createResource(
         const nx::Uuid& resourceTypeId, const QnResourceParams& params) override;
+
+    virtual QnLayoutResourcePtr createLayout() const override;
 };

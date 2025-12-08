@@ -5,8 +5,8 @@
 #include <QtCore/QVariant>
 
 #include <client/client_globals.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 
 namespace nx::vms::client::desktop {
@@ -34,7 +34,7 @@ QVariant ShowreelItem::data(int role) const
             return m_showreel.name;
 
         case core::ResourceIconKeyRole:
-            return QVariant::fromValue<int>(QnResourceIconCache::Showreel);
+            return QVariant::fromValue<int>(ResourceIconCache::Showreel);
 
         case core::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::showreel);

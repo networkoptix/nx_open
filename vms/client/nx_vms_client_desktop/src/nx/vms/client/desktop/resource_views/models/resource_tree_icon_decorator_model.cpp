@@ -2,7 +2,8 @@
 
 #include "resource_tree_icon_decorator_model.h"
 
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 
 #include <nx/utils/log/assert.h>
 #include <client/client_globals.h>
@@ -11,7 +12,7 @@ namespace nx::vms::client::desktop {
 
 ResourceTreeIconDecoratorModel::ResourceTreeIconDecoratorModel():
     base_type(nullptr),
-    m_resourceIconCache(qnResIconCache)
+    m_resourceIconCache(appContext()->resourceIconCache())
 {
     NX_ASSERT(m_resourceIconCache);
 }
@@ -32,14 +33,16 @@ void ResourceTreeIconDecoratorModel::setDisplayResourceStatus(bool display)
 
 QVariant ResourceTreeIconDecoratorModel::data(const QModelIndex& index, int role) const
 {
+    using nx::vms::client::core::ResourceIconCache;
+
     if (role == Qt::DecorationRole)
     {
         auto iconKeyData = sourceModel()->data(mapToSource(index), core::ResourceIconKeyRole);
         if (!iconKeyData.isNull())
         {
-            auto iconKey = static_cast<QnResourceIconCache::Key>(iconKeyData.toInt());
+            auto iconKey = static_cast<ResourceIconCache::Key>(iconKeyData.toInt());
             if (!displayResourceStatus())
-                iconKey &= ~QnResourceIconCache::StatusMask;
+                iconKey &= ~ResourceIconCache::StatusMask;
 
             return m_resourceIconCache->icon(iconKey);
         }

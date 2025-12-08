@@ -8,11 +8,11 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/camera_resource_index.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/camera_resource_index.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/common/system_context.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace entity_resource_tree {
 
 RecorderItemDataHelper::RecorderItemDataHelper(
@@ -78,14 +78,14 @@ int RecorderItemDataHelper::iconKey(const QString& recorderGroupId) const
 {
     const auto& camerasSet = m_camerasByRecorderGroupId.value(recorderGroupId);
     if (camerasSet.empty() || !(*camerasSet.cbegin())->isMultiSensorCamera())
-        return QnResourceIconCache::Recorder;
+        return ResourceIconCache::Recorder;
 
     const bool anyOfCameraOnline =
         std::ranges::any_of(camerasSet, [](const auto& camera) { return camera->isOnline(); });
 
     return anyOfCameraOnline
-        ? QnResourceIconCache::MultisensorCamera
-        : QnResourceIconCache::MultisensorCamera | QnResourceIconCache::Offline;
+        ? ResourceIconCache::MultisensorCamera
+        : ResourceIconCache::MultisensorCamera | ResourceIconCache::Offline;
 }
 
 bool RecorderItemDataHelper::isRecorder(const QString& recorderGroupId) const
@@ -167,4 +167,4 @@ void RecorderItemDataHelper::onCameraStatusChanged(const QnResourcePtr& cameraRe
 }
 
 } // namespace entity_resource_tree
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

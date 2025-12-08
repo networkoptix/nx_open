@@ -6,8 +6,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -77,7 +78,7 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
         {
             case TargetColumn:
                 if (resource)
-                    return qnResIconCache->icon(resource);
+                    return appContext()->resourceIconCache()->icon(resource);
                 break;
 
             case DeleteButtonColumn:

@@ -5,26 +5,26 @@
 #include <QtCore/QUrlQuery>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/core/skin/skin.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 namespace {
 
-QIcon::Mode iconMode(core::ResourceTree::ItemState itemState)
+QIcon::Mode iconMode(ResourceTree::ItemState itemState)
 {
     switch (itemState)
     {
-        case core::ResourceTree::ItemState::normal:
+        case ResourceTree::ItemState::normal:
             return QIcon::Normal;
 
-        case core::ResourceTree::ItemState::selected:
+        case ResourceTree::ItemState::selected:
             return QIcon::Selected;
 
-        case core::ResourceTree::ItemState::accented:
+        case ResourceTree::ItemState::accented:
             return QIcon::Active;
 
         default:
@@ -48,15 +48,15 @@ QPixmap ResourceIconProvider::requestPixmap(
         return {};
 
     const auto mode = iconMode(path.empty()
-        ? core::ResourceTree::ItemState::normal
-        : core::ResourceTree::ItemState(path.takeFirst().toInt()));
+        ? ResourceTree::ItemState::normal
+        : ResourceTree::ItemState(path.takeFirst().toInt()));
 
-    core::SvgIconColorer::ThemeSubstitutions overriddenColors;
+    SvgIconColorer::ThemeSubstitutions overriddenColors;
     for (const auto& queryValue: queryItems)
         overriddenColors[mode][queryValue.first] = queryValue.second;
 
-    return qnResIconCache->iconPixmap(
-        QnResourceIconCache::Key(keyInt), requestedSize, overriddenColors, mode);
+    return appContext()->resourceIconCache()->iconPixmap(
+        ResourceIconCache::Key(keyInt), requestedSize, overriddenColors, mode);
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

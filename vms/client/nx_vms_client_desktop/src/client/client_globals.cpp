@@ -201,10 +201,6 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
 
         // Additional roles for the resource tree. Placed at the end of the list for purpose
         // not to change enumeration values for BlueBox integration.
-        IDR_ITEM(ParentResourceRole),
-        IDR_ITEM(CameraGroupIdRole),
-        IDR_ITEM(ResourceTreeCustomGroupIdRole),
-
         IDR_ITEM(ParentNodeTypeRole),
         IDR_ITEM(TopLevelParentNodeTypeRole),
         IDR_ITEM(TargetResourceTreeCustomGroupIdRole),

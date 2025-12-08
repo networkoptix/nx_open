@@ -63,6 +63,9 @@ constexpr auto nxReflectVisitAllEnumItems(CoreItemDataRole*, Visitor&& visitor)
         IDR_CORE_ITEM(ObjectTitleRole),
         IDR_CORE_ITEM(HasTitleImageRole),
 
+        IDR_CORE_ITEM(CameraGroupIdRole),
+        IDR_CORE_ITEM(ResourceTreeCustomGroupIdRole),
+        IDR_CORE_ITEM(ParentResourceRole),
         IDR_CORE_ITEM(NodeTypeRole),
         IDR_CORE_ITEM(FlattenedRole),
         IDR_CORE_ITEM(ResourceExtraStatusRole),

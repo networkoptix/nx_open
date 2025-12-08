@@ -7,7 +7,8 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/time/formatter.h>
 
 using namespace nx::vms::client::core;
@@ -64,7 +65,7 @@ struct ImportFromDeviceDialogModel::Private
 
     std::map<nx::Uuid, DeviceData> deviceData;
 
-    QnResourceIconCache* const resourceIconCache = nullptr;
+    ResourceIconCache* const resourceIconCache = nullptr;
 
 public:
     Private(ImportFromDeviceDialogModel* parent);
@@ -79,7 +80,7 @@ public:
 
 ImportFromDeviceDialogModel::Private::Private(ImportFromDeviceDialogModel* parent):
     q(parent),
-    resourceIconCache(qnResIconCache)
+    resourceIconCache(appContext()->resourceIconCache())
 {
 }
 

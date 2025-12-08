@@ -361,10 +361,6 @@ namespace Qn
 
         // Additional roles for the resource tree. Placed at the end of the list for purpose
         // not to change enumeration values for BlueBox integration.
-        ParentResourceRole,                         /**< Role for parent resource if such exists (QnResourcePtr). */
-        CameraGroupIdRole,                          /**< Role for camera group ID, related to recorders and multisensor cameras (QString). */
-        ResourceTreeCustomGroupIdRole,              /**< Role for user defined group ID, used for the custom cameras grouping within Resource Tree (QString). */
-
         ParentNodeTypeRole,                         /**< Role for parent node type in action parameters related to the resource tree (ResourceTree::NodeType). */
         TopLevelParentNodeTypeRole,                 /**< Role for topmost parent node type in action parameters related to the resource tree (ResourceTree::NodeType). */
         TargetResourceTreeCustomGroupIdRole,        /**< Role used to access parameter for Resource Tree drag & drop interactions (QString). */

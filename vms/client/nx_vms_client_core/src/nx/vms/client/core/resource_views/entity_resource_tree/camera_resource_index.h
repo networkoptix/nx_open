@@ -9,10 +9,10 @@
 
 class QnResourcePool;
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace entity_resource_tree {
 
-class CameraResourceIndex: public QObject
+class NX_VMS_CLIENT_CORE_API CameraResourceIndex: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -45,4 +45,4 @@ private:
 };
 
 } // namespace entity_resource_tree
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

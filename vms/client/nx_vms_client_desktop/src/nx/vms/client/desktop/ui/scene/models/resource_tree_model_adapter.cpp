@@ -476,8 +476,8 @@ QHash<int, QByteArray> ResourceTreeModelAdapter::roleNames() const
     roleNames[Qn::RawResourceRole] = "resource";
     roleNames[Qn::HelpTopicIdRole] = "helpTopicId";
     roleNames[core::UuidRole] = "uuid";
-    roleNames[Qn::ResourceTreeCustomGroupIdRole] = "customGroupId";
-    roleNames[Qn::CameraGroupIdRole] = "cameraGroupId";
+    roleNames[core::ResourceTreeCustomGroupIdRole] = "customGroupId";
+    roleNames[core::CameraGroupIdRole] = "cameraGroupId";
     return roleNames;
 }
 
@@ -699,8 +699,8 @@ core::ResourceTree::ExpandedNodeId ResourceTreeModelAdapter::expandedNodeId(
         case NodeType::customResourceGroup:
         {
             const auto groupId = nodeType == NodeType::recorder
-                ? index.data(Qn::CameraGroupIdRole).toString()
-                : index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
+                ? index.data(core::CameraGroupIdRole).toString()
+                : index.data(core::ResourceTreeCustomGroupIdRole).toString();
 
             QString parentId;
 

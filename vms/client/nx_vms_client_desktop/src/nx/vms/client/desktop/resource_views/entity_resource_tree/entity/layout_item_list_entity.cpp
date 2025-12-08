@@ -4,7 +4,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/item_order/resource_tree_item_order.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/item_order/resource_tree_item_order.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -13,7 +13,7 @@ LayoutItemListEntity::LayoutItemListEntity(
     const QnLayoutResourcePtr& layout,
     const LayoutItemCreator& layoutItemCreator)
     :
-    base_type(layoutItemCreator, layoutItemsOrder())
+    base_type(layoutItemCreator, core::entity_resource_tree::layoutItemsOrder())
 {
     setItems(layout->getItems().keys().toVector());
 

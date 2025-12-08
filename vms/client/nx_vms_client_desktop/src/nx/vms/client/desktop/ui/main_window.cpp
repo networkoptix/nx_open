@@ -11,7 +11,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/event_search/models/visible_item_data_decorator_model.h>
-#include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
+#include <nx/vms/client/core/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/opengl/gl_functions.h>
@@ -87,7 +87,7 @@ MainWindow::MainWindow(QQmlEngine* engine, WindowContext* context, QWidget* pare
     WindowContextAware(context),
     d(new Private(this))
 {
-    engine->addImageProvider("resource", new ResourceIconProvider());
+    engine->addImageProvider("resource", new core::ResourceIconProvider());
     engine->addImageProvider("previews",
         new core::VisibleItemDataDecoratorModel::PreviewProvider());
 

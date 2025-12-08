@@ -6,28 +6,30 @@
 
 #include <client/client_globals.h>
 #include <core/resource/videowall_resource.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/system_context.h>
 
 namespace {
 
-QnResourceIconCache::Key calculateKey(
+using nx::vms::client::core::ResourceIconCache;
+
+ResourceIconCache::Key calculateKey(
     nx::vms::common::SystemContext* context,
     const QnVideoWallItem& item)
 {
-    QnResourceIconCache::Key result = QnResourceIconCache::VideoWallItem;
+    ResourceIconCache::Key result = ResourceIconCache::VideoWallItem;
 
     if (!item.runtimeStatus.online)
-        return result | QnResourceIconCache::Offline;
+        return result | ResourceIconCache::Offline;
 
     if (item.runtimeStatus.controlledBy.isNull())
         return result;
 
     if (item.runtimeStatus.controlledBy == context->peerId())
-        return result | QnResourceIconCache::Control;
+        return result | ResourceIconCache::Control;
 
-    return result | QnResourceIconCache::Locked;
+    return result | ResourceIconCache::Locked;
 }
 
 } // namespace

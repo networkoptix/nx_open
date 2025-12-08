@@ -9,7 +9,8 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 
 #include "../details/node/view_node.h"
 #include "../details/node/view_node_data.h"
@@ -49,9 +50,10 @@ ViewNodeData getGroupNodeData(
         return ViewNodeData();
 
     static const int kGroupedDeviceSortOrder = -1; //< Multisensor cameras and recorders on top of the list
+    const auto resourceIconCache = appContext()->resourceIconCache();
     const QIcon icon = cameraResource->isMultiSensorCamera()
-        ? qnResIconCache->icon(QnResourceIconCache::MultisensorCamera)
-        : qnResIconCache->icon(QnResourceIconCache::Recorder);
+        ? resourceIconCache->icon(core::ResourceIconCache::MultisensorCamera)
+        : resourceIconCache->icon(core::ResourceIconCache::Recorder);
 
     auto data = ViewNodeDataBuilder()
         .withData(resourceColumn, resourceColumnRole, true)
@@ -80,7 +82,7 @@ ViewNodeData getResourceNodeData(
         return ViewNodeData();
     }
 
-    const auto icon = qnResIconCache->icon(resource);
+    const auto icon = appContext()->resourceIconCache()->icon(resource);
     auto data = ViewNodeDataBuilder()
         .withData(resourceColumn, resourceColumnRole, true)
         .withText(resourceColumn, resource->getName())

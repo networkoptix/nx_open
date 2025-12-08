@@ -5,18 +5,18 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/cross_system/resource_tree/cloud_layouts_source.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/camera_resource_index.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/accessible_resource_proxy_source.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/composite_resource_source.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/filtered_resource_proxy_source.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/resource_tree/cloud_layouts_source.h>
 #include <nx/vms/client/desktop/cross_system/resource_tree/cloud_system_cameras_source.h>
 #include <nx/vms/client/desktop/cross_system/resource_tree/cloud_systems_source.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 
-#include "../camera_resource_index.h"
 #include "../user_layout_resource_index.h"
 #include "../webpage_resource_index.h"
 #include "parent_servers_proxy_source.h"
@@ -28,6 +28,7 @@ namespace entity_resource_tree {
 
 using namespace nx::core::access;
 using namespace nx::vms::client::core::entity_item_model;
+using namespace nx::vms::client::core::entity_resource_tree;
 
 ResourceTreeItemKeySourcePool::ResourceTreeItemKeySourcePool(
     SystemContext* systemContext,
@@ -49,17 +50,17 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::serversSource(
     const QnResourceAccessSubject& subject,
     bool reduceEdgeServers)
 {
-    auto accessibleServersSource = std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+    auto accessibleServersSource = std::make_unique<AccessibleResourceProxySource>(
         systemContext(),
         subject,
         std::make_unique<ServerResourceSource>(resourcePool()));
 
-    auto accessibleCamerasSource = std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+    auto accessibleCamerasSource = std::make_unique<AccessibleResourceProxySource>(
         systemContext(),
         subject,
         std::make_unique<CameraResourceSource>(m_cameraResourceIndex, QnMediaServerResourcePtr()));
 
-    auto accessibleProxiedWebPagesSource = std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+    auto accessibleProxiedWebPagesSource = std::make_unique<AccessibleResourceProxySource>(
         systemContext(),
         subject,
         std::make_unique<ProxiedWebResourceSource>(
@@ -67,10 +68,10 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::serversSource(
             QnMediaServerResourcePtr()));
 
     auto accessibleResourcesParentServersSource = std::make_unique<ParentServersProxySource>(
-        std::make_unique<nx::vms::client::core::entity_resource_tree::CompositeResourceSource>(
+        std::make_unique<CompositeResourceSource>(
             std::move(accessibleCamerasSource), std::move(accessibleProxiedWebPagesSource)));
 
-    auto compositeServersSource = std::make_unique<nx::vms::client::core::entity_resource_tree::CompositeResourceSource>(
+    auto compositeServersSource = std::make_unique<CompositeResourceSource>(
         std::move(accessibleServersSource), std::move(accessibleResourcesParentServersSource));
 
     if (reduceEdgeServers)
@@ -86,7 +87,7 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::serversSource(
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::healthMonitorsSource(
     const QnResourceAccessSubject& subject)
 {
-    auto accessibleServersSource = std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+    auto accessibleServersSource = std::make_unique<AccessibleResourceProxySource>(
         systemContext(),
         subject,
         std::make_unique<ServerResourceSource>(resourcePool()));
@@ -109,16 +110,16 @@ ResourceTreeItemKeySourcePool::UniqueResourceSourcePtr ResourceTreeItemKeySource
     if (accessSubject.isValid())
     {
         return std::make_shared<ResourceSourceAdapter>(
-            std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+            std::make_unique<AccessibleResourceProxySource>(
                 systemContext(),
                 accessSubject,
-                std::make_unique<nx::vms::client::core::entity_resource_tree::FilteredResourceProxySource>(
+                std::make_unique<FilteredResourceProxySource>(
                     resourceFilter,
                     std::make_unique<CameraResourceSource>(m_cameraResourceIndex, parentServer))));
     }
 
     return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<nx::vms::client::core::entity_resource_tree::FilteredResourceProxySource>(
+        std::make_unique<FilteredResourceProxySource>(
             resourceFilter,
             std::make_unique<CameraResourceSource>(m_cameraResourceIndex, parentServer)));
 }
@@ -127,18 +128,18 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::devicesAndProxiedWebPages
     const QnMediaServerResourcePtr& parentServer,
     const QnResourceAccessSubject& subject)
 {
-    auto cameras = std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+    auto cameras = std::make_unique<AccessibleResourceProxySource>(
         systemContext(),
         subject,
         std::make_unique<CameraResourceSource>(m_cameraResourceIndex, parentServer));
 
-    auto proxiedWebResources = std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+    auto proxiedWebResources = std::make_unique<AccessibleResourceProxySource>(
         systemContext(),
         subject,
         std::make_unique<ProxiedWebResourceSource>(m_webPageResourceIndex.get(), parentServer));
 
     return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<nx::vms::client::core::entity_resource_tree::CompositeResourceSource>(
+        std::make_unique<CompositeResourceSource>(
             std::move(cameras),
             std::move(proxiedWebResources)));
 }
@@ -146,24 +147,24 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::devicesAndProxiedWebPages
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::layoutsSource(
     const QnUserResourcePtr& user)
 {
-    auto layouts = std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+    auto layouts = std::make_unique<AccessibleResourceProxySource>(
         systemContext(),
         user,
         std::make_unique<LayoutResourceSource>(resourcePool(), user, true));
 
-    auto intercomLayouts = std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+    auto intercomLayouts = std::make_unique<AccessibleResourceProxySource>(
         systemContext(),
         user,
         std::make_unique<IntercomLayoutResourceSource>(resourcePool()));
 
-    auto result = std::make_unique<nx::vms::client::core::entity_resource_tree::CompositeResourceSource>(
+    auto result = std::make_unique<CompositeResourceSource>(
         std::move(layouts),
         std::move(intercomLayouts));
 
     if (user->isCloud())
     {
         auto crossSystemLayouts = std::make_unique<CloudLayoutsSource>();
-        result = std::make_unique<nx::vms::client::core::entity_resource_tree::CompositeResourceSource>(
+        result = std::make_unique<CompositeResourceSource>(
             std::move(result),
             std::move(crossSystemLayouts));
     }
@@ -175,10 +176,11 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::allLayoutsSource(
     const QnUserResourcePtr& user)
 {
     return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+        std::make_unique<AccessibleResourceProxySource>(
             systemContext(),
             user,
-            std::make_unique<LayoutResourceSource>(resourcePool(), QnUserResourcePtr(), true)));
+            std::make_unique<LayoutResourceSource>(
+                resourcePool(), QnUserResourcePtr(), true)));
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::shareableLayoutsSource(
@@ -188,20 +190,22 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::shareableLayoutsSource(
     if (resourceFilter)
     {
         return std::make_shared<ResourceSourceAdapter>(
-            std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+            std::make_unique<AccessibleResourceProxySource>(
                 systemContext(),
                 user,
-                std::make_unique<nx::vms::client::core::entity_resource_tree::FilteredResourceProxySource>(
+                std::make_unique<FilteredResourceProxySource>(
                     resourceFilter,
-                    std::make_unique<LayoutResourceSource>(resourcePool(), user, true))));
+                    std::make_unique<LayoutResourceSource>(
+                        resourcePool(), user, true))));
     }
     else
     {
         return std::make_shared<ResourceSourceAdapter>(
-            std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+            std::make_unique<AccessibleResourceProxySource>(
                 systemContext(),
                 user,
-                std::make_unique<LayoutResourceSource>(resourcePool(), user, true)));
+                std::make_unique<LayoutResourceSource>(
+                    resourcePool(), user, true)));
     }
 }
 
@@ -210,7 +214,7 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::integrationsSource(
     bool includeProxiedIntegrations)
 {
     return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+        std::make_unique<AccessibleResourceProxySource>(
             systemContext(),
             subject,
             std::make_unique<WebpageResourceSource>(
@@ -224,7 +228,7 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::webPagesSource(
     bool includeProxiedWebPages)
 {
     return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+        std::make_unique<AccessibleResourceProxySource>(
             systemContext(),
             subject,
             std::make_unique<WebpageResourceSource>(
@@ -238,7 +242,7 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::webPagesAndIntegrationsSo
     bool includeProxied)
 {
     return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+        std::make_unique<AccessibleResourceProxySource>(
             systemContext(),
             subject,
             std::make_unique<WebpageResourceSource>(
@@ -251,7 +255,7 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::videoWallsSource(
     const QnResourceAccessSubject& subject)
 {
     return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<nx::vms::client::core::entity_resource_tree::AccessibleResourceProxySource>(
+        std::make_unique<AccessibleResourceProxySource>(
             systemContext(),
             subject,
             std::make_unique<VideowallResourceSource>(resourcePool())));

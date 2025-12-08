@@ -6,10 +6,11 @@
 #include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_source.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
+namespace nx::vms::client::core::entity_resource_tree { class CameraResourceIndex; }
+
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class CameraResourceIndex;
 class UserLayoutResourceIndex;
 class UserRolesProvider;
 class WebPageResourceIndex;
@@ -23,7 +24,7 @@ class NX_VMS_CLIENT_DESKTOP_API ResourceTreeItemKeySourcePool: public SystemCont
 public:
     ResourceTreeItemKeySourcePool(
         SystemContext* systemContext,
-        const CameraResourceIndex* cameraResourceIndex,
+        const core::entity_resource_tree::CameraResourceIndex* cameraResourceIndex,
         const UserLayoutResourceIndex* sharedLayoutResourceIndex);
 
     ~ResourceTreeItemKeySourcePool();
@@ -136,7 +137,7 @@ public:
     UniqueResourceSourcePtr cloudSystemCamerasSource(const QString& systemId);
 
 private:
-    const CameraResourceIndex* m_cameraResourceIndex;
+    const core::entity_resource_tree::CameraResourceIndex* m_cameraResourceIndex;
     const UserLayoutResourceIndex* m_userLayoutResourceIndex;
     QScopedPointer<WebPageResourceIndex> m_webPageResourceIndex;
 };

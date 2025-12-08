@@ -37,6 +37,7 @@
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/font_config.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/skin_image_provider.h>
 #include <nx/vms/client/core/system_context.h>
@@ -205,6 +206,7 @@ struct ApplicationContext::Private
     std::unique_ptr<VoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
     std::unique_ptr<Skin> skin;
     std::unique_ptr<ColorTheme> colorTheme;
+    std::unique_ptr<ResourceIconCache> iconCache;
     std::vector<QPointer<SystemContext>> systemContexts;
     std::unique_ptr<UnifiedResourcePool> unifiedResourcePool;
     std::unique_ptr<FontConfig> fontConfig;
@@ -358,6 +360,11 @@ void ApplicationContext::destroyCrossSystemModules()
     d->crossSystemLayoutsWatcher.reset();
     d->cloudCrossSystemManager.reset();
     d->cloudLayoutsManager.reset();
+}
+
+void ApplicationContext::resetResourceIconCache(ResourceIconCache* iconCache)
+{
+    d->iconCache.reset(iconCache);
 }
 
 void ApplicationContext::initializeTranslations(const QString& targetLocale)
@@ -580,6 +587,11 @@ CloudServiceChecker* ApplicationContext::cloudServiceChecker() const
 CloudFeaturesWatcher* ApplicationContext::cloudFeaturesWatcher() const
 {
     return d->cloudFeaturesWatcher.get();
+}
+
+ResourceIconCache* ApplicationContext::resourceIconCache() const
+{
+    return d->iconCache.get();
 }
 
 SessionTokenTerminator* ApplicationContext::sessionTokenTerminator() const

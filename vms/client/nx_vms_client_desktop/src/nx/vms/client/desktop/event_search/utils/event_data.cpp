@@ -7,8 +7,8 @@
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/rules/utils/event_details.h>
 
@@ -42,6 +42,8 @@ QString eventIconPath(
     const QString& custom,
     const QnResourceList& devices)
 {
+    using nx::vms::client::core::ResourceIconCache;
+
     switch (icon)
     {
         case Icon::none:
@@ -49,11 +51,12 @@ QString eventIconPath(
 
         case Icon::resource:
         {
+            const auto resourceIconCache = appContext()->resourceIconCache();
             return devices.isEmpty()
-                ? qnResIconCache->iconPath(
-                      QnResourceIconCache::Camera | QnResourceIconCache::NotificationMode)
-                : qnResIconCache->iconPath(QnResourceIconCache::key(devices.front())
-                      | QnResourceIconCache::NotificationMode);
+                ? resourceIconCache->iconPath(
+                      ResourceIconCache::Camera | ResourceIconCache::NotificationMode)
+                : resourceIconCache->iconPath(resourceIconCache->key(devices.front())
+                      | ResourceIconCache::NotificationMode);
         }
 
         case Icon::softTrigger:

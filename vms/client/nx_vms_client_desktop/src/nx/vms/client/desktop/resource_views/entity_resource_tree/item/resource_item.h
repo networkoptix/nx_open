@@ -3,74 +3,26 @@
 #pragma once
 
 #include <core/resource/resource.h>
-#include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/item/core_resource_item.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class ResourceItem: public core::entity_item_model::AbstractItem
+class ResourceItem: public core::entity_resource_tree::CoreResourceItem
 {
-    using base_type = core::entity_item_model::AbstractItem;
+    using base_type = core::entity_resource_tree::CoreResourceItem;
 public:
     ResourceItem(const QnResourcePtr& resource);
-
     virtual QVariant data(int role) const override;
-    virtual Qt::ItemFlags flags() const override;
+
+protected:
+    virtual void initResourceIconKeyNotifications() const override;
 
 private:
-    QnResource* resource() const;
-    bool isCamera() const;
-    bool isLayout() const;
-    bool isUser() const;
-
-    QVariant displayData() const;
-    QVariant resourceStatusData() const;
-    QVariant resourceIconKeyData() const;
-    QVariant resourceExtraStatusData() const;
-    QVariant resourceExtraInfoData() const;
     QVariant helpTopic() const;
-    QVariant parentResourceData() const;
-
-    QVariant cameraGroupIdData() const;
-    void initCameraGroupIdNotifications();
-
-    QVariant customGroupIdData() const;
-    void initCustomGroupIdNotifications();
-
-    void discardCache(QVariant& cachedValue, const QVector<int>& relevantRoles) const;
 
 private:
-    QnResourcePtr m_resource;
-    const bool m_isCamera = false;
-    const bool m_isLayout = false;
-    const bool m_isUser = false;
-
-    mutable std::once_flag m_displayFlag;
-    mutable QVariant m_displayCache;
-
-    mutable std::once_flag m_statusFlag;
-    mutable QVariant m_statusCache;
-
-    mutable std::once_flag m_resourceExtraStatusFlag;
-    mutable QVariant m_resourceExtraStatusCache;
-
-    mutable std::once_flag m_resourceIconKeyFlag;
-    mutable QVariant m_resourceIconKeyCache;
-
-    mutable std::once_flag m_resourceExtraInfoFlag;
-    mutable QVariant m_resourceExtraInfoCache;
-
-    mutable std::once_flag m_parentResourceFlag;
-    mutable QVariant m_parentResourceCache;
-
-    mutable QVariant m_cameraGroupIdCache;
-
-    mutable QVariant m_customGroupIdCache;
-
     const QVariant m_helpTopic;
-
-    mutable nx::utils::ScopedConnections m_connectionsGuard;
 };
 
 } // namespace entity_resource_tree

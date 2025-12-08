@@ -2,13 +2,13 @@
 
 #include "layout_resource_source.h"
 
-#include <client/client_globals.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/common/intercom/utils.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace entity_resource_tree {
 
 LayoutResourceSource::LayoutResourceSource(
@@ -72,7 +72,7 @@ void LayoutResourceSource::onResourceRemoved(const QnResourcePtr& resource)
 
     if (resource->hasFlags(Qn::layout))
     {
-        const auto layout = resource.dynamicCast<core::LayoutResource>();
+        const auto layout = resource.dynamicCast<LayoutResource>();
         if (NX_ASSERT(layout)) //< Sending `resourceRemoved` for a not added resource is OK.
             emit resourceRemoved(resource);
     }
@@ -94,14 +94,14 @@ void LayoutResourceSource::processResource(
     if (resource->hasFlags(Qn::removed) || resource->hasFlags(Qn::exported))
         return;
 
-    const auto layout = resource.dynamicCast<core::LayoutResource>();
+    const auto layout = resource.dynamicCast<LayoutResource>();
     if (!NX_ASSERT(layout))
         return;
 
     if (layout->isServiceLayout()
-        || layout->layoutType() == core::LayoutResource::LayoutType::intercom
-        || layout->layoutType() == core::LayoutResource::LayoutType::videoWall
-        || layout->layoutType() == core::LayoutResource::LayoutType::invalid)
+        || layout->layoutType() == LayoutResource::LayoutType::intercom
+        || layout->layoutType() == LayoutResource::LayoutType::videoWall
+        || layout->layoutType() == LayoutResource::LayoutType::invalid)
     {
         return;
     }
@@ -112,10 +112,10 @@ void LayoutResourceSource::processResource(
         return;
     }
 
-    connect(layout.get(), &core::LayoutResource::layoutTypeChanged,
+    connect(layout.get(), &LayoutResource::layoutTypeChanged,
         this, &LayoutResourceSource::onLayoutTypeChanged, Qt::UniqueConnection);
 
-    if (layout->layoutType() == core::LayoutResource::LayoutType::unknown)
+    if (layout->layoutType() == LayoutResource::LayoutType::unknown)
         return;
 
     if (!m_parentUser
@@ -127,4 +127,4 @@ void LayoutResourceSource::processResource(
 }
 
 } // namespace entity_resource_tree
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

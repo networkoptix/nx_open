@@ -5,7 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace entity_resource_tree {
 
 CameraResourceIndex::CameraResourceIndex(const QnResourcePool* resourcePool):
@@ -100,4 +100,4 @@ void CameraResourceIndex::indexCamera(const QnVirtualCameraResourcePtr& camera)
 }
 
 } // namespace entity_resource_tree
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

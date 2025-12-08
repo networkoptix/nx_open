@@ -13,6 +13,7 @@
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/camera_hotspots/camera_hotspots_display_utils.h>
@@ -20,7 +21,6 @@
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/camera_hotspots_item_delegate.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/thumbnails/live_camera_thumbnail.h>
 #include <ui/common/palette.h>

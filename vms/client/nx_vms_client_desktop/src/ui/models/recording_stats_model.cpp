@@ -9,9 +9,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/text/archive_duration.h>
 #include <nx/vms/text/time_strings.h>
 
@@ -194,6 +194,8 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
 
 QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
 {
+    using nx::vms::client::core::ResourceIconCache;
+
     /* Check invalid indices. */
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
@@ -203,6 +205,8 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
         rowType = m_data.showForeignCameras ? Foreign : Totals;
     if (index.row() >= m_data.cameras.size() + 1)
         rowType = Totals;
+
+    const auto resourceIconCache = appContext()->resourceIconCache();
 
     switch(role)
     {
@@ -215,13 +219,13 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
 
             if (rowType == Totals)
             {
-                return qnResIconCache->icon(
-                    QnResourceIconCache::Cameras | QnResourceIconCache::AlwaysSelected);
+                return resourceIconCache->icon(
+                    ResourceIconCache::Cameras | ResourceIconCache::AlwaysSelected);
             }
 
             if (rowType == Normal)
             {
-                return qnResIconCache->icon(
+                return resourceIconCache->icon(
                     resourcePool()->getCameraByPhysicalId(m_data.cameras[index.row()].physicalId));
             }
 

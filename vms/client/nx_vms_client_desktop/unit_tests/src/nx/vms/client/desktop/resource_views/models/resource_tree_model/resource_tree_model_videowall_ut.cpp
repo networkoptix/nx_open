@@ -6,8 +6,8 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 #include "resource_tree_model_test_fixture.h"
 
@@ -15,6 +15,7 @@ namespace nx::vms::client::desktop {
 namespace test {
 
 using namespace index_condition;
+using core::ResourceIconCache;
 
 // String constants.
 static constexpr auto kUniqueVideoWallName = "unique_video_wall_name";
@@ -142,7 +143,7 @@ TEST_F(ResourceTreeModelTest, videoWallIconType)
     const auto videoWallIndex = uniqueMatchingIndex(kUniqueVideoWallNameCondition);
 
     // And it have videowall icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::VideoWall)(videoWallIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::VideoWall)(videoWallIndex));
 }
 
 TEST_F(ResourceTreeModelTest, videoWallScreenIconType)
@@ -160,7 +161,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenIconType)
     const auto videoWallScreenIndex = uniqueMatchingIndex(kUniqueVideoWallScreenNameCondition);
 
     // And it have videowall item icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::VideoWallItem)(videoWallScreenIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::VideoWallItem)(videoWallScreenIndex));
 }
 
 TEST_F(ResourceTreeModelTest, videoWallMatrixIconType)
@@ -178,7 +179,7 @@ TEST_F(ResourceTreeModelTest, videoWallMatrixIconType)
     const auto videoWallMatrixIndex = uniqueMatchingIndex(kUniqueVideoWallMatrixNameCondition);
 
     // And it have videowall matrix item icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::VideoWallMatrix)(videoWallMatrixIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::VideoWallMatrix)(videoWallMatrixIndex));
 }
 
 TEST_F(ResourceTreeModelTest, videoWallScreenIconStatus)
@@ -196,28 +197,28 @@ TEST_F(ResourceTreeModelTest, videoWallScreenIconStatus)
     setVideoWallScreenRuntimeStatus(videoWall, videoWallScreen, false);
 
     // Then icon has Offline decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Offline)
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Offline)
         (uniqueMatchingIndex(kUniqueVideoWallScreenNameCondition)));
 
     // When video wall screen is online and have null "controlled by" UUID.
     setVideoWallScreenRuntimeStatus(videoWall, videoWallScreen, true);
 
     // Then icon has no decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Unknown)
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Unknown)
         (uniqueMatchingIndex(kUniqueVideoWallScreenNameCondition)));
 
     // When video wall screen is online and have "controlled by" UUID same as common module GUID.
     setVideoWallScreenRuntimeStatus(videoWall, videoWallScreen, true, peerId());
 
     // Then icon has Control decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Control)
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Control)
         (uniqueMatchingIndex(kUniqueVideoWallScreenNameCondition)));
 
     // When video wall screen is online and have "controlled by" UUID not same as common module GUID.
     setVideoWallScreenRuntimeStatus(videoWall, videoWallScreen, true, nx::Uuid::createUuid());
 
     // Then icon has Locked decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Locked)
+    ASSERT_TRUE(iconStatusMatch(ResourceIconCache::Locked)
         (uniqueMatchingIndex(kUniqueVideoWallScreenNameCondition)));
 }
 
@@ -361,7 +362,7 @@ TEST_F(ResourceTreeModelTest, videoWallIsNotDisplayedIfNotLoggedIn)
     ASSERT_TRUE(noneMatches(kUniqueVideoWallNameCondition));
 
     // Then no more nodes with videowall icon type found in the resource tree.
-    ASSERT_TRUE(noneMatches(iconTypeMatch(QnResourceIconCache::VideoWall)));
+    ASSERT_TRUE(noneMatches(iconTypeMatch(ResourceIconCache::VideoWall)));
 }
 
 TEST_F(ResourceTreeModelTest, videoWallHelpTopic)
@@ -525,7 +526,7 @@ TEST_F(ResourceTreeModelTest, videoWallNodeIsVisibleAndEditableOnlyByUsersHaveSu
     loginAsLiveViewer("live_viewer");
 
     // Then no video walls found in the resource tree.
-    ASSERT_TRUE(noneMatches(iconTypeMatch(QnResourceIconCache::VideoWall)));
+    ASSERT_TRUE(noneMatches(iconTypeMatch(ResourceIconCache::VideoWall)));
 
     // When custom user with videowall control is logged in.
     loginAsCustomUser("customUser");

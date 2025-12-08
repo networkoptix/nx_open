@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_RESOURCE_ICON_CACHE_H
-#define QN_RESOURCE_ICON_CACHE_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtGui/QIcon>
@@ -10,12 +9,14 @@
 #include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/core/skin/skin.h>
 
+namespace nx::vms::client::core {
+
 /**
  * Cache for resource icons with overlaid status.
  *
  * Note that this class is not thread-safe.
  */
-class QnResourceIconCache: public QObject
+class NX_VMS_CLIENT_CORE_API ResourceIconCache: public QObject
 {
     Q_OBJECT;
     Q_FLAGS(Key KeyPart);
@@ -106,16 +107,14 @@ public:
     {
     public:
         IconWithDescription() = default;
-        IconWithDescription(
-            const nx::vms::client::core::ColorizedIconDeclaration& iconDescription);
+        IconWithDescription(const ColorizedIconDeclaration& iconDescription);
 
         QIcon icon;
-        nx::vms::client::core::ColorizedIconDeclaration iconDescription;
+        ColorizedIconDeclaration iconDescription;
     };
 
-    QnResourceIconCache(QObject* parent = nullptr);
-
-    virtual ~QnResourceIconCache();
+    ResourceIconCache(QObject* parent = nullptr);
+    virtual ~ResourceIconCache();
 
     QIcon icon(const QnResourcePtr& resource);
 
@@ -127,33 +126,30 @@ public:
     QIcon icon(Key key);
     QPixmap iconPixmap(Key key,
         const QSize& requestedSize,
-        const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions& svgColorSubstitutions,
+        const SvgIconColorer::ThemeSubstitutions& svgColorSubstitutions,
         QnIcon::Mode mode = QnIcon::Normal);
 
-    QString iconPath(Key key) const;
+    virtual QString iconPath(Key key) const;
     QString iconPath(const QnResourcePtr& resource) const;
     QColor iconColor(Key key, QnIcon::Mode mode = QnIcon::Normal) const;
     QColor iconColor(const QnResourcePtr& resource) const;
 
-    static Key userKey(const QnUserResourcePtr& user);
+    Key userKey(const QnUserResourcePtr& user) const;
+    virtual Key key(const QnResourcePtr& resource) const;
+    QIcon cameraRecordingStatusIcon(ResourceExtraStatus status) const;
 
-    static Key key(const QnResourcePtr& resource);
+protected:
+    static QIcon loadIcon(const QString& name,
+        const SvgIconColorer::ThemeSubstitutions& themeSubstitutions = {});
+    static SvgIconColorer::ThemeSubstitutions treeThemeSubstitutions();
+    static SvgIconColorer::ThemeSubstitutions treeThemeOfflineSubstitutions();
 
-    static QnResourceIconCache* instance();
-
-    static QIcon cameraRecordingStatusIcon(nx::vms::client::core::ResourceExtraStatus status);
-
-private:
-    QString iconPathFromLegacyIcons(Key key) const;
     IconWithDescription searchIconOutsideCache(Key key);
     IconWithDescription iconDescription(Key key);
 
-    QHash<Key, QString> m_legacyIconsPaths;
     QHash<Key, IconWithDescription> m_cache;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceIconCache::Key)
+Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceIconCache::Key)
 
-#define qnResIconCache QnResourceIconCache::instance()
-
-#endif // QN_RESOURCE_ICON_CACHE_H
+} // namespace nx::vms::client::core

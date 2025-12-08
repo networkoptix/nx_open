@@ -2,15 +2,13 @@
 
 #include "resource_tree_item_order.h"
 
-#include <client/client_globals.h>
 #include <common/common_globals.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/common/intercom/utils.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace entity_resource_tree {
 
 using namespace nx::vms::client::core::entity_item_model;
@@ -86,20 +84,17 @@ ItemOrder layoutItemsOrder()
         {
             if (flags.testFlag(Qn::web_page))
             {
-                if (ini().webPagesAndIntegrations)
+                switch (iconKey)
                 {
-                    switch (iconKey)
-                    {
-                        case QnResourceIconCache::IntegrationProxied: return 2;
-                        case QnResourceIconCache::Integration: return 3;
-                        case QnResourceIconCache::WebPageProxied: return 4;
-                        case QnResourceIconCache::WebPage: return 5;
-                    }
+                    case ResourceIconCache::IntegrationProxied: return 2;
+                    case ResourceIconCache::Integration: return 3;
+                    case ResourceIconCache::WebPageProxied: return 4;
+                    case ResourceIconCache::WebPage: return 5;
 
-                    NX_ASSERT(false, "Unexpected value (%1)", iconKey);
+                    default:
+                        NX_ASSERT(false, "Unexpected value (%1)", iconKey);
+                        return 5;
                 }
-
-                return iconKey == QnResourceIconCache::WebPageProxied ? 2 : 3;
             }
 
             if (flags.testFlag(Qn::server))
@@ -193,4 +188,4 @@ ItemOrder serverResourcesOrder()
 }
 
 } // namespace entity_resource_tree
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

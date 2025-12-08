@@ -3,8 +3,8 @@
 #include <client/client_globals.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/showreel_data.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 
@@ -14,6 +14,7 @@ namespace nx::vms::client::desktop {
 namespace test {
 
 using namespace index_condition;
+using core::ResourceIconCache;
 
 // String constants.
 static constexpr auto kUniqueShowreelName = "unique_showreel_name";
@@ -63,7 +64,7 @@ TEST_F(ResourceTreeModelTest, showreelIconType)
     const auto showreelIndex = uniqueMatchingIndex(kUniqueShowreelNameCondition);
 
     // And it have showreel icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::Showreel)(showreelIndex));
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::Showreel)(showreelIndex));
 }
 
 TEST_F(ResourceTreeModelTest, showreelIsChildrenOfCorrespondingTopLevelNode)
@@ -99,7 +100,7 @@ TEST_F(ResourceTreeModelTest, showreelIsNotDisplayedIfNotLoggedIn)
     ASSERT_TRUE(noneMatches(displayFullMatch(kUniqueShowreelName)));
 
     // Then no more nodes with showreel icon type found in the resource tree.
-    ASSERT_TRUE(noneMatches(iconTypeMatch(QnResourceIconCache::Showreel)));
+    ASSERT_TRUE(noneMatches(iconTypeMatch(ResourceIconCache::Showreel)));
 }
 
 TEST_F(ResourceTreeModelTest, showreelTooltip)

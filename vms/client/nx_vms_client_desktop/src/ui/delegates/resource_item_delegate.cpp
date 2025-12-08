@@ -17,15 +17,15 @@
 #include <core/resource/videowall_resource.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
-#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
-#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_state.h>
@@ -790,7 +790,8 @@ void QnResourceItemDelegate::paintExtraStatus(
     // Draw recording status icon.
     if (m_options.testFlag(RecordingIcons))
     {
-        const auto recordingIcon = QnResourceIconCache::cameraRecordingStatusIcon(extraStatus);
+        const auto recordingIcon =
+            appContext()->resourceIconCache()->cameraRecordingStatusIcon(extraStatus);
         if (!recordingIcon.isNull())
         {
             if (!shiftIconLeft())

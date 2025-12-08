@@ -2,12 +2,12 @@
 
 #include "main_tree_resource_item_decorator.h"
 
-#include <core/resource/resource.h>
+#include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/resource.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <client/client_globals.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 
 namespace {
 
@@ -120,8 +120,8 @@ QVariant MainTreeResourceItemDecorator::data(int role) const
         {
             const auto resource = m_sourceItem->data(core::ResourceRole).value<QnResourcePtr>();
             const auto overridenIcon = resource->isOnline()
-                ? QnResourceIconCache::HealthMonitor | QnResourceIconCache::Online
-                : QnResourceIconCache::HealthMonitor | QnResourceIconCache::Offline;
+                ? ResourceIconCache::HealthMonitor | ResourceIconCache::Online
+                : ResourceIconCache::HealthMonitor | ResourceIconCache::Offline;
             return QVariant::fromValue<int>(overridenIcon);
         }
     }

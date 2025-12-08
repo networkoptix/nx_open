@@ -16,12 +16,12 @@
 #include <nx/utils/math/math.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/rules/utils/audit_log_conversion.h>

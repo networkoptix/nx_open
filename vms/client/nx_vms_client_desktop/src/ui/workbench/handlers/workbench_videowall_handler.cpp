@@ -44,6 +44,8 @@
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -55,10 +57,8 @@
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
-#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/ui/messages/videowall_messages.h>

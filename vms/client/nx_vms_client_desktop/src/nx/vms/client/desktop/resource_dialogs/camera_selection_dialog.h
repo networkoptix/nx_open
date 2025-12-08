@@ -6,8 +6,8 @@
 
 #include <core/resource/resource.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_selection_widget.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
@@ -20,7 +20,7 @@ class ResourceSelectionWidget;
 struct PinnedItemDescription
 {
     QString displayText;
-    QnResourceIconCache::Key iconKey;
+    core::ResourceIconCache::Key iconKey;
 };
 
 class CameraSelectionDialog: public QnSessionAwareButtonBoxDialog
@@ -220,7 +220,7 @@ bool CameraSelectionDialog::selectCameras(
         };
 
     static const PinnedItemDescription kPinnedItemDescription{
-        sourceCamera(), QnResourceIconCache::Camera};
+        sourceCamera(), core::ResourceIconCache::Camera};
 
     CameraSelectionDialog dialog(ResourceFilter{}, validator, alertProvider,
         /*permissionsHandledByFilter*/ false, kPinnedItemDescription, parent);
