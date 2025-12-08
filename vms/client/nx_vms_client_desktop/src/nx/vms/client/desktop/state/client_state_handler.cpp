@@ -128,6 +128,8 @@ void ClientStateHandler::clientStarted(const StartupParameters& parameters)
 
     d->startupParameters = parameters;
 
+    NX_DEBUG(this, "Client started, mode: %1", (int) parameters.mode);
+
     switch (parameters.mode)
     {
         case StartupParameters::Mode::cleanStartup:
@@ -158,6 +160,8 @@ void ClientStateHandler::storeSystemIndependentState()
 {
     if (!qnRuntime->isDesktopMode())
         return;
+
+    NX_DEBUG(this, "Store system-independent state, session: %1", d->sessionId.toLogString());
 
     const auto state = serializeState(
         ClientStateDelegate::Substate::systemIndependentParameters);
@@ -247,6 +251,8 @@ void ClientStateHandler::createNewWindow(
     const std::optional<core::LogonData>& logonData,
     const QStringList& args)
 {
+    NX_DEBUG(this, "Create new window, session: %1", d->sessionId.toLogString());
+
     SessionState state;
     for (const auto& [delegateId, delegate]: d->delegates)
     {
@@ -305,6 +311,8 @@ void ClientStateHandler::restoreWindowsConfiguration(const core::LogonData& logo
 {
     if (!NX_ASSERT(d->sessionId))
         return;
+
+    NX_DEBUG(this, "Restore windows configuration, session: %1", d->sessionId.toLogString());
 
     auto windowStates = d->clientStateStorage.readFullSessionState(d->sessionId);
     if (!NX_ASSERT(!windowStates.empty()))
@@ -375,8 +383,10 @@ void ClientStateHandler::clientRequestedToSaveState()
     if (!NX_ASSERT(d->sessionId))
         return;
 
+    NX_DEBUG(this, "Client requested to save state, session: %1", d->sessionId.toLogString());
+
     const QString randomFilename = nx::Uuid::createUuid().toSimpleString() + ".json";
-    const auto state = serializeState(ClientStateDelegate::Substate::systemSpecificParameters);
+    const auto state = serializeState(ClientStateDelegate::Substate::allParameters);
     d->clientStateStorage.writeSessionState(d->sessionId, randomFilename, state);
     storeSystemIndependentState();
 }
@@ -385,6 +395,8 @@ void ClientStateHandler::clientRequestedToRestoreState(const QString& filename)
 {
     if (!NX_ASSERT(d->sessionId))
         return;
+
+    NX_DEBUG(this, "Client requested to restore state, session: %1", d->sessionId.toLogString());
 
     loadClientState(d->clientStateStorage.readSessionState(d->sessionId, filename));
 }
@@ -401,7 +413,7 @@ void ClientStateHandler::storeSystemSpecificState()
     if (!NX_ASSERT(d->sessionId))
         return;
 
-    NX_VERBOSE(this, "Store system-specific state, session: %1", d->sessionId.toLogString());
+    NX_DEBUG(this, "Store system-specific state, session: %1", d->sessionId.toLogString());
 
     const auto state = serializeState(ClientStateDelegate::Substate::systemSpecificParameters);
     d->clientStateStorage.writeSystemSubstate(d->sessionId, state);

@@ -2,7 +2,8 @@
 
 #include "client_state_storage.h"
 
-#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
 
@@ -96,6 +97,8 @@ FullSessionState ClientStateStorage::readFullSessionState(const SessionId& sessi
             return result;
         };
 
+    NX_VERBOSE(this, "Read full state, session: %1", sessionId.toLogString());
+
     const QString sessionIdString = sessionId.toQString();
 
     auto state = readState(sessionIdString);
@@ -147,6 +150,8 @@ SessionState ClientStateStorage::readStateInternal(
     const QString& name,
     bool mayFail) const
 {
+    NX_VERBOSE(this, "Read state internal: %1/%2", dir, name);
+
     QDir directory(m_root);
     if (dir != "" && dir != ".")
     {
@@ -176,6 +181,8 @@ void ClientStateStorage::writeStateInternal(
     const QString& name,
     const SessionState& state)
 {
+    NX_VERBOSE(this, "Write state to '%1/%2', keys: %3", dir, name, state.keys());
+
     if (!m_root.exists())
         m_root.mkpath(".");
 
@@ -192,12 +199,18 @@ void ClientStateStorage::writeStateInternal(
     if (!NX_ASSERT(file.open(QIODevice::WriteOnly), "File '%1' cannot be opened for writing", path))
         return;
 
-    file.write(QJson::serialized(state));
+    const auto format = ini().developerMode ? QJsonDocument::Indented : QJsonDocument::Compact;
+    QJsonValue value;
+    QJson::serialize(state, &value);
+
+    file.write(value.toJson(format));
     file.close();
 }
 
 std::pair<SessionState, bool> ClientStateStorage::readStateDirectly(const QString& path) const
 {
+    NX_VERBOSE(this, "Read state directly: %1", path);
+
     QFile file(path);
     if (!NX_ASSERT(file.open(QIODevice::ReadOnly), "File '%1' cannot be opened for direct reading", path))
         return {{}, false};

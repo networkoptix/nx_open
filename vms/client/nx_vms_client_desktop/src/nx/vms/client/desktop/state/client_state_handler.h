@@ -99,6 +99,13 @@ public:
     void setClientProcessExecutionInterface(ClientProcessExecutionInterfacePtr executionInterface);
 
     /**
+     * Set statistics modules.
+     */
+    void setStatisticsModules(
+        QnStatisticsManager* statisticsManager,
+        QnSessionRestoreStatisticsModule* statisticsModule);
+
+    /**
      * Add delegate for the stateful element.
      */
     void registerDelegate(const QString& id, ClientStateDelegatePtr delegate);
@@ -109,6 +116,16 @@ public:
     void unregisterDelegate(const QString& id);
 
     /**
+     * Common system-independent state will be updated.
+     */
+    void storeSystemIndependentState();
+
+    /**
+     * System-specific state will be updated.
+     */
+    void storeSystemSpecificState();
+
+    /**
      * Handle client start.
      *
      * If the session file was provided as a startup parameter, client must load system-independent
@@ -117,11 +134,6 @@ public:
      * system-independent state is used for initialization.
      */
     void clientStarted(const StartupParameters& parameters);
-
-    /**
-     * Common system-independent state will be updated.
-     */
-    void storeSystemIndependentState();
 
     /**
      * Handle client connection.
@@ -192,18 +204,6 @@ public:
      * Handle state restoring that is requested in another instance of client.
      */
     void clientRequestedToRestoreState(const QString& filename);
-
-    /**
-     * Set statistics modules.
-     */
-    void setStatisticsModules(
-        QnStatisticsManager* statisticsManager,
-        QnSessionRestoreStatisticsModule* statisticsModule);
-
-    /**
-     * System-specific state will be updated.
-     */
-    void storeSystemSpecificState();
 
 private:
     SessionState serializeState(ClientStateDelegate::SubstateFlags flags) const;
