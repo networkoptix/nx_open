@@ -103,6 +103,7 @@ bool isCodecSupported(AVCodecID codecId)
         case AV_CODEC_ID_H263:
         case AV_CODEC_ID_H263P:
         case AV_CODEC_ID_H264:
+        case AV_CODEC_ID_H265:
         case AV_CODEC_ID_MPEG1VIDEO:
         case AV_CODEC_ID_MPEG2VIDEO:
         case AV_CODEC_ID_MPEG4:
