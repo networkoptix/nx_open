@@ -16,6 +16,10 @@
 
 namespace {
 
+static constexpr QStringView kPtzZoomCommand = u"custom_zoom";
+static constexpr QStringView kPtzPtrCommand = u"custom_ptr";
+static constexpr QStringView kPtzFocusCommand = u"custom_focus";
+
 QSet<QString> parameterIds(const QnCameraAdvancedParamGroup& group)
 {
     QSet<QString> result;
@@ -236,11 +240,22 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(
     const QnCameraAdvancedParameter& parameter,
     const QString& value)
 {
-    using namespace nx::vms::common::ptz;
-
     // Check that we are in the correct state.
     if (state() != State::Init || (!d->cameraIsOnline && !parameter.availableInOffline))
         return;
+
+    const std::set ptzCommands = {kPtzZoomCommand, kPtzPtrCommand, kPtzFocusCommand};
+    if (ptzCommands.contains(parameter.writeCmd))
+        sendCustomPtzCommand(parameter, value);
+    else
+        saveSingleValue(parameter, value);
+}
+
+void CameraAdvancedParamsWidget::sendCustomPtzCommand(
+    const QnCameraAdvancedParameter& parameter,
+    const QString& value)
+{
+    using namespace nx::vms::common::ptz;
 
     if (!d->ptzController)
         return;
@@ -249,7 +264,7 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(
 
     Options options{Type::configurational};
 
-    if(parameter.writeCmd == lit("custom_zoom"))
+    if (parameter.writeCmd == kPtzZoomCommand)
     {
         // Expecting a single value.
         Vector speed;
@@ -261,10 +276,10 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(
             d->ptzController->continuousMove(speed, options);
         }
     }
-    else if (parameter.writeCmd == lit("custom_ptr"))
+    else if (parameter.writeCmd == kPtzPtrCommand)
     {
         // Expecting a value like "horizontal,vertical,rotation".
-        QStringList values = value.split(',');
+        const auto values = QStringView(value).split(',');
 
         if (values.size() != 3)
             return;
@@ -274,18 +289,24 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(
         // Workaround for VMS-15380: changing sign of 'pan' control to make camera
         // rotate in a proper direction.
         // TODO: We need some flag to set a proper direction for camera rotation.
-        speed.pan = -values[0].toDouble(&ok);
-        speed.tilt = values[1].toDouble(&ok);
+        if (speed.pan = -values[0].toDouble(&ok); !ok)
+            return;
+        if (speed.tilt = values[1].toDouble(&ok); !ok)
+            return;
+
+        double rotation = 0.0;
+        if (rotation = values[2].toDouble(&ok); !ok)
+            return;
 
         // Control provides the angle in range [-180; 180],
         // but we should send values in range [-1.0, 1.0].
-        speed.rotation = qBound(values[2].toDouble(&ok) / 180.0, -1.0, 1.0);
+        speed.rotation = qBound(rotation / 180.0, -1.0, 1.0);
 
         qDebug() << "Sending custom_ptr(pan=" << speed.pan << ", tilt=" << speed.tilt << ", rot=" << speed.rotation << ")";
 
         d->ptzController->continuousMove(speed, options);
     }
-    else if (parameter.writeCmd == lit("custom_focus"))
+    else if (parameter.writeCmd == kPtzFocusCommand)
     {
         // Expecting a single value.
         qreal speed = value.toDouble(&ok);
