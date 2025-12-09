@@ -110,10 +110,14 @@ if(WINDOWS AND withDistributions)
 endif()
 
 if(NOT IOS AND NOT EMSCRIPTEN)
-    set(CRASHPAD_HANDLER_PATH "${CONAN_CRASHPAD_ROOT}/bin/crashpad_handler${CMAKE_EXECUTABLE_SUFFIX}")
+    set(CRASHPAD_HANDLER_NAME "crashpad_handler${CMAKE_EXECUTABLE_SUFFIX}")
     nx_copy(
-        "${CRASHPAD_HANDLER_PATH}"
+        "${CONAN_CRASHPAD_ROOT}/bin/${CRASHPAD_HANDLER_NAME}"
         DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+    set(CRASHPAD_HANDLER_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CRASHPAD_HANDLER_NAME}")
+    if(CMAKE_STRIP)
+        execute_process(COMMAND "${CMAKE_STRIP}" -S "${CRASHPAD_HANDLER_PATH}")
+    endif()
 endif()
 
 add_subdirectory(cloud)

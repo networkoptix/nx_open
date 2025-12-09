@@ -61,8 +61,16 @@ function(nx_process_linux_target_debug_symbols target)
         # On macOS the dump_syms_linux is built only for 64-bit elf files.
         set(DUMP_SYMS_COMMAND)
     else()
+        # Android dependencies contain debug symbols that also need to be processed.
+        # Stripping debug symbols is handled in Gradle.
+        if(ANDROID)
+            get_filename_component(COMPILER_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
+            set(GEN_SYM_ARGS "--platform=android" "--readelf-path=${COMPILER_DIR}/llvm-readelf" "--lib-paths=${QT_DIR}/lib")
+        else()
+            set(GEN_SYM_ARGS "--skip-deps")
+        endif()
         set(DUMP_SYMS_COMMAND COMMAND
-            "${PYTHON_EXECUTABLE}" "${CONAN_BREAKPAD-TOOLS_ROOT}/generate_breakpad_symbols.py" --dump-syms-path "${DUMP_SYMS}" --build-dir "${PROJECT_BINARY_DIR}" --symbols-dir "${breakpadSymbolsOutputDir}" --binary "$<TARGET_FILE:${target}>" --skip-deps --verbose)
+            "${PYTHON_EXECUTABLE}" "${CONAN_BREAKPAD-TOOLS_ROOT}/generate_breakpad_symbols.py" --dump-syms-path "${DUMP_SYMS}" --build-dir "${PROJECT_BINARY_DIR}" --symbols-dir "${breakpadSymbolsOutputDir}" --binary "$<TARGET_FILE:${target}>" --verbose ${GEN_SYM_ARGS})
     endif()
 
     add_custom_command(TARGET ${target} POST_BUILD
