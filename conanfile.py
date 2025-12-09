@@ -74,7 +74,7 @@ class NxOpenConan(ConanFile):
         "mobile_user_manual:format": "pdf",
     }
 
-    ffmpeg_version_and_revision = "7.0.1#6784ea2299c2f5a436db3bbd57b1b4a5"
+    ffmpeg_version_and_revision = "7.0.1#741917fb2433679f2ecb239c3cbedff7"
 
     python_requires = (
         "os_deps_from_deb_based_distro/0.5" "#43dce86a813993ad9acb644d3941e399",
@@ -149,7 +149,7 @@ class NxOpenConan(ConanFile):
         self.build_requires("apidoctool/3.0" "#483c5073667ee722756e0ca31e18972a")
         self.build_requires("qt-host/6.9.0" "#1ed505d80eb8881914f63d7d586de0a7")
         self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
-        self.build_requires("breakpad-tools/2024.02.16" "#0b0da27a7ec2f99505630994b48a70a4")
+        self.build_requires("breakpad-tools/2024.02.16" "#0327f836a8727dc7bd456fee67f78645")
 
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
@@ -188,14 +188,14 @@ class NxOpenConan(ConanFile):
         self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("libmp3lame/3.100" "#da13ecbaf0d06421ae586b7226d985ad")
-        self.requires("openssl/1.1.1q" "#cf9c0c761f39805e5a258dc39daff2bd")
-        self.requires("qt/6.9.0" "#5fa54b8a5e73813413f2bdb017dca88d")
+        self.requires("openssl/1.1.1q" "#6cb93038eb614569f872e8ec45bb33c4")
+        self.requires("qt/6.9.0" "#e37145fa8dea487f3fd829dbaf5b182d")
         self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
         self.requires("boost/1.83.0" "#d150c9edc8081c98965b05ea9c2df318")
         self.requires("rapidjson/cci.20230929" "#751fc0dfc70af706c708706450fc2ab7")
         self.requires("zlib/1.3.1" "#99d6f9ea0a1dd63d973392c24ce0aa9b")
         self.requires("perfetto/47.0" "#fefcb910df242e7dca2a309cac9396cb")
-        self.requires("crashpad/cci.20250729" "#9bf9bb5a8bdca7e87a19ff92f5c3bb90")
+        self.requires("crashpad/cci.20250729" "#7c4f947fc506eb2a07720af501bc5255")
 
         if self.settings.os not in ("Android", "iOS"):
             # Qt dependency.
@@ -227,8 +227,7 @@ class NxOpenConan(ConanFile):
 
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
-                self.requires("os_deps_for_desktop_linux/ubuntu_focal"
-                    "#e89b9e29cdcfa7699fa4810eae291feb")
+                self.requires("os_deps_for_desktop_linux/ubuntu_focal" "#e89b9e29cdcfa7699fa4810eae291feb")
 
         if self.haveDesktopClient:
             if self.isMacos:
