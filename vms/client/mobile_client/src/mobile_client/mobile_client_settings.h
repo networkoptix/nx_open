@@ -5,6 +5,7 @@
 #include <QtCore/QSize>
 
 #include <mobile_client/mobile_client_startup_parameters.h>
+#include <nx/build_info.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/maintenance/remote_log_session_data.h>
 #include <nx/vms/client/mobile/push_notification/details/push_notification_structures.h>
@@ -59,7 +60,7 @@ public:
 
         VideoRenderingApi,
 
-        CrashdumpUploadsEnabled,
+        CrashReportingEnabled,
 
         VariableCount
     };
@@ -171,8 +172,9 @@ private:
 
         QN_DECLARE_RW_PROPERTY(
             bool,
-            crashdumpUploadsEnabled, setCrashdumpUploadsEnabled,
-            CrashdumpUploadsEnabled, false)
+            crashReportingEnabled, setCrashReportingEnabled,
+            CrashReportingEnabled,
+            (nx::build_info::publicationType() != nx::build_info::PublicationType::release))
 
     QN_END_PROPERTY_STORAGE()
 
