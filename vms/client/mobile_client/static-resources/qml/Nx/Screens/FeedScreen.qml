@@ -226,6 +226,8 @@ Page
                 minimumIntervalMs: 250
             }
 
+            onTextChanged: notifications.positionViewAtBeginning()
+
             function matchAnySpace(str)
             {
                 return str.replace(/\\ /g, "\\s")
@@ -289,6 +291,7 @@ Page
                     time: model.time
                     viewed: model.viewed ?? true
                     url: model.url
+                    expanded: feedScreen.searching
 
                     onClicked:
                     {
