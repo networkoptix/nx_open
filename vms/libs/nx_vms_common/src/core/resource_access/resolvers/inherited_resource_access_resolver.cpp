@@ -171,6 +171,9 @@ InheritedResourceAccessResolver::Private::Private(
 
     connect(subjectHierarchy, &SubjectHierarchy::changed,
         this, &Private::handleSubjectHierarchyChanged, Qt::DirectConnection);
+
+    connect(subjectHierarchy, &SubjectHierarchy::reset,
+        this, &Private::handleReset, Qt::DirectConnection);
 }
 
 InheritedResourceAccessResolver::Private::ResourceAccessData

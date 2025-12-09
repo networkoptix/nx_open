@@ -42,6 +42,7 @@
 #include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/client/mobile/window_context.h>
+#include <nx/vms/client/mobile/workarounds/user_rights_workaround.h>
 #include <nx/vms/discovery/manager.h>
 #include <ui/camera_thumbnail_provider.h>
 #include <watchers/available_cameras_watcher.h>
@@ -160,6 +161,7 @@ SystemContext::SystemContext(WindowContext* context,
         return;
 
     createMessageProcessor<QnMobileClientMessageProcessor>(this);
+    UserRightsWorkaround::install(this);
 
     startModuleDiscovery(core::appContext()->moduleDiscoveryManager());
 
