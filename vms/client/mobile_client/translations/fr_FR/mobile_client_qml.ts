@@ -183,7 +183,7 @@
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
-      <translation>Connecter au serveur</translation>
+      <translation>Se connecter à un serveur</translation>
     </message>
     <message>
       <source>Delete</source>
