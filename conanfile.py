@@ -74,7 +74,7 @@ class NxOpenConan(ConanFile):
         "mobile_user_manual:format": "pdf",
     }
 
-    ffmpeg_version_and_revision = "7.0.1#96103b3aeaceafb173b5c82d34c7b3d2"
+    ffmpeg_version_and_revision = "7.0.1#b00ddd83d08cc4ed6c25bbef9527994b"
 
     python_requires = (
         "os_deps_from_deb_based_distro/0.5" "#43dce86a813993ad9acb644d3941e399",
@@ -151,7 +151,7 @@ class NxOpenConan(ConanFile):
         if not self.isEmscripten:
             self.build_requires("apidoctool/3.0" "#483c5073667ee722756e0ca31e18972a")
             self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
-            self.build_requires("breakpad-tools/2024.02.16" "#0b0da27a7ec2f99505630994b48a70a4")
+            self.build_requires("breakpad-tools/2024.02.16" "#0327f836a8727dc7bd456fee67f78645")
 
         if self.isLinux or self.isWindows:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
@@ -170,7 +170,7 @@ class NxOpenConan(ConanFile):
         if self.isAndroid:
             self.build_requires("openjdk/18.0.1" "#a8a02e50d3ff18df2248cae06ed5a13c")
             if "ANDROID_HOME" not in os.environ:
-                self.build_requires("AndroidSDK/34" "#eea6103b2dcc6cd808d0e8c2ee512bf9")
+                self.build_requires("AndroidSDK/34" "#2087398e918c534f59a775e88d936e45")
             if "ANDROID_NDK" not in os.environ:
                 self.build_requires("AndroidNDK/r29" "#a170457e398db464111140b1ba7576fc")
         elif not self.isEmscripten:
@@ -192,8 +192,8 @@ class NxOpenConan(ConanFile):
 
         self.requires("boost/1.83.0" "#d150c9edc8081c98965b05ea9c2df318")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
-        self.requires("openssl/1.1.1q" "#e648f58c45605a06b7be93cafb31ab98")
-        self.requires("qt/6.9.1" "#dd8b44863ca5ae5851258f57349adf43")
+        self.requires("openssl/1.1.1q" "#389fdbabc290c55ab79fee03761f20dd")
+        self.requires("qt/6.9.1" "#18a7fb0db802ee37066ece7bb5066f77")
         self.requires("rapidjson/cci.20230929" "#751fc0dfc70af706c708706450fc2ab7")
         self.requires("zlib/1.3.1" "#99d6f9ea0a1dd63d973392c24ce0aa9b")
 
@@ -202,7 +202,7 @@ class NxOpenConan(ConanFile):
             self.requires("libmp3lame/3.100" "#da13ecbaf0d06421ae586b7226d985ad")
             self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
             self.requires("perfetto/47.0" "#fefcb910df242e7dca2a309cac9396cb")
-            self.requires("crashpad/cci.20250729" "#9bf9bb5a8bdca7e87a19ff92f5c3bb90")
+            self.requires("crashpad/cci.20250729" "#7c4f947fc506eb2a07720af501bc5255")
 
         if self.settings.os not in ("Android", "iOS", "Emscripten"):
             # Qt dependency.
@@ -234,8 +234,7 @@ class NxOpenConan(ConanFile):
 
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
-                self.requires("os_deps_for_desktop_linux/ubuntu_focal"
-                    "#e3b3c4100f7d891449e13cb22ac44715")
+                self.requires("os_deps_for_desktop_linux/ubuntu_focal" "#e3b3c4100f7d891449e13cb22ac44715")
 
         if self.haveDesktopClient:
             if self.isMacos:
