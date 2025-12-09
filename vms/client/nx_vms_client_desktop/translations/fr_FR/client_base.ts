@@ -196,7 +196,7 @@
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Déconnecter du serveur</translation>
+      <translation>Se déconnecter du serveur</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
@@ -839,7 +839,7 @@
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation>Connecter à ce serveur</translation>
+      <translation>Se connecter à ce serveur</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -855,7 +855,7 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>Connecter à un autre Serveur...</translation>
+      <translation>Se connecter à un autre Serveur...</translation>
     </message>
     <message>
       <source>New</source>
@@ -3343,7 +3343,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation>Avancée</translation>
+      <translation>Avancé</translation>
     </message>
     <message>
       <source>Restart required</source>
@@ -4757,7 +4757,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Advanced</source>
-      <translation>Avancée</translation>
+      <translation>Avancé</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -7347,7 +7347,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Advanced</source>
-      <translation>Avancée</translation>
+      <translation>Avancé</translation>
     </message>
     <message>
       <source>Web Page</source>
