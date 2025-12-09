@@ -164,5 +164,9 @@
         <source>Service unauthorized.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Insufficient storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
