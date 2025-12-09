@@ -27,6 +27,9 @@ public:
 
     void Set(nostd::string_view key, nostd::string_view value) noexcept override
     {
+        // Set MUST REPLACE any existing values.
+        // See https://opentelemetry.io/docs/specs/otel/context/api-propagators/#set
+        m_headers.erase(std::string(key));
         m_headers.emplace(std::string(key), std::string(value));
     }
 };
