@@ -549,14 +549,14 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     <name>ConnectButton</name>
     <message>
       <source>Connect to Server</source>
-      <translation>Connecter au serveur</translation>
+      <translation>Se connecter à un serveur</translation>
     </message>
   </context>
   <context>
     <name>ConnectTile</name>
     <message>
       <source>Connect to Server</source>
-      <translation>Connecter au serveur</translation>
+      <translation>Se connecter à un serveur</translation>
     </message>
   </context>
   <context>

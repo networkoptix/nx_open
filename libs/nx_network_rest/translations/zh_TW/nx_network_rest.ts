@@ -164,5 +164,9 @@
       <source>Service unauthorized.</source>
       <translation>服務沒有通過身份驗證。</translation>
     </message>
+    <message>
+      <source>Insufficient storage.</source>
+      <translation type="unfinished">Insufficient storage.</translation>
+    </message>
   </context>
 </TS>

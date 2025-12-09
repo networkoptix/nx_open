@@ -2337,7 +2337,7 @@ et cliquez sur le bouton &quot;Rechercher&quot;</translation>
     </message>
     <message>
       <source>Additional storage</source>
-      <translation>Stockage additionnelle</translation>
+      <translation>Stockage additionnel</translation>
     </message>
     <message>
       <source>Base forecast on data recorded during</source>
@@ -2582,7 +2582,7 @@ et cliquez sur le bouton &quot;Rechercher&quot;</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation>Avancée</translation>
+      <translation>Avancé</translation>
     </message>
     <message>
       <source>Allow using Client API</source>
