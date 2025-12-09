@@ -396,7 +396,7 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     const auto featureWatcher = context->cloudFeaturesWatcher();
 
     const bool enabledFromCloud = featureWatcher->hasFeature(Feature::vmsClientCrashReporting);
-    const bool forcedByUser = qnSettings->crashdumpUploadsEnabled();
+    const bool forcedByUser = context->clientSettings()->crashReportingEnabled();
     const bool enableCrashReporting = enabledFromCloud || forcedByUser;
     NX_DEBUG(
         nx::log::Tag(QString("main()")),

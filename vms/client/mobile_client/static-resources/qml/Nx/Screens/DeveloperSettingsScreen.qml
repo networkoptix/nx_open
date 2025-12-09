@@ -220,14 +220,14 @@ BaseSettingsScreen
 
             width: parent.width
             text: "Upload client crashdumps"
-            checkState: appContext.settings.crashdumpUploadsEnabled ? Qt.Checked : Qt.Unchecked
+            checkState: appContext.settings.crashReportingEnabled ? Qt.Checked : Qt.Unchecked
             onCheckStateChanged:
             {
                 const value = checkState != Qt.Unchecked
-                if (value == appContext.settings.crashdumpUploadsEnabled)
+                if (value == appContext.settings.crashReportingEnabled)
                     return
 
-                appContext.settings.crashdumpUploadsEnabled = value
+                appContext.settings.crashReportingEnabled = value
                 d.openRestartDialog()
             }
         }
@@ -321,7 +321,7 @@ BaseSettingsScreen
             copySessionIdToClipboard()
             // Prevent showing crash button just after enabling crashdump uploads - the app should
             // be restarted first to apply changes.
-            crashdumpsEnabled = appContext.settings.crashdumpUploadsEnabled
+            crashdumpsEnabled = appContext.settings.crashReportingEnabled
         }
     }
 }

@@ -7,6 +7,7 @@
 
 #include <client_core/local_connection_data.h>
 #include <mobile_client/mobile_client_startup_parameters.h>
+#include <nx/build_info.h>
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/singleton.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -63,7 +64,7 @@ public:
         EnableSoftwareDecoderFallback,
         ShowHowShareWorksNotification,
 
-        CrashdumpUploadsEnabled,
+        CrashReportingEnabled,
 
         VariableCount
     };
@@ -170,8 +171,9 @@ private:
 
         QN_DECLARE_RW_PROPERTY(
             bool,
-            crashdumpUploadsEnabled, setCrashdumpUploadsEnabled,
-            CrashdumpUploadsEnabled, false)
+            crashReportingEnabled, setCrashReportingEnabled,
+            CrashReportingEnabled,
+            (nx::build_info::publicationType() != nx::build_info::PublicationType::release))
 
     QN_END_PROPERTY_STORAGE()
 
