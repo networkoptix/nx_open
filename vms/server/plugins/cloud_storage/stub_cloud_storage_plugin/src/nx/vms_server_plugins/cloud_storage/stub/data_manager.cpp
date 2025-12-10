@@ -42,8 +42,6 @@ const char* kImageExtension = ".img";
 
 using namespace std::chrono;
 
-constexpr size_t kMaxSendBufferSize = 5;
-
 struct FileInfo
 {
     FileInfo() = default;

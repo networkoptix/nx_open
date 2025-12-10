@@ -46,8 +46,6 @@ Protocol protocolFromTag(qint32 tag)
     }
 }
 
-Q_GLOBAL_STATIC_WITH_ARGS(quint64, qn_localMagic, (QDateTime::currentMSecsSinceEpoch()));
-
 static const QString kInternalMimeType = "application/x-noptix-resources";
 static const QString kUriListMimeType = "text/uri-list"; //< Must be equal to Qt internal type.
 static const QString kUserIdMimeType = "application/x-user-id";

@@ -24,7 +24,6 @@ NX_DECLARE_COLORIZED_ICON(kPlusIcon, "20x20/Outline/add.svg", kIconSubstitutions
 
 const QSize kButtonSize(20, 20);
 const int kSliderHeight = 120;
-const int kControlBtn = Qt::LeftButton;
 
 } // namespace
 

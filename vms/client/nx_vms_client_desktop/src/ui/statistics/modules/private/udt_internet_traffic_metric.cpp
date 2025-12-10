@@ -4,8 +4,6 @@
 
 #include <nx/network/udt/udt_socket.h>
 
-static auto& statistics = nx::network::UdtStatistics::global;
-
 bool UdtInternetTrafficMetric::isSignificant() const
 {
     return nx::network::UdtStatistics::global.internetBytesTransferred != 0;

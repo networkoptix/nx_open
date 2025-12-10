@@ -5,9 +5,6 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 
-static const std::chrono::minutes kNonceServerTimeDifference(5);
-static const std::chrono::hours kNonceExpirationPeriod(1);
-
 TimeBasedNonceProvider::TimeBasedNonceProvider(
     std::chrono::milliseconds maxServerTimeDifference,
     std::chrono::milliseconds steadyExpirationPeriod)

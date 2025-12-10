@@ -35,7 +35,6 @@ using namespace nx::vms::client::desktop;
 namespace {
 
 constexpr int kReconnectDelayMs = 1000 * 5;
-constexpr int kCommandExecuteTimeoutMs = 1000 * 6;
 
 } // namespace
 

@@ -267,17 +267,6 @@ void NewDeviceAdditionDialog::handlePortValueChanged(int value)
 
 void NewDeviceAdditionDialog::handleTabClicked(int /*index*/)
 {
-    // We need two functions below to prevent blinking when page is changed.
-    [[maybe_unused]] static const auto resetPageSize = [](QWidget* widget) { widget->setFixedHeight(0); };
-    const auto setHeightFromLayout =
-        [this](QWidget* widget)
-        {
-            const auto layout = widget->layout();
-            widget->setFixedHeight(layout->minimumSize().height());
-            executeLater(
-                [widget, layout]() { widget->setMaximumHeight(layout->maximumSize().height()); },
-                this);
-        };
 }
 
 void NewDeviceAdditionDialog::updateSelectedServerButtonVisibility()

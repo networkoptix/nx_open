@@ -19,7 +19,6 @@ bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(
     if (license->type() != Qn::LC_VideoWall)
         return false;
 
-    const auto context = systemContext()->as<nx::vms::client::core::SystemContext>();
     const auto currentSession = appContext()->networkModule()->session();
     if (!currentSession)
         return false;

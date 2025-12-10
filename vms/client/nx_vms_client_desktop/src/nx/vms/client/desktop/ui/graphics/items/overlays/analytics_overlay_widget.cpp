@@ -32,8 +32,6 @@ using namespace nx::vms::client::core;
 static constexpr int kAreaLineWidth = 1;
 static constexpr bool kNoFillForObjects = false;
 
-static constexpr int kFpsLimit = 60;
-static constexpr milliseconds kTimeBetweenUpdateRequests = 1000ms / kFpsLimit;
 static constexpr qreal kMinimalTooltipOffset = 16;
 
 struct BestSide

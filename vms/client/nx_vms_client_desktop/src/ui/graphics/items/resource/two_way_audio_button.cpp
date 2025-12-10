@@ -38,9 +38,6 @@ constexpr int kHintFontPixelSize = 14;
 /** How long error should be displayed. */
 constexpr int kShowErrorMs = 2000;
 
-/** How long hint should be displayed. */
-constexpr int kShowHintMs = 2000;
-
 /** Animation speed. 1.0 means show/hide for 1 second. */
 constexpr qreal kHintOpacityAnimationSpeed = 3.0;
 

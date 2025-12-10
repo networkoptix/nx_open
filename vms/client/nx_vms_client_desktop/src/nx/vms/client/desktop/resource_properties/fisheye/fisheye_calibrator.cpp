@@ -14,8 +14,6 @@
 
 namespace {
 
-static constexpr int kBufferAlignment = 32;
-
 struct Distance
 {
     qint64 distance = std::numeric_limits<qint64>::max();
@@ -33,7 +31,7 @@ inline void pixSort(quint8& a, quint8& b)
     if (a > b)
         std::swap(a, b);
 }
-
+/*
 quint8 opt_med5(quint8* p)
 {
     pixSort(p[0], p[1]);
@@ -45,7 +43,7 @@ quint8 opt_med5(quint8* p)
     pixSort(p[1], p[2]);
     return(p[2]);
 }
-
+*/
 quint8 opt_med9(quint8* p)
 {
     pixSort(p[1], p[2]);

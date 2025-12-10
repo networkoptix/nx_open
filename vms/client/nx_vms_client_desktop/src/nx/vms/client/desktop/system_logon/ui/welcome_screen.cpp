@@ -64,14 +64,6 @@ using RemoteConnectionErrorCode = nx::vms::client::core::RemoteConnectionErrorCo
 namespace {
 
 const int kDefaultSimpleModeTilesNumber = 6;
-const std::chrono::milliseconds kSystemConnectTimeout = std::chrono::seconds(12);
-
-QnResourceList extractResources(const QList<QUrl>& urls, QnResourcePool* resourcePool)
-{
-    return QnFileProcessor::createResourcesForFiles(
-        QnFileProcessor::findAcceptedFiles(urls),
-        resourcePool);
-}
 
 } // namespace
 

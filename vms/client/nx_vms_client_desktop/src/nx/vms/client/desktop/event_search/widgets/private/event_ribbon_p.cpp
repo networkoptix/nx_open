@@ -95,8 +95,6 @@ static constexpr int kNumAnimatedTilesAtInsertion = 3;
 
 static const auto kBypassVideoCachePropertyName = "__qn_bypassVideoCache";
 
-static constexpr int kTileDescriptionLineLimit = 8;
-
 QSize minimumWidgetSize(QWidget* widget)
 {
     return widget->minimumSizeHint().expandedTo(widget->minimumSize());

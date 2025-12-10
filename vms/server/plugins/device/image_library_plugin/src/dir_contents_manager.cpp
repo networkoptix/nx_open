@@ -10,7 +10,6 @@
 
 static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
 static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
-static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
 static const unsigned int MAX_IMAGES_IN_ARCHIVE = 10000;
 
 DirContentsManager::DirContentsManager(

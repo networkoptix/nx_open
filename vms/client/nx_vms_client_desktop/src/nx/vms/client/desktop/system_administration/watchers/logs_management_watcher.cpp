@@ -43,7 +43,7 @@ const QString kFailedSuffix{"_failed"};
 const QString kNormalSuffix{""};
 const QString kPartialSuffix{"_partial"};
 
-constexpr size_t kProgressUpdateInterval = 25;
+constexpr int kProgressUpdateInterval = 25;
 
 bool needLogLevelWarningFor(const LogsManagementWatcher::UnitPtr& unit)
 {
@@ -606,7 +606,7 @@ struct LogsManagementWatcher::Unit::Private
             });
 
         m_downloader->setOnProgressHasBeenMade(
-            [this, callback](nx::Buffer&& buffer, std::optional<double> progress)
+            [this, callback](nx::Buffer&& buffer, std::optional<double> /*progress*/)
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -1157,7 +1157,7 @@ struct LogsManagementWatcher::Private
         void loadInitialSettings()
         {
             auto callback = nx::utils::guarded(q,
-                [this](bool success, rest::Handle requestId, QByteArray result, auto headers)
+                [this](bool success, rest::Handle /*requestId*/, QByteArray result, auto /*headers*/)
                 {
                     if (!success)
                         return;
@@ -1223,8 +1223,8 @@ struct LogsManagementWatcher::Private
             auto callback = nx::utils::guarded(q,
                 [this, server, oldSettings](
                     bool success,
-                    rest::Handle requestId,
-                    rest::ServerConnection::ErrorOrEmpty result)
+                    rest::Handle /*requestId*/,
+                    rest::ServerConnection::ErrorOrEmpty /*result*/)
                 {
                     if (!success)
                         server->data()->setSettings(oldSettings);
@@ -1685,8 +1685,8 @@ void LogsManagementWatcher::onReceivedServerLogSettings(
 }
 
 void LogsManagementWatcher::onSentServerLogSettings(
-    const nx::Uuid& serverId,
-    bool success)
+    const nx::Uuid& /*serverId*/,
+    bool /*success*/)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     d->updateServerLogLevelWarning();

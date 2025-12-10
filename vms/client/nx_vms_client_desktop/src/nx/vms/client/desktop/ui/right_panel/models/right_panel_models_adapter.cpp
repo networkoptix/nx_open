@@ -108,14 +108,8 @@ static constexpr milliseconds kQueuedFetchDelay = 50ms;
 // There's a lot of code duplication of preview loading mechanics with EventRibbon.
 // TODO: #vkutin Refactor it.
 
-static constexpr milliseconds kPreviewCheckInterval = 100ms;
-
-static constexpr milliseconds kPreviewLoadTimeout = 1min;
-
 static constexpr int kSimultaneousPreviewLoadsLimit = 15;
 static constexpr int kSimultaneousPreviewLoadsLimitArm = 5;
-
-static constexpr int kDefaultThumbnailWidth = 224;
 
 // Load previews no more than one per this time period.
 milliseconds tilePreviewLoadInterval()

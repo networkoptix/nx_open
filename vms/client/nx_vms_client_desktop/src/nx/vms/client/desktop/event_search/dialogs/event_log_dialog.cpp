@@ -412,12 +412,13 @@ void EventLogDialog::updateServerEventsMenu()
     if (anyServerEventIndex == QModelIndex())
         return;
 
+    /* TODO: #amalov Filter inaccessible events?
     const auto anyServerEventItem = m_eventTypesModel->itemFromIndex(anyServerEventIndex);
     auto selectedEventType = eventType(ui->eventComboBox->currentModelIndex());
     const auto serverGroup =
         systemContext()->vmsRulesEngine()->eventGroups().findGroup(kServerIssueEventGroup);
 
-    /* TODO: #amalov Filter inaccessible events?
+
     const auto accessibleEvents = serverGroup.items;NvrEventsActionsAccess::removeInacessibleNvrEvents(
         childEvents(EventType::anyServerEvent), resourcePool());
 
