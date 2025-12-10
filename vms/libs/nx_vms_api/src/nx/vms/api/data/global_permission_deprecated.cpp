@@ -38,7 +38,7 @@ std::tuple<GlobalPermissions, std::vector<nx::Uuid>, std::map<nx::Uuid, AccessRi
         groups = {kLiveViewersGroupId};
 
     AccessRights accessRights = AccessRight::view | AccessRight::audio;
-    for (const auto [accessRight, permission]: kLut)
+    for (const auto& [accessRight, permission]: kLut)
     {
         if (permissions.testFlag(permission))
             accessRights.setFlag(accessRight);
@@ -71,7 +71,7 @@ std::tuple<GlobalPermissions, std::vector<nx::Uuid>, std::map<nx::Uuid, AccessRi
 static GlobalPermissionsDeprecated accessRightsToGlobalPermissions(AccessRights accessRights)
 {
     GlobalPermissionsDeprecated result;
-    for (const auto [accessRight, permission]: kLut)
+    for (const auto& [accessRight, permission]: kLut)
     {
         if (accessRights.testFlag(accessRight))
             result.setFlag(permission);

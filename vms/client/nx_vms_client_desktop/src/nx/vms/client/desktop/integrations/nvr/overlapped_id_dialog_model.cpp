@@ -58,17 +58,17 @@ QModelIndex OverlappedIdDialogModel::index(int row, int column, const QModelInde
     return createIndex(row, column);
 }
 
-QModelIndex OverlappedIdDialogModel::parent(const QModelIndex& index) const
+QModelIndex OverlappedIdDialogModel::parent(const QModelIndex& /*index*/) const
 {
     return QModelIndex();
 }
 
-int OverlappedIdDialogModel::rowCount(const QModelIndex& parent) const
+int OverlappedIdDialogModel::rowCount(const QModelIndex& /*parent*/) const
 {
     return m_idList.size() + 1;
 }
 
-int OverlappedIdDialogModel::columnCount(const QModelIndex& parent) const
+int OverlappedIdDialogModel::columnCount(const QModelIndex& /*parent*/) const
 {
     return 1;
 }

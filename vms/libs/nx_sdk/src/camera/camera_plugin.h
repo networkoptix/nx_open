@@ -113,6 +113,8 @@ namespace nxcip
             strncpy(defaultPassword, value.defaultPassword, sizeof(defaultPassword) - 1);
             defaultPassword[sizeof(defaultPassword) - 1] = '\0';
         }
+
+        CameraInfo& operator=(const CameraInfo& other) = default;
     };
 
     struct CameraInfo2: public CameraInfo
@@ -136,6 +138,8 @@ namespace nxcip
             strncpy(groupId, value.groupId, sizeof(groupId) - 1);
             strncpy(groupName, value.groupName, sizeof(groupName) - 1);
         }
+
+        CameraInfo2& operator=(const CameraInfo2& value) = default;
 
         char groupId[256];
         char groupName[256];

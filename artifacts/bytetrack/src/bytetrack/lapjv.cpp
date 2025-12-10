@@ -152,7 +152,7 @@ int _carr_dense(
 
 /** Find columns with minimum d[j] and put them on the SCAN list.
  */
-size_t _find_dense(const size_t n, size_t lo, double *d, int *cols, int *y)
+size_t _find_dense(const size_t n, size_t lo, double *d, int *cols, int */*y*/)
 {
     size_t hi = lo + 1;
     double mind = d[cols[lo]];

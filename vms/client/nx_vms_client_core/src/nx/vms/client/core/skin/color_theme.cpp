@@ -427,7 +427,8 @@ ColorTheme::ColorTheme(QObject* parent):
         legacyColorsFileName(),
         basicColorsFileName(),
         derivedColorsFileName(),
-        skinColorsFileName())
+        skinColorsFileName(),
+        parent)
 {
 }
 

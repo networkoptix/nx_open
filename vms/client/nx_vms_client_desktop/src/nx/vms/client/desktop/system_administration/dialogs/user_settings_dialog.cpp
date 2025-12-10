@@ -487,7 +487,7 @@ struct UserSettingsDialog::Private
     void onUserSaveRequestCompleted(
         const UserSettingsDialogState& state,
         std::optional<QString> actualPassword,
-        common::SessionTokenHelperPtr sessionTokenHelper,
+        common::SessionTokenHelperPtr /*sessionTokenHelper*/,
         bool success,
         int handle,
         rest::ErrorOrData<nx::vms::api::UserModel> data)

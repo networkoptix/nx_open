@@ -261,7 +261,7 @@ struct ClientPool::Private
             HttpConnection* connection = itr->second.get();
             if (connection->getHandle() == kInvalidHandle
                 && (connection->idleTimeout.hasExpired(kHttpDisconnectTimeout)
-                    || connectionPool.size() > maxPoolSize))
+                    || (int) connectionPool.size() > maxPoolSize))
             {
                 connection->client->post(
                     [connection = std::move(itr->second)]() mutable

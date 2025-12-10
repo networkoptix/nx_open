@@ -14,16 +14,6 @@
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 
-namespace {
-
-#if defined(NO_MOBILE_PTZ_SUPPORT)
-    static constexpr bool kSupportMobilePtz = false;
-#else
-    static constexpr bool kSupportMobilePtz = true;
-#endif
-
-} // namespace
-
 namespace nx {
 namespace client {
 namespace mobile {

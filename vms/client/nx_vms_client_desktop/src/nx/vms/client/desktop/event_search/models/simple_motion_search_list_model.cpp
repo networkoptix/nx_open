@@ -192,9 +192,9 @@ bool SimpleMotionSearchListModel::isConstrained() const
 bool SimpleMotionSearchListModel::hasAccessRights() const
 {
     // Panel is hidden for live viewers but should be visible when browsing local files offline.
-    return !isOnline()
-        || system() && system()->accessController()->isDeviceAccessRelevant(
-            nx::vms::api::AccessRight::viewArchive);
+    return !isOnline() || (
+        system() && system()->accessController()->isDeviceAccessRelevant(
+            nx::vms::api::AccessRight::viewArchive));
 }
 
 int SimpleMotionSearchListModel::rowCount(const QModelIndex& parent) const

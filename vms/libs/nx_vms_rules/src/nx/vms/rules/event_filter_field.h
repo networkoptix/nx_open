@@ -17,6 +17,7 @@ class NX_VMS_RULES_API EventFilterField: public Field
 public:
     using Field::Field;
 
+    using Field::match;
     virtual bool match(const QVariant& value) const = 0;
 };
 

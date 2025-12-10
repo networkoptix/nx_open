@@ -1,6 +1,8 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-nx_add_target(nx_vms_common_test_support LIBRARY NO_MOC
+nx_add_target(nx_vms_common_test_support LIBRARY
+    NO_MOC
+    WERROR_IF LINUX
     PUBLIC_LIBS
         nx_vms_common
     PRIVATE_LIBS

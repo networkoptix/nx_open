@@ -94,6 +94,8 @@ protected:
     Qn::SerializationFormat outputFormat() const { return m_outputFormat; }
 
 private:
+    using RequestHandlerWithContext::processRequest;
+
     template <typename Output>
     bool serializeOutputToResponse(
         const ApiRequestResult& result,

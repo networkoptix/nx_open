@@ -40,6 +40,7 @@ NodeViewModel::NodeViewModel(
     int columnCount,
     QObject* parent)
     :
+    base_type(parent),
     d(new Private(this, columnCount))
 {
 }

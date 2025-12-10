@@ -47,7 +47,7 @@ ServerAudioConnectionWatcher::ServerAudioConnectionWatcher(
         this, &ServerAudioConnectionWatcher::handleConnectedChanged);
 
     handleConnectedChanged();
-    for (const auto resource: resourcePool()->getResources<nx::vms::client::core::DesktopResource>())
+    for (const auto& resource: resourcePool()->getResources<nx::vms::client::core::DesktopResource>())
         handleResourceAdded(resource);
 }
 

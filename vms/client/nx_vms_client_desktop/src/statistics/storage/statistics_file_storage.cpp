@@ -199,7 +199,7 @@ void QnStatisticsFileStorage::removeOutdatedFiles()
     static const qint64 kMillisecondsInDay = 24 * 60 * 60 * 1000;
     const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     const qint64 leftTimeStamp = currentTime - m_storeDaysCount * kMillisecondsInDay;
-    for (const auto filePath: entries)
+    for (const auto& filePath: entries)
     {
         const qint64 timeStamp = getStatisticsFileTimeStamp(filePath);
         if (timeStamp < leftTimeStamp)

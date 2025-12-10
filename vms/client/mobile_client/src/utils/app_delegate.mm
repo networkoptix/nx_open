@@ -76,7 +76,7 @@
     withCompletionHandler: (void (^)()) completionHandler
 {
     const auto content = response.notification.request.content;
-    const auto url = [content.userInfo objectForKey: @"url"];
+    NSString* const url = [content.userInfo objectForKey: @"url"];
     if (url && [url length])
         QDesktopServices::openUrl(QUrl::fromNSURL([NSURL URLWithString:url]));
 

@@ -360,7 +360,7 @@ void QnLayoutsModelUnsorted::addLayout(const QnLayoutResourcePtr& layout, bool d
 {
     const auto layoutId = layout->getId();
 
-    if (const bool layoutExists = itemRow(layoutId) >= 0)
+    if (itemRow(layoutId) >= 0) //< Layout exists.
         return;
 
     const auto row = m_itemsList.size();

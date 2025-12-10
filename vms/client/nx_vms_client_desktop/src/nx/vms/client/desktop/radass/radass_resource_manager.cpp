@@ -74,7 +74,7 @@ RadassMode RadassResourceManager::mode(const core::LayoutResourcePtr& layout) co
         return RadassMode::Auto;
 
     LayoutItemIndexList items;
-    for (const auto item: layout->getItems())
+    for (const auto& item: layout->getItems())
         items << LayoutItemIndex(layout, item.uuid);
 
     return mode(items);
@@ -90,7 +90,7 @@ void RadassResourceManager::setMode(const core::LayoutResourcePtr& layout, Radas
         return;
 
     LayoutItemIndexList items;
-    for (const auto item: layout->getItems())
+    for (const auto& item: layout->getItems())
         items << LayoutItemIndex(layout, item.uuid);
 
     setMode(items, value);

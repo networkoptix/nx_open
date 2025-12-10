@@ -24,10 +24,10 @@ void DeviceAgent::getDeviceInfo(nx::sdk::Result<const nx::sdk::IDeviceInfo*>* ou
 }
 
 void DeviceAgent::doCreateStreamWriter(
-    nxcip::MediaStreamQuality quality,
-    int64_t startTimeMs,
-    const nx::sdk::IList<nx::sdk::cloud_storage::ICodecInfo>* codecList,
-    const char* opaqueMetadata,
+    nxcip::MediaStreamQuality /*quality*/,
+    int64_t /*startTimeMs*/,
+    const nx::sdk::IList<nx::sdk::cloud_storage::ICodecInfo>* /*codecList*/,
+    const char* /*opaqueMetadata*/,
     nx::sdk::Result<nx::sdk::cloud_storage::IStreamWriter*>* outResult)
 {
     *outResult = nx::sdk::Result<nx::sdk::cloud_storage::IStreamWriter*>(
@@ -35,10 +35,10 @@ void DeviceAgent::doCreateStreamWriter(
 }
 
 void DeviceAgent::doCreateStreamReader(
-    const char* bucketUrl,
-    nxcip::MediaStreamQuality quality,
-    int64_t startTimeMs,
-    int64_t durationMs,
+    const char* /*bucketUrl*/,
+    nxcip::MediaStreamQuality /*quality*/,
+    int64_t /*startTimeMs*/,
+    int64_t /*durationMs*/,
     nx::sdk::Result<nx::sdk::cloud_storage::IStreamReader*>* outResult)
 {
     *outResult = nx::sdk::Result<nx::sdk::cloud_storage::IStreamReader*>(

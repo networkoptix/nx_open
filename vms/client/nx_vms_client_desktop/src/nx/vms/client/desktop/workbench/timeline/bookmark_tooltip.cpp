@@ -66,25 +66,25 @@ void BookmarkTooltip::setReadOnly(bool readOnly)
 
 void BookmarkTooltip::onPlayClicked(int index)
 {
-    if (NX_ASSERT(index >= 0 && index < m_bookmarks.size()))
+    if (NX_ASSERT(index >= 0 && index < (int) m_bookmarks.size()))
         emit playClicked(m_bookmarks.at(index));
 }
 
 void BookmarkTooltip::onEditClicked(int index)
 {
-    if (NX_ASSERT(index >= 0 && index < m_bookmarks.size()))
+    if (NX_ASSERT(index >= 0 && index < (int) m_bookmarks.size()))
         emit editClicked(m_bookmarks.at(index));
 }
 
 void BookmarkTooltip::onExportClicked(int index)
 {
-    if (NX_ASSERT(index >= 0 && index < m_bookmarks.size()))
+    if (NX_ASSERT(index >= 0 && index < (int) m_bookmarks.size()))
         emit exportClicked(m_bookmarks.at(index));
 }
 
 void BookmarkTooltip::onDeleteClicked(int index)
 {
-    if (NX_ASSERT(index >= 0 && index < m_bookmarks.size()))
+    if (NX_ASSERT(index >= 0 && index < (int) m_bookmarks.size()))
         emit deleteClicked(m_bookmarks.at(index));
 }
 

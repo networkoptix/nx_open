@@ -914,7 +914,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
 
                 if (!hasDiscontinue
                     && recordMatcher->filter()->limit > 0
-                    && rez.size() >= recordMatcher->filter()->limit)
+                    && (int) rez.size() >= recordMatcher->filter()->limit)
                 {
                     break;
                 }

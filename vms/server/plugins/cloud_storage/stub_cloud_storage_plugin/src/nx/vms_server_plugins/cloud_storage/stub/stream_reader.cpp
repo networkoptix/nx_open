@@ -25,7 +25,6 @@ StreamReader::StreamReader(
     :
     m_dataManager(dataManager),
     m_deviceId(deviceId),
-    m_streamIndex(streamIndex),
     m_timestampUs(startTimeMs * 1000),
     m_durationUs(durationMs * 1000)
 {

@@ -7,6 +7,7 @@ if (IOS)
 endif()
 
 nx_add_target(nx_audio LIBRARY NO_API_MACROS
+    WERROR_IF LINUX
     ADDITIONAL_SOURCES
         ${mac_sources}
     PUBLIC_LIBS

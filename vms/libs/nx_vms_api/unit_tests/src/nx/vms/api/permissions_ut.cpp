@@ -38,7 +38,7 @@ TEST(Permissions, BackwardCompatibility)
         {Old::customUser | Old::controlVideowall, {}, false, {}},
         {Old::accessAllMedia, {}, false, {}},
     };
-    const auto userId = nx::Uuid::createUuid();
+
     for (const auto& origin: deprecatedPermissions)
     {
         GlobalPermissions permissions;

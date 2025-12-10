@@ -373,7 +373,7 @@ QVariant QnTableExportCompositeModel::headerData(
 QModelIndex QnTableExportCompositeModel::index(
     int row,
     int column,
-    const QModelIndex& parent) const
+    const QModelIndex& /*parent*/) const
 {
     return createIndex(row, column);
 }

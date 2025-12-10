@@ -203,7 +203,7 @@ void QnResourcePool::Private::SameNameUsers::selectMainUser()
     {
         for (const auto& [p, users]: m_byPriority)
         {
-            for (const auto& u: users)
+            if (!users.empty())
             {
                 m_main = users.front();
                 NX_VERBOSE(this, "Selected disabled main user: %1", m_main);

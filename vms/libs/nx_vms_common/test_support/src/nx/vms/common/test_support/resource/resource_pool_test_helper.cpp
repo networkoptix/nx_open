@@ -171,7 +171,7 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addIntercomLayout(
 
     resourcePool()->addResource(layout);
     NX_ASSERT(!intercomCamera->isIntercom()
-        || intercomCamera->isIntercom() && nx::vms::common::isIntercomLayout(layout));
+        || (intercomCamera->isIntercom() && nx::vms::common::isIntercomLayout(layout)));
     return layout;
 }
 

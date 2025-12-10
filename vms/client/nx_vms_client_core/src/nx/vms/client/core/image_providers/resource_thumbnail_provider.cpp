@@ -110,7 +110,7 @@ struct ResourceThumbnailProvider::Private
 
         // Some cameras are actually provide only sound stream. So we draw sound icon for this.
         const auto mediaResource = resource.dynamicCast<QnMediaResource>();
-        if (const bool useCustomSoundIcon = mediaResource && !mediaResource->hasVideo())
+        if (mediaResource && !mediaResource->hasVideo())
             return {ProviderType::image, "48x48/Outline/sound.svg"};
 
         if (resource.dynamicCast<QnVirtualCameraResource>())

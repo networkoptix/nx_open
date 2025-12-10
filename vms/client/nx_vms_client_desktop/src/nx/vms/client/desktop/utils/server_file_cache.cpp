@@ -306,7 +306,7 @@ void ServerFileCache::deleteFile(const QString& filename)
         relativeFilePath(filename),
         [this](bool success,
             rest::Handle requestId,
-            const rest::ServerConnection::ErrorOrEmpty& result)
+            const rest::ServerConnection::ErrorOrEmpty& /*result*/)
         {
             if (!m_deleting.contains(requestId))
                 return;

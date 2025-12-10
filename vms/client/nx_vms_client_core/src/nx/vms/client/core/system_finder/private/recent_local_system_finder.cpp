@@ -58,8 +58,6 @@ void RecentLocalSystemFinder::updateSystems()
             /*cloudSystemId*/ QString(),
             connection.systemName);
 
-        static const int kVeryFarPriority = 100000;
-
         nx::vms::api::ModuleInformationWithAddresses fakeServerInfo;
         fakeServerInfo.id = nx::Uuid::createUuid();   //< It should be new unique id.
         fakeServerInfo.systemName = connection.systemName;

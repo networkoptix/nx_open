@@ -41,7 +41,6 @@ namespace nx::vms::client::core {
 
 namespace {
 
-static const nx::utils::SoftwareVersion kSimplifiedLoginSupportVersion(5, 1);
 static const nx::utils::SoftwareVersion kUserRightsRedesignVersion(6, 0);
 
 /**

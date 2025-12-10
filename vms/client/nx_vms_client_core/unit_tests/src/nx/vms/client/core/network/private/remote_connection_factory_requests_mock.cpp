@@ -116,7 +116,7 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSes
 }
 
 void RemoteConnectionFactoryRequestsManager::checkDigestAuthentication(
-    ContextPtr context, bool is2FaEnabledForUser) const
+    ContextPtr context, bool /*is2FaEnabledForUser*/) const
 {
     ++m_requestsCount;
     auto credentials = context->credentials();

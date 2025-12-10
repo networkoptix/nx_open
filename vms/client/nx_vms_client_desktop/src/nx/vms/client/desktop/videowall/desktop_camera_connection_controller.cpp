@@ -98,7 +98,6 @@ void DesktopCameraConnectionController::atUserChanged(const QnUserResourcePtr& u
     if (!user)
         return;
 
-    const auto userId = user->getId();
     auto localSettings = systemContext()->localSettings();
     if (!ini().enableDesktopCameraLazyInitialization
         || localSettings->desktopCameraWasUsedAtPreviousLogin())

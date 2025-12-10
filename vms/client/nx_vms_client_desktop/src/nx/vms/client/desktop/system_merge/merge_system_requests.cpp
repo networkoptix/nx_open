@@ -111,7 +111,7 @@ Request makeConnectedRequest(
 }
 
 std::unique_ptr<nx::network::http::AsyncClient> makeConnectClient(
-    QnMediaServerResourcePtr proxy, nx::network::ssl::AdapterFunc proxyAdapterFunc)
+    QnMediaServerResourcePtr /*proxy*/, nx::network::ssl::AdapterFunc proxyAdapterFunc)
 {
     // While making CONNECT request, proxy certificate is being verified.
     auto httpConnectClient =

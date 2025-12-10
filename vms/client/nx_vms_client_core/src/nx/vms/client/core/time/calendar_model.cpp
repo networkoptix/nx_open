@@ -38,7 +38,6 @@ int roleForPeriodStorageType(PeriodStorageType type)
 
 struct Day
 {
-    Day();
     Day(const QDate& date, qint64 displayOffset);
 
     qint64 endTime() const;
@@ -48,8 +47,6 @@ struct Day
 
     bool hasArchive[(int) PeriodStorageType::count]{false, false};
 };
-
-Day::Day() {}
 
 Day::Day(const QDate& date, qint64 displayOffset):
     date(date),

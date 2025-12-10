@@ -17,6 +17,7 @@ public:
     Q_INVOKABLE QValidator::State validate(QString value) const;
 
 private:
+    using QIntValidator::validate;
     static int lowest();
     static int highest();
 };
@@ -34,6 +35,7 @@ public:
     static void registerQmlType();
 
 private:
+    using QDoubleValidator::validate;
     static double lowest();
     static double highest();
 };

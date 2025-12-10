@@ -38,7 +38,7 @@ void MotionSearchDurationMetric::addWidget(QnResourceWidget *resourceWidget)
 
     const QPointer<MotionSearchDurationMetric> guard(this);
     const auto widgetOptionsChangedHandler =
-        [this, guard, mediaWidget]()
+        [guard, mediaWidget]()
         {
             if (!guard || !mediaWidget)
                 return;

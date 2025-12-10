@@ -20,7 +20,6 @@ namespace {
 static constexpr int kTextIndent = 6;
 static constexpr int kIconIndent = 4;
 static constexpr int kIconPadding = 2;
-static constexpr int kDeactivateButtonSize = 22;
 static constexpr int kRoundingRadius = 2;
 static constexpr int kMinimumHeight = 24;
 

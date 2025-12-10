@@ -29,14 +29,16 @@ namespace atomic {
 
 #ifdef _WIN32
     typedef volatile LONG AtomicLong;
+    typedef LONG ReturnAtomicLong;
 #elif __GNUC__
     typedef volatile long AtomicLong;
+    typedef long ReturnAtomicLong;
 #else
     #error "Unsupported compiler is used."
 #endif
 
 /** Increments *val, returns the new (incremented) value. */
-static AtomicLong inc(AtomicLong* val)
+static ReturnAtomicLong inc(AtomicLong* val)
 {
     #ifdef _WIN32
         return InterlockedIncrement(val);
@@ -46,7 +48,7 @@ static AtomicLong inc(AtomicLong* val)
 }
 
 /** Decrements *val, returns the new (decremented) value. */
-static AtomicLong dec(AtomicLong* val)
+static ReturnAtomicLong dec(AtomicLong* val)
 {
     #ifdef _WIN32
         return InterlockedDecrement(val);

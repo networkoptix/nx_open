@@ -47,7 +47,7 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
         resourcePool()->getResourcesByIds<QnLayoutResource>(otherLayoutIds.keys());
 
     QSet<nx::Uuid> resourcesOnOtherLayouts;
-    for (const auto otherLayout: otherLayouts)
+    for (const auto& otherLayout: otherLayouts)
         addLayoutResourceIds(otherLayout, resourcesOnOtherLayouts);
 
     const auto losingAccessToResources = removedResources.filtered(
@@ -101,7 +101,7 @@ bool QnWorkbenchLayoutsChangeValidator::confirmLoadVideoWallMatrix(
         resourcePool()->getResourcesByIds<QnLayoutResource>(otherLayoutIds.keys());
 
     QSet<nx::Uuid> resourcesOnOtherLayouts;
-    for (const auto otherLayout: otherLayouts)
+    for (const auto& otherLayout: otherLayouts)
         addLayoutResourceIds(otherLayout, resourcesOnOtherLayouts);
 
     removedResourceIds -= resourcesOnOtherLayouts;
@@ -170,7 +170,7 @@ bool QnWorkbenchLayoutsChangeValidator::confirmDeleteVideoWallMatrices(
             resourcePool()->getResourcesByIds<QnLayoutResource>(otherLayoutIds.keys());
 
         QSet<nx::Uuid> resourcesOnOtherLayouts;
-        for (const auto otherLayout: otherLayouts)
+        for (const auto& otherLayout: otherLayouts)
             addLayoutResourceIds(otherLayout, resourcesOnOtherLayouts);
 
         removedResourceIds -= resourcesOnOtherLayouts;

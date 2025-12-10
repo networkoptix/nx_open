@@ -323,7 +323,7 @@ void ModuleConnector::Module::addEndpoints(std::set<nx::network::SocketAddress> 
         // For known server sort endpoints by accessibility type and connect by order.
         bool hasNewEndpoints = false;
         for (auto& endpoint: endpoints)
-            hasNewEndpoints |= (bool) saveEndpoint(std::move(endpoint));
+            hasNewEndpoints |= (bool) saveEndpoint(endpoint);
 
         if (hasNewEndpoints)
         {

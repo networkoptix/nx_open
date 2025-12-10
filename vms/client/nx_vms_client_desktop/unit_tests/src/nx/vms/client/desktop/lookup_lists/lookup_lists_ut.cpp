@@ -264,7 +264,7 @@ protected:
 
     void whenSetAttributesPosition(const std::vector<QString>& selectedChoice)
     {
-        for (int i = 0; i < selectedChoice.size(); ++i)
+        for (int i = 0; i < (int) selectedChoice.size(); ++i)
             m_importModel->headerIndexChanged(i, selectedChoice[i]);
     }
 
@@ -273,7 +273,7 @@ protected:
         const auto attributeMapping = m_importModel->columnIndexToAttribute();
 
         ASSERT_EQ(m_entriesModel->columnCount(), selectedNames.size());
-        for (int i = 0; i < selectedNames.size(); ++i)
+        for (int i = 0; i < (int) selectedNames.size(); ++i)
         {
             EXPECT_EQ(selectedNames[i], attributeMapping[i])
                 << "Expect to have: " << selectedNames[i].toStdString() << " on position: " << i;
@@ -297,7 +297,7 @@ protected:
         }
     }
 
-    void thenHeaderDataEqualTo(QAbstractItemModel* model, const QList<QString>& data)
+    void thenHeaderDataEqualTo(QAbstractItemModel* /*model*/, const QList<QString>& data)
     {
         int valueToCheckLeft = data.size();
         for (int column = 0; column < m_entriesModel->columnCount(); ++column)
@@ -357,10 +357,11 @@ protected:
             ASSERT_TRUE(curHeader.isValid());
             ASSERT_FALSE(curHeader.toList().empty());
             ASSERT_EQ(curHeader.toList().front().toString(),
-                c < modelImportTo.attributeNames.size() ? modelImportTo.attributeNames[c]
-                                                        : m_importModel->doNotImportText());
+                c < (int) modelImportTo.attributeNames.size()
+                    ? modelImportTo.attributeNames[c]
+                    : m_importModel->doNotImportText());
 
-            for (int r = 0; r < exportedData.entries.size(); ++r)
+            for (int r = 0; r < (int) exportedData.entries.size(); ++r)
             {
                 // Check that data in importModel is the same as in imported file.
                 ASSERT_EQ(m_importModel->index(r, c).data(),

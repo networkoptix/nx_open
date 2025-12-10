@@ -216,20 +216,20 @@ void SubsetListModel::sourceRowsMoved(const QModelIndex& sourceParent, int /*sou
     }
 }
 
-void SubsetListModel::sourceColumnsInserted(const QModelIndex& parent, int first, int last)
+void SubsetListModel::sourceColumnsInserted(const QModelIndex& parent, int first, int /*last*/)
 {
     if (equals(parent, m_sourceRoot) && first <= m_sourceColumn)
         entireColumnChanged();
 }
 
-void SubsetListModel::sourceColumnsRemoved(const QModelIndex& parent, int first, int last)
+void SubsetListModel::sourceColumnsRemoved(const QModelIndex& parent, int first, int /*last*/)
 {
     if (equals(parent, m_sourceRoot) && first <= m_sourceColumn)
         entireColumnChanged();
 }
 
 void SubsetListModel::sourceColumnsMoved(const QModelIndex& sourceParent, int sourceFirst,
-    int sourceLast, const QModelIndex& destinationParent, int destinationRow)
+    int /*sourceLast*/, const QModelIndex& destinationParent, int destinationRow)
 {
     if ((equals(sourceParent, m_sourceRoot) && sourceFirst <= m_sourceColumn)
         || (equals(destinationParent, m_sourceRoot) && destinationRow <= m_sourceColumn))

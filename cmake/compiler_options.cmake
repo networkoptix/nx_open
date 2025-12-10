@@ -410,7 +410,6 @@ if(NOT compilerMsvc)
         add_compile_options(
             -Wno-non-virtual-dtor
             -Wno-deprecated
-            -Wno-deprecated-declarations
             -Wno-unused-parameter
             -Wno-unused-but-set-parameter
             -Wno-unused-exception-parameter
@@ -459,9 +458,11 @@ if(NOT compilerMsvc)
         -Wno-error=unused-function
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers
-        -Werror=reorder
-        -Werror=delete-non-virtual-dtor
-        -Werror=conversion-null
+        -Wno-dangling-else #< Skip, because style guide require "if else" without braces for single line bodies.
+        -Wno-error=deprecated-declarations #< Used in code and can't stop build.
+        $<$<COMPILE_LANGUAGE:CXX>:-Werror=reorder>
+        $<$<COMPILE_LANGUAGE:CXX>:-Werror=delete-non-virtual-dtor>
+        $<$<COMPILE_LANGUAGE:CXX>:-Werror=conversion-null>
     )
 
     if(compilerMsvc)

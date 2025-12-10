@@ -189,7 +189,7 @@ std::optional<QnStatisticsManager::StatisticsData> QnStatisticsManager::prepareS
     const auto totalMetricsList = m_storage->getMetricsList(minTimeStampMs, settings.limit);
 
     QnMetricHashesList totalFiltered;
-    for (const auto metrics: totalMetricsList)
+    for (const auto& metrics: totalMetricsList)
     {
         const auto filtered = filteredMetrics(metrics, settings.filters);
         if (!filtered.isEmpty())
@@ -239,7 +239,7 @@ void QnStatisticsManager::saveCurrentStatistics()
 void QnStatisticsManager::resetStatistics()
 {
     m_sessionId = nx::Uuid::createUuid();
-    for (const auto module: m_modules)
+    for (const auto& module: m_modules)
     {
         if (module)
             module->reset();

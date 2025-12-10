@@ -31,6 +31,7 @@ public:
     std::optional<vms::rules::ItemDescriptor> actionDescriptor() const;
     vms::rules::ActionBuilder* actionBuilder() const;
     std::optional<vms::rules::ItemDescriptor> eventDescriptor() const;
+    using QWidget::eventFilter;
     vms::rules::EventFilter* eventFilter() const;
 
     virtual void setReadOnly(bool value);

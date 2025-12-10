@@ -40,11 +40,12 @@ CameraFullscreenMetric::CameraFullscreenMetric(QnWorkbenchDisplay *display)
         if (!guard)
             return;
 
-        const auto updateCounterImpl = [this, guard, widget, widgetOptionsChangedHandler]()
-        {
-            if (guard)
-                widgetOptionsChangedHandler(widget);
-        };
+        const auto updateCounterImpl =
+            [guard, widget, widgetOptionsChangedHandler]()
+            {
+                if (guard)
+                    widgetOptionsChangedHandler(widget);
+            };
 
         connect(widget, &QnResourceWidget::optionsChanged
             , this, updateCounterImpl);

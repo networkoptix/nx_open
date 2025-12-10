@@ -97,7 +97,7 @@ void RequestQueue::Private::executeRequests()
         Private::RequestHolder request;
         {
             const NX_MUTEX_LOCKER lock(&mutex);
-            if (requests.empty() || runningRequestIds.size() >= maxRunningCount)
+            if (requests.empty() || (int) runningRequestIds.size() >= maxRunningCount)
                 return;
 
             const auto id = requests.front().first;

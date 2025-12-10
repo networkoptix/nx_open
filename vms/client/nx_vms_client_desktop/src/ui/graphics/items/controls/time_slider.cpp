@@ -2399,7 +2399,7 @@ void QnTimeSlider::setThumbnailSelecting(milliseconds time, bool selecting)
             break;
     }
 
-    for (auto ipos = pos + 1;
+    for (auto ipos = std::next(pos);
         ipos != m_thumbnailData.end() && ipos->thumbnail->actualTime() == actualTime; ++ipos)
     {
         ipos->selecting = selecting;
@@ -2835,7 +2835,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
         m_nextTickmarkPos[i] = milliseconds(roundUp(startPos, (*m_steps)[i], m_timeZone));
 
     /* Draw tickmarks. */
-    for (int i = 0; i < m_tickmarkLines.size(); i++)
+    for (int i = 0; i < (int) m_tickmarkLines.size(); i++)
         m_tickmarkLines[i].clear();
 
     while(true)
@@ -2900,7 +2900,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
 void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
 {
     const auto backgroundColor =
-        [this](qint64 number) -> QColor
+        [](qint64 number) -> QColor
         {
            static const QList<QColor> kDateBarBackgrounds{{
                 core::colorTheme()->color("dark11"),

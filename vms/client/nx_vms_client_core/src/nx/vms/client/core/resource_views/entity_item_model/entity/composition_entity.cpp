@@ -106,7 +106,7 @@ int CompositionEntity::subEntityCount() const
 
 AbstractEntity* CompositionEntity::subEntityAt(int index)
 {
-    if (index >= m_composition.size() || index < 0)
+    if (index >= (int) m_composition.size() || index < 0)
     {
         NX_ASSERT(false, "Invalid index");
         return nullptr;

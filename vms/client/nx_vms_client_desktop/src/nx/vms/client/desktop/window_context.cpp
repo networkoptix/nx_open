@@ -190,7 +190,7 @@ SystemContext* WindowContext::system() const
     return base_type::system()->as<SystemContext>();
 }
 
-void WindowContext::setCurrentSystem(SystemContext* value)
+void WindowContext::setCurrentSystem(SystemContext* /*value*/)
 {
     NX_ASSERT(false, "NOT IMPLEMENTED YET");
 }

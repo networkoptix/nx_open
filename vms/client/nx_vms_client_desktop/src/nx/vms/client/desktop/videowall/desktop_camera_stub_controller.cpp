@@ -78,7 +78,7 @@ void DesktopCameraStubController::atResourcesAdded(const QnResourceList& resourc
         const auto layoutId = layout->getId();
         m_desktopCameraLayoutConnections[layout->getId()] =
             connect(layout.get(), &core::LayoutResource::itemRemoved, this,
-                [this, layoutId](const QnLayoutResourcePtr& resource,
+                [this, layoutId](const QnLayoutResourcePtr& /*resource*/,
                     const nx::vms::common::LayoutItemData& item)
                 {
                     if (!core::isDesktopCameraResource(item.resource))

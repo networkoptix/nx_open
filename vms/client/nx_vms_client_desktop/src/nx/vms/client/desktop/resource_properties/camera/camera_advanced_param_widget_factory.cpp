@@ -349,7 +349,7 @@ public:
         m_layout->insertWidget(0, m_slider);
 
         connect(m_slider, &nx::vms::client::desktop::VButtonSlider::valueChanged, this,
-            [this](int val)
+            [this](int /*val*/)
             {
                 emit valueChanged(m_id, value());
             });

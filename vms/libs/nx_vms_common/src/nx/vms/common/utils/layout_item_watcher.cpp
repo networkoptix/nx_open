@@ -213,14 +213,14 @@ void LayoutItemWatcher::Private::handleItemRemoved(
         auto& items = data.itemsOnLayouts[layout];
 
         items.remove(item.uuid);
-        if (removedFromLayout = items.empty())
+        if ((removedFromLayout = items.empty()))
         {
             data.itemsOnLayouts.remove(layout);
             data.layouts.remove(layout);
 
             layoutResources[layout].remove(resourceId);
 
-            if (removedFromLastLayout = data.layouts.empty())
+            if ((removedFromLastLayout = data.layouts.empty()))
             {
                 NX_ASSERT(data.itemsOnLayouts.empty());
                 resourceData.remove(resourceId);

@@ -718,7 +718,7 @@ void fromApiToResource(const VideowallControlMessageData& data, QnVideoWallContr
     message.videoWallGuid = data.videowallGuid;
     message.instanceGuid = data.instanceGuid;
     message.params.clear();
-    for (const std::pair<QString, QString>& pair : data.params)
+    for (const std::pair<const QString, QString>& pair : data.params)
         message.params[pair.first] = pair.second;
 }
 

@@ -191,7 +191,7 @@ void DeviceAgent::processFrameMotion(Ptr<IList<IMetadataPacket>> metadataPacketL
             motionPacket->rowCount() / m_deviceAgentSettings.objectHeightInMotionCells;
         if (objectRowCount < 1)
             objectRowCount = 1;
-        if (m_objectTrackIdForObjectCells.size() != objectColumnCount * objectRowCount)
+        if ((int) m_objectTrackIdForObjectCells.size() != objectColumnCount * objectRowCount)
         {
             m_objectTrackIdForObjectCells.resize(objectColumnCount * objectRowCount);
             for (auto& objectTrackId: m_objectTrackIdForObjectCells)

@@ -21,9 +21,6 @@
 
 namespace {
 
-/* Duration of success and failure notifications staying up: */
-static constexpr int kNotificationDurationMs = 1200;
-
 /* Opacity for disabled button: */
 static const qreal kDisabledTriggerOpacity = nx::style::Hints::kDisabledItemOpacity;
 

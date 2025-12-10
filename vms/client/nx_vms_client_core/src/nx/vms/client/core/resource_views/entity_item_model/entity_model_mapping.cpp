@@ -361,7 +361,7 @@ void EntityModelMapping::layoutAboutToBeChanged(const std::vector<int>& indexPer
 
     QModelIndexList fromList;
     QModelIndexList toList;
-    for (int i = 0; i < indexPermutation.size(); ++i)
+    for (int i = 0; i < (int) indexPermutation.size(); ++i)
     {
         fromList.append(entityModelIndex(i));
         toList.append(entityModelIndex(indexPermutation[i]));

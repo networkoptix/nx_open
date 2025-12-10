@@ -88,7 +88,7 @@ QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject* parent):
         });
 
     const auto resolutionMetric = QnFunctorMetric::create(
-        [this]()
+        []()
         {
             QStringList result;
             for (auto screen: qApp->screens())

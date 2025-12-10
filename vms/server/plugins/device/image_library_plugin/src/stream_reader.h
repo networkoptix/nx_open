@@ -61,7 +61,6 @@ private:
     nxcip::UsecUTCTimestamp m_curTimestamp;
     const unsigned int m_frameDuration;
     bool m_liveMode;
-    int m_encoderNumber;
     std::map<nxcip::UsecUTCTimestamp, std::string> m_dirEntries;
     std::map<nxcip::UsecUTCTimestamp, std::string>::const_iterator m_curPos;
     bool m_streamReset;

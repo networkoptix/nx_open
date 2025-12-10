@@ -98,7 +98,7 @@ QString getTargetFontFamiliy(const QString& defaultFontName, const QString& appl
     const auto systemLocale = QLocale::system();
     const QLocale appLocale(applicationLocaleCode);
     if (systemLocale.language() == appLocale.language()
-        && systemLocale.country() == appLocale.country())
+        && systemLocale.territory() == appLocale.territory())
     {
         // Fallback fonts are applied correctly.
         return defaultFontName;

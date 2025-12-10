@@ -38,7 +38,7 @@ public:
 
     void updateData(const std::vector<ObjectType*>& types)
     {
-        for (int i = 0; i < types.size(); ++i)
+        for (int i = 0; i < (int) types.size(); ++i)
         {
             ObjectType* type = types[i];
             data.insert(type, i);

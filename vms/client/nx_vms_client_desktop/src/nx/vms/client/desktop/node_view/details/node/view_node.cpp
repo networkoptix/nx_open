@@ -81,7 +81,7 @@ void ViewNode::addChild(const NodePtr& child)
 
 void ViewNode::addChildren(const NodeList& children)
 {
-    for (const auto child: children)
+    for (const auto& child: children)
         addChild(child);
 }
 
@@ -94,7 +94,7 @@ void ViewNode::insertChild(int index, const NodePtr& child)
 void ViewNode::insertChildren(int index, const NodeList& children)
 {
     auto it = d->nodes.begin() + index;
-    for (const auto child: children)
+    for (const auto& child: children)
     {
         child->d->parent = currentSharedNode().toStrongRef();
         it = d->nodes.insert(it, child) + 1;

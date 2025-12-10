@@ -144,7 +144,7 @@ void SessionRefreshDialog::refreshSession()
         this,
         [this](
             bool success,
-            int reqId,
+            int /*reqId*/,
             rest::ErrorOrData<nx::vms::api::LoginSession> session)
         {
             NX_LOG_RESPONSE(this, success, session, "Can't receive token.");

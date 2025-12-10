@@ -641,14 +641,13 @@ void CRendezvousQueue::updateConnStatus()
 
 CRcvQueue::CRcvQueue(
     int size,
-    int ipVersion,
+    int /*ipVersion*/,
     AbstractUdpChannel* c,
     CTimer* t)
     :
     m_UnitQueue(size),
     m_channel(c),
     m_timer(t),
-    m_iIPversion(ipVersion),
     m_bClosing(false),
     m_pRendezvousQueue(std::make_unique<CRendezvousQueue>())
 {

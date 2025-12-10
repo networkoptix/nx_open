@@ -32,12 +32,12 @@ int SingleItemEntity::rowCount() const
     return 1;
 }
 
-AbstractEntity* SingleItemEntity::childEntity(int row) const
+AbstractEntity* SingleItemEntity::childEntity(int /*row*/) const
 {
     return nullptr;
 }
 
-int SingleItemEntity::childEntityRow(const AbstractEntity* entity) const
+int SingleItemEntity::childEntityRow(const AbstractEntity* /*entity*/) const
 {
     return -1;
 }

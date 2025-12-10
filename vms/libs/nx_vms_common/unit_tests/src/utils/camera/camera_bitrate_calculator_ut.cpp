@@ -54,7 +54,7 @@ TEST(CameraBitrateCalculatorTest, BitrateDependenceOnInputParameters)
             {Qn::StreamQuality::normal,  1852.0f},
             {Qn::StreamQuality::highest, 3368.0f}};
 
-        for (const auto [param, expected] : paramsWithExpectedRes)
+        for (const auto& [param, expected]: paramsWithExpectedRes)
         {
             const float res = CameraBitrateCalculator::suggestBitrateForQualityKbps(
                 param, baseResolution, baseFps, baseCodec);
@@ -69,7 +69,7 @@ TEST(CameraBitrateCalculatorTest, BitrateDependenceOnInputParameters)
             {QSize{1280, 720},  1852.0f},
             {QSize{2560, 1440}, 4888.0f}};
 
-        for (const auto [param, expected]: paramsWithExpectedRes)
+        for (const auto& [param, expected]: paramsWithExpectedRes)
         {
             const float res = CameraBitrateCalculator::suggestBitrateForQualityKbps(
                 baseQuality, param, baseFps, baseCodec);
@@ -83,7 +83,7 @@ TEST(CameraBitrateCalculatorTest, BitrateDependenceOnInputParameters)
             {15, 1111.0f},
             {30, 2223.0f}};
 
-        for (const auto [param, expected]: paramsWithExpectedRes)
+        for (const auto& [param, expected]: paramsWithExpectedRes)
         {
             const float res = CameraBitrateCalculator::suggestBitrateForQualityKbps(
                 baseQuality, baseResolution, param, baseCodec);
@@ -97,7 +97,7 @@ TEST(CameraBitrateCalculatorTest, BitrateDependenceOnInputParameters)
             {"H264",  1852.0f},
             {"MJPEG", 3705.0f}};
 
-        for (const auto [param, expected]: paramsWithExpectedRes)
+        for (const auto& [param, expected]: paramsWithExpectedRes)
         {
             const float res = CameraBitrateCalculator::suggestBitrateForQualityKbps(
                 baseQuality, baseResolution, baseFps, param);
@@ -126,7 +126,7 @@ TEST(CameraBitrateCalculatorTest, UsesStreamCapability)
             {Qn::StreamQuality::normal, 2000.0f},
             {Qn::StreamQuality::highest, 5000.0f}};//< maxBitrate
 
-        for (const auto [param, expected]: paramsWithExpectedRes)
+        for (const auto& [param, expected]: paramsWithExpectedRes)
         {
             const float res = CameraBitrateCalculator::suggestBitrateForQualityKbps(
                 param, baseResolution, baseFps, baseCodec, baseStreamCapability, false);
@@ -140,7 +140,7 @@ TEST(CameraBitrateCalculatorTest, UsesStreamCapability)
             {2000.0f, 2000.0f},
             {3000.0f, 3000.0f}};
 
-        for (const auto [param, expected]: paramsWithExpectedRes)
+        for (const auto& [param, expected]: paramsWithExpectedRes)
         {
             nx::vms::api::CameraStreamCapability streamCapability = baseStreamCapability;
             streamCapability.defaultBitrateKbps = param;
@@ -156,7 +156,7 @@ TEST(CameraBitrateCalculatorTest, UsesStreamCapability)
             {15, 3333.3333f},
             {30, 1666.6666f}};
 
-        for (const auto [param, expected]: paramsWithExpectedRes)
+        for (const auto& [param, expected]: paramsWithExpectedRes)
         {
             nx::vms::api::CameraStreamCapability streamCapability = baseStreamCapability;
             streamCapability.defaultFps = param;
@@ -172,7 +172,7 @@ TEST(CameraBitrateCalculatorTest, UsesStreamCapability)
             {15,1200.0f},
             {30,2400.0f}};
 
-        for (const auto [param, expected]: paramsWithExpectedRes)
+        for (const auto& [param, expected]: paramsWithExpectedRes)
         {
             const float res = CameraBitrateCalculator::suggestBitrateForQualityKbps(
                 baseQuality, baseResolution, param, baseCodec, baseStreamCapability, false);

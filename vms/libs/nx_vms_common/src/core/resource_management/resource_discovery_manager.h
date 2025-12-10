@@ -70,9 +70,7 @@ public:
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
-    QnResourceDiscoveryManager(
-        nx::vms::common::SystemContext* systemContext,
-        QObject* parent = nullptr);
+    QnResourceDiscoveryManager(nx::vms::common::SystemContext* systemContext);
     virtual ~QnResourceDiscoveryManager() override;
 
     // this function returns only new devices( not in all_devices list);

@@ -370,7 +370,6 @@ private:
     AbstractUdpChannel* m_channel = nullptr;
     // shared timer with the snd queue
     CTimer* m_timer = nullptr;
-    const int m_iIPversion;
 
     // closing the worker
     volatile bool m_bClosing = false;

@@ -33,8 +33,6 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-const char* qn_hoveredPropertyName = "_qn_hovered";
-
 // We don't have icons for 3x scaling. Thus we have to turn on smooth mode
 // on painter.
 nx::utils::SharedGuardPtr make3xHiDpiWorkaround(QPainter* painter)

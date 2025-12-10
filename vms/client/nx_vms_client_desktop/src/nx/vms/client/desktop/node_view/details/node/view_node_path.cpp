@@ -6,11 +6,6 @@ namespace nx::vms::client::desktop {
 namespace node_view {
 namespace details {
 
-ViewNodePath::ViewNodePath(const ViewNodePath& other):
-    m_indices(other.indices())
-{
-}
-
 ViewNodePath::ViewNodePath(const Indices& indices):
     m_indices(indices)
 {

@@ -60,6 +60,7 @@ signals:
     void activePresetIndexChanged();
 
 private:
+    using QnProxyPtzController::continuousMove;
     QnResource* rawResource() const;
     void setRawResource(QnResource* value);
 

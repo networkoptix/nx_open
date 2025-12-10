@@ -1,7 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#pragma once
-
 #include "base_object_event_type.h"
 
 #include <nx/analytics/taxonomy/event_type.h>
@@ -247,7 +245,8 @@ void BaseObjectEventType<DerivedType, DescriptorType>::resolveReachability(bool 
 }
 
 template <typename DerivedType, typename DescriptorType>
-void BaseObjectEventType<DerivedType, DescriptorType>::resolveScopes(InternalState* inOutInternalState, ErrorHandler* errorHandler)
+void BaseObjectEventType<DerivedType, DescriptorType>::resolveScopes(
+    InternalState* inOutInternalState, ErrorHandler* errorHandler)
 {
     std::set<DescriptorScope> scopes;
 
@@ -306,7 +305,8 @@ void BaseObjectEventType<DerivedType, DescriptorType>::resolveScopes(InternalSta
 }
 
 template <typename DerivedType, typename DescriptorType>
-void BaseObjectEventType<DerivedType, DescriptorType>::resolve(InternalState* inOutInternalState, ErrorHandler* errorHandler)
+void BaseObjectEventType<DerivedType, DescriptorType>::resolve(InternalState* inOutInternalState,
+    ErrorHandler* errorHandler)
 {
     if (m_isResolved)
         return;
@@ -346,7 +346,8 @@ void BaseObjectEventType<DerivedType, DescriptorType>::resolve(InternalState* in
 }
 
 template <typename DerivedType, typename DescriptorType>
-void BaseObjectEventType<DerivedType, DescriptorType>::resolveSupportedAttributes(InternalState* inOutInternalState, ErrorHandler* errorHandler)
+void BaseObjectEventType<DerivedType, DescriptorType>::resolveSupportedAttributes(
+    InternalState* /*inOutInternalState*/, ErrorHandler* /*errorHandler*/)
 {
     // At this point all attributes of all types are resolved but support info is not set yet.
     std::map<QString, AbstractAttribute*> ownAttributes;

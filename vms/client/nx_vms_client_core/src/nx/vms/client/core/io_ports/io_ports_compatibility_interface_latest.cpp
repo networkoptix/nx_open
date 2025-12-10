@@ -33,7 +33,7 @@ bool IoPortsCompatibilityInterface_latest::setIoPortState(
     auto internalCallback =
         [this, cameraOutputId, callback](
             bool success,
-            rest::Handle handle,
+            rest::Handle /*handle*/,
             rest::ErrorOrData<QByteArray> response)
         {
             NX_LOG_RESPONSE(this, success, response,

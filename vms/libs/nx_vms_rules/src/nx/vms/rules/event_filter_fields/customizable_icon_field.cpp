@@ -8,7 +8,7 @@
 
 namespace nx::vms::rules {
 
-bool CustomizableIconField::match(const QVariant& value) const
+bool CustomizableIconField::match(const QVariant& /*value*/) const
 {
     // Field value used for event customization, matches any event value.
     return true;

@@ -23,6 +23,7 @@ endif()
 nx_add_target(nx_media
     LIBRARY
     GDI
+    WERROR_IF LINUX
     PUBLIC_LIBS
         nx_kit
         nx_audio

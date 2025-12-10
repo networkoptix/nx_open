@@ -38,7 +38,7 @@ bool QuickItemMouseTracker::eventFilter(QObject* object, QEvent* event)
         case QEvent::HoverMove:
         {
             const auto hover = static_cast<QHoverEvent*>(event);
-            setMousePosition(hover->pos());
+            setMousePosition(hover->position());
 
             if (event->type() == QEvent::HoverEnter)
                 setContainsMouse(true);

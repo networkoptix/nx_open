@@ -41,10 +41,10 @@ rest::Handle AnalyticsSettingsMockApiInterface::applySettings(
 rest::Handle AnalyticsSettingsMockApiInterface::activeSettingsChanged(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    const QString& activeElement,
-    const QJsonObject& settingsModel,
-    const QJsonObject& settingsValues,
-    const QJsonObject& paramValues,
+    const QString& /*activeElement*/,
+    const QJsonObject& /*settingsModel*/,
+    const QJsonObject& /*settingsValues*/,
+    const QJsonObject& /*paramValues*/,
     core::AnalyticsActiveSettingsCallback callback)
 {
     return makeRequest(RequestInfo::Type::get, device, engine, std::move(callback));
@@ -88,10 +88,10 @@ rest::Handle AnalyticsSettingsMockApiInterface::makeRequest(
 }
 
 rest::Handle AnalyticsSettingsMockApiInterface::makeRequest(
-    RequestInfo::Type type,
-    const QnVirtualCameraResourcePtr& device,
-    const AnalyticsEngineResourcePtr& engine,
-    core::AnalyticsActiveSettingsCallback callback)
+    RequestInfo::Type /*type*/,
+    const QnVirtualCameraResourcePtr& /*device*/,
+    const AnalyticsEngineResourcePtr& /*engine*/,
+    core::AnalyticsActiveSettingsCallback /*callback*/)
 {
     return {};
 }

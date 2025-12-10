@@ -364,7 +364,7 @@ void QnServerStorageManager::saveStorages(
 
     messageBusConnection->getMediaServerManager(nx::network::rest::kSystemSession)->saveStorages(
         apiStorages,
-        [storages, callback = std::move(callback)](int reqID, ec2::ErrorCode error)
+        [storages, callback = std::move(callback)](int /*reqID*/, ec2::ErrorCode error)
         {
             if (callback)
                 callback(error);

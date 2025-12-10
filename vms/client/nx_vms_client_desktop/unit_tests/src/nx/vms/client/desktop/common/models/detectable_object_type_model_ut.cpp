@@ -170,7 +170,7 @@ TEST_F(DetectableObjectTypeModelTest, derivedTypes)
         [&](std::vector<ExpectedObjectType> expectedObjectTypes, QModelIndex parentIndex)
         {
             ASSERT_EQ(m_testModel->rowCount(parentIndex), expectedObjectTypes.size());
-            for (int i = 0; i < expectedObjectTypes.size(); ++i)
+            for (int i = 0; i < (int) expectedObjectTypes.size(); ++i)
             {
                 const auto index = m_testModel->index(i, 0, parentIndex);
                 const auto expectedObjectType = expectedObjectTypes[i];

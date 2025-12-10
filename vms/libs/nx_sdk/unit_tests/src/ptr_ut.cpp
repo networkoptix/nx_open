@@ -212,7 +212,8 @@ TEST(Ptr, assign)
         ASSERT_FALSE(Data::s_destructorCalled);
         ASSERT_EQ(1, oldData->refCount());
 
-        oldData = oldData; //< Assign to itself.
+        auto& oldDataRef = oldData;
+        oldData = oldDataRef; //< Assign to itself without warning.
         ASSERT_FALSE(Data::s_destructorCalled);
         ASSERT_EQ(1, oldData->refCount());
         {

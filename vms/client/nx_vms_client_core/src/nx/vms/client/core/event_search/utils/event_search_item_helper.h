@@ -41,7 +41,7 @@ int removeDuplicateItems(Container& container,
     // In case of `FetchDirection::older` the container is sorted new-to-old, therefore we must do
     // the duplication removal in reverse order.
 
-    if (const bool reverse = direction == EventSearch::FetchDirection::older)
+    if (direction == EventSearch::FetchDirection::older)
     {
         const auto revItBegin = std::make_reverse_iterator(itEnd);
         const auto revItEnd = std::make_reverse_iterator(itBegin);

@@ -445,7 +445,7 @@ void SharedMemoryManager::connectToCloudStatusWatcher()
 int SharedMemoryManager::currentInstanceIndex() const
 {
     const SharedMemoryData data = d->readData();
-    for (int i = 0; i < data.processes.size(); ++i)
+    for (int i = 0; i < (int) data.processes.size(); ++i)
     {
         if (data.processes[i].pid == d->currentProcessPid)
             return i;

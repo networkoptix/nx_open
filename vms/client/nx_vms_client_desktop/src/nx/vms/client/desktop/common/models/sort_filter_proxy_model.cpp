@@ -22,7 +22,7 @@ SortFilterProxyModel::SortFilterProxyModel(QObject* parent):
             // Roles may be added during the first insertion or reset.
             m_rolesUpdatingConnections.add(
                 connect(sourceModel(), &QAbstractItemModel::modelReset, this,
-                    [=]
+                    [this, updateRoles]
                     {
                         updateRoles();
                         m_rolesUpdatingConnections.reset();
@@ -30,7 +30,7 @@ SortFilterProxyModel::SortFilterProxyModel(QObject* parent):
 
             m_rolesUpdatingConnections.add(
                 connect(sourceModel(), &QAbstractItemModel::rowsInserted, this,
-                    [=]
+                    [this, updateRoles]
                     {
                         updateRoles();
                         m_rolesUpdatingConnections.reset();

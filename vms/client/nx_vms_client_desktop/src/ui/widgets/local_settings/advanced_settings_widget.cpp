@@ -344,7 +344,7 @@ void QnAdvancedSettingsWidget::applyChanges()
             box.setDefaultButton(okButton);
 
             connect(okButton, &QPushButton::clicked, &box,
-                [=, box=&box]
+                [=, this, box=&box]
                 {
                     if (okButton->isIndicatorVisible())
                         return; //< The button has been clicked already.

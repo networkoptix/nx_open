@@ -11,6 +11,7 @@ nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/nx_sdk_version.inc.in
     ${copied_nx_sdk_version_file} @ONLY NEWLINE_STYLE UNIX)
 
 nx_add_target(nx_sdk LIBRARY LIBRARY_TYPE STATIC NO_MOC NO_PCH
+    WERROR_IF NOT WINDOWS
     ADDITIONAL_SOURCES
         ${copied_nx_sdk_version_file}
     PUBLIC_LIBS

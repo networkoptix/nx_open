@@ -167,11 +167,6 @@ int helpTopicIdData(EventLogModel::Column column, const EventLogModelData& data)
     }
 }
 
-QString resourceName(const QnResourcePtr& resource)
-{
-    return vms::rules::Strings::resource(resource, detailLevel());
-}
-
 QIcon resourceIcon(ResourceIconCache::Key key)
 {
     if ((key & ResourceIconCache::TypeMask) == ResourceIconCache::Unknown)
@@ -273,8 +268,6 @@ ResourceIconCache::Key resourceIconKey(ResourceType type, bool multiple)
 
 ResourceIconCache::Key actionTargetIcon(SystemContext* context, const EventLogModelData& data)
 {
-    using Key = ResourceIconCache::KeyPart;
-
     const auto resourceMap = actionResourceMap(context, data);
 
     if (resourceMap.empty() || resourceMap.size() > 1)

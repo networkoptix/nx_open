@@ -439,7 +439,7 @@ bool AttributeResolver::resolveUnit(
 }
 
 Attribute* AttributeResolver::resolveEnumerationAttribute(
-    AttributeDescription* inOutAttributeDescription, const AbstractAttribute* baseAttribute)
+    AttributeDescription* inOutAttributeDescription, const AbstractAttribute* /*baseAttribute*/)
 {
     const QString enumId = inOutAttributeDescription->subtype.value_or(QString());
     EnumType* enumType = m_context.internalState->getTypeById<EnumType>(enumId);
@@ -457,7 +457,7 @@ Attribute* AttributeResolver::resolveEnumerationAttribute(
 }
 
 Attribute* AttributeResolver::resolveColorAttribute(
-    AttributeDescription* inOutAttributeDescription, const AbstractAttribute* baseAttribute)
+    AttributeDescription* inOutAttributeDescription, const AbstractAttribute* /*baseAttribute*/)
 {
     const QString colorTypeId = inOutAttributeDescription->subtype.value_or(QString());
     ColorType* colorType = m_context.internalState->getTypeById<ColorType>(colorTypeId);
@@ -476,7 +476,7 @@ Attribute* AttributeResolver::resolveColorAttribute(
 }
 
 Attribute* AttributeResolver::resolveObjectAttribute(
-    AttributeDescription* inOutAttributeDescription, const AbstractAttribute* baseAttribute)
+    AttributeDescription* inOutAttributeDescription, const AbstractAttribute* /*baseAttribute*/)
 {
     const QString objectTypeId = inOutAttributeDescription->subtype.value_or(QString());
     ObjectType* objectType = m_context.internalState->getTypeById<ObjectType>(objectTypeId);

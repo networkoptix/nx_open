@@ -37,14 +37,13 @@ StreamReader::StreamReader(
     DirContentsManager* const dirContentsManager,
     unsigned int frameDurationUsec,
     bool liveMode,
-    int encoderNumber )
+    int /*encoderNumber*/)
 :
     m_refManager( parentRefManager ),
     m_dirContentsManager( dirContentsManager ),
     m_curTimestamp( 0 ),
     m_frameDuration( frameDurationUsec ),
     m_liveMode( liveMode ),
-    m_encoderNumber( encoderNumber ),
     m_streamReset( true ),
     m_nextFrameDeployTime( 0 ),
     m_isReverse( false ),

@@ -471,7 +471,7 @@ void AbstractResourceThumbnail::Private::updateRotation()
 
 void AbstractResourceThumbnail::Private::updateObsolescenceWatch()
 {
-    if (const bool watched = obsolescenceDuration > 0min && supportsObsolescence())
+    if (obsolescenceDuration > 0min && supportsObsolescence()) //< Watched.
         obsolescenceWatcher().subscribers.insert(this);
     else
         obsolescenceWatcher().subscribers.remove(this);

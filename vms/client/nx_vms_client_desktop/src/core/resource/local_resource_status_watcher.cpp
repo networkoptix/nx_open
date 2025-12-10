@@ -94,7 +94,7 @@ void QnLocalResourceStatusWatcher::onResourceAdded(const QnResourcePtr& resource
     }
 }
 
-void QnLocalResourceStatusWatcher::timerEvent(QTimerEvent* event)
+void QnLocalResourceStatusWatcher::timerEvent(QTimerEvent* /*event*/)
 {
     for (auto it = m_watchedResources.begin(); it != m_watchedResources.end();)
     {

@@ -116,8 +116,8 @@ namespace paramsToDetails {
 const auto session =
     [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
     {
-        record.details = SessionDetails{std::chrono::seconds(legacyRecord.rangeStartSec),
-            std::chrono::seconds(legacyRecord.rangeEndSec)};
+        record.details = SessionDetails{{std::chrono::seconds(legacyRecord.rangeStartSec),
+            std::chrono::seconds(legacyRecord.rangeEndSec)}};
     };
 const auto proxySession =
     [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)

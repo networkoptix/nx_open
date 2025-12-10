@@ -115,7 +115,7 @@ protected:
 
     SharedMemoryData::Process rawProcessSharedMemoryAt(int index)
     {
-        NX_ASSERT(index >= 0 && index < m_sharedMemory->processes.size());
+        NX_ASSERT(index >= 0 && index < (int) m_sharedMemory->processes.size());
         return m_sharedMemory->processes.at(index);
     }
 

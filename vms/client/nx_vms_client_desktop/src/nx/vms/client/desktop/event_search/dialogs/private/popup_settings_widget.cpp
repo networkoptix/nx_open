@@ -153,7 +153,7 @@ QStringList PopupSettingsWidget::watchedEvents() const
         return eventTypes;
 
     QStringList result;
-    for (const auto eventType: eventTypes)
+    for (const auto& eventType: eventTypes)
     {
         if (m_eventRulesCheckBoxes[eventType]->isChecked())
             result << eventType;

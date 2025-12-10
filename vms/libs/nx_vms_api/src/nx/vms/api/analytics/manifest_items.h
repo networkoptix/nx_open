@@ -148,18 +148,6 @@ struct AttributeDescriptionCommon
     {
     }
 
-    AttributeDescriptionCommon(const AttributeDescriptionCommon& other)
-        : name(other.name),
-        type(other.type),
-        subtype(other.subtype),
-        unit(other.unit),
-        minValue(other.minValue),
-        maxValue(other.maxValue),
-        attributeList(other.attributeList),
-        condition(other.condition)
-    {
-    }
-
     bool operator==(const AttributeDescriptionCommon& other) const = default;
 };
 
@@ -205,12 +193,6 @@ struct AttributeDescription : AttributeDescriptionCommon
     bool operator==(const AttributeDescription& other) const = default;
 
     AttributeDescription()
-    {
-    }
-
-    AttributeDescription(const AttributeDescription& other)
-        : AttributeDescriptionCommon(other),
-        items(other.items)
     {
     }
 

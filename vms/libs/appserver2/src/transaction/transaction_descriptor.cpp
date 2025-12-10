@@ -1692,7 +1692,7 @@ struct ModifyLayoutDataAccess
                 using namespace nx::vms::api;
                 const auto saasManager = systemContext->saasServiceManager();
                 auto maxItems = saasManager->tier().maxItemsInLayout;
-                if (maxItems && param.items.size() > maxItems)
+                if (maxItems && (int) param.items.size() > maxItems)
                 {
                     return Result(ErrorCode::forbidden,
                         nx::format(ServerApiErrors::tr("Maximum number of Layout items for the Site "

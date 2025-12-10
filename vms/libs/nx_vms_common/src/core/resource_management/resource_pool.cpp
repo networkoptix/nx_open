@@ -85,7 +85,7 @@ void QnResourcePool::addNewResources(const QnResourceList& resources, AddResourc
             [](const QnResourcePtr& resource) { return resource->resourcePool() == nullptr; }));
 }
 
-void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFlags flags)
+void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFlags /*flags*/)
 {
     for (const auto& resource: resources)
     {

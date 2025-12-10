@@ -28,7 +28,7 @@ QnResourcePtr ResourceFactory::createResource(
     {
         QnClientStorageResourcePtr result(new QnClientStorageResource());
         result->setActive(true);
-        return std::move(result);
+        return result;
     }
 
     if (resourceTypeId == api::AnalyticsPluginData::kResourceTypeId)

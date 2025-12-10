@@ -236,7 +236,8 @@ private:
         std::vector<nx::Uuid>* dst,
         const std::vector<nx::Uuid>& value,
         std::vector<nx::Uuid>* previousValue,
-        nx::MutexLocker& lock);
+        nx::MutexLocker&);
+
 private:
     nx::vms::api::UserType m_userType;
     QString m_password;

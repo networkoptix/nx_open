@@ -8,6 +8,7 @@ CompositeFilter::CompositeFilter(
     const std::vector<AbstractStateViewFilter*> filters,
     QObject* parent)
     :
+    AbstractStateViewFilter(parent),
     m_filters(filters)
 {
 }

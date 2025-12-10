@@ -615,7 +615,7 @@ bool isReflectedPositionOutsideFigure(
         posTransform);
 }
 
-Lines getEdges(const FigurePtr& figure, const Points& originalPoints, const QSizeF& scale)
+Lines getEdges(const FigurePtr& figure, const Points& originalPoints, const QSizeF& /*scale*/)
 {
     // Divide edge with direction marks on two parts.
     if (const Polyline* polyline = dynamic_cast<Polyline*>(figure.get()))

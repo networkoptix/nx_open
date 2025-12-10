@@ -54,7 +54,7 @@ bool LiveTypeFilter::matches(const nx::analytics::taxonomy::ObjectType* objectTy
     return !(m_liveTypesExcluded && (objectType->isLiveOnly() || objectType->isNonIndexable()));
 }
 
-bool LiveTypeFilter::matches(const nx::analytics::taxonomy::AbstractAttribute* attribute) const
+bool LiveTypeFilter::matches(const nx::analytics::taxonomy::AbstractAttribute* /*attribute*/) const
 {
     return true;
 }

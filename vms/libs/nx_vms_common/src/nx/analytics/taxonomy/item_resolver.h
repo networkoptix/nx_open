@@ -51,7 +51,7 @@ public:
         }
 
         std::vector<Item> ownItems;
-        for (int i = 0; i < m_context.ownItems->size(); ++i)
+        for (int i = 0; i < (int) m_context.ownItems->size(); ++i)
         {
             if (resolveOwnItem(&(*m_context.ownItems)[i]))
                 ownItems.push_back(std::move((*m_context.ownItems)[i]));
@@ -66,7 +66,7 @@ public:
             m_availableBaseItemIds.insert(itemId);
 
         std::vector<ItemId> baseItemIds;
-        for (int i = 0; i < m_context.baseItemIds->size(); ++i)
+        for (int i = 0; i < (int) m_context.baseItemIds->size(); ++i)
         {
             if (resolveBaseItemId((*m_context.baseItemIds)[i]))
                 baseItemIds.push_back(std::move((*m_context.baseItemIds)[i]));

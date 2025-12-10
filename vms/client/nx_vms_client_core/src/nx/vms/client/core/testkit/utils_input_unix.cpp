@@ -185,7 +185,7 @@ Qt::MouseButtons sendMouse(
     QPoint pixelDelta,
     QPoint angleDelta,
     bool inverted,
-    int scrollDelta)
+    int /*scrollDelta*/)
 {
     static int lastMouseTimestamp = 0;
 

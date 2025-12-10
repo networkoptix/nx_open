@@ -55,7 +55,7 @@ Device::StickPosition Device::currentStickPosition() const
 
 void Device::resetState()
 {
-    for (int i = 0; i < m_buttonStates.size(); ++i)
+    for (int i = 0; i < (int) m_buttonStates.size(); ++i)
     {
         if (m_buttonStates[i])
             emit buttonReleased(i);
@@ -117,7 +117,7 @@ void Device::processNewState(const State& newState)
 
     if (newState.buttonStates != m_buttonStates)
     {
-        for (int i = 0; i < m_buttonStates.size() && i < newState.buttonStates.size(); ++i)
+        for (int i = 0; i < (int) m_buttonStates.size() && i < (int) newState.buttonStates.size(); ++i)
         {
             if (m_buttonStates[i] == newState.buttonStates[i])
                 continue;

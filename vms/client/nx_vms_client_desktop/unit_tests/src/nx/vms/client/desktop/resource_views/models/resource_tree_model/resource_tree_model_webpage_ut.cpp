@@ -37,7 +37,6 @@ Condition getNodeCondition(WebPageSubtype subtype)
 static constexpr auto kUniqueWebPageName = "unique_web_page_name";
 static constexpr auto kUniqueIntegrationName = "unique_integration_name";
 static constexpr auto kUniqueServerName = "unique_server_name";
-static constexpr auto kUniqueUserName = "unique_user_name";
 static constexpr auto kServer1Name = "server_1";
 static constexpr auto kServer2Name = "server_2";
 

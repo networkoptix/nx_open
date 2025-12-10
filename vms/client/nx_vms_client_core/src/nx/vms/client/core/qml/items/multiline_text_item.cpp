@@ -187,7 +187,7 @@ void MultilineTextItem::geometryChange(const QRectF& newGeometry, const QRectF& 
     }
 }
 
-QSGNode* MultilineTextItem::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* data)
+QSGNode* MultilineTextItem::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* /*data*/)
 {
     auto node = static_cast<QSGTextNode*>(oldNode);
     if (!node)

@@ -31,7 +31,7 @@ QnStatisticValuesHash QnMetricsContainer::values() const
 
 void QnMetricsContainer::reset()
 {
-    for(const auto metric: m_metrics)
+    for (const auto& metric: m_metrics)
         metric->reset();
 }
 

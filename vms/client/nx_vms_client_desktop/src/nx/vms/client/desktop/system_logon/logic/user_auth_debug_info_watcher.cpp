@@ -144,7 +144,7 @@ public:
             return;
 
         const auto updateTokenInfoForDebugInfo =
-            [this]()
+            []()
             {
                 const auto session = appContext()->networkModule()->session();
                 const auto token = session->connection()->credentials().authToken;
@@ -222,7 +222,7 @@ UserAuthDebugInfoWatcher::UserAuthDebugInfoWatcher(QObject* parent):
                 return;
 
             const auto updateCloudAccessTokenInfoForDebugInfo =
-            [this]()
+            []()
             {
                 const auto token = appContext()->cloudStatusWatcher()->credentials().authToken;
                 processToken(token, "Cloud Access Token: ", kCloudAccessTokenDebugInfoKey);

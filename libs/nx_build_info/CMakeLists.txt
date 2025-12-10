@@ -5,6 +5,7 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/build_info.cpp)
 
 nx_add_target(nx_build_info LIBRARY
+    WERROR_IF LINUX
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/build_info.cpp"
     PUBLIC_LIBS

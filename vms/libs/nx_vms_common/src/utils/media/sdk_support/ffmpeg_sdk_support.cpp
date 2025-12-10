@@ -384,7 +384,7 @@ void setupIoContext(
 
 nx::sdk::Ptr<nx::sdk::cloud_storage::IMediaDataPacket> mediaPacketFromFrame(
     const QnConstAbstractMediaDataPtr& mediaData,
-    int streamIndex)
+    int /*streamIndex*/)
 {
     nx::sdk::cloud_storage::MediaPacketData data;
     data.channelNumber = mediaData->channelNumber;

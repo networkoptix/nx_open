@@ -410,7 +410,7 @@ bool QnWebResourceWidget::verifyCertificate(const QString& pemString, const QUrl
 }
 
 bool QnWebResourceWidget::askUserToAcceptCertificate(
-    const nx::network::ssl::CertificateChain& chain, const nx::Url& url)
+    const nx::network::ssl::CertificateChain& /*chain*/, const nx::Url& url)
 {
     const auto webPage = resource().dynamicCast<QnWebPageResource>();
     const bool isIntegration = ini().webPagesAndIntegrations

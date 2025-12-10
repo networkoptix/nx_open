@@ -38,11 +38,6 @@
 #include "player_data_consumer.h"
 #include "video_decoder_registry.h"
 
-static size_t qHash(const MetadataType& value)
-{
-    return size_t(value);
-}
-
 namespace nx::media {
 
 namespace {

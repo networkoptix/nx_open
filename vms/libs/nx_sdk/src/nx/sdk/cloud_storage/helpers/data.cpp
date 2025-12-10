@@ -583,6 +583,7 @@ TimePeriod::TimePeriod(
     duration(milliseconds(durationMs))
 {
 }
+
 CodecInfoData::CodecInfoData()
 {
 }

@@ -16,6 +16,7 @@ AbstractCachingResourceThumbnail::AbstractCachingResourceThumbnail(
     ThumbnailCache* cache,
     QObject* parent)
     :
+    base_type(parent),
     m_cache(cache)
 {
     if (!NX_ASSERT(cache))

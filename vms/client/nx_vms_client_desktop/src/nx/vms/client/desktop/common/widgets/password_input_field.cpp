@@ -63,7 +63,7 @@ PasswordInputField::PasswordInputField(QWidget* parent):
     PasswordPreviewButton::createInline(lineEdit, [this]() { return !hasRemotePassword(); });
 
     connect(lineEdit, &QLineEdit::textChanged, this,
-        [this](const QString& text) { d->updatePasswordIndicatorVisibility(); });
+        [this](const QString& /*text*/) { d->updatePasswordIndicatorVisibility(); });
 
     connect(lineEdit, &QLineEdit::textEdited, this,
         [this]() { setHasRemotePassword(false); });

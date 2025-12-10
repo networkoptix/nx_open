@@ -1,6 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 nx_add_target(desktop_client EXECUTABLE SIGNED
+    WERROR_IF LINUX
     RC_FILE
         "desktop_client.rc"
     NO_MOC

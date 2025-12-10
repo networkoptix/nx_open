@@ -526,7 +526,6 @@ void RightPanelModelsAdapter::addCameraToLayout()
 
     struct Policy: public CameraSelectionDialog::DummyPolicy
     {
-        using resource_type = QnVirtualCameraResource;
         static bool emptyListIsValid() { return false; }
         static bool multiChoiceListIsValid() { return false; }
     };
@@ -1180,7 +1179,7 @@ void RightPanelModelsAdapter::Private::initCslSupport(
 
             if (cameraContext)
             {
-                if (taxonomyManager = cameraContext->taxonomyManager())
+                if ((taxonomyManager = cameraContext->taxonomyManager()))
                 {
                     if (!cameraContext->messageProcessor())
                     {
@@ -1501,7 +1500,7 @@ void RightPanelModelsAdapter::Private::allItemsDataChangeNotify(const QList<int>
 }
 
 void RightPanelModelsAdapter::Private::connectModelToAccessController(
-    AnalyticsSearchListModel* analyticsModel,
+    AnalyticsSearchListModel* /*analyticsModel*/,
     SystemContext* systemContext)
 {
     m_accessControllerConnection.reset(

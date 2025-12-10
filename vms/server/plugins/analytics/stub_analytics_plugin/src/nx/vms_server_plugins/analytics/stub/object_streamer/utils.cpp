@@ -34,8 +34,8 @@ std::string makeObjectTypeFilterSettingName(const std::string& objectTypeId)
 }
 
 std::string makeSettingsModel(
-    const std::string& manifestFilePath,
-    const std::string& streamFilePath,
+    const std::string& /*manifestFilePath*/,
+    const std::string& /*streamFilePath*/,
     const std::string& pluginHomeDir,
     const std::set<std::string>& objectTypeIds)
 {

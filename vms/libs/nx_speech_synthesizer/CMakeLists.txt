@@ -2,7 +2,9 @@
 
 find_package(flite)
 
-nx_add_target(nx_speech_synthesizer LIBRARY NO_API_MACROS
+nx_add_target(nx_speech_synthesizer LIBRARY
+    NO_API_MACROS
+    WERROR_IF LINUX
     PUBLIC_LIBS
         nx_vms_common
     PRIVATE_LIBS

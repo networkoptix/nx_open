@@ -60,7 +60,7 @@ void nx::core::storage_forecast::doForecast(const CameraRecordingSettingsSet& ca
     qreal days = 0.0;
     if (high != byteScale.end()) //< We still need some space to record everything.
     {
-        const auto low = high - 1;
+        const auto low = std::prev(high);
         // Build a proportion in the space-time continuum.
         days = low.value() +
             (qreal) (high.value() - low.value()) * (totalSpace - low.key()) / (high.key() - low.key());

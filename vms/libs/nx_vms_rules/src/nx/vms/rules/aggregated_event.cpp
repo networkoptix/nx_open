@@ -55,7 +55,7 @@ std::pair<std::vector<EventPtr> /*firstEvents*/, std::vector<EventPtr> /*lastEve
     }
 
     // Check real events count here to ensure events would be correctly split if needed.
-    if (count() <= limit)
+    if ((int) count() <= limit)
         return {m_aggregatedEvents, {}};
 
     // If the event is build from log record data, the real m_aggregatedEvents amount can be less

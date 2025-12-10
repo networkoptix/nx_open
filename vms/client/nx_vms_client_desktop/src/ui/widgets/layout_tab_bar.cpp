@@ -511,7 +511,7 @@ void QnLayoutTabBar::at_workbench_currentLayoutChanged()
     checkInvariants();
 }
 
-void QnLayoutTabBar::tabInserted(int index)
+void QnLayoutTabBar::tabInserted(int /*index*/)
 {
     {
         QScopedValueRollback<bool> guard(m_update, false);

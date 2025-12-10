@@ -669,7 +669,7 @@ std::vector<EngineScope<ObjectType>> StateHelper::compatibleObjectTypeTreeUnion(
         devices,
         m_state,
         additionalEntities,
-        [this](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
+        [](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
         [](const AnalyticsEngineResourcePtr& engine) { return engine->objectTypeIds(); },
         [this](const QString& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
 }

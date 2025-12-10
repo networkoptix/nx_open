@@ -35,7 +35,7 @@ std::set<QString> getAllBaseTypeIds(const AbstractState* state, const QString& t
     if (!objectType)
         return result;
 
-    while (objectType = objectType->base())
+    while ((objectType = objectType->base()))
         result.insert(objectType->id());
 
     return result;
@@ -47,7 +47,7 @@ bool isBaseType(const AbstractState* state, const QString& baseTypeId, const QSt
     if (!objectType)
         return false;
 
-    while (objectType = objectType->base())
+    while ((objectType = objectType->base()))
     {
         if (objectType->id() == baseTypeId)
             return true;

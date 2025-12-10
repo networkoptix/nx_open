@@ -36,7 +36,7 @@ QJsonObject TargetLayoutsField::openApiDescriptor(const QVariantMap& properties)
     return descriptor;
 }
 
-QVariant TargetLayoutsField::build(const AggregatedEventPtr & event) const
+QVariant TargetLayoutsField::build(const AggregatedEventPtr& /*event*/) const
 {
     // Resource extraction code expects nx::Uuid or UuidList types.
     return QVariant::fromValue(value().values());

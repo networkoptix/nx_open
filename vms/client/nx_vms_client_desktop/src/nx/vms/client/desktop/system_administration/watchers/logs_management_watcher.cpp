@@ -1182,7 +1182,8 @@ struct LogsManagementWatcher::Private
         void loadServerSettings(const nx::Uuid& serverId)
         {
             auto callback = nx::utils::guarded(q,
-                [this](bool success, rest::Handle requestId, QByteArray result, auto headers)
+                [this](bool success, rest::Handle /*requestId*/, QByteArray result,
+                    auto /*headers*/)
                 {
                     if (!success)
                         return;

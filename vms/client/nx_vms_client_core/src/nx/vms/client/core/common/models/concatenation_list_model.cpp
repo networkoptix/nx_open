@@ -88,7 +88,7 @@ int ConcatenationListModel::mapFromSourceRow(const QAbstractItemModel* sourceMod
     return base >= 0 ? (base + row) : -1;
 }
 
-int ConcatenationListModel::rowCount(const QModelIndex& parent) const
+int ConcatenationListModel::rowCount(const QModelIndex& /*parent*/) const
 {
     return std::accumulate(m_models.cbegin(), m_models.cend(), 0,
         [this](int count, const QAbstractListModel* model)

@@ -43,10 +43,10 @@ QnMobileClientUiController::QnMobileClientUiController(
     connect(sessionManager(), &SessionManager::hasSessionChanged, this,
         [this]()
         {
-            NX_DEBUG(this, "initialize(): hasSessionChanged: screen is <%1>, has session is <%2>",
-                currentScreen(), sessionManager()->hasSession());
-
             const auto screen = currentScreen();
+
+            NX_DEBUG(this, "initialize(): hasSessionChanged: screen is <%1>, has session is <%2>",
+                screen, sessionManager()->hasSession());
 
             if (avoidHandlingConnectionStuff())
                 return;
@@ -79,7 +79,6 @@ QnMobileClientUiController::QnMobileClientUiController(
                 emit resourcesScreenRequested(QVariant());
         });
 
-    using Session = nx::vms::client::mobile::Session;
     using RemoteConnectionErrorCode = nx::vms::client::core::RemoteConnectionErrorCode;
     const auto handleSessionError =
         [this](

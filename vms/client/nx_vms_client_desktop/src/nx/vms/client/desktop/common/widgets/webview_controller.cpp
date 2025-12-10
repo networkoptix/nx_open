@@ -1042,7 +1042,7 @@ void WebViewController::initClientApiSupport(
         });
 
     registerApiObjectWithFactory("vms.auth",
-        [=](QObject* parent) -> QObject*
+        [=, this](QObject* parent) -> QObject*
         {
             // Objects may be used with another controller, so use webView to get current url.
             return new jsapi::Auth(

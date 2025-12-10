@@ -18,7 +18,6 @@ class NX_VMS_CLIENT_DESKTOP_API ViewNodePath
 public:
     using Indices = QList<int>;
 
-    ViewNodePath(const ViewNodePath& other);
     ViewNodePath(const Indices& indices = Indices());
 
     /**

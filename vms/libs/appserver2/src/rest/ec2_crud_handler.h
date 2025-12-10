@@ -44,7 +44,7 @@ public:
                 auto commands = details::commands<Model>(DeleteCommand);
                 NX_VERBOSE(this, "Add monitor for %1", commands);
                 auto guard = m_queryProcessor->addMonitor(
-                    [this](const auto& transaction) { notify(transaction); }, std::move(commands));
+                    [this](const auto& transaction) { this->notify(transaction); }, std::move(commands));
                 return nx::utils::Guard{
                     [this, guard = std::move(guard)]() { NX_VERBOSE(this, "Remove monitor"); }};
             }),

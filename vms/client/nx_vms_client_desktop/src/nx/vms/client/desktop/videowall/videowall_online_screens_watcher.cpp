@@ -34,13 +34,13 @@ VideoWallOnlineScreensWatcher::VideoWallOnlineScreensWatcher(
 
     auto runtimeInfoManager = systemContext->runtimeInfoManager();
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded, this,
-        [this, setItemOnline](const QnPeerRuntimeInfo& info)
+        [setItemOnline](const QnPeerRuntimeInfo& info)
         {
             setItemOnline(info, true);
         });
 
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved, this,
-        [this, setItemOnline](const QnPeerRuntimeInfo& info)
+        [setItemOnline](const QnPeerRuntimeInfo& info)
         {
             setItemOnline(info, false);
         });

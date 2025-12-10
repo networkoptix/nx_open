@@ -30,7 +30,6 @@ const int Packet::MAX_DATAGRAM_SIZE = 1412;
 static const QUuid PROTO_MAGIC("422DEA47-0B0C-439A-B1FA-19644CCBC0BD");
 static const int PROTO_VERSION = 1;
 
-static const int MTU_SIZE = 1412;
 static const QHostAddress MULTICAST_GROUP(QLatin1String("239.57.43.102"));
 static const int MULTICAST_PORT = 7001;
 

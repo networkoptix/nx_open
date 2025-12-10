@@ -82,10 +82,10 @@ std::string join(
     const std::string& itemPostfix)
 {
     std::string result;
-    for (int i = 0; i < strings.size(); ++i)
+    for (int i = 0; i < (int) strings.size(); ++i)
     {
         result += itemPrefix + strings[i] + itemPostfix;
-        if (i != strings.size() - 1)
+        if (i != (int) strings.size() - 1)
             result += delimiter;
     }
 

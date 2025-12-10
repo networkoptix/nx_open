@@ -154,7 +154,7 @@ QVariant Attribute::maxValue() const
     return QVariant();
 }
 
-bool Attribute::isSupported(nx::Uuid engineId, nx::Uuid deviceId) const
+bool Attribute::isSupported(nx::Uuid /*engineId*/, nx::Uuid /*deviceId*/) const
 {
     return false;
 }

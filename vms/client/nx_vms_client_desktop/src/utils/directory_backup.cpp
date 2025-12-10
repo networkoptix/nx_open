@@ -293,7 +293,7 @@ void QnMultipleDirectoriesBackup::addDirectoryBackup(const SingleDirectoryBackup
 bool QnMultipleDirectoriesBackup::backup(QnDirectoryBackupBehavior behavior) const
 {
     BackupsList successfulBackups;
-    for (const auto backup : m_backups)
+    for (const auto& backup : m_backups)
     {
         if (backup->backup(behavior))
         {

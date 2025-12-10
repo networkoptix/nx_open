@@ -88,7 +88,7 @@ CameraBookmarkList getSparseBookmarks(
     if (!NX_ASSERT(limit > 0, "Limit should be greater than 0!"))
         return {};
 
-    if (!minVisibleLength || (bookmarks.size() <= limit))
+    if (!minVisibleLength || (int) bookmarks.size() <= limit)
         return bookmarks;
 
     ItersLinkedList valuableBookmarksIters;

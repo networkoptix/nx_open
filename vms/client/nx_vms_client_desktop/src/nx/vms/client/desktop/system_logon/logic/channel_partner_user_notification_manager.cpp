@@ -73,7 +73,7 @@ void ChannelPartnerUserNotificationManager::handleConnect()
     const auto notificationsManager = workbench()->windowContext()->localNotificationsManager();
     m_connections << connect(
         notificationsManager, &workbench::LocalNotificationsManager::linkActivated,
-        [this](const nx::Uuid& notificationId, const QString& linkUrl)
+        [this](const nx::Uuid& notificationId, const QString& /*linkUrl*/)
         {
             if (notificationId != m_notificationId)
                 return;

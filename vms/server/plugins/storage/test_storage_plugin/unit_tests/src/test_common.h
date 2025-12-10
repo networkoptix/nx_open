@@ -64,7 +64,7 @@ class TestIODeviceHelper : public TestIODevice
 public:
     using TestIODevice::TestIODevice;
 
-    virtual uint32_t readImpl(void* dst, uint32_t size, int* ecode) const override
+    virtual uint32_t readImpl(void* dst, uint32_t size, int* /*ecode*/) const override
     {
         if (m_sampleFileName != "/path/to/sample/file.mkv")
             return 0;

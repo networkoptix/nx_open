@@ -502,7 +502,7 @@ void UserGroupsWidget::Private::setupUi()
                 ui->groupsTable->setCurrentIndex(sortModel->index(0, 0));
         });
     connect(ui->groupsTable, &TreeView::lostFocus, this,
-        [this](Qt::FocusReason reason)
+        [this](Qt::FocusReason /*reason*/)
         {
             if (!q->context()->settingsDialogManager()->isEditGroupDialogVisible())
                 ui->groupsTable->clearSelection();

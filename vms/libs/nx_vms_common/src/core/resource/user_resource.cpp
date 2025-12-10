@@ -475,7 +475,7 @@ bool QnUserResource::setGroupIdsInternal(
     std::vector<nx::Uuid>* dst,
     const std::vector<nx::Uuid>& value,
     std::vector<nx::Uuid>* previousValue,
-    nx::MutexLocker& lock)
+    nx::MutexLocker&)
 {
     if (*dst == value)
         return false;

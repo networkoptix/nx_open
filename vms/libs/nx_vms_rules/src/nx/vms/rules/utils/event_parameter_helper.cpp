@@ -180,11 +180,11 @@ struct EventParameterHelper::Private
 void EventParameterHelper::Private::initFormatFunctions()
 {
     auto extractDetailFunction =
-        [this](const QString& detailName, Qn::ResourceInfoLevel level)
+        [](const QString& detailName, Qn::ResourceInfoLevel level)
         {
             return
-                [this, detailName, level]
-                    (SubstitutionContext* substitution, common::SystemContext* context)
+                [detailName, level](
+                    SubstitutionContext* substitution, common::SystemContext* context)
                 {
                     return substitution->event->details(context, level)
                         .value(detailName).toString();

@@ -138,7 +138,7 @@ void LensPtzControl::updateState()
     Value newValue; //< value from handlers
 
     newValue.rotation = m_current.rotation;
-    if (int len2 = QPointF::dotProduct(m_rotationHandler.position, m_rotationHandler.position))
+    if (QPointF::dotProduct(m_rotationHandler.position, m_rotationHandler.position))
     {
         newValue.rotation = qAtan2(m_rotationHandler.position.x(), m_rotationHandler.position.y());
         newValue.rotation = qRadiansToDegrees(newValue.rotation);

@@ -57,7 +57,7 @@ void recursiveCall(const NodePtr& node, std::function<void (const NodePtr& )> fu
     if (!functor)
         return;
 
-    for (const auto child: node->children())
+    for (const auto& child: node->children())
         recursiveCall(child, functor);
 
     functor(node);

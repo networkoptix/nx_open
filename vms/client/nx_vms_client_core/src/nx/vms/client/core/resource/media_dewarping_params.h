@@ -30,7 +30,6 @@ struct NX_VMS_CLIENT_CORE_API MediaDewarpingParams: public nx::vms::api::dewarpi
 
 public:
     MediaDewarpingParams() = default;
-    MediaDewarpingParams(const MediaDewarpingParams&) = default;
     MediaDewarpingParams(const nx::vms::api::dewarping::MediaData& data): base_type(data) {}
 };
 

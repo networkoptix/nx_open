@@ -92,7 +92,7 @@ void ResourceDialogItemDelegateBase::initStyleOption(
 void ResourceDialogItemDelegateBase::paintSeparator(
     QPainter* painter,
     const QStyleOptionViewItem& option,
-    const QModelIndex& index) const
+    const QModelIndex& /*index*/) const
 {
     QnIndents indents;
     if (option.viewItemPosition == QStyleOptionViewItem::Beginning

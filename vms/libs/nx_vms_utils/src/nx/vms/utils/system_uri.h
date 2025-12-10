@@ -114,7 +114,6 @@ public:
     QString authCode;
 
     SystemUri() = default;
-    SystemUri(const SystemUri& other) = default;
     SystemUri(const nx::Url& url);
     SystemUri(const QString& uri);
 

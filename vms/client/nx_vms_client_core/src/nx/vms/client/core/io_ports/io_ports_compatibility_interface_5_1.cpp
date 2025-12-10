@@ -1,7 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#pragma once
-
 #include "io_ports_compatibility_interface_5_1.h"
 
 #include <core/resource/camera_resource.h>

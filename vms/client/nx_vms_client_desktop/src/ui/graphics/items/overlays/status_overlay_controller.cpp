@@ -17,8 +17,6 @@ const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kWhiteTheme = {{
 static const auto kLockIconPath = "48x48/Outline/lock.svg";
 static const auto kRestrictIconPath = "48x48/Outline/restrict.svg";
 static const auto kErrorIconPath = "48x48/Outline/error.svg";
-static const auto kSoundIconPath = "48x48/Outline/sound.svg";
-static const auto kPaidIconPath = "48x48/Outline/paid.svg";
 
 struct OverlayInfo
 {

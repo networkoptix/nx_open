@@ -49,7 +49,7 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
         return;
 
     const auto handleItemAdded =
-        [this](const QnLayoutResourcePtr& layout, const nx::vms::common::LayoutItemData& item)
+        [this](const QnLayoutResourcePtr& /*layout*/, const nx::vms::common::LayoutItemData& item)
         {
             if (const auto camera = nx::vms::client::core::getResourceByDescriptor(
                 item.resource).dynamicCast<QnVirtualCameraResource>())

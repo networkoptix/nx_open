@@ -319,7 +319,7 @@ void UniqueKeyListEntity<Key>::setupItemNotifications(AbstractItem* item)
                 // It's possible if was moved or removed on 'data changed' notification.
                 // TODO: #vbreus An attempt to add item should fail if done within
                 // this callback scope.
-                if (itemIndex >= m_itemSequence.size() || m_itemSequence[itemIndex] != item)
+                if (itemIndex >= (int) m_itemSequence.size() || m_itemSequence[itemIndex] != item)
                     return;
 
                 recoverItemSequenceOrder(itemIndex);

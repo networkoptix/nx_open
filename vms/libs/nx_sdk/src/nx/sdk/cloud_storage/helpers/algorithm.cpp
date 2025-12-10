@@ -21,10 +21,6 @@ auto orderPred(bool isAscending, const T& c1, const T& c2)
     return c2 < c1;
 }
 
-static constexpr int kMotionGridWidth = 44;
-static constexpr int kMotionGridHeight = 32;
-static const int kGridDataSizeBytes = kMotionGridWidth * kMotionGridHeight / 8;
-
 typedef struct
 {
     int64_t one;
@@ -118,8 +114,8 @@ std::vector<uint8_t> fromBase64(const std::string& data)
     const auto decodeCh =
         [](char toDecode)
         {
-            size_t i = (int)toDecode - 43;
-            if (i < 0 || i >= sizeof(b64))
+            int i = (int)toDecode - 43;
+            if (i < 0 || i >= (int) sizeof(b64))
                 throw std::logic_error("Not b64 " + std::to_string(i));
 
             int8_t decoded = b64[i];
@@ -184,7 +180,7 @@ std::string toBase64(const uint8_t* data, int size)
     std::string result;
     result.reserve((size_t) (size * 1.5f));
     char c;
-    size_t index = 0;
+    int index = 0;
     while (true)
     {
         if (index == size)

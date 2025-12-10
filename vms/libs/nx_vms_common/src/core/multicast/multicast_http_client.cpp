@@ -77,14 +77,16 @@ QUuid HTTPClient::execRequest(const Request& request, ResponseCallback callback,
     {
         if (response.httpResult == HTTP_NOT_AUTHORIZED) {
             updateAuthParams(request.serverId, response);
-            auto requestId2 = m_transport.addRequest(updateRequest(request), [request, callback, timeoutMs, this](const QUuid& requestId2, ErrCode errCode, const Response& response)
-            {
-                QUuid primaryRequestId = m_requestsPairs.key(requestId2, requestId2);
-                m_requestsPairs.remove(primaryRequestId);
-                if (callback)
-                    callback(primaryRequestId, errCode, response);
-            },
-            timeoutMs);
+            auto requestId2 = m_transport.addRequest(updateRequest(request),
+                [request, callback, this](
+                    const QUuid& requestId2, ErrCode errCode, const Response& response)
+                {
+                    QUuid primaryRequestId = m_requestsPairs.key(requestId2, requestId2);
+                    m_requestsPairs.remove(primaryRequestId);
+                    if (callback)
+                        callback(primaryRequestId, errCode, response);
+                },
+                timeoutMs);
             m_requestsPairs.insert(requestId, requestId2);
         }
         else {

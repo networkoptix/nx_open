@@ -73,7 +73,7 @@ QWindow *getMainWindow()
     {
     }
 
-    void setAndroidGestureExclusionArea(int startY, int height)
+    void setAndroidGestureExclusionArea(int /*startY*/, int /*height*/)
     {
     }
 

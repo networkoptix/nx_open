@@ -65,9 +65,6 @@ bool ResourceTreeModelSortingGroupingTest::sortingIsAlphanumericCaseInsensitive(
 bool ResourceTreeModelSortingGroupingTest::checkGrouping(
     const std::vector<Condition>& conditionsInOrder) const
 {
-    const auto rowLessThan =
-        [](const QModelIndex& l, const QModelIndex& r) { return l.row() < r.row(); };
-
     const auto indexesAreContinuous =
         [](const QModelIndexList& indexes) -> bool
         {
@@ -138,16 +135,16 @@ void ResourceTreeModelSortingGroupingTest::createAllKindsOfResources(
 
 void ResourceTreeModelSortingGroupingTest::createShowreels(const nx::Uuid& parentUserId) const
 {
-    for (const auto showreelName: sortingSignificantStrings())
+    for (const auto& showreelName: sortingSignificantStrings())
         addShowreel(showreelName, parentUserId);
 }
 
 void ResourceTreeModelSortingGroupingTest::createVideoWallsWithScreensAndMatrices() const
 {
-    for (const auto videoWallName: sortingSignificantStrings())
+    for (const auto& videoWallName: sortingSignificantStrings())
     {
         const auto videoWall = addVideoWall(videoWallName);
-        for (const auto videoWallChildName: sortingSignificantStrings())
+        for (const auto& videoWallChildName: sortingSignificantStrings())
         {
             addVideoWallScreen(videoWallChildName, videoWall);
             addVideoWallMatrix(videoWallChildName, videoWall);
@@ -157,21 +154,21 @@ void ResourceTreeModelSortingGroupingTest::createVideoWallsWithScreensAndMatrice
 
 void ResourceTreeModelSortingGroupingTest::createFileLayouts() const
 {
-    for (const auto fileLayoutName: sortingSignificantStrings())
+    for (const auto& fileLayoutName: sortingSignificantStrings())
         addFileLayout(fileLayoutName);
 }
 
 void ResourceTreeModelSortingGroupingTest::createSharedLayouts() const
 {
-    for (const auto sharedLayoutName: sortingSignificantStrings())
+    for (const auto& sharedLayoutName: sortingSignificantStrings())
         addLayout(sharedLayoutName);
 }
 
 void ResourceTreeModelSortingGroupingTest::createRecorders(const nx::Uuid& parentServerId) const
 {
-    for (const auto recorderName: sortingSignificantStrings())
+    for (const auto& recorderName: sortingSignificantStrings())
     {
-        for (const auto recorderSubCameraName: sortingSignificantStrings())
+        for (const auto& recorderSubCameraName: sortingSignificantStrings())
             addRecorderCamera(recorderSubCameraName, "recorder_" + recorderName, parentServerId);
     }
 }
@@ -179,9 +176,9 @@ void ResourceTreeModelSortingGroupingTest::createRecorders(const nx::Uuid& paren
 void ResourceTreeModelSortingGroupingTest::createMultisensorCameras(
     const nx::Uuid& parentServerId) const
 {
-    for (const auto multisensorCameraName: sortingSignificantStrings())
+    for (const auto& multisensorCameraName: sortingSignificantStrings())
     {
-        for (const auto multisensorSubCameraName: sortingSignificantStrings())
+        for (const auto& multisensorSubCameraName: sortingSignificantStrings())
         {
             addMultisensorSubCamera(
                 multisensorSubCameraName,
@@ -194,7 +191,7 @@ void ResourceTreeModelSortingGroupingTest::createMultisensorCameras(
 QnResourceList ResourceTreeModelSortingGroupingTest::createIncompatibleServers() const
 {
     QnResourceList result;
-    for (const auto incompatibleServerName: sortingSignificantStrings())
+    for (const auto& incompatibleServerName: sortingSignificantStrings())
     {
         const auto incompatibleServer = addServer(incompatibleServerName);
         incompatibleServer->setStatus(nx::vms::api::ResourceStatus::incompatible);
@@ -206,7 +203,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createIncompatibleServers()
 QnResourceList ResourceTreeModelSortingGroupingTest::createCompatibleServers() const
 {
     QnResourceList result;
-    for (const auto compatibleServerName: sortingSignificantStrings())
+    for (const auto& compatibleServerName: sortingSignificantStrings())
         result.append(addServer(compatibleServerName));
     return result;
 }
@@ -214,7 +211,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createCompatibleServers() c
 QnResourceList ResourceTreeModelSortingGroupingTest::createWebPages() const
 {
     QnResourceList result;
-    for (const auto webPageName: sortingSignificantStrings())
+    for (const auto& webPageName: sortingSignificantStrings())
         result.append(addWebPage(webPageName, WebPageSubtype::none));
     return result;
 }
@@ -222,7 +219,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createWebPages() const
 QnResourceList ResourceTreeModelSortingGroupingTest::createIntegrations() const
 {
     QnResourceList result;
-    for (const auto integrationName: sortingSignificantStrings())
+    for (const auto& integrationName: sortingSignificantStrings())
         result.append(addWebPage(integrationName, WebPageSubtype::clientApi));
     return result;
 }
@@ -231,7 +228,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createProxiedWebResources(
     const nx::Uuid& parentServerId) const
 {
     QnResourceList result;
-    for (const auto proxiedWebResourceName: sortingSignificantStrings())
+    for (const auto& proxiedWebResourceName: sortingSignificantStrings())
     {
         result.append(
             addProxiedWebPage(proxiedWebResourceName, WebPageSubtype::none, parentServerId));
@@ -243,7 +240,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createProxiedIntegrations(
     const nx::Uuid& parentServerId) const
 {
     QnResourceList result;
-    for (const auto proxiedIntegrationName: sortingSignificantStrings())
+    for (const auto& proxiedIntegrationName: sortingSignificantStrings())
     {
         result.append(
             addProxiedWebPage(proxiedIntegrationName, WebPageSubtype::clientApi, parentServerId));
@@ -254,7 +251,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createProxiedIntegrations(
 QnResourceList ResourceTreeModelSortingGroupingTest::createLocalImages() const
 {
     QnResourceList result;
-    for (const auto localImageNameBase: sortingSignificantStrings())
+    for (const auto& localImageNameBase: sortingSignificantStrings())
         result.append(addLocalMedia(localImageNameBase + ".png"));
     return result;
 }
@@ -262,7 +259,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createLocalImages() const
 QnResourceList ResourceTreeModelSortingGroupingTest::createLocalVideos() const
 {
     QnResourceList result;
-    for (const auto localVideoNameBase: sortingSignificantStrings())
+    for (const auto& localVideoNameBase: sortingSignificantStrings())
         result.append(addLocalMedia(localVideoNameBase + ".mkv"));
     return result;
 }
@@ -271,7 +268,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createCameras(
     const nx::Uuid& parentServerId) const
 {
     QnResourceList result;
-    for (const auto cameraName: sortingSignificantStrings())
+    for (const auto& cameraName: sortingSignificantStrings())
         result.append(addCamera(cameraName, parentServerId));
     return result;
 }
@@ -280,7 +277,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createIoModules(
     const nx::Uuid& parentServerId) const
 {
     QnResourceList result;
-    for (const auto ioModuleName: sortingSignificantStrings())
+    for (const auto& ioModuleName: sortingSignificantStrings())
         result.append(addIOModule(ioModuleName, parentServerId));
     return result;
 }
@@ -289,7 +286,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createVirtualCameras(
     const nx::Uuid& parentServerId) const
 {
     QnResourceList result;
-    for (const auto virtualCameraName: sortingSignificantStrings())
+    for (const auto& virtualCameraName: sortingSignificantStrings())
         result.append(addVirtualCamera(virtualCameraName, parentServerId));
     return result;
 }
@@ -298,7 +295,7 @@ QnLayoutResourceList ResourceTreeModelSortingGroupingTest::createLayouts(
     const nx::Uuid& parentUserId) const
 {
     QnLayoutResourceList result;
-    for (const auto layoutName: sortingSignificantStrings())
+    for (const auto& layoutName: sortingSignificantStrings())
         result.append(addLayout(layoutName, parentUserId));
     return result;
 }

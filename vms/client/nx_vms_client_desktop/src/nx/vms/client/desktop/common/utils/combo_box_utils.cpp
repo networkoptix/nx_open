@@ -55,7 +55,7 @@ void addHiddenItem(QComboBox* combo, const QString& text, const QVariant& data)
 }
 
 void addHiddenItem(
-    QComboBox* combo, const QIcon& icon, const QString& text, const QVariant& data)
+    QComboBox* combo, const QIcon& /*icon*/, const QString& text, const QVariant& data)
 {
     NX_ASSERT(combo);
     insertHiddenItem(combo, combo->count(), QIcon(), text, data);

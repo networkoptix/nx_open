@@ -179,13 +179,10 @@ TEST_F(HttpClientPoolTest, GeneralNegativeTest)
             waitCond.wakeAll();
         };
 
-    int requestsSent = 0;
     for (int i = 0; i < kRequests; ++i)
     {
-        if (doGet(&httpPool, wrongUrl, completionFunc))
-            ++requestsSent;
-        if (doGet(&httpPool, wrongPathUrl, completionFunc))
-            ++requestsSent;
+        doGet(&httpPool, wrongUrl, completionFunc);
+        doGet(&httpPool, wrongPathUrl, completionFunc);
     }
 
     // All events are arriving in separate thread.

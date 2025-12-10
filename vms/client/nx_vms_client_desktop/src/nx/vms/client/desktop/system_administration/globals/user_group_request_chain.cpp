@@ -392,7 +392,7 @@ std::function<void(const T&)> UserGroupRequestChain::Private::request(
     std::function<void(const Result&)> callback)
 {
     return
-        [this, callback = std::move(callback)](const T& t)
+        [this, callback = std::move(callback)](const T&)
         {
             std::vector<api::JsonRpcRequest> requests;
 
@@ -411,7 +411,7 @@ std::function<void(const T&)> UserGroupRequestChain::Private::request(
     std::function<void()> callback)
 {
     return
-        [this, callback = std::move(callback)](const T& t)
+        [this, callback = std::move(callback)](const T&)
         {
             std::vector<api::JsonRpcRequest> requests;
 

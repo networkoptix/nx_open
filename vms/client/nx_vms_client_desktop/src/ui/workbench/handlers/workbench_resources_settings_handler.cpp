@@ -242,7 +242,7 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
 
     const bool copyArchiveLength = dialog->copyArchiveLength();
     const auto applyChanges =
-        [this, &settings, &licenseUsageHelper, proposeToEnableRecording, copyArchiveLength](
+        [&settings, &licenseUsageHelper, proposeToEnableRecording, copyArchiveLength](
             const QnVirtualCameraResourcePtr& camera)
         {
             using CameraBitrateCalculator = nx::vms::common::CameraBitrateCalculator;

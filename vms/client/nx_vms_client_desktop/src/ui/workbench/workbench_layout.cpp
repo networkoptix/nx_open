@@ -819,7 +819,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(
             else
                 NX_VERBOSE(this, "Walker has finished the %1", Qt::Edge(processingEdge));
             checkedEdges |= processingEdge;
-            if (checkedEdges == allEdges && bestDistance < std::numeric_limits<qreal>::max())
+            if (checkedEdges == (int) allEdges && bestDistance < std::numeric_limits<qreal>::max())
             {
                 NX_VERBOSE(this, "Best position found: %1 (delta %2, distance %3)",
                     QRect(gridCell + bestDelta, size),
@@ -829,7 +829,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(
             }
 
             // We have checked all edges but there were no place at all. Let's start over.
-            if (checkedEdges == allEdges)
+            if (checkedEdges == (int) allEdges)
                 checkedEdges = kNoEdge;
 
             using edge_t = std::pair<Qt::Edge, QPoint>;
@@ -862,7 +862,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(
             }
 
             const auto bestEdgeIter = std::min_element(edgesToCheck.cbegin(), edgesToCheck.cend(),
-                [metric, &gridCell](const edge_t& left, const edge_t& right)
+                [metric](const edge_t& left, const edge_t& right)
                 {
                     return metric->calculate(left.second) < metric->calculate(right.second);
                 });

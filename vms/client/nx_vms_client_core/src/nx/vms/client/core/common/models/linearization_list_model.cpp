@@ -1182,7 +1182,7 @@ void LinearizationListModel::Private::sourceLayoutChanged(
 
     NX_VERBOSE(q, "Finished changing layout");
 
-    for (const auto range: std::as_const(affectedRanges))
+    for (const auto& range: std::as_const(affectedRanges))
     {
         // Emitting dataChanged for all affected nodes for all possibly changed roles.
         // This must be the fastest way to do it, instead of notifying about every actual change.

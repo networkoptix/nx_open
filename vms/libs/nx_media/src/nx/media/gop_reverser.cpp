@@ -107,11 +107,11 @@ void GopReverser::removeOneElement()
     std::pair<int, int> filled, empty; //< first - pos, second - count.
 
     // 1. Gather statistics with minimal empty and maximum non-empty elements in a row.
-    for (int i = 0; i < m_queue.size() - 1;)
+    for (int i = 0; i < (int) m_queue.size() - 1;)
     {
         const bool hasElement = (bool) m_queue[i];
         int j = i + 1;
-        for (; j < m_queue.size() && (bool) m_queue[j] == hasElement; ++j);
+        for (; j < (int) m_queue.size() && (bool) m_queue[j] == hasElement; ++j);
         const int count = j - i;
         if (hasElement && count > filled.second)
             filled = { i, count };

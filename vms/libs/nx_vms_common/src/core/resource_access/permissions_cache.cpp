@@ -47,7 +47,7 @@ bool PermissionsCache::setPermissions(
     if (storageRow.empty() && kInitialTableRowSize > index)
         storageRow.resize(kInitialTableRowSize, std::nullopt);
 
-    if (storageRow.size() <= index)
+    if ((int) storageRow.size() <= index)
         storageRow.resize(index + index / 2, std::nullopt);
 
     auto& record = storageRow[index];
@@ -77,7 +77,7 @@ bool PermissionsCache::removePermissions(
         return false;
 
     auto& storageRow = rowItr->second;
-    if (storageRow.size() <= index)
+    if ((int) storageRow.size() <= index)
         return false;
 
     auto& record = storageRow[index];
@@ -100,7 +100,7 @@ PermissionsCache::ResourceIdsWithPermissions PermissionsCache::permissionsForSub
 
     const auto& storageRow = rowItr->second;
     PermissionsCache::ResourceIdsWithPermissions result;
-    for (int i = 0; i < std::min(m_resourcesOrder.size(), storageRow.size()); ++i)
+    for (int i = 0; i < (int) std::min(m_resourcesOrder.size(), storageRow.size()); ++i)
     {
         if (!m_resourcesOrder.at(i).isNull())
             result.emplace_back(m_resourcesOrder.at(i), storageRow.at(i));
@@ -143,13 +143,13 @@ void PermissionsCache::removeResource(const nx::Uuid& resourceId)
         else
         {
             auto& storageRow = rowItr->second;
-            if (storageRow.size() > index)
+            if ((int) storageRow.size() > index)
                 storageRow[index].reset();
             rowItr++;
         }
     }
 
-    if (index > m_resourcesOrder.size() / 2)
+    if (index > (int) m_resourcesOrder.size() / 2)
         m_sparseColumns.push_back(index);
     else
         m_sparseColumns.push_front(index);
@@ -173,7 +173,7 @@ std::optional<Qn::Permissions> PermissionsCache::permissions(
         return {};
 
     const auto& storageRow = rowItr->second;
-    if (storageRow.size() <= index)
+    if ((int) storageRow.size() <= index)
         return {};
 
     return storageRow.at(index);

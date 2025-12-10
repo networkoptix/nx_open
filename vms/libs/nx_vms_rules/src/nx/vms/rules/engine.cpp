@@ -139,7 +139,10 @@ bool Engine::addEventConnector(EventConnector *eventConnector)
     if (m_connectors.contains(eventConnector))
         return false;
 
-    connect(eventConnector, &EventConnector::event, this, &Engine::processEvent);
+    connect(eventConnector,
+        static_cast<void (EventConnector::*)(const nx::vms::rules::EventPtr &event)>(
+            &EventConnector::event),
+        this, &Engine::processEvent);
     connect(eventConnector, &EventConnector::analyticsEvents, this, &Engine::processAnalyticsEvents);
     m_connectors.push_back(eventConnector);
 

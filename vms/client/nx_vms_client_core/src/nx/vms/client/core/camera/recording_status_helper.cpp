@@ -75,11 +75,9 @@ std::pair<RecordingStatus, RecordingMetadataTypes> currentRecordingMode(
 
         const bool recording = ResourceStatus::recording == camera->getStatus();
         const auto scheduledTasks = camera->getScheduleTasks();
-        bool recordScheduled = false;
         for (const auto& task: scheduledTasks)
         {
             const bool isRecording = (task.recordingType != RecordingType::never);
-            recordScheduled |= isRecording;
             if (task.dayOfWeek == dayOfWeek && qBetween(task.startTime, seconds, task.endTime + 1)
                 && isRecording)
             {
@@ -298,7 +296,7 @@ QString RecordingStatusHelper::qmlIconName(
 }
 
 QString RecordingStatusHelper::qmlSmallIconName(RecordingStatus recordingStatus,
-    nx::vms::api::RecordingMetadataTypes metadataTypes)
+    nx::vms::api::RecordingMetadataTypes /*metadataTypes*/)
 {
     switch (recordingStatus)
     {

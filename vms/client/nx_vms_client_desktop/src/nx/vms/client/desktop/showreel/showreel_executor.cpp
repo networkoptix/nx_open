@@ -94,7 +94,7 @@ void ShowreelExecutor::updateShowreel(const nx::vms::api::ShowreelData& showreel
     resetShowreelItems(showreel.items);
     if (m_showreel.items.empty())
         stopCurrentShowreel();
-    else if (m_showreel.currentIndex >= showreel.items.size())
+    else if (m_showreel.currentIndex >= (int) showreel.items.size())
         m_showreel.currentIndex = 0;
 }
 

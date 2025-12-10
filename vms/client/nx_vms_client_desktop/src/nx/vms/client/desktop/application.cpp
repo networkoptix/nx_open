@@ -220,7 +220,7 @@ void askForGraphicsApiSubstitution()
 }
 
 // This function is called BEFORE QApplication is created.
-void setGraphicsSettingsEarly(const QnStartupParameters& startupParams)
+void setGraphicsSettingsEarly(const QnStartupParameters& /*startupParams*/)
 {
     if (build_info::isLinux())
     {

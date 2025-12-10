@@ -19,6 +19,9 @@ class NX_VMS_RULES_API EventConnector: public QObject
 {
     Q_OBJECT
 
+public:
+    using QObject::event; //< avoid "hides overloaded virtual" warning.
+
 signals:
     void event(const nx::vms::rules::EventPtr &event);
 

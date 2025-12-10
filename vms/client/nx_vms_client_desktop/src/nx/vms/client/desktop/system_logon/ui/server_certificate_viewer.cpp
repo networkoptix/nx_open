@@ -285,7 +285,7 @@ void ServerCertificateViewer::showSelectedCertificate()
         return;
     bool ok = false;
     int index = currentItem->data(0, Qt::UserRole).toInt(&ok);
-    if (!NX_ASSERT(ok && index >= 0 && index < m_certificates.size()))
+    if (!NX_ASSERT(ok && index >= 0 && index < (int) m_certificates.size()))
         return;
 
     // Update data.

@@ -903,7 +903,7 @@ void QnVideowallManageWidgetPrivate::dragMoveAt(const QPoint& pos, const QPoint&
         });
 }
 
-void QnVideowallManageWidgetPrivate::dragEndAt(const QPoint& pos)
+void QnVideowallManageWidgetPrivate::dragEndAt(const QPoint& /*pos*/)
 {
     if (!m_process.isRunning())
         return;

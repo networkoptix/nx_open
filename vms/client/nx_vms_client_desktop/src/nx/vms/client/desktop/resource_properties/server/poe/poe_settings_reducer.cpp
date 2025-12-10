@@ -218,7 +218,7 @@ NodeViewStatePatch PoeSettingsReducer::blockDataChangesPatch(
         return NodeViewStatePatch::clearNodeViewPatch();
 
     int index = 0;
-    for (const auto node: state.rootNode->children())
+    for (const auto& node: state.rootNode->children())
     {
         ViewNodeData forOverride;
         const auto source = node->data();
@@ -239,7 +239,7 @@ node_view::details::NodeViewStatePatch PoeSettingsReducer::totalsDataChangesPatc
         [data]()
         {
             double total = 0;
-            for (const auto port: data.portStates)
+            for (const auto& port: data.portStates)
                 total += port.devicePowerConsumptionWatts;
             return total;
         }();

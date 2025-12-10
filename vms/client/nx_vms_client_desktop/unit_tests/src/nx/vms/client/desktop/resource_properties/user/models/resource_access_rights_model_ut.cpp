@@ -83,7 +83,7 @@ public:
         QStringList result;
         static const QRegularExpression matcher{"<b>([^<]*)</b>"};
 
-        for (const auto match: matcher.globalMatch(source))
+        for (const auto& match: matcher.globalMatch(source))
             result.push_back(match.captured(1));
 
         return result;

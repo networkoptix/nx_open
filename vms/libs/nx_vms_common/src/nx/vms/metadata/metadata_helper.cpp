@@ -92,7 +92,7 @@ void MetadataHelper::deleteUnusedFiles(
     }
 }
 
-QList<QRegion> MetadataHelper::regionsFromFilter(const QString& filter, int channelCount)
+QList<QRegion> MetadataHelper::regionsFromFilter(const QString& filter, int /*channelCount*/)
 {
     if (filter.isEmpty())
         return QList<QRegion>();

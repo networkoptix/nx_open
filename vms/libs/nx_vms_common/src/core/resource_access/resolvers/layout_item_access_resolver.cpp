@@ -584,7 +584,7 @@ void LayoutItemAccessResolver::Private::handleDesktopCameraAdded(const QnVirtual
         desktopCameraIds.insert(cameraId);
 
         const auto resourceLayouts = sharedLayoutItemsWatcher.resourceLayouts(cameraId);
-        for (const auto storedLayout: resourceLayouts)
+        for (const auto& storedLayout: resourceLayouts)
         {
             const auto layout = storedLayout->transientLayout();
 

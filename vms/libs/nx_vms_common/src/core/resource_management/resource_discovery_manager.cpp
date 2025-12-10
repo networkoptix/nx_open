@@ -32,8 +32,9 @@
 
 using namespace nx::vms::common;
 
-QnResourceDiscoveryManagerTimeoutDelegate::QnResourceDiscoveryManagerTimeoutDelegate( QnResourceDiscoveryManager* discoveryManager)
-:
+QnResourceDiscoveryManagerTimeoutDelegate::QnResourceDiscoveryManagerTimeoutDelegate(
+    QnResourceDiscoveryManager* discoveryManager)
+    :
     m_discoveryManager(discoveryManager)
 {
 }
@@ -46,8 +47,7 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 // ------------------------------------ QnResourceDiscoveryManager -----------------------------
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager(
-    nx::vms::common::SystemContext* systemContext,
-    QObject* parent)
+    nx::vms::common::SystemContext* systemContext)
     :
     nx::vms::common::SystemContextAware(systemContext),
     m_ready(false),

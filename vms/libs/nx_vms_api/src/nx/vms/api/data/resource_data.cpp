@@ -123,7 +123,7 @@ std::unordered_map<nx::Uuid, std::vector<ResourceParamData>> toParameterMap(
         std::transform(std::make_move_iterator(l),
             std::make_move_iterator(r),
             std::back_inserter(resources),
-            [](ResourceParamWithRefData data) -> ResourceParamData { return std::move(data); });
+            [](ResourceParamWithRefData data) -> ResourceParamData { return data; });
 
         l = r;
     }

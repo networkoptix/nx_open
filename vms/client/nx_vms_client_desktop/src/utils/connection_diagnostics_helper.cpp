@@ -39,8 +39,6 @@ using RemoteConnectionErrorCode = nx::vms::client::core::RemoteConnectionErrorCo
 
 namespace {
 
-static const auto kCloudTokenVersion = nx::utils::SoftwareVersion(5, 0);
-
 QString getDiffVersionsText()
 {
     return QnConnectionDiagnosticsHelper::tr("Client and Server have different versions");

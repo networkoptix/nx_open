@@ -77,8 +77,6 @@ class EmailSettingsAdaptor: public QnJsonResourcePropertyAdaptor<nx::vms::api::E
     std::function<nx::Uuid()> m_getOrganizationId;
 
 public:
-    EmailSettingsAdaptor() = default;
-
     EmailSettingsAdaptor(const QString& key,
         std::function<nx::Uuid()> getOrganizationId,
         std::function<bool(const nx::vms::api::EmailSettings&)> isValueValid,

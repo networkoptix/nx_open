@@ -24,7 +24,7 @@ ChunksFilterActionFactory::ChunksFilterActionFactory(Manager* parent):
 }
 
 QList<QAction*> ChunksFilterActionFactory::newActions(
-    const Parameters& parameters,
+    const Parameters& /*parameters*/,
     QObject* parent)
 {
     auto actionGroup = new QActionGroup(parent);
@@ -43,7 +43,7 @@ QList<QAction*> ChunksFilterActionFactory::newActions(
             action->setCheckable(true);
             action->setChecked(currentMode == mode);
             connect(action, &QAction::triggered, this,
-                [this, mode, systemContext]
+                [mode, systemContext]
                 {
                     systemContext->cameraDataManager()->setStorageLocation(mode);
                     systemContext->storageLocationCameraController()->setStorageLocation(mode);

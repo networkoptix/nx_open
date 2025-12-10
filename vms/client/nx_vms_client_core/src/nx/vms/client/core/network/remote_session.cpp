@@ -191,7 +191,7 @@ void RemoteSession::updatePassword(const QString& newPassword)
     auto callback = nx::utils::guarded(this,
         [this, credentials](RemoteConnectionFactory::ConnectionOrError result)
         {
-            if (const auto error = std::get_if<RemoteConnectionError>(&result))
+            if (std::get_if<RemoteConnectionError>(&result))
             {
                 d->connection->updateCredentials(credentials);
                 emit reconnectRequired();

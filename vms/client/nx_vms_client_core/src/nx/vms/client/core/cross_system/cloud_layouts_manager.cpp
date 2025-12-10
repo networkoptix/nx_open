@@ -369,7 +369,7 @@ struct CloudLayoutsManager::Private
         cloudLayout->setItems(items);
         systemContext->resourcePool()->addResource(cloudLayout);
 
-        return std::move(cloudLayout);
+        return cloudLayout;
     }
 
     void saveLayout(const CrossSystemLayoutResourcePtr& layout, SaveCallback callback)

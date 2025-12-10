@@ -622,7 +622,7 @@ bool GraphicsQmlView::Private::ensureOffscreen()
         offscreenInitialized = true;
 
         rhi->addCleanupCallback(this,
-            [this](QRhi* rhi)
+            [this](QRhi* /*rhi*/)
             {
                 quickWindow->setRenderTarget({});
                 quickWindow->disconnect(view);

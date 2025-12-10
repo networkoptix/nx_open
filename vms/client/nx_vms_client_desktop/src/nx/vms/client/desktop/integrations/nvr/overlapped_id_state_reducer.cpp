@@ -11,19 +11,19 @@ State OverlappedIdStateReducer::reset(State state)
     state.currentId = -1;
     state.idList.clear();
 
-    return std::move(state);
+    return state;
 }
 
 State OverlappedIdStateReducer::setCurrentId(State state, int id)
 {
     state.currentId = id;
-    return std::move(state);
+    return state;
 }
 
 State OverlappedIdStateReducer::setIdList(State state, const std::vector<int>& idList)
 {
     state.idList = idList;
-    return std::move(state);
+    return state;
 }
 
 } // namespace nx::vms::client::desktop::integrations

@@ -3025,7 +3025,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      */
     reg("rest/v{4-}/analytics/objectTracks/:id/^bestShotImage(\\.\\w+)?",
         GlobalPermission::none,
-        std::make_unique<AnalyticsObjectTracksImageHandler>(serverModule, serverConnector));
+        std::make_unique<AnalyticsObjectTracksImageHandler>(serverModule));
 
     /**%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage
      * Retrieves the Title image for an Analytics Object Track. The image is returned with its
@@ -3061,7 +3061,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      */
     reg("rest/v{4-}/analytics/objectTracks/:id/^titleImage(\\.\\w+)?",
         GlobalPermission::none,
-        std::make_unique<AnalyticsObjectTracksImageHandler>(serverModule, serverConnector));
+        std::make_unique<AnalyticsObjectTracksImageHandler>(serverModule));
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/manifest
      * Equivalent of IEngine::pushManifest().
@@ -3139,7 +3139,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      */
     reg("rest/v{4-}/analytics/engines/:id/deviceAgents/:deviceId/metadata/object",
         GlobalPermission::powerUser,
-        std::make_unique<DeviceAgentObjectMetadataHandler>(serverModule, serverConnector));
+        std::make_unique<DeviceAgentObjectMetadataHandler>(serverModule));
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/deviceAgents/{deviceId}/metadata/event
      * Equivalent of IDeviceAgent::IHandler::handleMetadata().
@@ -3175,7 +3175,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      */
     reg("rest/v{4-}/analytics/engines/:id/deviceAgents/:deviceId/metadata/title",
         GlobalPermission::powerUser,
-        std::make_unique<DeviceAgentObjectTitleMetadataHandler>(serverModule, serverConnector));
+        std::make_unique<DeviceAgentObjectTitleMetadataHandler>(serverModule));
 }
 
 static void registerMiscRestHandlers(

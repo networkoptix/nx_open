@@ -424,7 +424,6 @@ TransportHeader deserializeTransportHeader(const QByteArray& response, int* byte
     QDataStream in(&buffer);
     QByteArray tmpBuffer;
     tmpBuffer.resize(kGuidSize);
-    vms::api::PersistentIdData fullId;
     quint32 size;
 
     if (in.atEnd())

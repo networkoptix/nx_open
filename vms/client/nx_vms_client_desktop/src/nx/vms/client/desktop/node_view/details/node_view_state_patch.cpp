@@ -19,7 +19,7 @@ void addNode(NodeViewStatePatch& patch, const NodePtr& node)
         patch.addAppendStep(parentPath, node->data());
     }
 
-    for (const auto child: node->children())
+    for (const auto& child: node->children())
         addNode(patch, child);
 }
 
@@ -130,7 +130,7 @@ NodeViewState&& NodeViewStatePatch::applyTo(
 
     const auto safeOperationGuard = getOperationGuard ? getOperationGuard : emptyNodeGuard;
 
-    for (const auto step: steps)
+    for (const auto& step: steps)
     {
         switch(step.operationData.operation)
         {

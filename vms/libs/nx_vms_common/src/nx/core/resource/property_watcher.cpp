@@ -93,7 +93,8 @@ void PropertyWatcher::at_resourcesRemoved(const QnResourceList& resources)
         emit propertyChanged();
 }
 
-void PropertyWatcher::at_propertyChanged(const QnResourcePtr& resource, const QString& propertyName)
+void PropertyWatcher::at_propertyChanged(const QnResourcePtr& /*resource*/,
+    const QString& propertyName)
 {
     {
         NX_MUTEX_LOCKER lock(&m_mutex);

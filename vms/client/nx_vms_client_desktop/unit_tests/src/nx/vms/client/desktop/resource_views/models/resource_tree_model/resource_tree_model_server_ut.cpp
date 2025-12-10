@@ -944,7 +944,7 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenMultipleResourcesR
     nx::utils::ScopedConnection c = QObject::connect(
         resourcePool(),
         &QnResourcePool::resourceRemoved,
-        [&](const QnResourcePtr& resource)
+        [&](const QnResourcePtr& /*resource*/)
         {
             // Resources are removed from pool before this signal is emitted.
             ASSERT_EQ(kUniqueEdgeServerName, edgeServer->getName());

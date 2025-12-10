@@ -465,7 +465,7 @@ void ScheduleGridWidget::mouseReleaseEvent(QMouseEvent* event)
 
     const auto connection = connect(this, &ScheduleGridWidget::gridDataChanged,
         this, &ScheduleGridWidget::gridDataEdited);
-    QScopeGuard connectionGuard([this, connection]{ disconnect(connection); });
+    QScopeGuard connectionGuard([connection]{ disconnect(connection); });
 
     if (d->selectedCellsRange)
     {

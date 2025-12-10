@@ -16,7 +16,7 @@ ThreadPool::Manager::~Manager()
     NX_MUTEX_LOCKER lk(&m_mutex);
     m_destroyed = true;
 
-    for (const auto pool: m_threadPools)
+    for (const auto& pool: m_threadPools)
         delete pool;
 }
 

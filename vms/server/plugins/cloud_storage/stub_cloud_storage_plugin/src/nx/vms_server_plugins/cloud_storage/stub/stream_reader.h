@@ -42,7 +42,6 @@ protected:
 private:
     std::shared_ptr<DataManager> m_dataManager;
     std::string m_deviceId;
-    int m_streamIndex = -1;
     const int64_t m_timestampUs;
     const int64_t m_durationUs;
     nx::sdk::Ptr<nx::sdk::List<nx::sdk::cloud_storage::ICodecInfo>> m_codecInfos;

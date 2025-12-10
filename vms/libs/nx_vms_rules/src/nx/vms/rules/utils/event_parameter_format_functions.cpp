@@ -207,7 +207,7 @@ QString eventAttributeName(SubstitutionContext* substitution)
     return substitution->name.sliced(kEventAttributesPrefix.size());
 }
 
-QString eventAttribute(SubstitutionContext* substitution, common::SystemContext* context)
+QString eventAttribute(SubstitutionContext* substitution, common::SystemContext* /*context*/)
 {
     using Attributes = nx::common::metadata::Attributes;
 
@@ -244,7 +244,7 @@ QString serverName(SubstitutionContext* substitution, common::SystemContext* con
     return {};
 }
 
-QString eventField(SubstitutionContext* substitution, common::SystemContext* context)
+QString eventField(SubstitutionContext* substitution, common::SystemContext* /*context*/)
 {
     return variantToString(substitution->event->property(
         substitution->name.sliced(kEventFieldsPrefix.size()).toUtf8()))

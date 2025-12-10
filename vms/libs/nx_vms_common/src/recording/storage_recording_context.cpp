@@ -284,7 +284,7 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
         metadataPacketData = nx::recording::helpers::serializeMetadataPacket(metadataPacket);
     }
 
-    if (streamIndex >= context.formatCtx->nb_streams)
+    if (streamIndex >= (int) context.formatCtx->nb_streams)
     {
         NX_WARNING(this, "Invalid media data packet: %1, failed to write it to file", md);
         return;
