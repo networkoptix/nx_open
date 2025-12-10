@@ -2,6 +2,8 @@
 
 #include "dewarping_image_filter.h"
 
+#include <numbers>
+
 #include <QtCore/QtMath>
 
 #include <nx/media/config.h>
@@ -13,11 +15,13 @@ using namespace nx::vms::api;
 
 namespace {
 
-static constexpr auto k360VRAspectRatio = 16.0 / 9.0;
+static constexpr auto k360VRAspectRatio = 16.0f / 9.0f;
+static constexpr auto kFloatPi = std::numbers::pi_v<float>;
 
 QVector3D operator*(const QMatrix3x3& m, const QVector3D& v)
 {
-    return QVector3D(m(0, 0) * v.x() + m(0, 1) * v.y() + m(0, 2) * v.z(),
+    return QVector3D(
+        m(0, 0) * v.x() + m(0, 1) * v.y() + m(0, 2) * v.z(),
         m(1, 0) * v.x() + m(1, 1) * v.y() + m(1, 2) * v.z(),
         m(2, 0) * v.x() + m(2, 1) * v.y() + m(2, 2) * v.z());
 }
@@ -279,15 +283,15 @@ void QnDewarpingImageFilter::updateDewarpingParameters(qreal aspectRatio)
         const float centerY = float(maxY * 0.5);
 
         const float cameraImageTransform[9]{
-            float(centerX / M_PI), 0.0f, centerX,
-            0.0f, float(centerY / M_PI * aspectRatio), centerY,
+            centerX / kFloatPi, 0.0f, centerX,
+            0.0f, float(centerY / kFloatPi * aspectRatio), centerY,
             0.0f, 0.0f, 1.0f};
 
         m_cameraImageTransform = QMatrix3x3(cameraImageTransform);
 
-        m_horizonCorrectionTransform.rotate(-m_mediaParams.sphereAlpha, 0, 0, 1);
-        m_horizonCorrectionTransform.rotate(-m_mediaParams.sphereBeta, 1, 0, 0);
-        m_horizonCorrectionTransform.rotate(m_mediaParams.sphereAlpha, 0, 0, 1);
+        m_horizonCorrectionTransform.rotate(-m_mediaParams.sphereAlpha, 0.f, 0.f, 1.f);
+        m_horizonCorrectionTransform.rotate(-m_mediaParams.sphereBeta, 1.f, 0.f, 0.f);
+        m_horizonCorrectionTransform.rotate(m_mediaParams.sphereAlpha, 0.f, 0.f, 1.f);
     }
     else
     {
@@ -419,17 +423,17 @@ QVector2D QnDewarpingImageFilter::cameraProject(const QVector3D& pointOnSphere) 
         case dewarping::CameraProjection::equidistant:
         {
             const float theta = acos(std::clamp(y, -1.0f, 1.0f));
-            return xz.normalized() * theta / (M_PI / 2);
+            return xz.normalized() * theta / (kFloatPi / 2.0f);
         }
 
         case dewarping::CameraProjection::stereographic:
         {
-            return xz / (1.0 + y);
+            return xz / (1.0f + y);
         }
 
         case dewarping::CameraProjection::equisolid:
         {
-            return xz / sqrt(1.0 + y);
+            return xz / sqrt(1.0f + y);
         }
 
         case dewarping::CameraProjection::equirectangular360:
@@ -445,14 +449,14 @@ QVector2D QnDewarpingImageFilter::cameraProject(const QVector3D& pointOnSphere) 
 
 QVector3D QnDewarpingImageFilter::viewUnproject(const QVector2D& viewCoords) const
 {
-    const auto viewProjection = m_itemParams.panoFactor > 1.0
+    const auto viewProjection = m_itemParams.panoFactor > 1
         ? dewarping::ViewProjection::equirectangular
         : dewarping::ViewProjection::rectilinear;
 
     switch (viewProjection)
     {
         case dewarping::ViewProjection::rectilinear:
-            return m_unprojectionTransform * QVector3D(viewCoords.x(), viewCoords.y(), 1.0);
+            return m_unprojectionTransform * QVector3D(viewCoords.x(), viewCoords.y(), 1.0f);
 
         case dewarping::ViewProjection::equirectangular:
         {
@@ -487,8 +491,8 @@ QSize QnDewarpingImageFilter::getOptimalSize(
         ? k360VRAspectRatio
         : itemParamsParams.panoFactor;
 
-    const int x = int(sqrt(square * aspect) + 0.5);
-    const int y = int(x / aspect + 0.5);
+    const int x = int(sqrt(square * aspect) + 0.5f);
+    const int y = int(x / aspect + 0.5f);
     return QSize(qPower2Floor(x, 16), qPower2Floor(y, 2));
 }
 

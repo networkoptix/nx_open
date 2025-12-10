@@ -222,9 +222,9 @@ int suggestBitrate(
     {
         // Increase bitrate due to bad quality of libopenh264 coding.
         if (strcmp(codecName, "mpeg4") == 0)
-            codecFactor = 1.2;
+            codecFactor = 1.2f;
         else if (strcmp(codecName, "libopenh264") == 0)
-            codecFactor = 4;
+            codecFactor = 4.0f;
     }
 
     int result = hiEnd * resolutionFactor * codecFactor;
