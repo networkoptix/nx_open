@@ -712,7 +712,7 @@
     </message>
     <message>
       <source>Edit Credentials</source>
-      <translation type="unfinished">Edit Credentials</translation>
+      <translation>Итгэмжлэх нууц үгийг засах</translation>
     </message>
     <message>
       <source>Audio</source>
@@ -2364,7 +2364,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Reindex Archive</source>
-      <translation type="unfinished">Reindex Archive</translation>
+      <translation>Дахин индекс архив</translation>
     </message>
     <message>
       <source>Reindex Backup</source>

@@ -1387,7 +1387,7 @@
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Захиалгат</translation>
     </message>
     <message>
       <source>Multiple groups</source>

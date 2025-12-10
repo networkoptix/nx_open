@@ -635,7 +635,7 @@
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
-      <translation type="unfinished">Any</translation>
+      <translation>Ямар ч</translation>
     </message>
   </context>
   <context>

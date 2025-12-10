@@ -1119,7 +1119,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Захиалгат</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
@@ -4598,7 +4598,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Захиалагдсан</translation>
     </message>
     <message>
       <source>local</source>
@@ -5155,7 +5155,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserRolesModel</name>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Захиалгат</translation>
     </message>
     <message>
       <source>Custom access rights</source>
@@ -11448,7 +11448,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Захиалгат</translation>
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
@@ -11543,7 +11543,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Захиалгат</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
@@ -12490,7 +12490,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Захиалгат</translation>
     </message>
   </context>
   <context>
