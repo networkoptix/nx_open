@@ -2,19 +2,20 @@
 
 #pragma once
 
-#include <QtQuick/QQuickImageProvider>
+#include <QtQuick/QQuickAsyncImageProvider>
 
 namespace nx::vms::client::mobile {
 
-class PushNotificationImageProvider: public QQuickImageProvider
+class PushNotificationImageProvider: public QQuickAsyncImageProvider
 {
 public:
     static constexpr auto id = "push_notification";
 
     PushNotificationImageProvider();
-    virtual QImage requestImage(const QString &imageId, QSize*, const QSize&) override;
 
-    static QString url(const QString& imageId);
+    virtual QQuickImageResponse* requestImageResponse(const QString& id, const QSize&) override;
+
+    static QString url(const QString& cloudSystemId, const QString& imageUrl);
 };
 
 } // namespace nx::vms::client::mobile

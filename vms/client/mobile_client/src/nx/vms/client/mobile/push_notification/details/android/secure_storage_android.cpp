@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "../secure_storage.h"
+#include "../utils.h"
 
 #include <QtCore/QString>
 
@@ -68,7 +69,7 @@ void SecureStorage::save(const std::string& key, const std::string& value)
         valueObject.object<jstring>());
 }
 
-std::optional<std::vector<std::byte>> SecureStorage::loadImage(const std::string& id) const
+std::optional<std::vector<std::byte>> SecureStorage::loadFile(const std::string& key) const
 {
     const auto context = std::any_cast<QJniObject>(&m_context);
     if (!context || !context->isValid())
@@ -77,13 +78,13 @@ std::optional<std::vector<std::byte>> SecureStorage::loadImage(const std::string
     static const auto kFunctionSignature = makeSignature(
         {JniSignature::kContext, JniSignature::kString}, JniSignature::kByteArray);
 
-    const auto pathObject = QJniObject::fromString(id.c_str());
+    const auto keyObject = QJniObject::fromString(QString::number(hash(key)));
     const QJniObject dataObject = QJniObject::callStaticObjectMethod(
         kStorageClass,
-        "loadImage",
+        "loadFile",
         kFunctionSignature.c_str(),
         context->object(),
-        pathObject.object<jstring>());
+        keyObject.object<jstring>());
 
     if (!dataObject.isValid())
         return std::nullopt;
@@ -98,7 +99,35 @@ std::optional<std::vector<std::byte>> SecureStorage::loadImage(const std::string
     return result;
 }
 
-void SecureStorage::removeImage(const std::string& id)
+void SecureStorage::saveFile(const std::string& key, const std::vector<std::byte>& data)
+{
+    const auto context = std::any_cast<QJniObject>(&m_context);
+    if (!context || !context->isValid())
+        return;
+
+    static const auto kFunctionSignature = makeVoidSignature(
+        {JniSignature::kContext, JniSignature::kString, JniSignature::kByteArray});
+
+    const auto keyObject = QJniObject::fromString(QString::number(hash(key)));
+
+    QJniEnvironment env;
+    const auto dataObject = QJniObject::fromLocalRef(env->NewByteArray(data.size()));
+    env->SetByteArrayRegion(
+        dataObject.object<jbyteArray>(),
+        0,
+        data.size(),
+        reinterpret_cast<const jbyte*>(data.data()));
+
+    QJniObject::callStaticMethod<void>(
+        kStorageClass,
+        "saveFile",
+        kFunctionSignature.c_str(),
+        context->object(),
+        keyObject.object<jstring>(),
+        dataObject.object<jbyteArray>());
+}
+
+void SecureStorage::removeFile(const std::string& key)
 {
     const auto context = std::any_cast<QJniObject>(&m_context);
     if (!context || !context->isValid())
@@ -107,14 +136,14 @@ void SecureStorage::removeImage(const std::string& id)
     static const auto kFunctionSignature = makeVoidSignature(
         {JniSignature::kContext, JniSignature::kString});
 
-    const auto pathObject = QJniObject::fromString(id.c_str());
+    const auto keyObject = QJniObject::fromString(QString::number(hash(key)));
 
     QJniObject::callStaticMethod<void>(
         kStorageClass,
-        "removeImage",
+        "removeFile",
         kFunctionSignature.c_str(),
         context->object(),
-        pathObject.object<jstring>());
+        keyObject.object<jstring>());
 }
 
 } // namespace nx::vms::client::mobile

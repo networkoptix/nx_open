@@ -174,8 +174,8 @@ struct PushNotificationStorage::Private
 
     void removeImage(const PushNotification& notification)
     {
-        if (!notification.imageId.empty())
-            storage->removeImage(notification.imageId);
+        if (!notification.imageUrl.empty())
+            storage->removeFile(/*key*/ notification.imageUrl);
     };
 };
 
@@ -191,7 +191,7 @@ std::string PushNotificationStorage::addUserNotification(
     const std::string& description,
     const std::string& url,
     const std::string& cloudSystemId,
-    const std::string& imageId)
+    const std::string& imageUrl)
 {
     if (auto data = d->load())
     {
@@ -206,7 +206,7 @@ std::string PushNotificationStorage::addUserNotification(
             .description = description,
             .url = url,
             .cloudSystemId = cloudSystemId,
-            .imageId = imageId,
+            .imageUrl = imageUrl,
             .time = time,
         },
         onRemoved);
@@ -238,9 +238,16 @@ void PushNotificationStorage::setIsRead(const std::string& user, const std::stri
     }
 }
 
-std::optional<std::vector<std::byte>> PushNotificationStorage::loadImage(const std::string& id)
+std::optional<std::vector<std::byte>> PushNotificationStorage::findImage(const std::string& url)
 {
-    return d->storage->loadImage(id);
+    return d->storage->loadFile(/*key*/ url);
+}
+
+void PushNotificationStorage::saveImage(
+    const std::string& url,
+    const std::vector<std::byte>& image)
+{
+    d->storage->saveFile(/*key*/ url, image);
 }
 
 PushNotificationStorage::~PushNotificationStorage()

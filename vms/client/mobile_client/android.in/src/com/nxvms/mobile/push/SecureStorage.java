@@ -11,6 +11,7 @@ import androidx.security.crypto.MasterKeys;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class SecureStorage
@@ -31,24 +32,43 @@ public class SecureStorage
             preferences.edit().putString(key, value).apply();
     }
 
-    public static byte[] loadImage(Context context, String path)
+    public static byte[] loadFile(Context context, String key)
     {
         try
         {
-            return Files.readAllBytes(Paths.get(path));
+            return Files.readAllBytes(getPath(context, key));
         }
         catch (IOException e)
         {
-            Logger.error(kLogTag, String.format("Failed to load file %s: %s" , path, e));
+            Logger.error(kLogTag, String.format("Failed to load file: %s", e));
             return null;
         }
     }
 
-    public static void removeImage(Context context, String path)
+    public static void saveFile(Context context, String key, byte[] data)
     {
-        File file = new File(path);
+        try
+        {
+            Path path = getPath(context, key);
+            Files.createDirectories(path.getParent());
+            Files.write(path, data);
+        }
+        catch (IOException e)
+        {
+            Logger.error(kLogTag, String.format("Failed to save file: %s" , e));
+        }
+    }
+
+    public static void removeFile(Context context, String key)
+    {
+        File file = getPath(context, key).toFile();
         if (!file.delete())
-            Logger.error(kLogTag, String.format("Failed to delete file %s" , path));
+            Logger.error(kLogTag, "Failed to delete file");
+    }
+
+    private static Path getPath(Context context, String key)
+    {
+        return Paths.get(context.getFilesDir().getAbsolutePath() + "/secure_storage/" + key);
     }
 
     private static SharedPreferences getPreferences(Context context)
@@ -65,9 +85,7 @@ public class SecureStorage
         }
         catch (Exception e)
         {
-            Logger.error(kLogTag, String.format(
-                "Failed to create shared preferences '%s': %s", kPreferencesFileName, e));
-
+            Logger.error(kLogTag, String.format("Failed to create shared preferences: %s", e));
             return null;
         }
     }

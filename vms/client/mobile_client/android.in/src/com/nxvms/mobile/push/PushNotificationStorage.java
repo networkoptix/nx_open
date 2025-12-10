@@ -16,5 +16,7 @@ public class PushNotificationStorage
         String description,
         String url,
         String cloudSystemId,
-        String imageId);
+        String imageUrl);
+
+    public static native void saveImage(Context context, String url, byte[] image);
 }
