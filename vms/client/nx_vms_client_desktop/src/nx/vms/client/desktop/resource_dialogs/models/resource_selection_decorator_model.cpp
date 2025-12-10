@@ -4,9 +4,9 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
-#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
-#include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
+#include <nx/vms/client/core/common/models/item_model_algorithm.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 
 namespace {
 
@@ -43,7 +43,7 @@ ResourceSelectionDecoratorModel::ResourceSelectionDecoratorModel(
         [this]
         {
             m_resourceMapping.clear();
-            const auto leafIndexes = item_model::getLeafIndexes(this, QModelIndex());
+            const auto leafIndexes = core::item_model::getLeafIndexes(this, QModelIndex());
             for (const auto& leafIndex: leafIndexes)
             {
                 const auto resource = leafIndex.data(core::ResourceRole).value<QnResourcePtr>();
@@ -88,7 +88,8 @@ QVariant ResourceSelectionDecoratorModel::data(const QModelIndex& index, int rol
     const auto groupCheckState =
         [this](const QModelIndex& resourceIndex)
         {
-            const auto resources = getResources(item_model::getLeafIndexes(this, resourceIndex));
+            const auto resources = getResources(
+                core::item_model::getLeafIndexes(this, resourceIndex));
             if (m_selectedResources.contains(resources))
                 return Qt::Checked;
 
@@ -206,7 +207,7 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
                 return false;
 
             QSet<QnResourcePtr> childResources;
-            const auto leafIndexes = item_model::getLeafIndexes(this, index);
+            const auto leafIndexes = core::item_model::getLeafIndexes(this, index);
             for (const auto& leafIndex: leafIndexes)
             {
                 const auto childResource = leafIndex.data(core::ResourceRole).value<QnResourcePtr>();

@@ -12,11 +12,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/utils.h>
 #include <nx/utils/scoped_change_notifier.h>
+#include <nx/vms/client/core/common/models/item_model_algorithm.h>
 #include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
@@ -779,7 +779,7 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
 std::set<nx::Uuid> BackupSettingsDecoratorModel::backupEnabledCameras() const
 {
     std::set<nx::Uuid> result;
-    const auto leafIndexes = item_model::getLeafIndexes(this);
+    const auto leafIndexes = core::item_model::getLeafIndexes(this);
     for (const auto& index: leafIndexes)
     {
         const auto camera = cameraResource(index);
@@ -879,7 +879,7 @@ void BackupSettingsDecoratorModel::fixBackupContentTypesForCloudStorage()
     if (!d->isCloudBackupStorage)
         return;
 
-    const auto leafIndexes = item_model::getLeafIndexes(this);
+    const auto leafIndexes = core::item_model::getLeafIndexes(this);
     QModelIndexList camerasIndexes;
     std::copy_if(leafIndexes.cbegin(), leafIndexes.cend(), std::back_inserter(camerasIndexes),
         [this](const QModelIndex& index)

@@ -19,14 +19,14 @@
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/common/models/filter_proxy_model.h>
+#include <nx/vms/client/core/common/models/item_model_algorithm.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
-#include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -412,10 +412,10 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
                 return result;
 
             const auto filterLeafChildrenCount =
-                item_model::getLeafIndexes(filterModel, filterIndex).size();
+                core::item_model::getLeafIndexes(filterModel, filterIndex).size();
 
             const auto sourceLeafChildrenCount =
-                item_model::getLeafIndexes(sourceIndex.model(), sourceIndex).size();
+                core::item_model::getLeafIndexes(sourceIndex.model(), sourceIndex).size();
 
             const bool fullMatch = filterLeafChildrenCount == sourceLeafChildrenCount;
             result.setArgument(Qn::SelectedGroupFullyMatchesFilter, fullMatch);

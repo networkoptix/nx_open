@@ -21,11 +21,11 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/common/models/item_model_algorithm.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_composer.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_drag_drop_decorator_model.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_edit_delegate.h>
@@ -243,7 +243,7 @@ struct ResourceTreeModelAdapter::Private
                 bool hasLayoutEntities = false; //< Has entities openable as workbench layouts.
                 bool hasNotOpenableItems = false;
 
-                const auto indexes = item_model::getAllIndexes(q, rootIndex);
+                const auto indexes = core::item_model::getAllIndexes(q, rootIndex);
                 for (const auto& index: indexes)
                 {
                     if ((hasResources && hasLayoutEntities) || hasNotOpenableItems)
@@ -635,7 +635,7 @@ void ResourceTreeModelAdapter::activateSearchResults(Qt::KeyboardModifiers modif
         return;
 
     d->interactionHandler->activateSearchResults(
-        item_model::getLeafIndexes(this, d->rootIndex),
+        core::item_model::getLeafIndexes(this, d->rootIndex),
         modifiers);
 }
 

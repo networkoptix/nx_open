@@ -10,7 +10,7 @@
 #include <QtWidgets/QScrollBar>
 
 #include <nx/utils/scope_guard.h>
-#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
+#include <nx/vms/client/core/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <utils/common/variant.h>
 
@@ -246,7 +246,7 @@ void TreeView::collapseRecursively(const QModelIndex& index)
     if (!NX_ASSERT(index.model() == model(), "Invalid index: wrong model"))
         return;
 
-    const auto nonLeafIndexes = item_model::getNonLeafIndexes(model(), index);
+    const auto nonLeafIndexes = core::item_model::getNonLeafIndexes(model(), index);
     collapse(index);
     for (const auto& index: nonLeafIndexes)
         collapse(index);
