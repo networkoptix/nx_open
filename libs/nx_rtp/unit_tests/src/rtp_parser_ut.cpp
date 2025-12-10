@@ -96,3 +96,25 @@ TEST(RtpParser, JpegHeaderExtensionfAfterOnvifExtension)
     ASSERT_TRUE(parser.processData(data, 0, sizeof(data), packetLost, gotData).success);
     ASSERT_TRUE(extensionParsed);
 }
+
+
+TEST(RtpParser, InvialidOnvifExtension)
+{
+    bool packetLost = false;
+    bool gotData = false;
+    auto codecParser = std::make_unique<MockStreamParser>();
+    codecParser->rtpExtensionHandler =
+        [](const nx::rtp::RtpHeaderExtensionHeader&, quint8*, int)
+        {
+            // Should not be called. Header is broken.
+            ASSERT_TRUE(false);
+        };
+    nx::rtp::RtpParser parser(96, std::move(codecParser));
+    uint8_t data[] = {
+        0x90, 0x60, 0xef, 0xeb, 0x00, 0x01, 0x88, 0xda, 0x81, 0x46, 0x30, 0xa5, // RTP headers
+        0xab, 0xac, 0x00, 0x02, 0xec, 0xaf, 0x68, 0x9a, 0xd3, 0xbd, 0x16, 0x76, // Broken extension(8 byte)
+        0x5c, 0x81, 0xe0, 0x33, 0xe4, 0xac, 0x3b, 0xc1, 0x27, 0x1c, 0x22, 0xde, 0x71, 0x35, 0x22,
+        0x75, 0xba, 0x95, 0x00, 0x6c, 0x45, 0xe1, 0x03, 0x92 };
+
+    ASSERT_TRUE(parser.processData(data, 0, sizeof(data), packetLost, gotData).success);
+}
