@@ -40,8 +40,6 @@ public:
          * The empty value leaves the default protocol set.
          */
         std::string allowedSslVersions;
-
-        bool allowEcdsaCertificates = false;
     };
 
     static constexpr int kDefaultTcpBacklogSize = 128;

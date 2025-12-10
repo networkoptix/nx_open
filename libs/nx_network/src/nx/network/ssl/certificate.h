@@ -253,8 +253,7 @@ public:
 
     bool parse(
         const std::string& str,
-        std::string* errorMessage = nullptr,
-        bool allowEcdsaCertificates = false);
+        std::string* errorMessage = nullptr);
 
     bool bindToContext(SSL_CTX* sslContext, std::string* errorMessage = nullptr) const;
 
@@ -268,8 +267,7 @@ public:
 private:
     bool loadPrivateKey(
         const std::string& pem,
-        std::string* errorMessage = nullptr,
-        bool allowEcdsaCertificates = false);
+        std::string* errorMessage = nullptr);
 
 private:
     X509Certificate m_certificate;
