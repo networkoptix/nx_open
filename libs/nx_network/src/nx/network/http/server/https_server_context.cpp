@@ -51,7 +51,7 @@ void HttpsServerContext::loadCertificate(bool isMonitoringEnabled)
     }
     auto certData = file.readAll().toStdString();
 
-    if (!m_sslContext->setDefaultCertificate(certData, m_settings.allowEcdsaCertificates))
+    if (!m_sslContext->setDefaultCertificate(certData))
     {
         const auto error = nx::format("Failed to load certificate from '%1'")
             .args(m_settings.certificatePath).toStdString();

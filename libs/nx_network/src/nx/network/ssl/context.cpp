@@ -118,10 +118,10 @@ const std::string_view& Context::sslSessionId()
     return kSslSessionId;
 }
 
-bool Context::setDefaultCertificate(const std::string& pemStr, bool allowEcdsaCertificates)
+bool Context::setDefaultCertificate(const std::string& pemStr)
 {
     Pem pem;
-    if (!pem.parse(pemStr, nullptr, allowEcdsaCertificates))
+    if (!pem.parse(pemStr))
         return false;
 
     return setDefaultCertificate(pem);
