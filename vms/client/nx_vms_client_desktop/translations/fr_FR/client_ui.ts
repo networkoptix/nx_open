@@ -2333,7 +2333,7 @@
     </message>
     <message>
       <source>Forecast for Full Storage Usage</source>
-      <translation>Prévisions de l'utilisation complet du stockage</translation>
+      <translation>Prévisions de l’utilisation complète du stockage</translation>
     </message>
     <message>
       <source>Server is offline. Statistics are not available.</source>

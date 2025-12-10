@@ -1843,7 +1843,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Захиалгат</translation>
     </message>
     <message>
       <source>No custom groups yet</source>
@@ -1883,7 +1883,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Custom</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">Custom</translation>
+      <translation>Захиалгат</translation>
     </message>
   </context>
   <context>
