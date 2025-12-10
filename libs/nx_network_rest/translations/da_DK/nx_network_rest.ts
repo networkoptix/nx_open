@@ -166,7 +166,7 @@
     </message>
     <message>
       <source>Insufficient storage.</source>
-      <translation type="unfinished">Insufficient storage.</translation>
+      <translation>Utilstrækkelig lagerplads.</translation>
     </message>
   </context>
 </TS>

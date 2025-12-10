@@ -166,7 +166,7 @@
     </message>
     <message>
       <source>Insufficient storage.</source>
-      <translation type="unfinished">Insufficient storage.</translation>
+      <translation>Niewystarczająca ilość miejsca do przechowywania.</translation>
     </message>
   </context>
 </TS>
