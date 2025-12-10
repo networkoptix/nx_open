@@ -33,7 +33,6 @@ typedef struct
     uint64_t two;
 } simd128;
 
-
 } // namespace
 
 std::vector<std::string> split(const std::string& original, const std::string& separator)
@@ -126,7 +125,7 @@ std::vector<uint8_t> fromBase64(const std::string& data)
         };
 
     std::vector<uint8_t> result;
-    result.reserve(std::round(data.size() * 0.8f));
+    result.reserve(std::lround(data.size() * 0.8f));
     int8_t decoded = 0;
     while (true)
     {
@@ -179,7 +178,7 @@ std::string toBase64(const uint8_t* data, int size)
     enum class State { one, two, three } state = State::one;
     std::string result;
     result.reserve((size_t) (size * 1.5f));
-    char c;
+    char c = 0;
     int index = 0;
     while (true)
     {

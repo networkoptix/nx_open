@@ -56,13 +56,14 @@ std::optional<std::string> getOptionalStringValue(
     return value.string_value();
 }
 
-int64_t getIntValue(const nx::kit::Json& json, const std::string& key)
+template<typename ResultType = int64_t>
+ResultType getIntValue(const nx::kit::Json& json, const std::string& key)
 {
     const auto value = json[key];
     if (!value.is_number())
         throw std::logic_error("Value '" + key + "' is not a number");
 
-    return (int64_t) value.number_value();
+    return static_cast<ResultType>(value.number_value());
 }
 
 double getDoubleValue(const nx::kit::Json& json, const std::string& key)
@@ -628,21 +629,21 @@ CodecInfoData::CodecInfoData(const char* jsonData): CodecInfoData(parseJson(json
 
 CodecInfoData::CodecInfoData(const nx::kit::Json& json)
 {
-    compressionType = (nxcip::CompressionType) getIntValue(json, "compressionType");
-    pixelFormat = (nxcip::PixelFormat) getIntValue(json, "pixelFormat");
-    mediaType = (nxcip::MediaType) getIntValue(json, "mediaType");
-    width = getIntValue(json, "width");
-    height = getIntValue(json, "height");
+    compressionType = getIntValue<nxcip::CompressionType>(json, "compressionType");
+    pixelFormat = getIntValue<nxcip::PixelFormat>(json, "pixelFormat");
+    mediaType = getIntValue< nxcip::MediaType>(json, "mediaType");
+    width = getIntValue<int>(json, "width");
+    height = getIntValue<int>(json, "height");
     codecTag = getIntValue(json, "codecTag");
     bitRate = getIntValue(json, "bitRate");
-    channels = getIntValue(json, "channels");
-    frameSize = getIntValue(json, "frameSize");
-    blockAlign = getIntValue(json, "blockAlign");
-    sampleRate = getIntValue(json, "sampleRate");
-    sampleFormat = (nxcip::SampleFormat) getIntValue(json, "sampleFormat");
-    bitsPerCodedSample = getIntValue(json, "bitsPerCodedSample");
+    channels = getIntValue<int>(json, "channels");
+    frameSize = getIntValue<int>(json, "frameSize");
+    blockAlign = getIntValue<int>(json, "blockAlign");
+    sampleRate = getIntValue<int>(json, "sampleRate");
+    sampleFormat = getIntValue<nxcip::SampleFormat>(json, "sampleFormat");
+    bitsPerCodedSample = getIntValue<int>(json, "bitsPerCodedSample");
     channelLayout = getIntValue(json, "channelLayout");
-    channelNumber = getIntValue(json, "channelNumber");
+    channelNumber = getIntValue<int>(json, "channelNumber");
     extradataBase64 = getStringValue(json, "extradataBase64");
 }
 
