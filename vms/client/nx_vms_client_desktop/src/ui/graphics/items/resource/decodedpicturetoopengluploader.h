@@ -218,8 +218,6 @@ public:
     */
     bool uploadDataToGl(
         UploadedPicture* const dest, const CLConstVideoDecoderOutputPtr& frame);
-    bool renderVideoMemory(
-        UploadedPicture* const dest, const CLConstVideoDecoderOutputPtr& frame);
 private:
     friend class QnGlRendererTexture;
     friend class DecodedPicturesDeleter;

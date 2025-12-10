@@ -31,19 +31,7 @@ inline void pixSort(quint8& a, quint8& b)
     if (a > b)
         std::swap(a, b);
 }
-/*
-quint8 opt_med5(quint8* p)
-{
-    pixSort(p[0], p[1]);
-    pixSort(p[3], p[4]);
-    pixSort(p[0], p[3]);
-    pixSort(p[1], p[4]);
-    pixSort(p[1], p[2]);
-    pixSort(p[2], p[3]);
-    pixSort(p[1], p[2]);
-    return(p[2]);
-}
-*/
+
 quint8 opt_med9(quint8* p)
 {
     pixSort(p[1], p[2]);

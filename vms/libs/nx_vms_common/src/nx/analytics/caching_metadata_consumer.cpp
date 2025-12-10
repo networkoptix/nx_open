@@ -236,7 +236,7 @@ QnConstAbstractCompressedMetadataPtr MetadataCache<QnConstAbstractCompressedMeta
 
 template<>
 QnConstAbstractCompressedMetadataPtr MetadataCache<QnConstAbstractCompressedMetadataPtr>::uncompress(
-    const QnAbstractCompressedMetadataPtr& metadata)
+    const QnAbstractCompressedMetadataPtr& /*metadata*/)
 {
     NX_ASSERT(false, "Should never be called");
     return nullptr;

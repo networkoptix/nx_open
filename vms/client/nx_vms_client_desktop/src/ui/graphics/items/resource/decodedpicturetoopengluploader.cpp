@@ -1196,13 +1196,6 @@ nx::vms::api::ImageCorrectionData DecodedPictureToOpenGLUploader::getImageCorrec
     return m_imageCorrection;
 }
 
-bool DecodedPictureToOpenGLUploader::renderVideoMemory(
-    DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
-    const CLConstVideoDecoderOutputPtr& frame)
-{
-    return false;
-}
-
 uchar* DecodedPictureToOpenGLUploader::convertYuvToRgb(
     const AVPixelFormat format,
     const unsigned int width,
@@ -1269,7 +1262,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         }
 
         if (frame->memoryType() == MemoryType::VideoMemory)
-            return renderVideoMemory(emptyPictureBuf, frame);
+            return false; // Already not supported.
     }
     else
     {
