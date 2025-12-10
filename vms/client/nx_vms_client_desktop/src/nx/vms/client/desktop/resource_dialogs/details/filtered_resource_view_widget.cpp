@@ -8,7 +8,7 @@
 #include <QtGui/QAction>
 
 #include <core/resource/resource.h>
-#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
+#include <nx/vms/client/core/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/resource_dialog_item_selection_model.h>
@@ -284,7 +284,7 @@ void FilteredResourceViewWidget::setupFilter()
             if (filterString.isEmpty() && !newFilterString.isEmpty())
             {
                 const auto nonLeafSourceIndexes =
-                    item_model::getNonLeafIndexes(m_filterProxyModel->sourceModel());
+                    core::item_model::getNonLeafIndexes(m_filterProxyModel->sourceModel());
                 for (const auto& sourceIndex: nonLeafSourceIndexes)
                 {
                     if (treeView()->isExpanded(toViewIndex(sourceIndex)))
@@ -434,7 +434,7 @@ void FilteredResourceViewWidget::makeRequiredItemsVisible() const
 
     QSet<QModelIndex> indexesToExpand;
 
-    const auto allIndexes = item_model::getAllIndexes(treeView()->model());
+    const auto allIndexes = core::item_model::getAllIndexes(treeView()->model());
     for (const auto& index: allIndexes)
     {
         if (!m_visibleItemPredicate(index))

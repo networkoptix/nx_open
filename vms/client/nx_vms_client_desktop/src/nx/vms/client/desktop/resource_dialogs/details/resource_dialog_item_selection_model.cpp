@@ -2,7 +2,7 @@
 
 #include "resource_dialog_item_selection_model.h"
 
-#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
+#include <nx/vms/client/core/common/models/item_model_algorithm.h>
 
 namespace nx::vms::client::desktop {
 
@@ -35,8 +35,8 @@ void ResourceDialogItemSelectionModel::select(
         if (model()->rowCount(index.siblingAtColumn(kTreeColumnIndex)) > 0)
         {
             extendedSelectionNodeIndexes.insert(index.siblingAtColumn(kTreeColumnIndex));
-            const auto childNodeIndexes =
-                item_model::getNonLeafIndexes(model(), index.siblingAtColumn(kTreeColumnIndex));
+            const auto childNodeIndexes = core::item_model::getNonLeafIndexes(
+                model(), index.siblingAtColumn(kTreeColumnIndex));
             for (const auto& childIndex: childNodeIndexes)
                 extendedSelectionNodeIndexes.insert(childIndex);
         }

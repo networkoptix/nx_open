@@ -7,10 +7,10 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
+#include <nx/vms/client/core/common/models/item_model_algorithm.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
-#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
@@ -211,7 +211,7 @@ bool DetailedResourceTreeWidget::isEmpty() const
 
 int DetailedResourceTreeWidget::resourceCount()
 {
-    const auto leafIndexes = item_model::getLeafIndexes(m_entityModel.get(), QModelIndex());
+    const auto leafIndexes = core::item_model::getLeafIndexes(m_entityModel.get(), QModelIndex());
     QSet<QnResourcePtr> resourcesSet;
     resourcesSet.reserve(leafIndexes.size());
     for (const auto& leafIndex: leafIndexes)

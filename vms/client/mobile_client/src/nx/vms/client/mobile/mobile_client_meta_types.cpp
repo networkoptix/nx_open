@@ -30,6 +30,8 @@
 #include <nx/vms/client/mobile/event_search/models/parameters_visualization_model.h>
 #include <nx/vms/client/mobile/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/mobile/maintenance/remote_log_manager.h>
+#include <nx/vms/client/mobile/models/resource_tree_model.h>
+#include <nx/vms/client/mobile/models/resource_tree_search_model.h>
 #include <nx/vms/client/mobile/push_notification/details/push_systems_selection_model.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_model.h>
@@ -94,6 +96,12 @@ void registerQmlTypes()
 
     qmlRegisterType<NetworkInterfaceWatcher>(
         "nx.vms.client.mobile", 1, 0, "NetworkInterfaceWatcher");
+
+    qmlRegisterType<nx::vms::client::mobile::ResourceTreeModel>(
+        "nx.vms.client.mobile", 1, 0, "ResourceTreeModel");
+
+    qmlRegisterType<nx::vms::client::mobile::ResourceTreeSearchModel>(
+        "nx.vms.client.mobile", 1, 0, "ResourceTreeSearchModel");
 
     core::CloudUrlHelper::registerSingletonType(
         utils::SystemUri::ReferralSource::MobileClient,

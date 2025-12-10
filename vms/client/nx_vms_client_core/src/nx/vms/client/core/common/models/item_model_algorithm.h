@@ -6,7 +6,7 @@
 
 class QAbstractItemModel;
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace item_model {
 
 // TODO: #vbreus Bring here all item model related, implementation independent helpers scattered
@@ -16,7 +16,7 @@ namespace item_model {
  * Return all indexes referred to items with at least one child within subtree with root item with
  * <tt>parent</tt> index. Root item itself is not included.
  */
-NX_VMS_CLIENT_DESKTOP_API QModelIndexList getNonLeafIndexes(
+NX_VMS_CLIENT_CORE_API QModelIndexList getNonLeafIndexes(
     const QAbstractItemModel* model,
     const QModelIndex& parent = QModelIndex());
 
@@ -24,7 +24,7 @@ NX_VMS_CLIENT_DESKTOP_API QModelIndexList getNonLeafIndexes(
  * Return all indexes referred to childless items within subtree with root item with
  * <tt>parent</tt> index. Root item itself is not included.
  */
-NX_VMS_CLIENT_DESKTOP_API QModelIndexList getLeafIndexes(
+NX_VMS_CLIENT_CORE_API QModelIndexList getLeafIndexes(
     const QAbstractItemModel* model,
     const QModelIndex& parent = QModelIndex());
 
@@ -32,9 +32,9 @@ NX_VMS_CLIENT_DESKTOP_API QModelIndexList getLeafIndexes(
  * Return all indexes within subtree with root item with <tt>parent</tt> index as a flat list.
  * Root item itself is not included.
  */
-NX_VMS_CLIENT_DESKTOP_API QModelIndexList getAllIndexes(
+NX_VMS_CLIENT_CORE_API QModelIndexList getAllIndexes(
     const QAbstractItemModel* model,
     const QModelIndex& parent = QModelIndex());
 
 } // namespace item_model
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

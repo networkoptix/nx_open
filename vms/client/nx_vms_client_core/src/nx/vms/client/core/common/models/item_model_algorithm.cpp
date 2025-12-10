@@ -2,7 +2,7 @@
 
 #include "item_model_algorithm.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace item_model {
 
 QModelIndexList getNonLeafIndexes(const QAbstractItemModel* model, const QModelIndex& parent)
@@ -51,4 +51,4 @@ QModelIndexList getAllIndexes(const QAbstractItemModel* model, const QModelIndex
 }
 
 } // namespace item_model
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core
