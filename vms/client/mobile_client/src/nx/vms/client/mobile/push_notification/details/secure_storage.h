@@ -24,8 +24,9 @@ public:
     std::optional<std::string> load(const std::string& key) const;
     void save(const std::string& key, const std::string& value);
 
-    std::optional<std::vector<std::byte>> loadImage(const std::string& id) const;
-    void removeImage(const std::string& id);
+    std::optional<std::vector<std::byte>> loadFile(const std::string& key) const;
+    void saveFile(const std::string& key, const std::vector<std::byte>& data);
+    void removeFile(const std::string& key);
 
 private:
     std::any m_context;

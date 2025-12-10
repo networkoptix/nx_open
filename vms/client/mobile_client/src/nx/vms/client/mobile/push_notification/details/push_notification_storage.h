@@ -21,14 +21,14 @@ struct PushNotification
     std::string description;
     std::string url;
     std::string cloudSystemId;
-    std::string imageId;
+    std::string imageUrl;
     std::chrono::milliseconds time;
     bool isRead = false;
 
     bool operator==(const PushNotification&) const = default;
 };
 NX_REFLECTION_INSTRUMENT(PushNotification,
-    (id)(time)(title)(description)(url)(cloudSystemId)(imageId)(isRead))
+    (id)(time)(title)(description)(url)(cloudSystemId)(imageUrl)(isRead))
 
 class PushNotificationStorage
 {
@@ -37,7 +37,8 @@ public:
     ~PushNotificationStorage();
 
     std::vector<PushNotification> userNotifications(const std::string& user);
-    std::optional<std::vector<std::byte>> loadImage(const std::string& id);
+    std::optional<std::vector<std::byte>> findImage(const std::string& url);
+    void saveImage(const std::string& url, const std::vector<std::byte>& image);
     void setIsRead(const std::string& user, const std::string& id, bool value);
     std::string addUserNotification(
         const std::string& user,
@@ -45,7 +46,7 @@ public:
         const std::string& description,
         const std::string& url,
         const std::string& cloudSystemId,
-        const std::string& imageId);
+        const std::string& imageUrl);
 
 private:
     struct Private;

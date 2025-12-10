@@ -11,7 +11,6 @@
 #include <nx/vms/client/mobile/push_notification/details/push_ipc_data.h>
 #include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
 
-#include "utils/ipc_access_group.h"
 #include "utils/helpers.h"
 #include "utils/logger.h"
 
@@ -24,8 +23,6 @@ namespace {
 
 static const auto kAccessErrorText = @"No access to this information.";
 static const int kNotFoundHttpError = 404;
-static const auto kApplicationGroup =
-    [NSString stringWithUTF8String: nx::vms::client::mobile::details::kApplicationGroup];
 
 using namespace extension::helpers;
 
@@ -274,10 +271,10 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
 @property(nonatomic) std::string password;
 @property(nonatomic) std::string cloudRefreshToken;
 @property(nonatomic) std::string cloudSystemId;
-@property(nonatomic) std::string imageUrl;
+@property(nonatomic) NSString* imageUrl;
 - (bool) initialize: (NSString*) targets;
-- (void) showNotification: (NSString*) imageUrl;
-- (void) showNotificatoinWithImage: (NSString*) imageUrl withMethod: (AuthMethod) method;
+- (void) showNotification;
+- (void) showNotificatoinWithImage: (AuthMethod) method;
 - (void) saveNotificationImage: (NSURL*) sourceUrl;
 - (void) saveNotification;
 @end
@@ -298,6 +295,7 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
 
     const bool allowNotification = [self initialize: data[@"targets"]];
     self.cloudSystemId = std::string([data[@"systemId"] UTF8String]);
+    self.imageUrl = data[@"imageUrl"];
 
     if (allowNotification)
     {
@@ -311,7 +309,7 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
     }
 
     if (allowNotification)
-        [self showNotification: data[@"imageUrl"]];
+        [self showNotification];
     else //< Since we can't prevent notification popup in iOS we just show it with restricted data.
         [self serviceExtensionTimeWillExpire];
 }
@@ -362,17 +360,17 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
     return isInTargets;
 }
 
-- (void)showNotification: (NSString*) imageUrl
+- (void)showNotification
 {
     auto tokenInfo = PushIpcData::accessToken(self.cloudSystemId);
 
-    const NSURL* serverUrl = urlFromHostAndPath([NSURL URLWithString: imageUrl], @"");
+    const NSURL* serverUrl = urlFromHostAndPath([NSURL URLWithString: self.imageUrl], @"");
     AccessTokenStatus status = systemAccessTokenStatus(tokenInfo.accessToken, serverUrl);
 
     if (status == AccessTokenStatus::unsupported)
     {
         // 4.2 and below servers do not support token authorization.
-        [self showNotificatoinWithImage: imageUrl withMethod: AuthMethod::digest];
+        [self showNotificatoinWithImage: AuthMethod::digest];
         return;
     }
 
@@ -391,21 +389,21 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
     PushIpcData::setAccessToken(self.cloudSystemId, tokenInfo.accessToken, tokenInfo.expiresAt);
 
     if (!tokenInfo.accessToken.empty()) //< Definitely supports OAuth.
-        [self showNotificatoinWithImage: imageUrl withMethod: AuthMethod::bearer];
+        [self showNotificatoinWithImage: AuthMethod::bearer];
     else if (status == AccessTokenStatus::unsupported) //< Try to use digest authorization.
-        [self showNotificatoinWithImage: imageUrl withMethod: AuthMethod::digest];
+        [self showNotificatoinWithImage: AuthMethod::digest];
     else
         [self serviceExtensionTimeWillExpire];
 }
 
-- (void)showNotificatoinWithImage: (NSString*) imageUrl withMethod: (AuthMethod) method
+- (void)showNotificatoinWithImage: (AuthMethod) method
 {
     static const NSString* kLogTag = @"show notification with image";
 
     extension::Logger::log(kLogTag, [NSString stringWithFormat:
         @"trying to show notification with an image, auth method is %d.", method]);
 
-    if (!imageUrl || !imageUrl.length)
+    if (!self.imageUrl || !self.imageUrl.length)
     {
         extension::Logger::log(kLogTag, @"no image url presented.");
         [self serviceExtensionTimeWillExpire];
@@ -460,7 +458,7 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
             dispatch_semaphore_signal(semaphore);
         };
 
-    NSURL* url = [NSURL URLWithString: imageUrl];
+    NSURL* url = [NSURL URLWithString: self.imageUrl];
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL: url];
 
     const NSURLSessionDownloadTask* task = [session
@@ -488,25 +486,19 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
 {
     static const NSString* kLogTag = @"save notification image";
 
-    const auto fileManager = [NSFileManager defaultManager];
-    const auto sharedContainerUrl = [fileManager containerURLForSecurityApplicationGroupIdentifier: kApplicationGroup];
-    const auto directory = [sharedContainerUrl URLByAppendingPathComponent: @"push_notifications" isDirectory: YES];
-    const auto uniqueName = [[NSProcessInfo processInfo] globallyUniqueString];
-    const auto fileName = [NSString stringWithFormat: @"%@%@", uniqueName, @".png"];
-    const auto imageUrl = [directory URLByAppendingPathComponent: fileName];
+    NSData* data = [NSData dataWithContentsOfURL: sourceUrl];
+    if (!data)
+    {
+        extension::Logger::log(kLogTag, @"Failed to load image.");
+        return;
+    }
 
-    NSError* error = nil;
-    [fileManager createDirectoryAtURL: directory withIntermediateDirectories: true attributes: nil error: &error];
+    const auto ptr = static_cast<const std::byte*>([data bytes]);
+    std::vector<std::byte> image{ptr, ptr + data.length};
 
-    if (error)
-        extension::Logger::log(kLogTag, @"Failed to save image.");
-
-    [fileManager copyItemAtURL: sourceUrl toURL: imageUrl error: &error];
-
-    if (error)
-        extension::Logger::log(kLogTag, @"Failed to save image.");
-
-    self.imageUrl = std::string([imageUrl.path UTF8String]);
+    auto secureStorage = std::make_shared<SecureStorage>();
+    PushNotificationStorage notificationStorage{secureStorage};
+    notificationStorage.saveImage([self.imageUrl UTF8String], image);
 }
 
 - (void)saveNotification
@@ -523,7 +515,7 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
         [self.content.body UTF8String],
         url ? [url UTF8String] : "",
         self.cloudSystemId,
-        self.imageUrl);
+        [self.imageUrl UTF8String]);
 
     NSURLComponents* newUrl = [NSURLComponents componentsWithString: url];
 

@@ -44,17 +44,18 @@ QVariant PushNotificationModel::data(const QModelIndex& index, int role) const
             return QString::fromStdString(item.description);
 
         case ImageRole:
-            return item.imageId.empty()
+            return item.imageUrl.empty()
                 ? ""
-                : PushNotificationImageProvider::url(QString::fromStdString(item.imageId));
+                : PushNotificationImageProvider::url(
+                    QString::fromStdString(item.cloudSystemId),
+                    QString::fromStdString(item.imageUrl));
 
         case SourceRole:
         {
-            if (auto context = appContext()->cloudCrossSystemManager()->systemContext(
-                QString::fromStdString(item.cloudSystemId)))
-            {
-                return context->systemDescription()->name();
-            }
+            auto context = appContext()->cloudCrossSystemManager()->systemContext(
+                QString::fromStdString(item.cloudSystemId));
+
+            return context ? context->systemDescription()->name() : "";
         }
 
         case TimeRole:

@@ -11,6 +11,7 @@ import com.nxvms.mobile.utils.PushNotificationStorage;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.Exception;
@@ -69,7 +70,6 @@ public class PushMessageManager
         public String url;
         public String cloudSystemId;
         public String imageUrl;
-        public String imagePath;
     };
 
     public static void requestPushNotificationPermission()
@@ -223,10 +223,6 @@ public class PushMessageManager
     {
         Logger.info("save notification", "Saving notification");
 
-        final String fileName = UUID.randomUUID().toString() + ".png";
-        context.imagePath = context.context.getFilesDir().getAbsolutePath()
-            + "/push_notifications/" + fileName;
-
         context.id = PushNotificationStorage.addUserNotification(
             context.context,
             user,
@@ -234,7 +230,7 @@ public class PushMessageManager
             context.description,
             context.url,
             context.cloudSystemId,
-            context.imagePath);
+            context.imageUrl);
     }
 
     static public void showNotificationInternal(
@@ -415,19 +411,10 @@ public class PushMessageManager
 
         public void saveNotificationImage(Bitmap image)
         {
-            final String kLogTag = "save notification image";
-
-            File file = new File(context.imagePath);
-            file.getParentFile().mkdirs();
-
-            try (FileOutputStream stream = new FileOutputStream(file))
-            {
-                image.compress(Bitmap.CompressFormat.PNG, 0, stream);
-            }
-            catch (IOException e)
-            {
-                Logger.error(kLogTag, "Failed to save image" + e);
-            }
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.PNG, 0, stream);
+            PushNotificationStorage.saveImage(
+                context.context, context.imageUrl, stream.toByteArray());
         }
 
         @Override

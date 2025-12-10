@@ -22,12 +22,16 @@ void SecureStorage::save(const std::string& /*key*/, const std::string& /*value*
 {
 }
 
-std::optional<std::vector<std::byte>> SecureStorage::loadImage(const std::string& /*id*/) const
+std::optional<std::vector<std::byte>> SecureStorage::loadFile(const std::string& /*key*/) const
 {
     return {};
 }
 
-void SecureStorage::removeImage(const std::string& /*id*/)
+void SecureStorage::saveFile(const std::string& /*key*/, const std::vector<std::byte>& /*data*/)
+{
+}
+
+void SecureStorage::removeFile(const std::string& /*key*/)
 {
 }
 

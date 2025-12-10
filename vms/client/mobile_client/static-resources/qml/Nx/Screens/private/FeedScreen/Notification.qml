@@ -136,7 +136,7 @@ Control
                 Layout.fillWidth: true
                 Layout.preferredHeight: 180
 
-                visible: status === Image.Ready
+                visible: status === Image.Ready || status === Image.Loading
 
                 fillMode: Image.PreserveAspectCrop
 
