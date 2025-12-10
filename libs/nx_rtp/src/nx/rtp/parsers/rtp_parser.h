@@ -23,7 +23,7 @@ public:
     bool isUtcTime();
 
 private:
-    Result processRtpExtension(
+    void processRtpExtension(
         const RtpHeaderExtensionHeader& extensionHeader, quint8* data, int size);
     int64_t getTimestamp(uint32_t rtpTime, const nx::rtp::RtcpSenderReport& senderReport);
 

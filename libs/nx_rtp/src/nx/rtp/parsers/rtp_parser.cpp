@@ -47,12 +47,10 @@ Result RtpParser::processData(
 
     if (rtpHeader.extension.has_value())
     {
-        auto result = processRtpExtension(
+        processRtpExtension(
             rtpHeader.extension.value().header,
             packetData + rtpHeader.extension->extensionOffset,
             rtpHeader.extension->extensionSize);
-        if (!result.success)
-            return result;
     }
 
     if (rtpHeader.payloadSize == 0 && !m_codecParser->forceProcessEmptyData())
@@ -96,7 +94,7 @@ QString RtpParser::idForToStringFromPtr() const
     return NX_FMT("Payload type %1", m_payloadType);
 }
 
-Result RtpParser::processRtpExtension(
+void RtpParser::processRtpExtension(
     const RtpHeaderExtensionHeader& header, quint8* data, int size)
 {
     // Try to parse onvif timestamp extension (increase the buffer to the extension header, as the
@@ -108,9 +106,11 @@ Result RtpParser::processRtpExtension(
         nx::rtp::OnvifHeaderExtension onvifExtension;
         if (onvifExtension.read(headerData, headerSize))
             m_onvifExtensionTimestamp = onvifExtension.ntp;
+        else
+            NX_VERBOSE(this, "Failed to parse onvif rtp extension, header size: %1",  size);
 
-        if (header.lengthBytes() == kOnvifHeaderExtensionLength * 4)
-            return true;
+        if (header.lengthBytes() <= kOnvifHeaderExtensionLength * 4)
+            return;
 
         // See https://www.onvif.org/specs/stream/ONVIF-Streaming-Spec-v1606.pdf
         // 6.2.2 Compatibility with the JPEG header extension
@@ -118,16 +118,19 @@ Result RtpParser::processRtpExtension(
         size -= kOnvifHeaderExtensionLength * 4;
         if (size < RtpHeaderExtensionHeader::kSize)
         {
-            NX_DEBUG(this, "Invalid size of RTP header with an double extension, size: %1", size);
-            return false;
+            NX_VERBOSE(this, "Invalid RTP header size with a double extension, size: %1", size);
+            return;
         }
         RtpHeaderExtensionHeader jpegHeader = *(RtpHeaderExtensionHeader*)(data);
         data += RtpHeaderExtensionHeader::kSize;
         size -= RtpHeaderExtensionHeader::kSize;
-        return m_codecParser->processRtpExtension(jpegHeader, data, size);
+        if (!m_codecParser->processRtpExtension(jpegHeader, data, size))
+            NX_VERBOSE(this, "Failed to parse JPEG header, id: %1, size: %1", header.id(), size);
+        return;
     }
 
-    return m_codecParser->processRtpExtension(header, data, size);
+    if (!m_codecParser->processRtpExtension(header, data, size))
+        NX_VERBOSE(this, "Failed to parse rtp extension, id: %1 size: %2", header.id(), size);
 }
 
 int64_t RtpParser::getTimestamp(uint32_t rtpTime, const nx::rtp::RtcpSenderReport& senderReport)
