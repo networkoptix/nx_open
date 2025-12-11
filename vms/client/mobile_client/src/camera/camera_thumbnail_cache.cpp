@@ -136,6 +136,7 @@ void QnCameraThumbnailCache::stop()
 
     resourcePool()->disconnect(this);
 
+    NX_MUTEX_LOCKER lock(&m_mutex);
     m_thumbnailByResourceId.clear();
     m_pixmaps.clear();
     m_elapsedTimer.invalidate();
