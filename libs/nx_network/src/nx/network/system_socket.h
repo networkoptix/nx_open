@@ -191,7 +191,7 @@ protected:
 
 protected:
     std::unique_ptr<aio::AsyncSocketImplHelper<self_type>> m_aioHelper;
-    bool m_connected;
+    std::atomic<bool> m_connected{false};
 
 private:
     bool connectToIp(
