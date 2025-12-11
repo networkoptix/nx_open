@@ -1651,7 +1651,9 @@ void QnVirtualCameraResource::setSerialNumber(const QString& serialNumber)
 
 bool QnVirtualCameraResource::trustCameraTime() const
 {
-    return QnLexical::deserialized<bool>(getProperty(nx::vms::api::device_properties::kTrustCameraTime));
+    return QnLexical::deserialized<bool>(
+        getProperty(nx::vms::api::device_properties::kTrustCameraTime),
+        /*default value*/ true);
 }
 
 void QnVirtualCameraResource::setTrustCameraTime(bool value)

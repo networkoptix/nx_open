@@ -512,7 +512,7 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
-    if (state.expert.trustCameraTime.valueOr(true))
+    if (!state.expert.trustCameraTime.valueOr(false))
         return false;
 
     if (!state.expert.forcedPrimaryProfile.valueOr({}).isEmpty())
@@ -2892,7 +2892,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = resetRemoteArchiveSynchronizationEnabledToDefault(std::move(state));
     state = setCustomWebPagePort(std::move(state), 0);
     state = setCustomMediaPortUsed(std::move(state), false);
-    state = setTrustCameraTime(std::move(state), false);
+    state = setTrustCameraTime(std::move(state), true);
     state = setLogicalId(std::move(state), {});
 
     state.isDefaultExpertSettings = true;

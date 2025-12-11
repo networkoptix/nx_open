@@ -77,7 +77,7 @@ private:
     nx::utils::ElapsedTimer m_waitSenderReportTimer; //< need to wait Sender Report before sending BadCameraTime event
     const std::string m_resourceId;
     const nx::rtp::Sdp::MediaType m_mediaType;
-    TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
+    TimePolicy m_timePolicy = TimePolicy::useCameraTimeIfCorrect;
     bool m_badCameraTimeState = false;
     nx::utils::TimestampAdjustmentHistory m_adjustmentHistory;
     mutable nx::Mutex m_historicalAdjustmentDeltaMutex;
