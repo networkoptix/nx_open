@@ -99,7 +99,7 @@ private:
             size_t sequence, int ipVersion);
     };
 
-    bool m_terminated = false;
+    std::atomic<bool> m_terminated = false;
     mutable nx::Mutex m_mutex;
     mutable nx::WaitCondition m_cond;
     std::deque<size_t /*sequence*/> m_taskQueue;
