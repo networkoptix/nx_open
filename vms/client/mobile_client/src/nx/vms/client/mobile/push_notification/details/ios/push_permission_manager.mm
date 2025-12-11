@@ -79,7 +79,7 @@ struct PushPermissionManager::Private
 
     QTimer updateTimer;
     PushPermission permission = PushPermission::unknown;
-    bool updating = false;
+    std::atomic<bool> updating{false};
 
     Private(PushPermissionManager* q);
 };
