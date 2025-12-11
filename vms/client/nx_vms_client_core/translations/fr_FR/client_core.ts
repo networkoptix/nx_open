@@ -374,7 +374,7 @@
     <name>nx::vms::client::core::OrganizationsFilterModel</name>
     <message>
       <source>Other results</source>
-      <translation type="unfinished">Other results</translation>
+      <translation>Autres résultats</translation>
     </message>
   </context>
   <context>
