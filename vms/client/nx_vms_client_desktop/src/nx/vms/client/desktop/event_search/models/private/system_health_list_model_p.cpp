@@ -273,7 +273,7 @@ QnResourceList SystemHealthListModel::Private::displayedResourceList(int index) 
 
         case MessageType::remoteArchiveSyncError:
         case MessageType::archiveIntegrityFailed:
-            m_items[index].resources;
+            return m_items[index].resources;
 
         case MessageType::defaultCameraPasswords:
         case MessageType::usersEmailIsEmpty:
