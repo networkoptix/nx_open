@@ -1889,7 +1889,7 @@ AsyncClient::Result AsyncClient::invokeHandler(
     auto span = m_telemetrySpan;
     auto spanScope = span.activate();
 
-    const auto requestSequenceBak = m_requestSequence;
+    const auto requestSequenceBak = m_requestSequence.load();
     nx::utils::InterruptionFlag::Watcher objectDestructionWatcher(&m_objectDestructionFlag);
 
     handler(args...);

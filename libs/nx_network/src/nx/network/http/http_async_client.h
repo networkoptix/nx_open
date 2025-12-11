@@ -460,7 +460,7 @@ private:
     int m_lastReportedMessageNumber = -1;
     std::string m_remoteEndpointWithProtocol;
     SystemError::ErrorCode m_lastSysErrorCode = SystemError::noError;
-    int m_requestSequence = 0;
+    std::atomic<int> m_requestSequence = 0;
     int m_numberOfRedirectsTried = 0;
     nx::utils::InterruptionFlag m_objectDestructionFlag;
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
