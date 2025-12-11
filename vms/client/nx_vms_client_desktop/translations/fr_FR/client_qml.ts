@@ -770,7 +770,7 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>Test de l'événement</translation>
     </message>
     <message>
       <source>Test</source>
@@ -1366,7 +1366,7 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>Enquête sur le Joystick</translation>
     </message>
   </context>
   <context>
@@ -2432,7 +2432,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation>Mouvement</translation>
+      <translation>Mouvements</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -3128,7 +3128,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>Évènements de test...</translation>
     </message>
   </context>
   <context>

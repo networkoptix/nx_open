@@ -4220,7 +4220,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>Configurer 2FA</translation>
     </message>
   </context>
   <context>
@@ -4517,7 +4517,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>Désactiver le stockage cloud sur un serveur le désactivera sur tous les serveurs. La sauvegarde locale doit être configurée manuellement.</translation>
     </message>
   </context>
   <context>
@@ -5045,15 +5045,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation type="unfinished">Cloud storage is available</translation>
+      <translation>Le stockage cloud est disponible</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation type="unfinished">Cloud storage is enabled</translation>
+      <translation>Le stockage cloud est activé</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
-      <translation type="unfinished">Cloud Storage is enabled</translation>
+      <translation>Le stockage cloud est activé</translation>
     </message>
   </context>
   <context>
@@ -6250,11 +6250,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Transcodage vidéo requis. Session d'exportation redémarrée.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>Transcodage audio requis. Session d'exportation redémarrée.</translation>
     </message>
   </context>
   <context>
@@ -7019,7 +7019,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>Seules les périodes d'indisponibilité de la caméra ou du serveur survenues après l'activation de cette option seront importées automatiquement. Attention : si vous désactivez cette option, toutes les périodes d'indisponibilité non encore importées seront perdues et ne pourront pas être récupérées ultérieurement.</translation>
     </message>
   </context>
   <context>
@@ -7237,12 +7237,12 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>L'opération de remplacement de la caméra est impossible car le serveur est indisponible.</translation>
     </message>
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the site and replaced by the selected camera</translation>
+      <translation>%1 sera supprimé du site et remplacé par la caméra sélectionnée</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
@@ -7250,7 +7250,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>
-      <translation type="unfinished">Some data and settings may not be supported for the new camera</translation>
+      <translation>Certaines données et paramètres peuvent ne pas être pris en charge par la nouvelle caméra</translation>
     </message>
   </context>
   <context>
@@ -8092,17 +8092,17 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>Journal des événements pour la période de %1 à %2 - Affichage de %n premier événement. Pour trouver des événements spécifiques, veuillez ajuster la plage de dates ou appliquer des filtres supplémentaires.</numerusform>
+        <numerusform>Journal des événements pour la période de %1 à %2 - Affichage des %n premiers événements. Pour trouver des événements spécifiques, veuillez ajuster la plage de dates ou appliquer des filtres supplémentaires</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>Journal des événements pour %1 - Affichage de %n événement. Pour trouver des événements spécifiques, veuillez ajuster la plage de dates ou appliquer des filtres supplémentaires.</numerusform>
+        <numerusform>Journal des événements pour %1 - Affichage de %n événements. Pour trouver des événements spécifiques, veuillez ajuster la plage de dates ou appliquer des filtres supplémentaires</numerusform>
       </translation>
     </message>
   </context>
@@ -8957,7 +8957,7 @@ N'oubliez pas de retourner le niveau de log à son paramètre par défaut après
     </message>
     <message>
       <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
-      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
+      <translation>La taille des fichiers à diviser doit être supérieure à 10 Mo et inférieure ou égale à la moitié de la valeur définie pour la limite de volume maximal.</translation>
     </message>
   </context>
   <context>
