@@ -337,8 +337,12 @@ void PlayerDataConsumer::onDecodedFrame(VideoFramePtr decodedFrame)
 
 bool PlayerDataConsumer::checkSequence(int sequence)
 {
-    m_sequence = std::max(m_sequence, sequence);
-    if (sequence && m_sequence && sequence != m_sequence)
+    int expected = m_sequence.load();
+    int newValue = 0;
+    do {
+        newValue = std::max(expected, sequence);
+    } while (!m_sequence.compare_exchange_weak(expected, newValue));
+    if (sequence && newValue && sequence != newValue)
     {
         //NX_VERBOSE(this, nx::format("PlayerDataConsumer::checkSequence(%1): expected %2").arg(sequence).arg(m_sequence));
         return false;
