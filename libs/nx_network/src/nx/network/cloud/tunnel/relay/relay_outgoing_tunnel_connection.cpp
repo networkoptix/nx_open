@@ -17,7 +17,7 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_relayUrl(std::move(relayUrl)),
     m_relaySessionId(std::move(relaySessionId)),
     m_relayApiClient(std::move(relayApiClient)),
-    m_usageCounter(std::make_shared<int>(0))
+    m_usageCounter(std::make_shared<std::atomic<int>>(0))
 {
     bindToAioThread(getAioThread());
 
@@ -223,7 +223,7 @@ void OutgoingTunnelConnection::onInactivityTimeout()
 
 OutgoingConnection::OutgoingConnection(
     std::unique_ptr<AbstractStreamSocket> delegate,
-    std::shared_ptr<int> usageCounter)
+    std::shared_ptr<std::atomic<int>> usageCounter)
     :
     StreamSocketDelegate(delegate.get()),
     m_delegate(std::move(delegate)),

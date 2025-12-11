@@ -64,7 +64,7 @@ private:
     utils::InterruptionFlag m_objectDestructionFlag;
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
     nx::network::aio::Timer m_inactivityTimer;
-    std::shared_ptr<int> m_usageCounter;
+    std::shared_ptr<std::atomic<int>> m_usageCounter;
 
     void startInactivityTimer();
     void stopInactivityTimer();
@@ -82,14 +82,14 @@ class OutgoingConnection:
 public:
     OutgoingConnection(
         std::unique_ptr<AbstractStreamSocket> delegate,
-        std::shared_ptr<int> usageCounter);
+        std::shared_ptr<std::atomic<int>> usageCounter);
     virtual ~OutgoingConnection() override;
 
     virtual bool getProtocol(int* protocol) const override;
 
 private:
     std::unique_ptr<AbstractStreamSocket> m_delegate;
-    std::shared_ptr<int> m_usageCounter;
+    std::shared_ptr<std::atomic<int>> m_usageCounter;
 };
 
 } // namespace nx::network::cloud::relay
