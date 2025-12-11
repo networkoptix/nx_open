@@ -154,7 +154,7 @@ private:
     bool checkGlobalTimeAsync(
         const QnVirtualCameraResourcePtr& camera,
         const QnMediaServerResourcePtr& server,
-        qint64* result);
+        std::atomic<qint64>* result);
     void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr& camera);
     bool setupRtspSession(
         const QnVirtualCameraResourcePtr& camera,
@@ -172,16 +172,16 @@ private:
     quint8* m_rtpDataBuffer;
     bool m_tcpMode = true;
     QMap<quint32, quint16> m_prevTimestamp;
-    int64_t m_position = DATETIME_NOW;
+    std::atomic<int64_t> m_position = DATETIME_NOW;
     int64_t m_reopenPosition = 0; //< Skip data to this position after reopen.
     QnVirtualCameraResourcePtr m_camera;
     QnMediaServerResourcePtr m_server;
     int m_lastMediaFlags = -1;
-    bool m_closing = false;
+    std::atomic<bool> m_closing = false;
     bool m_singleShotMode = false;
     quint8 m_sendedCSec = 0;
     qint64 m_lastSeekTime = DATETIME_INVALID;
-    qint64 m_lastReceivedTime = DATETIME_INVALID;
+    std::atomic<qint64> m_lastReceivedTime = DATETIME_INVALID;
     MediaQuality m_quality = MediaQuality::MEDIA_Quality_High;
     bool m_qualityFastSwitch = true;
     QSize m_resolution;

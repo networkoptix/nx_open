@@ -74,14 +74,14 @@ struct ArchiveTimeCheckInfo
     ArchiveTimeCheckInfo(
         const QnVirtualCameraResourcePtr& camera,
         const QnMediaServerResourcePtr& server,
-        qint64* result):
+        std::atomic<qint64>* result):
         camera(camera), server(server), result(result)
     {
     }
 
     QnVirtualCameraResourcePtr camera;
     QnMediaServerResourcePtr server;
-    qint64* result = nullptr;
+    std::atomic<qint64>* result = nullptr;
 };
 
 } // namespace
@@ -243,7 +243,9 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime
 }
 
 bool QnRtspClientArchiveDelegate::checkGlobalTimeAsync(
-    const QnVirtualCameraResourcePtr& camera, const QnMediaServerResourcePtr& server, qint64* result)
+    const QnVirtualCameraResourcePtr& camera,
+    const QnMediaServerResourcePtr& server,
+    std::atomic<qint64>* result)
 {
     QnRtspClient client(
         QnRtspClient::Config{
@@ -271,8 +273,12 @@ bool QnRtspClientArchiveDelegate::checkGlobalTimeAsync(
     qint64 startTime = client.startTime();
     if (startTime != DATETIME_INVALID && startTime != DATETIME_NOW)
     {
-        if (startTime < *result || *result == DATETIME_INVALID)
-            *result = startTime;
+        qint64 expected = result->load();
+        qint64 newValue = 0;
+        do {
+            if (startTime < expected || expected == DATETIME_INVALID)
+                newValue = startTime;
+        } while (!result->compare_exchange_weak(expected, newValue));
     }
 
     return true;
@@ -300,8 +306,8 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(
     }
 
     QList<ArchiveTimeCheckInfo> checkList;
-    qint64 currentMinTime = DATETIME_INVALID;
-    qint64 otherMinTime = DATETIME_INVALID;
+    std::atomic<qint64> currentMinTime = DATETIME_INVALID;
+    std::atomic<qint64> otherMinTime = DATETIME_INVALID;
     for (const auto& server: mediaServerList)
     {
         checkList << ArchiveTimeCheckInfo(
@@ -326,7 +332,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(
         && (otherMinTime != DATETIME_INVALID)
         && (currentMinTime == DATETIME_INVALID || otherMinTime < currentMinTime))
     {
-        m_globalMinArchiveTime = otherMinTime;
+        m_globalMinArchiveTime = otherMinTime.load();
     }
     else
     {
