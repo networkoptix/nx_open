@@ -136,8 +136,8 @@ Item
         yAxis.enabled: false
         xAxis.onActiveValueChanged: (delta) =>
         {
-            const min = rightItem.opacity > 0 ? -(control.width + control.spacing) : 0
-            const max = leftItem.opacity > 0 ? (control.width + control.spacing) : 0
+            const min = rightItem?.opacity > 0 ? -(control.width + control.spacing) : 0
+            const max = leftItem?.opacity > 0 ? (control.width + control.spacing) : 0
 
             shiftPosition = MathUtils.bound(min, shiftPosition + delta, max)
         }

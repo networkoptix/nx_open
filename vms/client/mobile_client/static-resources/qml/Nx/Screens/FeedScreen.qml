@@ -192,15 +192,6 @@ Page
                 }
             }
         }
-
-        Behavior on opacity
-        {
-            SequentialAnimation
-            {
-                PauseAnimation { duration: 300 }
-                PropertyAction { }
-            }
-        }
     }
 
     ColumnLayout
@@ -305,51 +296,37 @@ Page
                     }
                 }
 
-                leftItem: Button
-                {
-                    id: unviewedButton
-
-                    text: qsTr("Unviewed")
-                    icon.source: "image://skin/20x20/Solid/eye_off.svg"
-                    backgroundColor: ColorTheme.colors.light16
-                    opacity: model.viewed ? 1.0 : 0.0
-
-                    onClicked:
-                    {
-                        feedState.setViewed(model.id, false)
-                        feedState.update()
-
-                        if (!animateActivation)
-                            apply()
-                    }
-
-                    function apply()
-                    {
-                        model.viewed = false
-                    }
-                }
-
                 rightItem: Button
                 {
-                    id: viewedButton
+                    property bool viewed: model.viewed ?? true
 
-                    text: qsTr("Viewed")
-                    icon.source: "image://skin/20x20/Solid/eye.svg"
-                    backgroundColor: ColorTheme.colors.brand
-                    opacity: !model.viewed ? 1.0 : 0.0
+                    text: viewed ? qsTr("Unviewed") : qsTr("Viewed")
+                    backgroundColor: viewed ? ColorTheme.colors.light16 : ColorTheme.colors.brand
+                    icon.source: viewed
+                        ? "image://skin/20x20/Solid/eye_off.svg"
+                        : "image://skin/20x20/Solid/eye.svg"
+
+                    function apply()
+                    {
+                        model.viewed = !model.viewed
+                    }
 
                     onClicked:
                     {
-                        feedState.setViewed(model.id, true)
+                        feedState.setViewed(model.id, !model.viewed)
                         feedState.update()
 
                         if (!animateActivation)
                             apply()
                     }
 
-                    function apply()
+                    Behavior on viewed
                     {
-                        model.viewed = true
+                        SequentialAnimation
+                        {
+                            PauseAnimation { duration: 300 }
+                            PropertyAction { }
+                        }
                     }
                 }
 
