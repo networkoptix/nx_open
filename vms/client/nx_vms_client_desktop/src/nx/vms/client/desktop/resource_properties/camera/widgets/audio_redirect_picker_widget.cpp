@@ -177,7 +177,10 @@ void AudioRedirectPickerWidget::selectAudioRedirectDevice()
         };
 
     const auto alertTextProvider =
-        [this](SystemContext* system, const QSet<QnResourcePtr>& resources, bool /*pinnedItemSelected*/)
+        [this](
+            SystemContext* /*system*/,
+            const QSet<QnResourcePtr>& resources,
+            bool /*pinnedItemSelected*/)
         {
             if (resources.empty())
                 return QString();

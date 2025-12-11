@@ -43,12 +43,14 @@ nx::vms::api::CameraScheduleTaskDataList defaultSchedule(int maxFps)
     for (qint8 dayOfWeek = 1; dayOfWeek <= 7; ++dayOfWeek)
     {
         schedule.push_back(nx::vms::api::CameraScheduleTaskData{
-            /*start time*/ 0,
-            seconds(24h).count(),
-            dayOfWeek,
+            {
+                .startTime = 0,
+                .endTime = seconds(24h).count(),
+                .dayOfWeek = dayOfWeek,
+            },
             nx::vms::api::RecordingType::metadataOnly,
             nx::vms::api::StreamQuality::high,
-            (qint16) maxFps,
+            maxFps,
             /*automatic bitrate*/ 0,
             {nx::vms::api::RecordingMetadataType::motion}});
     }

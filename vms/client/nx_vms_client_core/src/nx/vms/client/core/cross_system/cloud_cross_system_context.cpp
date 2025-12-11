@@ -76,9 +76,9 @@ nx::log::Level level(nx::vms::client::core::RemoteConnectionErrorCode code)
     {
         case Code::truncatedSessionToken:
             return nx::log::Level::verbose;
+        default:
+            return nx::log::Level::warning;
     }
-
-    return nx::log::Level::warning;
 }
 
 } // namespace

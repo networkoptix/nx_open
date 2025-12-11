@@ -320,7 +320,7 @@ QStringList Strings::subjectsLong(
     max -= result.size();
 
     QStringList groupNames;
-    for  (int i = 0; i < max && i < groups.size(); ++i)
+    for  (size_t i = 0; std::cmp_less(i, max) && i < groups.size(); ++i)
         groupNames.push_back(groups[i].name);
 
     groupNames.sort(Qt::CaseInsensitive);

@@ -552,9 +552,9 @@ QString EventLogDialog::errorText(nx::network::rest::ErrorId error)
     {
         case ErrorId::serviceUnavailable:
             return tr("Server cannot answer in reasonable time. Consider narrowing period or filter.");
+        default:
+            return tr("All Servers are offline. Logs are not available.");
     }
-
-    return tr("All Servers are offline. Logs are not available.");
 }
 
 void EventLogDialog::updateDataDelayed()

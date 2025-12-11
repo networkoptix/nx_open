@@ -228,7 +228,7 @@ void NotificationListModel::Private::removeCloudItems(const QString& systemId)
 }
 
 void NotificationListModel::Private::onRowsAboutToBeRemoved(
-    const QModelIndex& parent,
+    const QModelIndex& /*parent*/,
     int first,
     int last)
 {
