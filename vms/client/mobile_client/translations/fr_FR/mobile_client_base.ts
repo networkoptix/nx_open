@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Partagé uniquement</translation>
     </message>
   </context>
   <context>
@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>Impossible de partager le signet.</translation>
     </message>
   </context>
   <context>
