@@ -244,6 +244,7 @@ qint64 AudioOutput::playbackPositionUsec() const
 bool AudioOutput::isBufferUnderflow() const
 {
     Q_D(const AudioOutput);
+    QMutexLocker lock(&d->mutex);
     return d->audioOutput && d->audioOutput->isBufferUnderflow();
 }
 
