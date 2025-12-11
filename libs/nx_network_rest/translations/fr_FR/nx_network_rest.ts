@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Unsupported charset.</source>
-      <translation type="unfinished">Unsupported charset.</translation>
+      <translation>Jeu de caractères non pris en charge.</translation>
     </message>
   </context>
   <context>
@@ -166,7 +166,7 @@
     </message>
     <message>
       <source>Insufficient storage.</source>
-      <translation type="unfinished">Insufficient storage.</translation>
+      <translation>Stockage insuffisant.</translation>
     </message>
   </context>
 </TS>

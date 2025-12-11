@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Partagé uniquement</translation>
     </message>
   </context>
   <context>
@@ -61,7 +61,7 @@
     </message>
     <message>
       <source>Cannot change notifications settings</source>
-      <translation type="unfinished">Cannot change notifications settings</translation>
+      <translation>Impossible de modifier les paramètres de notification</translation>
     </message>
   </context>
   <context>
@@ -69,7 +69,7 @@
     <message>
       <source>%1 ago</source>
       <comment>notification time, like &apos;1 min ago&apos;</comment>
-      <translation type="unfinished">%1 ago</translation>
+      <translation>il y a %1</translation>
     </message>
   </context>
   <context>
@@ -89,7 +89,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>Impossible de partager le signet.</translation>
     </message>
   </context>
   <context>
@@ -108,15 +108,15 @@
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Caméras</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Tous Périphériques</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Mises en page</translation>
     </message>
   </context>
 </TS>

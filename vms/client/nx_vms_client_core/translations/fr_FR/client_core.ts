@@ -176,15 +176,15 @@
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</translation>
+      <translation>Pour vous connecter à ce site, désactivez &quot;Demandez un code de vérification à chaque connexion avec votre compte %1&quot; dans les paramètres de votre compte.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your account settings.</source>
-      <translation type="unfinished">You can enable two-factor authentication in your account settings.</translation>
+      <translation>Vous pouvez activer l'authentification à deux facteurs dans les paramètres de votre compte.</translation>
     </message>
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
-      <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+      <translation>Serveur ou réseau indisponible. Vérifiez l'adresse et la connexion.</translation>
     </message>
   </context>
   <context>
@@ -372,7 +372,7 @@
     <name>nx::vms::client::core::OrganizationsFilterModel</name>
     <message>
       <source>Other results</source>
-      <translation type="unfinished">Other results</translation>
+      <translation>Autres résultats</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
