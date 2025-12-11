@@ -130,10 +130,13 @@ private:
 
 private:
     std::atomic_bool dirty = false;
-    using EventTypesTreeFuture = QFuture<void>;
-    EventTypesTreeFuture eventTypesTreeFuture;
+
     mutable QMutex mutex;
     AnalyticsEntitiesTreeBuilder::NodePtr cachedEventTypesTree;
+
+    // This future should be destroyed before the mutex.
+    using EventTypesTreeFuture = QFuture<void>;
+    EventTypesTreeFuture eventTypesTreeFuture;
 };
 
 class AnalyticsObjectsSearchTreeBuilder:
