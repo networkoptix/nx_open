@@ -284,6 +284,8 @@ bool FfmpegVideoDecoder::sendPacket(const QnConstCompressedVideoDataPtr& compres
 bool FfmpegVideoDecoder::receiveFrame(VideoFramePtr* decodedFrame)
 {
     Q_D(FfmpegVideoDecoder);
+    if (!d->codecContext)
+        return false;
     int result = avcodec_receive_frame(d->codecContext, d->frame);
     if (result < 0)
     {

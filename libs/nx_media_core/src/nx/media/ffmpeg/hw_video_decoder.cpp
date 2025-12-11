@@ -15,6 +15,24 @@ extern "C" {
 
 namespace nx::media::ffmpeg {
 
+static bool isHwPixelFormat(AVPixelFormat format)
+{
+    // FFmpeg considers the following pixel formats to be HW - see pixfmt.h
+    switch (format)
+    {
+        case AV_PIX_FMT_D3D11:
+        case AV_PIX_FMT_D3D12:
+        case AV_PIX_FMT_MEDIACODEC:
+        case AV_PIX_FMT_OPENCL:
+        case AV_PIX_FMT_VAAPI:
+        case AV_PIX_FMT_VIDEOTOOLBOX:
+        case AV_PIX_FMT_VULKAN:
+            return true;
+        default:
+            return false;
+    }
+}
+
 static enum AVPixelFormat getHwFormat(AVCodecContext *ctx, const enum AVPixelFormat *pix_fmts)
 {
     if (!ctx || !ctx->opaque)
@@ -321,8 +339,7 @@ bool HwVideoDecoder::receiveFrame(CLVideoDecoderOutputPtr* const outFrame)
     if (m_metrics)
         m_metrics->decodedPixels() += frame->width * frame->height;
 
-    // Android MediaCodec decoder does not set hw_frames_ctx.
-    m_hardwareMode = (bool) frame->hw_frames_ctx || frame->format == AV_PIX_FMT_MEDIACODEC;
+    m_hardwareMode = (bool) frame->hw_frames_ctx || isHwPixelFormat((AVPixelFormat) frame->format);
     return true;
 }
 

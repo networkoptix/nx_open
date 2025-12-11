@@ -25,9 +25,16 @@ VideoApiRegistry::Entry* VideoApiRegistry::get(const AVFrame* frame)
     if (!frame)
         return nullptr;
 
-    // MediaCodec does not use hw_frames_ctx.
-    if (frame->format == AV_PIX_FMT_MEDIACODEC)
-        return get(AV_HWDEVICE_TYPE_MEDIACODEC);
+    // Some HW decoders do not use hw_frames_ctx.
+    switch (frame->format)
+    {
+        case AV_PIX_FMT_MEDIACODEC:
+            return get(AV_HWDEVICE_TYPE_MEDIACODEC);
+        case AV_PIX_FMT_VIDEOTOOLBOX:
+            return get(AV_HWDEVICE_TYPE_VIDEOTOOLBOX);
+        default:
+            break;
+    }
 
     if (!frame->hw_frames_ctx)
         return nullptr;
