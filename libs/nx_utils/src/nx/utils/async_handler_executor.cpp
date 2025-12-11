@@ -5,6 +5,7 @@
 #include <nx/utils/coro/task.h>
 #include <nx/utils/coro/task_utils.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/thread_affinity_deleter.h>
 
 #include "async_handler_executor_detail.h"
 
@@ -36,6 +37,7 @@ class ObjectImpl:
 public:
     explicit ObjectImpl(QObject* object)
     {
+        moveToThread(object->thread());
         connect(this, &DeferredImpl::execute, object,
             [](auto arg)
             {
@@ -51,14 +53,13 @@ class ThreadImpl:
 public:
     explicit ThreadImpl(QThread* thread)
     {
+        moveToThread(thread);
         connect(this, &DeferredImpl::execute, this,
             [](auto arg)
             {
                 (*arg.handler)();
             },
             Qt::QueuedConnection); //< Avoid resuming in await_suspend when on the same thread.
-
-        moveToThread(thread);
     }
 };
 
@@ -70,7 +71,7 @@ AsyncHandlerExecutor::AsyncHandlerExecutor():
 }
 
 AsyncHandlerExecutor::AsyncHandlerExecutor(QObject* object):
-    m_impl(std::make_shared<ObjectImpl>(object))
+    m_impl(new ObjectImpl(object), ThreadAffinityDeleter{})
 {
 }
 
