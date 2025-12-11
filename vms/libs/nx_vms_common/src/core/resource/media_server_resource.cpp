@@ -25,6 +25,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/thread_affinity_deleter.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/protocol_version.h>
@@ -289,9 +290,12 @@ rest::ServerConnectionPtr QnMediaServerResource::restConnection() const
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     if (!m_restConnection)
+    {
         m_restConnection = rest::ServerConnectionPtr(new rest::ServerConnection(
             systemContext(),
-            getId()));
+            getId()),
+            nx::utils::ThreadAffinityDeleter{});
+    }
 
     return m_restConnection;
 }

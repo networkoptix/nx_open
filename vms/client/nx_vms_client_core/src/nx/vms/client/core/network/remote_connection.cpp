@@ -7,6 +7,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/p2p/p2p_message_bus.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread_affinity_deleter.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/ec2/base_ec2_connection.h>
@@ -189,13 +190,15 @@ struct RemoteConnection::Private
     {
         NX_CRITICAL(systemContext);
 
-        serverApi = std::make_shared<rest::ServerConnection>(
-            systemContext->httpClientPool(),
-            moduleInformation.id,
-            auditId,
-            certificateCache.get(),
-            this->connectionInfo.address,
-            this->connectionInfo.credentials);
+        serverApi = rest::ServerConnectionPtr(
+            new rest::ServerConnection(
+                systemContext->httpClientPool(),
+                moduleInformation.id,
+                auditId,
+                certificateCache.get(),
+                this->connectionInfo.address,
+                this->connectionInfo.credentials),
+            nx::utils::ThreadAffinityDeleter{});
 
         queryProcessor = std::make_shared<QueryProcessor>(
             moduleInformation.id,
