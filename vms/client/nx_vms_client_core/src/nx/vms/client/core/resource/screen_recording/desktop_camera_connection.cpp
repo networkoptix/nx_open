@@ -14,6 +14,7 @@
 #include <nx/network/ssl/helpers.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/utils/thread_affinity_deleter.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/system_context.h>
@@ -311,10 +312,12 @@ void DesktopCameraConnection::run()
             nx::utils::SoftwareVersion version)
         {
             auto newProcessor = newSocket
-                ? std::make_shared<DesktopCameraConnectionProcessor>(
-                    std::move(newSocket),
-                    /*sslContext*/ nullptr,
-                    d->owner)
+                ? std::shared_ptr<DesktopCameraConnectionProcessor>(
+                    new DesktopCameraConnectionProcessor(
+                        std::move(newSocket),
+                        /*sslContext*/ nullptr,
+                        d->owner),
+                    nx::utils::ThreadAffinityDeleter{})
                 : std::shared_ptr<DesktopCameraConnectionProcessor>();
             if (newProcessor)
                 newProcessor->setServerVersion(version);
