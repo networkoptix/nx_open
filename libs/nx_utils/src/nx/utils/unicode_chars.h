@@ -22,6 +22,7 @@ namespace UnicodeChars
     inline constexpr QChar kWarningSign = QChar(0x26A0);
     inline constexpr QChar kWhiteHeavyCheckMark = QChar(0x2705);
     inline constexpr QChar kCrossMark = QChar(0x274C);
+    inline constexpr QChar kColorVariantSelector = QChar(0xFE0F);
 }
 
 } // namespace nx
