@@ -580,6 +580,7 @@ public:
 signals:
     void initialized();
 
+    void licenseServerChanged();
     void systemNameChanged();
     void localSystemIdChanged();
     void disabledVendorsChanged();
