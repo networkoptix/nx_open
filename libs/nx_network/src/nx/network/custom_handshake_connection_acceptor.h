@@ -367,6 +367,12 @@ private:
                         if (handshakeResult != SystemError::noError)
                         {
                             openConnections(lock);
+
+                            // If a nested post completes before the parent (socket) post, it could
+                            // delete the socket while its callback is still running. To prevent
+                            // this race, schedule the socket deletion via Post too.
+                            const auto connectionPtr = connection.get();
+                            connectionPtr->post([c = std::move(connection)]() mutable { c.reset(); });
                             return;
                         }
 
