@@ -9,6 +9,7 @@
 #include <string>
 
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/http/http_async_client.h>
 #include <nx/network/socket_factory.h>
 
 #include "account_manager.h"
@@ -94,6 +95,8 @@ public:
 
     /** Pings cloud_db with current credentials. */
     virtual void ping(std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) = 0;
+
+    virtual nx::network::http::ClientOptions& httpClientOptions() = 0;
 };
 
 class SystemEventHandlers

@@ -84,6 +84,8 @@ public:
 
     // It shouldn't be here.
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) = 0;
+
+    virtual network::http::ClientOptions& httpClientOptions() = 0;
 };
 
 class NX_OAUTH2_CLIENT_API Oauth2Client:
@@ -154,6 +156,8 @@ public:
             completionHandler) override;
 
     void setCredentials(network::http::Credentials credentials) override;
+
+    nx::network::http::ClientOptions& httpClientOptions() override;
 };
 
 using Oauth2ClientFactoryFunc = std::unique_ptr<AbstractOauth2Client>(

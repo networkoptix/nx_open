@@ -177,6 +177,11 @@ void Oauth2ClientMock::bindToAioThread(network::aio::AbstractAioThread*)
 {
 }
 
+nx::network::http::ClientOptions& Oauth2ClientMock::httpClientOptions()
+{
+    return m_clientOptions;
+}
+
 void Oauth2ClientMockManager::setResponse(const RequestPath& requestPath, const Response& response)
 {
     m_responses[requestPath] = response;
