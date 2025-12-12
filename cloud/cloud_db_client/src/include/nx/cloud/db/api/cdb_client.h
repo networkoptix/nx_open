@@ -96,6 +96,20 @@ public:
             m_connection->bindToAioThread(aioThread);
     }
 
+    nx::network::http::ClientOptions& httpClientOptions()
+    {
+        if (createConnectionIfNeeded())
+        {
+            return m_connection->httpClientOptions();
+        }
+        else
+        {
+            // TODO: #anekrasov this must be refactored to avoid throwing here
+            NX_ERROR(this, "Connection to CDB cannot be created");
+            throw std::runtime_error("Connection to CDB cannot be created");
+        }
+    }
+
 private:
     std::unique_ptr<api::Connection> m_connection;
     nx::cloud::db::api::ConnectionFactory* m_connectionFactory;

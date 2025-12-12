@@ -143,4 +143,9 @@ void Connection::setCacheEnabled(bool enabled)
     m_requestExecutor.setCacheEnabled(enabled);
 }
 
+nx::network::http::ClientOptions& Connection::httpClientOptions()
+{
+    return m_requestExecutor.httpClientOptions();
+}
+
 } // namespace nx::cloud::db::client

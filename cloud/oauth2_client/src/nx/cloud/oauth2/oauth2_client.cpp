@@ -156,6 +156,11 @@ void Oauth2Client::issueServiceToken(
         std::move(completionHandler));
 }
 
+nx::network::http::ClientOptions& Oauth2Client::httpClientOptions()
+{
+    return base_type::httpClientOptions();
+}
+
 void Oauth2Client::setCredentials(network::http::Credentials credentials)
 {
     httpClientOptions().setCredentials(credentials);

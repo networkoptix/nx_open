@@ -70,6 +70,8 @@ public:
 
     ApiRequestsExecutor* requestsExecutor() { return &m_requestExecutor; }
 
+    nx::network::http::ClientOptions& httpClientOptions() override;
+
 private:
     ApiRequestsExecutor m_requestExecutor;
     AccountManager m_accountManager;

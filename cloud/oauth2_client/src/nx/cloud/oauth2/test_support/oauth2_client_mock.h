@@ -116,6 +116,8 @@ public:
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
+    nx::network::http::ClientOptions& httpClientOptions() override;
+
 protected:
     template <class Request, class Response, class CompletionHandler>
     void processRequest(
@@ -132,6 +134,8 @@ protected:
 private:
     Oauth2ClientMockManager& m_manager;
     bool m_dummyMode = false;
+
+    nx::network::http::ClientOptions m_clientOptions;
 };
 
 template<class Request, class Response, class CompletionHandler>
