@@ -25,6 +25,7 @@
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/data/watermark_settings.h>
 #include <nx/vms/api/types/proxy_connection_access_policy.h>
+#include <nx/vms/common/nx_vms_common_ini.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -832,7 +833,8 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("Low quality screen video codec."); });
 
     d->licenseServerAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::licenseServer, "https://licensing.vmsproxy.com", this,
+        Names::licenseServer, ini().defaultLicenseServerUrl,
+        [](const QString& value) { return nx::Url::fromUserInput(value).isValid(); }, this,
         [] { return tr("License server."); });
 
     d->resourceFileUriAdaptor = new QnLexicalResourcePropertyAdaptor<nx::Url>(
@@ -1330,6 +1332,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         this,
         &SystemSettings::insecureDeprecatedAuthEnabledChanged,
         Qt::DirectConnection);
+
+    connect(
+        d->licenseServerAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::licenseServerChanged,
+        Qt::QueuedConnection);
 
     AdaptorList result;
     result
