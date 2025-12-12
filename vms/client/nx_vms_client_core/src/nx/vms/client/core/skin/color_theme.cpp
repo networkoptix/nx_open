@@ -83,11 +83,11 @@ void initializeThemeSpecificColors(QJsonObject* object, bool invertColors)
 
 QJsonObject generatedColorScheme(const ColorTree& basicColors, bool invertColors)
 {
-    const auto kBrandStep = 0.03;
-    const auto kBrandBackground = 0.15;
+    const auto kBrandStep = 0.03f;
+    const auto kBrandBackground = 0.15f;
 
-    const auto kColorStep = 0.03;
-    const auto kColorBackground = 0.15;
+    const auto kColorStep = 0.03f;
+    const auto kColorBackground = 0.15f;
 
     QJsonObject result;
 
