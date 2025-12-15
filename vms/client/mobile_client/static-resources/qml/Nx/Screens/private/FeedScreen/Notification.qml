@@ -136,8 +136,7 @@ Control
                 Layout.fillWidth: true
                 Layout.preferredHeight: 180
 
-                visible: status === Image.Ready || status === Image.Loading
-
+                visible: status != Image.Null
                 fillMode: Image.PreserveAspectCrop
 
                 layer.enabled: true
@@ -145,8 +144,8 @@ Control
                 {
                     maskSource: Rectangle
                     {
-                        width: image.paintedWidth
-                        height: image.paintedHeight
+                        width: image.paintedWidth || image.width
+                        height: image.paintedHeight || image.height
                         radius: 4
                     }
                 }
@@ -159,6 +158,24 @@ Control
                     sourcePath: "image://skin/48x48/Solid/play.svg"
                     sourceSize: Qt.size(48, 48)
                     primaryColor: ColorTheme.colors.light1
+                }
+
+                Rectangle
+                {
+                    anchors.fill: parent
+
+                    visible: image.status != Image.Ready
+                    color: ColorTheme.colors.dark8
+
+                    Text
+                    {
+                        anchors.centerIn: parent
+
+                        visible: image.status === Image.Error
+                        text: qsTr("No data")
+                        font.pixelSize: 12
+                        color: ColorTheme.colors.dark17
+                    }
                 }
             }
 
