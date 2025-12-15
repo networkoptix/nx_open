@@ -72,6 +72,7 @@ SetupWizardDialog::SetupWizardDialog(
     if (ini().developerMode)
     {
         auto urlLineEdit = new QLineEdit(this);
+        urlLineEdit->setFocusPolicy(Qt::NoFocus);
         layout->addWidget(urlLineEdit);
         connect(urlLineEdit, &QLineEdit::returnPressed, this,
             [this, urlLineEdit]()

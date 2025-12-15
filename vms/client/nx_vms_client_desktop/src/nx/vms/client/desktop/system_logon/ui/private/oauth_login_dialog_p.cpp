@@ -69,6 +69,7 @@ OauthLoginDialogPrivate::OauthLoginDialogPrivate(
     if (ini().developerMode)
     {
         m_urlLineEdit = new QLineEdit(q);
+        m_urlLineEdit->setFocusPolicy(Qt::NoFocus);
         connect(
             m_urlLineEdit,
             &QLineEdit::returnPressed,
