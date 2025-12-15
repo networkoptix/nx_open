@@ -71,7 +71,7 @@ struct NotificationTabModel::Private
         separatorModel->setVisible(baseModel->rowCount() > 0);
 
         connect(baseModel, &QAbstractItemModel::rowsAboutToBeInserted, separatorModel,
-            [baseModel, separatorModel]
+            [separatorModel]
             {
                 separatorModel->setVisible(true);
             });
@@ -87,7 +87,7 @@ struct NotificationTabModel::Private
         // This handler is for actual baseModel behavior.
         // Model is reset in case of system disconnecting. It is just clearing.
         connect(baseModel, &QAbstractItemModel::modelAboutToBeReset, separatorModel,
-            [baseModel, separatorModel]
+            [separatorModel]
             {
                 separatorModel->setVisible(false);
             });

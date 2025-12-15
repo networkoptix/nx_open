@@ -275,12 +275,12 @@ QModelIndex JoystickButtonActionChoiceModel::index(
     return createIndex(row, column);
 }
 
-QModelIndex JoystickButtonActionChoiceModel::parent(const QModelIndex& index) const
+QModelIndex JoystickButtonActionChoiceModel::parent(const QModelIndex& /*index*/) const
 {
     return QModelIndex();
 }
 
-int JoystickButtonActionChoiceModel::rowCount(const QModelIndex& parent) const
+int JoystickButtonActionChoiceModel::rowCount(const QModelIndex& /*parent*/) const
 {
     return d->info.size();
 }

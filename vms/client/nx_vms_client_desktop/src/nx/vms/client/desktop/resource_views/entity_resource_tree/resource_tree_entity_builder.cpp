@@ -42,7 +42,6 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/web_page_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_tree_item_key_source_pool.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_item_factory.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/user_layout_resource_index.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 
@@ -280,11 +279,10 @@ ResourceTreeEntityBuilder::ResourceTreeEntityBuilder(SystemContext* systemContex
     base_type(),
     SystemContextAware(systemContext),
     m_cameraResourceIndex(new core::entity_resource_tree::CameraResourceIndex(resourcePool())),
-    m_userLayoutResourceIndex(new UserLayoutResourceIndex(resourcePool())),
     m_recorderItemDataHelper(new core::entity_resource_tree::RecorderItemDataHelper(m_cameraResourceIndex.get())),
     m_itemFactory(new ResourceTreeItemFactory(systemContext)),
     m_itemKeySourcePool(new ResourceTreeItemKeySourcePool(
-        systemContext, m_cameraResourceIndex.get(), m_userLayoutResourceIndex.get()))
+        systemContext, m_cameraResourceIndex.get()))
 {
     // TODO: #sivanov There should be more elegant way to handle unit tests limitations.
     // Message processor does not exist in unit tests.

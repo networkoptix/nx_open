@@ -59,13 +59,13 @@ nx::core::transcoding::OverlaySettingsPtr createRuntimeSettingsFromDocument(
     context.palette.setColor(QPalette::WindowText, settings.foreground);
     document->documentLayout()->draw(&imagePainter, context);
 
-    QScopedPointer<nx::core::transcoding::ImageOverlaySettings> runtimeSettings(
+    std::unique_ptr<nx::core::transcoding::ImageOverlaySettings> runtimeSettings(
         new nx::core::transcoding::ImageOverlaySettings());
     runtimeSettings->offset = settings.offset;
     runtimeSettings->alignment = settings.alignment;
     runtimeSettings->image = targetImage;
 
-    return nx::core::transcoding::OverlaySettingsPtr(runtimeSettings.take());
+    return nx::core::transcoding::OverlaySettingsPtr(runtimeSettings.release());
 }
 
 } // namespace
@@ -102,7 +102,7 @@ OverlaySettingsPtr ExportImageOverlayPersistentSettings::createRuntimeSettings()
     const qreal aspectRatio = image.isNull() ? 1.0 : qreal(image.width()) / image.height();
     const qreal overlayHeight = overlayWidth / aspectRatio;
 
-    QScopedPointer<nx::core::transcoding::ImageOverlaySettings> runtimeSettings(
+    std::unique_ptr<nx::core::transcoding::ImageOverlaySettings> runtimeSettings(
         new nx::core::transcoding::ImageOverlaySettings());
     runtimeSettings->offset = offset;
     runtimeSettings->alignment = alignment;
@@ -125,7 +125,7 @@ OverlaySettingsPtr ExportImageOverlayPersistentSettings::createRuntimeSettings()
         imagePainter.end();
     }
 
-    return OverlaySettingsPtr(runtimeSettings.take());
+    return OverlaySettingsPtr(runtimeSettings.release());
 }
 
 void ExportTextOverlayPersistentSettingsBase::rescale(qreal factor)
@@ -177,7 +177,7 @@ void ExportTimestampOverlayPersistentSettings::rescale(qreal factor)
 
 OverlaySettingsPtr ExportTimestampOverlayPersistentSettings::createRuntimeSettings() const
 {
-    QScopedPointer<nx::core::transcoding::TimestampOverlaySettings> runtimeSettings(
+    std::unique_ptr<nx::core::transcoding::TimestampOverlaySettings> runtimeSettings(
         new nx::core::transcoding::TimestampOverlaySettings());
 
     runtimeSettings->offset = offset;
@@ -188,7 +188,7 @@ OverlaySettingsPtr ExportTimestampOverlayPersistentSettings::createRuntimeSettin
     runtimeSettings->foreground = foreground;
     runtimeSettings->outline = outline;
 
-    return OverlaySettingsPtr(runtimeSettings.take());
+    return OverlaySettingsPtr(runtimeSettings.release());
 }
 
 nx::core::transcoding::OverlaySettingsPtr

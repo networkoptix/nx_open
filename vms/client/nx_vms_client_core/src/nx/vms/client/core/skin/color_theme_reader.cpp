@@ -125,7 +125,7 @@ QColor ColorThemeReader::evaluateColor(const QString& textValue)
         NX_ASSERT(false, exception.what());
     }
 
-    if (static_cast<QMetaType::Type>(result.type()) == QMetaType::QColor)
+    if (result.typeId() == QMetaType::QColor)
         return qvariant_cast<QColor>(result);
 
     return QColor();

@@ -17,7 +17,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 
-#include "../user_layout_resource_index.h"
 #include "../webpage_resource_index.h"
 #include "parent_servers_proxy_source.h"
 #include "resource_sources/all_resource_key_sources.h"
@@ -32,12 +31,10 @@ using namespace nx::vms::client::core::entity_resource_tree;
 
 ResourceTreeItemKeySourcePool::ResourceTreeItemKeySourcePool(
     SystemContext* systemContext,
-    const CameraResourceIndex* cameraResourceIndex,
-    const UserLayoutResourceIndex* sharedLayoutResourceIndex)
+    const CameraResourceIndex* cameraResourceIndex)
     :
     SystemContextAware(systemContext),
     m_cameraResourceIndex(cameraResourceIndex),
-    m_userLayoutResourceIndex(sharedLayoutResourceIndex),
     m_webPageResourceIndex(new WebPageResourceIndex(resourcePool()))
 {
 }

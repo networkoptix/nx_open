@@ -304,7 +304,7 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
 
             if (cameraContext)
             {
-                if (taxonomyManager = cameraContext->taxonomyManager())
+                if ((taxonomyManager = cameraContext->taxonomyManager()))
                 {
                     if (!cameraContext->messageProcessor())
                     {
@@ -334,7 +334,7 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
      connect(
         appContext()->cloudCrossSystemManager(), &core::CloudCrossSystemManager::systemAboutToBeLost,
         this,
-        [this, q, setSystemContextToModels](const QString& systemId)
+        [q, setSystemContextToModels](const QString& systemId)
         {
             core::CloudCrossSystemContext* crossSystemContext =
                 appContext()->cloudCrossSystemManager()->systemContext(systemId);

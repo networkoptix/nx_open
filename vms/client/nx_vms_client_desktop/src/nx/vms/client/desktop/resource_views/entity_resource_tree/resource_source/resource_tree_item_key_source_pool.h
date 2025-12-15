@@ -11,7 +11,6 @@ namespace nx::vms::client::core::entity_resource_tree { class CameraResourceInde
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class UserLayoutResourceIndex;
 class UserRolesProvider;
 class WebPageResourceIndex;
 
@@ -24,8 +23,7 @@ class NX_VMS_CLIENT_DESKTOP_API ResourceTreeItemKeySourcePool: public SystemCont
 public:
     ResourceTreeItemKeySourcePool(
         SystemContext* systemContext,
-        const core::entity_resource_tree::CameraResourceIndex* cameraResourceIndex,
-        const UserLayoutResourceIndex* sharedLayoutResourceIndex);
+        const core::entity_resource_tree::CameraResourceIndex* cameraResourceIndex);
 
     ~ResourceTreeItemKeySourcePool();
 
@@ -138,7 +136,6 @@ public:
 
 private:
     const core::entity_resource_tree::CameraResourceIndex* m_cameraResourceIndex;
-    const UserLayoutResourceIndex* m_userLayoutResourceIndex;
     QScopedPointer<WebPageResourceIndex> m_webPageResourceIndex;
 };
 

@@ -23,7 +23,6 @@ class RecorderItemDataHelper;
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class UserLayoutResourceIndex;
 class ResourceTreeItemFactory;
 class ResourceTreeItemKeySourcePool;
 
@@ -109,7 +108,6 @@ private:
 
 private:
     QScopedPointer<core::entity_resource_tree::CameraResourceIndex> m_cameraResourceIndex;
-    QScopedPointer<UserLayoutResourceIndex> m_userLayoutResourceIndex;
     QSharedPointer<core::entity_resource_tree::RecorderItemDataHelper> m_recorderItemDataHelper;
     QScopedPointer<ResourceTreeItemFactory> m_itemFactory;
     QScopedPointer<ResourceTreeItemKeySourcePool> m_itemKeySourcePool;

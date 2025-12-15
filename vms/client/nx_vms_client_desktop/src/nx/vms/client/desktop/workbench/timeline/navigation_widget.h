@@ -34,8 +34,7 @@ private:
     void initButton(
         CustomPaintedButton* button,
         menu::IDType actionType,
-        const nx::vms::client::core::ColorizedIconDeclaration& iconDecl,
-        const QString& checkedIconPath = "");
+        const nx::vms::client::core::ColorizedIconDeclaration& iconDecl);
     void updatePlaybackButtonsIcons();
     void updatePlaybackButtonsEnabled();
     void updateJumpButtonsTooltips();

@@ -64,7 +64,7 @@ public:
 private:
     void paintTab(int index, QPainter* painter);
     QRect paintIcon(int index, const QIcon& icon, QPainter* painter);
-    QRect paintIconWidget(int index, QWidget* iconWidget, QPainter* painter);
+    QRect updateIconWidget(int index, QWidget* iconWidget);
 
     QIcon::Mode getIconMode(int index) const;
 
@@ -235,7 +235,7 @@ void CompactTabBar::Private::paintTab(int index, QPainter* painter)
     auto iconWidgetIter = m_iconWidgets.find(index);
 
     if (iconWidgetIter != m_iconWidgets.end() && iconWidgetIter->second)
-        iconRect = paintIconWidget(index, iconWidgetIter->second, painter);
+        iconRect = updateIconWidget(index, iconWidgetIter->second);
     else if (!icon.isNull())
         iconRect = paintIcon(index, icon, painter);
     else
@@ -325,16 +325,20 @@ QRect CompactTabBar::Private::paintIcon(int index, const QIcon& icon, QPainter* 
     return iconRect;
 }
 
-QRect CompactTabBar::Private::paintIconWidget(int index, QWidget* iconWidget, QPainter* painter)
+QRect CompactTabBar::Private::updateIconWidget(int index, QWidget* iconWidget)
 {
-    NX_ASSERT(iconWidget, "Null icon widget");
+    if (!NX_ASSERT(iconWidget, "Null icon widget"))
+        return {};
 
     // When we will want to add another iconWidget classes, we have to extract common interface
     // and use it instead of QWidget in method argument.
     auto notificationBellWidget = dynamic_cast<NotificationBellWidget*>(iconWidget);
-    NX_ASSERT(
+    if (!NX_ASSERT(
         notificationBellWidget,
-        "NotificationBellWidget is only supported as iconWidget for now.");
+        "NotificationBellWidget is only supported as iconWidget for now."))
+    {
+        return {};
+    }
 
     const auto isCurrent = q->currentIndex() == index;
 
@@ -349,7 +353,7 @@ QRect CompactTabBar::Private::paintIconWidget(int index, QWidget* iconWidget, QP
 
     const auto iconSize = notificationBellWidget->size();
 
-    QSize textAndIconSize(
+    const QSize textAndIconSize(
         iconSize.width() + (isCurrent ? (kTabInnerSpacing + textWidth) : 0),
         std::max(iconSize.height(), textSize.height()));
 
@@ -485,7 +489,7 @@ bool CompactTabBar::event(QEvent* event)
     {
         case QEvent::HoverEnter:
         case QEvent::HoverMove:
-            d->setHoveredTab(tabAt(static_cast<QHoverEvent*>(event)->pos()));
+            d->setHoveredTab(tabAt(static_cast<QHoverEvent*>(event)->position().toPoint()));
             break;
 
         case QEvent::HoverLeave:

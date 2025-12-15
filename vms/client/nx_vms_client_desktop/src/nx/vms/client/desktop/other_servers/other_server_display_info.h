@@ -30,9 +30,6 @@ private:
     const OtherServersManager* m_otherServerManager;
 
     const nx::Uuid m_serverId;
-
-    /** How detailed the info should be constructed. */
-    mutable Qn::ResourceInfoLevel m_detailLevel = Qn::RI_Invalid;
 };
 
 } // namespace nx::vms::client::desktop

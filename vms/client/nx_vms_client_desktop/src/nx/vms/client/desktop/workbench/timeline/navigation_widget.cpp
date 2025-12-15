@@ -201,8 +201,7 @@ void NavigationWidget::setTooltipsVisible(bool enabled)
 void NavigationWidget::initButton(
     CustomPaintedButton* button,
     menu::IDType actionType,
-    const nx::vms::client::core::ColorizedIconDeclaration& iconDecl,
-    const QString& checkedIconPath)
+    const nx::vms::client::core::ColorizedIconDeclaration& iconDecl)
 {
     const bool isCheckable = !iconDecl.checkedThemeSubstitutions().isEmpty();
     QAction* buttonAction = action(actionType);

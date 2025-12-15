@@ -165,7 +165,7 @@ protected:
         ASSERT_EQ(sourceModel->rowCount(), sourceValues.size());
         ASSERT_EQ(model->rowCount(), sourceValues.size());
 
-        for (int i = 0; i < sourceValues.size(); ++i)
+        for (size_t i = 0; i < sourceValues.size(); ++i)
         {
             ASSERT_EQ(
                 model->index(i, 0).data(Qt::CheckStateRole).value<Qt::CheckState>(),
@@ -179,7 +179,7 @@ protected:
         ASSERT_EQ(sourceModel->rowCount(), sourceValues.size());
         ASSERT_EQ(model->rowCount(), sourceValues.size());
 
-        for (int i = 0; i < sourceValues.size(); ++i)
+        for (size_t i = 0; i < sourceValues.size(); ++i)
         {
             ASSERT_EQ(model->index(i, 1).data().toString(), QString::number(sourceValues[i]));
         }
@@ -189,7 +189,7 @@ protected:
     {
         ASSERT_EQ(model->rowCount(), checkStateValues.size());
 
-        for (int i = 0; i < checkStateValues.size(); ++i)
+        for (size_t i = 0; i < checkStateValues.size(); ++i)
         {
             ASSERT_EQ(
                 model->index(i, 0).data(Qt::CheckStateRole).value<Qt::CheckState>(),
@@ -411,7 +411,7 @@ TEST_F(RowCheckModelTest, LayoutChangedCheck)
         {
             ASSERT_EQ(sourceModel->rowCount(), values.size());
 
-            for (int i = 0; i < values.size(); ++i)
+            for (size_t i = 0; i < values.size(); ++i)
             {
                 ASSERT_EQ(sourceModel->index(i, 0).data().toString(), QString::number(values[i]));
             }
@@ -421,7 +421,7 @@ TEST_F(RowCheckModelTest, LayoutChangedCheck)
         {
             ASSERT_EQ(model->rowCount(), values.size());
 
-            for (int i = 0; i < values.size(); ++i)
+            for (size_t i = 0; i < values.size(); ++i)
             {
                 ASSERT_EQ(model->index(i, 1).data().toString(), QString::number(values[i]));
             }

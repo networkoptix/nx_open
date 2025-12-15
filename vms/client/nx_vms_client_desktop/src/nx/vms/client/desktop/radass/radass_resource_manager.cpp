@@ -51,7 +51,7 @@ RadassResourceManager::RadassResourceManager(SystemContext* systemContext, QObje
         return;
 
     connect(systemContext, &SystemContext::remoteIdChanged, this,
-        [this, systemContext]()
+        [systemContext]()
         {
             auto crossSiteItemModes =
                 systemContext->userSettings()->crossSiteLayoutItemRadassModes();
