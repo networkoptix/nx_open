@@ -135,12 +135,16 @@ __VA_ARGS__ CATEGORY csv_type_category(const TYPE *);
 
 
 #define QN_FUSION_DEFINE_FUNCTIONS_csv_record(TYPE, ... /* PREFIX */)           \
-__VA_ARGS__ void serialize(const TYPE &value, QnCsvStreamWriter<QByteArray> *stream) { \
+__VA_ARGS__ [[maybe_unused]] void serialize(const TYPE &value,                  \
+    QnCsvStreamWriter<QByteArray> *stream)                                      \
+{                                                                               \
     QnCsvDetail::SerializationVisitor<QByteArray> visitor(stream);              \
     QnFusion::visit_members(value, visitor);                                    \
 }                                                                               \
                                                                                 \
-__VA_ARGS__ void serialize_header(const QString &prefix, QnCsvStreamWriter<QByteArray> *stream, const TYPE *dummy) { \
+__VA_ARGS__ [[maybe_unused]] void serialize_header(const QString &prefix,       \
+    QnCsvStreamWriter<QByteArray> *stream, const TYPE *dummy)                   \
+{                                                                               \
     QnCsvDetail::HeaderVisitor<QByteArray> visitor(prefix, stream);             \
     QnFusion::visit_members(*dummy, visitor);                                   \
 }                                                                               \

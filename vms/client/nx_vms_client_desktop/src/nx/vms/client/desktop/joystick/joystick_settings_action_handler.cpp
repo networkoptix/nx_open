@@ -30,7 +30,7 @@ JoystickSettingsActionHandler::JoystickSettingsActionHandler(
                     mainWindowWidget()));
 
                 connect(m_dialog.get(), &JoystickSettingsDialog::done,
-                    [this]
+                    []
                     {
                         appContext()->joystickManager()->setDeviceActionsEnabled(true);
                     });

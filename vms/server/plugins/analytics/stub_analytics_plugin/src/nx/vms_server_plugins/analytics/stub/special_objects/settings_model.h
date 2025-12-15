@@ -29,7 +29,7 @@ const std::string kGenerateObjectsEveryNFramesSetting{"generateObjectsEveryNFram
 const std::string kAdditionalFrameProcessingDelayMsSetting{"additionalFrameProcessingDelayMs"};
 const std::string kOverallMetadataDelayMsSetting{"overallMetadataDelayMs"};
 
-static const std::string kSettingsModel = /*suppress newline*/ 1 + R"json(
+static const std::string kSettingsModel = &(R"json(
 {
     "type": "Settings",
     "items":
@@ -151,7 +151,7 @@ static const std::string kSettingsModel = /*suppress newline*/ 1 + R"json(
         }
     ]
 }
-)json";
+)json")[1]; //< Suppress newline.
 
 } // namespace special_objects
 } // namespace stub

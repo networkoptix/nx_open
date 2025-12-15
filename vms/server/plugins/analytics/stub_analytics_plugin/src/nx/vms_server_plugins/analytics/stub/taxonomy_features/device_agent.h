@@ -59,8 +59,6 @@ private:
         std::atomic<bool> generateInstanceOfObjectTypeWithEnumAttributesWithInlineItems{true};
     };
 
-    Engine* const m_engine;
-
     int m_frameIndex = 0;
     std::vector<nx::sdk::Uuid> m_trackIds;
     Settings m_settings;

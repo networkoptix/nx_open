@@ -5,6 +5,7 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/protocol_version.cpp)
 
 nx_add_target(nx_vms_api LIBRARY
+    NO_WERROR
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/protocol_version.cpp"
     PUBLIC_LIBS nx_network_rest

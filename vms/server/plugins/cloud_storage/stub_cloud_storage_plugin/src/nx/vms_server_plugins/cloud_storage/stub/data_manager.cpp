@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <cmath>
 #include <functional>
 #include <map>
 
@@ -120,7 +121,7 @@ std::vector<uint8_t> mediaPacketDataToByteArray(
         + sizeof(data.timestampUs) + sizeof(data.type) + sizeof(data.channelNumber)
         + sizeof(data.isKeyFrame) + data.encryptionData.size() + 2 * sizeof(size_t);
 
-    result.reserve(totalDataSize * 1.2);
+    result.reserve((int)std::ceil(totalDataSize * 1.2));
     size_t size = data.dataSize;
     append(&size, sizeof(size), &result);
     append(data.data.data(), size, &result);
@@ -287,7 +288,7 @@ public:
         while (true)
         {
             uint8_t buf[4096];
-            DWORD bytesRead = -1;
+            DWORD bytesRead = (DWORD) -1;
             const auto readResult = ReadFile(m_hFile, buf, sizeof(buf), &bytesRead, NULL);
             if (readResult == FALSE)
             {
@@ -318,7 +319,7 @@ public:
             openFile();
         }
 
-        DWORD writtenBytes = -1;
+        DWORD writtenBytes = (DWORD) -1;
         const auto result = WriteFile(m_hFile, data.data(), data.size(), &writtenBytes, NULL);
         if (result == FALSE || writtenBytes != data.size())
         {
@@ -885,11 +886,11 @@ DataManager::DataManager(const std::string& workDir):
 {
     const auto kStubBucketToId = std::make_pair("bucket_24", 24);
     m_bucketUrlToId = kStubBucketToId;
-    size_t last = m_workDir.size() - 1;
+    int last = m_workDir.size() - 1;
     while (last >= 0 && (m_workDir.at(last) == '/' || m_workDir.at(last) == '\\'))
         last--;
 
-    if (last != m_workDir.size() - 1)
+    if (last != (int) m_workDir.size() - 1)
         m_workDir = m_workDir.substr(0, last + 1);
 
     NX_OUTPUT << __func__ << ": Work dir: '" << m_workDir << "'";

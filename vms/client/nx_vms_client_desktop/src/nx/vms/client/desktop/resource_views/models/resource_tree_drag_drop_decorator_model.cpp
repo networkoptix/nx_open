@@ -546,7 +546,7 @@ void ResourceTreeDragDropDecoratorModel::moveResources(
     const QnMediaServerResourcePtr& dropParentServer)
 {
     const auto moveResourcesToGroup =
-        [=](QnResourceList moved)
+        [=, this](QnResourceList moved)
         {
             moveCustomGroup(moved, dragGroupId, dropGroupId);
         };

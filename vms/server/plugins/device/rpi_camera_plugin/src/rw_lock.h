@@ -42,7 +42,7 @@ namespace rw_lock
             std::unique_lock<std::mutex> lock(m_mutex); // LOCK
 
             if (m_readers != 0)
-                m_cv.wait(lock, [=]{ return m_readers == 0; } );
+                m_cv.wait(lock, [this]{ return m_readers == 0; } );
 
             m_readers = -1;
         }

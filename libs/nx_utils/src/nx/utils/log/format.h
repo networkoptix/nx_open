@@ -53,7 +53,7 @@ public:
     Formatter args(const std::tuple<Values...>& values) const
     {
         return std::apply(
-            [this](auto&&... values) { return args(std::forward<decltype(values)>(values)...); },
+            [this](auto&&... values) { return this->args(std::forward<decltype(values)>(values)...); },
             values);
     }
 

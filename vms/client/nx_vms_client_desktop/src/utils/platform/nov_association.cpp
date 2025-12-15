@@ -20,7 +20,7 @@ QString quoted(const QString& string)
 namespace nx::vms::utils {
 
 bool registerNovFilesAssociation(
-    const QString& customizationId,
+    const QString& /*customizationId*/,
     const QString& applicationLauncherBinaryPath,
     const QString& applicationBinaryName,
     const QString& applicationName)

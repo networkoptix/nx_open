@@ -510,7 +510,7 @@ api::ResultType InstallationManager::installZip(
         return api::ResultType::ioError;
     }
 
-    auto extractor = QScopedPointer(new nx::zip::Extractor(fileName, targetDir));
+    auto extractor = std::make_unique<nx::zip::Extractor>(fileName, targetDir);
 
     if (!dummySpaceCheck(targetDir, (qint64) extractor->estimateUnpackedSize()))
     {

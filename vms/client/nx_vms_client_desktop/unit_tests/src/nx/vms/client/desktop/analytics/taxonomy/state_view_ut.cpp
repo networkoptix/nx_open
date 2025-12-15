@@ -201,7 +201,7 @@ private:
         const std::vector<ExpectedObjectType>& expectedObjectTypes)
     {
         ASSERT_EQ(objectTypes.size(), expectedObjectTypes.size());
-        for (int i = 0; i < objectTypes.size(); ++i)
+        for (int i = 0; i < (int) objectTypes.size(); ++i)
         {
             const ObjectType* objectType = objectTypes[i];
             const ExpectedObjectType& expected = expectedObjectTypes[i];
@@ -238,7 +238,7 @@ private:
         const std::vector<ExpectedAttribute>& expectedAttributes)
     {
         ASSERT_EQ(attributes.size(), expectedAttributes.size());
-        for (int i = 0; i < attributes.size(); ++i)
+        for (int i = 0; i < (int) attributes.size(); ++i)
         {
             const Attribute* attribute = attributes[i];
             const ExpectedAttribute& expectedAttribute = expectedAttributes[i];
@@ -316,7 +316,7 @@ private:
         const std::vector<QString> items = enumeration->items();
         ASSERT_EQ(items.size(), expectedAttribute.enumeration.size());
 
-        for (int i = 0; i < items.size(); ++i)
+        for (int i = 0; i < (int) items.size(); ++i)
             ASSERT_EQ(items[i], expectedAttribute.enumeration[i]);
     }
 
@@ -330,7 +330,7 @@ private:
         const std::vector<QString> items = colorSet->items();
         ASSERT_EQ(items.size(), expectedAttribute.colorSet.size());
 
-        for (int i = 0; i < items.size(); ++i)
+        for (int i = 0; i < (int) items.size(); ++i)
         {
             ASSERT_EQ(items[i], expectedAttribute.colorSet[i].name);
             ASSERT_EQ(colorSet->color(items[i]), expectedAttribute.colorSet[i].rgb);

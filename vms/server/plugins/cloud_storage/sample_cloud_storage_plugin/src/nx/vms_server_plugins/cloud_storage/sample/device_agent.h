@@ -12,8 +12,7 @@ namespace nx::vms_server_plugins::cloud_storage::sample {
 class DeviceAgent: public nx::sdk::RefCountable<nx::sdk::cloud_storage::IDeviceAgent>
 {
 public:
-    DeviceAgent(
-        const nx::sdk::cloud_storage::DeviceDescription& deviceDescription);
+    DeviceAgent();
 
 protected:
     virtual void getDeviceInfo(nx::sdk::Result<const nx::sdk::IDeviceInfo*>* outResult) const override;

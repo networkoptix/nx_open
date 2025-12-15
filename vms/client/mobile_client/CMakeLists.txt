@@ -161,6 +161,7 @@ if(NOT EXISTS ${customization_resources_dir})
 endif()
 
 set(target_args
+    NO_WERROR
     ROOT_FOLDER
     ADDITIONAL_SOURCES
         ${ios_sources}
@@ -181,7 +182,10 @@ set(target_args
 if(ANDROID)
     set(CMAKE_SHARED_MODULE_SUFFIX_CXX "_${CMAKE_ANDROID_ARCH_ABI}.so")
     string(REPLACE "-Wl,--as-needed" "" CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS})
-    nx_add_target(mobile_client LIBRARY LIBRARY_TYPE MODULE NO_API_MACROS ${target_args})
+    nx_add_target(mobile_client LIBRARY LIBRARY_TYPE MODULE
+        NO_API_MACROS
+        ${target_args}
+    )
 else()
     nx_add_target(mobile_client EXECUTABLE ${target_args})
 endif()

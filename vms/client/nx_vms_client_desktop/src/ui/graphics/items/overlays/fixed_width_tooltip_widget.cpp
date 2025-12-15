@@ -66,7 +66,7 @@ void QnFixedWidthTooltipWidget::paint(
     base_type::paint(painter, option, widget);
 
     paintSharp(painter,
-        [this, option, widget](QPainter* painter)
+        [this](QPainter* painter)
         {
             const auto& margins = contentsMargins();
             painter->drawPixmap(margins.left(), margins.top(), m_textPixmap);

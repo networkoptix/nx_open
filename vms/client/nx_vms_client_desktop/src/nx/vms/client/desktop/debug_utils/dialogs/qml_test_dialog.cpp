@@ -42,7 +42,7 @@ std::unique_ptr<QFile> historyFile(QFile::OpenMode mode)
     const auto location = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
     auto file = std::make_unique<QFile>(QDir(location).filePath(kFileName));
     if (file->open(mode | QFile::Text))
-        return std::move(file);
+        return file;
 
     return {};
 }

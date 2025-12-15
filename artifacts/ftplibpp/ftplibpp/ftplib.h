@@ -52,9 +52,11 @@
 #endif
 
 #if defined(__APPLE__)
-#define off64_t __darwin_off_t
-#define fseeko64 fseeko
-#define fopen64 fopen
+    #ifndef off64_t
+        #define off64_t __darwin_off_t
+    #endif
+    #define fseeko64 fseeko
+    #define fopen64 fopen
 #endif
 
 //SSL
@@ -68,8 +70,6 @@ typedef struct x509_st X509;
 #ifndef _FTPLIB_SSL_CLIENT_METHOD_
 #define _FTPLIB_SSL_CLIENT_METHOD_ TLSv1_2_client_method
 #endif
-
-using namespace std;
 
 //SSL
 typedef struct ssl_st SSL;

@@ -86,7 +86,7 @@ public:
 private:
     mutable QMap<nx::utils::SoftwareVersion, QnClientInstallationPtr> m_installationByVersion;
     QDir m_installationsDir;
-    QScopedPointer<nx::zip::Extractor> m_extractor;
+    std::unique_ptr<nx::zip::Extractor> m_extractor;
     /** Total number of bytes to be extracted by installZip method. */
     std::atomic_uint64_t m_totalUnpackedSize = 0;
 

@@ -82,11 +82,10 @@ struct QnServerSettingsDialog::Private
     // non-FLUX dialog.
     class PluginSettingsAdapter: public QnAbstractPreferencesWidget
     {
-        Private* const d;
         using base_type = QnAbstractPreferencesWidget;
 
     public:
-        PluginSettingsAdapter(Private* d): d(d)
+        PluginSettingsAdapter(Private* d)
         {
             d->pluginsPage->setParent(this);
             anchorWidgetToParent(d->pluginsPage);

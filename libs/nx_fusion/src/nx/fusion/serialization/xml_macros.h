@@ -31,7 +31,7 @@ private:
 } // namespace QnXmlDetail
 
 #define QN_FUSION_DEFINE_FUNCTIONS_xml(TYPE, /*PREFIX*/ ...) \
-    __VA_ARGS__ void serialize(const TYPE& value, QXmlStreamWriter* stream) \
+    __VA_ARGS__ [[maybe_unused]] void serialize(const TYPE& value, QXmlStreamWriter* stream) \
     { \
         QnXmlDetail::SerializationVisitor visitor(stream); \
         QnFusion::visit_members(value, visitor); \

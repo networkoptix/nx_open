@@ -19,7 +19,7 @@ if(MACOSX)
 endif()
 
 nx_add_target(nx_vms_common LIBRARY
-    # For add "WERROR_IF LINUX" need to fix Wswitch warnings.
+    NO_WERROR # For add "WERROR_IF LINUX" need to fix Wswitch warnings.
     ADDITIONAL_SOURCES
         ${mac_sources}
         ${date_time_formatter_sources}

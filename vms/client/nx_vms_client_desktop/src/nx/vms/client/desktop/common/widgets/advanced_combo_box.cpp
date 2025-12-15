@@ -81,7 +81,7 @@ void AdvancedComboBox::showPopup()
     base_type::showPopup();
 }
 
-void AdvancedComboBox::paintEvent(QPaintEvent* event)
+void AdvancedComboBox::paintEvent(QPaintEvent* /*event*/)
 {
     QStylePainter painter(this);
     painter.setPen(palette().color(QPalette::Text));

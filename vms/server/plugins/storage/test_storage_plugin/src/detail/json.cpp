@@ -109,16 +109,18 @@ static int matchString(const char **source, const char *pattern)
 
 static int reallocObject(struct JsonVal *val)
 {
-    if (!(val->u.object.keys = (char **)realloc(
-              val->u.object.keys,
-              (val->u.object.len + 1) * sizeof(*val->u.object.keys))))
+    val->u.object.keys = (char**)realloc(
+        val->u.object.keys,
+        (val->u.object.len + 1) * sizeof(*val->u.object.keys));
+    if (!val->u.object.keys)
     {
         return -1;
     }
 
-    if (!(val->u.object.values = (struct JsonVal*)realloc(
-              val->u.object.values,
-              (val->u.object.len + 1) * sizeof(*val->u.object.values))))
+    val->u.object.values = (struct JsonVal*)realloc(
+        val->u.object.values,
+        (val->u.object.len + 1) * sizeof(*val->u.object.values));
+    if (!val->u.object.values)
     {
         return -1;
     }
@@ -129,9 +131,10 @@ static int reallocObject(struct JsonVal *val)
 
 static int reallocArray(struct JsonVal *val)
 {
-    if (!(val->u.array.values = (struct JsonVal*)realloc(
-              val->u.array.values,
-              (val->u.array.len + 1) * sizeof(*val->u.array.values))))
+    val->u.array.values = (struct JsonVal*)realloc(
+        val->u.array.values,
+        (val->u.array.len + 1) * sizeof(*val->u.array.values));
+    if (!val->u.array.values)
     {
         return -1;
     }

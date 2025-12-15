@@ -1306,7 +1306,7 @@ void QnResourceWidget::updateHud(bool animate)
     const bool showOnlyCameraName = ((overlaysCanBeVisible && detailsVisible) || alwaysShowName)
         && !m_mouseInWidget;
     const bool showCameraNameWithButtons = overlaysCanBeVisible && m_mouseInWidget;
-    const bool showPosition = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget)
+    const bool showPosition = (overlaysCanBeVisible && (detailsVisible || m_mouseInWidget))
         || forceShowPosition()
         || (!workbench()->windowContext()->streamSynchronizer()->isRunning()
             && (selectionState() == SelectionState::notSelected));

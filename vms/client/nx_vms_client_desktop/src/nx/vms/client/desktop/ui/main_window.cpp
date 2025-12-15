@@ -36,19 +36,9 @@ namespace experimental {
 
 class MainWindow::Private: public QObject
 {
-    MainWindow* const q = nullptr;
-
-public:
-    Private(MainWindow* parent);
-
 public:
     QQuickWidget* sceneWidget = nullptr;
 };
-
-MainWindow::Private::Private(MainWindow* parent):
-    q(parent)
-{
-}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -85,7 +75,7 @@ protected:
 MainWindow::MainWindow(QQmlEngine* engine, WindowContext* context, QWidget* parent):
     base_type(parent),
     WindowContextAware(context),
-    d(new Private(this))
+    d(new Private())
 {
     engine->addImageProvider("resource", new core::ResourceIconProvider());
     engine->addImageProvider("previews",

@@ -12,8 +12,7 @@
 
 namespace nx::vms_server_plugins::cloud_storage::sample {
 
-DeviceAgent::DeviceAgent(
-    const nx::sdk::cloud_storage::DeviceDescription& deviceDescription)
+DeviceAgent::DeviceAgent()
 {
 }
 

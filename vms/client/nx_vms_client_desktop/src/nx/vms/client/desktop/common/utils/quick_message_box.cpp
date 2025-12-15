@@ -47,7 +47,7 @@ void QuickMessageBox::registerQmlType()
     qRegisterMetaType<QDialogButtonBox::ButtonRole>();
 
     qmlRegisterSingletonType<QuickMessageBox>("nx.vms.client.desktop", 1, 0, "MessageBox",
-        [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+        [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
         {
             static QuickMessageBox instance;
             return core::withCppOwnership(&instance);

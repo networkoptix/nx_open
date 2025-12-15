@@ -992,7 +992,7 @@ void FilterProxyModel::Private::sourceLayoutChanged(
 
     invalidateMapping();
 
-    for (const auto changing: m_changingIndexes)
+    for (const auto& changing: m_changingIndexes)
     {
         const auto newProxyIndex = q->mapFromSource(changing.second);
         q->changePersistentIndex(changing.first, newProxyIndex);

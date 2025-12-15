@@ -411,15 +411,57 @@ using LibHandle =
         void*;
     #endif
 
+#if defined(_WIN32)
+static std::string wideToUtf8(const wchar_t* w, int wlen)
+{
+    if (!w || wlen <= 0) return {};
+
+    int bytes = WideCharToMultiByte(
+        CP_UTF8,
+        0,              // or WC_ERR_INVALID_CHARS if you want strict validation
+        w, wlen,
+        nullptr, 0,
+        nullptr, nullptr);
+
+    if (bytes <= 0) return {};
+
+    std::string out(bytes, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, w, wlen, out.data(), bytes, nullptr, nullptr);
+    return out;
+}
+
+static std::wstring utf8ToWide(const std::string& s)
+{
+    if (s.empty()) return {};
+
+    int wchars = MultiByteToWideChar(
+        CP_UTF8,
+        MB_ERR_INVALID_CHARS, // remove if you prefer 'best effort'
+        s.data(),
+        (int)s.size(),
+        nullptr,
+        0);
+
+    if (wchars <= 0)
+        return {};
+
+    std::wstring out(wchars, L'\0');
+    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), (int)s.size(),
+        out.data(), wchars);
+    return out;
+}
+
+#endif
+
 static std::string getLastDynamicLibError()
 {
     #if defined(_WIN32)
         const DWORD errorCode = GetLastError();
 
-        char16_t msgBuf[1024];
+        wchar_t msgBuf[1024];
         memset(msgBuf, 0, sizeof(msgBuf));
 
-        FormatMessageW(
+        DWORD msgBufLen = FormatMessageW(
             /*dwFlags*/ FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
             /*lpSource*/ nullptr,
             /*dwMessageId*/ errorCode,
@@ -427,8 +469,6 @@ static std::string getLastDynamicLibError()
             (LPWSTR) &msgBuf,
             sizeof(msgBuf),
             /*Arguments*/ nullptr);
-
-        int msgBufLen = (int) wcslen((const wchar_t*) msgBuf);
 
         // Remove all trailing whitespace.
         for (int i = msgBufLen; i > 0; --i)
@@ -445,19 +485,14 @@ static std::string getLastDynamicLibError()
         }
 
         // Remove all leading whitespace.
-        const char16_t* msgStartPos = msgBuf;
+        const wchar_t* msgStartPos = msgBuf;
         int msgLen = msgBufLen;
         while (*msgStartPos && *msgStartPos <= L' ')
         {
             ++msgStartPos;
             --msgLen;
         }
-
-        // Convert the message: UTF-16 -> UTF-8.
-        // NOTE: int16_t is used instead of char16_t as a workaround for an MSVC2015 bug.
-        std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> converter;
-        const int16_t* const startPos = (const int16_t*) msgStartPos;
-        const std::string msg = converter.to_bytes(startPos, startPos + msgLen);
+        const std::string msg = wideToUtf8(msgStartPos, msgLen);
 
         const std::string errorCodeMessage = nx::kit::utils::format(
             "Windows error %d (0x%X)", errorCode, errorCode);
@@ -472,11 +507,7 @@ static std::string getLastDynamicLibError()
 static LibHandle loadLib(const std::string& libFilename)
 {
     #if defined(_WIN32)
-        // Convert the filename: UTF-8 -> UTF-16.
-        // NOTE: int16_t is used instead of char16_t as a workaround for an MSVC2015 bug.
-        std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> converter;
-        const std::basic_string<int16_t> libFilenameW = converter.from_bytes(libFilename);
-
+        const std::wstring libFilenameW = utf8ToWide(libFilename);
         const LibHandle libHandle = LoadLibraryW((wchar_t*) libFilenameW.c_str());
     #else
         const LibHandle libHandle = dlopen(libFilename.c_str(), /*resolve all funcs*/ RTLD_NOW);
@@ -514,11 +545,15 @@ static void unloadLib(LibHandle libHandle)
 template<typename EntryPoint>
 static typename EntryPoint::Func resolveLibFunc(LibHandle libHandle)
 {
-    #if defined(_WIN32)
-        return reinterpret_cast<typename EntryPoint::Func>(GetProcAddress(libHandle, EntryPoint::kFuncName));
-    #else
-        return reinterpret_cast<typename EntryPoint::Func>(dlsym(libHandle, EntryPoint::kFuncName));
-    #endif
+    auto address =
+        #if defined(_WIN32)
+            reinterpret_cast<void*>(GetProcAddress(libHandle, EntryPoint::kFuncName));
+        #else
+            dlsym(libHandle, EntryPoint::kFuncName)
+        #endif
+    ;
+
+    return reinterpret_cast<typename EntryPoint::Func>(address);
 }
 
 static std::string getPluginLibName(const std::string& libFilename)

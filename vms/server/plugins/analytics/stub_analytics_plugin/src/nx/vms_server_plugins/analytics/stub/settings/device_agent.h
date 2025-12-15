@@ -49,7 +49,6 @@ private:
         std::map<std::string, std::string>* inOutSettingValue);
 
 private:
-    Engine* const m_engine;
     ActiveSettingsBuilder m_activeSettingsBuilder;
 };
 

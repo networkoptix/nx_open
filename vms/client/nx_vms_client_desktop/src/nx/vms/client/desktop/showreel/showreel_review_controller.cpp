@@ -320,7 +320,6 @@ void ShowreelReviewController::updatePlaceholders()
             m_dropPlaceholders.remove(p);
     }
 
-    int placeholdersCount = 0;
     for (int x = boundingRect.left(); x <= boundingRect.right(); ++x)
     {
         for (int y = boundingRect.top(); y <= boundingRect.bottom(); ++y)
@@ -333,8 +332,6 @@ void ShowreelReviewController::updatePlaceholders()
             // If cell is empty and there is a placeholder (or vise versa), skip this step.
             if (mustBePlaceholder == placeholderExists)
             {
-                if (placeholderExists)
-                    ++placeholdersCount;
                 continue;
             }
 
@@ -345,7 +342,6 @@ void ShowreelReviewController::updatePlaceholders()
             else
             {
                 m_dropPlaceholders.insert(cell, createPlaceholder(cell));
-                ++placeholdersCount;
             }
         }
     }

@@ -772,7 +772,7 @@ Style::Style():
     installEventHandler(qApp,
         {QEvent::WindowDeactivate, QEvent::FocusOut},
         this,
-        [this](QObject* watched, QEvent*)
+        [](QObject* watched, QEvent*)
         {
             auto view = qobject_cast<QGraphicsView*>(watched);
             if (!view || !view->scene())

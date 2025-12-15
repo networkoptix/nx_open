@@ -174,7 +174,7 @@ nx::MoveOnlyFunc<void ()> makeSafeCallback(
                 });
         };
 
-    return std::move(responseHandler);
+    return responseHandler;
 }
 
 } // namespace

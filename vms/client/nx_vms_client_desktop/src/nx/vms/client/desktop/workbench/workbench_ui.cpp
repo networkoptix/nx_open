@@ -92,7 +92,6 @@ Qn::PaneState makePaneState(bool opened, bool pinned)
 
 constexpr int kHideControlsTimeoutMs = 2000;
 constexpr qreal kZoomedTimelineOpacity = 0.9;
-static constexpr int kReservedSceneWidth = 224;
 
 int calculateAutoFpsLimit(QnWorkbenchLayout* layout)
 {

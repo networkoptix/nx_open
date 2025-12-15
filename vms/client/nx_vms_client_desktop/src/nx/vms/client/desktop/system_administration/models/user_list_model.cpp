@@ -326,7 +326,7 @@ void UserListModel::Private::handleUserChanged(const QnUserResourcePtr& user)
 
 QnUserResourcePtr UserListModel::Private::user(const QModelIndex& index) const
 {
-    if (!index.isValid() || index.row() >= users.size())
+    if (!index.isValid() || index.row() >= (int) users.size())
         return QnUserResourcePtr();
 
     return *users.nth(index.row());

@@ -1045,7 +1045,7 @@ struct LogsManagementWatcher::Private
                 }
             }
 
-            nx::vms::event::Level level;
+            nx::vms::event::Level level{ nx::vms::event::Level::none};
             QString title;
             QString description;
             std::optional<ProgressState> progress;

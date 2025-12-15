@@ -303,7 +303,7 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
         { Qt::DecorationRole, Qt::DisplayRole, Qt::ToolTipRole, CameraBookmarkRole };
 
     const int row = index.row();
-    if (row >= m_bookmarks.size() || !kAcceptedRolesSet.contains(role))
+    if (row >= (int) m_bookmarks.size() || !kAcceptedRolesSet.contains(role))
         return QVariant();
 
     const QnCameraBookmark& bookmark = m_bookmarks.at(row);

@@ -341,7 +341,7 @@ bool EmulatedNonClientArea::event(QEvent* event)
     return base_type::event(event);
 }
 
-void EmulatedNonClientArea::paintEvent(QPaintEvent* event)
+void EmulatedNonClientArea::paintEvent(QPaintEvent* /*event*/)
 {
     const auto frameWidth = d->effectiveFrameWidth();
     if (frameWidth == 0)

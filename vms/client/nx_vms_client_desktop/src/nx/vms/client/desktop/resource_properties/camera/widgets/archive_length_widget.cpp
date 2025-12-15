@@ -154,7 +154,7 @@ void ArchiveLengthWidget::Private::setStore(CameraSettingsDialogStore* store)
         store, &CameraSettingsDialogStore::setMinRecordingPeriodAutomatic);
 
     storeConnections << connect(ui->spinBoxMinPeriod, QnSpinboxIntValueChanged,
-        [this, store](int value)
+        [this, store](int /*value*/)
         {
             store->setMinRecordingPeriodValue(
                 getPeriodDuration(ui->spinBoxMinPeriod, ui->comboBoxMinPeriodUnit));
@@ -175,7 +175,7 @@ void ArchiveLengthWidget::Private::setStore(CameraSettingsDialogStore* store)
         store, &CameraSettingsDialogStore::setMaxRecordingPeriodAutomatic);
 
     storeConnections << connect(ui->spinBoxMaxPeriod, QnSpinboxIntValueChanged,
-        [this, store](int value)
+        [this, store](int /*value*/)
         {
             store->setMaxRecordingPeriodValue(
                 getPeriodDuration(ui->spinBoxMaxPeriod, ui->comboBoxMaxPeriodUnit));

@@ -442,7 +442,7 @@ void CameraAdvancedParamWidgetsManager::setUpDependenciesForPage(
         auto runHandlerChains = makeHandlerChainLauncher(handlerChains);
         for (const auto& watch : watches)
         {
-            if (auto widget = m_paramWidgetsById.value(watch))
+            if (m_paramWidgetsById.value(watch))
                 m_handlerChains[watch].push_back(runHandlerChains);
         }
     }

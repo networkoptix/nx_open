@@ -391,7 +391,7 @@ void RulesTableModel::initialise()
 
 bool RulesTableModel::isIndexValid(const QModelIndex& index) const
 {
-    return index.isValid() && index.row() < m_ruleIds.size();
+    return index.isValid() && index.row() < (int) m_ruleIds.size();
 }
 
 bool RulesTableModel::canDisplayRule(const ConstRulePtr& rule) const

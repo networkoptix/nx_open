@@ -61,7 +61,7 @@ static const std::string kComboBoxForValueSetChangeId = "comboBoxForValueSetChan
 static const std::string kComboBoxForValueSetChangeValuePermanent = "Permanent";
 static const std::string kComboBoxForValueSetChangeValueOptional = "Optional";
 
-static const std::string kParametersModel = /*suppress newline*/ 1 + R"json(
+static const std::string kParametersModel = &R"json(
 {
     "type": "Settings",
     "items":
@@ -73,7 +73,7 @@ static const std::string kParametersModel = /*suppress newline*/ 1 + R"json(
         }
     ]
 }
-)json";
+)json"[1]; //< Suppress newline.
 
 // ------------------------------------------------------------------------------------------------
 static const std::string kEngineIntegrationSideSetting = "testIntegrationSideSpinBox";
@@ -82,15 +82,15 @@ static const std::string kShowExtraTextField = "showExtraTextField";
 static const std::string kPushEngineManifest = "pushEnginemManifest";
 static const std::string kExtraTextFieldTemplateVariableName = "@EXTRA_TEXTFIELD_TEMPLATE_VAR@";
 static const std::string kExtraCheckBoxTemplateVariableName = "@EXTRA_CHECKBOX_TEMPLATE_VAR@";
-const std::string kExtraCheckBoxJson = /*suppress newline*/ 1 + R"json(
+const std::string kExtraCheckBoxJson = &R"json(
 {
     "type": "CheckBox",
     "name": "extraCheckBox",
     "caption": "Extra Check Box",
     "defaultValue": true
 },
-)json";
-const std::string kExtraTextFieldJson = /*suppress newline*/ 1 + R"json(
+)json"[1]; //< Suppress newline.
+const std::string kExtraTextFieldJson = &R"json(
 {
     "type": "TextField",
     "name": "extraTextField",
@@ -98,13 +98,13 @@ const std::string kExtraTextFieldJson = /*suppress newline*/ 1 + R"json(
     "description": "Extra Text Field",
     "defaultValue": "some text"
 },
-)json";
-static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json("
+)json"[1]; //< Suppress newline.
+static const std::string kEngineSettingsModel = (std::string(R"json("
 {
     "type": "Settings",
     "items":
     [
-        )json" + kExtraTextFieldTemplateVariableName + R"json(
+        )json") + kExtraTextFieldTemplateVariableName + R"json(
         )json" + kExtraCheckBoxTemplateVariableName + R"json(
         {
             "type": "ComboBox",
@@ -371,17 +371,16 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
         }
     ]
 }
-)json";
+)json").substr(1); //< Suppress newline.
 
-static const std::string kAlternativeSettingsModel =
-    /*suppress newline*/ 1 + (const char*) R"json("
+static const std::string kAlternativeSettingsModel = (std::string(R"json("
 {
     "type": "Settings",
     "items":
     [
         {
             "type": "ComboBox",
-            "name": ")json" + kSettingsModelSettings + R"json(",
+            "name": ")json") + kSettingsModelSettings + R"json(",
             "caption": "Settings model",
             "defaultValue": ")json" + kRegularSettingsModelOption + R"json(",
             "range":
@@ -411,16 +410,16 @@ static const std::string kAlternativeSettingsModel =
         }
     ]
 }
-)json";
+)json").substr(1); //< Suppress newline.
 
-static const std::string kRegularSettingsModelPart1 = /*suppress newline*/ 1 + R"json(
+static const std::string kRegularSettingsModelPart1 = (std::string(R"json(
 {
     "type": "Settings",
     "items":
     [
         {
             "type": "ComboBox",
-            "name": ")json" + kSettingsModelSettings + R"json(",
+            "name": ")json") + kSettingsModelSettings + R"json(",
             "caption": "Settings model",
             "defaultValue": ")json" + kRegularSettingsModelOption + R"json(",
             "range":
@@ -451,9 +450,9 @@ static const std::string kRegularSettingsModelPart1 = /*suppress newline*/ 1 + R
                         ")json" + kGermanOption + R"json("
                     ]
                 },
-)json";
+)json").substr(1); //< Suppress newline.
 
-static const std::string kEnglishCitiesSettingsModelPart = /*suppress newline*/ 1 + R"json(
+static const std::string kEnglishCitiesSettingsModelPart = &R"json(
                 {
                     "type": "RadioButtonGroup",
                     "name": "testEnglishRadioButtonGroup",
@@ -466,9 +465,9 @@ static const std::string kEnglishCitiesSettingsModelPart = /*suppress newline*/ 
                         "Liverpool"
                     ]
                 },
-)json";
+)json"[1]; //< Suppress newline.
 
-static const std::string kGermanCitiesSettingsModelPart = /*suppress newline*/ 1 + R"json(
+static const std::string kGermanCitiesSettingsModelPart = &R"json(
                 {
                     "type": "RadioButtonGroup",
                     "name": "testGermanRadioButtonGroup",
@@ -482,9 +481,9 @@ static const std::string kGermanCitiesSettingsModelPart = /*suppress newline*/ 1
                         "Leipzig"
                     ]
                 },
-)json";
+)json"[1]; //< Suppress newline.
 
-static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R"json("
+static const std::string kRegularSettingsModelPart2 = (std::string(R"json("
                 {
                     "type": "RadioButtonGroup",
                     "name": "testRadioButtonGroup",
@@ -795,7 +794,7 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
         },
         {
             "type": "Section",
-            "caption": ")json" + kActiveSettingsSectionCaption + R"json(",
+            "caption": ")json") + kActiveSettingsSectionCaption + R"json(",
             "items":
             [
                 {
@@ -969,7 +968,7 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
         }
     ]
 }
-)json";
+)json").substr(1); //< Suppress newline.
 
 } // namespace settings
 } // namespace stub

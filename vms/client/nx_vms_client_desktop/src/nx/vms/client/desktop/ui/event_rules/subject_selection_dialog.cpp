@@ -336,7 +336,7 @@ void SubjectSelectionDialog::setValidationPolicy(QnSubjectValidationPolicy* poli
 
 void SubjectSelectionDialog::validateAllUsers()
 {
-    const auto validationState = m_roles->validateUsers(std::move(allSubjects()));
+    const auto validationState = m_roles->validateUsers(allSubjects());
 
     QIcon icon = (validationState == QValidator::Acceptable
         ? qnSkin->icon(kGroupIcon)

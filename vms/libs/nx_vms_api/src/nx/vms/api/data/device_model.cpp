@@ -85,7 +85,7 @@ struct MapFieldToParameter
     void operator()(const QString& parameter, Field M::* memPtr) const
     {
         std::mem_fn(memPtr)(from);
-        const auto& fieldValue = std::mem_fn(memPtr)(&from);
+        const auto fieldValue = std::mem_fn(memPtr)(&from);
 
         if constexpr (nx::traits::is<std::optional, std::decay_t<Field>>())
         {

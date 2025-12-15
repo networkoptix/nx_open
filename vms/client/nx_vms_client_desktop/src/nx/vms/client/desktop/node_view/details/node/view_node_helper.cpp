@@ -30,7 +30,7 @@ void forEachNodeInternal(
     if (!node || !callback)
         return;
 
-    for (const auto child: node->children())
+    for (const auto& child: node->children())
         forEachNodeInternal(child, callback, onlyLeafNodes);
 
     if (!onlyLeafNodes || node->isLeaf())

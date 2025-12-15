@@ -60,7 +60,7 @@ ControlBar::ControlBar(QWidget* parent):
     d->background->setHidden(true);
 
     d->background->setCustomPaintFunction(
-        [this](QPainter* painter, const QStyleOption* option, const QWidget* widget)
+        [](QPainter* painter, const QStyleOption* option, const QWidget* widget)
         {
             const auto& frameColor = option->palette.color(QPalette::Dark);
             const auto& fillBrush = option->palette.brush(QPalette::Window);

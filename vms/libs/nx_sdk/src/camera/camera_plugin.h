@@ -6,6 +6,7 @@
 #include <cstring>
 
 #include <stdint.h>
+#include <string.h>
 
 #include <plugins/plugin_api.h>
 
@@ -86,35 +87,6 @@ namespace nxcip
         char defaultLogin[256] = {};
         //!Plugin can specify default credentials to use with camera
         char defaultPassword[256] = {};
-
-        //!Initializes all values with zeros/empty strings
-        CameraInfo() = default;
-
-        CameraInfo(const CameraInfo& value)
-        {
-            strncpy(modelName, value.modelName, sizeof(modelName) - 1);
-            modelName[sizeof(modelName) - 1] = '\0';
-
-            strncpy(firmware, value.firmware, sizeof(firmware) - 1);
-            firmware[sizeof(firmware) - 1] = '\0';
-
-            strncpy(uid, value.uid, sizeof(uid) - 1);
-            uid[sizeof(uid) - 1] = '\0';
-
-            strncpy(url, value.url, sizeof(url) - 1);
-            url[sizeof(url) - 1] = '\0';
-
-            strncpy(auxiliaryData, value.auxiliaryData, sizeof(auxiliaryData) - 1);
-            auxiliaryData[sizeof(auxiliaryData) - 1] = '\0';
-
-            strncpy(defaultLogin, value.defaultLogin, sizeof(defaultLogin) - 1);
-            defaultLogin[sizeof(defaultLogin) - 1] = '\0';
-
-            strncpy(defaultPassword, value.defaultPassword, sizeof(defaultPassword) - 1);
-            defaultPassword[sizeof(defaultPassword) - 1] = '\0';
-        }
-
-        CameraInfo& operator=(const CameraInfo& other) = default;
     };
 
     struct CameraInfo2: public CameraInfo

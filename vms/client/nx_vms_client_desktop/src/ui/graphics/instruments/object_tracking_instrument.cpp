@@ -40,7 +40,7 @@ ObjectTrackingInstrument::ObjectTrackingInstrument(QObject* parent):
         this,
         &ClickInstrument::itemClicked,
         this,
-        [this](QGraphicsView* /*view*/, QGraphicsItem* item, ClickInfo info)
+        [](QGraphicsView* /*view*/, QGraphicsItem* item, ClickInfo info)
         {
             if (info.modifiers != Qt::AltModifier)
                 return;

@@ -36,7 +36,7 @@ void AnimatedTabWidget::handleCurrentChanged()
     const auto newTab = currentWidget();
 
     // Current index can change due to tab removal, in that case current widget can remain the same.
-    if (!newTab && !m_currentTab || newTab == m_currentTab)
+    if ((!newTab && !m_currentTab) || newTab == m_currentTab)
         return;
 
     if (!isVisible())

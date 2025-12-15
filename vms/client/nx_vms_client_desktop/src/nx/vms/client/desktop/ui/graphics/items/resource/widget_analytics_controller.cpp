@@ -401,8 +401,9 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
             timestamp);
 
         auto pixSetting = systemContext()->globalSettings()->pixelationSettings();
-        if (!accessController()->hasGlobalPermissions(GlobalPermission::viewUnredactedVideo) &&
-            pixSetting.isAllObjectTypes || pixSetting.objectTypeIds.contains(objectInfo.rawData.typeId))
+        if ((!accessController()->hasGlobalPermissions(GlobalPermission::viewUnredactedVideo) &&
+            pixSetting.isAllObjectTypes) ||
+            pixSetting.objectTypeIds.contains(objectInfo.rawData.typeId))
         {
             const auto watcher = systemContext()->analyticsTaxonomyStateWatcher();
             const auto state = NX_ASSERT(watcher) ? watcher->state() : nullptr;

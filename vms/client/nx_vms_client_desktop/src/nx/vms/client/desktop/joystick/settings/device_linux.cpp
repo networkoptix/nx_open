@@ -128,7 +128,7 @@ Device::State DeviceLinux::getNewState()
     {
         if (event.isAxis())
         {
-            if (event.axisOrButtonIndex() >= newStickPosition.size())
+            if (event.axisOrButtonIndex() >= (int) newStickPosition.size())
                 continue; // We don't use additional axes.
 
             newStickPosition[event.axisOrButtonIndex()] =
@@ -136,7 +136,7 @@ Device::State DeviceLinux::getNewState()
         }
         else if (event.isButton())
         {
-            if (event.axisOrButtonIndex() >= newButtonStates.size())
+            if (event.axisOrButtonIndex() >= (int) newButtonStates.size())
                 continue; // We don't use more buttons, than in joystick config.
 
             newButtonStates[event.axisOrButtonIndex()] = event.axisOrButtonState();

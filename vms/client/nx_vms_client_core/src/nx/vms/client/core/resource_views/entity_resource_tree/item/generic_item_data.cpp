@@ -83,7 +83,7 @@ InvalidatorPtr recorderIconInvalidator(
     return result;
 }
 
-GenericItem::DataProvider cloudLayoutIconProvider(const QnLayoutResourcePtr& layout)
+GenericItem::DataProvider cloudLayoutIconProvider(const QnLayoutResourcePtr& /*layout*/)
 {
     return []() -> int { return ResourceIconCache::CloudLayout; };
 }

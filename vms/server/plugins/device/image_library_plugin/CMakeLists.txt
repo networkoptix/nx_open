@@ -1,7 +1,9 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 # Used in Combined Plugin.
-nx_add_target(image_library_plugin_integration LIBRARY LIBRARY_TYPE STATIC NO_MOC
+nx_add_target(image_library_plugin_integration LIBRARY
+    LIBRARY_TYPE STATIC
+    NO_MOC
     PUBLIC_LIBS nx_sdk
     FOLDER server/libs
 )

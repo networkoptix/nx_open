@@ -3,6 +3,7 @@
 # Generate configuration file for the test - it contains the list of plugin library paths.
 
 nx_add_server_plugin_test(analytics_plugin_ut NO_GTEST
+    WERROR_IF LINUX
     PRIVATE_LIBS
         nx_sdk
         nx_kit

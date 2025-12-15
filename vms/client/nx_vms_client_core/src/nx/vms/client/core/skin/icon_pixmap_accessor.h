@@ -16,7 +16,6 @@ public:
     QString name(int index) const;
 
 private:
-    const QIcon *m_icon;
     const QPixmapIconEngine *m_engine;
 };
 

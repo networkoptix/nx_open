@@ -190,6 +190,9 @@ protected:
     }
 
     QnUserResourcePtr m_currentUser;
+
+private:
+    using ContextBasedTest::createLayout;
 };
 
 // ------------------------------------------------------------------------------------------------

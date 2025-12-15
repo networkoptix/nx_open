@@ -12,7 +12,7 @@ if(withTcmalloc)
     find_package(gperftools REQUIRED)
 endif()
 
-set(nx_enable_werror OFF)
+set(nx_enable_werror ON)
 
 include(${PROJECT_SOURCE_DIR}/cmake/windows_signing.cmake)
 
@@ -182,7 +182,17 @@ function(nx_add_target name type)
         endif()
     endif()
 
-    if(NOT NX_NO_WERROR AND (nx_enable_werror OR NX_WERROR OR NOT "${NX_WERROR_IF}" STREQUAL ""))
+    if((NX_NO_WERROR AND NX_WERROR) OR
+        (NX_NO_WERROR AND NOT "${NX_WERROR_IF}" STREQUAL "") OR
+        (NX_WERROR AND NOT "${NX_WERROR_IF}" STREQUAL "")
+    )
+        message(FATAL_ERROR "Only one of NO_WERROR, WERROR, WERROR_IF can be defined for target.")
+    endif()
+
+    if(NOT NX_NO_WERROR AND
+        (nx_enable_werror OR NX_WERROR) AND
+        "${NX_WERROR_IF}" STREQUAL "" # If NX_WERROR_IF defined enable WERROR only for "IF" condition after.
+    )
         nx_target_enable_werror(${name} "${NX_WERROR_IF}")
     endif()
 

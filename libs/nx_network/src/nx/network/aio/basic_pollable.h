@@ -202,6 +202,8 @@ protected:
     nx::utils::InterruptionFlag::Watcher interruptionWatcher() { return {&m_interruptionFlag}; }
 
 private:
+    using AbstractPollable::post;
+
     mutable Pollable m_pollable;
     AIOService* m_aioService = nullptr;
     nx::utils::InterruptionFlag m_interruptionFlag;

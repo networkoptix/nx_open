@@ -77,7 +77,7 @@ EntityItemModelTest::RandomNameGenerator EntityItemModelTest::randomNameGenerato
 std::vector<int> EntityItemModelTest::inversePermutation(const std::vector<int>& permutation) const
 {
     std::vector<int> result(permutation.size(), 0);
-    for (int i = 0; i < permutation.size(); ++i)
+    for (int i = 0; i < (int) permutation.size(); ++i)
         result[permutation[i]] = i;
     return result;
 }

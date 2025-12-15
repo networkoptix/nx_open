@@ -31,7 +31,7 @@ QnLauncherProgress::QnLauncherProgress(const std::wstring& caption):
     cls.lpszClassName = L"LauncherProgressWindow";
     const ATOM wndClass = RegisterClassEx(&cls);
 
-    m_mainWnd = CreateWindowEx(WS_EX_DLGMODALFRAME, (LPCTSTR)wndClass, nullptr,
+    m_mainWnd = CreateWindowEx(WS_EX_DLGMODALFRAME, reinterpret_cast<LPCTSTR>(wndClass), nullptr,
         WS_OVERLAPPED | WS_BORDER | WS_VISIBLE,
         (GetSystemMetrics(SM_CXSCREEN) - kWidth) / 2,
         (GetSystemMetrics(SM_CYSCREEN) - kHeight) / 2,

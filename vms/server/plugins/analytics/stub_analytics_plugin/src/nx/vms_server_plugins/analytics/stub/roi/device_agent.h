@@ -32,7 +32,6 @@ protected:
     virtual std::string manifestString() const override;
 
 private:
-    Engine* const m_engine;
     std::string m_integrationSideTestPolygonSettingValue;
 };
 

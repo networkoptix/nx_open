@@ -224,7 +224,7 @@ QGraphicsWidget* QnGraphicsStackedWidgetPrivate::setCurrentIndex(int index)
 
 QGraphicsWidget* QnGraphicsStackedWidgetPrivate::currentWidget() const
 {
-    NX_ASSERT(m_currentIndex >= 0 && m_currentIndex < m_widgets.size()
+    NX_ASSERT((m_currentIndex >= 0 && m_currentIndex < m_widgets.size())
         || m_currentIndex == kNoIndex);
 
     return m_currentIndex >= 0 && m_currentIndex < m_widgets.size()

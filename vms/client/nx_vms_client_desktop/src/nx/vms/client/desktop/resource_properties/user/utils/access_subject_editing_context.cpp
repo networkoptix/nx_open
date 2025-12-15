@@ -829,7 +829,7 @@ AccessRights AccessSubjectEditingContext::combinedRelevantAccessRights(
     const QModelIndexList& indexes) const
 {
     return std::accumulate(indexes.cbegin(), indexes.cend(), AccessRights{},
-        [this](AccessRights sum, const QModelIndex& index)
+        [](AccessRights sum, const QModelIndex& index)
         {
             return sum | resourceAccessTreeItemInfo(index).relevantAccessRights;
         });
@@ -899,7 +899,7 @@ QnResourceList AccessSubjectEditingContext::selectionLayouts(
         if (nodeType == ResourceTree::NodeType::layouts)
         {
             return resourcePool()->getResources<LayoutResource>(
-                [this, &currentUserId](const LayoutResourcePtr& layout) -> bool
+                [&currentUserId](const LayoutResourcePtr& layout) -> bool
                 {
                     if (layout->isFile())
                         return false;

@@ -28,7 +28,7 @@ UserGroupDataList sorted(UserGroupDataList list)
 }
 
 #define SORT_AND_EXPECT_EQ(list1, list2) \
-    EXPECT_EQ(sorted(std::move(list1)), sorted(std::move(list2)))
+    EXPECT_EQ(sorted(list1), sorted(list2))
 
 class UserGroupManagerTest: public ::testing::Test
 {

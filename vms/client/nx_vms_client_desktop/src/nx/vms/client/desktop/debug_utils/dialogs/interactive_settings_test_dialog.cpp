@@ -59,7 +59,7 @@ void InteractiveSettingsTestDialog::loadManifest()
     const QString serializedModel = ui->manifestTextEdit->toPlainText().trimmed();
     const QJsonObject model = QJsonDocument::fromJson(serializedModel.toUtf8()).object();
 
-    if (const auto rootObject = m_settingsWidget->rootObject())
+    if (m_settingsWidget->rootObject())
     {
         QMetaObject::invokeMethod(
             m_settingsWidget->rootObject(),

@@ -129,7 +129,7 @@ void QnSignInfo::paintEvent(QPaintEvent*)
         painter.drawText(16, metric.height() + 16, text);
 }
 
-void QnSignInfo::setImageSize(int textureWidth, int textureHeight)
+void QnSignInfo::setImageSize(int /*textureWidth*/, int /*textureHeight*/)
 {
     update();
 }

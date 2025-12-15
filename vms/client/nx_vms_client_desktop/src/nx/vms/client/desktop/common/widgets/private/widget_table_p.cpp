@@ -329,7 +329,7 @@ void WidgetTable::Private::layoutChanged(
 
     /* Copy widget pointer to the buffer and clear its source location: */
     auto fetchItem =
-        [this, &buffer](QPointer<QWidget>& source)
+        [&buffer](QPointer<QWidget>& source)
         {
             if (source)
             {

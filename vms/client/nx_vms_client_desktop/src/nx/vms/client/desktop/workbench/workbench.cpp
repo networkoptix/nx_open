@@ -258,7 +258,7 @@ Workbench::Workbench(WindowContext* windowContext, QObject* parent):
     setCurrentLayout(d->dummyLayout.get());
 
     connect(d->dummyLayout.get(), &QnWorkbenchLayout::itemAdded, this,
-        [this]() { NX_ASSERT(false, "Items cannot be added to dummy layout"); });
+        []() { NX_ASSERT(false, "Items cannot be added to dummy layout"); });
 
     d->stateDelegate = std::make_shared<StateDelegate>(this);
     appContext()->clientStateHandler()->registerDelegate(kWorkbenchDataKey, d->stateDelegate);
@@ -329,7 +329,7 @@ core::LayoutResourcePtr Workbench::currentLayoutResource() const
 
 QnWorkbenchLayout* Workbench::layout(int index) const
 {
-    if (index < 0 || index >= d->layouts.size())
+    if (index < 0 || index >= (int) d->layouts.size())
     {
         NX_ASSERT(false, "Invalid layout index '%1'.", index);
         return nullptr;
@@ -411,7 +411,7 @@ QnWorkbenchLayout* Workbench::replaceLayout(
 
 void Workbench::removeLayout(int index)
 {
-    if (!NX_ASSERT(index >= 0 && index < d->layouts.size()))
+    if (!NX_ASSERT(index >= 0 && index < (int) d->layouts.size()))
         return;
 
     auto layout = d->layouts[index].get();
@@ -424,7 +424,7 @@ void Workbench::removeLayout(int index)
 
         int newCurrentIndex = index;
         newCurrentIndex++;
-        if (newCurrentIndex >= d->layouts.size())
+        if (newCurrentIndex >= (int) d->layouts.size())
             newCurrentIndex -= 2;
         if (newCurrentIndex >= 0)
             newCurrentLayout = d->layouts[newCurrentIndex].get();
@@ -455,13 +455,13 @@ void Workbench::removeLayouts(const core::LayoutResourceList& resources)
     if (updateCurrentLayout)
     {
         int newCurrentLayoutIndex = 0;
-        while (newCurrentLayoutIndex < d->layouts.size()
+        while (newCurrentLayoutIndex < (int) d->layouts.size()
             && removedLayouts.contains(d->layouts[newCurrentLayoutIndex]->resource()))
         {
             ++newCurrentLayoutIndex;
         }
 
-        if (newCurrentLayoutIndex < d->layouts.size())
+        if (newCurrentLayoutIndex < (int) d->layouts.size())
             setCurrentLayout(d->layouts[newCurrentLayoutIndex].get());
         else
             setCurrentLayout(nullptr);

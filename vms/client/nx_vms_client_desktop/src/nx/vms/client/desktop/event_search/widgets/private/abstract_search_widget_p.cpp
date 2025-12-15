@@ -196,7 +196,7 @@ AbstractSearchWidgetPrivate::AbstractSearchWidgetPrivate(
                 textFilter->setText(value);
         });
 
-    if (auto textFilter = m_commonSetup->textFilter())
+    if (m_commonSetup->textFilter())
     {
         connect(m_commonSetup->textFilter(), &core::TextFilterSetup::textChanged, this,
             [this]()

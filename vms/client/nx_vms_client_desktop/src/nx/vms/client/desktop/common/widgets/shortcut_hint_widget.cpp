@@ -85,7 +85,7 @@ QStringList splitString(const QString& string)
     breakPoints.push_back(string.size());
 
     QStringList result;
-    for (int i = 0; i < breakPoints.size() - 1; ++i)
+    for (int i = 0; i < (int) breakPoints.size() - 1; ++i)
     {
         const auto subsringSize = breakPoints.at(i + 1) - breakPoints.at(i);
         result.push_back(string.mid(breakPoints.at(i), subsringSize));

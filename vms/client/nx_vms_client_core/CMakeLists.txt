@@ -36,6 +36,7 @@ else()
 endif()
 
 nx_add_target(nx_vms_client_core LIBRARY
+    NO_WERROR
     ADDITIONAL_SOURCES
         ${qt_helpers_sources}
         ${ios_sources}

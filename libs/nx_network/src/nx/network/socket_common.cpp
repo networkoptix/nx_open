@@ -6,6 +6,8 @@
 
 #include "socket_common.h"
 
+#include <bit>
+
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>

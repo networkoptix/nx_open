@@ -147,7 +147,7 @@ void EdgeServerReducerProxySource::updateEdgeServerReducedState(const QnResource
         return;
 
     const auto removeCamera =
-        [=]()
+        [this, server]()
         {
             if (const auto camera = m_reducedServerCameras.take(server))
                 emit resourceRemoved(camera);

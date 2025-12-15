@@ -18,12 +18,9 @@ namespace nx::vms::client::desktop
 
 class TimeSynchronizationServerStateWatcher::Private : public QObject
 {
-    TimeSynchronizationServerStateWatcher* q = nullptr;
-
 public:
     Private(TimeSynchronizationServerStateWatcher* q, TimeSynchronizationWidgetStore* store) :
         QObject(),
-        q(q),
         m_store(store)
     {
         NX_ASSERT(store);

@@ -110,7 +110,6 @@ public:
 private:
     QPointer<TimeSynchronizationWidgetStore> m_store;
     rest::Handle m_currentRequest = 0;
-    qint64 m_currentRequestStartTime = 0;
     int m_tickCount = 0;
     QTimer m_timer;
     nx::utils::ElapsedTimer m_elapsedTimer;

@@ -18,7 +18,7 @@ namespace nx::vms::client::desktop {
 
 FakeResourceListView::FakeResourceListView(
     const FakeResourceList& fakeResources,
-    QWidget* parent)
+    QWidget* /*parent*/)
     :
     base_type(),
     m_model(new FakeResourceListModel(fakeResources, this))

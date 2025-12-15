@@ -75,7 +75,7 @@ TEST(Json, AuditRecord)
     nx::network::rest::JsonReflectResult<AuditRecordList> result;
     result.errorId = nx::network::rest::ErrorId::unauthorized;
     result.reply.push_back(record);
-    const std::string expected = /*suppress newline*/ 1 + R"json(
+    const std::string expected = &R"json(
 {
     "errorId": "unauthorized",
     "errorString": "",
@@ -99,7 +99,7 @@ TEST(Json, AuditRecord)
             }
         }
     ]
-})json";
+})json"[1]; //< Suppress newline.
     ASSERT_EQ(
         expected,
         nx::utils::formatJsonString(nx::reflect::json::serialize(result)).toStdString());

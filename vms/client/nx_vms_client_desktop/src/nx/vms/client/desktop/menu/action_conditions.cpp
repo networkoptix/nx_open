@@ -650,7 +650,7 @@ ActionVisibility ClearMotionSelectionCondition::check(
 
 ActionVisibility ResourceRemovalCondition::check(
     const Parameters& parameters,
-    WindowContext* context)
+    WindowContext* /*context*/)
 {
     using namespace nx::vms::client::core;
 
@@ -770,7 +770,7 @@ ActionVisibility RenameResourceCondition::check(const Parameters& parameters, Wi
 
 ActionVisibility LayoutItemRemovalCondition::check(
     const LayoutItemIndexList& layoutItems,
-    WindowContext* context)
+    WindowContext* /*context*/)
 {
     for (const LayoutItemIndex& item: layoutItems)
     {
@@ -859,7 +859,7 @@ LayoutCountCondition::LayoutCountCondition(int minimalRequiredCount):
 
 ActionVisibility LayoutCountCondition::check(const Parameters& /*parameters*/, WindowContext* context)
 {
-    if (context->workbench()->layouts().size() < m_minimalRequiredCount)
+    if ((int) context->workbench()->layouts().size() < m_minimalRequiredCount)
         return DisabledAction;
     return EnabledAction;
 }
@@ -2398,7 +2398,7 @@ ConditionWrapper allowedToShowServersInResourceTree()
 ConditionWrapper joystickConnected()
 {
     return new CustomBoolCondition(
-        [](const Parameters&, WindowContext* context)
+        [](const Parameters&, WindowContext* /*context*/)
         {
             return !appContext()->joystickManager()->devices().isEmpty();
         });
@@ -2514,7 +2514,7 @@ ConditionWrapper userHasCamerasWithEditableSettings()
 ConditionWrapper hasPermissionsForResources(Qn::Permissions permissions)
 {
     return new ResourcesCondition(
-        [permissions](const QnResourceList& resources, WindowContext* context)
+        [permissions](const QnResourceList& resources, WindowContext* /*context*/)
         {
             return std::ranges::all_of(
                 resources,
@@ -2640,7 +2640,7 @@ ConditionWrapper hardwareVideoDecodingDisabled()
 ConditionWrapper parentServerHasActiveBackupStorage()
 {
     return new ResourcesCondition(
-        [](const QnResourceList& resources, WindowContext* context)
+        [](const QnResourceList& resources, WindowContext* /*context*/)
         {
             return std::ranges::any_of(resources.filtered<QnVirtualCameraResource>(),
                 [](const auto& camera)

@@ -41,7 +41,7 @@ ScreenRecordingIndicator::ScreenRecordingIndicator(QWidget* parent): base_type(p
     timer->start(kUpdateInterval);
 }
 
-void ScreenRecordingIndicator::paintEvent(QPaintEvent* event)
+void ScreenRecordingIndicator::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);

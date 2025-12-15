@@ -65,7 +65,7 @@ void handleRemoveOperation(
         return;
     }
 
-    for (const auto child: node->children())
+    for (const auto& child: node->children())
     {
         const auto childRemoveStep = PatchStep{child->path(), {removeNodeOperation}};
         handleRemoveOperation(childRemoveStep, state, getOperationGuard);

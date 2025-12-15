@@ -55,7 +55,7 @@ void testReadWrite(int readCount, int writeCount, int sampleCount)
     buffer.init(config);
     SampleGen samples(sampleCount, buffer.sampleSize(), buffer.planeCount());
 
-    uint8_t** buffers;
+    uint8_t** buffers = nullptr;
     while (samples.samplesRest() != 0)
     {
         buffers = buffer.startWriting(writeCount);
@@ -70,9 +70,13 @@ void testReadWrite(int readCount, int writeCount, int sampleCount)
 
     if (buffer.sampleCount() > 0)
     {
-        int restCount = buffer.sampleCount();
-        ASSERT_TRUE(buffer.popData(restCount, buffers));
-        samples.read(buffers, restCount);
+        ASSERT_TRUE(buffers != nullptr);
+        if (buffers)
+        {
+            int restCount = buffer.sampleCount();
+            ASSERT_TRUE(buffer.popData(restCount, buffers));
+            samples.read(buffers, restCount);
+        }
     }
     ASSERT_TRUE(samples.data == samples.dataRef);
 }

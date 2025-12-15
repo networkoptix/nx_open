@@ -94,6 +94,7 @@ if(LINUX)
 endif()
 
 nx_add_target(nx_vms_client_desktop LIBRARY
+    NO_WERROR
     ADDITIONAL_SOURCES
         ${uic_files}
         ${mac_sources}

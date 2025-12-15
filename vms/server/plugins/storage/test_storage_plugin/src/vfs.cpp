@@ -72,8 +72,8 @@ std::string jsonTypeName(enum JsonType type)
 bool checkJsonObjValue(
     const struct JsonVal* val,
     enum JsonType type,
-    const char* key,
-    const char* originalString)
+    [[maybe_unused]] const char* key,
+    [[maybe_unused]] const char* originalString)
 {
     [[maybe_unused]] constexpr auto noKeyErrorStr =
         "[TestStorage, JSON]: no '%s' key found: json string: %s\n";

@@ -25,6 +25,7 @@ endforeach()
 
 nx_add_target(wix_custom_actions LIBRARY
     NO_MOC
+    WERROR_IF LINUX
     RC_FILE "CustomActions.rc"
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/CustomActions.def"

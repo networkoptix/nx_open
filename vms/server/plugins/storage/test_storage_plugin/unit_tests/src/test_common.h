@@ -84,7 +84,7 @@ public:
                 *ecode = nx_spl::error::UnknownError;
             return 0;
         }
-        m_pos = pos;
+        m_pos = (uint32_t) pos;
 
         return 1;
     }

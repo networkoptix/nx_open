@@ -90,7 +90,7 @@ AudioRecordingSettings::AudioRecordingSettings():
     Storage(new nx::utils::property_storage::FileSystemBackend(
         QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
             + "/settings/screen_recording")),
-    m_devices([this] { return fetchDevicesList(); })
+    m_devices([] { return fetchDevicesList(); })
 {
     load();
 }

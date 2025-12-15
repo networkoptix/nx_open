@@ -111,7 +111,7 @@ int LookupListsModel::rowCount(const QModelIndex& /*parent*/) const
 
 QVariant LookupListsModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || index.row() >= m_lookupLists.size())
+    if (!index.isValid() || index.row() >= (int) m_lookupLists.size())
         return {};
 
     if (role == Qt::DisplayRole)

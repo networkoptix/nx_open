@@ -11,6 +11,7 @@ add_custom_command(
 )
 
 nx_add_target(appserver2 LIBRARY NO_API_MACROS
+    NO_WERROR
     ADDITIONAL_SOURCES
         ${transaction_types_file}
     PUBLIC_LIBS

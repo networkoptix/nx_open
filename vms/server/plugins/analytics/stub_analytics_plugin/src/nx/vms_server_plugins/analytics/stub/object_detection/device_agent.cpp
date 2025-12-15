@@ -67,7 +67,7 @@ std::string choiceValue(const std::string& values)
     if (parsedValues.empty())
         parsedValues = splitString(values, '|');
 
-    std::uniform_int_distribution<> dist(0, parsedValues.size());
+    std::uniform_int_distribution<> dist(0, (int) parsedValues.size());
     const int index = std::rand() % parsedValues.size();
     return parsedValues[index];
 }

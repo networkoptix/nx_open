@@ -124,7 +124,7 @@ public:
             });
         engine->registerEventField(
             fieldMetatype<AnalyticsAttributesField>(),
-            [this](const FieldDescriptor* descriptor)
+            [](const FieldDescriptor* descriptor)
             {
                 return new AnalyticsAttributesField(descriptor);
             });

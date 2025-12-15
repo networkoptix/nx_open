@@ -370,9 +370,9 @@ void EventTile::Private::updatePreviewsVisibility()
             q->ui->imagePreviewWidget->parentWidget()->show();
             return;
         }
-        else if (q->ui->imagePreviewWidget->imageProvider()
-            || !q->ui->imagePreviewWidget->placeholder().isEmpty()
-            && !obfuscationEnabled)
+        else if (q->ui->imagePreviewWidget->imageProvider() || (
+            !q->ui->imagePreviewWidget->placeholder().isEmpty()
+            && !obfuscationEnabled))
         {
             q->ui->videoPreviewWidget->hide();
             q->ui->imagePreviewWidget->show();

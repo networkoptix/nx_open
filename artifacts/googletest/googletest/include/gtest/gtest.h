@@ -1984,19 +1984,19 @@ class TestWithParam : public Test, public WithParamInterface<T> {};
 
 #define EXPECT_FLOAT_EQ(val1, val2)                                         \
   EXPECT_PRED_FORMAT2(::testing::internal::CmpHelperFloatingPointEQ<float>, \
-                      val1, val2)
+      (float)(val1), (float)(val2))
 
 #define EXPECT_DOUBLE_EQ(val1, val2)                                         \
   EXPECT_PRED_FORMAT2(::testing::internal::CmpHelperFloatingPointEQ<double>, \
-                      val1, val2)
+      (double)(val1), (double)(val2))
 
 #define ASSERT_FLOAT_EQ(val1, val2)                                         \
   ASSERT_PRED_FORMAT2(::testing::internal::CmpHelperFloatingPointEQ<float>, \
-                      val1, val2)
+      (float)(val1), (float)(val2))
 
 #define ASSERT_DOUBLE_EQ(val1, val2)                                         \
   ASSERT_PRED_FORMAT2(::testing::internal::CmpHelperFloatingPointEQ<double>, \
-                      val1, val2)
+      (double)(val1), (double)(val2))
 
 #define EXPECT_NEAR(val1, val2, abs_error)                                   \
   EXPECT_PRED_FORMAT3(::testing::internal::DoubleNearPredFormat, val1, val2, \

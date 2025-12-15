@@ -457,7 +457,7 @@ public:
         m_ptrWidget->onRotationButtonClockWise(value);
     }
 
-    QString rotationText(int rotation)
+    QString rotationText(int /*rotation*/)
     {
         // Right now we do not have specific rotation. So we disable it for now.
         //return tr("Rotation: ") + QString::number(int(rotation)) + lit("\xB0");

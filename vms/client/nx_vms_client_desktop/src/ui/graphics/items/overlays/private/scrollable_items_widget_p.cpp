@@ -82,7 +82,7 @@ void QnScrollableItemsWidgetPrivate::updateContentPosition()
     const auto contentGeometry = m_scrollArea->contentWidget()->geometry();
 
     const qreal left =
-        [=]() -> qreal
+        [this, contentGeometry]() -> qreal
         {
             switch (m_alignment & Qt::AlignHorizontal_Mask)
             {

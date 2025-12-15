@@ -30,7 +30,6 @@ static const unsigned int MOTION_PRESENCE_CHANCE_PERCENT = 70;
 
 static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
 static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
-static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
 
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
@@ -265,6 +264,7 @@ void StreamReader::doLiveDelay()
 #ifdef _WIN32
         ::Sleep( (DWORD) ((m_nextFrameDeployTime - curTimeUsec) / USEC_IN_MS) );
 #elif _POSIX_C_SOURCE >= 199309L
+        static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
         struct timespec delay;
         memset( &delay, 0, sizeof(delay) );
         delay.tv_sec = (m_nextFrameDeployTime - curTimeUsec) / USEC_IN_SEC;

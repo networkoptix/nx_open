@@ -300,6 +300,12 @@ if(compilerMsvc)
         # Declaration of 'id' hides global declaration.
         /wd4459
 
+        # Deprecated / unsafe function or symbol.
+        /wd4996
+
+        # Structure was padded due to alignment specifier.
+        /wd4324
+
         # -----------------------------------------------------------------------------------------
         # Treat the following warnigns as errors.
 
@@ -472,6 +478,7 @@ if(NOT compilerMsvc)
             -Wno-error=maybe-uninitialized
             -Wno-missing-field-initializers
             -Wno-psabi
+            -flarge-source-files
         )
         if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
             add_compile_options(-fno-devirtualize)

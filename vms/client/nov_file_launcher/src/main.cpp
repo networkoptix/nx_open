@@ -24,12 +24,11 @@ typedef signed __int64 int64_t;
 
 using namespace std;
 
-static const int IO_BUFFER_SIZE = 1024*1024;
 static const int64_t MAGIC = 0x73a0b934820d4055ll;
 
 wofstream logfile;
 
-wstring loadString(UINT id)
+wstring loadString(UINT /*id*/)
 {
     enum { BUFFER_SIZE = 1024 };
     wchar_t buffer[BUFFER_SIZE];
@@ -53,7 +52,7 @@ wstring getFullFileName(const wstring& folder, const wstring& fileName)
         return fileName;
 
     wstring value = folder;
-    for (int i = 0; i < value.length(); ++i)
+    for (int i = 0; i < (int) value.length(); ++i)
     {
         if (value[i] == L'\\')
             value[i] = L'/';
@@ -91,7 +90,7 @@ wchar_t getNativeSeparator()
 wstring toNativeSeparator(const wstring& path)
 {
     wstring value = path;
-    for (int i = 0; i < value.length(); ++i)
+    for (int i = 0; i < (int) value.length(); ++i)
     {
         if (value[i] == L'/' || value[i] == L'\\')
             value[i] = getNativeSeparator();
@@ -209,7 +208,7 @@ int launchFile(const wstring& executePath)
         return -1;
     }
 
-    srcFile.seekg(-sizeof(int64_t) * 2, std::ios::end);
+    srcFile.seekg(-(int) sizeof(int64_t) * 2, std::ios::end);
     [[maybe_unused]] const int64_t novPosOffset = srcFile.tellg();
 
     int64_t magic = 0, novPos = 0, indexTablePos = 0;
@@ -279,7 +278,7 @@ int launchFile(const wstring& executePath)
 
             progress.setRange(filePosList.front(), filePosList.back());
 
-            for (int i = 0; i < filePosList.size() - 1; ++i)
+            for (int i = 0; i < (int) filePosList.size() - 1; ++i)
             {
                 wstring fullFileName = getFullFileName(dstDir, fileNameList[i]);
                 logfile << L"Export file: " << fullFileName.c_str() << L"\n";

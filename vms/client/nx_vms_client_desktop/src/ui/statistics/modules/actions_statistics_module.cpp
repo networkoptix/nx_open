@@ -48,7 +48,7 @@ void QnActionsStatisticsModule::setActionManager(
 QnStatisticValuesHash QnActionsStatisticsModule::values() const
 {
     QnStatisticValuesHash result;
-    for (const auto module: m_modules)
+    for (const auto& module: m_modules)
         result.insert(module->values());
 
     return result;
@@ -56,6 +56,6 @@ QnStatisticValuesHash QnActionsStatisticsModule::values() const
 
 void QnActionsStatisticsModule::reset()
 {
-    for (const auto &module:m_modules)
+    for (const auto& module: m_modules)
         module->reset();
 }

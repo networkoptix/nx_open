@@ -54,7 +54,7 @@ namespace
     }
 }
 
-bool QnCameraAdvancedParamsXmlParser::validateXml(QIODevice *xmlSource)
+bool QnCameraAdvancedParamsXmlParser::validateXml(QIODevice* /*xmlSource*/)
 {
     // TODO: #sivanov Why the file is not reset to initial position?
     // It leads to 'EOF' error in parsing.

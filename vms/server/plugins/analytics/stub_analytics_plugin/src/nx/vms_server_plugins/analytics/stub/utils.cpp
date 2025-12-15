@@ -16,7 +16,8 @@ using namespace nx::sdk;
 
 bool toBool(std::string str)
 {
-    std::transform(str.begin(), str.begin(), str.end(), ::tolower);
+    std::transform(str.begin(), str.begin(), str.end(),
+        [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
     return str == "true" || str == "1";
 }
 

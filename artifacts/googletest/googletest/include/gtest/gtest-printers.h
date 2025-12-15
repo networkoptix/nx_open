@@ -233,7 +233,8 @@ void operator<<(LookupBlocker, LookupBlocker);
 
 // ADL bumps into preprocessor error when looking for std::chrono stream operators
 // with Xcode 15.3 because they are supported only for CMAKE_OSX_DEPLOYMENT_TARGET >= 13.3
-#if __apple_build_version__ >= 15000309 && __MAC_OS_X_VERSION_MIN_REQUIRED < __MAC_13_3 //< Build version for XCode 15.3.
+#if defined(__apple_build_version__) && \
+    __apple_build_version__ >= 15000309 && __MAC_OS_X_VERSION_MIN_REQUIRED < __MAC_13_3 //< Build version for XCode 15.3.
 
 inline std::ostream& operator<<(std::ostream& os, std::chrono::milliseconds ms)
 {

@@ -154,7 +154,7 @@ UserGroupData QnUserRolesModel::Private::roleByRow(int row) const
     if (!NX_ASSERT(row >= 0 && row < count()))
         return {};
 
-    if (row < m_userRoles.size())
+    if (row < (int) m_userRoles.size())
         return m_userRoles[row];
 
     if (!NX_ASSERT(m_customRoleEnabled))

@@ -3,7 +3,9 @@
 set(APPNAME nx_vms_web_assembly_client)
 set(APPEXPORTNAME nx_vms_web_assembly_client_entry)
 
-nx_add_target(nx_vms_web_assembly_client EXECUTABLE PRIVATE_LIBS embind Qt6::Quick nx_utils)
+nx_add_target(nx_vms_web_assembly_client EXECUTABLE
+    PRIVATE_LIBS embind Qt6::Quick nx_utils
+)
 qt6_import_qml_plugins(nx_vms_web_assembly_client)
 
 include("${QT_DIR}/lib/cmake/Qt6/QtWasmHelpers.cmake")
