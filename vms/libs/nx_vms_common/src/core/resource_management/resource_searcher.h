@@ -109,7 +109,7 @@ private:
 
 // =====================================================================
 class NX_VMS_COMMON_API QnAbstractNetworkResourceSearcher:
-    virtual public QnAbstractResourceSearcher
+    public QnAbstractResourceSearcher
 {
 protected:
     QnAbstractNetworkResourceSearcher(nx::vms::common::SystemContext* systemContext);
@@ -151,7 +151,7 @@ protected:
 
 // =====================================================================
 class NX_VMS_COMMON_API QnAbstractHttpResourceSearcher:
-    virtual public QnAbstractNetworkResourceSearcher
+    public QnAbstractNetworkResourceSearcher
 {
 protected:
     QnAbstractHttpResourceSearcher(nx::vms::common::SystemContext* systemContext);
