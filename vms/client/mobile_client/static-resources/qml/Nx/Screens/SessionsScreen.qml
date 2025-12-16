@@ -639,6 +639,7 @@ Page
 
         visible: (organizationsModel.topLevelLoading || currentRootLoading || waitingForLastOpened)
             && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
+            || !organizationsModel.firstLoadAttemptFinished
 
         component MaskItem: Rectangle
         {
