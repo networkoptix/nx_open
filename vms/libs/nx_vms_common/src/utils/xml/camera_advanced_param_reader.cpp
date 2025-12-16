@@ -119,21 +119,24 @@ bool QnCameraAdvancedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdva
 
     QDomDocument xmlDom;
     {
-        QString errorStr;
-        int errorLine;
-        int errorColumn;
-        if (!xmlDom.setContent(xmlSource, &errorStr, &errorLine, &errorColumn)) {
-            qWarning() << "Parse xml error at line: " << errorLine << ", column: " << errorColumn << ", error: " << errorStr;
+        if (const auto result = xmlDom.setContent(xmlSource); !result)
+        {
+            NX_WARNING(typeid(QnCameraAdvancedParamsXmlParser),
+                "Parse xml error at line: %1, column: %2, error: %3",
+                result.errorLine,
+                result.errorColumn,
+                result.errorMessage);
             return false;
         }
     }
 
     QDomElement root = xmlDom.documentElement();
-    if (root.tagName() != QnXmlTag::plugin) {
+    if (root.tagName() != QnXmlTag::plugin)
+    {
         NX_WARNING(typeid(QnCameraAdvancedParamsXmlParser),
-            lit("Parse xml error: could not find tag %1. Got %2 instead.")
-            .arg(QnXmlTag::plugin)
-            .arg(root.tagName()));
+            "Parse xml error: could not find tag %1. Got %2 instead.",
+            QnXmlTag::plugin,
+            root.tagName());
         return false;
     }
 
