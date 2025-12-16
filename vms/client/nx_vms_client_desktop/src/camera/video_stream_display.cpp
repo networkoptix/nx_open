@@ -544,12 +544,11 @@ void QnVideoStreamDisplay::flushReverseBlock(
 
 bool QnVideoStreamDisplay::isRecreateDecoderRequired(QnCompressedVideoDataPtr data)
 {
-    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+    if (!m_decoderData.decoder || !data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
         return false;
 
     // Check can we use one more HW decoder or HW acceleration is disabled.
     return shouldUpdateDecoder(data, m_reverseMode)
-        || !m_decoderData.decoder
         || m_decoderData.compressionType != data->compressionType;
 }
 
@@ -610,8 +609,15 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     }
 
     QnAbstractVideoDecoder* dec = m_decoderData.decoder.get();
-    if (isRecreateDecoderRequired(data))
+    if (!m_decoderData.decoder || isRecreateDecoderRequired(data))
     {
+        if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+        {
+            NX_DEBUG(this, "Skip media data with codec: %1, waiting for key frame...",
+                data->compressionType);
+            return Status_Skipped;
+        }
+
         NX_DEBUG(this, "Reset video decoder, resolution: codec: %1, exist: %2",
             data->compressionType, dec != nullptr);
 
