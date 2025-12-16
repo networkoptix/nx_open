@@ -32,6 +32,41 @@ NSURL* fileUrl(const std::string& key)
     return [directory URLByAppendingPathComponent: fileName];
 }
 
+void remove(NSString* key)
+{
+    const auto query = @{
+        (id) kSecClass: (id) kSecClassGenericPassword,
+        (id) kSecAttrAccount: key,
+        (id) kSecAttrAccessGroup: (id) kAccessGroup,
+        (id) kSecAttrAccessible: (id) kSecAttrAccessibleAfterFirstUnlock
+    };
+
+    SecItemDelete((__bridge CFDictionaryRef) query);
+}
+
+bool isActual(NSString* key)
+{
+    return [[NSUserDefaults standardUserDefaults] boolForKey: key];
+}
+
+void setActual(NSString* key, bool value)
+{
+    [[NSUserDefaults standardUserDefaults] setBool: value forKey: key];
+}
+
+/**
+ * Ensures that Keychain is empty when Client is reinstalled, since Keychain is persistent. Uses
+ * NSUserDefaults flags, which are not preserved, as indication that Client has been reinstalled.
+ */
+void ensureActual(NSString* key)
+{
+    if (isActual(key))
+        return;
+
+    remove(key);
+    setActual(key, true);
+}
+
 } // namespace
 
 namespace nx::vms::client::mobile {
@@ -43,6 +78,8 @@ SecureStorage::SecureStorage()
 
 std::optional<std::string> SecureStorage::load(const std::string& key) const
 {
+    ensureActual([NSString stringWithUTF8String: key.c_str()]);
+
     const auto query = @{
         (id) kSecClass: (id) kSecClassGenericPassword,
         (id) kSecAttrAccount: [NSString stringWithUTF8String: key.c_str()],
