@@ -91,6 +91,10 @@ public:
         READ topLevelLoading
         NOTIFY topLevelLoadingChanged)
 
+    Q_PROPERTY(bool firstLoadAttemptFinished
+        READ firstLoadAttemptFinished
+        NOTIFY firstLoadAttemptFinishedChanged)
+
     Q_PROPERTY(bool hasChannelPartners
         READ hasChannelPartners
         NOTIFY hasChannelPartnersChanged)
@@ -126,6 +130,7 @@ public:
     QModelIndex sitesRoot() const;
 
     bool topLevelLoading() const;
+    bool firstLoadAttemptFinished() const;
     bool hasChannelPartners() const;
     bool hasOrganizations() const;
 
@@ -139,6 +144,7 @@ signals:
     void systemsModelChanged();
     void sitesRootChanged();
     void topLevelLoadingChanged();
+    void firstLoadAttemptFinishedChanged();
     void hasChannelPartnersChanged();
     void hasOrganizationsChanged();
     void fullTreeLoaded();

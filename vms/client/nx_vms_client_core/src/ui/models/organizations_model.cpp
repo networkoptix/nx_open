@@ -2,6 +2,7 @@
 
 #include "organizations_model.h"
 
+#include <QtCore/qtmetamacros.h>
 #include <ranges>
 
 #include <QtCore/QCoreApplication>
@@ -242,6 +243,7 @@ struct OrganizationsModel::Private
 
     QSet<nx::Uuid> accessibleOrgs;
     bool topLevelLoading = false;
+    bool firstLoadAttemptFinished = false;
     uint64_t updateGeneration = 0;
 
     nx::utils::ScopedConnection statusConnection;
@@ -565,6 +567,15 @@ struct OrganizationsModel::Private
 
         topLevelLoading = loading;
         emit q->topLevelLoadingChanged();
+    }
+
+    void setFirstLoadAttemptFinished(bool value)
+    {
+        if (firstLoadAttemptFinished == value)
+            return;
+
+        firstLoadAttemptFinished = value;
+        emit q->firstLoadAttemptFinishedChanged();
     }
 
     void beginSitesReset()
@@ -1069,6 +1080,8 @@ void OrganizationsModel::setStatusWatcher(CloudStatusWatcher* statusWatcher)
 
     if (d->prevStatus != CloudStatusWatcher::LoggedOut)
         d->startPolling();
+    else
+        d->setFirstLoadAttemptFinished(true);
 }
 
 QAbstractItemModel* OrganizationsModel::systemsModel() const
@@ -1209,6 +1222,7 @@ coro::Task<bool> OrganizationsModel::Private::loadChannelPartnerOrgsAsync(Channe
 
 coro::FireAndForget OrganizationsModel::Private::startPolling()
 {
+    setFirstLoadAttemptFinished(false);
     ++updateGeneration;
 
     co_await nx::coro::cancelIf(
@@ -1222,14 +1236,17 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
     const auto guard = nx::utils::ScopeGuard(
         nx::utils::guarded(
             q,
-            [thisGeneration = updateGeneration, self = QPointer(q)]()
+            [this, thisGeneration = updateGeneration]()
             {
-                if (self && thisGeneration == self->d->updateGeneration)
-                    self->d->setTopLevelLoading(false);
+                if (thisGeneration == updateGeneration)
+                    setTopLevelLoading(false);
             }));
 
     for (;;)
     {
+        const auto firstLoadAttemptFinishedGuard = nx::utils::ScopeGuard(
+            nx::utils::guarded(q, [this]() { setFirstLoadAttemptFinished(true);}));
+
         if (!NX_ASSERT(statusWatcher))
             co_return;
 
@@ -1374,6 +1391,7 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
 
         co_await loadOrgListAsync(std::move(*orgList));
 
+        setFirstLoadAttemptFinished(true);
         emit q->fullTreeLoaded();
 
         // Delay before next update.
@@ -1417,6 +1435,11 @@ QModelIndex OrganizationsModel::sitesRoot() const
 bool OrganizationsModel::topLevelLoading() const
 {
     return d->topLevelLoading;
+}
+
+bool OrganizationsModel::firstLoadAttemptFinished() const
+{
+    return d->firstLoadAttemptFinished;
 }
 
 void OrganizationsModel::setChannelPartners(const ChannelPartnerList& data)
