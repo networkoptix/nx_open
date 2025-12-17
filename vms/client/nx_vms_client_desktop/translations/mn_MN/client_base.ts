@@ -2580,7 +2580,7 @@ License Key: %2</translation>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Шинэ нууц үг</translation>
     </message>
     <message>
       <source>Repeat Password</source>
@@ -2603,7 +2603,7 @@ License Key: %2</translation>
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Шинэ нууц үг</translation>
     </message>
     <message>
       <source>Confirm Password</source>
