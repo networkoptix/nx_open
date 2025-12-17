@@ -202,9 +202,15 @@ ListView
         return NxGlobals.toHtmlEscaped(text)
     }
 
-    section.property: currentSearchRegExp || siteList.currentTab == OrganizationsModel.SitesTab
-        ? "section"
-        : ""
+    readonly property var currentRootType: siteList.currentRoot
+        ? accessor.getData(siteList.currentRoot, "type")
+        : undefined
+
+    section.property: currentSearchRegExp
+        || siteList.currentTab == OrganizationsModel.SitesTab
+        || currentRootType === OrganizationsModel.Organization
+        || currentRootType === OrganizationsModel.Folder
+        ? "section" : ""
     section.criteria: ViewSection.FullString
     section.delegate: ColumnLayout
     {
