@@ -9,6 +9,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/rules/utils/event_details.h>
 
