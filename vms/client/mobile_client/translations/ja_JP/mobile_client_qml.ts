@@ -629,6 +629,10 @@
       <source>Show more</source>
       <translation>詳細を表示</translation>
     </message>
+    <message>
+      <source>No data</source>
+      <translation type="unfinished">No data</translation>
+    </message>
   </context>
   <context>
     <name>OptionSelector</name>

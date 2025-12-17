@@ -629,6 +629,10 @@
       <source>Show more</source>
       <translation>Xem thêm</translation>
     </message>
+    <message>
+      <source>No data</source>
+      <translation type="unfinished">No data</translation>
+    </message>
   </context>
   <context>
     <name>OptionSelector</name>
