@@ -2,7 +2,6 @@
 
 nx_add_target(nx_vms_common_test_support LIBRARY
     NO_MOC
-    WERROR_IF LINUX
     PUBLIC_LIBS
         nx_vms_common
     PRIVATE_LIBS

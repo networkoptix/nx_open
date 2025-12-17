@@ -736,7 +736,7 @@ QPixmap TileInteractionHandler::createDragPixmap(const QnResourceList& resources
     painter.setFont(font);
 
     QColor background = palette.color(QPalette::Highlight);
-    background.setAlphaF(style::Hints::kDisabledItemOpacity);
+    background.setAlphaF((float) style::Hints::kDisabledItemOpacity);
     painter.fillRect(QRect(0, 0, width, height), background);
 
     QRect rect(style::Metrics::kStandardPadding, 0, width, iconSize.height());

@@ -238,7 +238,7 @@ Result<int> CUDTUnited::createConnection(
     ns = std::make_shared<CUDTSocket>();
     ns->m_pUDT = std::make_shared<CUDT>(*(ls->m_pUDT));
     ns->m_pPeerAddr = remotePeerAddress;
-    ns->m_pPeerAddr.get()->sa_family = ls->m_iIPversion;
+    ns->m_pPeerAddr.get()->sa_family = (FamilyT) ls->m_iIPversion;
 
     ns->m_SocketId = generateSocketId();
 
@@ -551,7 +551,7 @@ Result<> CUDTUnited::connect(const UDTSOCKET u, const sockaddr* name, int namele
 
     // record peer address
     s->m_pPeerAddr = detail::SocketAddress(name, namelen);
-    s->m_pPeerAddr.setFamily(s->m_iIPversion);
+    s->m_pPeerAddr.setFamily(FamilyT(s->m_iIPversion));
 
     return success();
 }

@@ -107,8 +107,8 @@ namespace nxcip
         CameraInfo2(const CameraInfo2& value):
             CameraInfo(value)
         {
-            strncpy(groupId, value.groupId, sizeof(groupId) - 1);
-            strncpy(groupName, value.groupName, sizeof(groupName) - 1);
+            strncpy(groupId, value.groupId, sizeof(groupId));
+            strncpy(groupName, value.groupName, sizeof(groupName));
         }
 
         CameraInfo2& operator=(const CameraInfo2& value) = default;

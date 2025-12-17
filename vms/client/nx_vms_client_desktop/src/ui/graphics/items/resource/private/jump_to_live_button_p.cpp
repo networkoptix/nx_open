@@ -104,7 +104,7 @@ JumpToLiveButtonPrivate::JumpToLiveButtonPrivate(JumpToLiveButton* main):
 
     auto shadowEffect = new QGraphicsDropShadowEffect(m_toolTip);
     auto shadowColor = QPalette().color(QPalette::Shadow);
-    shadowColor.setAlphaF(kToolTipShadowOpacity);
+    shadowColor.setAlphaF((float) kToolTipShadowOpacity);
     shadowEffect->setColor(shadowColor);
     shadowEffect->setOffset(kToolTipShadowOffset);
     shadowEffect->setBlurRadius(kToolTipShadowBlurRadius);

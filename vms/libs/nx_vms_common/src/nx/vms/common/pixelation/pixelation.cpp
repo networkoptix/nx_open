@@ -176,7 +176,7 @@ void RenderingProcess::updateCapturedImage()
         QImage::Format_RGBA8888_Premultiplied};
 
     if (rhi()->isYUpInFramebuffer())
-        m_capturedImage = m_capturedImage.mirrored();
+        m_capturedImage = m_capturedImage.flipped(Qt::Vertical);
 }
 
 class MaskRenderingProcess: public RenderingProcess
@@ -527,7 +527,7 @@ QImage Pixelation::Private::pixelate(
     const QImage::Format originalFormat = source.format();
     QImage image = source.convertToFormat(QImage::Format_RGBA8888);
     if (rhi->isYUpInFramebuffer())
-        image = source.mirrored();
+        image = source.flipped(Qt::Vertical);
 
     if (image.size() != sourceTexture->pixelSize())
     {

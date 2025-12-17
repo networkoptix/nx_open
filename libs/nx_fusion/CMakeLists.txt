@@ -8,7 +8,6 @@ file(GLOB_RECURSE boost_pp_variadic_seq_files CONFIGURE_DEPENDS
     "${boost_pp_variadic_seq_src_dir}/*.h")
 
 nx_add_target(nx_fusion LIBRARY
-    WERROR_IF LINUX
     PUBLIC_LIBS
         Qt6::Sql
         nx_utils

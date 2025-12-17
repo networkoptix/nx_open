@@ -96,7 +96,8 @@ TEST_F(ResourceTreeModelTest, fileLayoutItemAdds)
 
     // Than that video resource is represented as child of file layout
     const auto fileLayoutIndex = uniqueMatchingIndex(displayContains(fileLayoutResource->getName()));
-    const auto childVideoIndex = uniqueMatchingIndex(directChildOf(fileLayoutIndex));
+
+    uniqueMatchingIndex(directChildOf(fileLayoutIndex));
 }
 
 TEST_F(ResourceTreeModelTest, fileLayoutItemRemoves)
@@ -113,7 +114,7 @@ TEST_F(ResourceTreeModelTest, fileLayoutItemRemoves)
     // Than that video resource is represented as child of file layout
     auto fileLayoutIndex =
         QPersistentModelIndex(uniqueMatchingIndex(displayContains(fileLayoutResource->getName())));
-    const auto childVideoIndex = uniqueMatchingIndex(directChildOf(fileLayoutIndex));
+    uniqueMatchingIndex(directChildOf(fileLayoutIndex));
 
     // When video resource is removed from the resource pool.
     resourcePool()->removeResource(videoResource);

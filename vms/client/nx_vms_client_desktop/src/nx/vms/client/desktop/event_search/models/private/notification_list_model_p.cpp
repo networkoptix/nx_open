@@ -362,7 +362,7 @@ void NotificationListModel::Private::onNotificationAction(
 
     // Cache is required to prevent the app from freezing when a lot of notifications are received.
     m_notificationsCache.push_front(std::move(eventData));
-    if (m_notificationsCache.size() > m_maximumCount)
+    if ((int) m_notificationsCache.size() > m_maximumCount)
         m_notificationsCache.pop_back();
 }
 

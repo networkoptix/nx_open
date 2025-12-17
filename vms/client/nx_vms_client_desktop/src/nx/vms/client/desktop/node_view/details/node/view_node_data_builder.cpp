@@ -32,7 +32,7 @@ ViewNodeDataBuilder::ViewNodeDataBuilder(const ViewNodeData& data):
 ViewNodeDataBuilder::~ViewNodeDataBuilder()
 {
     if (m_outerData)
-        m_data.take();
+        m_data.release();
 }
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::separator()

@@ -49,7 +49,7 @@ void FoundDevicesModel::addDevices(const std::vector<api::DeviceModelForSearch>&
     auto newIds = extractIds(devices);
     const auto currentIds = extractIds(m_devices);
     const auto addedIds = newIds.subtract(currentIds);
-    if (addedIds.size() != devices.size())
+    if (addedIds.size() != (int) devices.size())
         NX_ASSERT(false, "Devices exist already");
 
     if (addedIds.isEmpty())

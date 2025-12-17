@@ -193,7 +193,7 @@ QJsonObject generatedColorScheme(const ColorTree& basicColors, bool invertColors
     {
         auto color = colors[colorName];
         if (!NX_ASSERT(color.isValid()))
-            ;
+            continue;
 
         const auto cH = color.hslHueF();
         const auto cS = color.hslSaturationF();

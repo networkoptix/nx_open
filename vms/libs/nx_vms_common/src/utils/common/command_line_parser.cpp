@@ -22,20 +22,28 @@ void QnCommandLineParameter::init(void *target, int type, const QString &longNam
     m_shortName = shortName;
     m_description = description;
 
-    if(impliedValue.userType() == qMetaTypeId<QnCommandLineDefaultImpliedValue>()) {
-        if(m_type == QMetaType::Bool) {
+    if(impliedValue.userType() == qMetaTypeId<QnCommandLineDefaultImpliedValue>())
+    {
+        if(m_type == QMetaType::Bool)
             m_impliedValue = true; /* Default for booleans. */
-        } else {
+        else
             m_impliedValue = QVariant();
-        }
-    } else {
+    }
+    else
+    {
         m_impliedValue = impliedValue;
 
-        if(m_impliedValue.isValid()) {
-            if(m_impliedValue.canConvert(static_cast<QVariant::Type>(m_type))) {
-                m_impliedValue.convert(static_cast<QVariant::Type>(m_type));
-            } else {
-                NX_ASSERT(false, "Type of the implied value of command line parameter '%1' does not match parameter's type.", longName);
+        if(m_impliedValue.isValid())
+        {
+            const QMetaType targetType(m_type);
+            if (m_impliedValue.canConvert(targetType))
+            {
+                m_impliedValue.convert(targetType);
+            }
+            else
+            {
+                NX_ASSERT(false, "Type of the implied value of command line parameter '%1' does not "
+                    "match parameter's type.", longName);
                 m_impliedValue = QVariant();
             }
         }
@@ -223,14 +231,14 @@ bool QnCommandLineParser::parse(const QStringList& arguments, QTextStream *error
 
         /* Convert to typed value. */
         QVariant typedValue = value;
-        bool success = typedValue.convert(static_cast<QMetaType::Type>(parameter.type()));
+        bool success = typedValue.convert(QMetaType(parameter.type()));
         if (!success)
         {
             if (errorStream)
             {
                 *errorStream
                     << nx::format("Invalid value for '%1' argument - expected %2, provided '%3'.").args(
-                        name, QMetaType::typeName(parameter.type()), value.toString())
+                        name, QMetaType(parameter.type()).name(), value.toString())
                     << Qt::endl;
             }
             result = false;

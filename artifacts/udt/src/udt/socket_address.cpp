@@ -60,7 +60,7 @@ int SocketAddress::family() const
     return m_address.ss_family;
 }
 
-void SocketAddress::setFamily(int val)
+void SocketAddress::setFamily(FamilyT val)
 {
     m_address.ss_family = val;
     m_length = val == AF_INET ? sizeof(sockaddr_in) : sizeof(sockaddr_in6);

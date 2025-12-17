@@ -117,7 +117,10 @@ int pthread_cond_wait_monotonic_timepoint(
     pthread_cond_t* condition, pthread_mutex_t* mutex, uint64_t timeMks)
 {
 #ifdef __APPLE__
-    const auto now = CTimer::getTime().count();
+    const auto nowSigned = CTimer::getTime().count();
+    if (nowSigned < 0)
+        return ETIMEDOUT;
+    const uint64_t now = static_cast<uint64_t>(nowSigned);
     if (now > timeMks)
         return ETIMEDOUT;
 
@@ -155,9 +158,12 @@ pthread_cond_t CTimer::m_EventCond = CreateEvent(NULL, false, false, NULL);
 void setCurrentThreadName(const std::string& name)
 {
 #if defined(_WIN32)
-    using SetThreadDescription = std::add_pointer_t<HRESULT WINAPI(HANDLE, PCWSTR)>;
-    if (const auto setThreadDescription = reinterpret_cast<SetThreadDescription>(
-        GetProcAddress(GetModuleHandleA("kernel32.dll"), "SetThreadDescription")))
+    using SetThreadDescriptionFn = std::add_pointer_t<HRESULT WINAPI(HANDLE, PCWSTR)>;
+
+    auto proc = ::GetProcAddress(GetModuleHandleA("kernel32.dll"), "SetThreadDescription");
+    auto setThreadDescription =
+        reinterpret_cast<SetThreadDescriptionFn>(reinterpret_cast<void*>(proc));
+    if (setThreadDescription)
     {
         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
         setThreadDescription(GetCurrentThread(), converter.from_bytes(name).c_str());
@@ -415,7 +421,7 @@ void CIPAddress::ntop(const sockaddr* addr, uint32_t ip[4], int ver)
 
 void CIPAddress::pton(detail::SocketAddress* addr, const uint32_t ip[4], int ver)
 {
-    addr->setFamily(ver);
+    addr->setFamily(FamilyT(ver));
     if (AF_INET == ver)
     {
         sockaddr_in* a = addr->v4();

@@ -32,7 +32,12 @@ auto front(Container&& c)
     if constexpr (nx::ranges::PairLikeRange<std::decay_t<Container>>)
         return std::move(c.begin()->second);
     else if constexpr (requires { c.front(); })
-        return std::move(c.front());
+    {
+        if constexpr (std::is_reference_v<decltype(c.front())>)
+            return std::move(c.front());
+        else
+            return c.front();
+    }
     else
         return std::move(*c.begin());
 }
@@ -103,6 +108,7 @@ class CrudHandler: public Handler
 {
 public:
     using Void = nx::utils::Void;
+    using Handler::subscriptionId;
 
     explicit CrudHandler(QString idParamName = "id", CrudFeatures features = {}):
         // Maximum security if not set on registration.

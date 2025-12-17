@@ -285,22 +285,28 @@ void Manager::start(QnResourcePool* resourcePool)
 
     d->resourcePoolConnections << connect(
         resourcePool,
-        &QnResourcePool::resourceAdded,
+        &QnResourcePool::resourcesAdded,
         this,
-        [handleServerAdded](const QnResourcePtr& resource)
+        [handleServerAdded](const QnResourceList& resources)
         {
-            if (const auto server = resource.dynamicCast<QnMediaServerResource>())
-                handleServerAdded(server);
+            for (const auto& resource: resources)
+            {
+                if (const auto server = resource.dynamicCast<QnMediaServerResource>())
+                    handleServerAdded(server);
+            }
         });
 
     d->resourcePoolConnections << connect(
         resourcePool,
-        &QnResourcePool::resourceRemoved,
+        &QnResourcePool::resourcesRemoved,
         this,
-        [this](const QnResourcePtr& resource)
+        [this](const QnResourceList& resources)
         {
-            if (const auto server = resource.dynamicCast<QnMediaServerResource>())
-                server->disconnect(this);
+            for (const auto& resource: resources)
+            {
+                if (const auto server = resource.dynamicCast<QnMediaServerResource>())
+                    server->disconnect(this);
+            }
         });
 
     for (const auto& server: resourcePool->servers())

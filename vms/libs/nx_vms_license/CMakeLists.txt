@@ -3,7 +3,6 @@
 nx_add_target(nx_vms_license LIBRARY
     LIBRARY_TYPE STATIC
     NO_API_MACROS
-    WERROR_IF LINUX
     PUBLIC_LIBS nx_vms_common
     FOLDER common/libs
 )

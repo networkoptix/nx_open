@@ -24,11 +24,21 @@ EdgeServerStateTracker::EdgeServerStateTracker(QnMediaServerResource* edgeServer
 
     const auto resourcePool = edgeServer->resourcePool();
 
-    connect(resourcePool, &QnResourcePool::resourceAdded,
-        this, &EdgeServerStateTracker::onResourceAdded);
+    connect(resourcePool, &QnResourcePool::resourcesAdded,
+        this,
+        [this] (const QnResourceList& resources)
+        {
+            for (const auto& resource: resources)
+                onResourceAdded(resource);
+        });
 
-    connect(resourcePool, &QnResourcePool::resourceRemoved,
-        this, &EdgeServerStateTracker::onResourceRemoved);
+    connect(resourcePool, &QnResourcePool::resourcesRemoved,
+        this,
+        [this] (const QnResourceList& resources)
+        {
+            for (const auto& resource: resources)
+                onResourceRemoved(resource);
+        });
 }
 
 bool EdgeServerStateTracker::hasUniqueCoupledChildCamera() const

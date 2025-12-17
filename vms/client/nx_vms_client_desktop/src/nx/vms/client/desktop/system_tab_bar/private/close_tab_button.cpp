@@ -76,7 +76,7 @@ void CloseTabButton::paintEvent(QPaintEvent*)
                 state = QIcon::On;
         }
     }
-    else if (const auto buttonWidget = qobject_cast<const HomeTabButton*>(parent()))
+    else if (qobject_cast<const HomeTabButton*>(parent()))
     {
         state = QIcon::On;
     }

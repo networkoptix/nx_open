@@ -8,7 +8,6 @@ endif()
 
 nx_add_target(nx_network LIBRARY
     NO_MOC
-    WERROR_IF LINUX
     ADDITIONAL_SOURCES
         ${mac_sources}
     PUBLIC_LIBS

@@ -159,7 +159,7 @@ QSize DropdownButton::sizeHint() const
         return base_type::sizeHint();
 
     Q_D(const QPushButton);
-    if (d->sizeHint.isValid() && d->lastAutoDefault == autoDefault())
+    if (d->sizeHint.isValid() && d->lastAutoDefault == (unsigned int) autoDefault())
         return d->sizeHint;
 
     d->lastAutoDefault = autoDefault();

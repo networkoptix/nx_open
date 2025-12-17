@@ -977,7 +977,7 @@ quint64 DecodedPictureToOpenGLUploader::nextFrameToDisplayTimestamp() const
     //async upload case (only when HW decoding enabled)
     if( !m_renderedPictures.empty() )
         return m_renderedPictures.back()->pts();
-    return AV_NOPTS_VALUE;
+    return (quint64) AV_NOPTS_VALUE;
 }
 
 void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()

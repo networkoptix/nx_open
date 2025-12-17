@@ -31,15 +31,18 @@ QString QnCameraNamesWatcher::getCameraName(const nx::Uuid& cameraId)
     if (!cameraResource)
         return nx::format("<%1>", tr("Removed camera"));
 
-    connect(resPool, &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
+    connect(resPool, &QnResourcePool::resourcesRemoved, this,
+        [this](const QnResourceList& resources)
         {
-            const auto cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
-            if (!cameraResource)
-                return;
+            for (const auto& resource: resources)
+            {
+                const auto cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
+                if (!cameraResource)
+                    continue;
 
-            m_names.remove(cameraResource->getId());
-            disconnect(cameraResource.data(), nullptr, this, nullptr);
+                m_names.remove(cameraResource->getId());
+                disconnect(cameraResource.data(), nullptr, this, nullptr);
+            }
         });
 
     connect(cameraResource.data(), &QnVirtualCameraResource::nameChanged, this,

@@ -140,7 +140,7 @@ void GraphicsWebEngineView::dragEnterEvent(QGraphicsSceneDragDropEvent* event)
 
 void GraphicsWebEngineView::updateCanGoBack()
 {
-    if (QQuickItem* webView = rootObject())
+    if (rootObject())
         setCanGoBack(m_controller->canGoBack());
 }
 

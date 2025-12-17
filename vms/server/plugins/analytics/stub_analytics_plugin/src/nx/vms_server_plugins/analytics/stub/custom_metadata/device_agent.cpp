@@ -10,18 +10,13 @@
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace stub {
-namespace custom_metadata {
+namespace nx::vms_server_plugins::analytics::stub::custom_metadata {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    ConsumingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT, engine->integration()->instanceId()),
-    m_engine(engine)
+    ConsumingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT, engine->integration()->instanceId())
 {
 }
 
@@ -56,8 +51,4 @@ bool DeviceAgent::pushCustomMetadataPacket(
     return true;
 }
 
-} // namespace custom_metadata
-} // namespace stub
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::stub::custom_metadata

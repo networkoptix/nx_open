@@ -909,13 +909,13 @@ void Style::drawPrimitive(PrimitiveElement element,
             {
                 mainColor = core::colorTheme()->color("red");
                 if (!enabled)
-                    mainColor.setAlphaF(nx::style::Hints::kDisabledBrandedButtonOpacity);
+                    mainColor.setAlphaF((float) nx::style::Hints::kDisabledBrandedButtonOpacity);
             }
             else if (isAccented(widget))
             {
                 mainColor = core::colorTheme()->color("brand");
                 if (!enabled)
-                    mainColor.setAlphaF(nx::style::Hints::kDisabledBrandedButtonOpacity);
+                    mainColor.setAlphaF((float) nx::style::Hints::kDisabledBrandedButtonOpacity);
             }
 
             QColor buttonColor = mainColor;
@@ -997,13 +997,13 @@ void Style::drawPrimitive(PrimitiveElement element,
             {
                 mainColor = core::colorTheme()->color("red");
                 if (!enabled)
-                    mainColor.setAlphaF(nx::style::Hints::kDisabledItemOpacity);
+                    mainColor.setAlphaF((float) nx::style::Hints::kDisabledItemOpacity);
             }
             else if (isAccented(widget))
             {
                 mainColor = core::colorTheme()->color("brand");
                 if (!enabled)
-                    mainColor.setAlphaF(nx::style::Hints::kDisabledItemOpacity);
+                    mainColor.setAlphaF((float) nx::style::Hints::kDisabledItemOpacity);
             }
 
             QColor buttonColor = mainColor;
@@ -1105,8 +1105,8 @@ void Style::drawPrimitive(PrimitiveElement element,
                 /* Read-only input: */
                 frameColor = base;
                 brushColor = base;
-                frameColor.setAlphaF(0.4);
-                brushColor.setAlphaF(0.2);
+                frameColor.setAlphaF(0.4f);
+                brushColor.setAlphaF(0.2f);
             }
             else if (focused)
             {

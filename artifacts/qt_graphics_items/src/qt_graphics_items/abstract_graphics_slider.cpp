@@ -175,7 +175,7 @@ bool AbstractGraphicsSlider::isSliderDown() const
 void AbstractGraphicsSlider::setSliderDown(bool down)
 {
     Q_D(AbstractGraphicsSlider);
-    bool doEmit = d->pressed != down;
+    bool doEmit = bool(d->pressed) != down;
 
     d->pressed = down;
 
@@ -628,7 +628,7 @@ void AbstractGraphicsSlider::initStyleOption(QStyleOption* option) const
         sliderOption->orientation = d->orientation;
 
         sliderOption->upsideDown = d->orientation == Qt::Horizontal
-            ? d->invertedAppearance != (option->direction == Qt::RightToLeft)
+            ? bool(d->invertedAppearance) != (option->direction == Qt::RightToLeft)
             : !d->invertedAppearance;
 
         sliderOption->direction = Qt::LeftToRight; // we use the upsideDown option instead

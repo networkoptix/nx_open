@@ -150,10 +150,11 @@ bool QnResourceData::value(const QString &key, int type, void *value, const Copy
     }
 
     if(data.type != QMetaType::UnknownType)
-        NX_ASSERT(false, "Resource data for key '%1' was requested with a non-standard type '%2'.", key, QMetaType::typeName(type));
+        NX_ASSERT(false, "Resource data for key '%1' was requested with a non-standard type '%2'.",
+            key, QMetaType(type).name());
 
     QnJsonSerializer *serializer = QnJsonSerializer::serializer(type);
-    if (!NX_ASSERT(serializer, "type %1, name '%2'", type, QMetaType::typeName(type)))
+    if (!NX_ASSERT(serializer, "type %1, name '%2'", type, QMetaType(type).name()))
         return false;
 
     QnJsonContext ctx;

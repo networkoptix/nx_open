@@ -348,24 +348,24 @@ void StylePrivate::drawTextButton(QPainter* painter,
 
         if (pressed)
         {
-            backgroundColor.setAlphaF(0.05);
+            backgroundColor.setAlphaF(0.05f);
             textColor = core::colorTheme()->color("light7");
         }
         else if (hovered)
         {
-            backgroundColor.setAlphaF(0.15);
+            backgroundColor.setAlphaF(0.15f);
             textColor = core::colorTheme()->color("light1");
         }
         else if (enabled)
         {
-            backgroundColor.setAlphaF(0.10);
+            backgroundColor.setAlphaF(0.10f);
             textColor = core::colorTheme()->color("light4");
         }
         else
         {
-            backgroundColor.setAlphaF(0.03);
+            backgroundColor.setAlphaF(0.03f);
             textColor = core::colorTheme()->color("light4");
-            textColor.setAlphaF(0.3); //< #spanasenko Is it the right way?
+            textColor.setAlphaF(0.3f); //< #spanasenko Is it the right way?
         }
 
         QnScopedPainterPenRollback pen(painter, Qt::NoPen);

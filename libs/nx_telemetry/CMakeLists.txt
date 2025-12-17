@@ -4,7 +4,6 @@ find_package(opentelemetry-cpp REQUIRED)
 
 nx_add_target(nx_telemetry LIBRARY
     NO_MOC
-    WERROR_IF LINUX
     PUBLIC_LIBS
         nx_utils
     PRIVATE_LIBS

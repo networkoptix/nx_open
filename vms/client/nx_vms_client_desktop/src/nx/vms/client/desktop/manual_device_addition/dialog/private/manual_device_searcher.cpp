@@ -107,7 +107,8 @@ void ManualDeviceSearcher::stop()
         return;
 
     const auto stopCallback = nx::utils::guarded(this,
-        [this](bool success, rest::Handle /*handle*/, rest::ServerConnection::ErrorOrEmpty result)
+        [this](bool /*success*/, rest::Handle /*handle*/,
+            rest::ServerConnection::ErrorOrEmpty /*result*/)
         {
             if (m_status.state != QnManualResourceSearchStatus::Finished)
                 abort();

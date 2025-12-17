@@ -4,7 +4,6 @@ set(udt_dir ${CMAKE_CURRENT_SOURCE_DIR}/../../artifacts/udt)
 
 nx_add_target(udt LIBRARY
     NO_MOC
-    WERROR_IF LINUX
     SOURCE_DIR ${udt_dir}/src
     FOLDER common/libs
 )

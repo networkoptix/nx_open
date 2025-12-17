@@ -577,7 +577,7 @@ void QnServerSettingsWidget::showServerCertificate(const QString& id)
     }
 
     std::string pem;
-    ServerCertificateViewer::Mode mode;
+    ServerCertificateViewer::Mode mode = ServerCertificateViewer::Mode::presented;
     if (id == kUserProvidedCertificateLink)
     {
         pem = m_server->userProvidedCertificate();

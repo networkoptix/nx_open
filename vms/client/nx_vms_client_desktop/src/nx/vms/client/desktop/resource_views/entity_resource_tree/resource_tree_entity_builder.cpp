@@ -1051,7 +1051,6 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
         AbstractEntityPtr layoutsEntity;
         if (ini().foldersForLayoutsInResourceTree)
         {
-            using GroupingRule = GroupingRule<QString, QnResourcePtr>;
             using GroupingRuleStack =
                 GroupGroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
 

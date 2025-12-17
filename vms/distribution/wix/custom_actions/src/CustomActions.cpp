@@ -277,7 +277,7 @@ UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
         CString localAppDataFolder = GetAppDataLocalFolderPath();
         dbFolder.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
 
-        WcaLog(LOGMSG_STANDARD, "Deleting ecs and mserver %S with -shm,-val.", dbFolder);
+        WcaLog(LOGMSG_STANDARD, "Deleting ecs and mserver %S with -shm,-val.", dbFolder.GetString());
 
         DeleteFile(dbFolder + L"\\ecs.sqlite");
         DeleteFile(dbFolder + L"\\ecs.sqlite-shm");
@@ -530,11 +530,11 @@ UINT __stdcall DeleteClientConfigFiles(MSIHANDLE hInstall)
 
     try
     {
-        WcaLog(LOGMSG_STANDARD, "Deleting client configs `%S`.", configsFolder);
+        WcaLog(LOGMSG_STANDARD, "Deleting client configs `%S`.", configsFolder.GetString());
 
         if (!dirExists(configsFolder))
         {
-            WcaLog(LOGMSG_STANDARD, "Configs directory doesn't exist `%S`.", configsFolder);
+            WcaLog(LOGMSG_STANDARD, "Configs directory doesn't exist `%S`.", configsFolder.GetString());
             return wca.success();
         }
 
@@ -549,14 +549,14 @@ UINT __stdcall DeleteClientConfigFiles(MSIHANDLE hInstall)
 
         if (SHFileOperation(&fileOperationDescription) != 0)
         {
-            WcaLog(LOGMSG_STANDARD, "Couldn't delete configs directory `%S`.", configsFolder);
+            WcaLog(LOGMSG_STANDARD, "Couldn't delete configs directory `%S`.", configsFolder.GetString());
             return wca.failure();
         }
     }
     catch (const Error& e)
     {
         WcaLog(LOGMSG_STANDARD, "Couldn't delete client config directory `%S`. Error: %S",
-            configsFolder, e.msg());
+            configsFolder.GetString(), e.msg());
         return wca.failure();
     }
 

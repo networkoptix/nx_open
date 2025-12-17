@@ -173,7 +173,7 @@ static constexpr qreal kMaxBackwardSpeed = 16.0;
 
 static const auto kUpdateDetailsInterval = 1s;
 
-static constexpr auto k360VRAspectRatio = 16.0 / 9.0;
+static constexpr float k360VRAspectRatio = 16.0f / 9.0f;
 
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
     {QIcon::Normal, {.primary = "light1"}}

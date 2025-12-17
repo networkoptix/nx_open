@@ -64,7 +64,7 @@ void AnimationTimer::updateCurrentTime(qint64 time)
 
         // Listeners may be added to the list or deleted as objects in the process, this is why we
         // have to iterate by index. Note: listeners cannot be removed from the list meanwhile.
-        for (int i = 0; i < m_listeners.size(); i++)
+        for (int i = 0; i < (int) m_listeners.size(); i++)
         {
             auto listener = m_listeners[i].lock();
             if (!listener)
@@ -86,7 +86,7 @@ void AnimationTimer::updateCurrentTime(qint64 time)
 void AnimationTimer::clearListeners()
 {
     const bool wasActive = isActive();
-    for (int i = 0; i < m_listeners.size(); i++)
+    for (int i = 0; i < (int) m_listeners.size(); i++)
     {
         if (auto listener = m_listeners[i].lock())
             listener->m_timer = nullptr;

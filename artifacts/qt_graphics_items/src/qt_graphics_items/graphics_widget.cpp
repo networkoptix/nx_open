@@ -630,7 +630,7 @@ bool GraphicsWidgetPrivate::windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *
             q->setCursor(cursor);
     }
 
-    if (windowData->closeButtonHovered != oldCloseButtonHovered)
+    if (bool(windowData->closeButtonHovered) != oldCloseButtonHovered)
         q->update(windowData->closeButtonRect);
 
     return section != Qt::NoSection;
@@ -722,7 +722,7 @@ bool GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
     if(windowData->closeButtonGrabbed) {
         bool oldCloseButtonHovered = windowData->closeButtonHovered;
         windowData->closeButtonHovered = windowData->closeButtonRect.contains(event->pos());
-        if(oldCloseButtonHovered != windowData->closeButtonHovered)
+        if(oldCloseButtonHovered != bool(windowData->closeButtonHovered))
             q->update(windowData->closeButtonRect);
         return true;
     }

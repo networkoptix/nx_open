@@ -19,7 +19,6 @@ if(MACOSX)
 endif()
 
 nx_add_target(nx_vms_common LIBRARY
-    NO_WERROR # For add "WERROR_IF LINUX" need to fix Wswitch warnings.
     ADDITIONAL_SOURCES
         ${mac_sources}
         ${date_time_formatter_sources}
@@ -54,19 +53,12 @@ nx_make_target_translatable(nx_vms_common COMPONENTS "client" "server" "mobile")
 target_compile_definitions(nx_vms_common
     PRIVATE
         NX_VMS_COMMON_API=${API_EXPORT_MACRO}
-    INTERFACE
-        NX_VMS_COMMON_API=${API_IMPORT_MACRO}
-)
-
-set_property(
-    SOURCE
-        src/nx/vms/statistics/settings.cpp
-    APPEND
-    PROPERTY COMPILE_DEFINITIONS
         NX_STATISTICS_SERVER_URL="${statisticsServerUrl}"
         NX_STATISTICS_SERVER_USER="${statisticsServerUser}"
         NX_STATISTICS_SERVER_PASSWORD="${statisticsServerPassword}"
         NX_CRASH_REPORT_API_URL="${crashReportApiUrl}"
+    INTERFACE
+        NX_VMS_COMMON_API=${API_IMPORT_MACRO}
 )
 
 if(LINUX)

@@ -516,7 +516,7 @@ void UserListWidget::Private::setupUi()
     setPaletteColor(selectionControls, QPalette::WindowText, core::colorTheme()->color("light4"));
     setPaletteColor(selectionControls, QPalette::Dark, core::colorTheme()->color("dark15"));
     QColor disabledTextColor = core::colorTheme()->color("light4");
-    disabledTextColor.setAlphaF(0.3);
+    disabledTextColor.setAlphaF(0.3f);
     setPaletteColor(selectionControls, QPalette::Disabled, QPalette::WindowText,
         disabledTextColor);
     setPaletteColor(deleteNotFoundUsersButton, QPalette::Disabled, QPalette::WindowText,

@@ -295,8 +295,13 @@ SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
     connect(resourcePool(), &QnResourcePool::resourcesAdded, this, &SystemSettings::initialize,
         Qt::DirectConnection);
 
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        &SystemSettings::at_resourcePool_resourceRemoved, Qt::DirectConnection);
+    connect(resourcePool(), &QnResourcePool::resourcesRemoved, this,
+        [this] (const QnResourceList& resources)
+        {
+            for (const auto& resource: resources)
+                at_resourcePool_resourceRemoved(resource);
+        },
+        Qt::DirectConnection);
 
     initialize();
 
@@ -2784,10 +2789,11 @@ api::SystemSettings SystemSettings::apiSettings() const
     return result;
 }
 
-api::SystemSettings SystemSettings::apiSettings(const std::vector<api::SystemSettingName>& names) const
+api::SystemSettings SystemSettings::apiSettings(const std::vector<api::SystemSettingName>& names)
+    const
 {
     api::SystemSettings result;
-    for (auto name: names)
+    for (const auto& name: names)
     {
         switch (name)
         {
@@ -2797,6 +2803,13 @@ api::SystemSettings SystemSettings::apiSettings(const std::vector<api::SystemSet
                     break;
             BOOST_PP_SEQ_FOR_EACH(VALUE, result, SystemSettings_Fields)
             #undef VALUE
+
+            case api::SystemSettingName::sessionLimitMinutes: //< Fallback for deprecated API name.
+                result.sessionLimitS = d->sessionLimitSAdaptor->value();
+                break;
+
+            case api::SystemSettingName::none: //< Ignore.
+                break;
         }
     }
     return result;

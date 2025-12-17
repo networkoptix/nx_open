@@ -100,7 +100,7 @@ QPixmap LoadingIndicator::createPixmap(double progress)
     auto c1 = core::colorTheme()->color("light1");
     auto c2 = core::colorTheme()->color("light5");
     auto c3 = core::colorTheme()->color("light10");
-    c2.setAlphaF(0.54);
+    c2.setAlphaF(0.54f);
     c3.setAlphaF(0);
 
     g.setColorAt(0, c1);

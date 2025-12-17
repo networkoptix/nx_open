@@ -2,7 +2,6 @@
 
 nx_add_target(oauth2_client
     LIBRARY NO_MOC
-    WERROR_IF NOT WINDOWS
     PUBLIC_LIBS nx_network cloud_db_client
     FOLDER common/libs
 )

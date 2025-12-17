@@ -539,6 +539,8 @@ TierValue ServiceManager::tierLimitUsed(SaasTierLimitName value) const
         case SaasTierLimitName::ldapAllowed:
             return globalSettings()->ldap().isValid(/*checkPassword*/ false);
 
+        default:
+            break;
     }
     NX_ASSERT(0, "Not implemented %1", static_cast<int>(value));
     return 0;

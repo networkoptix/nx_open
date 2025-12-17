@@ -115,7 +115,7 @@ QJsonDocument executeGetFrameTimePoints(Director* director, QJsonObject request)
     return QJsonDocument(response);
 }
 
-QJsonDocument getServerRequestStatistics(QJsonObject request)
+QJsonDocument getServerRequestStatistics(QJsonObject /*request*/)
 {
     auto metrics = nx::vms::common::appContext()->metrics();
     auto response = formResponseBase(DirectorJsonInterface::Ok);

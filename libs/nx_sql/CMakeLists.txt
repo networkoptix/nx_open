@@ -2,7 +2,6 @@
 
 nx_add_target(nx_sql LIBRARY
     NO_MOC
-    WERROR_IF LINUX
     PUBLIC_LIBS
         Qt6::Core
         Qt6::Sql

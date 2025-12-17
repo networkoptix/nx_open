@@ -41,7 +41,7 @@ void VelocityMeter::addPoint(const QPointF& point, const qint64 timestampMs)
         velocity = QVector2D((point - m_prevPoint) / elapsed) * 1000;
 
         // A primitive Kalman filter.
-        constexpr float kKalmanGain = 0.7;
+        constexpr float kKalmanGain = 0.7f;
         m_velocity = velocity * kKalmanGain + m_velocity * (1.f - kKalmanGain);
         emit velocityChanged();
     }

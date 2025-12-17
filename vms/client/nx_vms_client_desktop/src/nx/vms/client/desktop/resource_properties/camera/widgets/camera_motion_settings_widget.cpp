@@ -36,7 +36,7 @@ namespace nx::vms::client::desktop {
 namespace {
 
 static constexpr QSize kSensitivityButtonSize(34, 34);
-static constexpr float kSensitivityButtonOpacity = 0.3;
+static constexpr float kSensitivityButtonOpacity = 0.3f;
 
 using StreamIndex = nx::vms::api::StreamIndex;
 

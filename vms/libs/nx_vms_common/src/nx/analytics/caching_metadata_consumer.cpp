@@ -166,13 +166,6 @@ QString metadataRepresentation(QnConstAbstractCompressedMetadataPtr metadata)
 
 template<>
 QnMetaDataV1Ptr MetadataCache<QnMetaDataV1Ptr>::uncompress(
-    const QnAbstractCompressedMetadataPtr& metadata)
-{
-    return std::dynamic_pointer_cast<QnMetaDataV1>(metadata);
-}
-
-template<>
-QnMetaDataV1Ptr MetadataCache<QnMetaDataV1Ptr>::uncompress(
     const QnConstAbstractCompressedMetadataPtr& metadata)
 {
     return QnMetaDataV1Ptr(std::dynamic_pointer_cast<const QnMetaDataV1>(metadata)->clone());
@@ -198,14 +191,6 @@ ObjectMetadataPacketPtr MetadataCache<ObjectMetadataPacketPtr>::uncompress(
     const QnConstAbstractCompressedMetadataPtr& metadata)
 {
     const auto compressedMetadata = std::dynamic_pointer_cast<const QnCompressedMetadata>(metadata);
-    return fromCompressedMetadataPacket(compressedMetadata);
-}
-
-template<>
-ObjectMetadataPacketPtr MetadataCache<ObjectMetadataPacketPtr>::uncompress(
-    const QnAbstractCompressedMetadataPtr& metadata)
-{
-    const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
     return fromCompressedMetadataPacket(compressedMetadata);
 }
 

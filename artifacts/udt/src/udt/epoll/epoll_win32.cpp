@@ -112,8 +112,8 @@ Result<int> EpollWin32::poll(
     if (isTimeoutSpecified)
     {
         const auto fullSeconds = duration_cast<seconds>(timeout);
-        tv.tv_sec = fullSeconds.count();
-        tv.tv_usec = duration_cast<microseconds>(timeout - fullSeconds).count();
+        tv.tv_sec = decltype(tv.tv_sec) (fullSeconds.count());
+        tv.tv_usec = decltype(tv.tv_usec) (duration_cast<microseconds>(timeout - fullSeconds).count());
     }
 
     int eventCount = ::select(

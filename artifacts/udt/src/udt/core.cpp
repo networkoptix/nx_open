@@ -369,7 +369,7 @@ Result<> CUDT::getOpt(UDTOpt optName, void* optval, int& optlen)
             break;
 
         case UDT_RCVTIMEO:
-            *(int*)optval = m_recvTimeout.count();
+            *(int*)optval = (int) m_recvTimeout.count();
             optlen = sizeof(int);
             break;
 
@@ -1588,8 +1588,8 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
 
                 m_iAckSeqNo = CAckNo::incack(m_iAckSeqNo);
                 data[0] = m_iRcvLastAck;
-                data[1] = m_iRTT.count();
-                data[2] = m_iRTTVar.count();
+                data[1] = (int32_t) m_iRTT.count();
+                data[2] = (int32_t) m_iRTTVar.count();
                 data[3] = m_pRcvBuffer->getAvailBufSize();
                 // a minimum flow window of 2 is used, even if buffer is full, to break potential deadlock
                 if (data[3] < 2)

@@ -94,7 +94,7 @@ TEST(UuidHelper, toStdString)
     for (const char c: kFixedUuidString)
     {
         if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
-            fixedUuidWithoutFormatOptions.push_back(tolower(c));
+            fixedUuidWithoutFormatOptions.push_back(char(tolower(c)));
     }
     ASSERT_STREQ(fixedUuidWithoutFormatOptions,
         UuidHelper::toStdString(kFixedUuid, UuidHelper::FormatOptions::none));

@@ -19,21 +19,6 @@ namespace {
 
 static constexpr auto kReasonToCount = "reasonToCount";
 
-bool isValidReason(nx::vms::api::EventReason reason)
-{
-    switch (reason)
-    {
-        case nx::vms::api::EventReason::failedToConnectToLdap:
-        case nx::vms::api::EventReason::failedToCompleteSyncWithLdap:
-        case nx::vms::api::EventReason::noLdapUsersAfterSync:
-        case nx::vms::api::EventReason::someUsersNotFoundInLdap:
-            return true;
-
-        default:
-            return false;
-    }
-}
-
 } // namespace
 
 namespace nx::vms::rules {

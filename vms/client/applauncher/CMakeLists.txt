@@ -5,7 +5,6 @@ if(LINUX)
 endif()
 
 nx_add_target(applauncher EXECUTABLE SIGNED
-    WERROR_IF LINUX
     RC_FILE
         "applauncher.rc"
     PUBLIC_LIBS

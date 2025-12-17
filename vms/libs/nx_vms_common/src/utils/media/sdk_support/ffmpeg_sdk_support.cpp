@@ -459,6 +459,8 @@ nxcip::DataPacketType toSdkDataPacketType(QnAbstractMediaData::DataType type)
             return nxcip::dptData;
         case QnAbstractMediaData::VIDEO:
             return nxcip::dptVideo;
+        case QnAbstractMediaData::META_V1: //< Deprecated. See declaration in QnAbstractMediaData.
+            break;
     }
 
     NX_ASSERT(false);

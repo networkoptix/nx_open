@@ -127,7 +127,14 @@ protected:
             "TemplateArg must be inherited from IRefCountable");
 
         static const std::string id =
-            std::string(&baseIdCharArray[0]) + "<" + &TemplateArg::interfaceId()->value[0] + ">";
+            [](const char* base, const char* arg)
+            {
+                std::string s(base);
+                s.push_back('<');
+                s.append(arg);
+                s.push_back('>');
+                return s;
+            }(baseIdCharArray, TemplateArg::interfaceId()->value);
 
         return reinterpret_cast<const InterfaceId*>(id.c_str());
     }

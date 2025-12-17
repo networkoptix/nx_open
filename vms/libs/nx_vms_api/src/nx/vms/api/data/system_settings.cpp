@@ -34,6 +34,9 @@ bool deserialize(QnJsonContext* context, const QJsonValue& value, SaveableSiteSe
                     return false;
             BOOST_PP_SEQ_FOR_EACH(VALUE, target, SaveableSiteSettings_Fields)
             #undef VALUE
+
+            default:
+                break;
         }
     }
 
@@ -50,6 +53,9 @@ bool deserialize(QnJsonContext* context, const QJsonValue& value, SaveableSiteSe
                     return false;
             BOOST_PP_SEQ_FOR_EACH(VALUE, context, UnsaveableSiteSettings_Fields)
             #undef VALUE
+
+            default:
+                break;
         }
     }
 
@@ -83,6 +89,9 @@ nx::reflect::DeserializationResult deserialize(
                 }
             BOOST_PP_SEQ_FOR_EACH(VALUE, data, SaveableSiteSettings_Fields)
             #undef VALUE
+
+            case SiteSettingName::none: //< Only for avoid Wswitch warning.
+                break;
         }
     }
 

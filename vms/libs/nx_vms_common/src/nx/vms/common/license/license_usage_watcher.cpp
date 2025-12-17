@@ -57,27 +57,36 @@ DeviceLicenseUsageWatcher::DeviceLicenseUsageWatcher(SystemContext* context, QOb
 
     // Call update if camera was added or removed.
     auto updateIfNeeded =
-        [this](const QnResourcePtr &resource)
+        [this](const QnResourceList& resources)
         {
-            if (resource.dynamicCast<QnVirtualCameraResource>())
-                emit licenseUsageChanged();
+            for (const auto& resource: resources)
+            {
+                if (resource.dynamicCast<QnVirtualCameraResource>())
+                    emit licenseUsageChanged();
+            }
         };
 
-    connect(resPool, &QnResourcePool::resourceAdded, this, updateIfNeeded);
-    connect(resPool, &QnResourcePool::resourceRemoved, this, updateIfNeeded);
+    connect(resPool, &QnResourcePool::resourcesAdded, this, updateIfNeeded);
+    connect(resPool, &QnResourcePool::resourcesRemoved, this, updateIfNeeded);
 
-    connect(resPool, &QnResourcePool::resourceAdded, this,
-        [connectToCamera](const QnResourcePtr& resource)
+    connect(resPool, &QnResourcePool::resourcesAdded, this,
+        [connectToCamera](const QnResourceList& resources)
         {
-            if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
-                connectToCamera(camera);
+            for (const auto& resource: resources)
+            {
+                if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
+                    connectToCamera(camera);
+            }
         });
 
-    connect(resPool, &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
+    connect(resPool, &QnResourcePool::resourcesRemoved, this,
+        [this](const QnResourceList& resources)
         {
-            if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
-                camera->disconnect(this);
+            for (const auto& resource: resources)
+            {
+                if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
+                    camera->disconnect(this);
+            }
         });
 
     for (const auto& camera: resPool->getAllCameras(QnResourcePtr(), true))
@@ -103,30 +112,36 @@ VideoWallLicenseUsageWatcher::VideoWallLicenseUsageWatcher(
                 &LicenseUsageWatcher::licenseUsageChanged);
         };
 
-    auto resourceAdded =
-        [this, connectTo](const QnResourcePtr& resource)
+    auto resourcesAdded =
+        [this, connectTo](const QnResourceList& resources)
         {
-            if (const auto videowall = resource.dynamicCast<QnVideoWallResource>())
+            for (const auto& resource: resources)
             {
-                connectTo(videowall);
-                emit licenseUsageChanged();
+                if (const auto videowall = resource.dynamicCast<QnVideoWallResource>())
+                {
+                    connectTo(videowall);
+                    emit licenseUsageChanged();
+                }
             }
         };
 
-    auto resourceRemoved =
-        [this](const QnResourcePtr& resource)
+    auto resourcesRemoved =
+        [this](const QnResourceList& resources)
         {
-            if (const auto videowall = resource.dynamicCast<QnVideoWallResource>())
+            for (const auto& resource: resources)
             {
-                videowall->disconnect(this);
-                emit licenseUsageChanged();
+                if (const auto videowall = resource.dynamicCast<QnVideoWallResource>())
+                {
+                    videowall->disconnect(this);
+                    emit licenseUsageChanged();
+                }
             }
         };
 
     const auto& resPool = context->resourcePool();
 
-    connect(resPool, &QnResourcePool::resourceAdded, this, resourceAdded);
-    connect(resPool, &QnResourcePool::resourceRemoved, this, resourceRemoved);
+    connect(resPool, &QnResourcePool::resourcesAdded, this, resourcesAdded);
+    connect(resPool, &QnResourcePool::resourcesRemoved, this, resourcesRemoved);
     for (const auto& videowall: resPool->getResources<QnVideoWallResource>())
         connectTo(videowall);
 }

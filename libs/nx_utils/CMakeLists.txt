@@ -29,7 +29,6 @@ endif()
 
 nx_add_target(nx_utils LIBRARY
     NO_MOC
-    WERROR_IF LINUX
     ADDITIONAL_SOURCES
         ${ios_sources}
         ${aes_library_sources}

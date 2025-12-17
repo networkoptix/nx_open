@@ -33,18 +33,6 @@ namespace {
 
 constexpr auto kDelimiter = QLatin1StringView(", ");
 
-QString detailToString(const QVariantMap& details, const QString& key)
-{
-    const auto value = details.value(key);
-    return value.canConvert<QString>() ? value.toString() : QString();
-}
-
-QString propertyToString(const AggregatedEventPtr& event, const char* key)
-{
-    const auto value = event->property(key);
-    return value.isValid() && value.canConvert<QString>() ? value.toString() : QString();
-}
-
 // Can convert common event types.
 std::optional<QString> variantToString(const QVariant& var)
 {

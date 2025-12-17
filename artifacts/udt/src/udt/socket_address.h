@@ -11,7 +11,10 @@
 #include <string>
 
 #ifdef _WIN32
+    using FamilyT = ADDRESS_FAMILY;
     using socklen_t = int;
+#else
+    using FamilyT = sa_family_t;
 #endif
 
 namespace detail {
@@ -33,7 +36,7 @@ public:
     socklen_t size() const;
 
     int family() const;
-    void setFamily(int val);
+    void setFamily(FamilyT val);
 
     unsigned short port() const;
 

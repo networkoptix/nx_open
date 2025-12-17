@@ -218,7 +218,7 @@ QString LookupListImportEntriesModel::doNotImportText() const
 bool LookupListImportEntriesModel::hasIndex(
     int row, int column, const QModelIndex& /*parent*/) const
 {
-    return row >= 0 && column >= 0 && row < d->previewData.size()
+    return row >= 0 && column >= 0 && row < (int) d->previewData.size()
         && column < (int) d->previewData[row].size();
 }
 

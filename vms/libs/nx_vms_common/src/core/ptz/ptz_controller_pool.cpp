@@ -101,13 +101,21 @@ QnPtzControllerPool::~QnPtzControllerPool()
 void QnPtzControllerPool::init()
 {
     connect(resourcePool(),
-        &QnResourcePool::resourceAdded,
+        &QnResourcePool::resourcesAdded,
         this,
-        &QnPtzControllerPool::registerResource);
+        [this] (const QnResourceList& resources)
+        {
+            for (const auto& resource: resources)
+                registerResource(resource);
+        });
     connect(resourcePool(),
-        &QnResourcePool::resourceRemoved,
+        &QnResourcePool::resourcesRemoved,
         this,
-        &QnPtzControllerPool::unregisterResource);
+        [this] (const QnResourceList& resources)
+        {
+            for (const auto& resource: resources)
+                unregisterResource(resource);
+        });
 
     for (const QnResourcePtr& resource: resourcePool()->getResources())
         registerResource(resource);

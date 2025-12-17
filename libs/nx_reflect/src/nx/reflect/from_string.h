@@ -13,7 +13,7 @@ namespace nx::reflect {
 
 namespace detail {
 
-template<typename T, typename = std::void_t<>>
+template<typename T, typename = void>
 struct IsQByteArrayAlike: std::false_type {};
 
 template<typename T>
@@ -28,7 +28,7 @@ inline constexpr bool IsQByteArrayAlikeV = IsQByteArrayAlike<Args...>::value;
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename T, typename = std::void_t<>>
+template<typename T, typename = void>
 struct HasFromBase64: std::false_type {};
 
 template<typename T>
@@ -136,7 +136,7 @@ T fromString(std::string_view str, bool* ok = nullptr)
     const auto res = detail::fromStringSfinae(str, &val);
     if (ok)
         *ok = res;
-    return val;
+    return res ? val : T{};
 }
 
 template<typename T>

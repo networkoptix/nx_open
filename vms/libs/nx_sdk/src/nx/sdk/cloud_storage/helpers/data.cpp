@@ -46,7 +46,7 @@ std::string getStringValue(const nx::kit::Json& json, const std::string& key)
     return value.string_value();
 }
 
-std::optional<std::string> getOptionalStringValue(
+[[maybe_unused]] std::optional<std::string> getOptionalStringValue(
     const nx::kit::Json& json, const std::string& key)
 {
     const auto value = json[key];
@@ -66,7 +66,7 @@ ResultType getIntValue(const nx::kit::Json& json, const std::string& key)
     return static_cast<ResultType>(value.number_value());
 }
 
-double getDoubleValue(const nx::kit::Json& json, const std::string& key)
+[[maybe_unused]] double getDoubleValue(const nx::kit::Json& json, const std::string& key)
 {
     const auto value = json[key];
     if (!value.is_number())
@@ -75,7 +75,7 @@ double getDoubleValue(const nx::kit::Json& json, const std::string& key)
     return value.number_value();
 }
 
-bool getBoolValue(const nx::kit::Json& json, const std::string& key)
+[[maybe_unused]] bool getBoolValue(const nx::kit::Json& json, const std::string& key)
 {
     const auto value = json[key];
     if (!value.is_bool())
@@ -84,7 +84,8 @@ bool getBoolValue(const nx::kit::Json& json, const std::string& key)
     return value.bool_value();
 }
 
-std::optional<int64_t> getOptionalIntValue(const nx::kit::Json& json, const std::string& key)
+[[maybe_unused]] std::optional<int64_t> getOptionalIntValue(const nx::kit::Json& json,
+    const std::string& key)
 {
     const auto value = json[key];
     if (!value.is_number())

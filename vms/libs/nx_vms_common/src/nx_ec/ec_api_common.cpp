@@ -37,6 +37,10 @@ QString toString(ErrorCode errorCode)
             return "notImplemented";
         case ErrorCode::notFound:
             return "notFound";
+        case ErrorCode::asyncRaceError:
+            return "asyncRaceError";
+        case ErrorCode::badRequest:
+            return "badRequest";
     }
     return "unknown error";
 }

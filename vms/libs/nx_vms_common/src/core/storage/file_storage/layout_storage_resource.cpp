@@ -146,7 +146,7 @@ QIODevice* QnLayoutFileStorageResource::openInternal(const QString& url, QIODevi
 
     const auto fileName = stripName(url);
 
-    QScopedPointer<QIODevice> stream;
+    std::unique_ptr<QIODevice> stream;
     if (shouldCrypt(fileName))
     {
         NX_ASSERT(!(openMode & QIODevice::WriteOnly) || !m_password.isEmpty()); // Want to write but no password.
@@ -161,7 +161,7 @@ QIODevice* QnLayoutFileStorageResource::openInternal(const QString& url, QIODevi
     if (!stream->open(openMode))
         return nullptr;
 
-    return stream.take();
+    return stream.release();
 }
 
 int QnLayoutFileStorageResource::getCapabilities() const

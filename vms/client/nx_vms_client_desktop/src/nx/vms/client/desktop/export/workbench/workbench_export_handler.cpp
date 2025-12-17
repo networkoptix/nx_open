@@ -315,7 +315,7 @@ public:
                 QnAviResourcePtr file(new QnAviResource(completeFilename));
                 file->setStatus(nx::vms::api::ResourceStatus::online);
                 resourcePool->addResource(file);
-                return std::move(file);
+                return file;
             }
 
             case FileExtension::nov:

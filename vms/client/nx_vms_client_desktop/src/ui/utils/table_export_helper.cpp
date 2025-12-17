@@ -344,7 +344,7 @@ int QnTableExportCompositeModel::columnCount(const QModelIndex& parent) const
     return m_models.first()->columnCount(QModelIndex());
 }
 
-QVariant QnTableExportCompositeModel::data(const QModelIndex& index, int role) const
+QVariant QnTableExportCompositeModel::data(const QModelIndex& index, int /*role*/) const
 {
     const auto subTableRow = calculateSubTableRow(index.row());
     const auto subModel = m_models.at(subTableRow.first);
@@ -378,7 +378,7 @@ QModelIndex QnTableExportCompositeModel::index(
     return createIndex(row, column);
 }
 
-QModelIndex QnTableExportCompositeModel::parent(const QModelIndex& index) const
+QModelIndex QnTableExportCompositeModel::parent(const QModelIndex& /*index*/) const
 {
     return QModelIndex();
 }

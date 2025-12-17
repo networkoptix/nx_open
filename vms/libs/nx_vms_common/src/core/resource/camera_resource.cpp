@@ -1358,6 +1358,8 @@ void QnVirtualCameraResource::setPtzCapabilities(
         case ptz::Type::configurational:
             capsToProperty(nx::vms::api::device_properties::kConfigurationalPtzCapabilities);
             return;
+        default:
+            NX_ASSERT(false, "Wrong ptz type, we should never be here");
     }
     NX_ASSERT(false, "Wrong ptz type, we should never be here");
 }

@@ -205,7 +205,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceRemoved(
     if (const auto& engine = resource.objectCast<AnalyticsEngineResource>())
     {
         engine->disconnect(this);
-        if (engines.remove(engine->getId()) > 0)
+        if (engines.remove(engine->getId()))
             updateStore();
     }
 }

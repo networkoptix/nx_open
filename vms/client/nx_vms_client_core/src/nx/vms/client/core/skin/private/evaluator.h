@@ -186,7 +186,13 @@ namespace Qee {
                 throw IllegalArgumentException(QString("Parameter %2 is not specified for function '%1'.").arg(m_name).arg(index));
             const QVariant &param = ref(index);
             if(!param.canConvert<T>())
-                throw IllegalArgumentException(QString("Parameter %2 of function '%1' is of type '%3', but type '%4' was expected.").arg(m_name).arg(index).arg(QLatin1String(param.typeName())).arg(QLatin1String(QMetaType::typeName(qMetaTypeId<T>()))));
+            {
+                throw IllegalArgumentException(QString(
+                    "Parameter %2 of function '%1' is of type '%3', but type '%4' was expected.")
+                    .arg(m_name).arg(index).arg(QLatin1String(param.typeName()))
+                    .arg(QLatin1String(QMetaType(qMetaTypeId<T>()).name())));
+            }
+
             return param.value<T>();
         }
 

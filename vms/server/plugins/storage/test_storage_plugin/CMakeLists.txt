@@ -4,7 +4,6 @@
 nx_add_target(test_storage_plugin_integration LIBRARY
     LIBRARY_TYPE STATIC
     NO_MOC
-    WERROR_IF LINUX
     PUBLIC_LIBS nx_sdk
     FOLDER server/libs
 )

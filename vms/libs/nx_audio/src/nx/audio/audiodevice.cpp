@@ -188,11 +188,11 @@ Sound* AudioDevice::createSound(const nx::media::audio::Format& format) const
     if (!m_device || !m_context)
         return nullptr;
 
-    QScopedPointer<Sound> sound(new Sound(m_device, format));
+    std::unique_ptr<Sound> sound = std::make_unique<Sound>(m_device, format);
     if (sound->isValid())
     {
         sound->setVolumeLevel(m_volume);
-        return sound.take();
+        return sound.release();
     }
 
     return nullptr;

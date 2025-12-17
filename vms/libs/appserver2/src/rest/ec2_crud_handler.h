@@ -190,7 +190,7 @@ public:
         if (nx::Uuid::isUuidString(*it))
         {
             const auto id = nx::Uuid::fromStringSafe(*it);
-            return id.isNull() ? QString("*") : d->subscriptionId(id);
+            return id.isNull() ? QString("*") : subscriptionIdFromId(id);
         }
 
         if constexpr (requires { d->flexibleIdToId(*it); })
@@ -198,9 +198,9 @@ public:
             if (const auto id = d->flexibleIdToId(*it); id.isNull())
                 throw Exception::notFound(NX_FMT("Resource '%1' is not found", *it));
             else
-                return d->subscriptionId(id);
+                return d->subscriptionIdFromId(id);
         }
-        return d->subscriptionId(*it);
+        return subscriptionIdFromId(*it);
     }
 
     template<typename T>
@@ -232,7 +232,7 @@ protected:
         data.reserve(list->size());
         for (const auto& item: *list)
         {
-            data.emplace_back(d->subscriptionId(nx::utils::model::getId(item)),
+            data.emplace_back(d->subscriptionIdFromId(nx::utils::model::getId(item)),
                 nx::reflect::json::serialize(item));
         }
         auto result = nx::network::rest::CollectionHash{std::move(data)};
@@ -241,7 +241,7 @@ protected:
             for (auto& item: *list)
             {
                 item.etag = nx::utils::toBase64Url(
-                    result.hash(d->subscriptionId(nx::utils::model::getId(item))));
+                    result.hash(d->subscriptionIdFromId(nx::utils::model::getId(item))));
             }
         }
         return result;
@@ -284,7 +284,7 @@ protected:
         else if (!result.empty())
         {
             nx::network::rest::CollectionHash::Item item{
-                d->subscriptionId(id), nx::reflect::json::serialize(result.front())};
+                d->subscriptionIdFromId(id), nx::reflect::json::serialize(result.front())};
             if (processJsonRpcEtag)
             {
                 auto lock = m_subscriptions.lock();
@@ -395,8 +395,8 @@ protected:
         return objectType == ApiObject_NotDefined || objectType == m_objectType;
     }
 
-    static QString subscriptionId(QString id) { return id; }
-    static QString subscriptionId(const nx::Uuid& id) { return id.toSimpleString(); }
+    static QString subscriptionIdFromId(QString id)  { return id; }
+    static QString subscriptionIdFromId(nx::Uuid id)  { return id.toSimpleString(); }
 
     void notify(
         const QString& id,
@@ -611,7 +611,7 @@ private:
             if (d->isValidType(id))
             {
                 NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
-                d->notify(d->subscriptionId(id), NotifyType::delete_);
+                d->notify(d->subscriptionIdFromId(id), NotifyType::delete_);
             }
             return;
         }
@@ -628,7 +628,7 @@ private:
                 if (d->isValidType(id))
                 {
                     NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
-                    d->notify(d->subscriptionId(id), NotifyType::update);
+                    d->notify(d->subscriptionIdFromId(id), NotifyType::update);
                 }
                 return true;
             });

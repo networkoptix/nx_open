@@ -272,7 +272,7 @@ void CameraHotspotsItemDelegate::initStyleOption(
             QPainter disabledPixmapPainter(&disabledIconPixmap);
             disabledPixmapPainter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
             disabledPixmapPainter.fillRect(disabledIconPixmap.rect(),
-                QColor::fromRgbF(0, 0, 0, nx::style::Hints::kDisabledItemOpacity));
+                QColor::fromRgbF(0, 0, 0, (float) nx::style::Hints::kDisabledItemOpacity));
             option->icon.addPixmap(disabledIconPixmap, QIcon::Disabled);
         }
     }

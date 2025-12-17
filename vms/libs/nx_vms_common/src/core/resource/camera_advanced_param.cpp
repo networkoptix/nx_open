@@ -479,10 +479,11 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
         case ConditionType::unknown:
             NX_ASSERT(false, "Unexpected unknown condition");
             return false;
-    }
 
-    NX_ASSERT(false, nx::format("Unexpected condition value: %1").args(static_cast<int>(type)));
-    return false;
+        default:
+            NX_ASSERT(false, nx::format("Unexpected condition value: %1").args(static_cast<int>(type)));
+            return false;
+    }
 }
 
 void QnCameraAdvancedParameterDependency::autoFillId(const QString& prefix)

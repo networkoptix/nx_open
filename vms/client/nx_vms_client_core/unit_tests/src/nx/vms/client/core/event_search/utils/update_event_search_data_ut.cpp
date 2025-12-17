@@ -30,7 +30,8 @@ public:
         return parent.isValid() ? 0 : (int) items.size();
     }
 
-    virtual QModelIndex index(int row, int column = 0) const
+    virtual QModelIndex index(int row, int column = 0, const QModelIndex& /*parent*/ = QModelIndex())
+        const override
     {
         return createIndex(row, column, nullptr);
     }

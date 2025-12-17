@@ -6,7 +6,6 @@ find_package(RapidJSON REQUIRED)
 
 nx_add_target(nx_reflect LIBRARY
     NO_MOC
-    WERROR_IF LINUX
     PUBLIC_LIBS
         nx_preprocessor
         Boost::headers

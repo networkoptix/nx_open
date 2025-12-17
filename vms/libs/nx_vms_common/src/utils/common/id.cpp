@@ -9,7 +9,7 @@ nx::Uuid intToGuid(qint32 value, const QByteArray& postfix)
 {
     QCryptographicHash md5Hash( QCryptographicHash::Md5 );
     value = qToBigEndian(value);
-    md5Hash.addData((const char*) &value, sizeof(value));
+    md5Hash.addData(QByteArrayView((const char*) &value, sizeof(value)));
     md5Hash.addData(postfix);
     QByteArray ha2 = md5Hash.result();
     return nx::Uuid::fromRfc4122(ha2);

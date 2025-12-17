@@ -78,7 +78,7 @@ LPCWSTR GetProperty(MSIHANDLE hInstall, LPCWSTR name)
 bool IsPortAvailable(int port)
 {
     PortChecker port_checker;
-    return port_checker.isPortAvailable(port);
+    return port_checker.isPortAvailable((unsigned short) port);
 }
 
 bool IsPortRangeAvailable(int firstPort, int count)
@@ -86,7 +86,7 @@ bool IsPortRangeAvailable(int firstPort, int count)
     PortChecker port_checker;
 
     for (int port = firstPort; count; port++, count--)
-        if (!port_checker.isPortAvailable(port))
+        if (!port_checker.isPortAvailable((unsigned short) port))
             return false;
 
     return true;
@@ -118,7 +118,6 @@ bool fill_local_addresses(addresses_t& local_addresses) {
     ULONG outBufLen = 0;
     ULONG Iterations = 0;
 
-    DWORD dwSize = 0;
     DWORD dwRetVal = 0;
 
     // Allocate a 15 KB buffer to start with.
@@ -221,7 +220,7 @@ CString GetAppDataLocalFolderPath() {
     } else {
         GetProfilesDirectory(buffer, &size);
         CAtlString user = Is64BitWindows() ? L"Default User" : L"LocalService";
-        result.Format(L"%s\\%s\\Local Settings\\Application Data", buffer, user);
+        result.Format(L"%s\\%s\\Local Settings\\Application Data", buffer, user.GetString());
     }
 
     return result;

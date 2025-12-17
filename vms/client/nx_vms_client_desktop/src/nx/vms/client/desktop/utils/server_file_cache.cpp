@@ -125,7 +125,7 @@ void ServerFileCache::getFileList()
 
     api->getStoredFiles(
         [this](bool success,
-            rest::Handle requestId,
+            rest::Handle /*requestId*/,
             const rest::ErrorOrData<nx::vms::api::StoredFileDataList>& result)
         {
             if (!success || !result)

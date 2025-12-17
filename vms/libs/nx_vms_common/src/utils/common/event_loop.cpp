@@ -22,6 +22,7 @@ bool qnHasEventLoop(QThread* thread)
 
     return false;
 #else
+    Q_UNUSED(thread)
     return true;
 #endif
 }

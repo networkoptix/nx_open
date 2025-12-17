@@ -64,7 +64,7 @@ public:
 
 private:
     const bool m_outerData;
-    QScopedPointer<ViewNodeData> m_data;
+    std::unique_ptr<ViewNodeData> m_data;
 };
 
 } // namespace details

@@ -24,9 +24,6 @@ protected:
     virtual bool pushCustomMetadataPacket(
         nx::sdk::Ptr<const nx::sdk::analytics::ICustomMetadataPacket> customMetadataPacket
     ) override;
-
-private:
-    Engine* const m_engine;
 };
 
 } // namespace custom_metadata

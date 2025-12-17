@@ -143,7 +143,7 @@ BOOL CALLBACK enumFunc(HMODULE /*hModule*/, LPCTSTR /*lpszType*/, LPTSTR lpszNam
     const auto info = (WinAudioDeviceInfo::Private*)lParam;
     if (info->iconGroupIndex == 0)
     {
-        info->iconGroupNum = (short)lpszName;
+        info->iconGroupNum = static_cast<int>(reinterpret_cast<ULONG_PTR>(lpszName));
         return false;
     }
     info->iconGroupIndex--;

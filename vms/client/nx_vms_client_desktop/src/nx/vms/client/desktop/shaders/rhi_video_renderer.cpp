@@ -455,7 +455,6 @@ void RhiVideoRenderer::ensureTextures(const AVFrame* frame)
     if (!textures)
     {
         d->textures = std::make_unique<VideoTextures>();
-        d->textures.get();
     }
 
     for (size_t i = d->planeCount; i < VideoTextures::maxCount; ++i)

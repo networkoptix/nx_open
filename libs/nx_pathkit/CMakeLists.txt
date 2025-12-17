@@ -5,7 +5,6 @@ find_package(pathkit)
 
 nx_add_target(nx_pathkit LIBRARY
     NO_MOC
-    WERROR_IF LINUX
     PUBLIC_LIBS
         nx_utils
         Qt6::Gui

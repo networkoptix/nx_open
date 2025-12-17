@@ -2,7 +2,6 @@
 
 nx_add_target(vms_gateway_core LIBRARY
     NO_MOC
-    WERROR_IF LINUX
     PUBLIC_LIBS
         nx_vms_common
         nx_network
