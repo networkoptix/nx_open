@@ -44,6 +44,19 @@ AVHWDeviceType deviceTypeFromRhi(QRhi* rhi)
     }
 }
 
+int getHwDataIndex(const AVFrame* frame)
+{
+    switch (frame->format)
+    {
+        case AV_PIX_FMT_MEDIACODEC:
+        case AV_PIX_FMT_VIDEOTOOLBOX:
+        case AV_PIX_FMT_VAAPI:
+            return 3;
+        default:
+            return 0;
+    }
+}
+
 class VideoFrameAdapter: public AbstractVideoSurface
 {
 public:
@@ -201,7 +214,9 @@ bool HwVideoDecoderOldPlayer::decode(
         return false;
     }
 
-    if ((*outFramePtr)->width <= 0 || (*outFramePtr)->height <= 0 || !(*outFramePtr)->data[0])
+    const int hwIndex = getHwDataIndex((*outFramePtr).get());
+
+    if ((*outFramePtr)->width <= 0 || (*outFramePtr)->height <= 0 || !(*outFramePtr)->data[hwIndex])
         return false;
 
     m_lastStatus = 0;
