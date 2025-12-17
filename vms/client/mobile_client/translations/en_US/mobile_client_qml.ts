@@ -630,6 +630,10 @@
         <source>Show more</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>OptionSelector</name>
