@@ -216,7 +216,7 @@ private:
     qint64 m_lastGopSeekTime;
     QVector<int> m_audioCodecs;
     bool m_IFrameAfterJumpFound;
-    qint64 m_requiredJumpTime;
+    std::atomic<qint64> m_requiredJumpTime;
     qint64 m_lastSeekPosition = AV_NOPTS_VALUE;
     bool m_lastUsePreciseSeek;
     QString m_onDestroyFileName;
