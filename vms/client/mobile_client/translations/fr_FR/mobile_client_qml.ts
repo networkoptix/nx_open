@@ -137,7 +137,7 @@
     <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation type="unfinished">Log in to the site in %1</translation>
+      <translation>Se connecter au site dans %1</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
@@ -150,17 +150,17 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+      <translation>Si le site est &lt;font color=&apos;%2&apos;&gt;pas connecté&lt;/a&gt; à %1</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>Cliquez sur &quot;Connecter le site à %1&quot; dans l'onglet %1 de l'administration du site.</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
+      <translation>Si le site est &lt;font color=&apos;%2&apos;&gt;connecté&lt;/a&gt; à %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
+      <translation>Ouvrez la page des paramètres du site et cliquez sur &quot;changez&quot; lien à côté du nom du propriétaire</translation>
     </message>
   </context>
   <context>
@@ -246,11 +246,11 @@
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation type="unfinished">Copy Client ID</translation>
+      <translation>Copier l'ID du client</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation type="unfinished">Force Crash</translation>
+      <translation>Forcer le plantage</translation>
     </message>
   </context>
   <context>
@@ -502,7 +502,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>Ajouter un serveur</translation>
     </message>
   </context>
   <context>
@@ -1067,7 +1067,7 @@
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Les sites en état de suspension ou d'arrêt ne sont pas disponibles</translation>
     </message>
   </context>
   <context>
@@ -1279,7 +1279,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Connexion perdue. Reconnexion...</translation>
     </message>
   </context>
 </TS>
