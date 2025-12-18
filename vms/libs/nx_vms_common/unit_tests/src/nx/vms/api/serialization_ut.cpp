@@ -172,7 +172,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .rtpTimeoutMs = 10s,
     .securityForPowerUsers = true,
     .sequentialFlirOnvifSearcherEnabled = false,
-    .serverHeader = QString{"$vmsName/$vmsVersion ($company) $compatibility"},
+    .serverHeader = QString{"$vmsName/$vmsVersion"},
     .showMouseTimelinePreview = true,
     .statisticsReportServerApi = QString{},
     .statisticsReportTimeCycle = QString{"30d"},
