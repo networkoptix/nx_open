@@ -922,7 +922,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("Show Servers in the Resource Tree for non-admins."); });
 
     d->serverHeaderAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::serverHeader, "$vmsName/$vmsVersion ($company) $compatibility", this,
+        Names::serverHeader, "$vmsName/$vmsVersion", this,
         [] { return tr("HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility."); });
     connect(
         d->serverHeaderAdaptor,

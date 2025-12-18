@@ -35,6 +35,9 @@ class NX_VMS_COMMON_API QnRtspClientArchiveDelegate: public QnAbstractArchiveDel
 {
     Q_OBJECT
 public:
+    /** Zero version if serverString is invalid. */
+    static nx::utils::SoftwareVersion extractServerVersion(const nx::String& serverString);
+
     QnRtspClientArchiveDelegate(
         QnArchiveStreamReader* reader,
         const QString& rtpLogTag,

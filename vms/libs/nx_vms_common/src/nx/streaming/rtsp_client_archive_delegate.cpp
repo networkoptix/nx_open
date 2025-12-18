@@ -69,18 +69,6 @@ QString getUrl(const QnVirtualCameraResourcePtr& camera, const QnMediaServerReso
     return url;
 }
 
-/**
- * @return Zero version if serverString is invalid.
- */
-nx::utils::SoftwareVersion extractServerVersion(const nx::String& serverString)
-{
-    int versionStartPos = serverString.indexOf("/") + 1;
-    int versionEndPos = serverString.indexOf(" ", versionStartPos);
-
-    return nx::utils::SoftwareVersion(
-        serverString.mid(versionStartPos, versionEndPos - versionStartPos));
-}
-
 struct ArchiveTimeCheckInfo
 {
     ArchiveTimeCheckInfo(
@@ -97,6 +85,16 @@ struct ArchiveTimeCheckInfo
 };
 
 } // namespace
+
+nx::utils::SoftwareVersion QnRtspClientArchiveDelegate::extractServerVersion(
+    const nx::String& serverString)
+{
+    int versionStartPos = serverString.indexOf("/") + 1;
+    int versionEndPos = serverString.indexOf(" ", versionStartPos);
+
+    return nx::utils::SoftwareVersion(
+        serverString.mid(versionStartPos, versionEndPos - versionStartPos));
+}
 
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(
     QnArchiveStreamReader* reader,
