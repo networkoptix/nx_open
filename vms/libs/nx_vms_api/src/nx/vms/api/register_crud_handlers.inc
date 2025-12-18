@@ -117,7 +117,6 @@ static void registerLoginRestHandlers(
      * and can't be used to access other Servers.
      * %caption Create authorization Ticket
      * %ingroup Login
-     * %param[ref] _strict,_ticket
      * %permissions Any user with a valid Session.
      * %return:{LoginSession}
      *
