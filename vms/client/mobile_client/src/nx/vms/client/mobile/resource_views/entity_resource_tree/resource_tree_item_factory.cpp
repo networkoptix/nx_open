@@ -38,7 +38,7 @@ AbstractItemPtr ResourceTreeItemFactory::createAllDevicesItem() const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("All Devices"))
-        .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::camerasAndDevices))
+        .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::allDevices))
         .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Cameras))
         .withFlags({Qt::ItemIsEnabled | Qt::ItemIsSelectable});
 }

@@ -157,7 +157,7 @@ BubbleToolTip
 
                     onTriggered:
                     {
-                        if (!toolTip.visible || !resourceHelper.isVideoCamera)
+                        if (!toolTip.visible || !isCameraWithVideo())
                             return
 
                         videoPreview.cameraResource = toolTip.resource
@@ -190,13 +190,18 @@ BubbleToolTip
     onVideoPreviewEnabledChanged:
         updateVideoPreview()
 
+    function isCameraWithVideo()
+    {
+        return resourceHelper.isCamera && resourceHelper.hasVideo
+    }
+
     function updateVideoPreview()
     {
         videoPreview.mediaPlayer.stop()
         videoPreview.cameraResource = null
         videoTimer.stop()
 
-        if (visible && videoDelayMs > 0 && resourceHelper.isVideoCamera)
+        if (visible && videoDelayMs > 0 && isCameraWithVideo())
             videoTimer.start()
     }
 }

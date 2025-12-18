@@ -5,6 +5,7 @@
 #include <QtCore/QTimeZone>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -31,6 +32,21 @@ void ResourceHelper::setResource(const QnResourcePtr& value)
             this, &ResourceHelper::resourceNameChanged);
         m_connections << connect(m_resource.get(), &QnResource::statusChanged,
             this, &ResourceHelper::resourceStatusChanged);
+
+        m_connections << connect(m_resource.get(), &QnResource::propertyChanged, this,
+            [this](
+                const QnResourcePtr& /*resource*/,
+                const QString& key,
+                const QString& /*prevValue*/,
+                const QString& /*newValue*/)
+            {
+                if (key == nx::vms::api::device_properties::kMediaCapabilities)
+                    emit audioSupportedChanged();
+                else if (key == nx::vms::api::device_properties::kIoConfigCapability)
+                    emit isIoModuleChanged();
+                else if (key == nx::vms::api::device_properties::kNoVideoSupport)
+                    emit hasVideoChanged();
+            });
 
         if (auto systemContext = SystemContext::fromResource(m_resource); NX_ASSERT(systemContext))
         {
@@ -60,19 +76,6 @@ void ResourceHelper::setResource(const QnResourcePtr& value)
                 emit defaultCameraPasswordChanged();
                 emit oldCameraFirmwareChanged();
             });
-
-        m_connections << connect(camera.get(), &QnVirtualCameraResource::propertyChanged, this,
-            [this](
-                const QnResourcePtr& /*resource*/,
-                const QString& key,
-                const QString& /*prevValue*/,
-                const QString& /*newValue*/)
-            {
-                if (key == nx::vms::api::device_properties::kMediaCapabilities)
-                    emit audioSupportedChanged();
-                else if (key == nx::vms::api::device_properties::kIoConfigCapability)
-                    emit isIoModuleChanged();
-            });
     }
 
     emit resourceChanged();
@@ -83,7 +86,6 @@ void ResourceHelper::setResource(const QnResourcePtr& value)
     emit displayOffsetChanged();
     emit audioSupportedChanged();
     emit isIoModuleChanged();
-    emit isVideoCameraChanged();
     emit hasVideoChanged();
 }
 
@@ -143,16 +145,20 @@ bool ResourceHelper::isIoModule() const
     return camera && camera->isIOModule();
 }
 
-bool ResourceHelper::isVideoCamera() const
-{
-    const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>();
-    return camera && camera->hasVideo();
-}
-
 bool ResourceHelper::hasVideo() const
 {
     const auto mediaResource = m_resource.dynamicCast<QnMediaResource>();
     return mediaResource && mediaResource->hasVideo();
+}
+
+bool ResourceHelper::isCamera() const
+{
+    return !m_resource.dynamicCast<QnVirtualCameraResource>().isNull();
+}
+
+bool ResourceHelper::isLayout() const
+{
+    return !m_resource.dynamicCast<QnLayoutResource>().isNull();
 }
 
 // FIXME: #sivanov Used in the only place in the mobile client.
