@@ -433,24 +433,6 @@ AbstractItemPtr ResourceTreeItemFactory::createLocalFilesItem() const
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MediaFolders));
 }
 
-AbstractItemPtr ResourceTreeItemFactory::createAllCamerasAndResourcesItem() const
-{
-    return GenericItemBuilder()
-        .withRole(Qt::DisplayRole, tr("All Cameras & Resources"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Cameras))
-        .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::allCamerasAccess))
-        .withFlags({Qt::ItemNeverHasChildren});
-}
-
-AbstractItemPtr ResourceTreeItemFactory::createAllSharedLayoutsItem() const
-{
-    return GenericItemBuilder()
-        .withRole(Qt::DisplayRole, tr("All Shared Layouts"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::SharedLayouts))
-        .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::allLayoutsAccess))
-        .withFlags({Qt::ItemNeverHasChildren});
-}
-
 AbstractItemPtr ResourceTreeItemFactory::createSharedResourcesItem() const
 {
     return GenericItemBuilder()

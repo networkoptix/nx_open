@@ -47,10 +47,6 @@ public:
     AbstractItemPtr createHealthMonitorsItem() const;
     AbstractItemPtr createVideoWallsItem(QString customName = QString()) const;
 
-    // Resource Tree childless disabled user resources placeholders.
-    AbstractItemPtr createAllCamerasAndResourcesItem() const;
-    AbstractItemPtr createAllSharedLayoutsItem() const;
-
     // Resource Tree user resources group items.
     AbstractItemPtr createSharedResourcesItem() const;
     AbstractItemPtr createSharedLayoutsItem(bool useRegularAppearance) const;

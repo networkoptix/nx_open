@@ -27,9 +27,9 @@ Page
     leftButtonIcon.height: 20
     leftButtonEnabled: !loadingDummy.visible
 
-    LayoutSheet
+    ResourceTreeSheet
     {
-        id: layoutSheet
+        id: resourceTreeSheet
     }
 
     customBackHandler:
@@ -43,7 +43,7 @@ Page
                 mainWindow.close()
         }
 
-    onLeftButtonClicked: layoutSheet.open()
+    onLeftButtonClicked: resourceTreeSheet.open()
     property alias filterIds: camerasGrid.filterIds
 
     rightControl: IconButton

@@ -14,6 +14,7 @@ Popup
     default property alias data: contentColumn.data
     property alias title: sheetTitleText.text
     property alias contentSpacing: contentColumn.spacing
+    readonly property int headerHeight: 56
 
     parent: Overlay.overlay
 
@@ -41,7 +42,7 @@ Popup
 
             x: windowParams.leftMargin
             width: parent.width - windowParams.leftMargin - windowParams.rightMargin
-            height: 56
+            height: headerHeight
 
             TitleLabel
             {
@@ -66,15 +67,13 @@ Popup
             }
         }
 
-        Flickable
+        Item
         {
             y: header.height + 12
 
             width: parent.width
             height: parent.height - y
             clip: true
-
-            contentHeight: contentColumn.height
 
             Column
             {

@@ -26,10 +26,15 @@ class ResourceHelper: public QObject
 
     Q_PROPERTY(bool audioSupported READ audioSupported NOTIFY audioSupportedChanged)
     Q_PROPERTY(bool isIoModule READ isIoModule NOTIFY isIoModuleChanged)
-    Q_PROPERTY(bool isVideoCamera READ isVideoCamera NOTIFY isVideoCameraChanged)
 
-    /** Whether it's a video or image resource. */
+    /** Whether resource has video stream. */
     Q_PROPERTY(bool hasVideo READ hasVideo NOTIFY hasVideoChanged)
+
+    /** Whether resource is camera resource. */
+    Q_PROPERTY(bool isCamera READ isCamera NOTIFY resourceChanged)
+
+    /** Whether resource is layout resource. */
+    Q_PROPERTY(bool isLayout READ isLayout NOTIFY resourceChanged)
 
     Q_PROPERTY(qint64 displayOffset READ displayOffset NOTIFY displayOffsetChanged)
 
@@ -46,10 +51,10 @@ public:
 
     bool audioSupported() const;
     bool isIoModule() const;
-    bool hasVideo() const;
 
-    /** Whether the resource is a camera with a video stream. */
-    bool isVideoCamera() const;
+    bool hasVideo() const;
+    bool isCamera() const;
+    bool isLayout() const;
 
     qint64 displayOffset() const;
 
@@ -60,7 +65,6 @@ signals:
     void defaultCameraPasswordChanged();
     void oldCameraFirmwareChanged();
     void audioSupportedChanged();
-    void isVideoCameraChanged();
     void isIoModuleChanged();
     void hasVideoChanged();
     void displayOffsetChanged();

@@ -374,26 +374,6 @@ Condition mixedLayoutsNodeCondition()
         non(topLevelNode()));
 }
 
-Condition allCamerasAndResourcesNodeCondition()
-{
-    return allOf(
-        displayFullMatch("All Cameras & Resources"),
-        iconFullMatch(ResourceIconCache::Cameras),
-        nodeTypeDataMatch(ResourceTree::NodeType::allCamerasAccess),
-        non(hasFlag(Qt::ItemIsEnabled)),
-        non(topLevelNode()));
-}
-
-Condition allSharedLayoutsNodeCondition()
-{
-    return allOf(
-        displayFullMatch("All Shared Layouts"),
-        iconFullMatch(ResourceIconCache::SharedLayouts),
-        nodeTypeDataMatch(ResourceTree::NodeType::allLayoutsAccess),
-        non(hasFlag(Qt::ItemIsEnabled)),
-        non(topLevelNode()));
-}
-
 Condition non(Condition paramCondition)
 {
     return [paramCondition](const QModelIndex& index)

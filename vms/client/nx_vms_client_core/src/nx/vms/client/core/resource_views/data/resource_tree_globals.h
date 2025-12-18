@@ -41,12 +41,11 @@ NX_REFLECTION_ENUM_CLASS(NodeType,
     analyticsEngines, //< Root node for analytics engines.
     otherSystems, //< Root node for remote systems.
     localResources, //< Root node for local resources.
+    allDevices, //< 'All Devices' placeholder, displayed among layouts in the mobile client resource tree.
 
     // Per-user placeholder nodes.
 
     roleUsers, //< 'Users' node, displayed under roles.
-    allCamerasAccess, //< 'All Cameras' placeholder, displayed for users and roles with full access.
-    allLayoutsAccess, //< 'All Shared Layouts' placeholder, displayed under admins.
     sharedResources, //< 'Cameras & Resources' node, displayed for custom users and roles.
     sharedLayouts, //< 'Layouts' node, displayed under users and roles with custom access.
 
