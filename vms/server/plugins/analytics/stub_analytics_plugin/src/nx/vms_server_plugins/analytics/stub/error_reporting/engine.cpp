@@ -92,7 +92,7 @@ std::string Engine::manifestString() const
 
 void Engine::doSetSettings(
     nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
-    const nx::sdk::IStringMap* /*settings*/)
+    const nx::sdk::IStringMap*)
 {
     if (std::strcmp(ini().returnErrorFromEngineSetSettings,
         Ini::kErrorInsteadOfSettingsResponse) == 0)
@@ -134,8 +134,21 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
 void Engine::doGetSettingsOnActiveSettingChange(
     Result<const IActiveSettingChangedResponse*>* outResult,
-    const IActiveSettingChangedAction* /*activeSettingChangedAction*/)
+    const IActiveSettingChangedAction* activeSettingChangedAction)
 {
+    using namespace std::string_literals;
+
+    if (ini().crashInEngineSetSettings
+        && activeSettingChangedAction
+        && activeSettingChangedAction->activeSettingName()
+        && (activeSettingChangedAction->activeSettingName() == kCrashThePluginSettingName))
+    {
+        const std::string message =
+            "ATTENTION: Intentionally crashing the process as per stub error reporting settings";
+        NX_PRINT << message;
+        nx::kit::debug::intentionallyCrash(message.c_str());
+    }
+
     if (std::strcmp(ini().returnErrorFromEngineActiveSettingChange,
         Ini::kErrorInsteadOfSettingsResponse) == 0)
     {

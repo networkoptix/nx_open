@@ -75,6 +75,10 @@ struct Ini: public nx::kit::IniConfig
         "String value \"settingsResponseWithError\": Return Settings Response containing an error "
         "from Engine's Integration-side Settings.");
 
+    NX_INI_FLAG(true, crashInEngineSetSettings,
+        "Crash the plugin in Engine's setSettings(). If the plugin is loaded in a separate \n"
+        "process, the crash will not affect the Server and Plugin will be restarted.");
+
     //---------------------------------------------------------------------------------------------
     // DeviceAgent settings.
 

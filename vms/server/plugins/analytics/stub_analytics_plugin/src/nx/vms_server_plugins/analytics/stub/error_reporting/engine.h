@@ -12,6 +12,8 @@ namespace analytics {
 namespace stub {
 namespace error_reporting {
 
+static const std::string kCrashThePluginSettingName = "Crash the Plugin";
+
 class Engine: public nx::sdk::analytics::Engine
 {
 public:

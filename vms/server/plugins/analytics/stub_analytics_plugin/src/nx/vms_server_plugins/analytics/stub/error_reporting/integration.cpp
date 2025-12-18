@@ -81,6 +81,12 @@ std::string Integration::manifestString() const
                 "caption": "",
                 "defaultValue": "",
                 "visible": false
+            },
+            {
+                "type": "Button",
+                "name": ")json" + kCrashThePluginSettingName + R"json(",
+                "caption": "Crashes the plugin when clicked",
+                "isActive": true
             }
         ]
     }
