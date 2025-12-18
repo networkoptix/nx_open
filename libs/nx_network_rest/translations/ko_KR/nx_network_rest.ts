@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Unsupported charset.</source>
-      <translation type="unfinished">Unsupported charset.</translation>
+      <translation>지원되지 않는 값.</translation>
     </message>
   </context>
   <context>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your Site administrator.</translation>
+      <translation>암호가 만료됨. 관리자에게 문의 요망.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a Site administrator.</translation>
+      <translation>이 사용자는 시스템 관리자에 의해 비활성화 되었습니다.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your Site administrator.</translation>
+      <translation>이 승인 방법은 허용되지 않습니다. 시스템 관리자에게 문의하십시오.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
@@ -68,19 +68,19 @@
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your Site administrator.</translation>
+      <translation>내부 서버 오류 (%1) 입니다. 시스템 관리자에게 문의하십시오.</translation>
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
-      <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+      <translation>알 수 없는 오류로 인해 요청이 승인되지 않았습니다.</translation>
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>이 사이트의 세션 키가 너무 오래되었습니다.</translation>
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
-      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+      <translation>엔드포인트에서 요구할 때 자격 증명이 제공되지 않았습니다.</translation>
     </message>
   </context>
   <context>
@@ -144,11 +144,11 @@
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
-      <translation type="unfinished">Session is too old according to the Site config.</translation>
+      <translation>사이트 구성에 따르면 세션이 너무 오래되었습니다.</translation>
     </message>
     <message>
       <source>Resource no longer present on server.</source>
-      <translation type="unfinished">Resource no longer present on server.</translation>
+      <translation>서버에 더 이상 리소스가 없습니다.</translation>
     </message>
     <message>
       <source>Not allowed.</source>
@@ -162,11 +162,11 @@
     </message>
     <message>
       <source>Service unauthorized.</source>
-      <translation type="unfinished">Service unauthorized.</translation>
+      <translation>서비스가 허가되지 않았습니다.</translation>
     </message>
     <message>
       <source>Insufficient storage.</source>
-      <translation type="unfinished">Insufficient storage.</translation>
+      <translation>저장 공간 부족.</translation>
     </message>
   </context>
 </TS>

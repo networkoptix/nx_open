@@ -1222,7 +1222,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>다이제스트 인증은 더 이상 사용되지 않으며 다음 릴리스에서 비활성화될 예정입니다. 따라서 기본 베어러 인증을 사용할 수 없는 경우에만 사용해야 합니다.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
@@ -1526,7 +1526,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>어떤 %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1876,7 +1876,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>내장</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -2278,7 +2278,7 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     <message>
       <source>Also inherits it from</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from</translation>
+      <translation>또한 그것을 상속받습니다.</translation>
     </message>
     <message>
       <source>Inherits %1 permission from</source>
@@ -2287,11 +2287,11 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Already inherited from</source>
-      <translation type="unfinished">Already inherited from</translation>
+      <translation>이미 상속받은 것</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
-      <translation type="unfinished">Will stay inherited from</translation>
+      <translation>이미 상속받은 것</translation>
     </message>
   </context>
   <context>
@@ -2718,7 +2718,7 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>에서</translation>
     </message>
   </context>
   <context>
