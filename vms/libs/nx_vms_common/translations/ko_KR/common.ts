@@ -186,15 +186,15 @@
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>이 그룹의 구성원은 무제한 사이트 권한을 갖습니다. 관리자는 고급 사용자를 생성 및 수정하고, 사이트를 병합하고, 사이트를 %1에 연결하거나 연결을 끊을 수 있습니다.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>이 그룹의 구성원은 고급 뷰어 그룹에서 부여한 권한 외에도 사이트 구성의 대부분을 제어할 수 있지만, 자신의 그룹 및 권한을 삭제하거나 변경하는 등 관리자 관련 설정을 변경할 수 없으며, 다른 고급 사용자를 만들거나 편집할 수 없습니다.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>이 그룹의 구성원은 사이트 상태 모니터링 정보와 서버 프로세서 부하를 실시간으로 볼 수 있습니다(서버 모니터링).</translation>
     </message>
   </context>
   <context>
@@ -585,11 +585,11 @@
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>사용자는 선택한 레이아웃에 액세스할 수 없습니다</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>일부 사용자는 선택한 레이아웃에 액세스할 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -873,20 +873,20 @@
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
+      <translation>
+        <numerusform>%n 로컬 녹음 서비스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
+      <translation>
+        <numerusform>%n/%1 로컬 녹음 서비스</numerusform>
       </translation>
     </message>
     <message>
       <source>Local recording services</source>
-      <translation type="unfinished">Local recording services</translation>
+      <translation>로컬 녹음 서비스</translation>
     </message>
   </context>
   <context>
@@ -1006,7 +1006,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>선택된 사용자 역할 중 어느 것에도 사용자가 포함되어 있지 않습니다</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1263,11 +1263,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>선택한 모든 사용자의 이메일 주소가 설정되지 않았습니다.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>일부 선택된 사용자의 이메일 주소가 설정되지 않았습니다.</translation>
     </message>
   </context>
   <context>
@@ -1286,7 +1286,7 @@
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>실시간 보기</translation>
     </message>
   </context>
   <context>
@@ -1297,14 +1297,14 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>자세한 내용은 채널 파트너에게 문의하세요.</translation>
     </message>
   </context>
   <context>
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>사이트 추가하기</translation>
     </message>
   </context>
   <context>
@@ -1400,7 +1400,7 @@
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>비디오 트랜스코딩이 필요합니다.</translation>
     </message>
   </context>
   <context>
@@ -1436,11 +1436,11 @@
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>로컬 시스템 ID, null은 시스템이 아직 설정되지 않았음을 의미합니다.</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>새로운 통합 등록 요청 생성을 활성화하거나 비활성화합니다</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
@@ -1484,7 +1484,7 @@
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h).</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h).</translation>
+      <translation>시스템 활성 업데이트 간격 (초, 1초~1시간).</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h).</source>
@@ -1492,7 +1492,7 @@
     </message>
     <message>
       <source>Proxy connection access policy.</source>
-      <translation type="unfinished">Proxy connection access policy.</translation>
+      <translation>프록시 연결 액세스 정책.</translation>
     </message>
     <message>
       <source>Time synchronization enabled.</source>
@@ -1528,7 +1528,7 @@
     </message>
     <message>
       <source>Cloud Site ID.</source>
-      <translation type="unfinished">Cloud Site ID.</translation>
+      <translation>클라우드 사이트 ID.</translation>
     </message>
     <message>
       <source>Cloud authorization key.</source>
@@ -1536,19 +1536,19 @@
     </message>
     <message>
       <source>Enable 2FA for the Site.</source>
-      <translation type="unfinished">Enable 2FA for the Site.</translation>
+      <translation>사이트에 2FA를 활성화합니다.</translation>
     </message>
     <message>
       <source>Site name.</source>
-      <translation type="unfinished">Site name.</translation>
+      <translation>사이트 이름.</translation>
     </message>
     <message>
       <source>Last master Site merge ID.</source>
-      <translation type="unfinished">Last master Site merge ID.</translation>
+      <translation>마지막 마스터 사이트 병합 ID입니다.</translation>
     </message>
     <message>
       <source>Last slave Site merge ID.</source>
-      <translation type="unfinished">Last slave Site merge ID.</translation>
+      <translation>마지막 슬레이브 사이트 병합 ID.</translation>
     </message>
     <message>
       <source>Disable Device vendors.</source>
@@ -1584,15 +1584,15 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>북마크의 최대 개수입니다. 0보다 작거나 같은 값은 무한대입니다.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption).</translation>
+      <translation>HTTPS(데이터 트래픽 암호화)를 시행합니다.</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption).</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption).</translation>
+      <translation>RTSPS(비디오 트래픽 암호화)를 시행합니다.</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
@@ -1712,7 +1712,7 @@
     </message>
     <message>
       <source>Pixelation settings.</source>
-      <translation type="unfinished">Pixelation settings.</translation>
+      <translation>픽셀화 설정.</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds).</source>
@@ -1720,7 +1720,7 @@
     </message>
     <message>
       <source>Apply session limit for Cloud tokens.</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens.</translation>
+      <translation>클라우드 토큰에 세션 제한을 적용합니다.</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server.</source>
@@ -1776,7 +1776,7 @@
     </message>
     <message>
       <source>Default locale for new users.</source>
-      <translation type="unfinished">Default locale for new users.</translation>
+      <translation>신규 사용자를 위한 기본 로케일입니다.</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording.</source>
@@ -1784,7 +1784,7 @@
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device.</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device.</translation>
+      <translation>서버가 장치에 연결되면 IO 포트 상태를 유지합니다.</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB).</source>
@@ -1800,7 +1800,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds).</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds).</translation>
+      <translation>VMS 서버에서 비디오 스트림 권한을 확인합니다(밀리초).</translation>
     </message>
     <message>
       <source>Storage encryption enabled.</source>
@@ -1840,7 +1840,7 @@
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>더 이상 사용되지 않는 HTTP 기본 및 다이제스트 인증(안전하지 않음)을 활성화합니다.</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
@@ -1856,7 +1856,7 @@
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+      <translation>SMTP 설정. 이 설정은 고급 사용자에게만 표시됩니다.</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -1868,7 +1868,7 @@
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
-      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+      <translation>클라우드에서 공개 키를 업데이트하는 간격입니다.</translation>
     </message>
   </context>
 </TS>

@@ -7607,17 +7607,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local Site owner is absent or disabled.</source>
-      <translation type="unfinished">Local Site owner is absent or disabled.</translation>
+      <translation>로컬 사이트 소유자가 부재중이거나 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site connected to %1</translation>
+      <translation>%1에 연결된 사이트</translation>
     </message>
     <message>
       <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to connect Site to %1</translation>
+      <translation>사이트를 %1에 연결하지 못했습니다.</translation>
     </message>
     <message>
       <source>Connect Site to %1</source>
@@ -8992,7 +8992,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
-      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+      <translation>선택한 목록과 일치하는 속성이 객체에 없습니다.</translation>
     </message>
     <message>
       <source>Object was added to the List</source>
