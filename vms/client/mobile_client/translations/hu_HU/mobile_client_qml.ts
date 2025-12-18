@@ -632,7 +632,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Nincs adat</translation>
     </message>
   </context>
   <context>

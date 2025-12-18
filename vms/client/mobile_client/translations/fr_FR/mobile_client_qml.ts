@@ -45,27 +45,27 @@
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation type="unfinished">Download video to this device</translation>
+      <translation>Télécharger la vidéo sur cet appareil</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation type="unfinished">Optimize Network</translation>
+      <translation>Optimiser le réseau</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation type="unfinished">Apply network optimization methods</translation>
+      <translation>Appliquer les méthodes d'optimisation du réseau</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation type="unfinished">Parallel Decoding</translation>
+      <translation>Décodage parallèle</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation type="unfinished">Use multiple decoders to improve performance</translation>
+      <translation>Utiliser plusieurs décodeurs pour améliorer les performances</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation type="unfinished">Please restart the app to apply changes</translation>
+      <translation>Veuillez redémarrer l'application pour appliquer les modifications</translation>
     </message>
   </context>
   <context>
@@ -137,7 +137,7 @@
     <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation type="unfinished">Log in to the site in %1</translation>
+      <translation>Se connecter au site dans %1</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
@@ -150,17 +150,17 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+      <translation>Si le site est &lt;font color=&apos;%2&apos;&gt;pas connecté&lt;/a&gt; à %1</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>Cliquez sur &quot;Connecter le site à %1&quot; dans l'onglet %1 de l'administration du site.</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
+      <translation>Si le site est &lt;font color=&apos;%2&apos;&gt;connecté&lt;/a&gt; à %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
+      <translation>Ouvrez la page des paramètres du site et cliquez sur &quot;changez&quot; lien à côté du nom du propriétaire</translation>
     </message>
   </context>
   <context>
@@ -246,11 +246,11 @@
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation type="unfinished">Copy Client ID</translation>
+      <translation>Copier l'ID du client</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation type="unfinished">Force Crash</translation>
+      <translation>Forcer le plantage</translation>
     </message>
   </context>
   <context>
@@ -371,23 +371,23 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>Flux</translation>
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>Aucune notification</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>Aucune notification push n'a été trouvée.</translation>
     </message>
     <message>
       <source>Unviewed</source>
-      <translation type="unfinished">Unviewed</translation>
+      <translation>Non consulté</translation>
     </message>
     <message>
       <source>Viewed</source>
-      <translation type="unfinished">Viewed</translation>
+      <translation>Consulté</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -399,15 +399,15 @@
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation type="unfinished">No New Notifications</translation>
+      <translation>Aucune nouvelle notification</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+      <translation>Aucune nouvelle notification push n'a été trouvée, mais vous pouvez consulter l'historique complet de vos notifications.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation type="unfinished">View All</translation>
+      <translation>Voir tout</translation>
     </message>
     <message>
       <source>All</source>
@@ -415,15 +415,15 @@
     </message>
     <message>
       <source>Notifications Off</source>
-      <translation type="unfinished">Notifications Off</translation>
+      <translation>Notifications désactivées</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+      <translation>Les notifications sont actuellement désactivées pour cette application. Pour activer les notifications, utilisez les paramètres de votre téléphone</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+      <translation>Vous avez désactivé les notifications push pour ce site. Pour les activer, allez à la page Paramètres.</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -519,7 +519,7 @@
     </message>
     <message>
       <source>Live Previews</source>
-      <translation type="unfinished">Live Previews</translation>
+      <translation>Aperçus en direct</translation>
     </message>
     <message>
       <source>Server Time</source>
@@ -527,7 +527,7 @@
     </message>
     <message>
       <source>Show server time on cameras</source>
-      <translation type="unfinished">Show server time on cameras</translation>
+      <translation>Afficher l'heure du serveur sur les caméras</translation>
     </message>
   </context>
   <context>
@@ -560,7 +560,7 @@
     </message>
     <message>
       <source>Open external link in browser?</source>
-      <translation type="unfinished">Open external link in browser?</translation>
+      <translation>Ouvrir un lien externe dans le navigateur ?</translation>
     </message>
   </context>
   <context>
@@ -595,7 +595,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>Ajouter un serveur</translation>
     </message>
   </context>
   <context>
@@ -632,7 +632,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Aucune donnée</translation>
     </message>
   </context>
   <context>
@@ -668,7 +668,7 @@
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation type="unfinished">Hardware Acceleration</translation>
+      <translation>Accélération matérielle</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
@@ -1186,7 +1186,7 @@
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Les sites en état de suspension ou d'arrêt ne sont pas disponibles</translation>
     </message>
   </context>
   <context>
@@ -1247,7 +1247,7 @@
     </message>
     <message>
       <source>Open account settings</source>
-      <translation type="unfinished">Open account settings</translation>
+      <translation>Ouvrir les paramètres du compte</translation>
     </message>
   </context>
   <context>
@@ -1346,7 +1346,7 @@
     </message>
     <message>
       <source>2FA Disabled</source>
-      <translation type="unfinished">2FA Disabled</translation>
+      <translation>2FA désactivé</translation>
     </message>
   </context>
   <context>
@@ -1412,7 +1412,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Connexion perdue. Reconnexion...</translation>
     </message>
   </context>
 </TS>

@@ -631,7 +631,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>데이터 없음</translation>
     </message>
   </context>
   <context>

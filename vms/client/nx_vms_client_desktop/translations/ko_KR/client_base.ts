@@ -6654,14 +6654,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>%n 기기에 대해서는 백업이 활성화되지 않습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>백업을 활성화하려면 %n개의 적절한 클라우드 스토리지 서비스가 필요합니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -7042,15 +7042,15 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
+      <translation>
+        <numerusform>서비스 사용</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
+      <translation>
+        <numerusform>사용된 라이센스</numerusform>
       </translation>
     </message>
   </context>
@@ -7444,7 +7444,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+      <translation>채널 파트너 사용자&apos; 의 액세스는 조직 수준에서 관리되며 사이트 사용자 관리에는 표시되지 않습니다.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -7634,17 +7634,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local Site owner is absent or disabled.</source>
-      <translation type="unfinished">Local Site owner is absent or disabled.</translation>
+      <translation>로컬 사이트 소유자가 부재중이거나 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site connected to %1</translation>
+      <translation>%1에 연결된 사이트</translation>
     </message>
     <message>
       <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to connect Site to %1</translation>
+      <translation>사이트를 %1에 연결하지 못했습니다.</translation>
     </message>
     <message>
       <source>Connect Site to %1</source>
@@ -9014,7 +9014,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
-      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+      <translation>선택한 목록과 일치하는 속성이 객체에 없습니다.</translation>
     </message>
     <message>
       <source>Object was added to the List</source>

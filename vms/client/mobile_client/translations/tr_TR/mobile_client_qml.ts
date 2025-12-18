@@ -632,7 +632,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Veri bulunamadı</translation>
     </message>
   </context>
   <context>

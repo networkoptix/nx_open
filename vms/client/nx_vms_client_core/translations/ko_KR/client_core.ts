@@ -176,15 +176,15 @@
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</translation>
+      <translation>이 시스템에 로그인하려면 &quot;을 비활성화하세요. %1 계정&quot; 으로 %2에 로그인할 때마다 확인 코드를 요청하세요.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your account settings.</source>
-      <translation type="unfinished">You can enable two-factor authentication in your account settings.</translation>
+      <translation>%1에서 2단계 인증을 사용할 수 있습니다.</translation>
     </message>
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
-      <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+      <translation>서버 또는 네트워크를 사용할 수 없습니다. 주소와 연결 상태를 확인하십시오.</translation>
     </message>
   </context>
   <context>
