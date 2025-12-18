@@ -7,11 +7,11 @@ set(fileSourceDir ${CMAKE_CURRENT_LIST_DIR})
 
 function(_install_provisioning_profile profile_path profile_id system_provisioning_profiles_dir)
     if(NOT EXISTS ${system_provisioning_profiles_dir})
-        return()
+        message(FATAL_ERROR "Provisioning profiles directory does not exist: ${system_provisioning_profiles_dir}")
     endif()
 
     execute_process(
-        COMMAND ${CMAKE_COMMAND} -E copy
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${profile_path}"
             "${system_provisioning_profiles_dir}/${profile_id}.mobileprovision"
         RESULT_VARIABLE result
@@ -38,12 +38,29 @@ function(_prepare_provisioning_profile source_file_path ret_profile_id)
     message(STATUS "Using provisioning profile: ${source_file_path}, id: ${profile_id}")
     set(${ret_profile_id} ${profile_id} PARENT_SCOPE)
 
-    # Install to Xcode >= 16 location.
-    _install_provisioning_profile(${source_file_path} ${profile_id}
-        "$ENV{HOME}/Library/Developer/Xcode/UserData/Provisioning Profiles")
-    # Install to Xcode < 16 location.
-    _install_provisioning_profile(${source_file_path} ${profile_id}
-        "$ENV{HOME}/Library/MobileDevice/Provisioning Profiles")
+    # Historically (Xcode < 16) there was a single directory for provisioning profiles. Starting
+    # with Xcode 16, the default location is Xcode UserData directory. If the new directory is
+    # absent, Xcode still falls back to the legacy directory. We check both locations and install
+    # the profile to whichever exists.
+    set(xcode16_profiles_dir "$ENV{HOME}/Library/Developer/Xcode/UserData/Provisioning Profiles")
+    set(legacy_profiles_dir "$ENV{HOME}/Library/MobileDevice/Provisioning Profiles")
+
+    # If neither directory exists, fail early with a clear message.
+    if(NOT EXISTS ${xcode16_profiles_dir} AND NOT EXISTS ${legacy_profiles_dir})
+        message(FATAL_ERROR "Neither provisioning profiles directory exists:\n"
+            "  ${xcode16_profiles_dir}\n"
+            "  ${legacy_profiles_dir}\n"
+            "Please ensure Xcode is installed correctly or create one of these directories.")
+    endif()
+
+    # Install only to existing locations to avoid spurious failures on systems that have only one of
+    # the possible directories.
+    if(EXISTS ${xcode16_profiles_dir})
+        _install_provisioning_profile(${source_file_path} ${profile_id} "${xcode16_profiles_dir}")
+    endif()
+    if(EXISTS ${legacy_profiles_dir})
+        _install_provisioning_profile(${source_file_path} ${profile_id} "${legacy_profiles_dir}")
+    endif()
 endfunction()
 
 function(nx_prepare_ios_signing target profile_name app_id)
