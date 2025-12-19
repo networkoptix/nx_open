@@ -42,10 +42,10 @@ TreeViewDelegate
             return false;
 
         if (resourceHelper.isLayout)
-            return windowContext.deprecatedUiController.layout === resource
+            return windowContext.depricatedUiController.layout === resource
 
         if (model.nodeType === ResourceTree.NodeType.allDevices)
-            return windowContext.deprecatedUiController.layout === null
+            return windowContext.depricatedUiController.layout === null
 
         return false
     }

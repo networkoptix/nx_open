@@ -73,20 +73,20 @@ Sheet
                     }
                     else if (delegateItem.isCamera)
                     {
-                        windowContext.deprecatedUiController.layout = null
+                        windowContext.depricatedUiController.layout = null
                         Workflow.openVideoScreen(resource);
                         control.close()
                     }
                     else if (delegateItem.isLayout)
                     {
                         Workflow.openResourcesScreen()
-                        windowContext.deprecatedUiController.layout = resource
+                        windowContext.depricatedUiController.layout = resource
                         control.close()
                     }
                     else if (delegateItem.isAllDevices)
                     {
                         Workflow.openResourcesScreen()
-                        windowContext.deprecatedUiController.layout = null
+                        windowContext.depricatedUiController.layout = null
                         control.close()
                     }
                 }
@@ -101,10 +101,10 @@ Sheet
             {
                 collapseRecursively(-1) //< Collapse tree recursively.
                 expandRecursively(-1, 1); //< Expand tree to depth 1.
-                if (windowContext.deprecatedUiController.layout)
+                if (windowContext.depricatedUiController.layout)
                 {
                     expandToIndex(searchModel.mapFromSource(
-                        treeModel.resourceIndex(windowContext.deprecatedUiController.layout)))
+                        treeModel.resourceIndex(windowContext.depricatedUiController.layout)))
                 }
             }
         }
