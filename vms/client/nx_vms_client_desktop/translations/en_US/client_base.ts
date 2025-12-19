@@ -12231,14 +12231,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>All Cameras &amp; Resources</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>All Shared Layouts</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Cameras &amp; Resources</source>
         <translation></translation>
     </message>
