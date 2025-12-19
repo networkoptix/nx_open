@@ -178,8 +178,7 @@ function(nx_add_target name type)
         elseif(LINUX OR ANDROID)
             nx_process_linux_target_debug_symbols(${name})
         elseif(WINDOWS)
-            # Temporary disabled to investigate linker failures on CI.
-            # nx_process_windows_target_debug_symbols(${name})
+            nx_process_windows_target_debug_symbols(${name})
         endif()
     endif()
 
