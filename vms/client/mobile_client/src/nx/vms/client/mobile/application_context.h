@@ -21,10 +21,10 @@ namespace nx::vms::client::mobile {
 
 namespace detail { class CredentialsHelper; }
 
+class AbstractSecureStorage;
 class LocalSettings;
 class PushNotificationManager;
 class PushNotificationStorage;
-class SecureStorage;
 class SystemContext;
 class WindowContext;
 
@@ -80,7 +80,7 @@ public:
 
     QnCameraThumbnailProvider* cameraThumbnailProvider() const;
 
-    SecureStorage* secureStorage() const;
+    AbstractSecureStorage* secureStorage() const;
 
     PushNotificationStorage* pushNotificationStorage() const;
 

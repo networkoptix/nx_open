@@ -2,6 +2,7 @@
 
 #include "../push_notification_storage.h"
 
+#include "android_secure_storage.h"
 #include "jni_helpers.h"
 
 namespace {
@@ -37,7 +38,7 @@ JNIEXPORT jstring JNICALL Java_com_nxvms_mobile_utils_PushNotificationStorage_ad
     jstring cloudSystemId,
     jstring imageUrl)
 {
-    auto secureStorage = std::make_shared<SecureStorage>(QJniObject{context});
+    auto secureStorage = std::make_shared<details::AndroidSecureStorage>(context);
     PushNotificationStorage notificationStorage{secureStorage};
     const std::string& id = notificationStorage.addUserNotification(
         toStr(user),
@@ -58,7 +59,7 @@ JNIEXPORT void JNICALL Java_com_nxvms_mobile_utils_PushNotificationStorage_saveI
     jstring url,
     jbyteArray image)
 {
-    auto secureStorage = std::make_shared<SecureStorage>(QJniObject{context});
+    auto secureStorage = std::make_shared<details::AndroidSecureStorage>(context);
     PushNotificationStorage notificationStorage{secureStorage};
     notificationStorage.saveImage(toStr(url), toBytes(env, image));
 }

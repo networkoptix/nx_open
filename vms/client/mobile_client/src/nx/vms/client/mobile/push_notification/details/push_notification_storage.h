@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -10,9 +11,9 @@
 
 #include <nx/reflect/instrument.h>
 
-#include "secure_storage.h"
-
 namespace nx::vms::client::mobile {
+
+class AbstractSecureStorage;
 
 struct PushNotification
 {
@@ -33,7 +34,18 @@ NX_REFLECTION_INSTRUMENT(PushNotification,
 class PushNotificationStorage
 {
 public:
-    PushNotificationStorage(std::shared_ptr<SecureStorage> storage);
+    // PushNotificationStorage has a separate storage for each user with its own capacity.
+    // Additionally, a total capacity is maintained by removing the earliest items from other
+    // storages one by one making them equal in size.
+    static constexpr int kUserStorageCapacity = 100;
+    static constexpr int kExpectedUserCount = 2;
+    static constexpr int kTotalStorageCapacity = kExpectedUserCount * kUserStorageCapacity;
+
+public:
+    PushNotificationStorage(
+        std::shared_ptr<AbstractSecureStorage> storage,
+        std::function<std::chrono::milliseconds()> currentTime = {});
+
     ~PushNotificationStorage();
 
     std::vector<PushNotification> userNotifications(const std::string& user);

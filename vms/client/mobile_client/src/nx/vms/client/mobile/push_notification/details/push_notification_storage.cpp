@@ -4,18 +4,18 @@
 
 #include <cctype>
 #include <functional>
-#include <vector>
 #include <ranges>
+#include <vector>
 
 #include <nx/reflect/json.h>
+
+#include "abstract_secure_storage.h"
 
 namespace nx::vms::client::mobile {
 
 namespace {
 
 constexpr auto kStorageKey = "push_notifications";
-constexpr auto kStorageCapacity = 100;
-constexpr auto kTotalStorageCapacity = 2 * kStorageCapacity;
 
 using ItemRemovedCallback = std::function<void(const PushNotification&)>;
 
@@ -53,6 +53,7 @@ struct Storage
 
     void maintainCapacity(ItemRemovedCallback onRemoved)
     {
+        const auto kStorageCapacity = PushNotificationStorage::kUserStorageCapacity;
         if (size() > kStorageCapacity)
         {
             std::for_each(items.begin() + kStorageCapacity, items.end(), onRemoved);
@@ -109,7 +110,7 @@ struct Data
         storage->maintainCapacity(onRemoved);
 
         // Remove notifications one by one, making the other storages equal in size.
-        int removeCount = size() - kTotalStorageCapacity;
+        int removeCount = size() - PushNotificationStorage::kTotalStorageCapacity;
         if (removeCount <= 0)
             return;
 
@@ -150,7 +151,8 @@ NX_REFLECTION_INSTRUMENT(Data, (storages));
 
 struct PushNotificationStorage::Private
 {
-    std::shared_ptr<SecureStorage> storage;
+    std::shared_ptr<AbstractSecureStorage> storage;
+    std::function<std::chrono::milliseconds()> currentTime;
 
     std::optional<Data> load()
     {
@@ -179,10 +181,12 @@ struct PushNotificationStorage::Private
     };
 };
 
-PushNotificationStorage::PushNotificationStorage(std::shared_ptr<SecureStorage> storage):
-    d(std::make_unique<Private>())
+PushNotificationStorage::PushNotificationStorage(
+    std::shared_ptr<AbstractSecureStorage> storage,
+    std::function<std::chrono::milliseconds()> currentTime)
+    :
+    d(std::make_unique<Private>(storage, currentTime ? currentTime : now))
 {
-    d->storage = storage;
 }
 
 std::string PushNotificationStorage::addUserNotification(
@@ -198,7 +202,7 @@ std::string PushNotificationStorage::addUserNotification(
         auto onRemoved =
             [this](const PushNotification& notification) { d->removeImage(notification); };
 
-        const auto time = now();
+        const auto time = d->currentTime();
         const auto id = std::to_string(time.count());
         data->addUserNotification(user, PushNotification{
             .id = id,

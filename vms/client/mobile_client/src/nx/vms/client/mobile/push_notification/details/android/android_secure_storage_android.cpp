@@ -1,17 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "../secure_storage.h"
-#include "../utils.h"
-
-#include <QtCore/QString>
+#include "android_secure_storage.h"
 
 #include <string>
 
+#include <QtCore/QString>
+
+#include "../utils.h"
 #include "jni_helpers.h"
 
-namespace nx::vms::client::mobile {
-
-using namespace details;
+namespace nx::vms::client::mobile::details {
 
 namespace {
 
@@ -19,16 +17,14 @@ constexpr auto kStorageClass = "com/nxvms/mobile/utils/SecureStorage";
 
 } // namespace
 
-template<>
-SecureStorage::SecureStorage(const QJniObject& context):
+AndroidSecureStorage::AndroidSecureStorage(const QJniObject& context):
     m_context(context.isValid() ? context : currentActivity())
 {
 }
 
-std::optional<std::string> SecureStorage::load(const std::string& key) const
+std::optional<std::string> AndroidSecureStorage::load(const std::string& key) const
 {
-    const auto context = std::any_cast<QJniObject>(&m_context);
-    if (!context || !context->isValid())
+    if (!m_context.isValid())
         return std::nullopt;
 
     static const auto kFunctionSignature = makeSignature(
@@ -39,7 +35,7 @@ std::optional<std::string> SecureStorage::load(const std::string& key) const
         kStorageClass,
         "load",
         kFunctionSignature.c_str(),
-        context->object(),
+        m_context.object(),
         keyObject.object<jstring>());
 
     if (!result.isValid())
@@ -48,10 +44,9 @@ std::optional<std::string> SecureStorage::load(const std::string& key) const
     return result.toString().toStdString();
 }
 
-void SecureStorage::save(const std::string& key, const std::string& value)
+void AndroidSecureStorage::save(const std::string& key, const std::string& value)
 {
-    const auto context = std::any_cast<QJniObject>(&m_context);
-    if (!context || !context->isValid())
+    if (!m_context.isValid())
         return;
 
     static const auto kFunctionSignature = makeVoidSignature(
@@ -64,15 +59,14 @@ void SecureStorage::save(const std::string& key, const std::string& value)
         kStorageClass,
         "save",
         kFunctionSignature.c_str(),
-        context->object(),
+        m_context.object(),
         keyObject.object<jstring>(),
         valueObject.object<jstring>());
 }
 
-std::optional<std::vector<std::byte>> SecureStorage::loadFile(const std::string& key) const
+std::optional<std::vector<std::byte>> AndroidSecureStorage::loadFile(const std::string& key) const
 {
-    const auto context = std::any_cast<QJniObject>(&m_context);
-    if (!context || !context->isValid())
+    if (!m_context.isValid())
         return std::nullopt;
 
     static const auto kFunctionSignature = makeSignature(
@@ -83,7 +77,7 @@ std::optional<std::vector<std::byte>> SecureStorage::loadFile(const std::string&
         kStorageClass,
         "loadFile",
         kFunctionSignature.c_str(),
-        context->object(),
+        m_context.object(),
         keyObject.object<jstring>());
 
     if (!dataObject.isValid())
@@ -99,10 +93,9 @@ std::optional<std::vector<std::byte>> SecureStorage::loadFile(const std::string&
     return result;
 }
 
-void SecureStorage::saveFile(const std::string& key, const std::vector<std::byte>& data)
+void AndroidSecureStorage::saveFile(const std::string& key, const std::vector<std::byte>& data)
 {
-    const auto context = std::any_cast<QJniObject>(&m_context);
-    if (!context || !context->isValid())
+    if (!m_context.isValid())
         return;
 
     static const auto kFunctionSignature = makeVoidSignature(
@@ -122,15 +115,14 @@ void SecureStorage::saveFile(const std::string& key, const std::vector<std::byte
         kStorageClass,
         "saveFile",
         kFunctionSignature.c_str(),
-        context->object(),
+        m_context.object(),
         keyObject.object<jstring>(),
         dataObject.object<jbyteArray>());
 }
 
-void SecureStorage::removeFile(const std::string& key)
+void AndroidSecureStorage::removeFile(const std::string& key)
 {
-    const auto context = std::any_cast<QJniObject>(&m_context);
-    if (!context || !context->isValid())
+    if (!m_context.isValid())
         return;
 
     static const auto kFunctionSignature = makeVoidSignature(
@@ -142,8 +134,8 @@ void SecureStorage::removeFile(const std::string& key)
         kStorageClass,
         "removeFile",
         kFunctionSignature.c_str(),
-        context->object(),
+        m_context.object(),
         keyObject.object<jstring>());
 }
 
-} // namespace nx::vms::client::mobile
+} // namespace nx::vms::client::mobile::details
