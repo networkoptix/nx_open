@@ -12074,14 +12074,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Tập tin cục bộ</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Tất cả Camera &amp; Nguồn</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Tất cả các bố cục được chia sẻ</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Camera &amp; Nguồn</translation>
     </message>

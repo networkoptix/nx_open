@@ -12607,14 +12607,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       <translation>Pliki lokalne</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Wszystkie kamery i zasoby</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Wszystkie udostępnione układy</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Kamery i zasoby</translation>
     </message>

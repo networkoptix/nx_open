@@ -1579,7 +1579,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>사이트 병합...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>

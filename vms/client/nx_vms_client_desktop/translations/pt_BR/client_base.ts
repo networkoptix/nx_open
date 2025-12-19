@@ -12252,14 +12252,6 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
       <translation>Arquivos locais</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Todas as câmeras e recursos</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Todos os layouts compartilhados</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Câmeras e Recursos</translation>
     </message>

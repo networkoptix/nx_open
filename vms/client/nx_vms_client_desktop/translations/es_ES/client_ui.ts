@@ -1697,8 +1697,8 @@
     <message>
       <source>Enter address, subnet range or subnet mask, login and password
 and click on the &quot;Search&quot; button</source>
-      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
-and click on the &quot;Search&quot; button</translation>
+      <translation>Ingrese la dirección, el rango de subred o la máscara de subred, el nombre de usuario y la contraseña
+y haga clic en el botón &quot;Buscar&amp;quot</translation>
     </message>
   </context>
   <context>

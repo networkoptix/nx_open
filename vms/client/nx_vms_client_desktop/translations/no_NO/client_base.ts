@@ -12249,14 +12249,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Lokale filer</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Alle kameraer og ressurser</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Alle delte visninger</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Kameraer og ressurser</translation>
     </message>

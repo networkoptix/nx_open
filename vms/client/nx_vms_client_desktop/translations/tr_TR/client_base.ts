@@ -12247,14 +12247,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       <translation>Yerel Dosya</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Tüm kameralar ve kaynaklar</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Paylaşılan Tüm Ekran Düzenleri</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Kameralar ve Kaynaklar</translation>
     </message>

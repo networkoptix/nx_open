@@ -12253,14 +12253,6 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <translation>Lokale Dateien</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Alle Kameras &amp; Ressourcen</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Alle freigegebenen Layouts</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Kameras &amp; Ressourcen</translation>
     </message>

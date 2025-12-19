@@ -12254,14 +12254,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <translation>Fichiers locaux</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Toutes caméras &amp; ressources</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Toutes mises en page partagées</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Caméras &amp; ressources</translation>
     </message>

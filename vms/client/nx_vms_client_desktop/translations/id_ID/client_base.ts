@@ -12074,14 +12074,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       <translation>File Lokal</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Semua Kamera &amp; Resources</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Semua Layout yang Dibagikan</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Kamera &amp; Resource</translation>
     </message>

@@ -12252,14 +12252,6 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <translation>Lokale bestanden</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Alle camera's &amp; apparaten</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Alle gedeelde layouts</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Cameras &amp; Resources</translation>
     </message>

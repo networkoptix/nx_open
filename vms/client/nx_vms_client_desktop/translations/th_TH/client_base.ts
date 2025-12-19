@@ -12074,14 +12074,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>ไฟล์ท้องถิ่น</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>กล้องและทรัพยากรทั้งหมด</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>เลย์เอาต์ร่วมกันทั้งหมด</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>กล้องและทรัพยากร</translation>
     </message>

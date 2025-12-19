@@ -281,7 +281,7 @@
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation>Chủ đề đã bị xóa</translation>
+      <translation>Chủ thể đã bị xóa</translation>
     </message>
     <message>
       <source>Removed device</source>

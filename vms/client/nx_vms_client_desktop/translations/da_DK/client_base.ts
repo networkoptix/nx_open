@@ -12250,14 +12250,6 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <translation>Lokale filer</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Alle Kameraer Og Ressourcer</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Alle Delte Layout</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Kameraer Og Ressourcer</translation>
     </message>

@@ -12610,14 +12610,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Локальные файлы</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Все камеры и ресурсы</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Все Раскладки с общим доступом</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Камеры и ресурсы</translation>
     </message>

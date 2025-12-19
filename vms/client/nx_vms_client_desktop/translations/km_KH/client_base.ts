@@ -12074,14 +12074,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Local Files</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>All Cameras &amp; Resources</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>All Shared Layouts</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Cameras &amp; Resources</translation>
     </message>

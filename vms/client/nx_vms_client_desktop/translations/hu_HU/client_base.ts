@@ -12253,14 +12253,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Helyi fájlok</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Minden kamera &amp; forrás</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Minden megosztott elrendezés</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Kamerák &amp; források</translation>
     </message>

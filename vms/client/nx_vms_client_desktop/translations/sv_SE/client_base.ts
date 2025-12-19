@@ -12252,14 +12252,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Lokala filer</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Alla kameror och resurser</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Alla delade vyer</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Kameror &amp; resurser</translation>
     </message>

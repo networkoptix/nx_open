@@ -12611,14 +12611,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>קבצים מקומיים</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>כל המצלמות והמשאבים</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>כל הפריסות המשותפות</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>מצלמות &amp; משאבים</translation>
     </message>

@@ -12253,14 +12253,6 @@ Recomendámosche que non abras esta páxina web. Se comprendes os riscos, podes 
       <translation>Ficheiros locais</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Todas as cámaras e recursos</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Todos os deseños compartidos</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Cámaras e recursos</translation>
     </message>

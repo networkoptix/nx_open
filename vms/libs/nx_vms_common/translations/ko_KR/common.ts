@@ -186,15 +186,15 @@
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>이 그룹의 구성원은 무제한 사이트 권한을 갖습니다. 관리자는 고급 사용자를 생성 및 수정하고, 사이트를 병합하고, 사이트를 %1에 연결하거나 연결을 끊을 수 있습니다.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>이 그룹의 구성원은 고급 뷰어 그룹에서 부여한 권한 외에도 사이트 구성의 대부분을 제어할 수 있지만, 자신의 그룹 및 권한을 삭제하거나 변경하는 등 관리자 관련 설정을 변경할 수 없으며, 다른 고급 사용자를 만들거나 편집할 수 없습니다.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>이 그룹의 구성원은 사이트 상태 모니터링 정보와 서버 프로세서 부하를 실시간으로 볼 수 있습니다(서버 모니터링).</translation>
     </message>
   </context>
   <context>

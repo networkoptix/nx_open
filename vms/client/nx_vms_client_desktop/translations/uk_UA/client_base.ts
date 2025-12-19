@@ -12611,14 +12611,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Локальні Файли</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Усі Камери та Пристрої</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Всi Розкладки із загальним доступом</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Усі Камери та Пристрої</translation>
     </message>

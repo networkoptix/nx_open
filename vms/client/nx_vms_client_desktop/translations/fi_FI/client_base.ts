@@ -12253,14 +12253,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Paikalliset tiedostot</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Kaikki kamerat ja resurssit</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Kaikki jaetut asettelut</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Kamerat ja resurssit</translation>
     </message>

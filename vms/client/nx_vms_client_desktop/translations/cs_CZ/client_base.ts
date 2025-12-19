@@ -12611,14 +12611,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Místní soubory</translation>
     </message>
     <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Všechny kamery a zdroje</translation>
-    </message>
-    <message>
-      <source>All Shared Layouts</source>
-      <translation>Všechna sdílené rozložení</translation>
-    </message>
-    <message>
       <source>Cameras &amp; Resources</source>
       <translation>Kamery a zdroje</translation>
     </message>
