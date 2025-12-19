@@ -326,7 +326,7 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     QGuiApplication::setApplicationDisplayName(nx::branding::mobileClientDisplayName());
     QGuiApplication::setApplicationVersion(nx::build_info::mobileClientVersion());
 
-    Q_INIT_RESOURCE(mobile_client);
+    Q_INIT_RESOURCE(mobile_client_library);
 
     QQuickStyle::setStyle("Basic");
 

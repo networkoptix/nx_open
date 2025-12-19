@@ -284,6 +284,7 @@ QN_FUSION_DECLARE_FUNCTIONS(
 
 } // namespace nx::vms::common
 
+Q_DECLARE_METATYPE(nx::vms::common::CameraBookmark);
 Q_DECLARE_TYPEINFO(nx::vms::common::CameraBookmark, Q_MOVABLE_TYPE);
 
 // Create aliases to old global namespace names so the rest of the code does not have
