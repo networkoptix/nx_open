@@ -1,6 +1,5 @@
 /* crypt.h -- base code for crypt/uncrypt ZIPfile
 
-
    Version 1.01e, February 12th, 2005
 
    Copyright (C) 1998-2005 Gilles Vollant
@@ -59,7 +58,6 @@ static int update_keys(unsigned long* pkeys,const z_crc_t FAR * pcrc_32_tab,int 
     }
     return c;
 }
-
 
 /***********************************************************************
  * Initialize the encryption keys and the random header according to
@@ -128,8 +126,8 @@ static int crypthead(
     {
         buf[n] = (unsigned char)zencode(pkeys, pcrc_32_tab, header[n], t);
     }
-    buf[n++] = zencode(pkeys, pcrc_32_tab, (int)(crcForCrypting >> 16) & 0xff, t);
-    buf[n++] = zencode(pkeys, pcrc_32_tab, (int)(crcForCrypting >> 24) & 0xff, t);
+    buf[n++] = (unsigned char)zencode(pkeys, pcrc_32_tab, (int)(crcForCrypting >> 16) & 0xff, t);
+    buf[n++] = (unsigned char)zencode(pkeys, pcrc_32_tab, (int)(crcForCrypting >> 24) & 0xff, t);
     return n;
 }
 
