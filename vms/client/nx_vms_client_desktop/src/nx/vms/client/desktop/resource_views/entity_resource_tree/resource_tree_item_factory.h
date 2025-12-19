@@ -47,10 +47,6 @@ public:
     AbstractItemPtr createHealthMonitorsItem() const;
     AbstractItemPtr createVideoWallsItem(QString customName = QString()) const;
 
-    // Resource Tree user resources group items.
-    AbstractItemPtr createSharedResourcesItem() const;
-    AbstractItemPtr createSharedLayoutsItem(bool useRegularAppearance) const;
-
     // Resource Tree resource based items.
     AbstractItemPtr createResourceItem(const QnResourcePtr& resource);
 

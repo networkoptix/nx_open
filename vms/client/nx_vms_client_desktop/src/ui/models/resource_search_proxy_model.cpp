@@ -212,8 +212,6 @@ bool QnResourceSearchProxyModel::isRejectedNodeType(
         case NodeType::separator:
         case NodeType::currentSystem:
         case NodeType::currentUser:
-        case NodeType::sharedLayouts:
-        case NodeType::sharedResources:
             return true;
         case NodeType::videoWallItem:
         case NodeType::videoWallMatrix:

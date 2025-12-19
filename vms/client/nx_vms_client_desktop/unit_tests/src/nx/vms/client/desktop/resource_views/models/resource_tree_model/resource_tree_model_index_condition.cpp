@@ -344,36 +344,6 @@ Condition serversNodeCondition()
         topLevelNode());
 }
 
-Condition sharedResourcesNodeCondition()
-{
-    return allOf(
-        displayFullMatch("Cameras & Resources"),
-        iconFullMatch(ResourceIconCache::Cameras),
-        nodeTypeDataMatch(ResourceTree::NodeType::sharedResources),
-        hasFlag(Qt::ItemIsEnabled),
-        non(topLevelNode()));
-}
-
-Condition sharedLayoutsNodeCondition()
-{
-    return allOf(
-        displayFullMatch("Shared Layouts"),
-        iconFullMatch(ResourceIconCache::SharedLayouts),
-        nodeTypeDataMatch(ResourceTree::NodeType::sharedLayouts),
-        hasFlag(Qt::ItemIsEnabled),
-        non(topLevelNode()));
-}
-
-Condition mixedLayoutsNodeCondition()
-{
-    return allOf(
-        displayFullMatch("Layouts"),
-        iconFullMatch(ResourceIconCache::Layouts),
-        nodeTypeDataMatch(ResourceTree::NodeType::sharedLayouts),
-        hasFlag(Qt::ItemIsEnabled),
-        non(topLevelNode()));
-}
-
 Condition non(Condition paramCondition)
 {
     return [paramCondition](const QModelIndex& index)

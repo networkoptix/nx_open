@@ -65,15 +65,6 @@ Condition integrationsNodeCondition();
 Condition webPagesNodeCondition();
 Condition serversNodeCondition();
 
-// Shared resources and layouts nodes lookup conditions.
-Condition sharedResourcesNodeCondition();
-Condition sharedLayoutsNodeCondition();
-Condition mixedLayoutsNodeCondition(); //< "Layouts" text, plain icon, but sharedLayouts node type.
-
-// Shared resources and layouts placeholder nodes lookup conditions.
-Condition allCamerasAndResourcesNodeCondition();
-Condition allSharedLayoutsNodeCondition();
-
 // Logical conditions.
 Condition non(Condition paramCondition);
 

@@ -43,12 +43,6 @@ NX_REFLECTION_ENUM_CLASS(NodeType,
     localResources, //< Root node for local resources.
     allDevices, //< 'All Devices' placeholder, displayed among layouts in the mobile client resource tree.
 
-    // Per-user placeholder nodes.
-
-    roleUsers, //< 'Users' node, displayed under roles.
-    sharedResources, //< 'Cameras & Resources' node, displayed for custom users and roles.
-    sharedLayouts, //< 'Layouts' node, displayed under users and roles with custom access.
-
     // Repeating nodes.
 
     role, //< Custom role.

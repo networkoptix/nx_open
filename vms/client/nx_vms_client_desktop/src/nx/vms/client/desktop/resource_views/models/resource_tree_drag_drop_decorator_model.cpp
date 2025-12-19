@@ -651,15 +651,6 @@ QModelIndex ResourceTreeDragDropDecoratorModel::targetDropIndex(const QModelInde
         return dropIndex.parent();
     }
 
-    // Dropping into accessible layouts is the same as dropping into a user.
-    if (hasNodeType(dropIndex, NodeType::sharedLayouts))
-    {
-        const auto parentIndex = dropIndex.parent();
-        if (hasNodeType(parentIndex, NodeType::role) || hasResourceFlags(parentIndex, Qn::user))
-            return parentIndex;
-        return QModelIndex();
-    }
-
     // Dropping into a camera is the same as dropping into a "Cameras & Devices" top level node
     // (servers are not displayed).
     if (hasNodeType(dropIndex.parent(), NodeType::camerasAndDevices))
@@ -668,19 +659,6 @@ QModelIndex ResourceTreeDragDropDecoratorModel::targetDropIndex(const QModelInde
     // Dropping into a server camera is the same as dropping into a server (servers are displayed).
     if (hasResourceFlags(dropIndex.parent(), Qn::server))
         return dropIndex.parent();
-
-    // Dropping something into a group of resources:
-    // Dropping at a group of cameras -> ResourceTree::NodeType::sharedResources
-    // Dropping at a group of layouts -> ResourceTree::NodeType::sharedLayouts
-    // In both cases we expect that parent node is user or user role.
-    if (hasNodeType(dropIndex, NodeType::sharedResources)
-        || hasNodeType(dropIndex, NodeType::sharedLayouts))
-    {
-        const auto parentIndex = dropIndex.parent();
-        if (hasNodeType(parentIndex, NodeType::role) || hasResourceFlags(parentIndex, Qn::user))
-            return parentIndex;
-        return QModelIndex();
-    }
 
     return dropIndex;
 }

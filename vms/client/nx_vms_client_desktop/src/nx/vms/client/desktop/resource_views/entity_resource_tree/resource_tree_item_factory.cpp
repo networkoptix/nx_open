@@ -433,31 +433,6 @@ AbstractItemPtr ResourceTreeItemFactory::createLocalFilesItem() const
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MediaFolders));
 }
 
-AbstractItemPtr ResourceTreeItemFactory::createSharedResourcesItem() const
-{
-    return GenericItemBuilder()
-        .withRole(Qt::DisplayRole, tr("Cameras & Resources"))
-        .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Cameras))
-        .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::sharedResources));
-}
-
-AbstractItemPtr ResourceTreeItemFactory::createSharedLayoutsItem(bool useRegularAppearance) const
-{
-    const auto displayText = useRegularAppearance
-        ? tr("Layouts")
-        : tr("Shared Layouts");
-
-   const auto iconKey = useRegularAppearance
-       ? static_cast<int>(ResourceIconCache::Layouts)
-       : static_cast<int>(ResourceIconCache::SharedLayouts);
-
-    return GenericItemBuilder()
-        .withRole(Qt::DisplayRole, displayText)
-        .withRole(core::ResourceIconKeyRole, iconKey)
-        .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::sharedLayouts))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Layouts));
-}
-
 AbstractItemPtr ResourceTreeItemFactory::createResourceItem(const QnResourcePtr& resource)
 {
     if (!m_resourceItemCache.contains(resource))
