@@ -12813,7 +12813,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <name>nx::vms::client::desktop::rules::SoundPicker</name>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Gestionar</translation>
     </message>
   </context>
   <context>
