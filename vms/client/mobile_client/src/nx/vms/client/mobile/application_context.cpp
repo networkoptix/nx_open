@@ -24,12 +24,12 @@
 #include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/mobile/mobile_client_meta_types.h>
+#include <nx/vms/client/mobile/push_notification/details/abstract_secure_storage.h>
 #include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
-#include <nx/vms/client/mobile/push_notification/details/secure_storage.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_image_provider.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
-#include <nx/vms/client/mobile/settings/local_settings.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
+#include <nx/vms/client/mobile/settings/local_settings.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/ui/detail/credentials_helper.h>
 #include <nx/vms/client/mobile/ui/detail/screens.h>
@@ -44,7 +44,12 @@
 #include <utils/mobile_app_info.h>
 
 #if defined(Q_OS_ANDROID)
+#include <nx/vms/client/mobile/push_notification/details/android/android_secure_storage.h>
 #include <nx/vms/client/mobile/push_notification/details/android/jni_helpers.h>
+#elif defined(Q_OS_IOS)
+#include <ios/extension/utils/ios_secure_storage.h>
+#else
+#include <nx/vms/client/mobile/push_notification/details/desktop_secure_storage.h>
 #endif
 
 namespace nx::vms::client::mobile {
@@ -58,12 +63,14 @@ core::ApplicationContext::Features makeFeatures()
     return result;
 }
 
-std::unique_ptr<SecureStorage> createSecureStorage()
+std::unique_ptr<AbstractSecureStorage> createSecureStorage()
 {
 #if defined(Q_OS_ANDROID)
-    return std::make_unique<SecureStorage>(details::currentActivity());
+    return std::make_unique<details::AndroidSecureStorage>(details::currentActivity());
+#elif defined(Q_OS_IOS)
+    return std::make_unique<details::IosSecureStorage>();
 #else
-    return std::make_unique<SecureStorage>();
+    return std::make_unique<DesktopSecureStorage>();
 #endif
 }
 
@@ -82,7 +89,7 @@ struct ApplicationContext::Private
     std::unique_ptr<PushNotificationManager> pushManager;
     std::unique_ptr<detail::CredentialsHelper> credentialsHelper;
     QPointer<QnCameraThumbnailProvider> cameraThumbnailProvider; //< Owned by the QML engine.
-    std::shared_ptr<SecureStorage> secureStorage;
+    std::shared_ptr<AbstractSecureStorage> secureStorage;
     std::unique_ptr<PushNotificationStorage> pushNotificationStorage;
     std::unique_ptr<LocalSettings> localSettings;
 
@@ -390,7 +397,7 @@ QnCameraThumbnailProvider* ApplicationContext::cameraThumbnailProvider() const
     return d->cameraThumbnailProvider.get();
 }
 
-SecureStorage* ApplicationContext::secureStorage() const
+AbstractSecureStorage* ApplicationContext::secureStorage() const
 {
     return d->secureStorage.get();
 }

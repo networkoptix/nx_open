@@ -12,10 +12,11 @@
 #include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
 
 #include "utils/helpers.h"
+#include "utils/ios_secure_storage.h"
 #include "utils/logger.h"
 
 using PushIpcData = nx::vms::client::mobile::details::PushIpcData;
-using SecureStorage = nx::vms::client::mobile::SecureStorage;
+using IosSecureStorage = nx::vms::client::mobile::details::IosSecureStorage;
 using PushNotification = nx::vms::client::mobile::PushNotification;
 using PushNotificationStorage = nx::vms::client::mobile::PushNotificationStorage;
 
@@ -496,7 +497,7 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
     const auto ptr = static_cast<const std::byte*>([data bytes]);
     std::vector<std::byte> image{ptr, ptr + data.length};
 
-    auto secureStorage = std::make_shared<SecureStorage>();
+    auto secureStorage = std::make_shared<IosSecureStorage>();
     PushNotificationStorage notificationStorage{secureStorage};
     notificationStorage.saveImage([self.imageUrl UTF8String], image);
 }
@@ -507,7 +508,7 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
 
     NSString* url = [self.content.userInfo objectForKey: @"url"];
 
-    auto secureStorage = std::make_shared<SecureStorage>();
+    auto secureStorage = std::make_shared<IosSecureStorage>();
     PushNotificationStorage notificationStorage{secureStorage};
     const std::string id = notificationStorage.addUserNotification(
         self.user,

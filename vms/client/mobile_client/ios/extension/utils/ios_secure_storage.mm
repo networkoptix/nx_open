@@ -3,11 +3,11 @@
 #include <Foundation/Foundation.h>
 #include <Security/Security.h>
 
-#include <nx/vms/client/mobile/push_notification/details/secure_storage.h>
 #include <nx/vms/client/mobile/push_notification/details/utils.h>
 
 #include "ipc_access_group.h"
 #include "logger.h"
+#include "ios_secure_storage.h"
 
 using Logger = extension::Logger;
 
@@ -69,14 +69,9 @@ void ensureActual(NSString* key)
 
 } // namespace
 
-namespace nx::vms::client::mobile {
+namespace nx::vms::client::mobile::details {
 
-template<>
-SecureStorage::SecureStorage()
-{
-}
-
-std::optional<std::string> SecureStorage::load(const std::string& key) const
+std::optional<std::string> IosSecureStorage::load(const std::string& key) const
 {
     ensureActual([NSString stringWithUTF8String: key.c_str()]);
 
@@ -101,7 +96,7 @@ std::optional<std::string> SecureStorage::load(const std::string& key) const
     return result;
 }
 
-void SecureStorage::save(const std::string& key, const std::string& value)
+void IosSecureStorage::save(const std::string& key, const std::string& value)
 {
     const NSData* data = [NSData dataWithBytes: value.data() length: value.size()];
     const auto query = @{
@@ -120,7 +115,7 @@ void SecureStorage::save(const std::string& key, const std::string& value)
         Logger::log(kLogTag, [NSString stringWithFormat: @"Failed to save %d", (int) status]);
 }
 
-std::optional<std::vector<std::byte>> SecureStorage::loadFile(const std::string& key) const
+std::optional<std::vector<std::byte>> IosSecureStorage::loadFile(const std::string& key) const
 {
     const auto data = [NSData dataWithContentsOfURL: fileUrl(key)];
 
@@ -134,7 +129,7 @@ std::optional<std::vector<std::byte>> SecureStorage::loadFile(const std::string&
     return std::vector<std::byte>(ptr, ptr + data.length);
 }
 
-void SecureStorage::saveFile(const std::string& key, const std::vector<std::byte>& data)
+void IosSecureStorage::saveFile(const std::string& key, const std::vector<std::byte>& data)
 {
     const auto url = fileUrl(key);
     const auto directory = [url URLByDeletingLastPathComponent];
@@ -148,7 +143,7 @@ void SecureStorage::saveFile(const std::string& key, const std::vector<std::byte
         Logger::log(kLogTag, @"Failed to save file");
 }
 
-void SecureStorage::removeFile(const std::string& key)
+void IosSecureStorage::removeFile(const std::string& key)
 {
     const auto url = fileUrl(key);
     const auto fileManager = [NSFileManager defaultManager];
@@ -160,4 +155,4 @@ void SecureStorage::removeFile(const std::string& key)
         Logger::log(kLogTag, [NSString stringWithFormat: @"Failed to remove file: %@", error]);
 }
 
-} // namespace nx::vms::client::mobile
+} // namespace nx::vms::client::mobile::details
