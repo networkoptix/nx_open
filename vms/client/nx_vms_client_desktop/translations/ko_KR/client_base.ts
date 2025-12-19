@@ -1032,7 +1032,7 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>사이트에 연결</translation>
     </message>
     <message>
       <source>Site Administration...</source>
@@ -1052,7 +1052,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>사이트 병합...</translation>
     </message>
     <message>
       <source>Open in</source>
@@ -1533,7 +1533,7 @@ License Key: %2</source>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>사이트에 연결</translation>
     </message>
   </context>
   <context>
@@ -4291,7 +4291,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>2FA DISABLED</source>
-      <translation type="unfinished">2FA DISABLED</translation>
+      <translation>2FA 비활성화됨</translation>
     </message>
   </context>
   <context>
@@ -4627,7 +4627,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>이동할 수 있는</translation>
     </message>
     <message>
       <source>Unknown size</source>
@@ -4635,7 +4635,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>저장소는 사이트의 다양한 서버에서 서로 다른 읽기-쓰기 정책을 갖습니다</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
@@ -5856,7 +5856,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In</source>
-      <translation type="unfinished">In</translation>
+      <translation>에서</translation>
     </message>
     <message numerus="yes">
       <source>%n removed devices</source>
@@ -7724,7 +7724,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>사이트 추가하기</translation>
     </message>
   </context>
   <context>
@@ -8126,7 +8126,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>비디오 트랜스코딩이 필요합니다.</translation>
     </message>
   </context>
   <context>
@@ -9045,7 +9045,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>어떤 %1</translation>
     </message>
   </context>
   <context>
@@ -9167,7 +9167,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>사이트 병합</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
@@ -9180,7 +9180,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
-      <translation type="unfinished">Merging Sites...</translation>
+      <translation>사이트 병합...</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
@@ -9247,7 +9247,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>사이트 추가하기</translation>
     </message>
     <message>
       <source>Site was not found.</source>
@@ -11554,7 +11554,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>지정된 이메일을 사용하는 사용자는 이미 채널 파트너를 통해 관리자 액세스 권한을 가지고 있습니다</translation>
     </message>
   </context>
   <context>
@@ -12038,7 +12038,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>사이트 추가하기</translation>
     </message>
   </context>
   <context>

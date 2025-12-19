@@ -6395,15 +6395,15 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Ver Archivo</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Exportar Archivo</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>Ver Marcadores</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
@@ -6423,7 +6423,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>View Live.</source>
-      <translation type="unfinished">View Live.</translation>
+      <translation>Vista en vivo.</translation>
     </message>
     <message>
       <source>User Input.</source>
@@ -6435,7 +6435,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Reproducir audio</translation>
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
@@ -6763,16 +6763,16 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>La copia de seguridad no se activará para %n dispositivos:</numerusform>
+        <numerusform>La copia de seguridad no se activará para %n dispositivos:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>%n Se requieren servicios de almacenamiento en la nube adecuados para activar la copia de seguridad de los mismos.</numerusform>
+        <numerusform>%n Se requieren servicios de almacenamiento en la nube adecuados para activar la copia de seguridad de los mismos.</numerusform>
       </translation>
     </message>
   </context>
@@ -7157,17 +7157,17 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message numerus="yes">
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
-        <numerusform>Use Services</numerusform>
+      <translation>
+        <numerusform>Utilizar servicios</numerusform>
+        <numerusform>Utilizar servicios</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
-        <numerusform>Use Licenses</numerusform>
+      <translation>
+        <numerusform>Utilizar Licencia</numerusform>
+        <numerusform>Utilizar Licencia</numerusform>
       </translation>
     </message>
   </context>
@@ -7568,7 +7568,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+      <translation>El acceso de los usuarios socios de canal&apos; se administra a nivel de la organización y no son visibles en la administración de usuarios del sitio.</translation>
     </message>
     <message>
       <source>Learn more</source>

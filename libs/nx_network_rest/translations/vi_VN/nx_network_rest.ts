@@ -166,7 +166,7 @@
     </message>
     <message>
       <source>Insufficient storage.</source>
-      <translation type="unfinished">Insufficient storage.</translation>
+      <translation>Không đủ bộ nhớ.</translation>
     </message>
   </context>
 </TS>
