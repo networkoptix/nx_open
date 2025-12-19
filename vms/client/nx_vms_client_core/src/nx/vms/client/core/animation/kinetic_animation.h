@@ -14,9 +14,20 @@ class NX_VMS_CLIENT_CORE_API KineticAnimation: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QPointF position READ position NOTIFY positionChanged)
+    Q_PROPERTY(QPointF startPosition READ startPosition NOTIFY measurementStarted)
     Q_PROPERTY(qreal deceleration READ deceleration WRITE setDeceleration)
     Q_PROPERTY(qreal epsilonSpeed READ epsilonSpeed WRITE setEpsilonSpeed)
     Q_PROPERTY(qreal maximumSpeed READ maximumSpeed WRITE setMaximumSpeed)
+    Q_PROPERTY(State state READ state NOTIFY stateChanged)
+
+public:
+    enum State
+    {
+        Stopped,
+        Measuring,
+        Running
+    };
+    Q_ENUM(State)
 
 public:
     KineticAnimation();
@@ -30,6 +41,11 @@ public:
 
     // Current position.
     QPointF position() const;
+
+    // Starting position (that was passed to startMeasurement).
+    QPointF startPosition() const;
+
+    State state() const;
 
     qreal deceleration() const;
     void setDeceleration(qreal value);
@@ -56,12 +72,18 @@ signals:
     // Emitted when inertial run is finished.
     void stopped();
 
+    // Emitted when state is changed.
+    void stateChanged();
+
 private:
     KineticHelper<qreal> m_xHelper;
     KineticHelper<qreal> m_yHelper;
 
     class Animation;
     Animation* const m_animation;
+
+    QPointF m_startPosition{};
+    State m_state = State::Stopped;
 };
 
 } // namespace animation

@@ -2,16 +2,29 @@
 
 #include "chunk_provider.h"
 
+#include <chrono>
+#include <optional>
+#include <unordered_map>
+
 #include <QtQml/QtQml>
 
+#include <analytics/db/analytics_db_types.h>
+#include <api/server_rest_connection.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/resource/data_loaders/flat_camera_data_loader.h>
 #include <nx/vms/client/core/system_context.h>
+#include <utils/common/synctime.h>
+
+using namespace std::chrono;
+using namespace nx::analytics::db;
 
 namespace nx::vms::client::core {
+
+// ------------------------------------------------------------------------------------------------
 
 class ChunkProvider::ChunkProviderInternal
 {
@@ -32,8 +45,13 @@ public:
 
     void update();
 
+    void setForcedBottomBound(std::optional<milliseconds> value, bool notifyChange = true);
+    void updateClippedPeriods();
+
 private:
     void updateInternal();
+
+    const QnTimePeriodList& rawPeriods() const;
 
     void setLoading(bool value);
     void notifyAboutTimePeriodsChange();
@@ -46,7 +64,98 @@ private:
     bool m_loading = false;
     int updateTriesCount = 0;
     nx::utils::ScopedConnections connections;
+    std::optional<milliseconds> m_forcedBottomBound;
+    QnTimePeriodList m_clippedPeriods;
 };
+
+// ------------------------------------------------------------------------------------------------
+
+class ChunkProvider::Private: public QObject
+{
+    ChunkProvider* const q;
+
+    int analyticsUpdateHandle = 0;
+    QTimer analyticsUpdateTimer;
+
+public:
+    using ProvidersHash =
+        std::unordered_map<Qn::TimePeriodContent, std::unique_ptr<ChunkProviderInternal>>;
+
+    const ProvidersHash providers{
+        [this]()
+        {
+            static const std::vector<Qn::TimePeriodContent> kContentTypes{
+                Qn::RecordingContent, Qn::MotionContent, Qn::AnalyticsContent};
+
+            ProvidersHash result;
+            for (const auto type: kContentTypes)
+                result.emplace(type, std::make_unique<ChunkProviderInternal>(type, q));
+
+            return result;
+        }()};
+
+    explicit Private(ChunkProvider* q);
+
+    // This is a workaround for our servers often having analytics chunks without analytics DB.
+    // An API request is sent to find out the earliest object track the analytics DB contains.
+    void updateAnalyticsBottom();
+    void resetAnalyticsBottom();
+};
+
+// ------------------------------------------------------------------------------------------------
+
+ChunkProvider::Private::Private(ChunkProvider* q): q(q)
+{
+    analyticsUpdateTimer.setInterval(1h);
+    analyticsUpdateTimer.callOnTimeout([this]() { updateAnalyticsBottom(); });
+}
+
+void ChunkProvider::Private::updateAnalyticsBottom()
+{
+    const auto resource = q->resource();
+    if (!resource)
+        return;
+
+    const QPointer<core::SystemContext> systemContext =
+        resource->systemContext()->as<core::SystemContext>();
+
+    const auto api = systemContext->connectedServerApi();
+    if (!NX_ASSERT(api))
+        return;
+
+    Filter filter;
+    filter.deviceIds.insert(resource->getId());
+    filter.maxObjectTracksToSelect = 1;
+    filter.sortOrder = Qt::AscendingOrder;
+
+    const auto responseHandler = nx::utils::guarded(this,
+        [this, nowUs = qnSyncTime->currentTimePoint()](
+            bool success, rest::Handle handle, LookupResult&& result)
+        {
+            if (!success || handle != analyticsUpdateHandle)
+                return;
+
+            providers.at(Qn::AnalyticsContent)->setForcedBottomBound(duration_cast<milliseconds>(
+                result.empty() ? nowUs : microseconds(result.front().firstAppearanceTimeUs)));
+
+            analyticsUpdateHandle = 0;
+        });
+
+    analyticsUpdateHandle = api->lookupObjectTracks(filter, /*isLocal*/ false, responseHandler,
+        thread());
+
+    if (!analyticsUpdateTimer.isActive())
+        analyticsUpdateTimer.start();
+}
+
+void ChunkProvider::Private::resetAnalyticsBottom()
+{
+    analyticsUpdateHandle = 0;
+    analyticsUpdateTimer.stop();
+    providers.at(Qn::AnalyticsContent)->setForcedBottomBound(std::nullopt, /*notifyChange*/ false);
+}
+
+// ------------------------------------------------------------------------------------------------
 
 ChunkProvider::ChunkProviderInternal::ChunkProviderInternal(
     Qn::TimePeriodContent contentType,
@@ -82,9 +191,11 @@ void ChunkProvider::ChunkProviderInternal::setResource(const QnResourcePtr& valu
     connections << connect(m_loader.get(), &FlatCameraDataLoader::ready, q,
         [this](qint64 /*startTimeMs*/)
         {
+            updateClippedPeriods();
             notifyAboutTimePeriodsChange();
             setLoading(false);
         });
+
     connections << connect(m_loader.get(), &FlatCameraDataLoader::failed, q,
         [this]()
         {
@@ -106,10 +217,42 @@ void ChunkProvider::ChunkProviderInternal::setResource(const QnResourcePtr& valu
     update();
 }
 
-const QnTimePeriodList& ChunkProvider::ChunkProviderInternal::periods() const
+const QnTimePeriodList& ChunkProvider::ChunkProviderInternal::rawPeriods() const
 {
     static QnTimePeriodList kEmptyPeriods;
     return m_loader ? m_loader->periods() : kEmptyPeriods;
+}
+
+const QnTimePeriodList& ChunkProvider::ChunkProviderInternal::periods() const
+{
+    static QnTimePeriodList kEmptyPeriods;
+    return m_forcedBottomBound ? m_clippedPeriods : rawPeriods();
+}
+
+void ChunkProvider::ChunkProviderInternal::setForcedBottomBound(
+    std::optional<milliseconds> value, bool notifyChange)
+{
+    if (m_forcedBottomBound == value)
+        return;
+
+    m_forcedBottomBound = value;
+    updateClippedPeriods();
+
+    if (notifyChange)
+        emit q->periodsUpdated(m_contentType);
+}
+
+void ChunkProvider::ChunkProviderInternal::updateClippedPeriods()
+{
+    if (m_forcedBottomBound)
+    {
+        m_clippedPeriods = rawPeriods().intersectedPeriods(
+            QnTimePeriod{m_forcedBottomBound->count(), QnTimePeriod::kInfiniteDuration});
+    }
+    else if (!m_clippedPeriods.empty())
+    {
+        m_clippedPeriods = {};
+    }
 }
 
 bool ChunkProvider::ChunkProviderInternal::loading() const
@@ -173,17 +316,13 @@ void ChunkProvider::ChunkProviderInternal::notifyAboutTimePeriodsChange()
 
 ChunkProvider::ChunkProvider(QObject* parent):
     base_type(parent),
-    m_providers(
-        [this]()
-        {
-            ProvidersHash result;
-            result.insert(Qn::RecordingContent,
-                ChunkProviderPtr(new ChunkProviderInternal(Qn::RecordingContent, this)));
-            result.insert(Qn::MotionContent,
-                ChunkProviderPtr(new ChunkProviderInternal(Qn::MotionContent, this)));
-            return result;
-        }())
+    d(new Private{this})
 {
+}
+
+ChunkProvider::~ChunkProvider()
+{
+    // Required here for forward-declared scoped pointer destruction.
 }
 
 bool ChunkProvider::hasChunks() const
@@ -201,17 +340,29 @@ void ChunkProvider::registerQmlType()
     qmlRegisterType<ChunkProvider>("nx.vms.client.core", 1, 0, "ChunkProvider");
 }
 
+QnResourcePtr ChunkProvider::resource() const
+{
+    return d->providers.at(Qn::RecordingContent)->resource();
+}
+
 QnResource* ChunkProvider::rawResource() const
 {
-    return m_providers[Qn::RecordingContent]->resource().data();
+    return resource().get();
 }
 
 void ChunkProvider::setRawResource(QnResource* value)
 {
-    QnResourcePtr resource = value ? value->toSharedPointer() : QnResourcePtr();
+    if (value == rawResource())
+        return;
 
-    for (const auto& provider: m_providers)
+    QnResourcePtr resource = value ? value->toSharedPointer() : QnResourcePtr();
+    d->resetAnalyticsBottom();
+
+    for (const auto& [_, provider]: d->providers)
         provider->setResource(resource);
+
+    d->updateAnalyticsBottom();
+    emit resourceChanged();
 }
 
 qint64 ChunkProvider::bottomBound() const
@@ -222,25 +373,38 @@ qint64 ChunkProvider::bottomBound() const
 
 const QnTimePeriodList& ChunkProvider::periods(Qn::TimePeriodContent type) const
 {
-    return m_providers[type]->periods();
+    return d->providers.at(type)->periods();
 }
 
 bool ChunkProvider::isLoading() const
 {
-    return m_providers[Qn::RecordingContent]->loading();
+    return d->providers.at(Qn::RecordingContent)->loading();
 }
 
 bool ChunkProvider::isLoadingMotion() const
 {
-    return m_providers[Qn::MotionContent]->loading();
+    return d->providers.at(Qn::MotionContent)->loading();
+}
+
+bool ChunkProvider::isLoadingAnalytics() const
+{
+    return d->providers.at(Qn::AnalyticsContent)->loading();
 }
 
 void ChunkProvider::handleLoadingChanged(Qn::TimePeriodContent contentType)
 {
-    if (contentType == Qn::RecordingContent)
-        emit loadingChanged();
-    else
-        emit loadingMotionChanged();
+    switch (contentType)
+    {
+        case Qn::RecordingContent:
+            emit loadingChanged();
+            break;
+        case Qn::MotionContent:
+            emit loadingMotionChanged();
+            break;
+        case Qn::AnalyticsContent:
+            emit loadingAnalyticsChanged();
+            break;
+    }
 }
 
 qint64 ChunkProvider::closestChunkEndMs(qint64 position, bool forward) const
@@ -252,18 +416,18 @@ qint64 ChunkProvider::closestChunkEndMs(qint64 position, bool forward) const
 
 void ChunkProvider::update()
 {
-    for (const auto& provider: m_providers)
+    for (const auto& [_, provider]: d->providers)
         provider->update();
 }
 
 QString ChunkProvider::motionFilter() const
 {
-    return m_providers[Qn::MotionContent]->filter();
+    return d->providers.at(Qn::MotionContent)->filter();
 }
 
 void ChunkProvider::setMotionFilter(const QString& value)
 {
-    m_providers[Qn::MotionContent]->setFilter(value);
+    d->providers.at(Qn::MotionContent)->setFilter(value);
 }
 
 } // namespace nx::vms::client::core

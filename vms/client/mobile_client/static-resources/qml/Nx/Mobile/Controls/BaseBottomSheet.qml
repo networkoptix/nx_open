@@ -15,6 +15,8 @@ Drawer
 
     property bool closeAutomatically: true
 
+    property real extraBottomPadding: 20
+
     edge: Qt.BottomEdge
 
     width: parent.width
@@ -42,7 +44,7 @@ Drawer
         const customPadding = d.keyboardHeight > 0
             ? 0
             : windowParams.bottomMargin
-        return 20 + customPadding + d.keyboardHeight
+        return extraBottomPadding + customPadding + d.keyboardHeight
     }
 
     Overlay.modal: OverlayBackground { }

@@ -398,10 +398,9 @@ QString NxGlobalsObject::toPlainText(const QString& value) const
     return QTextDocumentFragment::fromHtml(value).toPlainText();
 }
 
-qint64 NxGlobalsObject::syncTimeCurrentTimePointMs() const
+qint64 NxGlobalsObject::syncNowMs() const
 {
-    using namespace std::chrono;
-    return duration_cast<milliseconds>(qnSyncTime->currentTimePoint()).count();
+    return qnSyncTime->currentMSecsSinceEpoch();
 }
 
 QString NxGlobalsObject::shortcutText(const QVariant& var) const

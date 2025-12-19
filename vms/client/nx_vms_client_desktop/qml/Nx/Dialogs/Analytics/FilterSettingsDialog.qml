@@ -230,11 +230,16 @@ Dialog
                                     }
                                 }
 
+                                ProximityScrollHelper
+                                {
+                                    id: proximityScrollHelper
+                                }
+
                                 function relativePositionChanged()
                                 {
                                     if (drag.active)
                                     {
-                                        autoScroller.velocity = ProximityScrollHelper.velocity(
+                                        autoScroller.velocity = proximityScrollHelper.velocity(
                                             Qt.rect(0, 0, objectList.width, objectList.height),
                                             objectList.position)
 

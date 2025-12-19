@@ -8,7 +8,6 @@
 #include <QtCore/QEvent>
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QEasingCurve>
-#include <QtGui/QGuiApplication>
 #include <QtWidgets/QAbstractScrollArea>
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QScrollBar>
@@ -16,70 +15,12 @@
 
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/common/utils/proximity_scroll_helper.h>
 #include <nx/vms/client/desktop/style/helper.h>
 
 namespace {
 
-static constexpr int kScrollAssistAreaHeight = nx::style::Metrics::kViewRowHeight * 2;
-static const auto kScrollAssistAreaSensitivityEasing = QEasingCurve(QEasingCurve::InCubic);
-
-static constexpr double kBaseScrollVelocity = 3.0; //< Pixels per millisecond at edge proximity 1.
-static constexpr double kRapidScrollVelocityMultiplier = 10.0;
-
 static constexpr auto kScrollBarValuePropertyName = "value";
-
-/**
- * Defines non-linear relation between cursor proximity to the edge of scroll area and resulting
- * scroll speed. Values in the beginning of the range affect velocity much less (fine positioning)
- * then ones from the end of the range (coarse positioning).
- * @param edgeProximity Value in the [0, 1] range which describes mouse cursor nearness to the
- *     scroll triggering edge of the scroll area.
- * @returns Scrolling velocity in pixels per millisecond.
- */
-double velocityByEdgeProximity(double edgeProximity)
-{
-    const auto edgeProximityMultiplier =
-        std::max(0.0001, kScrollAssistAreaSensitivityEasing.valueForProgress(edgeProximity));
-
-    double result = kBaseScrollVelocity * edgeProximityMultiplier;
-
-    if (QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier))
-        result *= kRapidScrollVelocityMultiplier;
-
-    return result;
-}
-
-/**
- * @param cursorPos The cursor position in the same coordinate system as scrollAreaGeometry defined.
- * @returns Value from [0.0, 1.0] range which means cursor nearness to the scroll area top edge.
- */
-double topScrollAssistEdgeProximity(const QRectF& scrollAreaGeometry, const QPointF& cursorPos)
-{
-    const auto topScrollAssistArea = scrollAreaGeometry.adjusted(
-        0, 0, 0, -scrollAreaGeometry.height() + kScrollAssistAreaHeight);
-
-    if (!topScrollAssistArea.contains(cursorPos))
-        return 0.0;
-
-    return 1.0 - static_cast<double>(cursorPos.y() - topScrollAssistArea.top())
-        / topScrollAssistArea.height();
-}
-
-/**
- * @param cursorPos The cursor position in the same coordinate system as scrollAreaGeometry defined.
- * @returns Value from [0.0, 1.0] range which means cursor nearness to the scroll area bottom edge.
- */
-double bottomScrollAssistEdgeProximity(const QRectF& scrollAreaGeometry, const QPointF& cursorPos)
-{
-    const auto bottomScrollAssistArea = scrollAreaGeometry.adjusted(
-        0, scrollAreaGeometry.height() - kScrollAssistAreaHeight, 0, 0);
-
-    if (!bottomScrollAssistArea.contains(cursorPos))
-        return 0.0;
-
-    return 1.0 - static_cast<double>(bottomScrollAssistArea.bottom() - cursorPos.y())
-        / bottomScrollAssistArea.height();
-}
 
 } // namespace
 
@@ -128,7 +69,8 @@ ItemViewDragAndDropScrollAssist::ItemViewDragAndDropScrollAssist(
     QAbstractItemView* itemView)
     :
     base_type(scrollArea),
-    m_scrollArea(scrollArea)
+    m_scrollArea(scrollArea),
+    m_proximityScrollHelper(new core::ProximityScrollHelper(this))
 {
     itemView->setAutoScroll(false);
     itemView->viewport()->installEventFilter(this);
@@ -170,28 +112,24 @@ void ItemViewDragAndDropScrollAssist::updateScrollingStateAndParameters()
     const auto cursorPos = m_scrollArea->mapFromGlobal(QCursor::pos());
     const auto geometry = m_scrollArea->geometry();
 
-    const auto topEdgeProximity = topScrollAssistEdgeProximity(geometry, cursorPos);
-    const auto bottomEdgeProximity = bottomScrollAssistEdgeProximity(geometry, cursorPos);
+    const auto velocity = m_proximityScrollHelper->velocity(geometry, cursorPos);
 
-    if (qFuzzyIsNull(std::max(topEdgeProximity, bottomEdgeProximity)))
+    if (qFuzzyIsNull(velocity))
     {
         stopScrolling();
         return;
     }
 
-    const bool isForwardScroll = bottomEdgeProximity > topEdgeProximity;
-    const auto edgeProximity = std::max(topEdgeProximity, bottomEdgeProximity);
-
     if (!isScrolling())
-        initializeScrolling(isForwardScroll, edgeProximity);
+        initializeScrolling(velocity);
     else
-        updateScrollingVelocity(edgeProximity);
+        updateScrollingVelocity(velocity);
 }
 
 void ItemViewDragAndDropScrollAssist::initializeScrolling(
-    bool isForwardScroll,
-    double edgeProximity)
+    double velocity)
 {
+    const bool isForwardScroll = velocity > 0;
     const auto verticalScrollBar = m_scrollArea->verticalScrollBar();
 
     const auto startValue = verticalScrollBar->value();
@@ -200,7 +138,7 @@ void ItemViewDragAndDropScrollAssist::initializeScrolling(
         : verticalScrollBar->minimum();
     const auto pixelDistance = std::abs(endValue - startValue);
 
-    const int durationMs = pixelDistance / velocityByEdgeProximity(edgeProximity);
+    const int durationMs = pixelDistance / std::fabs(velocity);
 
     if (durationMs <= 0 || pixelDistance <= 0)
         return;
@@ -220,7 +158,7 @@ void ItemViewDragAndDropScrollAssist::stopScrolling() const
         m_animation->stop();
 }
 
-void ItemViewDragAndDropScrollAssist::updateScrollingVelocity(double edgeProximity) const
+void ItemViewDragAndDropScrollAssist::updateScrollingVelocity(double velocity) const
 {
     if (!isScrolling())
         return;
@@ -228,7 +166,7 @@ void ItemViewDragAndDropScrollAssist::updateScrollingVelocity(double edgeProximi
     const auto pixelDistance =
         std::abs(m_animation->endValue().toInt() - m_animation->startValue().toInt());
 
-    const int durationMs = pixelDistance / velocityByEdgeProximity(edgeProximity);
+    const int durationMs = pixelDistance / std::fabs(velocity);
 
     if (durationMs <= 0 || pixelDistance <= 0)
         return;
@@ -238,25 +176,6 @@ void ItemViewDragAndDropScrollAssist::updateScrollingVelocity(double edgeProximi
 
     m_animation->setDuration(durationMs);
     m_animation->setCurrentTime(std::lround(animationProgress * durationMs));
-}
-
-qreal ProximityScrollHelper::velocity(const QRectF& geometry, const QPointF& position) const
-{
-    const auto topEdgeProximity = topScrollAssistEdgeProximity(geometry, position);
-    const auto bottomEdgeProximity = bottomScrollAssistEdgeProximity(geometry, position);
-
-    if (qFuzzyIsNull(std::max(topEdgeProximity, bottomEdgeProximity)))
-        return 0.0;
-
-    const auto speed = velocityByEdgeProximity(std::max(topEdgeProximity, bottomEdgeProximity));
-    return bottomEdgeProximity > topEdgeProximity ? speed : -speed;
-}
-
-void ProximityScrollHelper::registerQmlType()
-{
-    static ProximityScrollHelper instance;
-    qmlRegisterSingletonInstance<ProximityScrollHelper>(
-        "nx.vms.client.desktop", 1, 0, "ProximityScrollHelper", &instance);
 }
 
 } // namespace nx::vms::client::desktop

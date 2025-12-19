@@ -4,6 +4,8 @@
 
 #include <QtCore/QObject>
 
+#include <common/common_globals.h>
+
 Q_MOC_INCLUDE("nx/vms/client/core/media/chunk_provider.h")
 
 namespace nx::vms::client::core { class ChunkProvider; }
@@ -18,10 +20,10 @@ class ChunkPositionWatcher: public QObject
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(bool motionSearchMode
-        READ motionSearchMode
-        WRITE setMotionSearchMode
-        NOTIFY motionSearchModeChanged)
+    Q_PROPERTY(Qn::TimePeriodContent contentType
+        READ contentType
+        WRITE setContentType
+        NOTIFY contentTypeChanged)
 
     Q_PROPERTY(qint64 position
         READ position
@@ -39,8 +41,8 @@ public:
     explicit ChunkPositionWatcher(QObject* parent = nullptr);
     virtual ~ChunkPositionWatcher() override;
 
-    bool motionSearchMode() const;
-    void setMotionSearchMode(bool value);
+    Qn::TimePeriodContent contentType() const;
+    void setContentType(Qn::TimePeriodContent value);
 
     qint64 position() const;
     void setPosition(qint64 value);
@@ -53,7 +55,7 @@ public:
     Q_INVOKABLE qint64 firstChunkStartTimeMs() const;
 
 signals:
-    void motionSearchModeChanged();
+    void contentTypeChanged();
     void positionChanged();
     void chunkProviderChanged();
 

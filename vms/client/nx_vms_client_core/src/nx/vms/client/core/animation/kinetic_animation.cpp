@@ -48,10 +48,14 @@ public:
         switch (newState)
         {
             case QAbstractAnimation::Stopped:
+                m_main->m_state = KineticAnimation::Stopped;
+                emit m_main->stateChanged();
                 emit m_main->stopped();
                 break;
 
             case QAbstractAnimation::Running:
+                m_main->m_state = KineticAnimation::Running;
+                emit m_main->stateChanged();
                 emit m_main->inertiaStarted();
                 break;
 
@@ -79,6 +83,16 @@ QPointF KineticAnimation::position() const
     return QPointF(
         m_xHelper.value(),
         m_yHelper.value());
+}
+
+QPointF KineticAnimation::startPosition() const
+{
+    return m_startPosition;
+}
+
+KineticAnimation::State KineticAnimation::state() const
+{
+    return m_state;
 }
 
 qreal KineticAnimation::deceleration() const
@@ -127,6 +141,9 @@ void KineticAnimation::startMeasurement(const QPointF& position)
     m_animation->stop();
     m_xHelper.start(position.x());
     m_yHelper.start(position.y());
+    m_state = KineticAnimation::Measuring;
+    m_startPosition = position;
+    emit stateChanged();
     emit measurementStarted();
     emit positionChanged(position);
 }
@@ -153,6 +170,8 @@ void KineticAnimation::stop()
         m_animation->stop();
         m_xHelper.stop();
         m_yHelper.stop();
+        m_state = KineticAnimation::Stopped;
+        emit stateChanged();
         emit stopped();
     }
 }

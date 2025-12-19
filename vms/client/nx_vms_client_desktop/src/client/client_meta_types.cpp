@@ -54,7 +54,6 @@
 #include <nx/vms/client/desktop/resource_properties/user/models/resource_access_rights_model.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_rights_list.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/limited_model.h>
-#include <nx/vms/client/desktop/resource_views/item_view_drag_and_drop_scroll_assist.h>
 #include <nx/vms/client/desktop/rules/model_view/key_value_model.h>
 #include <nx/vms/client/desktop/rules/model_view/rules_sort_filter_proxy_model.h>
 #include <nx/vms/client/desktop/rules/model_view/rules_table_model.h>
@@ -251,7 +250,6 @@ void registerQmlTypesInternal()
     RoiCameraThumbnail::registerQmlType();
     QuickMessageBox::registerQmlType();
     EmbeddedPopup::registerQmlType();
-    ProximityScrollHelper::registerQmlType();
     ContextHelp::registerQmlType();
     WhatsThis::registerQmlType();
     MouseSpyInterface::registerQmlType();

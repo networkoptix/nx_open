@@ -13,6 +13,8 @@ Popup
     property alias position: calendar.position
     property alias displayOffset: calendar.displayOffset
 
+    property bool horizontal: false
+
     signal picked(real position)
 
     readonly property int _animationDuration: 200
@@ -60,10 +62,10 @@ Popup
             NumberAnimation
             {
                 target: contentItem
-                property: "y"
+                property: control.horizontal ? "x" : "y"
                 duration: _animationDuration
                 easing.type: Easing.OutCubic
-                from: 56
+                from: control.horizontal ? -56 : 56
                 to: 0
             }
         }
@@ -84,10 +86,11 @@ Popup
             NumberAnimation
             {
                 target: contentItem
-                property: "y"
+                property: control.horizontal ? "x" : "y"
                 duration: _animationDuration
                 easing.type: Easing.OutCubic
-                to: 56
+                from: 0
+                to: control.horizontal ? -56 : 56
             }
         }
     }

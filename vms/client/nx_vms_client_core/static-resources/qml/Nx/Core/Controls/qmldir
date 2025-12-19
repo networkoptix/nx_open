@@ -9,7 +9,9 @@ Preview 1.0 Preview.qml
 RectangularMask 1.0 RectangularMask.qml
 RecordingStatusIndicator 1.0 RecordingStatusIndicator.qml
 RefreshIndicator 1.0 RefreshIndicator.qml
+RemoteImage 1.0 RemoteImage.qml
 ScalableContentHolder 1.0 ScalableContentHolder.qml
+Slider 1.0 Slider.qml
 SpinnerBusyIndicator 1.0 SpinnerBusyIndicator.qml
 StripePattern 1.0 StripePattern.qml
 ToolTip 1.0 ToolTip.qml

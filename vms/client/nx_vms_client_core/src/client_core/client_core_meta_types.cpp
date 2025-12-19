@@ -35,6 +35,7 @@
 #include <nx/vms/client/core/common/utils/path_util.h>
 #include <nx/vms/client/core/common/utils/properties_sync.h>
 #include <nx/vms/client/core/common/utils/property_update_filter.h>
+#include <nx/vms/client/core/common/utils/proximity_scroll_helper.h>
 #include <nx/vms/client/core/common/utils/row_count_watcher.h>
 #include <nx/vms/client/core/common/utils/validators.h>
 #include <nx/vms/client/core/common/utils/velocity_meter.h>
@@ -50,6 +51,7 @@
 #include <nx/vms/client/core/items/grid_viewport.h>
 #include <nx/vms/client/core/media/abstract_time_period_storage.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
+#include <nx/vms/client/core/media/typed_chunk_provider.h>
 #include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
 #include <nx/vms/client/core/motion/helpers/media_player_motion_provider.h>
 #include <nx/vms/client/core/motion/items/motion_mask_item.h>
@@ -81,7 +83,11 @@
 #include <nx/vms/client/core/time/date_range.h>
 #include <nx/vms/client/core/time/day_hours_model.h>
 #include <nx/vms/client/core/time/display_time_helper.h>
+#include <nx/vms/client/core/time/duration_formatter.h>
 #include <nx/vms/client/core/time/month_list_model.h>
+#include <nx/vms/client/core/timeline/items/chunk_bar.h>
+#include <nx/vms/client/core/timeline/utils/timeline_label_formatter.h>
+#include <nx/vms/client/core/timeline/utils/timeline_zoom_calculator.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/client/core/ui/frame_section.h>
 #include <nx/vms/client/core/ui/translation_list_model.h>
@@ -182,6 +188,7 @@ void registerQmlTypesInternal()
     MotionMaskItem::registerQmlType();
     PropertiesSync::registerQmlTypes();
     PropertyUpdateFilter::registerQmlType();
+    ProximityScrollHelper::registerQmlType();
     PathUtil::registerQmlType();
     TextureSizeHelper::registerQmlType();
     IntValidator::registerQmlType();
@@ -195,9 +202,11 @@ void registerQmlTypesInternal()
     OauthClient::registerQmlType();
     CalendarModel::registerQmlType();
     DayHoursModel::registerQmlType();
+    DurationFormatter::registerQmlType();
     MonthListModel::registerQmlType();
     AbstractTimePeriodStorage::registerQmlType();
     ChunkProvider::registerQmlType();
+    TypedChunkProvider::registerQmlType();
     ColorTheme::registerQmlType();
     FontConfig::registerQmlType();
     GlobalTemporaries::registerQmlType();
@@ -223,7 +232,10 @@ void registerQmlTypesInternal()
     RecordingStatusHelper::registerQmlType();
     SystemContextAccessor::registerQmlType();
     ValuesText::registerQmlType();
-    ResourceTree::registerQmlType();
+	ResourceTree::registerQmlType();
+    timeline::ChunkBar::registerQmlType();
+    timeline::LabelFormatter::registerQmlType();
+    timeline::ZoomCalculator::registerQmlType();
 
     qRegisterMetaType<nx::vms::client::core::ThumbnailStatus>();
 

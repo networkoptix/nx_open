@@ -1,21 +1,27 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Window
 
 import Nx.Common
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 import Nx.Items
 import Nx.Mobile
+import Nx.Mobile.Controls
 import Nx.Models
 import Nx.Ui
 
 import nx.vms.client.core
+import nx.vms.client.mobile.timeline as Timeline
+import nx.vms.common
 
 import "private/VideoScreen"
 import "private/VideoScreen/utils.js" as VideoScreenUtils
 import "private/VideoScreen/Ptz"
+import "private/VideoScreen/Timeline" as Timeline
 
 Page
 {
@@ -34,11 +40,35 @@ Page
 
     clip: false
 
+    // TODO: FIXME! Control left handed / right handed layouts via settings.
+    LayoutMirroring.enabled: false
+    LayoutMirroring.childrenInherit: true
+
     VideoScreenController
     {
         id: controller
 
-        navigator: navigator
+        chunkContentType:
+        {
+            switch (timeline.objectsType)
+            {
+                case Timeline.ObjectsLoader.ObjectsType.motion:
+                    return CommonGlobals.MotionContent
+                case Timeline.ObjectsLoader.ObjectsType.analytics:
+                    return CommonGlobals.AnalyticsContent
+                default:
+                    return CommonGlobals.RecordingContent
+            }
+        }
+
+        forceVideoPause: d.forceVideoPause
+        chunkProvider: cameraChunkProvider
+
+        timelineController: Timeline.Controller
+        {
+            controller: controller
+            timeline: timeline
+        }
 
         mediaPlayer.videoQuality: appContext.settings.lastUsedQuality
 
@@ -73,10 +103,10 @@ Page
         property bool showOfflineStatus: false
         property bool showNoLicensesWarning:
             controller.noLicenses
-            && !controller.mediaPlayer.liveMode
+            && !controller.playingLive
         property bool showDefaultPasswordWarning:
             controller.hasDefaultCameraPassword
-            && controller.mediaPlayer.liveMode
+            && controller.playingLive
 
         // TODO: Rely only on controller.dummyState == ""
         property bool cameraWarningVisible:
@@ -100,15 +130,17 @@ Page
             || showDefaultPasswordWarning
             || showNoLicensesWarning
 
+        property bool forceVideoPause: false
+
+        readonly property bool canViewArchive: controller.accessRightsHelper.canViewArchive
+        readonly property bool hasArchive: canViewArchive && cameraChunkProvider.bottomBound >= 0
+
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 
-        property bool uiVisible: true
-        property real uiOpacity: uiVisible ? 1.0 : 0.0
-
-        Behavior on uiOpacity
-        {
-            NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
-        }
+        // TODO: Implement free text search mode.
+        property bool searchActive: false
+        property int searchResults: 0
+        property int searchIndex: 0
 
         property bool controlsVisible: true
         property real controlsOpacity: controlsVisible ? 1.0 : 0.0
@@ -121,7 +153,6 @@ Page
 
         property int mode: VideoScreenUtils.VideoScreenMode.Navigation
         readonly property bool ptzMode: mode === VideoScreenUtils.VideoScreenMode.Ptz
-        onPtzModeChanged: navigator.motionSearchMode = false
 
         Timer
         {
@@ -132,14 +163,7 @@ Page
 
         onCameraWarningVisibleChanged:
         {
-            showUi()
             d.controlsVisible = !(d.cameraWarningVisible && controller.serverOffline)
-        }
-
-        onApplicationActiveChanged:
-        {
-            if (!applicationActive && !ptzPanel.moveOnTapMode)
-                showUi()
         }
     }
 
@@ -161,8 +185,6 @@ Page
     }
 
     title: controller.resourceHelper.qualifiedResourceName
-    toolBar.opacity: d.uiOpacity
-    toolBar.visible: opacity > 0
     titleLabelOpacity: d.cameraUiOpacity
     titleControls:
         [
@@ -234,26 +256,14 @@ Page
         }
     }
 
-    MouseArea
-    {
-        id: toggleMouseArea
-
-        anchors.fill: parent
-        onClicked:
-        {
-            if (!ptzPanel.moveOnTapMode)
-                toggleUi()
-        }
-    }
-
     ScalableVideo
     {
         id: video
 
-        y: toolBar.visible ? -header.height : 0
+        y: 0
         x: -windowParams.leftMargin
         width: mainWindow.width
-        height: mainWindow.height
+        height: width / 1.6
 
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
         opacity: d.cameraUiOpacity
@@ -261,19 +271,19 @@ Page
         resourceHelper: controller.resourceHelper
         mediaPlayer: controller.mediaPlayer
         videoCenterHeightOffsetFactor: 1 / 3
-        motionController.motionSearchMode: navigator.motionSearchMode
-        motionController.enabled: navigator.hasArchive && !d.ptzMode
-
-        onClicked: toggleUi()
+        motionController.motionSearchMode: controller.contentType === CommonGlobals.MotionContent
+        motionController.enabled: d.hasArchive && !d.ptzMode
 
         readonly property string roiHintText: qsTr("Tap and hold to select an area")
+
         onHideRoiHint:
         {
             if (banner.text == roiHintText)
                 banner.hide()
         }
 
-        onShowRoiHint: banner.showText(roiHintText)
+        onShowRoiHint:
+            banner.showText(roiHintText)
 
         Connections
         {
@@ -281,11 +291,8 @@ Page
 
             function onDrawingRoiChanged()
             {
-                if (!target.drawingRoi)
-                    return
-
-                navigator.motionSearchMode = true
-                showUi()
+                if (target.drawingRoi)
+                    objectsTypeSheet.selectedType = Timeline.ObjectsLoader.ObjectsType.motion
             }
 
             function onRequestUnallowedDrawing()
@@ -298,6 +305,17 @@ Page
                 banner.showText(qsTr("Invalid custom area. Please draw a correct one."))
             }
         }
+    }
+
+    NxDotPreloader
+    {
+        anchors.centerIn: video
+        color: ColorTheme.colors.light16
+        dotRadius: 6
+        spacing: 8
+
+        running: controller.mediaPlayer.loading
+            && controller.mediaPlayer.playbackState !== MediaPlayer.Previewing
     }
 
     Item
@@ -350,41 +368,540 @@ Page
         }
     }
 
-    Image
+    component ControlButton: Button
     {
-        id: controlsShadowGradient
+        property bool suppressDisabledState: false
 
-        property real customHeight:
-        {
-            const barSize = windowContext.ui.windowHelpers.navigationBarSize()
-            if (d.ptzMode || ptzPanel.moveOnTapMode)
-                return barSize
+        readonly property string effectiveState: suppressDisabledState && !enabled
+            ? (checked ? "default_checked" : "default_unchecked")
+            : state
 
-            return navigator.buttonsPanelHeight + barSize
-        }
+        backgroundColor: parameters.colors[effectiveState]
+        foregroundColor: parameters.textColors[effectiveState]
 
-        x: -windowParams.leftMargin
+        leftPadding: 10
+        rightPadding: 10
+        icon.width: 24
+        icon.height: 24
+    }
+
+    Rectangle
+    {
+        id: navigationBar
+
         width: mainWindow.width
-        height: 96 + customHeight
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: videoScreen.height - mainWindow.height
+        height: navigationBarContent.height + navigationBarContent.contentMargin * 2
+        anchors.top: video.bottom
 
-        visible: opacity > 0
-        source: lp("/images/timeline_gradient.png")
+        color: ColorTheme.colors.dark4
 
-        opacity:
+        readonly property bool hasChunkNavigation:
+            objectsTypeSheet.selectedType !== Timeline.ObjectsLoader.ObjectsType.bookmarks
+
+        Item
         {
-            var visiblePtzControls = d.ptzMode && d.uiVisible
-            if (visiblePtzControls || ptzPanel.moveOnTapMode)
-                return 1
+            id: navigationBarContent
 
-            return d.ptzMode ? d.uiOpacity : navigator.opacity
+            readonly property real contentMargin: 12
+
+            component ExpandCollapseAnimation: NumberAnimation { duration: 150 }
+
+            anchors.left: navigationBar.left
+            anchors.leftMargin: contentMargin
+            anchors.right: navigationBar.right
+            anchors.rightMargin: contentMargin
+
+            anchors.verticalCenter: navigationBar.verticalCenter
+            height: navigationBarLayout.height
+
+            RowLayout
+            {
+                id: navigationBarLayout
+
+                width: Math.max(implicitWidth, navigationBarContent.width)
+                anchors.horizontalCenter: navigationBarContent.horizontalCenter
+
+                spacing: 0
+
+                ControlButton
+                {
+                    id: calendarButton
+
+                    icon.source: "image://skin/24x24/Solid/calendar.svg"
+                    enabled: d.hasArchive
+
+                    onClicked:
+                        calendarPanel.open()
+                }
+
+                Item
+                {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+
+                Row
+                {
+                    leftPadding: 8
+                    rightPadding: 8
+
+                    spacing: speedControl.expanded ? navigationBarContent.contentMargin : 8
+                    Behavior on spacing { ExpandCollapseAnimation {}}
+
+                    LayoutMirroring.enabled: false
+
+                    ControlButton
+                    {
+                        id: prevChunkButton
+
+                        icon.source: "image://skin/24x24/Outline/chunk_previous.svg"
+                        enabled: d.hasArchive && navigationBar.hasChunkNavigation
+
+                        onClicked:
+                            controller.jumpBackward()
+                    }
+
+                    ButtonBar
+                    {
+                        id: playBar
+
+                        enabled: d.hasArchive
+                        opacity: enabled ? 1.0 : 0.3
+                        layer.enabled: opacity < 1.0
+
+                        ControlButton
+                        {
+                            id: playPauseButton
+
+                            suppressDisabledState: !playBar.enabled
+                            width: 60
+
+                            icon.source: controller.playing
+                                ? "image://skin/24x24/Outline/pause.svg"
+                                : "image://skin/24x24/Outline/play_small.svg"
+
+                            onClicked:
+                            {
+                                if (controller.playing)
+                                    controller.pause()
+                                else
+                                    controller.play()
+                            }
+                        }
+
+                        Rectangle
+                        {
+                            id: speedControl
+
+                            readonly property real speed: speedSlider.value < 0
+                                ? -Math.pow(2.0, -speedSlider.value - 1.0)
+                                : Math.pow(2.0, speedSlider.value)
+
+                            property bool expanded: false
+
+                            readonly property real expandedWidth: navigationBarContent.width
+                                - playPauseButton.width - playBar.spacing
+
+                            color: playBar.backgroundColor
+                            radius: playBar.roundingRadius
+                            height: speedButton.height
+                            clip: true
+
+                            width: expanded ? expandedWidth : speedButton.width
+                            Behavior on width { ExpandCollapseAnimation {}}
+
+                            ControlButton
+                            {
+                                id: speedButton
+
+                                enabled: !speedControl.expanded
+                                suppressDisabledState: !playBar.enabled || speedControl.expanded
+                                width: 60
+
+                                text: `${speedControl.speed}x`
+
+                                onClicked:
+                                    speedControl.expanded = true
+                            }
+
+                            RowLayout
+                            {
+                                anchors.left: speedButton.right
+                                spacing: 0
+
+                                height: speedControl.height
+                                width: speedControl.expandedWidth - speedButton.width
+
+                                opacity: speedControl.expanded ? 1.0 : 0.0
+                                Behavior on opacity { NumberAnimation { duration: 250 }}
+
+                                visible: opacity > 0.0
+
+                                Slider
+                                {
+                                    id: speedSlider
+
+                                    enabled: !controller.playingLive
+                                    opacity: (playBar.enabled && !enabled) ? 0.3 : 1.0
+
+                                    Layout.alignment: Qt.AlignVCenter
+                                    Layout.fillWidth: true
+
+                                    from: 0 //< TODO: Fix reverse in the player and make this "-5".
+                                    to: 4
+                                    stepSize: 1
+                                    snapMode: Slider.SnapOnRelease
+                                }
+
+                                ControlButton
+                                {
+                                    id: speedControlCollapseButton
+
+                                    leftPadding: 18
+                                    rightPadding: 18
+                                    icon.source: "image://skin/24x24/Solid/cancel.svg"
+                                    Layout.alignment: Qt.AlignVCenter
+
+                                    onClicked:
+                                        speedControl.expanded = false
+                                }
+                            }
+
+                            Binding
+                            {
+                                controller.speed: speedControl.speed
+                            }
+                        }
+
+                        onEnabledChanged:
+                        {
+                            if (!enabled)
+                                speedControl.expanded = false
+                        }
+
+                        Connections
+                        {
+                            target: controller
+
+                            function onPlayingLiveChanged()
+                            {
+                                if (controller.playingLive)
+                                    speedSlider.value = 0
+                            }
+                        }
+                    }
+
+                    ControlButton
+                    {
+                        id: nextChunkButton
+
+                        icon.source: "image://skin/24x24/Outline/chunk_future.svg"
+
+                        enabled: d.hasArchive && navigationBar.hasChunkNavigation
+                            && !controller.playingLive
+
+                        onClicked:
+                            controller.jumpForward()
+                    }
+                }
+
+                Item
+                {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+
+                ControlButton
+                {
+                    id: actionsButton
+
+                    icon.source: "image://skin/24x24/Outline/grid_view.svg"
+                    enabled: controller.playingLive
+                }
+            }
         }
     }
 
     Item
     {
+        id: navigator
+
+        anchors.top: navigationBar.bottom
+        anchors.bottom: parent.bottom
+        width: mainWindow.width
+
+        visible: d.canViewArchive
+
+        DataTimeline
+        {
+            id: timeline
+
+            z: 1
+            width: navigator.width
+            anchors.top: navigator.top
+            anchors.bottom: bottomBar.top
+
+            chunkProvider: cameraChunkProvider
+            objectsType: objectsTypeSheet.selectedType
+
+            interactive: !objectsTypeSheet.opened && !timelineObjectSheet.opened
+
+            onObjectTileTapped: (data) =>
+            {
+                if (!data?.perObjectData)
+                    return
+
+                timelineObjectSheet.fallbackImagePaths = data.imagePaths ?? []
+                timelineObjectSheet.model = data.perObjectData
+                timelineObjectSheet.open()
+            }
+        }
+
+        Timeline.ObjectDetailsSheet
+        {
+            id: timelineObjectSheet
+        }
+
+        Rectangle
+        {
+            id: bottomBar
+
+            width: navigator.width
+            height: 68
+            anchors.bottom: navigator.bottom
+
+            color: ColorTheme.colors.dark4
+
+            RowLayout
+            {
+                id: mainControls
+
+                anchors.left: bottomBar.left
+                anchors.leftMargin: 12
+                anchors.right: bottomBar.right
+                anchors.rightMargin: 12
+                anchors.verticalCenter: bottomBar.verticalCenter
+
+                visible: !d.searchActive
+
+                spacing: 0
+
+                LEDButton
+                {
+                    id: liveButton
+
+                    text: qsTr("LIVE")
+                    checked: controller.playingLive
+
+                    font.pixelSize: 14
+                    leftPadding: 12
+                    rightPadding: 12
+
+                    onClicked:
+                    {
+                        if (controller.playingLive)
+                            controller.pause()
+                        else
+                            controller.playLive()
+                    }
+                }
+
+                Item
+                {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+
+                Row
+                {
+                    leftPadding: 8
+                    rightPadding: 8
+                    spacing: 8
+
+                    ControlButton
+                    {
+                        icon.source: "image://skin/24x24/Outline/eye_view.svg"
+
+                        onClicked:
+                            objectsTypeSheet.open()
+                    }
+
+                    ControlButton
+                    {
+                        icon.source: "image://skin/24x24/Outline/selection.svg"
+                        visible: false //< TODO: Implement timeline selection.
+                    }
+                }
+
+                Item
+                {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+
+                ButtonBar
+                {
+                    ControlButton
+                    {
+                        id: zoomOutButton
+                        icon.source: "image://skin/24x24/Outline/minus.svg"
+                    }
+
+                    ControlButton
+                    {
+                        id: zoomInButton
+                        icon.source: "image://skin/24x24/Outline/plus.svg"
+                    }
+
+                    ZoomController
+                    {
+                        id: zoomController
+
+                        zoomingState:
+                        {
+                            if (zoomInButton.pressed)
+                                return ZoomController.ZoomingIn
+
+                            return zoomOutButton.pressed
+                                ? ZoomController.ZoomingOut
+                                : ZoomController.Stopped
+                        }
+
+                        onZoomStep: (factor) =>
+                            timeline.zoom(factor)
+                    }
+                }
+            }
+
+            RowLayout
+            {
+                id: searchControls
+
+                anchors.fill: parent
+                anchors.leftMargin: 12
+                anchors.rightMargin: 12
+
+                visible: d.searchActive
+
+                spacing: 8
+
+                Text
+                {
+                    text: d.searchResults
+                        ? `${d.searchIndex + 1} of ${d.searchResults}`
+                        : qsTr("No results")
+
+                    color: ColorTheme.colors.light10
+                    font.pixelSize: 16
+                    font.weight: 400
+                    padding: 8
+
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter
+                }
+
+                ControlButton
+                {
+                    id: searchUp
+
+                    icon.source: "image://skin/24x24/Outline/arrow_up.svg"
+                    enabled: d.searchIndex < (d.searchResults - 1)
+
+                    onClicked:
+                        ++d.searchIndex
+                }
+
+                ControlButton
+                {
+                    id: searchDown
+
+                    icon.source: "image://skin/24x24/Outline/arrow_down.svg"
+                    enabled: d.searchIndex > 0
+
+                    onClicked:
+                        --d.searchIndex
+                }
+            }
+        }
+    }
+
+    Item
+    {
+        id: noRightsPlaceholder
+
+        anchors.fill: navigator
+        visible: !d.canViewArchive
+
+        Column
+        {
+            spacing: 24
+            anchors.centerIn: parent
+
+            ColoredImage
+            {
+                sourcePath: "image://skin/64x64/Outline/no_information.svg"
+                sourceSize: Qt.size(64, 64)
+                primaryColor: ColorTheme.colors.light10
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Column
+            {
+                spacing: 16
+                width: noRightsPlaceholder.width
+
+                Text
+                {
+                    text: qsTr("Not available")
+                    font.pixelSize: 16
+                    font.weight: Font.Medium
+                    color: ColorTheme.colors.light4
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                Text
+                {
+                    text: qsTr("You do not have permission<br>to view the archive",
+                        "<br> is a line break")
+                    font.pixelSize: 12
+                    color: ColorTheme.colors.light12
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    wrapMode: Text.Wrap
+                }
+            }
+        }
+    }
+
+    ChunkProvider
+    {
+        id: cameraChunkProvider
+
+        resource: controller.resource
+    }
+
+    CalendarPanel
+    {
+        id: calendarPanel
+
+        horizontal: true
+        position: timeline.positionMs
+        displayOffset: controller.resourceHelper.displayOffset
+        chunkProvider: cameraChunkProvider
+
+        onPicked: controller.forcePosition(position, true)
+    }
+
+    Timeline.ObjectsTypeSheet
+    {
+        id: objectsTypeSheet
+    }
+
+    Item
+    {
         id: content
+
+        visible: false
 
         width: windowParams.availableWidth
         height: windowParams.availableHeight - header.height
@@ -395,7 +912,7 @@ Page
             id: informationLabelLoader
             anchors.right: parent.right
             anchors.rightMargin: 8
-            opacity: Math.min(d.uiOpacity, d.cameraUiOpacity)
+            opacity: d.cameraUiOpacity
             active: appContext.settings.showCameraInfo
             sourceComponent: InformationLabel
             {
@@ -429,13 +946,6 @@ Page
                     compact: videoScreen.height < 540
                     state: controller.dummyState
 
-                    MouseArea
-                    {
-                        z: -1
-                        anchors.fill: parent
-                        onClicked: toggleUi()
-                    }
-
                     onButtonClicked:
                         controller.resourceHelper.cloudAuthorize()
                 }
@@ -457,7 +967,7 @@ Page
             controller.resource: controller.resource
             customRotation: controller.resourceHelper.customRotation
 
-            opacity: Math.min(d.uiOpacity, d.controlsOpacity)
+            opacity: d.controlsOpacity
             visible: opacity > 0 && d.ptzMode
 
             onCloseButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Navigation
@@ -466,13 +976,11 @@ Page
             {
                 if (ptzPanel.moveOnTapMode)
                 {
-                    hideUi()
                     moveOnTapOverlay.open()
                     video.fitToBounds()
                 }
                 else
                 {
-                    showUi()
                     moveOnTapOverlay.close()
                 }
             }
@@ -515,84 +1023,9 @@ Page
                 if (moveOnTapOverlay.visible)
                     return
 
-                showUi()
                 ptzPanel.moveOnTapMode = false
             }
         }
-
-        VideoNavigation
-        {
-            id: navigator
-
-            drawingRoi: video.motionController.motionSearchMode && video.motionController.drawingRoi
-            changingMotionRoi:
-            {
-                return video.motionController.drawingRoi
-                    ? false
-                    : video.moving && !video.motionController.customRoiExists
-            }
-
-            onWarningTextChanged: banner.showText(warningText)
-
-            hasCustomRoi: video.motionController.customRoiExists
-            hasCustomVisualArea: video.motionController.hasCustomVisualArea
-            canViewArchive: controller.accessRightsHelper.canViewArchive
-            animatePlaybackControls: d.animatePlaybackControls
-            controller: controller
-            controlsOpacity: d.cameraUiOpacity
-            onPtzButtonClicked:
-            {
-                d.mode = VideoScreenUtils.VideoScreenMode.Ptz
-                video.to1xScale()
-            }
-
-            anchors.bottom: parent.bottom
-            width: parent.width
-
-            visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Navigation
-            opacity: Math.min(d.uiOpacity, d.controlsOpacity)
-            onSwitchToPreviousCamera:
-            {
-                if (!camerasModel)
-                    return
-
-                switchToCamera(camerasModel.previousResource(controller.resource))
-            }
-
-            onSwitchToNextCamera:
-            {
-                if (!camerasModel)
-                    return
-
-                switchToCamera(camerasModel.nextResource(controller.resource))
-            }
-
-            motionFilter: video.fisheyeMode ? "" : video.motionController.motionFilter
-        }
-    }
-
-    Rectangle
-    {
-        id: bottomControlsBackground
-
-        color: videoScreen.backgroundColor
-        width: mainWindow.width
-        height: mainWindow.height - videoScreen.height
-        anchors.top: content.bottom
-        z: -1
-    }
-
-    Rectangle
-    {
-        id: navigationBarTint
-
-        color: ColorTheme.colors.dark3
-        visible: mainWindow.hasNavigationBar
-        width: mainWindow.width - parent.width
-        height: video.height
-        x: windowParams.leftMargin ? -windowParams.leftMargin : parent.width
-        anchors.top: video.top
-        opacity: Math.min(navigator.opacity, d.cameraUiOpacity)
     }
 
     SequentialAnimation
@@ -646,44 +1079,6 @@ Page
         }
     }
 
-    Component.onDestruction: windowContext.ui.windowHelpers.exitFullscreen()
-
-    function hideUi()
-    {
-        d.uiVisible = false
-        if (CoreUtils.isMobilePlatform())
-            windowContext.ui.windowHelpers.enterFullscreen()
-    }
-
-    function showUi()
-    {
+    Component.onDestruction:
         windowContext.ui.windowHelpers.exitFullscreen()
-        d.uiVisible = true
-    }
-
-    function toggleUi()
-    {
-        if (d.uiVisible)
-            hideUi()
-        else
-            showUi()
-    }
-
-    function switchToCamera(resource)
-    {
-        navigator.motionSearchMode = false
-        cameraSwitchAnimation.stop()
-        cameraSwitchAnimation.newResource = resource
-        if (controller.mediaPlayer.liveMode)
-        {
-            cameraSwitchAnimation.thumbnail = camerasModelAccessor.getData(
-                camerasModel.rowByResource(resource), "thumbnail")
-        }
-        else
-        {
-            cameraSwitchAnimation.thumbnail = ""
-        }
-
-        cameraSwitchAnimation.start()
-    }
 }

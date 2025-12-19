@@ -3,8 +3,7 @@
 #pragma once
 
 #include <QtQml/QQmlPropertyMap>
-
-#include <nx/vms/client/core/network/server_certificate_validation_level.h>
+#include <QtCore/QVariant>
 
 namespace nx::client::mobile {
 

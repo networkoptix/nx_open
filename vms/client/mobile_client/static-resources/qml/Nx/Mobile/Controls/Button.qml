@@ -24,46 +24,109 @@ T.AbstractButton
     property bool showBusyIndicator: false
     property int type: Button.Type.Interface
 
+    property real textIndent: 0 //< Additional text indent from the left.
+
+    readonly property var parameters: d.parameters[control.type]
+
+    property color backgroundColor: parameters.colors[state]
+    property color foregroundColor: parameters.textColors[state]
+
+    property color borderColor: parameters.borderColors
+        ? (parameters.borderColors[state] ?? "transparent")
+        : "transparent"
+
     implicitHeight: 44
-    implicitWidth: textItem.width + control.leftPadding + control.rightPadding
+    implicitWidth: (contentItem?.implicitWidth ?? 0) + control.leftPadding + control.rightPadding
 
     focusPolicy: Qt.TabFocus
     padding: 10
     leftPadding: 16
     rightPadding: 16
+    spacing: 4
+
+    font.pixelSize: 16
+    font.weight: 500
+
+    icon.width: 20
+    icon.height: 20
 
     background: Rectangle
     {
         radius: 6
-        color: d.parameters[control.type].colors[control.state]
-        border.color:
-        {
-            const params = d.parameters[control.type]
-            const borderColors = params.borderColors
-            return (borderColors && borderColors[control.state]) ?? params.colors[control.state]
-        }
+        color: control.backgroundColor
+        border.color: control.borderColor
     }
 
     contentItem: Item
     {
-        Text
-        {
-            id: textItem
+        id: content
 
+        readonly property bool hasIcon: !!imageItem.sourcePath
+        readonly property bool hasText: !!textItem.text
+
+        implicitWidth:
+        {
+            let result = content.hasIcon ? imageItem.implicitWidth : 0
+            if (content.hasText)
+                result += textItem.implicitWidth
+            if (content.hasText && content.hasIcon)
+                result += control.spacing
+            return result
+        }
+
+        implicitHeight:
+        {
+            let result = content.hasIcon ? imageItem.implicitHeight : 0
+            if (content.hasText)
+                result = Math.max(result, textItem.implicitHeight)
+            return result
+        }
+
+        Row
+        {
+            anchors.horizontalCenter: content.horizontalCenter
+            height: content.height
+            spacing: control.spacing
             visible: !control.showBusyIndicator
 
-            anchors.centerIn: parent
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
+            ColoredImage
+            {
+                id: imageItem
 
-            width: control.width - control.leftPadding - control.rightPadding
+                name: control.icon.name
+                sourcePath: control.icon.source
+                sourceSize: Qt.size(control.icon.width, control.icon.height)
+                primaryColor: control.foregroundColor
+                visible: content.hasIcon
 
-            text: control.text
-            wrapMode: Text.Wrap
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: (parent.height - height) % 2
+            }
 
-            font.pixelSize: 16
-            font.weight: 500
-            color: d.parameters[control.type].textColors[control.state]
+            Text
+            {
+                id: textItem
+
+                visible: content.hasText
+
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: (parent.height - height) % 2
+
+                leftPadding: control.textIndent
+
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                width: content.hasIcon
+                    ? control.availableWidth - imageItem.width - control.spacing
+                    : control.availableWidth
+
+                text: control.text
+                wrapMode: Text.Wrap
+
+                font: control.font
+                color: control.foregroundColor
+            }
         }
 
         SpinnerBusyIndicator
@@ -158,7 +221,7 @@ T.AbstractButton
                     disabled: ColorTheme.transparent(ColorTheme.colors.light10, 0.3)
                 }
             }
-            return result;
+            return result
         }
     }
 }

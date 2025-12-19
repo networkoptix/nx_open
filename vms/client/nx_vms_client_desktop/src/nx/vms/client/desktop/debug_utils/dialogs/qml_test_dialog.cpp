@@ -37,9 +37,9 @@ namespace {
 
 std::unique_ptr<QFile> historyFile(QFile::OpenMode mode)
 {
-    static const QString kFileName = "nx_qml_test_dialog_history.txt";
+    static const QString kFileName = "qml_component_test_history.txt";
 
-    const auto location = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    const auto location = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     auto file = std::make_unique<QFile>(QDir(location).filePath(kFileName));
     if (file->open(mode | QFile::Text))
         return file;
@@ -139,6 +139,7 @@ QmlTestDialog::QmlTestDialog(QWidget* parent):
             d->qmlWidget->setSource({});
             d->qmlWidget->engine()->clearComponentCache();
             d->qmlWidget->setSource(QUrl::fromUserInput(d->editBox->currentText().trimmed()));
+            d->editBox->insertItem(0, d->editBox->currentText());
             d->saveHistory();
         });
 

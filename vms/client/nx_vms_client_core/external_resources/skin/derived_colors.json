@@ -329,5 +329,45 @@
         "green_light": "#66e54d",
         "green_dark": "#33b21a",
         "green_bg": "#1a590d"
+    },
+
+    "mobileTimeline": {
+        "background": "dark6",
+        "chunks": {
+            "background": "#162E18",
+            "recording": "#47A44B",
+            "motion": "#EF5350",
+            "analytics": "#FFC61A",
+            "bookmarks": "#349EF4",
+            "lastSecond": "light1.setAlpha(77)"
+        },
+        "scale": {
+            "ticks": "dark10",
+            "labels": "light10"
+        },
+        "timeMarker": {
+            "background": "light4",
+            "text": "dark4"
+        },
+        "header": {
+            "background": "mobileTimeline.background",
+            "text": "light10",
+            "underline": "light14",
+            "shadow": "dark13"
+        },
+        "tile": {
+            "background": "dark9",
+            "background2": "dark8",
+            "background3": "dark7",
+            "caption": "light4",
+            "description": "light16",
+            "preview": {
+                "noDataBackground": "dark8",
+                "noDataText": "dark17",
+                "multiBackground": "dark11",
+                "plusMoreBackground": "dark13",
+                "plusMoreText": "light10"
+            }
+        }
     }
 }

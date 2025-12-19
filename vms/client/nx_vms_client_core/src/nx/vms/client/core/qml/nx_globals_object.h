@@ -111,10 +111,8 @@ public:
 
     Q_INVOKABLE QString toPlainText(const QString& value) const;
 
-    /**
-     * Returns qnSyncTime->currentTimePoint() but in milliseconds for easier usage with JS Date.
-     */
-    Q_INVOKABLE qint64 syncTimeCurrentTimePointMs() const;
+    /** Returns qnSyncTime->currentMSecsSinceEpoch(). */
+    Q_INVOKABLE qint64 syncNowMs() const;
 
     /** Returns native string representation of QQuickAction shortcut property. */
     Q_INVOKABLE QString shortcutText(const QVariant& var) const;

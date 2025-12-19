@@ -776,7 +776,7 @@ FocusScope
 
             onPositionChanged: (position) =>
             {
-                autoScroller.velocity = ProximityScrollHelper.velocity(
+                autoScroller.velocity = proximityScrollHelper.velocity(
                     Qt.rect(0, 0, listView.width, listView.height),
                     position)
 
@@ -798,6 +798,11 @@ FocusScope
                 autoExpandTimer.update(NxGlobals.invalidModelIndex())
                 autoScroller.velocity = 0
             }
+        }
+
+        ProximityScrollHelper
+        {
+            id: proximityScrollHelper
         }
 
         AutoScroller

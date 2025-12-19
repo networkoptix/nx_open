@@ -16,6 +16,16 @@ NxObject
 {
     id: controller
 
+    property AbstractTimelineController timelineController
+    property ChunkProvider chunkProvider
+    property int chunkContentType: CommonGlobals.RecordingContent
+    property bool forceVideoPause: false
+    property bool tryFixVirtualCameraPosition: true
+
+    property alias speed: mediaPlayer.speed
+
+    readonly property alias playing: d.playing
+    readonly property bool playingLive: d.playing && mediaPlayer.liveMode
     readonly property alias audioController: audioController
     readonly property alias resource: resourceHelper.resource
     readonly property alias systemContext: systemContextAccessor.systemContext
@@ -98,84 +108,20 @@ NxObject
     property alias resourceHelper: resourceHelper
     property alias accessRightsHelper: accessRightsHelper
     property alias mediaPlayer: mediaPlayer
-    property VideoNavigation navigator
 
-    NxObject
+    ChunkPositionWatcher
     {
-        id: timelineController
+        id: chunkPositionWatcher
 
-        readonly property bool mediaLoaded: mediaPlayer.mediaStatus === MediaPlayer.Loaded
-        readonly property bool loadingChunks: navigator.timeline.chunkProvider.loading
-            || navigator.timeline.chunkProvider.loadingMotion
-
-        onLoadingChunksChanged:
-        {
-            if (loadingChunks || !d.tryFixVirtualCameraPosition)
-                return
-
-            d.tryFixVirtualCameraPosition = false
-
-            if (controller.liveVirtualCamera)
-                jumpToFirstChunk()
-        }
-
-        ChunkPositionWatcher
-        {
-            id: chunkPositionWatcher
-
-            motionSearchMode: navigator.motionSearchMode
-            position: mediaPlayer.position
-            chunkProvider: navigator.timeline.chunkProvider
-        }
-
-        onMediaLoadedChanged:
-        {
-            timelineController.updateTimelinePosition()
-        }
-
-        Connections
-        {
-            target: mediaPlayer
-
-            function onPositionChanged()
-            {
-                timelineController.updateTimelinePosition()
-            }
-        }
-
-        function setTimelinePosition(position, immediate)
-        {
-            if (immediate)
-                navigator.timeline.timelineView.setPositionImmediately(position)
-            else
-                navigator.timeline.position = position
-        }
-
-        function updateTimelinePosition()
-        {
-            if (mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
-                return
-
-            var liveMode = mediaPlayer.liveMode && !navigator.playback.paused
-            if (!liveMode && !navigator.timeline.moving)
-            {
-                navigator.timeline.autoReturnToBounds = false
-                navigator.timeline.position = mediaPlayer.position
-            }
-        }
-
-        function timelineJump(position)
-        {
-            navigator.timeline.autoReturnToBounds = false
-            navigator.timeline.timelineView.setPositionImmediately(position)
-        }
+        contentType: controller.chunkContentType
+        position: mediaPlayer.position
+        chunkProvider: controller.chunkProvider
     }
 
     NxObject
     {
         id: d
 
-        property bool tryFixVirtualCameraPosition: false
         property bool playing: false
 
         property real lastPosition: -1
@@ -203,7 +149,7 @@ NxObject
 
         player: mediaPlayer
         playable: windowContext.sessionManager.hasConnectedSession
-            && !navigator.forceVideoPause
+            && !controller.forceVideoPause
 
         interruptOnInactivity: CoreUtils.isMobilePlatform()
     }
@@ -346,7 +292,11 @@ NxObject
 
     function play()
     {
+        if (d.playing && mediaPlayer.playing)
+            return
         d.playing = true
+        if (mediaPlayer.liveMode)
+            mediaPlayer.position = d.lastPosition //< Force out of the live mode.
         mediaPlayer.play()
         d.savePosition()
     }
@@ -395,7 +345,7 @@ NxObject
         var nextChunkStartTime = chunkPositionWatcher.nextChunkStartTimeMs()
         forcePosition(nextChunkStartTime)
         if (nextChunkStartTime == -1)
-            play()
+            playLive()
     }
 
     function jumpBackward()
@@ -410,7 +360,7 @@ NxObject
 
     function setResource(resource)
     {
-        d.tryFixVirtualCameraPosition = true
+        controller.tryFixVirtualCameraPosition = true
         resourceHelper.resource = resource
     }
 

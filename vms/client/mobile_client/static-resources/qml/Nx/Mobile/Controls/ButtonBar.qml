@@ -13,6 +13,7 @@ Container
     spacing: 1
 
     property color backgroundColor: ColorTheme.colors.dark8
+    property real roundingRadius: 6 //< Matches default Button background.
 
     property Component spacerDelegate: Component
     {
@@ -27,7 +28,7 @@ Container
     background: Rectangle
     {
         color: control.backgroundColor
-        radius: 6 //< Matches default Button background.
+        radius: control.roundingRadius
     }
 
     contentItem: Item

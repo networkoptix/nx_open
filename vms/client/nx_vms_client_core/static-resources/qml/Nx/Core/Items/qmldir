@@ -12,5 +12,6 @@ RoiSelectionPreloader 1.0 RoiSelectionPreloader.qml
 RoundedMask 1.0 RoundedMask.qml
 ShadedCircle 1.0 ShadedCircle.qml
 UniformGrid 1.0 UniformGrid.qml
+VerticalTimeScale 1.0 VerticalTimeScale.qml
 VideoPositioner 1.0 VideoPositioner.qml
 Watermark 1.0 Watermark.qml

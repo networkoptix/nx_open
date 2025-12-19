@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Window
 
+import Nx.Core
+
 /**
  * Highlighting rectangle automatically binds to the focused item in the window. Can be placed
  * anywhere (parent changes but the initial ownership is preserved).

@@ -119,7 +119,10 @@ function openVideoScreen(resource, screenshotUrl, xHint, yHint, timestamp, camer
         }
     if (camerasModel)
         properties["camerasModel"] = camerasModel
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/VideoScreen.qml"), properties)
+
+    const screen = appContext.settings.newTimelinePrototype
+        ? stackView.pushScreen(Qt.resolvedUrl("../Screens/VideoScreen.qml"), properties)
+        : stackView.pushScreen(Qt.resolvedUrl("../Screens/DeprecatedVideoScreen.qml"), properties)
 }
 
 function openSettingsScreen()

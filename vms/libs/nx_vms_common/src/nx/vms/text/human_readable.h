@@ -56,6 +56,7 @@ public:
         Long,
         Full
     };
+    Q_ENUM(SuffixFormat)
 
     enum class DigitalSizeMultiplier
     {

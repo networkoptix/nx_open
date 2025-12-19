@@ -1,7 +1,7 @@
 module Nx.Core
 
+DebugRect 1.0 DebugRect.qml
 NxObject 1.0 NxObject.qml
-ViewUpdateWatcher 1.0 ViewUpdateWatcher.qml
 
 CoreUtils 1.0 utils.js
 MathUtils 1.0 math_utils.js

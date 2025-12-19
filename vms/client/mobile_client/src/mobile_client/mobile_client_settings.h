@@ -58,6 +58,8 @@ public:
         EnableSoftwareDecoderFallback,
         ShowHowShareWorksNotification,
 
+        NewTimelinePrototype,
+
         VideoRenderingApi,
 
         CrashReportingEnabled,
@@ -164,6 +166,11 @@ private:
             bool,
             enableSoftwareDecoderFallback, setEnableSoftwareDecoderFallback,
             EnableSoftwareDecoderFallback, true)
+
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            newTimelinePrototype, setNewTimelinePrototype,
+            NewTimelinePrototype, false)
 
         QN_DECLARE_RW_PROPERTY(
             QString,

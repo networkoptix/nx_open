@@ -5,6 +5,7 @@ BaseSettingsScreen 1.0 BaseSettingsScreen.qml
 BetaFeaturesScreen 1.0 BetaFeaturesScreen.qml
 CameraSettingsScreen 1.0 CameraSettingsScreen.qml
 CustomConnectionScreen 1.0 CustomConnectionScreen.qml
+DeprecatedVideoScreen 1.0 DeprecatedVideoScreen.qml
 DeveloperSettingsScreen 1.0 DeveloperSettingsScreen.qml
 EventSearchMenuScreen 1.0 EventSearchMenuScreen.qml
 FeedScreen 1.0 FeedScreen.qml
@@ -15,4 +16,3 @@ SavedConnectionScreen 1.0 SavedConnectionScreen.qml
 SessionsScreen 1.0 SessionsScreen.qml
 SettingsScreen 1.0 SettingsScreen.qml
 VideoDummy 1.0 VideoDummy.qml
-VideoScreen 1.0 VideoScreen.qml

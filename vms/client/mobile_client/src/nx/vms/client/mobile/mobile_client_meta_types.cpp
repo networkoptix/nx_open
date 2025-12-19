@@ -38,6 +38,7 @@
 #include <nx/vms/client/mobile/push_notification/push_notification_provider.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/session/ui_messages.h>
+#include <nx/vms/client/mobile/timeline/objects_loader.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/client/mobile/utils/navigation_bar_utils.h>
 #include <nx/vms/client/mobile/cameras_grid/cameras_grid_helper.h>
@@ -129,6 +130,7 @@ void registerQmlTypes()
     PushNotificationProvider::registerQmlType();
     QnCameraListModel::registerQmlType();
     CamerasGridHelper::registerQmlType();
+	timeline::ObjectsLoader::registerQmlTypes();
 
     qmlRegisterUncreatableMetaObject(nx::vms::api::staticMetaObject, "nx.vms.api", 1, 0,
         "API", "API is a namespace");

@@ -87,7 +87,7 @@ struct ChunkPositionWatcher::Private: public QObject
 
     QPointer<nx::vms::client::core::ChunkProvider> provider;
 
-    bool motionSearchMode = false;
+    Qn::TimePeriodContent contentType = Qn::TimePeriodContent::RecordingContent;
 };
 
 ChunkPositionWatcher::Private::Private(ChunkPositionWatcher* q):
@@ -122,9 +122,7 @@ void ChunkPositionWatcher::Private::updateProviderConnections()
 const QnTimePeriodList& ChunkPositionWatcher::Private::periods() const
 {
     static QnTimePeriodList kEmptyPeriods;
-    return provider
-        ? provider->periods(motionSearchMode ? Qn::MotionContent : Qn::RecordingContent)
-        : kEmptyPeriods;
+    return provider ? provider->periods(contentType) : kEmptyPeriods;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -133,7 +131,7 @@ ChunkPositionWatcher::ChunkPositionWatcher(QObject* parent):
     base_type(parent),
     d(new Private(this))
 {
-    connect(this, &ChunkPositionWatcher::motionSearchModeChanged,
+    connect(this, &ChunkPositionWatcher::contentTypeChanged,
         d.data(), &Private::updateChunksInformation);
     connect(this, &ChunkPositionWatcher::chunkProviderChanged,
         d.data(), &Private::updateProviderConnections);
@@ -145,18 +143,18 @@ ChunkPositionWatcher::~ChunkPositionWatcher()
 {
 }
 
-bool ChunkPositionWatcher::motionSearchMode() const
+Qn::TimePeriodContent ChunkPositionWatcher::contentType() const
 {
-    return d->motionSearchMode;
+    return d->contentType;
 }
 
-void ChunkPositionWatcher::setMotionSearchMode(bool value)
+void ChunkPositionWatcher::setContentType(Qn::TimePeriodContent value)
 {
-    if (d->motionSearchMode == value)
+    if (d->contentType == value)
         return;
 
-    d->motionSearchMode = value;
-    emit motionSearchModeChanged();
+    d->contentType = value;
+    emit contentTypeChanged();
 }
 
 qint64 ChunkPositionWatcher::position() const

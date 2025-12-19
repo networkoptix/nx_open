@@ -30,7 +30,6 @@ ContextHintLabel 1.0 ContextHintLabel.qml
 CopyableLabel 1.0 CopyableLabel.qml
 DateField 1.0 DateField.qml
 DebugFocusRect 1.0 DebugFocusRect.qml
-DebugRect 1.0 DebugRect.qml
 DeprecatedIconButton 1.0 DeprecatedIconButton.qml
 DialogBanner 1.0 DialogBanner.qml
 DialogButtonBox 1.0 DialogButtonBox.qml

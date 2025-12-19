@@ -2,9 +2,11 @@
 
 #include "qml_settings_adaptor.h"
 
+#include <ini.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/settings/ini_helpers.h>
 
 using nx::vms::client::core::appContext;
 

@@ -9,6 +9,8 @@ class QAbstractScrollArea;
 class QAbstractItemView;
 class QPropertyAnimation;
 
+namespace nx::vms::client::core { class ProximityScrollHelper; }
+
 namespace nx::vms::client::desktop {
 
 /**
@@ -28,7 +30,6 @@ class ItemViewDragAndDropScrollAssist: public QObject
     using base_type = QObject;
 
 public:
-
     /**
      * Sets up the scroll assistance during drag and drop interaction for given scroll area and
      * item view.
@@ -55,24 +56,13 @@ private:
     void stopScrolling() const;
 
     void updateScrollingStateAndParameters();
-    void initializeScrolling(bool isForwardScroll, double edgeProximity);
-    void updateScrollingVelocity(double edgeProximity) const;
+    void initializeScrolling(double velocity);
+    void updateScrollingVelocity(double velocity) const;
 
 private:
-    QAbstractScrollArea* m_scrollArea;
+    QAbstractScrollArea* const m_scrollArea;
     QPointer<QPropertyAnimation> m_animation;
-};
-
-/**
- * A helper to calculate auto-scroll velocity based on edge proximity.
- */
-class ProximityScrollHelper: public QObject
-{
-    Q_OBJECT
-public:
-    /** Signed velocity in pixels per millisecond. */
-    Q_INVOKABLE qreal velocity(const QRectF& geometry, const QPointF& position) const;
-    static void registerQmlType();
+    core::ProximityScrollHelper* const m_proximityScrollHelper;
 };
 
 } // namespace nx::vms::client::desktop

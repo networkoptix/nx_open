@@ -17,15 +17,16 @@
 #include <QtGui/QPainter>
 
 #include "timeline_text_helper.h"
-#include "timeline_zoom_level.h"
 #include "timeline_chunk_painter.h"
 
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
 #include <nx/vms/client/core/animation/kinetic_helper.h>
+#include <nx/vms/client/core/timeline/data/timeline_zoom_level.h>
 #include <utils/math/color_transformations.h>
 
 using KineticHelper = nx::vms::client::core::animation::KineticHelper<qreal>;
+using TimelineZoomLevel = nx::vms::client::core::TimelineZoomLevel;
 
 namespace {
 
@@ -167,7 +168,7 @@ public:
     KineticHelper zoomKineticHelper;
     bool dragWasInterruptedByZoom = false;
 
-    QVector<QnTimelineZoomLevel> zoomLevels;
+    QVector<TimelineZoomLevel> zoomLevels;
     QVector<qreal> maxZoomLevelTextLength;
 
     QnTimePeriodList timePeriods[Qn::TimePeriodContentCount];
@@ -191,31 +192,31 @@ public:
         const int min = 60 * sec;
         const int hour = 60 * min;
 
-        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 10});
-        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 50});
-        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 100});
-        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 500});
-        zoomLevels.append({QnTimelineZoomLevel::Seconds, sec});
-        zoomLevels.append({QnTimelineZoomLevel::Seconds, 5 * sec});
-        zoomLevels.append({QnTimelineZoomLevel::Seconds, 10 * sec});
-        zoomLevels.append({QnTimelineZoomLevel::Seconds, 30 * sec});
-        zoomLevels.append({QnTimelineZoomLevel::Minutes, min});
-        zoomLevels.append({QnTimelineZoomLevel::Minutes, 5 * min});
-        zoomLevels.append({QnTimelineZoomLevel::Minutes, 10 * min});
-        zoomLevels.append({QnTimelineZoomLevel::Minutes, 30 * min});
-        zoomLevels.append({QnTimelineZoomLevel::Hours, hour});
-        zoomLevels.append({QnTimelineZoomLevel::Hours, 3 * hour});
-        zoomLevels.append({QnTimelineZoomLevel::Hours, 6 * hour});
-        zoomLevels.append({QnTimelineZoomLevel::Hours, 12 * hour});
-        zoomLevels.append({QnTimelineZoomLevel::Days, 1});
-        zoomLevels.append({QnTimelineZoomLevel::Days, 5});
-        zoomLevels.append({QnTimelineZoomLevel::Days, 15});
-        zoomLevels.append({QnTimelineZoomLevel::Months, 1});
-        zoomLevels.append({QnTimelineZoomLevel::Months, 3});
-        zoomLevels.append({QnTimelineZoomLevel::Months, 6});
-        zoomLevels.append({QnTimelineZoomLevel::Years,  1});
-        zoomLevels.append({QnTimelineZoomLevel::Years, 5});
-        zoomLevels.append({QnTimelineZoomLevel::Years, 10});
+        zoomLevels.append({TimelineZoomLevel::Milliseconds, 10});
+        zoomLevels.append({TimelineZoomLevel::Milliseconds, 50});
+        zoomLevels.append({TimelineZoomLevel::Milliseconds, 100});
+        zoomLevels.append({TimelineZoomLevel::Milliseconds, 500});
+        zoomLevels.append({TimelineZoomLevel::Seconds, sec});
+        zoomLevels.append({TimelineZoomLevel::Seconds, 5 * sec});
+        zoomLevels.append({TimelineZoomLevel::Seconds, 10 * sec});
+        zoomLevels.append({TimelineZoomLevel::Seconds, 30 * sec});
+        zoomLevels.append({TimelineZoomLevel::Minutes, min});
+        zoomLevels.append({TimelineZoomLevel::Minutes, 5 * min});
+        zoomLevels.append({TimelineZoomLevel::Minutes, 10 * min});
+        zoomLevels.append({TimelineZoomLevel::Minutes, 30 * min});
+        zoomLevels.append({TimelineZoomLevel::Hours, hour});
+        zoomLevels.append({TimelineZoomLevel::Hours, 3 * hour});
+        zoomLevels.append({TimelineZoomLevel::Hours, 6 * hour});
+        zoomLevels.append({TimelineZoomLevel::Hours, 12 * hour});
+        zoomLevels.append({TimelineZoomLevel::Days, 1});
+        zoomLevels.append({TimelineZoomLevel::Days, 5});
+        zoomLevels.append({TimelineZoomLevel::Days, 15});
+        zoomLevels.append({TimelineZoomLevel::Months, 1});
+        zoomLevels.append({TimelineZoomLevel::Months, 3});
+        zoomLevels.append({TimelineZoomLevel::Months, 6});
+        zoomLevels.append({TimelineZoomLevel::Years,  1});
+        zoomLevels.append({TimelineZoomLevel::Years, 5});
+        zoomLevels.append({TimelineZoomLevel::Years, 10});
         targetZoomLevel = zoomLevel = zoomLevels.size() - zoomLevelsVisible;
 
         static constexpr int kMaxStickyPointSpeed = 15;
@@ -1447,19 +1448,19 @@ void QnTimelinePrivate::updateTextHelper()
     {
         const auto &level = zoomLevels[i];
 
-        if (level.type == QnTimelineZoomLevel::Days || level.type == QnTimelineZoomLevel::Months)
+        if (level.type == TimelineZoomLevel::Days || level.type == TimelineZoomLevel::Months)
         {
             maxZoomLevelTextLength[i] = 0;
             for (int month = 1; month <= 12; ++month)
             {
                 maxZoomLevelTextLength[i] = qMax(
                     maxZoomLevelTextLength[i],
-                    fm.size(0, level.type == QnTimelineZoomLevel::Days
+                    fm.size(0, level.type == TimelineZoomLevel::Days
                         ? locale.monthName(month, QLocale::ShortFormat)
                         : locale.standaloneMonthName(month, QLocale::ShortFormat)).width());
             }
 
-            if (level.type == QnTimelineZoomLevel::Days)
+            if (level.type == TimelineZoomLevel::Days)
                 maxZoomLevelTextLength[i] += fm.size(0, " 88").width();
         }
         else

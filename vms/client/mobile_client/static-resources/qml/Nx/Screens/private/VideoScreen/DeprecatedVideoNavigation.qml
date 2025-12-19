@@ -310,7 +310,7 @@ Item
                 chunkProvider: cameraChunkProvider
             }
 
-            Timeline
+            DeprecatedTimeline
             {
                 id: timeline
 
