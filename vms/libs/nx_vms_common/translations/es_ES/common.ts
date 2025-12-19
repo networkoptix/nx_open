@@ -261,7 +261,7 @@
     <name>QnCameraAnalyticsObjectsPolicy</name>
     <message>
       <source>Analytics objects are not available for %1</source>
-      <translation type="unfinished">Analytics objects are not available for %1</translation>
+      <translation>Objetos de Analíticos no están disponibles %1</translation>
     </message>
   </context>
   <context>
