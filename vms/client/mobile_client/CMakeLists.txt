@@ -170,7 +170,6 @@ set(target_args
         ${customization_resources_dir}
     OTHER_SOURCES
         ${QML_FILES}
-        ${resources}
     PUBLIC_LIBS
         Qt6::WebChannel Qt6::WebSockets Qt6::Svg Qt6::WebView Qt6::QuickControls2
         nx_kit
@@ -178,13 +177,22 @@ set(target_args
         nx_vms_common
         nx_vms_client_core)
 
+nx_add_target(mobile_client_library
+    LIBRARY
+    LIBRARY_TYPE STATIC
+    NO_API_MACROS
+    SOURCE_EXCLUSIONS main.cpp
+    ${target_args})
+
 if(ANDROID)
     set(CMAKE_SHARED_MODULE_SUFFIX_CXX "_${CMAKE_ANDROID_ARCH_ABI}.so")
     string(REPLACE "-Wl,--as-needed" "" CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS})
-    nx_add_target(mobile_client LIBRARY LIBRARY_TYPE MODULE NO_API_MACROS ${target_args})
+    add_library(mobile_client MODULE src/main.cpp ${resources})
 else()
-    nx_add_target(mobile_client EXECUTABLE ${target_args})
+    add_executable(mobile_client src/main.cpp ${resources})
 endif()
+
+target_link_libraries(mobile_client PRIVATE mobile_client_library)
 
 add_dependencies(mobile_client mobile_client_external_resources)
 
@@ -207,7 +215,7 @@ if(ANDROID)
     set(push_extra_libs)
 
     if(pushNotificationProvider STREQUAL "firebase")
-        nx_exclude_sources_from_target(mobile_client
+        nx_exclude_sources_from_target(mobile_client_library
             src/nx/vms/client/mobile/push_notification/details/android/baidu)
 
         set(gradle_dep_lines "\
@@ -230,7 +238,7 @@ if(ANDROID)
                 ${customization.mobile.android.baidu.displayName})
         endif()
 
-        nx_exclude_sources_from_target(mobile_client
+        nx_exclude_sources_from_target(mobile_client_library
             src/nx/vms/client/mobile/push_notification/details/android/firebase)
 
         # Update package name and id to support multiple application instances on
@@ -322,7 +330,7 @@ if(ANDROID)
     # Used by PushNotificationStorage.java.
     add_library(push_notification_storage SHARED
         src/nx/vms/client/mobile/push_notification/details/push_notification_storage.cpp
-        src/nx/vms/client/mobile/push_notification/details/android/secure_storage_android.cpp
+        src/nx/vms/client/mobile/push_notification/details/android/android_secure_storage_android.cpp
         src/nx/vms/client/mobile/push_notification/details/android/push_notification_storage_android.cpp
         src/nx/vms/client/mobile/push_notification/details/android/jni_helpers_android.cpp)
 
@@ -468,8 +476,8 @@ file(GLOB_RECURSE shader_sources CONFIGURE_DEPENDS
     "static-resources/qml/*.vert"
    # "static-resources/qml/*.frag" - there is a single fragment shader that requires special handling.
 )
-# This command generates mobile_client_other_files target.
-qt6_add_shaders(mobile_client "mobile_client_vertex_shaders"
+# This command generates mobile_client_library_other_files target.
+qt6_add_shaders(mobile_client_library "mobile_client_vertex_shaders"
     BATCHABLE
     PREFIX
         "/"
@@ -478,14 +486,14 @@ qt6_add_shaders(mobile_client "mobile_client_vertex_shaders"
     FILES
         ${shader_sources}
 )
-set_property(TARGET mobile_client_other_files PROPERTY FOLDER client/other_files)
+set_property(TARGET mobile_client_library_other_files PROPERTY FOLDER client/other_files)
 
 set(projection_types "Stereographic;Equisolid;Equidistant")
 
 foreach(lensProjectionType ${projection_types})
     foreach(viewProjectionType ${projection_types})
         set(unique_shader_suffix "${lensProjectionType}_${viewProjectionType}")
-        qt6_add_shaders(mobile_client "mobile_client_fragment_shaders_${unique_shader_suffix}"
+        qt6_add_shaders(mobile_client_library "mobile_client_fragment_shaders_${unique_shader_suffix}"
             BATCHABLE
             PREFIX
                 "/"
@@ -498,3 +506,7 @@ foreach(lensProjectionType ${projection_types})
         )
     endforeach()
 endforeach()
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
