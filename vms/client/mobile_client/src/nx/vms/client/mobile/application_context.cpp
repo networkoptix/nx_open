@@ -28,6 +28,7 @@
 #include <nx/vms/client/mobile/push_notification/details/secure_storage.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_image_provider.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
+#include <nx/vms/client/mobile/settings/local_settings.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/ui/detail/credentials_helper.h>
@@ -83,6 +84,7 @@ struct ApplicationContext::Private
     QPointer<QnCameraThumbnailProvider> cameraThumbnailProvider; //< Owned by the QML engine.
     std::shared_ptr<SecureStorage> secureStorage;
     std::unique_ptr<PushNotificationStorage> pushNotificationStorage;
+    std::unique_ptr<LocalSettings> localSettings;
 
     void initializeHolePunching();
     void initializeTranslations();
@@ -293,6 +295,8 @@ ApplicationContext::ApplicationContext(
     initializeCrossSystemModules();
     d->windowContext->setMainSystemContext(d->mainSystemContext.get());
 
+    d->localSettings.reset(new LocalSettings());
+
     connect(cloudCrossSystemManager(),
         &core::CloudCrossSystemManager::cloudAuthorizationRequested,
         this,
@@ -394,6 +398,11 @@ SecureStorage* ApplicationContext::secureStorage() const
 PushNotificationStorage* ApplicationContext::pushNotificationStorage() const
 {
     return d->pushNotificationStorage.get();
+}
+
+LocalSettings* ApplicationContext::localSettings() const
+{
+    return d->localSettings.get();
 }
 
 } // namespace nx::vms::client::mobile

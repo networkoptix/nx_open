@@ -40,6 +40,8 @@ class QnCameraListModel: public QSortFilterProxyModel,
         NOTIFY selectedIdsChagned)
 
 public:
+    static void registerQmlType();
+
     QnCameraListModel(QObject* parent = nullptr);
     virtual ~QnCameraListModel() override;
 
@@ -73,6 +75,7 @@ signals:
     void countChanged();
     void filterIdsChanged();
     void selectedIdsChagned();
+    void systemContextsSetChanged();
 
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;

@@ -131,6 +131,22 @@ struct SystemContext::Private
         appContext()->cameraThumbnailProvider()};
 };
 
+SystemContext* SystemContext::fromResource(const QnResource* resource)
+{
+    if (!resource)
+        return {};
+
+    return dynamic_cast<SystemContext*>(resource->systemContext());
+}
+
+SystemContext* SystemContext::fromResource(const QnResourcePtr& resource)
+{
+    if (!resource)
+        return {};
+
+    return dynamic_cast<SystemContext*>(resource->systemContext());
+}
+
 SystemContext::SystemContext(WindowContext* context,
     Mode mode,
     nx::Uuid peerId,

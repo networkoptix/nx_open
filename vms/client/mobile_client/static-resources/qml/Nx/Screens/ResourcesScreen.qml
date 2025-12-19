@@ -151,9 +151,9 @@ Page
     {
         for (var i = 0; i !== camerasGrid.count; ++i)
         {
-            const cameraItem = camerasGrid.itemAtIndex(i)
-            if (cameraItem && cameraItem.mediaPlayer)
-                cameraItem.mediaPlayer.stop()
+            const mediaPlayer = camerasGrid.getMediaPlayer(i)
+            if (mediaPlayer)
+                mediaPlayer.stop()
         }
 
         const point = mapToItem(camerasGrid.parent, width / 2, height / 2)

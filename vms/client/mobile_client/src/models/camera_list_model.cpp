@@ -4,6 +4,7 @@
 
 #include <QtCore/QPointer>
 #include <QtCore/QUrlQuery>
+#include <QtQml/QtQml>
 
 #include <camera/camera_thumbnail_cache.h>
 #include <core/resource/camera_resource.h>
@@ -83,13 +84,22 @@ QnCameraListModel::Private::Private(QnCameraListModel* q):
                     if (camera)
                         handleThumbnailUpdated(camera);
                 }));
+
+            emit this->q->systemContextsSetChanged();
         });
 
     connect(model.get(), &QnAvailableCameraListModel::systemContextRemoved, this,
         [this](mobile::SystemContext* systemContext)
         {
             systemContextConnections.erase(systemContext);
+
+            emit this->q->systemContextsSetChanged();
         });
+}
+
+void QnCameraListModel::registerQmlType()
+{
+    qmlRegisterType<QnCameraListModel>("Nx.Mobile", 1, 0, "QnCameraListModel");
 }
 
 QnCameraListModel::QnCameraListModel(QObject* parent):
