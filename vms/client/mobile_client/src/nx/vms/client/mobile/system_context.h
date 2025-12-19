@@ -18,11 +18,13 @@ class QnResourceDiscoveryManager;
 namespace nx::client::mobile { class EventRulesWatcher; }
 
 namespace nx::vms::client::core {
+
 class EventSearchModelAdapter;
 class TwoWayAudioController;
 class CommonObjectSearchSetup;
 class AnalyticsSearchSetup;
 class BookmarkSearchSetup;
+
 } // namespace nx::vms::client::core
 
 namespace nx::vms::client::mobile {
@@ -49,6 +51,9 @@ class SystemContext: public core::SystemContext,
         READ hasSearchObjectsPermission NOTIFY hasSearchObjectsPermissionChanged)
 
 public:
+    static SystemContext* fromResource(const QnResource* resource);
+    static SystemContext* fromResource(const QnResourcePtr& resource);
+
     /**
      * @see nx::vms::client::core::SystemContext
      */

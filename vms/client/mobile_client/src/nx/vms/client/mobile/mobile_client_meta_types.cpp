@@ -40,6 +40,7 @@
 #include <nx/vms/client/mobile/session/ui_messages.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/client/mobile/utils/navigation_bar_utils.h>
+#include <nx/vms/client/mobile/cameras_grid/cameras_grid_helper.h>
 #include <private/qqmlvaluetype_p.h>
 #include <resources/camera_access_rights_helper.h>
 #include <settings/qml_settings_adaptor.h>
@@ -68,7 +69,6 @@ void registerQmlTypes()
     qmlRegisterUncreatableType<nx::client::mobile::QmlSettingsAdaptor>(
         "Nx.Settings", 1, 0, "MobileSettings", "Cannot create an instance of MobileSettings.");
 
-    qmlRegisterType<QnCameraListModel>("Nx.Mobile", 1, 0, "QnCameraListModel");
     qmlRegisterType<QnLayoutsModel>("Nx.Mobile", 1, 0, "QnLayoutsModel");
     qmlRegisterType<core::animation::KineticAnimation>("Nx.Core", 1, 0, "KineticAnimation");
     qmlRegisterType<QnCameraAccessRightsHelper>("Nx.Mobile", 1, 0, "QnCameraAccessRightsHelper");
@@ -127,6 +127,8 @@ void registerQmlTypes()
     PushNotificationModel::registerQmlType();
     PushNotificationFilterModel::registerQmlType();
     PushNotificationProvider::registerQmlType();
+    QnCameraListModel::registerQmlType();
+    CamerasGridHelper::registerQmlType();
 
     qmlRegisterUncreatableMetaObject(nx::vms::api::staticMetaObject, "nx.vms.api", 1, 0,
         "API", "API is a namespace");

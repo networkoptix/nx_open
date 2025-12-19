@@ -130,3 +130,12 @@ function executeLater(callback, parent)
 {
     executeDelayed(callback, 0, parent)
 }
+
+function assert(testValue, text)
+{
+    if (testValue)
+        return
+
+    console.log("Assert violation: " + text)
+    console.trace()
+}

@@ -21,6 +21,7 @@ namespace nx::vms::client::mobile {
 
 namespace detail { class CredentialsHelper; }
 
+class LocalSettings;
 class PushNotificationManager;
 class PushNotificationStorage;
 class SecureStorage;
@@ -82,6 +83,8 @@ public:
     SecureStorage* secureStorage() const;
 
     PushNotificationStorage* pushNotificationStorage() const;
+
+    LocalSettings* localSettings() const;
 
 private:
     struct Private;
