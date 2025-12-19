@@ -60,14 +60,14 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>Evento de Sitio</translation>
     </message>
   </context>
   <context>
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>soporte regional / de licencia</translation>
     </message>
   </context>
   <context>
@@ -187,20 +187,20 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>Visualizadores de Salud del Sitio</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>Los miembros de este grupo tienen privilegios ilimitados en el Sitio. Los Administradores pueden crear y modificar Usuarios Avanzados, fusionar Sitios y conectar o desconectar Sitios a %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Los Miembros de este grupo pueden, adicionalmente a los permisos otorgados por el grupo de Visualizadores Avanzados, controlar la configuracion del Sitio, pero no tienen permitido cambiar los ajustes de ningun Administrador, como borrar o cambiar sus propios grupos o permisos y no pueden crear o editar otros Usuarios Avanzados.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Los miembros de este grupo pueden ver la información de Monitoreo del estado del sitio y la carga del procesador del servidor en tiempo real (Monitoreo del servidor).</translation>
     </message>
   </context>
   <context>
@@ -254,14 +254,14 @@
     <name>QnCameraAnalyticsEventsPolicy</name>
     <message>
       <source>Analytics events are not available for %1</source>
-      <translation type="unfinished">Analytics events are not available for %1</translation>
+      <translation>Los eventos analíticos no están disponibles para %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsObjectsPolicy</name>
     <message>
       <source>Analytics objects are not available for %1</source>
-      <translation type="unfinished">Analytics objects are not available for %1</translation>
+      <translation>Objetos de Analíticos no están disponibles %1</translation>
     </message>
   </context>
   <context>

@@ -196,7 +196,7 @@
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>일부 사용자는 선택한 레이아웃에 액세스할 수 없습니다</translation>
     </message>
     <message>
       <source>For</source>
@@ -1275,11 +1275,11 @@
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>목록이 선택되지 않았습니다</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>주어진 id &apos;%1&apos; 를 가진 목록이 존재하지 않습니다</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>

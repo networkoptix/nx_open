@@ -13,7 +13,7 @@
     <name>QnSystemsModel</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>사이트 추가하기</translation>
     </message>
     <message>
       <source>Your Site</source>
@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation type="unfinished">Failed to access site</translation>
+      <translation>사이트에 접속하지 못했습니다</translation>
     </message>
   </context>
   <context>
@@ -383,7 +383,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>폴더</translation>
     </message>
     <message>
       <source>Sites</source>

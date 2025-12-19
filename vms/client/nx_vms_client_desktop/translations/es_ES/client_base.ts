@@ -6382,15 +6382,15 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Ver Archivo</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Exportar Archivo</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>Ver Marcadores</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
@@ -6410,7 +6410,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>View Live.</source>
-      <translation type="unfinished">View Live.</translation>
+      <translation>Vista en vivo.</translation>
     </message>
     <message>
       <source>User Input.</source>
@@ -6422,7 +6422,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Reproducir audio</translation>
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
