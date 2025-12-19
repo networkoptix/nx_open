@@ -165,7 +165,7 @@
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>사이트 소유자 계정으로 %1 에 연결</translation>
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
@@ -816,7 +816,7 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>사이트 없음</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -942,7 +942,7 @@
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>만료되지 않음</translation>
     </message>
     <message>
       <source>Shared link options</source>
@@ -950,7 +950,7 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>공유하기</translation>
     </message>
     <message>
       <source>Share Link</source>
@@ -962,14 +962,14 @@
     </message>
     <message>
       <source>Expiration</source>
-      <translation type="unfinished">Expiration</translation>
+      <translation>만료</translation>
     </message>
   </context>
   <context>
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>사이트에 연결</translation>
     </message>
     <message>
       <source>Log in as</source>
@@ -1047,11 +1047,11 @@
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>유예</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>SHUTDOWN</translation>
     </message>
     <message>
       <source>PENDING</source>
