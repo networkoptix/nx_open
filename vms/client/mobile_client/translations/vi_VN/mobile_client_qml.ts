@@ -541,13 +541,6 @@
     </message>
   </context>
   <context>
-    <name>LayoutSheet</name>
-    <message>
-      <source>Layouts</source>
-      <translation>Bố cục</translation>
-    </message>
-  </context>
-  <context>
     <name>LinkAboutToOpenDialog</name>
     <message>
       <source>Cancel</source>
@@ -803,7 +796,7 @@
     <name>ResourceTreeSheet</name>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Tài nguyên</translation>
     </message>
   </context>
   <context>

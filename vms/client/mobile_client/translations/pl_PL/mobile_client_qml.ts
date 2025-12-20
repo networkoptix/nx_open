@@ -544,13 +544,6 @@
     </message>
   </context>
   <context>
-    <name>LayoutSheet</name>
-    <message>
-      <source>Layouts</source>
-      <translation>Układy</translation>
-    </message>
-  </context>
-  <context>
     <name>LinkAboutToOpenDialog</name>
     <message>
       <source>Cancel</source>
@@ -806,7 +799,7 @@
     <name>ResourceTreeSheet</name>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Zasoby</translation>
     </message>
   </context>
   <context>
