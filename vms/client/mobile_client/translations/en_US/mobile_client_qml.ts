@@ -542,13 +542,6 @@
     </message>
 </context>
 <context>
-    <name>LayoutSheet</name>
-    <message>
-        <source>Layouts</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>LinkAboutToOpenDialog</name>
     <message>
         <source>Cancel</source>
