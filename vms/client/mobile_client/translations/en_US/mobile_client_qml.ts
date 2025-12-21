@@ -216,6 +216,67 @@
     </message>
 </context>
 <context>
+    <name>DataTimeline</name>
+    <message>
+        <source>Live</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DeprecatedVideoNavigation</name>
+    <message>
+        <source>No motion data for this camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No motion found in the selected area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No motion found in the visible area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LIVE</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DeprecatedVideoScreen</name>
+    <message>
+        <source>Area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tap and hold to select an area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable motion search first to select an area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid custom area. Please draw a correct one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DetailsScreen</name>
     <message>
         <source>Preview</source>
@@ -625,6 +686,29 @@
     </message>
     <message>
         <source>No data</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ObjectsTypeSheet</name>
+    <message>
+        <source>View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1350,29 +1434,6 @@
     </message>
 </context>
 <context>
-    <name>VideoNavigation</name>
-    <message>
-        <source>No motion data for this camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No motion found in the selected area</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No motion found in the visible area</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No Archive</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>LIVE</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>VideoScreen</name>
     <message>
         <source>Area</source>
@@ -1401,6 +1462,23 @@
     <message>
         <source>Objects</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>LIVE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have permission&lt;br&gt;to view the archive</source>
+        <comment>&lt;br&gt; is a line break</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
