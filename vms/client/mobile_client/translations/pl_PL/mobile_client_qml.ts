@@ -1222,23 +1222,23 @@
     <name>VideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation>Brak detekcji ruchu na tej kamerze</translation>
+      <translation type="unfinished">No motion data for this camera</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation>Brak detekcji ruchu w wybranym obszarze</translation>
+      <translation type="unfinished">No motion found in the selected area</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation>Brak detekcji ruchu w widocznym obszarze</translation>
+      <translation type="unfinished">No motion found in the visible area</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation>Brak archiwum</translation>
+      <translation type="unfinished">No Archive</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>LIVE</translation>
+      <translation type="unfinished">LIVE</translation>
     </message>
   </context>
   <context>
