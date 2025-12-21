@@ -123,4 +123,79 @@
       <translation>Раскладки</translation>
     </message>
   </context>
+  <context>
+    <name>nx::vms::client::mobile::timeline::AnalyticsLoaderDelegate</name>
+    <message>
+      <source>Unknown Object</source>
+      <translation type="unfinished">Unknown Object</translation>
+    </message>
+    <message numerus="yes">
+      <source>Objects (%n)</source>
+      <translation type="unfinished">
+        <numerusform>Objects (%n)</numerusform>
+        <numerusform>Objects (%n)</numerusform>
+        <numerusform>Objects (%n)</numerusform>
+        <numerusform>Objects (%n)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Objects (&gt;%n)</source>
+      <translation type="unfinished">
+        <numerusform>Objects (&gt;%n)</numerusform>
+        <numerusform>Objects (&gt;%n)</numerusform>
+        <numerusform>Objects (&gt;%n)</numerusform>
+        <numerusform>Objects (&gt;%n)</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::timeline::BookmarkLoaderDelegate</name>
+    <message>
+      <source>Bookmark</source>
+      <translation type="unfinished">Bookmark</translation>
+    </message>
+    <message numerus="yes">
+      <source>Bookmarks (%n)</source>
+      <translation type="unfinished">
+        <numerusform>Bookmarks (%n)</numerusform>
+        <numerusform>Bookmarks (%n)</numerusform>
+        <numerusform>Bookmarks (%n)</numerusform>
+        <numerusform>Bookmarks (%n)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Bookmarks (&gt;%n)</source>
+      <translation type="unfinished">
+        <numerusform>Bookmarks (&gt;%n)</numerusform>
+        <numerusform>Bookmarks (&gt;%n)</numerusform>
+        <numerusform>Bookmarks (&gt;%n)</numerusform>
+        <numerusform>Bookmarks (&gt;%n)</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::timeline::MotionLoaderDelegate</name>
+    <message>
+      <source>Motion detected</source>
+      <translation type="unfinished">Motion detected</translation>
+    </message>
+    <message numerus="yes">
+      <source>Motions (&gt;%n)</source>
+      <translation type="unfinished">
+        <numerusform>Motions (&gt;%n)</numerusform>
+        <numerusform>Motions (&gt;%n)</numerusform>
+        <numerusform>Motions (&gt;%n)</numerusform>
+        <numerusform>Motions (&gt;%n)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Motions (%n)</source>
+      <translation type="unfinished">
+        <numerusform>Motions (%n)</numerusform>
+        <numerusform>Motions (%n)</numerusform>
+        <numerusform>Motions (%n)</numerusform>
+        <numerusform>Motions (%n)</numerusform>
+      </translation>
+    </message>
+  </context>
 </TS>

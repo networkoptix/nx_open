@@ -216,6 +216,67 @@
     </message>
   </context>
   <context>
+    <name>DataTimeline</name>
+    <message>
+      <source>Live</source>
+      <translation type="unfinished">Live</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeprecatedVideoNavigation</name>
+    <message>
+      <source>No motion data for this camera</source>
+      <translation type="unfinished">No motion data for this camera</translation>
+    </message>
+    <message>
+      <source>No motion found in the selected area</source>
+      <translation type="unfinished">No motion found in the selected area</translation>
+    </message>
+    <message>
+      <source>No motion found in the visible area</source>
+      <translation type="unfinished">No motion found in the visible area</translation>
+    </message>
+    <message>
+      <source>No Archive</source>
+      <translation type="unfinished">No Archive</translation>
+    </message>
+    <message>
+      <source>LIVE</source>
+      <translation type="unfinished">LIVE</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeprecatedVideoScreen</name>
+    <message>
+      <source>Area</source>
+      <translation type="unfinished">Area</translation>
+    </message>
+    <message>
+      <source>Camera Settings</source>
+      <translation type="unfinished">Camera Settings</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation type="unfinished">Bookmarks</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation type="unfinished">Objects</translation>
+    </message>
+    <message>
+      <source>Tap and hold to select an area</source>
+      <translation type="unfinished">Tap and hold to select an area</translation>
+    </message>
+    <message>
+      <source>Enable motion search first to select an area</source>
+      <translation type="unfinished">Enable motion search first to select an area</translation>
+    </message>
+    <message>
+      <source>Invalid custom area. Please draw a correct one.</source>
+      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+    </message>
+  </context>
+  <context>
     <name>DetailsScreen</name>
     <message>
       <source>Preview</source>
@@ -628,6 +689,29 @@
     <message>
       <source>No data</source>
       <translation>אין נתונים</translation>
+    </message>
+  </context>
+  <context>
+    <name>ObjectsTypeSheet</name>
+    <message>
+      <source>View</source>
+      <translation type="unfinished">View</translation>
+    </message>
+    <message>
+      <source>Motions</source>
+      <translation type="unfinished">Motions</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation type="unfinished">Bookmarks</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation type="unfinished">Objects</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>
@@ -1352,29 +1436,6 @@
     </message>
   </context>
   <context>
-    <name>VideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>אין נתוני תנועה עבור מצלמה זו</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>לא נמצאה תנועה באזור הגילוי הנבחר</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>לא נמצאה תנועה באזור הגלוי</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>ללא ארכיון</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>חי</translation>
-    </message>
-  </context>
-  <context>
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
@@ -1403,6 +1464,23 @@
     <message>
       <source>Objects</source>
       <translation>אובייקטים</translation>
+    </message>
+    <message>
+      <source>LIVE</source>
+      <translation type="unfinished">LIVE</translation>
+    </message>
+    <message>
+      <source>No results</source>
+      <translation type="unfinished">No results</translation>
+    </message>
+    <message>
+      <source>Not available</source>
+      <translation type="unfinished">Not available</translation>
+    </message>
+    <message>
+      <source>You do not have permission&lt;br&gt;to view the archive</source>
+      <comment>&lt;br&gt; is a line break</comment>
+      <translation type="unfinished">You do not have permission&lt;br&gt;to view the archive</translation>
     </message>
   </context>
   <context>
