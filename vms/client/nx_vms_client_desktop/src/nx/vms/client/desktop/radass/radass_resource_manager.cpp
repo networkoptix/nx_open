@@ -20,48 +20,10 @@ namespace nx::vms::client::desktop {
 static const RadassMode kDefaultResolution = nx::reflect::fromString(ini().defaultResolution,
     RadassMode::Auto);
 
-namespace {
-
-RadassModeByLayoutItemIdHash removeNonexistentItems(
-    RadassModeByLayoutItemIdHash source, QnResourcePool* resourcePool)
-{
-    if (!NX_ASSERT(resourcePool))
-        return source;
-
-    UuidSet existingItems;
-    for (const auto& layout: resourcePool->getResources<core::LayoutResource>())
-        existingItems.unite(nx::utils::toQSet(layout->getItems().keys()));
-
-    const auto storedItems = nx::utils::toQSet(source.keys());
-
-    auto removedItems = storedItems - existingItems;
-    for (const auto& item: removedItems)
-        source.remove(item);
-
-    return source;
-}
-
-} // namespace
-
 RadassResourceManager::RadassResourceManager(SystemContext* systemContext, QObject* parent):
     base_type(parent),
     SystemContextAware(systemContext)
 {
-    if (!NX_ASSERT(systemContext))
-        return;
-
-    connect(systemContext, &SystemContext::remoteIdChanged, this,
-        [this, systemContext]()
-        {
-            auto crossSiteItemModes =
-                systemContext->userSettings()->crossSiteLayoutItemRadassModes();
-            systemContext->userSettings()->crossSiteLayoutItemRadassModes = removeNonexistentItems(
-                crossSiteItemModes, nx::vms::client::core::appContext()->cloudLayoutsPool());
-
-            auto localItemModes = systemContext->localSettings()->localLayoutItemRadassModes();
-            systemContext->localSettings()->localLayoutItemRadassModes = removeNonexistentItems(
-                localItemModes, systemContext->resourcePool());
-        });
 }
 
 RadassResourceManager::~RadassResourceManager()
@@ -121,7 +83,7 @@ RadassMode RadassResourceManager::mode(const LayoutItemIndexList& items) const
         {
             const bool isCloudLayout =
                 (bool) index.layout().dynamicCast<core::CrossSystemLayoutResource>();
-            RadassModeByLayoutItemIdHash modes = isCloudLayout
+            const RadassModeByLayoutItemIdHash modes = isCloudLayout
                 ? systemContext()->userSettings()->crossSiteLayoutItemRadassModes()
                 : systemContext()->localSettings()->localLayoutItemRadassModes();
 
@@ -146,7 +108,7 @@ void RadassResourceManager::setMode(const LayoutItemIndexList& items, RadassMode
         if (!isRadassSupported(item))
             continue;
 
-        auto oldMode = mode(item);
+        const auto oldMode = mode(item);
 
         const bool isCloudLayout =
             (bool) item.layout().dynamicCast<core::CrossSystemLayoutResource>();
