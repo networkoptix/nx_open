@@ -7746,12 +7746,12 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>Conectar al Sitio a %1</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>Conectar al Sitio a %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
