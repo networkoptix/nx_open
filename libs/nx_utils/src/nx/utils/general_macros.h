@@ -62,3 +62,35 @@
         return (std::forward<decltype(self)>(self).__VA_ARGS__)( \
             std::forward<decltype(args)>(args)...); \
     })
+
+#if defined(_MSC_VER)
+    #define NX_PRAGMA(x) __pragma(x)
+#else
+    #define NX_DO_PRAGMA(x) _Pragma(#x)
+    #define NX_PRAGMA(x) NX_DO_PRAGMA(x)
+#endif
+
+#if defined(_MSC_VER)
+    #define NX_DIAG_PUSH() NX_PRAGMA(warning(push))
+    #define NX_DIAG_POP()  NX_PRAGMA(warning(pop))
+    #define NX_DIAG_DISABLE_DEPRECATED() NX_PRAGMA(warning(disable: 4996))
+#elif defined(__clang__)
+    #define NX_DIAG_PUSH() NX_PRAGMA(clang diagnostic push)
+    #define NX_DIAG_POP()  NX_PRAGMA(clang diagnostic pop)
+    #define NX_DIAG_DISABLE_DEPRECATED() NX_PRAGMA(clang diagnostic ignored "-Wdeprecated-declarations")
+#elif defined(__GNUC__)
+    #define NX_DIAG_PUSH() NX_PRAGMA(GCC diagnostic push)
+    #define NX_DIAG_POP()  NX_PRAGMA(GCC diagnostic pop)
+    #define NX_DIAG_DISABLE_DEPRECATED() NX_PRAGMA(GCC diagnostic ignored "-Wdeprecated-declarations")
+#else
+    #define NX_DIAG_PUSH() ((void)0)
+    #define NX_DIAG_POP()  ((void)0)
+    #define NX_DIAG_DISABLE_DEPRECATED() ((void)0)
+#endif
+
+#define NX_SUPPRESS_DEPRECATED_BEGIN() \
+    NX_DIAG_PUSH(); \
+    NX_DIAG_DISABLE_DEPRECATED()
+
+#define NX_SUPPRESS_DEPRECATED_END() \
+    NX_DIAG_POP()

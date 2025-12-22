@@ -12,8 +12,6 @@ namespace nx::vms::client::core {
 class NX_VMS_CLIENT_CORE_API StandardItemModel: public QStandardItemModel
 {
     Q_OBJECT
-    Q_DECLARE_PRIVATE(QAbstractItemModel)
-
 public:
     virtual bool moveRows(const QModelIndex& sourceParent, int sourceRow, int count,
         const QModelIndex& destinationParent, int destinationChild) override;

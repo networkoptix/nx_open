@@ -317,7 +317,7 @@ wstring trimAndUnquote(std::wstring str)
     return str;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char** /*argv*/)
 {
     logfile.open(getTempPath() + L"nov_file_launcher.log", std::ofstream::out);
 

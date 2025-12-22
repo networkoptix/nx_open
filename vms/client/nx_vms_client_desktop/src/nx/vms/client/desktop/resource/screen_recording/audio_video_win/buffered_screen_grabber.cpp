@@ -14,8 +14,6 @@ namespace {
 #endif
 
     typedef DECLSPEC_IMPORT HRESULT (STDAPICALLTYPE *fn_DwmEnableComposition) (UINT uCompositionAction);
-    static fn_DwmEnableComposition DwmEnableComposition = 0;
-    static const int LOGO_CORNER_OFFSET = 8;
     static const int MAX_JITTER = 60;
 
 } //namespace

@@ -43,7 +43,7 @@ public slots:
     void startDevicePolling();
 
 private:
-    static bool enumerationCallback(LPCDIDEVICEINSTANCE deviceInstance, LPVOID workerPtr);
+    static BOOL CALLBACK enumerationCallback(LPCDIDEVICEINSTANCE deviceInstance, LPVOID workerPtr);
 
     void registerDevice(const OsWinApiDeviceWin::Device& device);
     void unregisterDeviceById(const QString& deviceId);

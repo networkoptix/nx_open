@@ -404,6 +404,8 @@ void ChunkProvider::handleLoadingChanged(Qn::TimePeriodContent contentType)
         case Qn::AnalyticsContent:
             emit loadingAnalyticsChanged();
             break;
+        default:
+            break;
     }
 }
 

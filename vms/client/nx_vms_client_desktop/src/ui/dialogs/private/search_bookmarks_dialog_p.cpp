@@ -267,8 +267,8 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(menu::Parameters &para
         if (!index.isValid())
             return QnCameraBookmark();
 
-        const auto bookmark =
-            m_model->data(index, nx::vms::client::core::CameraBookmarkRole).value<QnCameraBookmark>();
+        const auto data = m_model->data(index, nx::vms::client::core::CameraBookmarkRole);
+        const auto bookmark = data.value<QnCameraBookmark>();
         if (!bookmark.isValid())
             return QnCameraBookmark();
 

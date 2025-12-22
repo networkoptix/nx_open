@@ -39,7 +39,7 @@ void saveFileBookmark(NSString* path)
         return;
     }
 
-    NSLog(@"Data length: %d", data.length);
+    NSLog(@"Data length: %zu", (size_t) data.length);
     const auto prefs = [NSUserDefaults standardUserDefaults];
     const auto savedEntitlements = [prefs dictionaryForKey:@"directoryEntitlements"];
 
@@ -119,6 +119,8 @@ void enable_animations(void *);
 }
 
 id customWindowsToEnterFullScreenForWindow(id self, SEL _cmd, NSWindow *window) {
+    (void)self;
+    (void)_cmd;
     return [NSArray arrayWithObject:window];
 }
 

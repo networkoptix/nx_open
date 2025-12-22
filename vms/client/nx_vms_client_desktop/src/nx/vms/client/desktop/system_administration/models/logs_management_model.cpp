@@ -41,6 +41,7 @@ QVariant statusIcon(LogsManagementUnitPtr unit)
     using State = LogsManagementWatcher::Unit::DownloadState;
     switch (unit->state())
     {
+        case State::none:
         case State::pending:
         case State::loading:
             return {};
@@ -339,6 +340,7 @@ QString LogsManagementModel::logLevelTooltip(nx::log::Level level) const
 {
     switch (level)
     {
+        case nx::log::Level::notConfigured:
         case nx::log::Level::undefined:
             return {};
         case nx::log::Level::info:
@@ -349,6 +351,7 @@ QString LogsManagementModel::logLevelTooltip(nx::log::Level level) const
             return tr("Non-default Logging level. We recommend setting it to \"info\"");
         case nx::log::Level::debug:
         case nx::log::Level::verbose:
+        case nx::log::Level::trace:
             return tr("Logging level degrades performance");
     }
 

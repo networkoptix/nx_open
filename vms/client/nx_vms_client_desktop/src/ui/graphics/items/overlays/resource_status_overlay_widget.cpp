@@ -439,6 +439,8 @@ bool QnStatusOverlayWidget::eventFilter(QObject* obj, QEvent* event)
                 m_hovered = false;
                 updateTooltip();
                 break;
+            default:
+                break;
         }
     }
     return base_type::eventFilter(obj, event);

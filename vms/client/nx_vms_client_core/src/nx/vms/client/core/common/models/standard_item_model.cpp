@@ -23,7 +23,7 @@ bool StandardItemModel::moveRows(const QModelIndex& sourceParent, int sourceRow,
         destinationChild -= count;
 
     // Preserve persistent indices: they mustn't suffer from row removal and re-insertion.
-    Q_D(QAbstractItemModel);
+    auto* d = (::QAbstractItemModelPrivate*) QAbstractItemModel::d_ptr.data();
     const auto savedPersistentIndexes = d->persistent.indexes;
     d->persistent.indexes.clear();
 

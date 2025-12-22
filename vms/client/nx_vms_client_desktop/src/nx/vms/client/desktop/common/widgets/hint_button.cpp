@@ -74,7 +74,9 @@ HintButton* HintButton::createHeaderViewHint(QHeaderView* headerView, int sectio
         return nullptr;
 
     const auto model = headerView->model();
-    if (!NX_ASSERT(model || (section < 0) || section >= model->columnCount()))
+    if (!NX_ASSERT(model))
+        return nullptr;
+    if (!NX_ASSERT(section >= 0 && section < model->columnCount()))
         return nullptr;
 
     const auto hintButton = new HintButton(headerView);

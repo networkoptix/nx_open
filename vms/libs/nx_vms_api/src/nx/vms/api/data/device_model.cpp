@@ -406,7 +406,7 @@ std::vector<Model> fromCameras(std::vector<CameraData> cameras)
         std::back_inserter(result),
         [](CameraData data) -> Model
         {
-            return {{DeviceModelGeneral::fromCameraData(std::move(data))}};
+            return Model{{{DeviceModelGeneral::fromCameraData(std::move(data))}}};
         });
 
     return result;

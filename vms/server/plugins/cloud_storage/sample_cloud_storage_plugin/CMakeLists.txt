@@ -2,13 +2,11 @@
 
 # Used in Combined Plugin.
 nx_add_target(sample_cloud_storage_plugin_integration LIBRARY LIBRARY_TYPE STATIC NO_MOC
-    NO_WERROR
     PUBLIC_LIBS nx_sdk
     FOLDER server/libs
 )
 
 nx_add_server_plugin(sample_cloud_storage_plugin NO_MOC OPTIONAL
-    NO_WERROR
     SOURCE_DIR "plugin"
     PRIVATE_LIBS sample_cloud_storage_plugin_integration
 )

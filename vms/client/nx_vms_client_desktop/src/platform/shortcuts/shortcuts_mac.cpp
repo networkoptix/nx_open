@@ -58,19 +58,19 @@ bool QnMacShortcuts::createShortcut(
     return true;
 }
 
-bool QnMacShortcuts::deleteShortcut(const QString& destinationPath, const QString& name) const
+bool QnMacShortcuts::deleteShortcut(const QString& /*destinationPath*/, const QString& /*name*/) const
 {
     return true;
 }
 
-bool QnMacShortcuts::shortcutExists(const QString& destinationPath, const QString& name) const
+bool QnMacShortcuts::shortcutExists(const QString& /*destinationPath*/, const QString& /*name*/) const
 {
     return false;
 }
 
 QnPlatformShortcuts::ShortcutInfo QnMacShortcuts::getShortcutInfo(
-    const QString& destinationPath,
-    const QString& name) const
+    const QString& /*destinationPath*/,
+    const QString& /*name*/) const
 {
     return {};
 }

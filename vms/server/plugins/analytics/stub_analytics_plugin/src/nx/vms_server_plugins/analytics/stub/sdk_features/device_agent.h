@@ -29,9 +29,6 @@ public:
 
 protected:
     virtual std::string manifestString() const override;
-
-private:
-    Engine* const m_engine;
 };
 
 } // namespace sdk_features

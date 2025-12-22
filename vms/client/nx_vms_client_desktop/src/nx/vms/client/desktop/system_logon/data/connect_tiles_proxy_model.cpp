@@ -69,7 +69,7 @@ void ConnectTilesProxyModel::setSourceModel(QAbstractItemModel* sourceModel)
     {
         d->visibilityModel = dynamic_cast<SystemsVisibilitySortFilterModel*>(sourceModel);
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         NX_CRITICAL(false, "No models except SystemsVisibilitySortFilterModel are supported.");
     }
@@ -232,6 +232,11 @@ QVariant ConnectTilesProxyModel::data(const QModelIndex& index, int role) const
                     ? TileVisibilityScope::HiddenTileVisibilityScope
                     : TileVisibilityScope::DefaultTileVisibilityScope);
             }
+            else if (d->connectTileEnabled && isLastIndex(index))
+            {
+                return QVariant::fromValue(TileVisibilityScope::DefaultTileVisibilityScope);
+            }
+            break;
         }
         default:
         {

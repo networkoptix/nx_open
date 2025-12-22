@@ -275,8 +275,9 @@ bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode error)
         case RemoteConnectionErrorCode::internalError:
         case RemoteConnectionErrorCode::networkContentError:
             return true;
+        default:
+            return false;
     }
-    return false;
 }
 
 void RemoteSession::establishConnection(RemoteConnectionPtr connection)

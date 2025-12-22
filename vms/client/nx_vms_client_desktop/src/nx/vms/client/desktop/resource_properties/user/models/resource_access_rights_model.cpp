@@ -589,7 +589,7 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
     std::sort(videoWalls.begin(), videoWalls.end(), collator);
 
     const auto makeDescription =
-        [this](const QString& single, const QString& plural, QStringList list) -> QString
+        [](const QString& single, const QString& plural, QStringList list) -> QString
         {
             return list.size() == 1
                 ? nx::format(single, html::bold(list.front()))

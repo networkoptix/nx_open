@@ -1099,12 +1099,10 @@ public:
             case Qt::ToolTipRole:
                 if (mapToSource(index).data(MembersModel::IsLdap).toBool())
                     return tr("LDAP group membership is managed on LDAP server");
-
+                [[fallthrough]];
             default:
                 return mapToSource(index).data(role);
         }
-
-        return {};
     }
 
     bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override

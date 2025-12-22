@@ -47,7 +47,6 @@ namespace rpi_cam
     private:
         std::weak_ptr<RPiCamera> m_camera;
         unsigned m_encoderNumber;
-        unsigned m_bitrateKbps;
     };
 }
 

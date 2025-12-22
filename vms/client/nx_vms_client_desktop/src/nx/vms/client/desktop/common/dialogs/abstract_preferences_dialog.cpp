@@ -208,6 +208,8 @@ void AbstractPreferencesDialog::initializeButtonBox()
             case QDialogButtonBox::ButtonRole::RejectRole:
                 m_cancelButton = button;
                 break;
+            default:
+                break;
         }
     }
 

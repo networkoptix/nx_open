@@ -161,7 +161,6 @@ if(NOT EXISTS ${customization_resources_dir})
 endif()
 
 set(target_args
-    NO_WERROR
     ROOT_FOLDER
     ADDITIONAL_SOURCES
         ${ios_sources}

@@ -22,9 +22,9 @@ struct DefaultPasswordCamerasWatcher::Private
             case nx::vms::api::ResourceStatus::online:
             case nx::vms::api::ResourceStatus::recording:
                 return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
     void handleCameraChanged(const QnVirtualCameraResourcePtr& camera)
@@ -82,9 +82,9 @@ void DefaultPasswordCamerasWatcher::handleResourceAdded(const QnResourcePtr& res
         return;
 
     auto handleCameraChanged =
-        [this, camera](const QnResourcePtr& resource)
+        [this](const QnResourcePtr& resource)
         {
-            d->handleCameraChanged(camera);
+            d->handleCameraChanged(resource.dynamicCast<QnVirtualCameraResource>());
         };
 
     connect(camera.get(), &QnVirtualCameraResource::statusChanged, this, handleCameraChanged);

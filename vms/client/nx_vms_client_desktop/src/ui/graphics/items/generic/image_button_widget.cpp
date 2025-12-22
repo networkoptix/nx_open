@@ -39,7 +39,7 @@ namespace {
     {
         bool result = true;
 
-        if (*flags < 0 || *flags > QnImageButtonWidget::MaxState)
+        if (*flags > QnImageButtonWidget::MaxState)
         {
             NX_ASSERT(false, "Invalid pixmap flags '%1'.", static_cast<int>(*flags));
             *flags = {};

@@ -45,7 +45,7 @@ protected:
     virtual AxisLimits parseAxisLimits(
         const AxisDescriptor& descriptor,
         const AxisLimits& oldLimits) const override;
-    static bool enumObjectsCallback(LPCDIDEVICEOBJECTINSTANCE deviceObject, LPVOID devicePtr);
+    static BOOL CALLBACK enumObjectsCallback(LPCDIDEVICEOBJECTINSTANCE deviceObject, LPVOID devicePtr);
     static void formAxisLimits(int min, int max, Device::AxisLimits* limits);
 
 private:

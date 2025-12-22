@@ -215,7 +215,7 @@ struct AnalyticsLoaderDelegate::Private
             QList<ObjectData> perObjectData;
             if (duration < minimumStackDuration)
             {
-                for (const auto track: nx::utils::reverseRange(result))
+                for (const auto& track: nx::utils::reverseRange(result))
                 {
                     const auto position = duration_cast<milliseconds>(microseconds(
                         track.firstAppearanceTimeUs));

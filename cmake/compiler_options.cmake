@@ -271,10 +271,6 @@ if(compilerMsvc)
         # Supress the following warnigns due to a lot of false positives or big amount of refactor
         # needed to eliminate them.
 
-        # Unreferenced formal parameter.
-        # Suppressed as it produces a lot of false positives in variadic template functions.
-        /wd4100
-
         # Unreachable code.
         # Suppressed as it produces a lot of false positives in template functions.
         /wd4702
@@ -307,6 +303,9 @@ if(compilerMsvc)
         # Structure was padded due to alignment specifier.
         /wd4324
 
+        # Inherits via dominance.
+        /wd4250
+
         # -----------------------------------------------------------------------------------------
         # Treat the following warnigns as errors.
 
@@ -338,6 +337,10 @@ if(compilerMsvc)
         # Inconsistent dll linkage. Most often caused by the double function implementation.
         /we4273
     )
+
+    # Ignore PDB was not found
+    add_link_options(/IGNORE:4099)
+
     add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
     add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
 
@@ -493,7 +496,6 @@ if(NOT compilerMsvc)
             # TODO: #tszelei Replace with -Wno-missing-designated-field-initializers when that flag
             # becomes available. See: VMS-55191.
             -Wno-missing-field-initializers
-            -Wno-error=unused-private-field
         )
     endif()
 endif()

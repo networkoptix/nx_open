@@ -133,6 +133,8 @@ bool HelpHandler::eventFilter(QObject* watched, QEvent* event)
 
                 return false;
             }
+            default:
+                break;
         }
     }
 

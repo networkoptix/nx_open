@@ -126,6 +126,8 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
         case Mode::unitTests:
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
             break;
+        case Mode::server:
+            break;
     }
 
     connect(this, &SystemContext::userChanged, this,

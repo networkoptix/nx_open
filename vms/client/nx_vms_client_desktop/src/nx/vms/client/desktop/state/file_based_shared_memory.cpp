@@ -108,6 +108,7 @@ struct FileBasedSharedMemory::Private
             return;
 
         #if defined(Q_OS_WIN)
+        {
             OVERLAPPED overlapped = {};
 
             const BOOL success = LockFileEx(
@@ -117,17 +118,19 @@ struct FileBasedSharedMemory::Private
                 /* nNumberOfBytesToLockLow */ kSharedDataSize,
                 /* nNumberOfBytesToLockHigh */ 0,
                 &overlapped);
+            NX_ASSERT(success);
+        }
         #else
+        {
             struct flock desc = {};
             desc.l_type = F_WRLCK;
             desc.l_whence = SEEK_SET;
             desc.l_start = 0;
             desc.l_len = kSharedDataSize;
-
             const bool success = (fcntl(sharedFile.handle(), F_SETLKW, &desc) == 0);
+            NX_ASSERT(success);
+        }
         #endif
-
-        NX_ASSERT(success);
     }
 
     void unlock()
@@ -135,24 +138,24 @@ struct FileBasedSharedMemory::Private
         if (!NX_ASSERT(sharedFile.isOpen()))
             return;
 
-        #if defined(Q_OS_WIN)
-            OVERLAPPED overlapped = {};
+#if defined(Q_OS_WIN)
+        OVERLAPPED overlapped = {};
 
-            const BOOL success = UnlockFileEx(
-                (HANDLE) _get_osfhandle(sharedFile.handle()),
-                /* dwReserved */ 0,
-                /* nNumberOfBytesToUnlockLow */ kSharedDataSize,
-                /* nNumberOfBytesToUnlockHigh */ 0,
-                &overlapped);
-        #else
-            struct flock desc = {};
-            desc.l_type = F_UNLCK;
-            desc.l_whence = SEEK_SET;
-            desc.l_start = 0;
-            desc.l_len = kSharedDataSize;
+        const BOOL success = UnlockFileEx(
+            (HANDLE) _get_osfhandle(sharedFile.handle()),
+            /* dwReserved */ 0,
+            /* nNumberOfBytesToUnlockLow */ kSharedDataSize,
+            /* nNumberOfBytesToUnlockHigh */ 0,
+            &overlapped);
+#else
+        struct flock desc = {};
+        desc.l_type = F_UNLCK;
+        desc.l_whence = SEEK_SET;
+        desc.l_start = 0;
+        desc.l_len = kSharedDataSize;
 
-            const bool success = (fcntl(sharedFile.handle(), F_SETLKW, &desc) == 0);
-        #endif
+        const bool success = (fcntl(sharedFile.handle(), F_SETLKW, &desc) == 0);
+#endif
 
         NX_ASSERT(success);
     }

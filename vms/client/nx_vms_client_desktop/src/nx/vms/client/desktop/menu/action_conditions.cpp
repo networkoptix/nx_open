@@ -1142,7 +1142,7 @@ ActionVisibility CreateZoomWindowCondition::check(const QnResourceWidgetList& wi
     return EnabledAction;
 }
 
-ActionVisibility NewUserLayoutCondition::check(const Parameters& parameters, WindowContext* context)
+ActionVisibility NewUserLayoutCondition::check(const Parameters& parameters, WindowContext* /*context*/)
 {
     using namespace nx::vms::client::core;
 

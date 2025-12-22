@@ -273,11 +273,13 @@ bool verifyUpdateContents(
                     contents.unsuportedSystemsReport.insert(
                         clientData.clientId,
                         UpdateStrings::getReportForUnsupportedOs(clientData.osInfo));
+                    break;
                 }
                 case update::FindPackageError::notFound:
                 {
                     NX_ERROR(logTag, "Update package is missing for %1", clientData.osInfo);
                     contents.missingUpdate.insert(clientData.clientId);
+                    break;
                 }
             }
         }

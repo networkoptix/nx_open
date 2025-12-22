@@ -22,11 +22,12 @@ static inline void throwIfFailedWithLocation(
     if (FAILED(hr))
     {
         throw std::runtime_error(
-            nx::format("Failed with HRESULT=0x%1 (%2) %3 at %4:%5",
+            nx::format("Failed with HRESULT=0x%1 (%2) %3 at %4(%5):%6",
                 QString::number((uint32_t) hr, 16),
                 std::system_category().message(hr),
                 text,
                 file,
+                func,
                 line).toStdString());
     }
 }

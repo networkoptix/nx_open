@@ -39,7 +39,10 @@ public:
         setOpacity(0.0);
     }
 
-    void paint(QPainter* painter)
+    virtual void paint(
+        QPainter* painter,
+        const QStyleOptionGraphicsItem* /*option*/,
+        QWidget* /*widget*/) override
     {
         const auto ratio = qApp->devicePixelRatio();
         if (q->m_size.isEmpty() || qFuzzyEquals(opacity(), 0.0) )
@@ -139,9 +142,9 @@ RewindWidget::~RewindWidget()
 }
 
 void RewindWidget::paint(
-    QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
+    QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-    m_background->paint(painter);
+    m_background->paint(painter, option, widget);
 }
 
 void RewindWidget::tick(int deltaMs)

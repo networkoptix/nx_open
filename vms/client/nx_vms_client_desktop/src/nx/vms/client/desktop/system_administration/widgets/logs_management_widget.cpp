@@ -399,16 +399,14 @@ void LogsManagementWidget::updateWidgets(LogsManagementWatcher::State state)
     bool downloadStarted = false;
     bool downloadFinished = false;
     int errorsCount = 0;
-    bool hasLocalErrors = false;
 
     switch (state)
     {
         case LogsManagementWatcher::State::hasLocalErrors:
-            hasLocalErrors = true;
             [[fallthrough]];
 
         case LogsManagementWatcher::State::hasErrors:
-            errorsCount = m_watcher->itemsWithErrors().count();;
+            errorsCount = m_watcher->itemsWithErrors().count();
             [[fallthrough]];
 
         case LogsManagementWatcher::State::finished:

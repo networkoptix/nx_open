@@ -41,7 +41,7 @@ void TableNodeViewModel::setHeaderDataProvider(HeaderDataProvider&& provider)
     m_headerDataProvider = provider;
 
     if (const int count = columnCount())
-        emit headerDataChanged(Qt::Horizontal, 0, columnCount() - 1);
+        emit headerDataChanged(Qt::Horizontal, 0, count - 1);
 
     if (const int count = rowCount())
         emit headerDataChanged(Qt::Vertical, 0, count - 1);

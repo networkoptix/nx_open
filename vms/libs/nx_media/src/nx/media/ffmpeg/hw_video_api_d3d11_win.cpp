@@ -340,7 +340,7 @@ public:
         av_frame_unref(m_frame);
     }
 
-    virtual MapData map(QVideoFrame::MapMode mode) override
+    virtual MapData map(QVideoFrame::MapMode /*mode*/) override
     {
         return {};
     }

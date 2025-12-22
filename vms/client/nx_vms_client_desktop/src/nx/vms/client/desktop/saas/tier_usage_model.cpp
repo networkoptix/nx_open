@@ -180,7 +180,7 @@ QVariant TierUsageModel::headerData(
     return base_type::headerData(section, orientation, role);
 }
 
-void TierUsageModel::setResourcesChangesTracking(SystemContext* systemContext, bool enabled)
+void TierUsageModel::setResourcesChangesTracking(SystemContext* /*systemContext*/, bool enabled)
 {
     if (enabled)
         d->timer->start();

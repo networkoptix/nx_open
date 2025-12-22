@@ -94,7 +94,6 @@ if(LINUX)
 endif()
 
 nx_add_target(nx_vms_client_desktop LIBRARY
-    NO_WERROR
     ADDITIONAL_SOURCES
         ${uic_files}
         ${mac_sources}
@@ -146,6 +145,10 @@ nx_add_target(nx_vms_client_desktop LIBRARY
 )
 nx_make_target_translatable(nx_vms_client_desktop COMPONENTS "client")
 add_dependencies(nx_vms_client_desktop nx_vms_client_desktop_external_resources)
+
+if(compilerClangCl)
+    target_compile_options(nx_vms_client_desktop PRIVATE -Wno-comment)
+endif()
 
 file(GLOB_RECURSE shader_sources CONFIGURE_DEPENDS
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}

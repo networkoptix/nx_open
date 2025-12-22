@@ -38,7 +38,7 @@ struct BookmarkLoaderDelegate::Private
     const int maxBookmarksPerBucket;
 
     static void handleLoadingFinished(
-        core::SystemContext* systemContext,
+        core::SystemContext* /*systemContext*/,
         QPromise<MultiObjectData>& promise,
         const QnTimePeriod& period,
         milliseconds minimumStackDuration,
@@ -47,7 +47,7 @@ struct BookmarkLoaderDelegate::Private
         QnCameraBookmarkList&& result)
     {
         QnTimePeriodList chunks;
-        if (result.size() > limit)
+        if ((int) result.size() > limit)
         {
             // If there are more than `limit` bookmarks, make one chunk covering the entire bucket.
             chunks.push_back(period);

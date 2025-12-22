@@ -334,6 +334,8 @@ void MessageBus::updateOutgoingConnection(
             (*connection)->sendTransaction(transaction, MessageType::pushTransactionData,
                 m_ubjsonTranSerializer->serializedTransactionWithoutHeader(transaction));
             break;
+        default:
+            NX_ASSERT(false); //< Not supported.
     }
 }
 
@@ -1683,16 +1685,6 @@ bool MessageBus::validateRemotePeerData(const vms::api::PeerDataEx& /*remotePeer
     return true;
 }
 
-template <>
-void MessageBus::sendTransaction(const ec2::QnTransaction<vms::api::RuntimeData>& tran)
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    vms::api::PersistentIdData peerId(tran.params.peer);
-    m_lastRuntimeInfo[peerId] = tran.params;
-    for (const auto& connection: m_connections)
-        sendTransactionImpl(connection, tran, TransportHeader());
-}
-
 template<class T>
 void MessageBus::proxyTransaction(const ec2::QnTransaction<T>& tran, const TransportHeader& header)
 {
@@ -1713,6 +1705,11 @@ template<class T>
 void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
+    if constexpr (std::is_same_v<T, vms::api::RuntimeData>)
+    {
+        vms::api::PersistentIdData peerId(tran.params.peer);
+        m_lastRuntimeInfo[peerId] = tran.params;
+    }
     for (const auto& connection: m_connections)
         sendTransactionImpl(connection, tran, TransportHeader());
 }

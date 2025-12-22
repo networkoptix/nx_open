@@ -87,7 +87,7 @@ QVariant FakeResourceListModel::data(const QModelIndex& index, int role) const
     return QVariant();
 }
 
-int FakeResourceListModel::columnCount(const QModelIndex& parent) const
+int FakeResourceListModel::columnCount(const QModelIndex& /*parent*/) const
 {
     return Columns::count;
 }

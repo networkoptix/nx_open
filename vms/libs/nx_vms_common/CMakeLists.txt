@@ -50,6 +50,11 @@ nx_add_target(nx_vms_common LIBRARY
 )
 nx_make_target_translatable(nx_vms_common COMPONENTS "client" "server" "mobile")
 
+if(compilerMsvc)
+    # ignore PDB was not found
+    target_link_options(nx_vms_common PRIVATE "/IGNORE:4099")
+endif()
+
 target_compile_definitions(nx_vms_common
     PRIVATE
         NX_VMS_COMMON_API=${API_EXPORT_MACRO}

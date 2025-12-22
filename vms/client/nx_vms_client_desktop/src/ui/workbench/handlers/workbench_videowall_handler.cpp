@@ -2967,8 +2967,8 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode(QnWor
         sendMessage(message, /*cached*/ true);
     }
 
-    const auto itemDewarpingData = item->data(Qn::ItemImageDewarpingRole)
-        .value<nx::vms::api::dewarping::ViewData>();
+    const auto data = item->data(Qn::ItemImageDewarpingRole);
+    const auto itemDewarpingData = data.value<nx::vms::api::dewarping::ViewData>();
     if (itemDewarpingData.enabled)
     {
         QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemDataChanged);

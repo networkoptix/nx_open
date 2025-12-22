@@ -3,11 +3,11 @@
 #pragma once
 
 #include <limits>
+#include <deque>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QPair>
 #include <QtCore/QtMath>
-#include <QtCore5Compat/QLinkedList>
 
 namespace nx::vms::client::core {
 namespace animation {
@@ -83,7 +83,7 @@ public:
     void start(T startValue)
     {
         stop();
-        m_moves.append(Move(startValue, 0));
+        m_moves.push_back(Move(startValue, 0));
         m_value = startValue;
         m_timer.start();
         m_state = Measuring;
@@ -94,10 +94,10 @@ public:
         if (m_state != Measuring)
             return;
 
-        m_moves.append(Move(targetValue, m_timer.elapsed()));
+        m_moves.push_back(Move(targetValue, m_timer.elapsed()));
         m_value = targetValue;
         if (m_moves.size() > maxMoves)
-            m_moves.removeFirst();
+            m_moves.pop_front();
     }
 
     void finish(T targetValue, int fakeTimeShift = 0)
@@ -105,10 +105,10 @@ public:
         if (m_state != Measuring)
             return;
 
-        m_moves.append(Move(targetValue, m_timer.elapsed() + fakeTimeShift));
+        m_moves.push_back(Move(targetValue, m_timer.elapsed() + fakeTimeShift));
 
-        const T sum = m_moves.last().first - m_moves.first().first;
-        const qreal time = m_moves.last().second - m_moves.first().second;
+        const T sum = m_moves.rbegin()->first - m_moves.begin()->first;
+        const qreal time = m_moves.rbegin()->second - m_moves.begin()->second;
 
         if (qFuzzyIsNull(time))
         {
@@ -197,7 +197,7 @@ private:
     typedef QPair<T, int> Move;
 
     QElapsedTimer m_timer;
-    QLinkedList<Move> m_moves;
+    std::deque<Move> m_moves;
     T m_startValue = T();
     T m_value = T();
     qreal m_startSpeed = 0.0;

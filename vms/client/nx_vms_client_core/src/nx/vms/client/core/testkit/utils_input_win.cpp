@@ -226,9 +226,9 @@ void callSendMouse(
 
 Q_INVOKABLE Qt::KeyboardModifiers sendKeys(
     QString keys,
-    QObject* receiver,
+    QObject* /*receiver*/,
     KeyOption option,
-    Qt::KeyboardModifiers modifiers)
+    Qt::KeyboardModifiers /*modifiers*/)
 {
     qGuiApp->focusWindow();
 
@@ -247,7 +247,7 @@ Q_INVOKABLE Qt::KeyboardModifiers sendKeys(
                 continue;
             }
         }
-        sendKey(keys.mid(i, 1));
+        sendKey(keys.at(i));
     }
     return Qt::NoModifier;
 }
@@ -256,13 +256,13 @@ Qt::MouseButtons sendMouse(
     QPoint screenPos,
     QString eventType,
     Qt::MouseButton button,
-    Qt::MouseButtons buttons,
+    Qt::MouseButtons /*buttons*/,
     Qt::KeyboardModifiers modifiers,
-    QWindow* windowHandle,
-    bool nativeSetPos,
-    QPoint pixelDelta,
-    QPoint angleDelta,
-    bool inverted,
+    QWindow* /*windowHandle*/,
+    bool /*nativeSetPos*/,
+    QPoint /*pixelDelta*/,
+    QPoint /*angleDelta*/,
+    bool /*inverted*/,
     int scrollDelta)
 {
     QString keyModifier;

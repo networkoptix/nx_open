@@ -442,6 +442,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                     return toHtmlEscaped(data(index, Qt::DisplayRole).toString(),
                         common::html::EscapeMethod::preWrap);
             }
+            break; //< Nested break could jump here. Outer break is required as well.
         }
 
         case core::DecorationPathRole:

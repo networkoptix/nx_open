@@ -96,7 +96,7 @@ void OsWinApiDriver::Worker::enumerateDevices()
     // This is a blocking system call.
     HRESULT status = directInput->EnumDevices(
         DI8DEVCLASS_GAMECTRL,
-        (LPDIENUMDEVICESCALLBACK) &Worker::enumerationCallback,
+        &Worker::enumerationCallback,
         this,
         DIEDFL_ATTACHEDONLY);
 
@@ -156,7 +156,7 @@ void OsWinApiDriver::Worker::enumerateDevices()
     NX_TRACE(this, "Enumeration finished");
 }
 
-bool OsWinApiDriver::Worker::enumerationCallback(
+BOOL CALLBACK OsWinApiDriver::Worker::enumerationCallback(
     LPCDIDEVICEINSTANCE deviceInstance,
     LPVOID workerPtr)
 {

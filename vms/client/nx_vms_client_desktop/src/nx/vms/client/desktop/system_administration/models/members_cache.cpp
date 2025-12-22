@@ -324,6 +324,7 @@ void MembersCache::updateStats(const QSet<nx::Uuid>& added, const QSet<nx::Uuid>
             statsModified = true;
             switch (group->type)
             {
+                case api::UserType::temporaryLocal:
                 case api::UserType::local:
                     m_stats.localGroups += diff;
                     break;

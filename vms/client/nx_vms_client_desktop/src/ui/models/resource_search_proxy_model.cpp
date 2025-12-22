@@ -161,9 +161,9 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     }
 
     if (auto resource = index.data(ResourceRole).value<QnResourcePtr>())
-        return isResourceMatchesQuery(resource, m_query);
+        return isResourceMatchesQuery(resource);
     else if (!searchGroupNodes.contains(nodeType))
-        return isRepresentationMatchesQuery(index, m_query);
+        return isRepresentationMatchesQuery(index);
 
     return false;
 }
@@ -227,8 +227,7 @@ bool QnResourceSearchProxyModel::isRejectedNodeType(
     }
 }
 
-bool QnResourceSearchProxyModel::isResourceMatchesQuery(QnResourcePtr resource,
-    const QnResourceSearchQuery& query) const
+bool QnResourceSearchProxyModel::isResourceMatchesQuery(QnResourcePtr resource) const
 {
     // Simply filter by text first.
     // Show everything that's allowed if nothing entered into search query text input.
@@ -246,8 +245,7 @@ bool QnResourceSearchProxyModel::isResourceMatchesQuery(QnResourcePtr resource,
     return resource->hasFlags(m_query.flags);
 }
 
-bool QnResourceSearchProxyModel::isRepresentationMatchesQuery(const QModelIndex& index,
-    const QnResourceSearchQuery& query) const
+bool QnResourceSearchProxyModel::isRepresentationMatchesQuery(const QModelIndex& index) const
 {
     return index.data(Qt::DisplayRole).toString().contains(m_query.text, Qt::CaseInsensitive);
 }

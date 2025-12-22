@@ -45,7 +45,7 @@ private:
         LPDIRECTINPUTDEVICE8 directInputDeviceObject);
     std::pair<QString, QString> getDeviceModelAndGuid(LPDIRECTINPUTDEVICE8 inputDevice) const;
 
-    static bool enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPVOID managerPtr);
+    static BOOL CALLBACK enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPVOID managerPtr);
 
     void onDeviceFailed(const QString& path);
 

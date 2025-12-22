@@ -480,7 +480,7 @@ void initialize(Manager* manager, Action* root)
         .checkable()
         .checked(false) //< This action will be kept in unchecked state.
         .condition(condition::isLoggedIn()
-            && condition::treeNodeType({ResourceTree::NodeType::camerasAndDevices})
+            && condition::treeNodeType(ResourceTree::NodeType::camerasAndDevices)
             && condition::allowedToShowServersInResourceTree());
 
     factory(HideServersInTreeAction)

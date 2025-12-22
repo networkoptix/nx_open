@@ -144,7 +144,7 @@ void ResourceNodeViewItemDelegate::paintItemText(
 void ResourceNodeViewItemDelegate::paintItemIcon(
     QPainter* painter,
     const QStyleOptionViewItem& option,
-    const QModelIndex& index,
+    const QModelIndex& /*index*/,
     QIcon::Mode mode) const
 {
     if (!option.features.testFlag(QStyleOptionViewItem::HasDecoration))

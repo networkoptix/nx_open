@@ -83,9 +83,8 @@ protected:
 private:
     bool isAcceptedIndex(QModelIndex index, NodeType allowedNode) const;
     bool isRejectedNodeType(NodeType nodeType, NodeType allowedNodeType) const;
-    bool isResourceMatchesQuery(QnResourcePtr resource, const QnResourceSearchQuery& query) const;
-    bool isRepresentationMatchesQuery(const QModelIndex& index,
-        const QnResourceSearchQuery& query) const;
+    bool isResourceMatchesQuery(QnResourcePtr resource) const;
+    bool isRepresentationMatchesQuery(const QModelIndex& index) const;
 
 private:
     QnResourceSearchQuery m_query;

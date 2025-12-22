@@ -41,7 +41,12 @@ nx::Uuid specialResourceGroupId(SpecialResourceGroup group)
     }();
 
     const auto it = reverseLookup.find(group);
-    return NX_ASSERT(it != reverseLookup.end()) ? it->second : nx::Uuid();
+    if (it == reverseLookup.end())
+    {
+        NX_ASSERT(false, nx::format("Group %1 missing in kSpecialResourceGroupIds", group));
+        return nx::Uuid();
+    }
+    return it->second;
 }
 
 void PrintTo(GlobalPermission value, std::ostream* os)

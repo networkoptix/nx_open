@@ -58,6 +58,7 @@ public:
     QLayoutItem* takeAt(int index) override;
     int count() const override;
 
+    using QLayout::setSpacing;
     void setSpacing(int horizontal, int vertical);
     int horizontalSpacing() const;
     int verticalSpacing() const;

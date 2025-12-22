@@ -181,7 +181,7 @@ void ManagerWindows::enumerateDevices()
 
     HRESULT status = d->directInput->EnumDevices(
         DI8DEVCLASS_GAMECTRL,
-        (LPDIENUMDEVICESCALLBACK)&ManagerWindows::enumDevicesCallback,
+        &ManagerWindows::enumDevicesCallback,
         this,
         DIEDFL_ATTACHEDONLY);
 
@@ -255,7 +255,7 @@ std::pair<QString, QString> ManagerWindows::getDeviceModelAndGuid(
     return {modelName, guid};
 }
 
-bool ManagerWindows::enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPVOID managerPtr)
+BOOL CALLBACK ManagerWindows::enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPVOID managerPtr)
 {
     if (!deviceInstance)
         return DIENUM_STOP;

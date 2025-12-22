@@ -958,7 +958,7 @@ void MainWindow::at_fileOpenSignalizer_activated(QObject*, QEvent* event)
 
 #ifdef Q_OS_WIN
 
-bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, qintptr* result)
+bool MainWindow::nativeEvent(const QByteArray& /*eventType*/, void* message, qintptr* result)
 {
     const auto msg = static_cast<MSG*>(message);
     const auto isMinimized =

@@ -30,10 +30,17 @@ QVariant HealthMonitorResourceItemDecorator::data(int role) const
         const auto flags = m_sourceItem->data(core::ResourceFlagsRole).value<Qn::ResourceFlags>();
         if (flags.testFlag(Qn::server))
         {
+#if 0
             auto iconKey = static_cast<ResourceIconCache::Key>(m_sourceItem->data(role).toInt());
-            iconKey &= !ResourceIconCache::TypeMask;
+            iconKey &= ~ResourceIconCache::TypeMask;
             iconKey |= ResourceIconCache::HealthMonitor;
             return QVariant::fromValue<int>(iconKey);
+#else
+            // Temporary restore old seems invalid behaviour, to check wheter UI tests can pass
+            // Line `iconKey &= !ResourceIconCache::TypeMask` always produced zero result before, so this version is equal to the previous one.
+            auto iconKey = ResourceIconCache::HealthMonitor;
+            return QVariant::fromValue<int>(iconKey);
+#endif
         }
     }
 

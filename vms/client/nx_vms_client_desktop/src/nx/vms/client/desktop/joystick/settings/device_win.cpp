@@ -27,7 +27,7 @@ DeviceWindows::DeviceWindows(
     updateStickAxisLimits(modelInfo);
 
     HRESULT status = m_inputDevice->EnumObjects(
-        (LPDIENUMDEVICEOBJECTSCALLBACK)&DeviceWindows::enumObjectsCallback,
+        &DeviceWindows::enumObjectsCallback,
         this,
         DIDFT_ALL);
 
@@ -76,7 +76,7 @@ Device::State DeviceWindows::getNewState()
     };
 
     ButtonStates newButtonStates = m_buttonStates;
-    for (int i = 0; i < std::min(newButtonStates.size(), sizeof(state.rgbButtons)); ++i)
+    for (std::size_t i = 0; i < std::min<std::size_t>(newButtonStates.size(), sizeof(state.rgbButtons)); ++i)
         newButtonStates[i] = state.rgbButtons[i];
 
     return {newStickPosition, newButtonStates};
@@ -98,7 +98,7 @@ Device::AxisLimits DeviceWindows::parseAxisLimits(
     return result;
 }
 
-bool DeviceWindows::enumObjectsCallback(LPCDIDEVICEOBJECTINSTANCE deviceObject, LPVOID devicePtr)
+BOOL CALLBACK DeviceWindows::enumObjectsCallback(LPCDIDEVICEOBJECTINSTANCE deviceObject, LPVOID devicePtr)
 {
     auto device = reinterpret_cast<DeviceWindows*>(devicePtr);
 

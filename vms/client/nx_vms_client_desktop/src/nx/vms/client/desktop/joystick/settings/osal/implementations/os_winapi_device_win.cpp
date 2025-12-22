@@ -48,7 +48,7 @@ OsWinApiDeviceWin::OsWinApiDeviceWin(const Device& device, QTimer* pollingTimer)
         return;
 
     HRESULT status = d->device.inputDevice->EnumObjects(
-        (LPDIENUMDEVICEOBJECTSCALLBACK)&OsWinApiDeviceWin::enumerateObjectsCallback,
+        &OsWinApiDeviceWin::enumerateObjectsCallback,
         this,
         DIDFT_ALL);
 
@@ -126,13 +126,13 @@ void OsWinApiDeviceWin::poll()
     state.y = hwState.lY;
     state.z = hwState.lZ;
 
-    for (int i = 0; i < std::min((size_t)d->buttonsNumber, sizeof(hwState.rgbButtons)); i++)
+    for (size_t i = 0; i < std::min((size_t)d->buttonsNumber, sizeof(hwState.rgbButtons)); i++)
         state.buttons[i] = hwState.rgbButtons[i];
 
     emit stateChanged(state);
 }
 
-bool OsWinApiDeviceWin::enumerateObjectsCallback(
+BOOL CALLBACK OsWinApiDeviceWin::enumerateObjectsCallback(
     LPCDIDEVICEOBJECTINSTANCE deviceObject,
     LPVOID devicePtr)
 {

@@ -31,7 +31,7 @@ public:
 
 protected:
     void poll();
-    static bool enumerateObjectsCallback(LPCDIDEVICEOBJECTINSTANCE deviceObject, LPVOID devicePtr);
+    static BOOL CALLBACK enumerateObjectsCallback(LPCDIDEVICEOBJECTINSTANCE deviceObject, LPVOID devicePtr);
 
 private:
     struct Private;

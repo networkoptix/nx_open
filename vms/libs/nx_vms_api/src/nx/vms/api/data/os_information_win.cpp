@@ -43,11 +43,16 @@ static QString resolveGetVersionEx(DWORD major, DWORD minor, bool ws)
 
 static bool winVersion(OSVERSIONINFOEXW* osvi)
 {
-    ZeroMemory(osvi, sizeof(osvi));
+    ZeroMemory(osvi, sizeof(*osvi));
     osvi->dwOSVersionInfoSize = sizeof(*osvi);
 
     NTSTATUS(WINAPI *getVersion)(LPOSVERSIONINFOEXW);
-    if ((FARPROC&)getVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion"))
+    const auto ntdll = GetModuleHandleA("ntdll");
+    if (!ntdll)
+        return false;
+    FARPROC p = GetProcAddress(ntdll, "RtlGetVersion");
+    getVersion = reinterpret_cast<decltype(getVersion)>(reinterpret_cast<void*>(p));
+    if (getVersion)
     {
         if (SUCCEEDED(getVersion(osvi)))
             return true;

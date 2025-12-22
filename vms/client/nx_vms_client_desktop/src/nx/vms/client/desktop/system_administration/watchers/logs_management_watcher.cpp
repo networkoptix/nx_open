@@ -1034,6 +1034,10 @@ struct LogsManagementWatcher::Private
                 case State::hasLocalErrors:
                     filter << Unit::DownloadState::error;
                     break;
+
+                case State::empty:
+                case State::hasSelection:
+                    break;
             }
 
             for (auto& server: servers)
@@ -1738,6 +1742,8 @@ void LogsManagementWatcher::updateDownloadState()
                     if (unit->errorIsLocal())
                         localErrorCount++;
 
+                    break;
+                case State::none:
                     break;
             }
             }

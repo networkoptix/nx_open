@@ -470,6 +470,7 @@ void UploadWorker::handleFileUploadCreated(bool success, RemoteResult code, QStr
                 d->upload.status = UploadState::Done;
                 emitProgress();
                 break;
+            case RemoteResult::loadingDownloads:
             case RemoteResult::ioError:
             case RemoteResult::fileDoesNotExist:
             case RemoteResult::invalidChecksum:

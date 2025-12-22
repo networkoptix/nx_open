@@ -44,7 +44,6 @@ namespace nx::vms::client::desktop {
 namespace {
 
 static const int AUDIO_QUEUE_MAX_SIZE = 256;
-static const int AUDIO_CAPTURE_FREQUENCY = 44100;
 static const int BASE_BITRATE = 1000 * 1000 * 10; // bitrate for best quality for fullHD mode;
 static const int MAX_VIDEO_JITTER = 2;
 
@@ -64,7 +63,7 @@ public:
     SpeexPreprocessState* m_speexPreprocess = nullptr;
 
     int audioPacketSize();
-    bool setupFormat(QString& errMessage);
+    bool setupFormat();
     bool setupPostProcess(int frameSize, int channels, int sampleRate);
     qint64 currentTime() const { return m_owner->currentTime(); }
     bool start();
@@ -251,7 +250,7 @@ int EncodedAudioInfo::audioPacketSize()
     return m_owner->frameSize() * m_audioFormat.channelCount() * m_audioFormat.bytesPerSample();
 }
 
-bool EncodedAudioInfo::setupFormat(QString& errMessage)
+bool EncodedAudioInfo::setupFormat()
 {
     int deviceID = nameToWaveIndex();
     WAVEINCAPS deviceCaps;
@@ -562,7 +561,7 @@ bool DesktopDataProvider::initAudioCapturing()
     {
         foreach(EncodedAudioInfo* audioChannel, d->audioInfo)
         {
-            if (!audioChannel->setupFormat(m_lastErrorStr))
+            if (!audioChannel->setupFormat())
                 return false;
         }
 

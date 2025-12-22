@@ -22,7 +22,6 @@ NovMediaExport::NovMediaExport(
     nx::StorageRecordingContext(true),
     m_mediaProvider(mediaProvider)
 {
-    memset(m_motionFileList, 0, sizeof(m_motionFileList));
 }
 
 NovMediaExport::~NovMediaExport()

@@ -44,11 +44,8 @@ NX_DECLARE_COLORIZED_ICON(
 class SimpleMotionSearchWidget::Private: public QObject
 {
     Q_DECLARE_TR_FUNCTIONS(SimpleMotionSearchWidget::Private)
-    SimpleMotionSearchWidget* const q;
-
 public:
     Private(SimpleMotionSearchWidget* q):
-        q(q),
         m_model(qobject_cast<SimpleMotionSearchListModel*>(q->model())),
         m_areaButton(q->createCustomFilterButton())
     {

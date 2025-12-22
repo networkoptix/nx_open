@@ -218,8 +218,9 @@ QString RecordingStatusHelper::tooltip(
                     return tr("Recording motion only");
                 case kObjectsMetadataTypes:
                     return tr("Recording objects only");
+                default:
+                    return QString();
             }
-            break;
         case RecordingStatus::recordingMetadataAndLQ:
             switch (metadataTypes)
             {
@@ -229,10 +230,12 @@ QString RecordingStatusHelper::tooltip(
                     return tr("Recording motion and low quality");
                 case kObjectsMetadataTypes:
                     return tr("Recording objects and low quality");
+                default:
+                    return QString();
             }
-            break;
+        default:
+            return QString();
     }
-    return QString();
 }
 
 QString RecordingStatusHelper::shortTooltip(
@@ -254,8 +257,9 @@ QString RecordingStatusHelper::shortTooltip(
                     return tr("Motion only");
                 case kObjectsMetadataTypes:
                     return tr("Objects only");
+                default:
+                    return QString();
             }
-            break;
         case RecordingStatus::recordingMetadataAndLQ:
             switch (metadataTypes)
             {
@@ -265,10 +269,12 @@ QString RecordingStatusHelper::shortTooltip(
                     return tr("Motion + Lo-Res");
                 case kObjectsMetadataTypes:
                     return tr("Objects + Lo-Res");
+                default:
+                    return QString();
             }
-            break;
+        default:
+            return QString();
     }
-    return QString();
 }
 
 QString RecordingStatusHelper::shortTooltip(const QnVirtualCameraResourcePtr& camera)
@@ -291,8 +297,9 @@ QString RecordingStatusHelper::qmlIconName(
             return "image://skin/20x20/Solid/archive.svg";
         case RecordingStatus::recordingScheduled:
             return "image://skin/20x20/Solid/record_part.svg";
+        default:
+            return QString{};
     }
-    return QString{};
 }
 
 QString RecordingStatusHelper::qmlSmallIconName(RecordingStatus recordingStatus,

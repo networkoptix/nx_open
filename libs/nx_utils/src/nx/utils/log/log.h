@@ -19,7 +19,7 @@ extern const NX_UTILS_API nx::log::Tag kSystemTag;
 
 constexpr size_t kLogNamesCount =
     nx::reflect::enumeration::visitAllItems<LogName>(
-        [](auto&&... items)
+        []([[maybe_unused]] auto&&... items)
         {
             return sizeof...(items);
         });

@@ -55,11 +55,6 @@ namespace {
 constexpr auto kDisplayTimeout = std::chrono::milliseconds(12500);
 constexpr auto kProcessNotificationCacheTimeout = std::chrono::milliseconds(500);
 
-QPixmap toPixmap(const QIcon& icon)
-{
-    return core::Skin::maximumSizePixmap(icon);
-}
-
 QnResourcePtr getResource(nx::Uuid resourceId, const QString& cloudSystemId)
 {
     if (resourceId.isNull())

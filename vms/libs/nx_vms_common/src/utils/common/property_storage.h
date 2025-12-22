@@ -139,7 +139,7 @@ private:                                                                        
 #define QN_DECLARE_RW_PROPERTY(TYPE, GETTER, SETTER, ID, DEFAULT_VALUE)         \
     QN_DECLARE_PROPERTY(TYPE, ID, #GETTER, true, DEFAULT_VALUE)                 \
 public:                                                                         \
-    TYPE GETTER() const { return value(ID).value<TYPE>(); }                     \
+    TYPE GETTER() const { auto v = value(ID); return v.value<TYPE>(); }         \
     void SETTER(const TYPE &value) { setValue(ID, QVariant::fromValue<TYPE>(value)); } \
 private:                                                                        \
 

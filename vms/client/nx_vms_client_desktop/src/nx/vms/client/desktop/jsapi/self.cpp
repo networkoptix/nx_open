@@ -17,9 +17,8 @@ namespace nx::vms::client::desktop::jsapi {
 class Self::Private: public CurrentSystemContextAware
 {
 public:
-    Private(Self* q, QnWorkbenchItem* item):
+    Private(QnWorkbenchItem* item):
         CurrentSystemContextAware(item->layout()->windowContext()),
-        q(q),
         m_item(item),
         m_tab(std::make_unique<Tab>(windowContext(), item->layout()))
     {
@@ -31,7 +30,6 @@ public:
     QnWorkbenchItem* item() const { return m_item; }
 
 private:
-    Self* const q = nullptr;
     QnWorkbenchItem* const m_item = nullptr;
     std::unique_ptr<Tab> m_tab;
 };
@@ -68,7 +66,7 @@ Error Self::Private::setPreventDefaultContextMenu(bool value)
 
 Self::Self(QnWorkbenchItem* item, QObject* parent):
     QObject(parent),
-    d(new Private(this, item))
+    d(new Private(item))
 {
     registerTypes();
 }

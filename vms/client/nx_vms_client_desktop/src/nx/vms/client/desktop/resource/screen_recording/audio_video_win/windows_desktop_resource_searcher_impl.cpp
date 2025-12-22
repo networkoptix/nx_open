@@ -7,7 +7,6 @@
 
 #include <commdlg.h>
 #include <d3d9.h>
-#include <d3dx9.h>
 #include <shellapi.h>
 
 #include <client/client_runtime_settings.h>

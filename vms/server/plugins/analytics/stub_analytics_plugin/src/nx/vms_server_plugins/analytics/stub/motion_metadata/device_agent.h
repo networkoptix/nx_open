@@ -49,8 +49,6 @@ private:
         nx::sdk::Ptr<nx::sdk::analytics::IMotionMetadataPacket> motionMetadataPacket);
 
 private:
-    Engine* const m_engine;
-
     int m_frameCounter = 0;
 
     struct DeviceAgentSettings

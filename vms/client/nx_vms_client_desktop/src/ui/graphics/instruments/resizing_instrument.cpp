@@ -45,8 +45,6 @@ bool itemIsResizableWidget(QGraphicsItem* item)
 class GraphicsWidget: public QGraphicsWidget
 {
 public:
-    friend class ResizingInstrument;
-
     Qt::WindowFrameSection getWindowFrameSectionAt(const QPointF& pos) const
     {
         return this->windowFrameSectionAt(pos);
@@ -193,7 +191,7 @@ bool ResizingInstrument::hoverEnterEvent(QWidget* viewport, QHoverEvent* event)
     return false;
 }
 
-bool ResizingInstrument::hoverLeaveEvent(QWidget* /*viewport*/, QHoverEvent* event)
+bool ResizingInstrument::hoverLeaveEvent(QWidget* /*viewport*/, QHoverEvent* /*event*/)
 {
     if (!m_cursorOverridden)
         return false;

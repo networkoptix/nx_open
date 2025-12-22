@@ -3822,7 +3822,7 @@ QSize Style::sizeFromContents(
                         Metrics::kCheckIndicatorSize);
                 }
 
-                QSize size = base_type::sizeFromContents(type, option, size, widget);
+                QSize newSize = base_type::sizeFromContents(type, option, size, widget);
 
                 int minHeight = Metrics::kViewRowHeight;
 
@@ -3832,11 +3832,11 @@ QSize Style::sizeFromContents(
                 else if (qobject_cast<const QListView*>(item->widget))
                     minHeight = Metrics::kListRowHeight;
 
-                size.setHeight(qMax(size.height(), minHeight));
-                size.setWidth(size.width() + indents.left() + indents.right()
+                newSize.setHeight(qMax(newSize.height(), minHeight));
+                newSize.setWidth(newSize.width() + indents.left() + indents.right()
                     - (pixelMetric(PM_FocusFrameHMargin, option, widget) + 1) * 2);
 
-                return size;
+                return newSize;
             }
 
             break;

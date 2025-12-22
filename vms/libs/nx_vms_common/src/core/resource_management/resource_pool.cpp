@@ -12,6 +12,7 @@
 #include <core/resource/videowall_matrix_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_access/resource_access_filter.h>
+#include <nx/utils/general_macros.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_context.h>
@@ -139,12 +140,17 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         connect(resource.get(), &QnResource::parentIdChanged, this, &QnResourcePool::parentIdChanged);
     }
 
+    // Emit notifications in deprecated style (remove when will be removed resourceAdded method.
+    NX_SUPPRESS_DEPRECATED_BEGIN();
+
     for (const auto& resource: std::as_const(addedResources))
     {
         NX_VERBOSE(this, "Added resource %1, id: %2, name: %3",
             resource, resource->getId(), resource->getName());
         emit resourceAdded(resource);
     }
+
+    NX_SUPPRESS_DEPRECATED_END();
 
     if (!addedResources.empty())
         emit resourcesAdded(addedResources);
@@ -265,7 +271,9 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
         }
     }
 
-    // Emit notifications.
+    // Emit notifications in deprecated style (remove when will be removed resourceRemoved method.
+    NX_SUPPRESS_DEPRECATED_BEGIN();
+
     for (const auto& layout: std::as_const(removedLayouts))
         emit resourceRemoved(layout);
 
@@ -275,6 +283,9 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
     for (const auto& user: std::as_const(removedUsers))
         emit resourceRemoved(user);
 
+    NX_SUPPRESS_DEPRECATED_END();
+
+    // Emit notifications.
     if (!removedResources.empty())
         emit resourcesRemoved(removedResources);
 }

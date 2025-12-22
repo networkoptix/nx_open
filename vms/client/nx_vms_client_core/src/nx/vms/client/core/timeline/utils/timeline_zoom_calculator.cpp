@@ -196,7 +196,7 @@ void ZoomCalculator::Private::update()
     }
 
     const auto it = std::upper_bound(kZoomLevels.cbegin(), kZoomLevels.cend(), minimumTickSpacingMs,
-        [this](qreal minStep, const TimelineZoomLevel& level)
+        [](qreal minStep, const TimelineZoomLevel& level)
         {
             return minStep <= level.averageTickLength();
         });

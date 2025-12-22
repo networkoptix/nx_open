@@ -22,7 +22,7 @@ NX_REFLECTION_ENUM_CLASS(Level,
 )
 
 constexpr size_t kLevelsCount = nx::reflect::enumeration::visitAllItems<Level>(
-    [](auto&&... items)
+    []([[maybe_unused]] auto&&... items)
     {
         return sizeof...(items);
     });

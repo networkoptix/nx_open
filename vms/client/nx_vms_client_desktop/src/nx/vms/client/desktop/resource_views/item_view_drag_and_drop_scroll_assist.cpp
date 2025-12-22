@@ -81,7 +81,7 @@ ItemViewDragAndDropScrollAssist::~ItemViewDragAndDropScrollAssist()
     stopScrolling();
 }
 
-bool ItemViewDragAndDropScrollAssist::eventFilter(QObject* watched, QEvent* event)
+bool ItemViewDragAndDropScrollAssist::eventFilter(QObject* /*watched*/, QEvent* event)
 {
     switch (event->type())
     {

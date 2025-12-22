@@ -316,6 +316,8 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::normalVisibleItems() 
         case Qn::NoLiveStreamOverlay:
             result |= QnStatusOverlayWidget::Control::kCaption;
             break;
+        default:
+            break;
     }
     return result;
 }

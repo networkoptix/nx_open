@@ -519,6 +519,7 @@ void CloudStatusWatcher::Private::updateConnection(AuthMode mode)
 
         case AuthMode::login:
             setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::NoError);
+            break;
 
         case AuthMode::update:
             setStatus(CloudStatusWatcher::UpdatingCredentials, CloudStatusWatcher::NoError);

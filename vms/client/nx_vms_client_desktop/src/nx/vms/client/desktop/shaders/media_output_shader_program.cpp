@@ -343,7 +343,7 @@ void MediaOutputShaderProgram::loadDewarpingParameters(const MediaData& mediaPar
     }
 
     const bool isPanoramic = m_key.viewProjection == ViewProjection::equirectangular;
-    if (!NX_ASSERT(isPanoramic == itemParams.panoFactor > 1))
+    if (!NX_ASSERT(isPanoramic == (itemParams.panoFactor > 1)))
         return;
 
     const bool isSpherical = MediaData::is360VR(m_key.cameraProjection);

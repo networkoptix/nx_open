@@ -134,6 +134,8 @@ void BaseInputFieldPrivate::updateStateWhileActive()
         case ValidationBehavior::validateOnInputShowOnFocus:
             parent->validate(/*showValidationResult*/ false);
             break;
+        case ValidationBehavior::validateOnFocus:
+            break;
     }
 }
 

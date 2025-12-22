@@ -700,7 +700,7 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::getResultCode(
     [[maybe_unused]] SystemError::ErrorCode systemErrorCode,
     const network::http::Response* response,
     const network::http::ApiRequestResult& fusionRequestResult,
-    const Output&... output) const
+    [[maybe_unused]] const Output&... output) const
 {
     if constexpr (std::is_same<ResultType, network::http::StatusCode::Value>::value)
     {

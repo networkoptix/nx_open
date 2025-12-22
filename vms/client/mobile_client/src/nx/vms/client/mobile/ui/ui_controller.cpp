@@ -105,7 +105,8 @@ bool UiController::tryRestoreLastUsedConnection()
     // TODO: 5.1+ Make startup parameters handling and using of last(used)Connection the same both
     // in the desktop and mobile clients.
 
-    const auto connectionUrl = qnSettings->startupParameters().url;
+    const auto parameters = qnSettings->startupParameters();
+    const auto connectionUrl = parameters.url;
     if (!connectionUrl.isEmpty())
     {
         sessionManager()->startSessionByUrl(connectionUrl);
