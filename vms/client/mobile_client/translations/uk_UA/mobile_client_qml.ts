@@ -1238,7 +1238,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation>НАЖИВО</translation>
+      <translation>ОН-ЛАЙН</translation>
     </message>
   </context>
   <context>

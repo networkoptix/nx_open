@@ -1236,7 +1236,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation>AO VIVO</translation>
+      <translation>Em Directo</translation>
     </message>
   </context>
   <context>

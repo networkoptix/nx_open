@@ -1232,7 +1232,7 @@
     </message>
     <message>
       <source>No Archive</source>
-      <translation>No Archive</translation>
+      <translation type="unfinished">No Archive</translation>
     </message>
     <message>
       <source>LIVE</source>

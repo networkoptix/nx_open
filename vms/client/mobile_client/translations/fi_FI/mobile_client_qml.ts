@@ -1236,7 +1236,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation>LIVE</translation>
+      <translation>Reaaliaikainen</translation>
     </message>
   </context>
   <context>
