@@ -264,6 +264,11 @@ if(compilerMsvc)
         /Zc:preprocessor
         /EHsc
 
+        # MSVC /FS = Force synchronous PDB writes.
+        # Needed with /Zi in highly-parallel builds (e.g., CMake+Ninja) to avoid multiple cl.exe
+        # processes contending for the same .pdb ("cannot open program database ... use /FS").
+        /FS
+
         # Enable most warnings by default.
         /W4
 
@@ -369,12 +374,7 @@ if(compilerMsvc)
         add_compile_options(/wd26444)
     endif()
 
-    # "/Z7" flag tells the compiler to save the debug info to the .obj file instead of sending this
-    # data to the process mspdbsrv.exe, which saves it to a .pdb file. This approach allows to
-    # avoid possible interprocess locks, and thus improves the parallelability of the entire build
-    # process. The .pdb files are generated during the linking process - the "/DEBUG" flag passed
-    # to the linker is responsible for this.
-    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "Embedded") # /Z7
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "ProgramDatabase") # /Zi
     add_link_options(/DEBUG)
     # Change /Ob1 -> /Ob2 for RelWithDebInfo to match the Release build.
     foreach(lang C CXX)
