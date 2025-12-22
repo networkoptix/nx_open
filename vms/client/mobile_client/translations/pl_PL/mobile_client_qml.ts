@@ -699,7 +699,7 @@
     </message>
     <message>
       <source>Motions</source>
-      <translation type="unfinished">Motions</translation>
+      <translation>Ruch</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -1471,16 +1471,16 @@
     </message>
     <message>
       <source>No results</source>
-      <translation type="unfinished">No results</translation>
+      <translation>Brak wyników</translation>
     </message>
     <message>
       <source>Not available</source>
-      <translation type="unfinished">Not available</translation>
+      <translation>Niedostępne</translation>
     </message>
     <message>
       <source>You do not have permission&lt;br&gt;to view the archive</source>
       <comment>&lt;br&gt; is a line break</comment>
-      <translation type="unfinished">You do not have permission&lt;br&gt;to view the archive</translation>
+      <translation>Nie masz uprawnień&lt;br&gt;do przeglądania archiwum</translation>
     </message>
   </context>
   <context>

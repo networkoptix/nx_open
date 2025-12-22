@@ -127,12 +127,12 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsLoaderDelegate</name>
     <message>
       <source>Unknown Object</source>
-      <translation type="unfinished">Unknown Object</translation>
+      <translation>Nieznany obiekt</translation>
     </message>
     <message numerus="yes">
       <source>Objects (%n)</source>
       <translation type="unfinished">
-        <numerusform>Objects (%n)</numerusform>
+        <numerusform>Obiekty (%n)</numerusform>
         <numerusform>Objects (%n)</numerusform>
         <numerusform>Objects (%n)</numerusform>
         <numerusform>Objects (%n)</numerusform>
@@ -141,7 +141,7 @@
     <message numerus="yes">
       <source>Objects (&gt;%n)</source>
       <translation type="unfinished">
-        <numerusform>Objects (&gt;%n)</numerusform>
+        <numerusform>Obiekty (&gt;%n)</numerusform>
         <numerusform>Objects (&gt;%n)</numerusform>
         <numerusform>Objects (&gt;%n)</numerusform>
         <numerusform>Objects (&gt;%n)</numerusform>
@@ -157,7 +157,7 @@
     <message numerus="yes">
       <source>Bookmarks (%n)</source>
       <translation type="unfinished">
-        <numerusform>Bookmarks (%n)</numerusform>
+        <numerusform>Zakładki (%n)</numerusform>
         <numerusform>Bookmarks (%n)</numerusform>
         <numerusform>Bookmarks (%n)</numerusform>
         <numerusform>Bookmarks (%n)</numerusform>
@@ -166,7 +166,7 @@
     <message numerus="yes">
       <source>Bookmarks (&gt;%n)</source>
       <translation type="unfinished">
-        <numerusform>Bookmarks (&gt;%n)</numerusform>
+        <numerusform>Zakładki (&gt;%n)</numerusform>
         <numerusform>Bookmarks (&gt;%n)</numerusform>
         <numerusform>Bookmarks (&gt;%n)</numerusform>
         <numerusform>Bookmarks (&gt;%n)</numerusform>
@@ -177,12 +177,12 @@
     <name>nx::vms::client::mobile::timeline::MotionLoaderDelegate</name>
     <message>
       <source>Motion detected</source>
-      <translation type="unfinished">Motion detected</translation>
+      <translation>Wykryto ruch</translation>
     </message>
     <message numerus="yes">
       <source>Motions (&gt;%n)</source>
       <translation type="unfinished">
-        <numerusform>Motions (&gt;%n)</numerusform>
+        <numerusform>Ruch (&gt;%n)</numerusform>
         <numerusform>Motions (&gt;%n)</numerusform>
         <numerusform>Motions (&gt;%n)</numerusform>
         <numerusform>Motions (&gt;%n)</numerusform>
@@ -191,7 +191,7 @@
     <message numerus="yes">
       <source>Motions (%n)</source>
       <translation type="unfinished">
-        <numerusform>Motions (%n)</numerusform>
+        <numerusform>Ruch (%n)</numerusform>
         <numerusform>Motions (%n)</numerusform>
         <numerusform>Motions (%n)</numerusform>
         <numerusform>Motions (%n)</numerusform>

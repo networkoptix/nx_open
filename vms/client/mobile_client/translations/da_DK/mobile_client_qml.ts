@@ -697,7 +697,7 @@
     </message>
     <message>
       <source>Motions</source>
-      <translation type="unfinished">Motions</translation>
+      <translation>Bevægelser</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -1469,16 +1469,16 @@
     </message>
     <message>
       <source>No results</source>
-      <translation type="unfinished">No results</translation>
+      <translation>Ingen resultater</translation>
     </message>
     <message>
       <source>Not available</source>
-      <translation type="unfinished">Not available</translation>
+      <translation>Ikke tilgængelig</translation>
     </message>
     <message>
       <source>You do not have permission&lt;br&gt;to view the archive</source>
       <comment>&lt;br&gt; is a line break</comment>
-      <translation type="unfinished">You do not have permission&lt;br&gt;to view the archive</translation>
+      <translation>Du har ikke tilladelse&lt;br&gt;til at se arkivet</translation>
     </message>
   </context>
   <context>
