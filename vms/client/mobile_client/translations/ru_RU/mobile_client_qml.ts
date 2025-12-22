@@ -219,61 +219,61 @@
     <name>DataTimeline</name>
     <message>
       <source>Live</source>
-      <translation type="unfinished">Live</translation>
+      <translation>В режиме реального времени</translation>
     </message>
   </context>
   <context>
     <name>DeprecatedVideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation type="unfinished">No motion data for this camera</translation>
+      <translation>Нет данных о детекции движения для этой камеры</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation type="unfinished">No motion found in the selected area</translation>
+      <translation>В выбранной области движения не обнаружено</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation type="unfinished">No motion found in the visible area</translation>
+      <translation>В видимой области движения не обнаружено</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Нет архива</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>LIVE</translation>
     </message>
   </context>
   <context>
     <name>DeprecatedVideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Область</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Настройки камеры</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Закладки</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объекты</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation type="unfinished">Tap and hold to select an area</translation>
+      <translation>Нажмите и удерживайте, чтобы выбрать область</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
+      <translation>Для выбора области сначала включите поиск движения</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+      <translation>Неверная область. Пожалуйста, попробуйте снова.</translation>
     </message>
   </context>
   <context>
@@ -695,7 +695,7 @@
     <name>ObjectsTypeSheet</name>
     <message>
       <source>View</source>
-      <translation type="unfinished">View</translation>
+      <translation>Просмотр</translation>
     </message>
     <message>
       <source>Motions</source>
@@ -703,15 +703,15 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Закладки</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объекты</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Закрыть</translation>
     </message>
   </context>
   <context>
@@ -1467,7 +1467,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>LIVE</translation>
     </message>
     <message>
       <source>No results</source>

@@ -219,61 +219,61 @@
     <name>DataTimeline</name>
     <message>
       <source>Live</source>
-      <translation type="unfinished">Live</translation>
+      <translation>Canlı</translation>
     </message>
   </context>
   <context>
     <name>DeprecatedVideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation type="unfinished">No motion data for this camera</translation>
+      <translation>Bu kamera için hareket verisi yok</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation type="unfinished">No motion found in the selected area</translation>
+      <translation>Seçilen alanda hareket bulunamadı</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation type="unfinished">No motion found in the visible area</translation>
+      <translation>Görünür alanda hareket bulunamadı</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Arşiv yok</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>CANLI</translation>
     </message>
   </context>
   <context>
     <name>DeprecatedVideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Alan</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kamera Ayarları</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Yer işaretleri</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Nesneler</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation type="unfinished">Tap and hold to select an area</translation>
+      <translation>Bir alan seçmek için dokunun ve basılı tutun</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
+      <translation>Bir alan seçmek için önce hareket aramayı etkinleştirin</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+      <translation>Geçersiz özel alan. Lütfen doğru bir tane çizin.</translation>
     </message>
   </context>
   <context>
@@ -693,7 +693,7 @@
     <name>ObjectsTypeSheet</name>
     <message>
       <source>View</source>
-      <translation type="unfinished">View</translation>
+      <translation>Görünüm</translation>
     </message>
     <message>
       <source>Motions</source>
@@ -701,15 +701,15 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Yer işaretleri</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Nesneler</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Kapat</translation>
     </message>
   </context>
   <context>
@@ -1465,7 +1465,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>CANLI</translation>
     </message>
     <message>
       <source>No results</source>

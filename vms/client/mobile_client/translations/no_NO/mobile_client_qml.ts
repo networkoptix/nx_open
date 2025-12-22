@@ -219,61 +219,61 @@
     <name>DataTimeline</name>
     <message>
       <source>Live</source>
-      <translation type="unfinished">Live</translation>
+      <translation>Live</translation>
     </message>
   </context>
   <context>
     <name>DeprecatedVideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation type="unfinished">No motion data for this camera</translation>
+      <translation>Ingen bevegelsesdata for dette kameraet</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation type="unfinished">No motion found in the selected area</translation>
+      <translation>Ingen bevegelse funnet i det valgte området</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation type="unfinished">No motion found in the visible area</translation>
+      <translation>Ingen bevegelse funnet i det synlige området</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Ingen Opptak</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>LIVE</translation>
     </message>
   </context>
   <context>
     <name>DeprecatedVideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Område</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kamerainnstillinger</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Bokmerker</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objekter</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation type="unfinished">Tap and hold to select an area</translation>
+      <translation>Trykk og hold for å velge et område</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
+      <translation>Aktiver bevegelsessøk først for å velge et område</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+      <translation>Ugyldig tilpasset område. Vennligst prøv igjen.</translation>
     </message>
   </context>
   <context>
@@ -693,7 +693,7 @@
     <name>ObjectsTypeSheet</name>
     <message>
       <source>View</source>
-      <translation type="unfinished">View</translation>
+      <translation>Visning</translation>
     </message>
     <message>
       <source>Motions</source>
@@ -701,15 +701,15 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Bokmerker</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objekter</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Lukke</translation>
     </message>
   </context>
   <context>
@@ -1465,7 +1465,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>LIVE</translation>
     </message>
     <message>
       <source>No results</source>

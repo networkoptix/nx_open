@@ -253,7 +253,7 @@
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Камерын тохиргоо</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -693,7 +693,7 @@
     <name>ObjectsTypeSheet</name>
     <message>
       <source>View</source>
-      <translation type="unfinished">View</translation>
+      <translation>Үзэх</translation>
     </message>
     <message>
       <source>Motions</source>
@@ -709,7 +709,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Хаах</translation>
     </message>
   </context>
   <context>

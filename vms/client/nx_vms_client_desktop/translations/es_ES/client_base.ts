@@ -2335,29 +2335,29 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Site merge</source>
-      <translation type="unfinished">Site merge</translation>
+      <translation>Fusión de Sitios</translation>
     </message>
     <message>
       <source>Server proxy connection</source>
-      <translation type="unfinished">Server proxy connection</translation>
+      <translation>Conexión al Servidor proxy</translation>
     </message>
     <message>
       <source>Site has been updated to version %1</source>
-      <translation type="unfinished">Site has been updated to version %1</translation>
+      <translation>El Sitio ha sido actualizado a la versión %1</translation>
     </message>
     <message>
       <source>%1 - %2, Duration: %3, Target: %4</source>
       <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
-      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+      <translation>%1 - %2, Duración: %3, Objetivo: %4</translation>
     </message>
     <message>
       <source>Start time: %1, Target: %2</source>
       <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
-      <translation type="unfinished">Start time: %1, Target: %2</translation>
+      <translation>Hora de Inicio:%1, Objetivo: %2</translation>
     </message>
     <message>
       <source>User IP</source>
-      <translation type="unfinished">User IP</translation>
+      <translation>Usuaria IP</translation>
     </message>
     <message>
       <source>Device</source>
@@ -2369,11 +2369,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Device IP</source>
-      <translation type="unfinished">Device IP</translation>
+      <translation>Dispositivo IP</translation>
     </message>
     <message>
       <source>Camera IP</source>
-      <translation type="unfinished">Camera IP</translation>
+      <translation>Cámara IP</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2426,7 +2426,7 @@ License Key: %2</translation>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
-      <translation type="unfinished">%1 Running</translation>
+      <translation>%1 Corriendo</translation>
     </message>
   </context>
   <context>
@@ -2673,12 +2673,12 @@ License Key: %2</translation>
     <message>
       <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect Site from %1</translation>
+      <translation>Desconectar el Sitio de %1</translation>
     </message>
     <message>
       <source>Connect Site to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1...</translation>
+      <translation>Conectar al Sitio a %1...</translation>
     </message>
     <message>
       <source>There is currently no connection between your site and %1.</source>
@@ -7773,12 +7773,12 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>Conectar al Sitio a %1</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>Conectar al Sitio a %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>

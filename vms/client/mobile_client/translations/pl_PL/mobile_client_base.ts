@@ -152,7 +152,7 @@
     <name>nx::vms::client::mobile::timeline::BookmarkLoaderDelegate</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Utwórz zakładkę</translation>
     </message>
     <message numerus="yes">
       <source>Bookmarks (%n)</source>

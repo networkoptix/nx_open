@@ -121,18 +121,18 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsLoaderDelegate</name>
     <message>
       <source>Unknown Object</source>
-      <translation type="unfinished">Unknown Object</translation>
+      <translation>不明なオブジェクト</translation>
     </message>
     <message numerus="yes">
       <source>Objects (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Objects (%n)</numerusform>
+      <translation>
+        <numerusform>オブジェクト (%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Objects (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Objects (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>オブジェクト (&gt;%n)</numerusform>
       </translation>
     </message>
   </context>
@@ -140,18 +140,18 @@
     <name>nx::vms::client::mobile::timeline::BookmarkLoaderDelegate</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>ブックマーク</translation>
     </message>
     <message numerus="yes">
       <source>Bookmarks (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Bookmarks (%n)</numerusform>
+      <translation>
+        <numerusform>ブックマーク (%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Bookmarks (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Bookmarks (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>ブックマーク (&gt;%n)</numerusform>
       </translation>
     </message>
   </context>
@@ -159,18 +159,18 @@
     <name>nx::vms::client::mobile::timeline::MotionLoaderDelegate</name>
     <message>
       <source>Motion detected</source>
-      <translation type="unfinished">Motion detected</translation>
+      <translation>モーション検知</translation>
     </message>
     <message numerus="yes">
       <source>Motions (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motions (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>モーション (&gt;%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Motions (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motions (%n)</numerusform>
+      <translation>
+        <numerusform>モーション (%n)</numerusform>
       </translation>
     </message>
   </context>
