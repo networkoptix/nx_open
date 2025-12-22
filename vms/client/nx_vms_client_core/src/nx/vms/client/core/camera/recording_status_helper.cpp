@@ -233,6 +233,8 @@ QString RecordingStatusHelper::tooltip(
                 default:
                     return QString();
             }
+        case RecordingStatus::noRecordingNoArchive:
+        case RecordingStatus::recordingScheduled:
         default:
             return QString();
     }
@@ -272,6 +274,8 @@ QString RecordingStatusHelper::shortTooltip(
                 default:
                     return QString();
             }
+        case RecordingStatus::noRecordingNoArchive:
+        case RecordingStatus::recordingScheduled:
         default:
             return QString();
     }
@@ -297,6 +301,7 @@ QString RecordingStatusHelper::qmlIconName(
             return "image://skin/20x20/Solid/archive.svg";
         case RecordingStatus::recordingScheduled:
             return "image://skin/20x20/Solid/record_part.svg";
+        case RecordingStatus::noRecordingNoArchive:
         default:
             return QString{};
     }
