@@ -72,7 +72,7 @@ using namespace std;
 /* win32 dll initializer */
 
 #if defined(_WIN32)
-BOOL APIENTRY DllMain (HINSTANCE hInst, DWORD reason, LPVOID reserved)
+BOOL APIENTRY DllMain (HINSTANCE /*hInst*/, DWORD reason, LPVOID /*reserved*/)
 {
     switch (reason)
     {
@@ -187,7 +187,8 @@ int ftplib::socket_wait(ftphandle *ctl)
             rv = 1;
             break;
         }
-    } while ((rv = ctl->idlecb(ctl->cbarg)));
+        rv = ctl->idlecb(ctl->cbarg);
+    } while (rv);
 
     return rv;
 }
@@ -214,7 +215,7 @@ int ftplib::readline(char *buf,int max,ftphandle *ctl)
             x = (max >= ctl->cavail) ? ctl->cavail : max-1;
             end = static_cast<char*>(memccpy(bp,ctl->cget,'\n',x));
             if (end != NULL)
-            x = end - bp;
+            x = int(end - bp);
             retval += x;
             bp += x;
             *bp = '\0';
@@ -446,7 +447,7 @@ int ftplib::Connect(const char *host)
     else
     {
         *pnum++ = '\0';
-        if (isdigit(*pnum)) sin.sin_port = htons(atoi(pnum));
+        if (isdigit(*pnum)) sin.sin_port = htons((unsigned short)atoi(pnum));
         else
         {
             pse = getservbyname(pnum,"tcp");
