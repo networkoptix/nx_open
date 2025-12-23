@@ -175,7 +175,7 @@ int ftplib::socket_wait(ftphandle *ctl)
     {
         FD_SET(ctl->handle,&fd);
         tv = ctl->idletime;
-        rv = select(ctl->handle+1, rfd, wfd, NULL, &tv);
+        rv = select(int(ctl->handle+1), rfd, wfd, NULL, &tv);
         if (rv == -1)
         {
             rv = 0;
@@ -410,7 +410,7 @@ char* ftplib::LastResponse()
  */
 int ftplib::Connect(const char *host)
 {
-    int sControl;
+    SocketType sControl;
     struct sockaddr_in sin;
     struct hostent *phe;
     struct servent *pse;
@@ -565,10 +565,10 @@ int ftplib::Login(const char *user, const char *pass)
  */
 int ftplib::FtpAcceptConnection(ftphandle *nData, ftphandle *nControl)
 {
-    int sData;
+    SocketType sData;
     struct sockaddr addr;
     socklen_t l;
-    int i;
+    SocketType i;
     struct timeval tv;
     fd_set mask;
     int rv = 0;
@@ -580,7 +580,7 @@ int ftplib::FtpAcceptConnection(ftphandle *nData, ftphandle *nControl)
     tv.tv_sec = ACCEPT_TIMEOUT;
     i = nControl->handle;
     if (i < nData->handle) i = nData->handle;
-    i = select(i+1, &mask, NULL, NULL, &tv);
+    i = select(int(i+1), &mask, NULL, NULL, &tv);
 
     if (i == -1)
     {
@@ -602,7 +602,7 @@ int ftplib::FtpAcceptConnection(ftphandle *nData, ftphandle *nControl)
         {
             l = sizeof(addr);
             sData = accept(nData->handle, &addr, &l);
-            i = errno;
+            const auto err = errno;
             net_close(nData->handle);
             if (sData > 0)
             {
@@ -612,7 +612,7 @@ int ftplib::FtpAcceptConnection(ftphandle *nData, ftphandle *nControl)
             }
             else
             {
-                strncpy(nControl->response, strerror(i), sizeof(nControl->response));
+                strncpy(nControl->response, strerror(err), sizeof(nControl->response));
                 nData->handle = 0;
                 rv = 0;
             }
@@ -718,7 +718,7 @@ int ftplib::FtpAccess(const char *path, accesstype type, transfermode mode, ftph
  */
 int ftplib::FtpOpenPort(ftphandle *nControl, ftphandle **nData, transfermode mode, int dir, char *cmd)
 {
-    int sData;
+    SocketType sData;
     union {
     struct sockaddr sa;
     struct sockaddr_in in;
@@ -851,7 +851,7 @@ int ftplib::FtpOpenPort(ftphandle *nControl, ftphandle **nData, transfermode mod
  */
 int ftplib::FtpOpenPasv(ftphandle *nControl, ftphandle **nData, transfermode mode, int dir, char *cmd)
 {
-    int sData;
+    SocketType sData;
     union {
         struct sockaddr sa;
         struct sockaddr_in in;

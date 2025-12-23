@@ -47,6 +47,12 @@
 #include <sys/time.h>
 #endif
 
+#ifdef _WIN32
+using SocketType = SOCKET;
+#else
+using SocketType = int;
+#endif
+
 #ifdef NOLFS
 #define off64_t long
 #endif
@@ -89,7 +95,7 @@ typedef bool (*FtpCallbackCert)(void *arg, X509 *cert);
 
 struct ftphandle {
 	char *cput,*cget;
-	int handle;
+	SocketType handle;
 	int cavail,cleft;
 	char *buf;
 	int dir;
