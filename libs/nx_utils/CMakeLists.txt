@@ -62,6 +62,14 @@ target_compile_definitions(nx_utils
     PRIVATE NX_UTILS_API=${API_EXPORT_MACRO}
     INTERFACE NX_UTILS_API=${API_IMPORT_MACRO})
 
+if(NOT EMSCRIPTEN)
+    # Defining PERFETTO_IMPLEMENTATION for nx_utils makes perfetto symbols compiled in nx_utils
+    # as "implementation" (dllexport / non-import), aligning declarations with the actual
+    # definitions and eliminating the spurious linker warnings.
+    target_compile_definitions(nx_utils
+        PRIVATE PERFETTO_IMPLEMENTATION)
+endif()
+
 target_include_directories(nx_utils
     PRIVATE
         ${Qt6Core_PRIVATE_INCLUDE_DIRS}
