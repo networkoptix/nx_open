@@ -6,6 +6,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
@@ -101,18 +102,20 @@ QnResourcePtr UnifiedResourcePool::resource(
 
             cloudSystem->initializeConnection(/*allowUserInteraction*/ true);
 
-            connect(cloudSystem, &CloudCrossSystemContext::statusChanged, this,
-                [&loop, &result, &cloudSystem, &resourceId]
-                {
-                    result =
-                        cloudSystem->systemContext()->resourcePool()->getResourceById(resourceId);
-                    loop.quit();
-                });
+            const nx::utils::ScopedConnection connectionGuard =
+                connect(cloudSystem, &CloudCrossSystemContext::statusChanged, this,
+                    [&loop, &result, &cloudSystem, &resourceId]
+                    {
+                        result = cloudSystem->systemContext()->resourcePool()
+                            ->getResourceById(resourceId);
+                        loop.quit();
+                    });
+
             loop.exec();
             return result;
         }
     }
-    return QnResourcePtr();
+    return {};
 }
 
 } // namespace nx::vms::client::core
