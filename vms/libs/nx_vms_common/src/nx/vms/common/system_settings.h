@@ -529,6 +529,9 @@ public:
     int mediaBufferSizeKb() const;
     void setMediaBufferSizeKb(int value);
 
+    std::chrono::seconds mediaSendTimeout() const;
+    void setMediaSendTimeout(std::chrono::seconds value);
+
     int mediaBufferSizeForAudioOnlyDeviceKb() const;
     void setMediaBufferSizeForAudioOnlyDeviceKb(int value);
 

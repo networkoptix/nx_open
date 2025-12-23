@@ -165,6 +165,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .maxVirtualCameraArchiveSynchronizationThreads = -1,
     .mediaBufferSizeForAudioOnlyDeviceKb = 16,
     .mediaBufferSizeKb = 256,
+    .mediaSendTimeoutS = 60s,
     .osTimeChangeCheckPeriodMs = 5s,
     .proxyConnectTimeoutSec = 5,
     .proxyConnectionAccessPolicy = ProxyConnectionAccessPolicy::powerUsers,
