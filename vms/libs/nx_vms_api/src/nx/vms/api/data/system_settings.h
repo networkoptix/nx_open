@@ -105,6 +105,7 @@ struct SaveableSettingsBase
     std::optional<int> maxVirtualCameraArchiveSynchronizationThreads;
     std::optional<int> mediaBufferSizeForAudioOnlyDeviceKb;
     std::optional<int> mediaBufferSizeKb;
+    std::optional<std::chrono::seconds> mediaSendTimeoutS;
     std::optional<std::chrono::milliseconds> osTimeChangeCheckPeriodMs;
     std::optional<int> proxyConnectTimeoutSec;
     std::optional<ProxyConnectionAccessPolicy> proxyConnectionAccessPolicy;
@@ -188,6 +189,7 @@ struct SaveableSettingsBase
     (maxVirtualCameraArchiveSynchronizationThreads) \
     (mediaBufferSizeForAudioOnlyDeviceKb) \
     (mediaBufferSizeKb) \
+    (mediaSendTimeoutS) \
     (osTimeChangeCheckPeriodMs) \
     (proxyConnectTimeoutSec) \
     (proxyConnectionAccessPolicy) \

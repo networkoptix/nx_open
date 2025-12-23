@@ -227,6 +227,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<QString>* additionalLocalFsTypesAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* keepIoPortStateIntactOnInitializationAdaptor= nullptr;
     QnResourcePropertyAdaptor<int>* mediaBufferSizeKbAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::seconds>* mediaSendTimeoutSAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* mediaBufferSizeForAudioOnlyDeviceKbAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* forceAnalyticsDbStoragePermissionsAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::chrono::milliseconds>* checkVideoStreamPeriodMsAdaptor = nullptr;
@@ -892,6 +893,11 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "keepIoPortStateIntactOnInitialization", false, this,
         [] { return tr("Keep IO port state on when Server connects to the device."); });
 
+    d->mediaSendTimeoutSAdaptor = new QnLexicalResourcePropertyAdaptor<std::chrono::seconds>(
+        "mediaSendTimeoutS", 60s,
+        [](auto v) { return v >= 1s; }, this,
+        [] { return tr("Socket sending timeout when Server streams media data (Seconds)."); });
+
     d->mediaBufferSizeKbAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "mediaBufferSizeKb", 256,
         [](auto v) { return v >= 10 && v <= 4 * 1024; }, this,
@@ -1422,6 +1428,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->additionalLocalFsTypesAdaptor
         << d->keepIoPortStateIntactOnInitializationAdaptor
         << d->mediaBufferSizeKbAdaptor
+        << d->mediaSendTimeoutSAdaptor
         << d->mediaBufferSizeForAudioOnlyDeviceKbAdaptor
         << d->forceAnalyticsDbStoragePermissionsAdaptor
         << d->checkVideoStreamPeriodMsAdaptor
@@ -2471,6 +2478,16 @@ int SystemSettings::mediaBufferSizeKb() const
 void SystemSettings::setMediaBufferSizeKb(int value)
 {
     d->mediaBufferSizeKbAdaptor->setValue(value);
+}
+
+std::chrono::seconds SystemSettings::mediaSendTimeout() const
+{
+    return d->mediaSendTimeoutSAdaptor->value();
+}
+
+void SystemSettings::setMediaSendTimeout(std::chrono::seconds value)
+{
+    d->mediaSendTimeoutSAdaptor->setValue(value);
 }
 
 int SystemSettings::mediaBufferSizeForAudioOnlyDeviceKb() const
