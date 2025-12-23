@@ -88,7 +88,7 @@ struct NX_VMS_API StreamSettings: MediaSettings
 
     /**%apidoc[opt]
      * %deprecated Add continuous timestamps in exported media data. Always true, regardless of
-     * the parameter value.
+     *     the parameter value.
      */
     bool continuousTimestamps = true;
 

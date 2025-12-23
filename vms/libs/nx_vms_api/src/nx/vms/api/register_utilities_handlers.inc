@@ -71,9 +71,10 @@ void registerUtilitiesHandlers(
      * %param[opt]:option enable_start_time_header Add `x-start-time` header when responding to
      *     PLAY request, only relevant if disable_fast_channel_zapping is absent (or false).
      * %return RTSP video/audio/metadata streams.
-     * NOTE for analytics streaming: if Device has analytics plugin then RTSP server creates
-     * addition track with type 'text'. This track contains analytics objects in the JSON format described below.
-     * RTP packet has 'marker' bit in case of it includes the end of a Json object.
+     *     NOTE for analytics streaming: if Device has analytics plugin then RTSP server creates
+     *     addition track with type 'text'. This track contains analytics objects in the JSON
+     *     format described below. RTP packet has 'marker' bit in case of it includes the end of a
+     *     JSON object.
      * %struct ObjectMetadataPacket
      */
     registerTcpHandler<QnRtspConnectionProcessor>(

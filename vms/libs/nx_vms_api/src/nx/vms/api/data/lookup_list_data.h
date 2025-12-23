@@ -55,11 +55,12 @@ struct NX_VMS_API LookupListData: IdData
      * using the dot.
      * Only attributes from attributeNames field will be used (and should actually be here). All
      * attributes are optional.
-     * %example [
-     *     {"Color": "red"},
-     *     {"License Plate.Number": "AA000A"},
-     *     {"Color": "blue", "License Plate.Number": "BB777B"}
-     * ]
+     * %example
+     *     [
+     *         {"Color": "red"},
+     *         {"License Plate.Number": "AA000A"},
+     *         {"Color": "blue", "License Plate.Number": "BB777B"}
+     *     ]
      */
     std::vector<LookupListEntry> entries;
 
