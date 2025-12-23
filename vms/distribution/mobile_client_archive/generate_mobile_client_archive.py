@@ -110,10 +110,6 @@ if tools.is_linux():
         'libavformat.so.61',
         'libavutil.so.59',
         'libcrypto.so.1.1',
-        'libcudart.so.12',
-        'libmfx-gen.so.1.2',
-        'libmfx.so.1',
-        'libmfxhw64.so.1',
         'libqtkeychain.so.0.9.0',
         'libssl.so.1.1',
         'libswresample.so.5',
@@ -121,12 +117,9 @@ if tools.is_linux():
         'libva-drm.so.2',
         'libva-x11.so.2',
         'libva.so.2',
-        'libvpl.so.2',
     ]
 else:
     sys_libs = [
-        'cudart64_12.dll',
-        'libvpl.dll',
         'qtkeychain.dll',
     ]
 

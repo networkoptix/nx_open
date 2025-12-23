@@ -96,8 +96,6 @@ nx_libraries = [
     'nx_monitoring',
     'vms_gateway_core',
     'udt',
-    'cudart64_12',
-    'libvpl',
     'qtkeychain'
 ]
 

@@ -218,18 +218,11 @@ class NxOpenConan(ConanFile):
             self.requires("vulkan-headers/1.3.290.0" "#6a0d12455e50dca266c79b88fda818b3")
             if self.settings.arch == "x86_64":
                 self.requires("cuda-toolkit/12.5.1" "#34ae878d0b2f4df2297bac67d026a307")
-                self.requires("libvpl/2023.4.0" "#22d0df9697d26ecbb784e71a2c882e05")
                 self.requires("libpq/15.5" "#fa107fbe709db74faa6e2cb3cf18a5ae")
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
                 self.requires("libva/2.22.0" "#c3156ed8aeb0461f978b086681a2aa18")
-                self.requires("intel-media-sdk/19.4" "#a3645f9972ae962e6ec4f426831bffea")
-                self.requires("intel-onevpl/23.4.2" "#f6cce96833acd40bc8e2f0d1759650df")
-                self.requires("intel-gmmlib/22.5.2" "#a9a4be5e7f657758b6300e3b09074628")
-                self.requires("intel-media-driver/23.4.3" "#9f52c4393479e16d22aaa6c6b57ecf99")
-                self.requires("nv-codec-headers/12.1.14.0" "#65e2d80efd67e46fc41f135f2468e3df")
-
                 self.requires("libmysqlclient/8.1.0" "#e762100664bad1c018ad71ecf702ea5e")
 
             if not self.isArm32:
@@ -333,22 +326,15 @@ class NxOpenConan(ConanFile):
             self.import_package("qt")
             if self.settings.arch == "x86_64":
                 self.import_package("libva")
-                self.import_package("intel-media-sdk")
-                self.import_package("intel-onevpl")
-                self.import_package("intel-gmmlib")
                 self.import_files_from_package(
                     "intel-media-driver",
                     "lib/dri",
                     "lib/libva-drivers",
                     "*.so*")
-                self.import_package("libvpl")
-
             if not self.isArm32:
                 self.import_package("ffmpeg")
         else:
             if self.isWindows:
-                self.import_package("intel-media-sdk-bin")
-                self.import_package("libvpl")
                 self.import_package("directx/JUN2010")
             elif self.isMacos:
                 self.import_package("hidapi")
