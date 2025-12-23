@@ -397,7 +397,7 @@ void registerRestHandlers(
             nx::vms::server::DevicesHandler<QueryProcessor, nx::vms::api::DeviceModelV3>>(
             queryProcessor, systemContext));
 
-    /**%apidoc GET /rest/v{4-}/devices
+    /**%apidoc GET /rest/v4/devices
      * Retrieves all Device records stored in the Site.
      * %jsonrpc subscribe
      * %caption Get Devices
@@ -406,7 +406,7 @@ void registerRestHandlers(
      * %permissions Depends on Resource access rights.
      * %return:{std::vector<DeviceModelV4>} List of all Device records.
      *
-     **%apidoc POST /rest/v{4-}/devices
+     **%apidoc POST /rest/v4/devices
      * Creates a record in the Site for the new Device. This method does not check for the Device
      * availability; use <code>POST /rest/v{1-}/devices/&ast;/searches</code> with `mode` equal to
      * `addFoundDevices` whenever possible instead.
@@ -419,7 +419,7 @@ void registerRestHandlers(
      * %permissions Depends on Resource access rights.
      * %return:{DeviceModelV4} Device record that was created.
      *
-     **%apidoc GET /rest/v{4-}/devices/{id}
+     **%apidoc GET /rest/v4/devices/{id}
      * Retrieves the specified Device record stored in the Site.
      * %jsonrpc subscribe
      * %caption Get Device
@@ -430,7 +430,7 @@ void registerRestHandlers(
      * %permissions Depends on Resource access rights.
      * %return:{DeviceModelV4} Device record.
      *
-     **%apidoc PUT /rest/v{4-}/devices/{id}
+     **%apidoc PUT /rest/v4/devices/{id}
      * Replaces all fields of the specified Device record stored in the Site.
      * %caption Replace Device
      * %ingroup Devices
@@ -442,7 +442,7 @@ void registerRestHandlers(
      * %permissions Depends on Resource access rights.
      * %return:{DeviceModelV4} Device record.
      *
-     **%apidoc PATCH /rest/v{4-}/devices/{id}
+     **%apidoc PATCH /rest/v4/devices/{id}
      * Modifies certain fields of the specified Device record stored in the Site.
      * %caption Modify Device
      * %ingroup Devices
@@ -454,7 +454,7 @@ void registerRestHandlers(
      * %permissions Depends on Resource access rights.
      * %return:{DeviceModelV4} Device record.
      *
-     **%apidoc DELETE /rest/v{4-}/devices/{id}
+     **%apidoc DELETE /rest/v4/devices/{id}
      * Deletes the specified Device record from the Site.
      * %caption Delete Device
      * %ingroup Devices
@@ -463,10 +463,82 @@ void registerRestHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Depends on Resource access rights.
      */
-    reg("rest/v{4-}/devices/:id?",
+    reg("rest/v4/devices/:id?",
         GlobalPermission::none,
         std::make_unique<
             nx::vms::server::DevicesHandler<QueryProcessor, nx::vms::api::DeviceModelV4>>(
+            queryProcessor, systemContext));
+
+    /**%apidoc GET /rest/v{5-}/devices
+     * Retrieves all Device records stored in the Site.
+     * %jsonrpc subscribe
+     * %caption Get Devices
+     * %ingroup Devices
+     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %permissions Depends on Resource access rights.
+     * %return:{std::vector<DeviceModelV5>} List of all Device records.
+     *
+     **%apidoc POST /rest/v{5-}/devices
+     * Creates a record in the Site for the new Device. This method does not check for the Device
+     * availability; use <code>POST /rest/v{1-}/devices/&ast;/searches</code> with `mode` equal to
+     * `addFoundDevices` whenever possible instead.
+     * %caption Create Device
+     * %ingroup Devices
+     * %struct DeviceModelV5
+     *     %param[unused] id
+     *     %param[unused] etag
+     * %param[ref] _strict,_ticket
+     * %permissions Depends on Resource access rights.
+     * %return:{DeviceModelV5} Device record that was created.
+     *
+     **%apidoc GET /rest/v{5-}/devices/{id}
+     * Retrieves the specified Device record stored in the Site.
+     * %jsonrpc subscribe
+     * %caption Get Device
+     * %ingroup Devices
+     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %permissions Depends on Resource access rights.
+     * %return:{DeviceModelV5} Device record.
+     *
+     **%apidoc PUT /rest/v{5-}/devices/{id}
+     * Replaces all fields of the specified Device record stored in the Site.
+     * %caption Replace Device
+     * %ingroup Devices
+     * %struct DeviceModelV5
+     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     * %param[unused] etag
+     * %param[ref] _strict,_ticket
+     * %permissions Depends on Resource access rights.
+     * %return:{DeviceModelV5} Device record.
+     *
+     **%apidoc PATCH /rest/v{5-}/devices/{id}
+     * Modifies certain fields of the specified Device record stored in the Site.
+     * %caption Modify Device
+     * %ingroup Devices
+     * %struct [opt] DeviceModelV5
+     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     * %param[unused] etag
+     * %param[ref] _strict,_ticket
+     * %permissions Depends on Resource access rights.
+     * %return:{DeviceModelV5} Device record.
+     *
+     **%apidoc DELETE /rest/v{5-}/devices/{id}
+     * Deletes the specified Device record from the Site.
+     * %caption Delete Device
+     * %ingroup Devices
+     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     * %param[ref] _strict,_ticket
+     * %permissions Depends on Resource access rights.
+     */
+    reg("rest/v{5-}/devices/:id?",
+        GlobalPermission::none,
+        std::make_unique<
+            nx::vms::server::DevicesHandler<QueryProcessor, nx::vms::api::DeviceModelV5>>(
             queryProcessor, systemContext));
 
     /**%apidoc GET /rest/v{1-}/devices/%2A/types

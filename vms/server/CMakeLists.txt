@@ -9,7 +9,7 @@ endif()
 add_subdirectory(plugins)
 
 set(versionedOpenapiJsons)
-foreach(apiVersion RANGE 1 4)
+foreach(apiVersion RANGE 1 5)
     set(_openapiJson "${CMAKE_CURRENT_BINARY_DIR}/api/openapi_v${apiVersion}.json")
     list(APPEND versionedOpenapiJsons "${_openapiJson}")
     nx_generate_openapi_schema(

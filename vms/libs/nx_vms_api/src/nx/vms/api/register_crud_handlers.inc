@@ -3345,7 +3345,7 @@ static void registerUpdateHandlers(
     const auto reg = processorPool->createRegisterHandlerFunctor();
 
     /**%apidoc POST /rest/v{4-}/update/start
-     * Starts an update process. Input to this can be requested from /rest/v4/update/info
+     * Starts an update process. Input to this can be requested from /rest/v{4-}/update/info
      * %caption Start Update
      * %ingroup Update
      * %struct UpdateInformation

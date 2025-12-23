@@ -26,6 +26,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DevicePtzOptions, (json), DevicePtzOptions_Fiel
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV1, (json), DeviceModelV1_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV3, (json), DeviceModelV3_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV4, (json), DeviceModelV4_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV5, (json), DeviceModelV5_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelForSearch, (json), DeviceModelForSearch_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceTypeModel, (json), DeviceTypeModel_Fields)
 
@@ -399,17 +400,15 @@ struct LessById
 template<typename Model>
 std::vector<Model> fromCameras(std::vector<CameraData> cameras)
 {
-    std::vector<Model> result;
-    result.reserve(cameras.size());
-    std::transform(std::make_move_iterator(cameras.begin()),
-        std::make_move_iterator(cameras.end()),
-        std::back_inserter(result),
-        [](CameraData data) -> Model
-        {
-            return Model{{{DeviceModelGeneral::fromCameraData(std::move(data))}}};
-        });
-
-    return result;
+    return std::move(cameras)
+        | nx::ranges::transform(
+            [](CameraData c) -> Model
+            {
+                Model m;
+                static_cast<DeviceModelGeneral&>(m) =
+                    DeviceModelGeneral::fromCameraData(std::move(c));
+                return m;
+            });
 }
 
 template <typename Model>
@@ -634,6 +633,16 @@ DeviceModelV4::DbUpdateTypes DeviceModelV4::toDbTypes() &&
 std::vector<DeviceModelV4> DeviceModelV4::fromDbTypes(DbListTypes data)
 {
     return api::fromDbTypes<DeviceModelV4>(std::move(data));
+}
+
+DeviceModelV5::DbUpdateTypes DeviceModelV5::toDbTypes() &&
+{
+    return api::toDbTypes(std::move(*this));
+}
+
+std::vector<DeviceModelV5> DeviceModelV5::fromDbTypes(DbListTypes data)
+{
+    return api::fromDbTypes<DeviceModelV5>(std::move(data));
 }
 
 } // namespace nx::vms::api

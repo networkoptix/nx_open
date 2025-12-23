@@ -548,6 +548,18 @@ struct NX_VMS_API DeviceModelV4: DeviceModelV3Base
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV4, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceModelV4, DeviceModelV4_Fields);
 
+/**%apidoc
+ * %param[unused] isLicenseUsed
+ */
+struct NX_VMS_API DeviceModelV5: DeviceModelV4
+{
+    DbUpdateTypes toDbTypes() &&;
+    static std::vector<DeviceModelV5> fromDbTypes(DbListTypes data);
+};
+#define DeviceModelV5_Fields DeviceModelV4_Fields
+QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV5, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceModelV5, DeviceModelV5_Fields);
+
 struct NX_VMS_API DeviceTypeModel
 {
     nx::Uuid id;
@@ -559,6 +571,6 @@ struct NX_VMS_API DeviceTypeModel
 QN_FUSION_DECLARE_FUNCTIONS(DeviceTypeModel, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceTypeModel, DeviceTypeModel_Fields);
 
-using DeviceModel = DeviceModelV4;
+using DeviceModel = DeviceModelV5;
 
 } // namespace nx::vms::api
