@@ -1873,5 +1873,9 @@
       <source>Update interval for public keys from the Cloud.</source>
       <translation>クラウドからの公開鍵の更新間隔。</translation>
     </message>
+    <message>
+      <source>Socket sending timeout when Server streams media data (Seconds).</source>
+      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+    </message>
   </context>
 </TS>

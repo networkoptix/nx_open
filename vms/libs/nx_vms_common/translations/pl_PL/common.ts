@@ -2083,5 +2083,9 @@
       <source>Update interval for public keys from the Cloud.</source>
       <translation>Interwał aktualizacji kluczy publicznych z chmury.</translation>
     </message>
+    <message>
+      <source>Socket sending timeout when Server streams media data (Seconds).</source>
+      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+    </message>
   </context>
 </TS>
