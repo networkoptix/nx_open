@@ -2007,5 +2007,9 @@
         <source>Update interval for public keys from the Cloud.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Socket sending timeout when Server streams media data (Seconds).</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
