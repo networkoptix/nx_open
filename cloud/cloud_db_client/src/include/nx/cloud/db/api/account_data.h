@@ -185,9 +185,8 @@ struct AccountUpdateData
      */
     std::optional<std::string> passwordHa1;
 
-    /**%apidoc
+    /**%apidoc One-time password from the authenticator app.
      * %deprecated Replaced by `mfaCode` attribute.
-     * One-time password from the authenticator app.
      */
     std::optional<std::string> totp;
 
@@ -285,9 +284,8 @@ struct AccountSecuritySettings
      */
     std::optional<bool> account2faEnabled;
 
-    /**%apidoc
+    /**%apidoc One-time password from the authenticator app.
      * %deprecated Replaced by `mfaCode` attribute.
-     * One-time password from the authenticator app.
      */
     std::optional<std::string> totp;
 

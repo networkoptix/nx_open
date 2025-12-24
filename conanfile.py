@@ -149,7 +149,7 @@ class NxOpenConan(ConanFile):
         self.build_requires("qt-host/6.9.1" "#593e82a6bad53a827e568d713f62867a")
 
         if not self.isEmscripten:
-            self.build_requires("apidoctool/3.0" "#80b1f6c3095658f36c2f18fec204639a")
+            self.build_requires("apidoctool/3.0" "#02ae3ddf972d89e3bcff43e0f35926d9")
             self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
             self.build_requires("breakpad-tools/2024.02.16" "#0327f836a8727dc7bd456fee67f78645")
 

@@ -84,9 +84,8 @@ struct SystemAttributesUpdate
      */
     std::optional<bool> system2faEnabled;
 
-    /**%apidoc
+    /**%apidoc One-time password from the authenticator app.
      * %deprecated Replaced by `mfaCode` attribute.
-     * One-time password from the authenticator app.
      */
     std::optional<std::string> totp;
 
