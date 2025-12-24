@@ -1937,5 +1937,9 @@
       <source>Update interval for public keys from the Cloud.</source>
       <translation>Khoảng thời gian cập nhật cho khóa công khai từ Đám mây.</translation>
     </message>
+    <message>
+      <source>Socket sending timeout when Server streams media data (Seconds).</source>
+      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+    </message>
   </context>
 </TS>
