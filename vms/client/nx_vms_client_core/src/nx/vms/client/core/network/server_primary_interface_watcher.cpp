@@ -77,8 +77,8 @@ void ServerPrimaryInterfaceWatcher::onResourcesAdded(const QnResourceList& resou
         {
             auto endpoint = server->getPrimaryAddress();
             endpoint.address = helpers::serverCloudHost(
-                systemContext()->moduleInformation().cloudId(),
-                server->getId());
+                systemContext()->moduleInformation().cloudSystemId, server->getId());
+
             systemContext()->moduleDiscoveryManager()->checkEndpoint(endpoint, server->getId());
         }
     }
