@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Unsupported charset.</source>
-      <translation type="unfinished">Unsupported charset.</translation>
+      <translation>不支援的字符集。</translation>
     </message>
   </context>
   <context>
@@ -166,7 +166,7 @@
     </message>
     <message>
       <source>Insufficient storage.</source>
-      <translation type="unfinished">Insufficient storage.</translation>
+      <translation>儲存空間不足。</translation>
     </message>
   </context>
 </TS>

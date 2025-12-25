@@ -1875,7 +1875,7 @@
     </message>
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
-      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+      <translation>サーバーがメディアデータをストリーミングする際のソケット送信タイムアウト (秒)。</translation>
     </message>
   </context>
 </TS>
