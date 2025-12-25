@@ -80,7 +80,6 @@ Page
         property: "title"
         value: layout.resourceName || windowContext.sessionManager.systemName
         when: windowContext.sessionManager.hasActiveSession
-        restoreMode: Binding.RestoreBinding
     }
 
     SearchToolBar
