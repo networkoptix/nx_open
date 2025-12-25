@@ -4,6 +4,7 @@
 #include <functional>
 #include <future>
 #include <thread>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -12,6 +13,7 @@
 #include <nx/network/websocket/websocket.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/thread/cf/wrappers.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx::network::websocket::test {
 
@@ -271,9 +273,10 @@ protected:
         ASSERT_TRUE(m_socketsSupplier.connectSockets()) << m_socketsSupplier.lastError();
     }
 
-    void givenServerClientWebSockets(
-        std::chrono::milliseconds clientTimeout, std::chrono::milliseconds serverTimeout,
-        bool noPongs = false)
+    void givenServerClientWebSockets(std::chrono::milliseconds clientTimeout,
+        std::chrono::milliseconds serverTimeout,
+        bool noPongs = false,
+        bool startSockets = true)
     {
         clientWebSocket.reset(new TestWebSocket(
             m_socketsSupplier.clientSocket(), clientSendMode, clientReceiveMode, Role::client,
@@ -289,10 +292,12 @@ protected:
 
         if (noPongs)
         {
-            clientWebSocket->disablePingPong();
-            serverWebSocket->disablePingPong();
+            clientWebSocket->setPingPongMode(PingPongMode::disabled);
+            serverWebSocket->setPingPongMode(PingPongMode::disabled);
         }
 
+        if (!startSockets)
+            return;
         clientWebSocket->start();
         serverWebSocket->start();
     }
@@ -1003,6 +1008,33 @@ TEST_P(WebSocket_PingPong, Close)
     startAndWaitForDestroyed();
     ASSERT_FALSE(clientWebSocket);
     ASSERT_FALSE(serverWebSocket);
+}
+
+TEST_P(WebSocket_PingPong, PongPayload)
+{
+    givenServerClientWebSockets(
+        kAliveTimeout, kAliveTimeout, /*noPongs*/ true, /*startSockets*/ false);
+    serverWebSocket->setPingPongMode(PingPongMode::onlyPong);
+    auto pongQueue = std::make_shared<nx::utils::SyncQueue<std::string>>();
+    clientWebSocket->setPongHandler(
+        [pongQueue](const nx::Buffer& payload) { pongQueue->push(payload.toStdString()); });
+
+    serverWebSocket->start();
+    clientWebSocket->start();
+    const std::vector<std::string> pingData{
+        "ping 1",
+        "",
+        "ping 2",
+    };
+    for (const auto& msg: pingData)
+    {
+        clientWebSocket->sendPingAsync(msg);
+    }
+    for (const auto& expected: pingData)
+    {
+        const auto actual = pongQueue->pop();
+        EXPECT_EQ(actual, expected);
+    }
 }
 
 TEST_P(WebSocket, SendMultiFrame_ReceiveSingleMessage)

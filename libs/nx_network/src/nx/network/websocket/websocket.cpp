@@ -117,7 +117,7 @@ void WebSocket::onPingTimer()
                 onWrite(SystemError::timedOut, 0);
         });
 
-    if (!m_pingPongDisabled)
+    if (m_pingPongMode == PingPongMode::pingPong)
         sendControlRequest(FrameType::ping);
 
     m_pingTimer->start(m_aliveTimeout, [this]() { onPingTimer(); });
@@ -198,9 +198,14 @@ void WebSocket::onRead(SystemError::ErrorCode error, size_t transferred)
         });
 }
 
-void WebSocket::disablePingPong()
+void WebSocket::setPingPongMode(PingPongMode mode)
 {
-    m_pingPongDisabled = true;
+    m_pingPongMode = mode;
+}
+
+void WebSocket::setPongHandler(nx::MoveOnlyFunc<void(nx::Buffer)> pongHandler)
+{
+    m_pongHandler = std::move(pongHandler);
 }
 
 void WebSocket::callOnReadhandler(SystemError::ErrorCode error, size_t transferred)
@@ -338,6 +343,11 @@ void WebSocket::sendCloseAsync()
     post([this]() { sendControlRequest(FrameType::close); });
 }
 
+void WebSocket::sendPingAsync(nx::Buffer payload)
+{
+    post([this, payload = std::move(payload)]() { sendControlRequest(FrameType::ping, payload); });
+}
+
 void WebSocket::sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler)
 {
     NX_VERBOSE(this, "SendMessage: IsFailed: %1, Write size: %2", m_failed, writeSize);
@@ -461,10 +471,12 @@ void WebSocket::gotFrame(FrameType type, nx::Buffer&& data, bool fin)
     switch (type)
     {
         case FrameType::ping:
-            if (!m_pingPongDisabled)
-                sendControlResponse(FrameType::pong);
+            if (m_pingPongMode != PingPongMode::disabled)
+                sendControlResponse(FrameType::pong, data);
             break;
         case FrameType::pong:
+            if (m_pongHandler)
+                m_pongHandler(std::move(data));
             break;
         case FrameType::close:
             sendControlResponse(FrameType::close);
@@ -479,9 +491,9 @@ void WebSocket::gotFrame(FrameType type, nx::Buffer&& data, bool fin)
     }
 }
 
-void WebSocket::sendControlResponse(FrameType type)
+void WebSocket::sendControlResponse(FrameType type, const Buffer& payload)
 {
-    nx::Buffer responseFrame = m_serializer.prepareMessage({}, type);
+    nx::Buffer responseFrame = m_serializer.prepareMessage(payload, type);
 
     sendMessage(
         responseFrame, responseFrame.size(),
@@ -495,9 +507,9 @@ void WebSocket::sendControlResponse(FrameType type)
         });
 }
 
-void WebSocket::sendControlRequest(FrameType type)
+void WebSocket::sendControlRequest(FrameType type, const Buffer& payload)
 {
-    nx::Buffer requestFrame = m_serializer.prepareMessage({}, type);
+    nx::Buffer requestFrame = m_serializer.prepareMessage(payload, type);
     sendMessage(
         requestFrame, requestFrame.size(),
         [this, type](SystemError::ErrorCode error, size_t /*transferred*/)

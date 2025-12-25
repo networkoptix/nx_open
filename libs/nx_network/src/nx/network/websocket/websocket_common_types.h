@@ -100,4 +100,11 @@ struct Statistics
     size_t totalOut = 0;
 };
 
+enum class PingPongMode
+{
+    pingPong,
+    onlyPong, /**< Disable sendind PING */
+    disabled, /**< Disable sending PING and PONG responses */
+};
+
 } // namespace nx::network::websocket

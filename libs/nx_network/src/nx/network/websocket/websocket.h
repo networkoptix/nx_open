@@ -86,11 +86,19 @@ public:
     Statistics outputStatistics() const { return m_serializer.statistics(); }
 
     /**
-     * Disable PONG responses.
+     * Controls PING, PONG messages.
      * NOTE: Don't call it unless you are completely sure what you are doing.
      * NOTE: Should be called before start().
      */
-    void disablePingPong();
+    void setPingPongMode(PingPongMode mode);
+
+    // Next methods are for test purposes only.
+
+    /**
+     * NOTE: Should be called before start().
+     */
+    void setPongHandler(nx::MoveOnlyFunc<void(nx::Buffer)> pongHandler);
+    void sendPingAsync(nx::Buffer payload);
 
 private:
     struct UserReadContext
@@ -127,8 +135,9 @@ private:
     std::optional<Serializer::Compression> m_compression;
     bool m_readingCeased = false;
     bool m_readingSuspended = false;
-    bool m_pingPongDisabled = false;
+    PingPongMode m_pingPongMode = PingPongMode::pingPong;
     QString m_lastErrorMessage;
+    nx::MoveOnlyFunc<void(nx::Buffer)> m_pongHandler;
 
     virtual void stopWhileInAioThread() override;
 
@@ -137,8 +146,8 @@ private:
 
     /** Own helper functions*/
     void sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler);
-    void sendControlResponse(FrameType type);
-    void sendControlRequest(FrameType type);
+    void sendControlResponse(FrameType type, const nx::Buffer& payload = {});
+    void sendControlRequest(FrameType type, const Buffer& payload = {});
     void onPingTimer();
     void onRead(SystemError::ErrorCode ecode, size_t transferred);
     void onWrite(SystemError::ErrorCode ecode, size_t transferred);
