@@ -78,6 +78,7 @@ struct NX_VMS_API ModuleInformation: ModuleInformationBase
     bool ecDbReadOnly = false;
 
     void fixRuntimeId();
+    /** Do not confuse with cloudSystemId. Returns serverId.cloudSystemId. */
     QString cloudId() const;
     bool isNewSystem() const;
     bool isSaasSystem() const;

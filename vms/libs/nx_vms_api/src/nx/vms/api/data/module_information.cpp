@@ -3,7 +3,6 @@
 #include "module_information.h"
 
 #include <QtCore/QCryptographicHash>
-#include <QtNetwork/QNetworkInterface>
 
 #include <nx/fusion/model_functions.h>
 
@@ -44,8 +43,9 @@ QString ModuleInformation::cloudId() const
         return QString();
 
     const auto tmpCloudSystemId = nx::Uuid::fromStringSafe(cloudSystemId);
-    return id.toSimpleString() + "." +
-        (tmpCloudSystemId.isNull() ? cloudSystemId : tmpCloudSystemId.toSimpleString());
+
+    return id.toSimpleString().append('.').append(
+        tmpCloudSystemId.isNull() ? cloudSystemId : tmpCloudSystemId.toSimpleString());
 }
 
 bool ModuleInformation::isNewSystem() const
