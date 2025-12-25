@@ -2009,7 +2009,7 @@
     </message>
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
-      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+      <translation>Timeout for socket sending, når serveren streamer mediedata (sekunder).</translation>
     </message>
   </context>
 </TS>

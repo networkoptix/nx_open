@@ -121,18 +121,18 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsLoaderDelegate</name>
     <message>
       <source>Unknown Object</source>
-      <translation type="unfinished">Unknown Object</translation>
+      <translation>未知的物件</translation>
     </message>
     <message numerus="yes">
       <source>Objects (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Objects (%n)</numerusform>
+      <translation>
+        <numerusform>物件 (%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Objects (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Objects (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>物件 (&gt;%n)</numerusform>
       </translation>
     </message>
   </context>
@@ -144,14 +144,14 @@
     </message>
     <message numerus="yes">
       <source>Bookmarks (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Bookmarks (%n)</numerusform>
+      <translation>
+        <numerusform>書籤 (%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Bookmarks (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Bookmarks (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>書籤 (&gt;%n)</numerusform>
       </translation>
     </message>
   </context>
@@ -159,18 +159,18 @@
     <name>nx::vms::client::mobile::timeline::MotionLoaderDelegate</name>
     <message>
       <source>Motion detected</source>
-      <translation type="unfinished">Motion detected</translation>
+      <translation>偵測到位移</translation>
     </message>
     <message numerus="yes">
       <source>Motions (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motions (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>位移偵測 (&gt;%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Motions (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motions (%n)</numerusform>
+      <translation>
+        <numerusform>位移偵測 (%n)</numerusform>
       </translation>
     </message>
   </context>
