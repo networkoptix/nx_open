@@ -127,16 +127,16 @@
     </message>
     <message numerus="yes">
       <source>Objects (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Objects (%n)</numerusform>
-        <numerusform>Objects (%n)</numerusform>
+      <translation>
+        <numerusform>Objekt (%n)</numerusform>
+        <numerusform>Objekt (%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Objects (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Objects (&gt;%n)</numerusform>
-        <numerusform>Objects (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>Objekt (&gt;%n)</numerusform>
+        <numerusform>Objekt (&gt;%n)</numerusform>
       </translation>
     </message>
   </context>
@@ -148,16 +148,16 @@
     </message>
     <message numerus="yes">
       <source>Bookmarks (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Bookmarks (%n)</numerusform>
-        <numerusform>Bookmarks (%n)</numerusform>
+      <translation>
+        <numerusform>Bokmärken (%n)</numerusform>
+        <numerusform>Bokmärken (%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Bookmarks (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Bookmarks (&gt;%n)</numerusform>
-        <numerusform>Bookmarks (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>Bokmärken (&gt;%n)</numerusform>
+        <numerusform>Bokmärken (&gt;%n)</numerusform>
       </translation>
     </message>
   </context>
@@ -165,20 +165,20 @@
     <name>nx::vms::client::mobile::timeline::MotionLoaderDelegate</name>
     <message>
       <source>Motion detected</source>
-      <translation type="unfinished">Motion detected</translation>
+      <translation>Rörelse detekterad</translation>
     </message>
     <message numerus="yes">
       <source>Motions (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motions (&gt;%n)</numerusform>
-        <numerusform>Motions (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>Rörelser (&gt;%n)</numerusform>
+        <numerusform>Rörelser (&gt;%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Motions (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motions (%n)</numerusform>
-        <numerusform>Motions (%n)</numerusform>
+      <translation>
+        <numerusform>Rörelser (%n)</numerusform>
+        <numerusform>Rörelser (%n)</numerusform>
       </translation>
     </message>
   </context>
