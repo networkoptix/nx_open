@@ -60,9 +60,11 @@ Item
             id: tile
 
             required property string name
+            required property string forwardedPort
             required property string port
             required property string login
             required property string password
+            required property string customLoginLabel
 
             height: 144
             width: 309
@@ -136,6 +138,7 @@ Item
                         text: qsTr("Local port")
                         font: grid.font
                         color: ColorTheme.colors.light16
+                        visible: tile.port
 
                         Layout.preferredWidth: grid.firstColumnWidth
                         Layout.preferredHeight: grid.rowHeight
@@ -143,16 +146,17 @@ Item
 
                     Item
                     {
+                        visible: tile.port
                         Layout.preferredHeight: grid.rowHeight
 
                         CopyableLabel
                         {
                             id: portLabel
-                            text: tile.port
+                            text: tile.forwardedPort
                             font: grid.font
                             color: hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light10
                             width: grid.secondColumnWidth
-                            visible: !!tile.port
+                            visible: !!tile.forwardedPort
                             copiedTooltipLifetimeMs: 2500
                         }
 
@@ -181,7 +185,7 @@ Item
 
                     Text
                     {
-                        text: qsTr("Username")
+                        text: tile.customLoginLabel ? tile.customLoginLabel : qsTr("Username")
                         font: grid.font
                         color: ColorTheme.colors.light16
 
@@ -191,7 +195,7 @@ Item
 
                     CopyableLabel
                     {
-                        text: tile.login == "" ? "—" : tile.login
+                        text: tile.login == "" ? "-" : tile.login
                         font: grid.font
                         color: hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light10
                         width: grid.secondColumnWidth
@@ -212,7 +216,7 @@ Item
 
                     CopyableLabel
                     {
-                        text: tile.password == "" ? "—" : tile.password
+                        text: tile.password == "" ? "-" : tile.password
                         font: grid.font
                         color: hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light10
                         width: grid.secondColumnWidth
@@ -222,6 +226,8 @@ Item
                         Layout.preferredHeight: grid.rowHeight
                     }
                 }
+
+                Item { Layout.fillHeight: true }
             }
         }
     }

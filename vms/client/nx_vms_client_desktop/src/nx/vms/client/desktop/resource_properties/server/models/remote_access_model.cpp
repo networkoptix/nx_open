@@ -46,8 +46,10 @@ QHash<int, QByteArray> RemoteAccessModel::roleNames() const
 {
     static QHash<int, QByteArray> kRoleNames{
         {static_cast<int>(Roles::name), "name"},
+        {static_cast<int>(Roles::customLoginLabel), "customLoginLabel"},
         {static_cast<int>(Roles::login), "login"},
         {static_cast<int>(Roles::password), "password"},
+        {static_cast<int>(Roles::forwardedPort), "forwardedPort"},
         {static_cast<int>(Roles::port), "port"},
     };
 
@@ -65,16 +67,22 @@ QVariant RemoteAccessModel::data(const QModelIndex& index, int role) const
     {
         case Roles::name:
             return QVariant::fromValue(item.name);
+        case Roles::customLoginLabel:
+            return item.loginLabel
+                ? QVariant::fromValue(*item.loginLabel)
+                : QVariant();
         case Roles::login:
             return QVariant::fromValue(item.login);
         case Roles::password:
             return QVariant::fromValue(item.password);
-        case Roles::port:
+        case Roles::forwardedPort:
             return item.forwardedPort
                 ? QVariant::fromValue(*item.forwardedPort)
-                : item.port
-                    ? QVariant()
-                    : QVariant("-");
+                : QVariant();
+        case Roles::port:
+            return item.port
+                ? QVariant::fromValue(*item.port)
+                : QVariant();
     }
 
     return QVariant();

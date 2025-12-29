@@ -25,9 +25,12 @@ struct NX_VMS_API PortForwardingConfiguration
     /**%apidoc[opt] */
     QString password;
 
+    /**%apidoc[opt] Custom label for login field in UI. */
+    std::optional<QString> loginLabel;
+
     bool operator==(const PortForwardingConfiguration&) const = default;
 };
-#define PortForwardingConfiguration_Fields (name)(port)(login)(password)
+#define PortForwardingConfiguration_Fields (name)(port)(login)(password)(loginLabel)
 QN_FUSION_DECLARE_FUNCTIONS(PortForwardingConfiguration, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(PortForwardingConfiguration, PortForwardingConfiguration_Fields);
 
