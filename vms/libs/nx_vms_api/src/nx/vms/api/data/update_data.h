@@ -88,12 +88,16 @@ struct NX_VMS_API ProductInfo
     /**%apidoc[opt] */
     PublicationType publicationType{PublicationType::release};
     /**%apidoc[opt]
-     * If present, the Server makes an attempt to retrieve an update manifest for the specified
-     * version id from the dedicated updates server and return it as a result.
+     * Required for `specific` and `latest` infoCategory.
+     * For `specific` infoCategory, the Server makes an attempt to retrieve an update manifest for
+     * the specified version from the server with updates and returns it as a result.
+     * For `latests` infoCategory, the Server makes an attempt to retrieve an update manifest for
+     * the version that is the latest for the specified version from the server with updates
+     * and returns it as a result.
      */
     std::string version{};
 
-    /**%apidoc[opt] Integer version of the release
+    /**%apidoc[opt] Integer version of the release. Used only for a Desktop Client component.
      * %example 50100
      */
     int protocolVersion{0};
@@ -133,7 +137,7 @@ struct NX_VMS_API UpdatePackage
      * %example 1073741824
      */
     double sizeB{0.0};
-    std::optional<std::string> signature;
+    std::optional<QByteArray> signature;
 
     std::string url;
 };
