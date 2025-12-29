@@ -19,7 +19,9 @@ public:
     enum class Roles
     {
         name = Qt::UserRole + 1,
+        forwardedPort,
         port,
+        customLoginLabel,
         login,
         password,
     };
