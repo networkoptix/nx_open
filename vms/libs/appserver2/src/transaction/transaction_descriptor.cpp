@@ -1035,11 +1035,8 @@ struct ModifyStorageAccess
 
         const auto resourcePool = systemContext->resourcePool();
         const auto existingResource = resourcePool->getResourceById(param.id);
-        if (!hasSystemAccess(accessData)
-            && !validateResourceNameOrEmpty(param, existingResource))
-        {
+        if (!validateResourceNameOrEmpty(param, existingResource))
             return invalidParameterError("name");
-        }
 
         transaction_descriptor::CanModifyStorageData data;
 
@@ -2760,25 +2757,42 @@ struct VideoWallControlAccess
     }
 };
 
+namespace {
+
+NX_REFLECTION_ENUM_CLASS(ShowreelAccessKind, read, modify, delete_)
+
+Result checkShowreelAccess(ShowreelAccessKind kind,
+    SystemContext* systemContext,
+    const nx::network::rest::UserAccessData& accessData,
+    const nx::vms::api::ShowreelData& showreel)
+{
+    if (showreel.parentId.isNull()
+        || accessData.userId == showreel.parentId
+        || (kind == ShowreelAccessKind::read
+            && accessData.userId == nx::network::rest::kCloudServiceUserAccess.userId)
+        || systemContext->resourceAccessManager()->hasPowerUserPermissions(accessData))
+    {
+        return {};
+    }
+
+    return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+        "User %1 is not allowed to %2 the Showreel with parentId %3"),
+        accessData.userId, kind, showreel.parentId));
+}
+
+} // namespace
+
 struct ShowreelAccess
 {
     Result operator()(
-        SystemContext*,
+        SystemContext* systemContext,
         const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::ShowreelData& showreel)
     {
         if (hasSystemAccess(accessData))
-            return Result();
+            return {};
 
-        if (showreel.parentId.isNull()
-            || accessData.userId == showreel.parentId)
-        {
-            return Result();
-        }
-        return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-            "User %1 is not allowed to modify the Showreel with parentId %2."),
-            accessData.userId,
-            showreel.parentId));
+        return checkShowreelAccess(ShowreelAccessKind::read, systemContext, accessData, showreel);
     }
 };
 
@@ -2792,11 +2806,14 @@ struct SaveShowreelAccess
         if (hasSystemAccess(accessData))
             return {};
 
-        if (auto r = ShowreelAccess()(systemContext, accessData, showreel); !r)
+        if (auto r = checkShowreelAccess(
+                ShowreelAccessKind::modify, systemContext, accessData, showreel);
+            !r)
+        {
             return r;
+        }
 
-        const auto existing = systemContext->showreelManager()->showreel(
-            showreel.id);
+        const auto existing = systemContext->showreelManager()->showreel(showreel.id);
         if (!existing.isValid() || existing.name != showreel.name)
         {
             if (!validateNotEmptyWithoutSpaces(showreel.name))
@@ -2813,11 +2830,15 @@ struct ShowreelAccessById
         const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::IdData& showreelId)
     {
-        const auto showreel = systemContext->showreelManager()->showreel(
-            showreelId.id);
+        if (hasSystemAccess(accessData))
+            return {};
+
+        const auto showreel = systemContext->showreelManager()->showreel(showreelId.id);
         if (!showreel.isValid())
-            return Result(); //< Allow everyone to work with tours which are already deleted.
-        return ShowreelAccess()(systemContext, accessData, showreel);
+            return {}; //< Allow everyone to work with showreel which is already deleted.
+
+        return checkShowreelAccess(
+            ShowreelAccessKind::delete_, systemContext, accessData, showreel);
     }
 };
 
