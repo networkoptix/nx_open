@@ -819,7 +819,7 @@ APPLY(606, removeShowreel, nx::vms::api::IdData, \
     CreateHashByIdHelper(), \
     &apiIdDataTriggerNotificationHelper, \
     ShowreelAccessById(), /*< save permission checker */ \
-    ShowreelAccessById(), /*< read permission checker */ \
+    InvalidAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
