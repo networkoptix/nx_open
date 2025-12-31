@@ -5,23 +5,23 @@
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
-      <translation type="unfinished">For the duration of event</translation>
+      <translation>이벤트 기간 동안</translation>
     </message>
     <message>
       <source>Of fixed duration</source>
-      <translation type="unfinished">Of fixed duration</translation>
+      <translation>고정된 기간의</translation>
     </message>
     <message>
       <source>Event occurs</source>
-      <translation type="unfinished">Event occurs</translation>
+      <translation>이벤트가 발생합니다</translation>
     </message>
     <message>
       <source>Event starts</source>
-      <translation type="unfinished">Event starts</translation>
+      <translation>이벤트 시작</translation>
     </message>
     <message>
       <source>Event stops</source>
-      <translation type="unfinished">Event stops</translation>
+      <translation>이벤트 중지</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -89,7 +89,7 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>취소</translation>
     </message>
     <message>
       <source>Added</source>
@@ -1054,19 +1054,19 @@
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>사이트 관리...</translation>
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>사이트 업데이트...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation type="unfinished">Lists Management...</translation>
+      <translation>목록 관리...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>오픈 통합...</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
@@ -1075,7 +1075,7 @@
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>에서 열기</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -1090,7 +1090,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>전용 창구</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1098,11 +1098,11 @@
     </message>
     <message>
       <source>JavaScript API...</source>
-      <translation type="unfinished">JavaScript API...</translation>
+      <translation>자바스크립트 API...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
-      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+      <translation>현재 연결된 사이트로 병합...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
@@ -1214,11 +1214,11 @@
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>동영상</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>모든 파일</translation>
     </message>
   </context>
   <context>
@@ -1370,11 +1370,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>귀하의 사이트가 인터넷에 접속할 수 없는 경우 제공된 라이선스 키와 하드웨어 ID를 %1 로 보내면 활성화 파일을 받으실 수 있습니다.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>귀하의 사이트가 인터넷에 접속할 수 없는 경우 제공된 라이선스 키와 하드웨어 ID를 지역/라이선스 지원팀으로 보내 활성화 파일을 받으세요:</translation>
     </message>
   </context>
   <context>
@@ -1612,7 +1612,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Enter a short Site description here.</source>
-      <translation type="unfinished">Enter a short Site description here.</translation>
+      <translation>여기에 짧은 사이트 설명을 입력하세요.</translation>
     </message>
   </context>
   <context>
@@ -1864,7 +1864,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Developer Build</source>
-      <translation type="unfinished">Developer Build</translation>
+      <translation>개발자 빌드</translation>
     </message>
   </context>
   <context>
@@ -1961,14 +1961,14 @@ License Key: %2</source>
     </message>
     <message>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+      <translation>참고: 하드웨어 비디오 디코딩이 켜져 있으면 이미지 향상 기능을 사용할 수 없습니다.</translation>
     </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
+      <translation>사이트가 종료되었습니다. 비디오월에 연결하려면 사이트가 활성화 상태여야 합니다. %1</translation>
     </message>
   </context>
   <context>
@@ -2064,32 +2064,32 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
+      <translation>
+        <numerusform>이 장치들은 시스템에서 제거 되었습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
+      <translation>
+        <numerusform>이 카메라들은 시스템에서 제거 되었습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
+      <translation>
+        <numerusform>이 리소스들은 시스템에서 제거 되었습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>This server is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This server is removed from Site</numerusform>
+      <translation>
+        <numerusform>이 서버들은 시스템에서 제거 되었습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>This user is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This user is removed from Site</numerusform>
+      <translation>
+        <numerusform>이 사용자들은 시스템에서 제거 되었습니다</numerusform>
       </translation>
     </message>
   </context>
@@ -2271,33 +2271,33 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site name changed</source>
-      <translation type="unfinished">Site name changed</translation>
+      <translation>사이트 이름이 변경되었습니다</translation>
     </message>
     <message>
       <source>Site merge</source>
-      <translation type="unfinished">Site merge</translation>
+      <translation>사이트 병합</translation>
     </message>
     <message>
       <source>Server proxy connection</source>
-      <translation type="unfinished">Server proxy connection</translation>
+      <translation>서버 프록시 연결</translation>
     </message>
     <message>
       <source>Site has been updated to version %1</source>
-      <translation type="unfinished">Site has been updated to version %1</translation>
+      <translation>사이트가 버전 %1으로 업데이트되었습니다</translation>
     </message>
     <message>
       <source>%1 - %2, Duration: %3, Target: %4</source>
       <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
-      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+      <translation>%1 - %2, 지속 시간: %3, 대상: %4</translation>
     </message>
     <message>
       <source>Start time: %1, Target: %2</source>
       <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
-      <translation type="unfinished">Start time: %1, Target: %2</translation>
+      <translation>시작 시간: %1, 목표 시간: %2</translation>
     </message>
     <message>
       <source>User IP</source>
-      <translation type="unfinished">User IP</translation>
+      <translation>사용자 IP</translation>
     </message>
     <message>
       <source>Device</source>
@@ -2309,11 +2309,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Device IP</source>
-      <translation type="unfinished">Device IP</translation>
+      <translation>장치 IP</translation>
     </message>
     <message>
       <source>Camera IP</source>
-      <translation type="unfinished">Camera IP</translation>
+      <translation>카메라 IP</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2609,58 +2609,58 @@ License Key: %2</source>
     <message>
       <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect Site from %1</translation>
+      <translation>%1에서 사이트 연결 해제</translation>
     </message>
     <message>
       <source>Connect Site to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1...</translation>
+      <translation>사이트를 %1에 연결하세요...</translation>
     </message>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+      <translation>현재 귀하의 사이트와 %1사이에 연결이 없습니다.</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+      <translation>%1에서 사이트 연결을 해제하려면 계정 비밀번호를 입력하세요</translation>
     </message>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+      <translation>%1에서 사이트 연결을 해제할 수 없습니다</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site disconnected from %1</translation>
+      <translation>사이트가 %1에서 연결 해제되었습니다</translation>
     </message>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">Disconnect site from %1?</translation>
+      <translation>%1에서 사이트 연결을 해제하시겠습니까?</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
-      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+      <translation>녹음이 중지되고 모든 서비스 구독이 제거됩니다</translation>
     </message>
     <message>
       <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be removed from the site</translation>
+      <translation>모든 %1 사용자는 사이트에서 제거됩니다</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>사이트에서 로그아웃됩니다. 로컬 네트워크를 통해서만 사이트에 접속할 수 있습니다</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>이 사이트는 로컬 네트워크를 통해서만 접속 가능합니다</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
-      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
+      <translation>기존 데이터(사이트 설정 및 보관)는 보존됩니다</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
@@ -2855,11 +2855,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
-      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+      <translation>사이트가 2단계 인증과 호환되지 않습니다</translation>
     </message>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
+      <translation>사이트에 로그인하는 데 실패했습니다. &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -2930,11 +2930,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>사이트 구성은 백업에서 복원되고, 서버 애플리케이션은 다시 시작됩니다.</translation>
     </message>
     <message>
       <source>Enter your account password to restore Site from backup</source>
-      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
+      <translation>백업에서 사이트를 복원하려면 계정 비밀번호를 입력하세요</translation>
     </message>
   </context>
   <context>
@@ -2979,7 +2979,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
-      <translation type="unfinished">Notifications filters are moved to the right panel</translation>
+      <translation>알림 필터가 오른쪽 패널로 이동되었습니다</translation>
     </message>
   </context>
   <context>
@@ -3038,7 +3038,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>오픈 통합</translation>
     </message>
   </context>
   <context>
@@ -3331,7 +3331,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
+      <translation>설정은 읽기 전용입니다. 사이트 관리자에게 문의하세요. 프로그램을 종료하면 모든 변경 사항이 삭제됩니다.</translation>
     </message>
   </context>
   <context>
@@ -3449,8 +3449,8 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>Set for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n devices</numerusform>
+      <translation>
+        <numerusform>%n 장치에 대해 설정됨</numerusform>
       </translation>
     </message>
   </context>
@@ -3501,7 +3501,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</translation>
+      <translation>&quot;가상 카메라&quot; 는 비디오 파일을 위한 가상 저장소로, 사이트의 모든 서버에 업로드하여 모든 사용자가 접근할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -3824,7 +3824,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Move to a dedicated window</source>
-      <translation type="unfinished">Move to a dedicated window</translation>
+      <translation>전용 창으로 이동</translation>
     </message>
   </context>
   <context>
@@ -4114,7 +4114,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
-      <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
+      <translation>원격 액세스를 사용하려면 먼저 계정의 안전하지 않은(다이제스트) 인증을 비활성화해야 합니다.</translation>
     </message>
   </context>
   <context>
@@ -4176,7 +4176,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>2FA 설정</translation>
     </message>
   </context>
   <context>
@@ -4195,7 +4195,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>UNSUPPORTED</source>
-      <translation type="unfinished">UNSUPPORTED</translation>
+      <translation>지원되지 않음</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
@@ -4203,7 +4203,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
-      <translation type="unfinished">SITE SHUT DOWN</translation>
+      <translation>사이트 폐쇄</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
@@ -4235,23 +4235,23 @@ License Key: %2</source>
     </message>
     <message>
       <source>CERTIFICATE ERROR</source>
-      <translation type="unfinished">CERTIFICATE ERROR</translation>
+      <translation>인증서 오류</translation>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+      <translation>이 카메라에 접근할 수 없습니다. 자세한 내용은 데스크톱 클라이언트에서 카메라 진단을 실행하세요.</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+      <translation>이 카메라에 접근하려면 권한 자격증명이 필요합니다.</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
-      <translation type="unfinished">CONNECTION LOST</translation>
+      <translation>연결이 끊어졌습니다</translation>
     </message>
     <message>
       <source>NOT ACTIVATED</source>
-      <translation type="unfinished">NOT ACTIVATED</translation>
+      <translation>활성화되지 않음</translation>
     </message>
     <message>
       <source>2FA DISABLED</source>
@@ -4399,11 +4399,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
-      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+      <translation>저장소 디렉터리와 상호 작용하는 방법을 정의하려면 읽기-쓰기 정책을 선택합니다.</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>독점적인</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -4411,36 +4411,36 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>고립된</translation>
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
-      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+      <translation>사이트 서버에는 저장소에 대한 서로 다른 읽기-쓰기 정책이 있습니다</translation>
     </message>
     <message>
       <source>URL: %1</source>
       <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
-      <translation type="unfinished">URL: %1</translation>
+      <translation>URL: %1</translation>
     </message>
     <message>
       <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
-      <translation type="unfinished">Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</translation>
+      <translation>단독 - 서버가 모든 폴더에서 읽기는 하지만 자기 폴더에만 쓰기를 수행합니다. 모든 폴더에서 오래된 데이터는 삭제합니다.</translation>
     </message>
     <message>
       <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>공유 - 서버가 모든 폴더에서 데이터를 읽지만, 자기 폴더에만 데이터를 씁니다. 자기 폴더의 오래된 데이터만 삭제합니다.</translation>
     </message>
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>격리됨 - 서버는 자체 폴더에서만 읽고 씁니다. 자체 폴더의 오래된 데이터만 삭제합니다.</translation>
     </message>
     <message>
       <source>Cloud storage cannot be enabled.</source>
-      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+      <translation>클라우드 스토리지를 활성화할 수 없습니다.</translation>
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
-      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+      <translation>활성화하려면 %1 더 적합한 서비스를 추가하거나 백업 기능이 활성화된 카메라 수를 줄이세요.</translation>
     </message>
     <message>
       <source>Insufficient services</source>
@@ -4448,31 +4448,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
-      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+      <translation>클라우드 백업이 활성화되면 클라우드 백업이 아닌 모든 저장소는 비활성화됩니다. &quot;모든 보관 파일&quot; 설정으로 구성된 기기는 &quot;모션, 객체 및 북마크&quot;로 변경됩니다;</translation>
     </message>
     <message>
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
-      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
+      <translation>클라우드 백업이 활성화되면 &quot;모든 보관&quot; 설정이 &quot;동작, 개체 및 북마크&quot; 로 변경됩니다</translation>
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+      <translation>사이트가 종료되어 클라우드 백업이 중단되었습니다. 클라우드 저장소에 백업하려면 사이트가 활성화되어 있어야 합니다. 도움이 필요하면 채널 파트너에게 문의하세요.</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>클라우드 백업은 계속되지만 사이트가 현재 일시 중단되었습니다. 백업 구성을 수정하거나 클라우드 스토리지 위치를 활성화하려면 사이트를 활성화해야 합니다. 도움이 필요하면 채널 파트너에게 문의하세요.</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>클라우드 스토리지를 사용하려면 사이트를 활성화해야 합니다. 도움이 필요하면 채널 파트너에게 문의하세요.</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>사이트가 중단되었습니다</translation>
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>한 서버에서 클라우드 스토리지를 비활성화하면 모든 서버에서도 비활성화됩니다. 로컬 백업은 수동으로 설정해야 합니다.</translation>
     </message>
   </context>
   <context>
@@ -4575,11 +4575,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>고립된</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>전용</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -4595,7 +4595,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown size</source>
-      <translation type="unfinished">Unknown size</translation>
+      <translation>알 수 없는 크기</translation>
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
@@ -4603,15 +4603,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
-      <translation type="unfinished">Click on the icon to see Servers list</translation>
+      <translation>아이콘을 클릭하면 서버 목록을 볼 수 있습니다</translation>
     </message>
     <message>
       <source>Read-Write Policy</source>
-      <translation type="unfinished">Read-Write Policy</translation>
+      <translation>읽기-쓰기 정책</translation>
     </message>
     <message>
       <source>Adaptive</source>
-      <translation type="unfinished">Adaptive</translation>
+      <translation>적응형</translation>
     </message>
   </context>
   <context>
@@ -4724,7 +4724,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to save site settings</source>
-      <translation type="unfinished">Failed to save site settings</translation>
+      <translation>사이트 설정을 저장하지 못했습니다</translation>
     </message>
   </context>
   <context>
@@ -4847,23 +4847,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Site has no internet access for time synchronization</source>
-      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+      <translation>사이트에는 시간 동기화를 위한 인터넷 접속이 없습니다</translation>
     </message>
     <message>
       <source>System partition is used for analytics data</source>
-      <translation type="unfinished">System partition is used for analytics data</translation>
+      <translation>시스템 파티션은 분석 데이터에 사용됩니다</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>사이트가 중단되었습니다</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>사이트 폐쇄</translation>
     </message>
     <message>
       <source>Email address is not set for your account</source>
-      <translation type="unfinished">Email address is not set for your account</translation>
+      <translation>%1 사용자 이메일 설정 안됨</translation>
     </message>
     <message>
       <source>Calling...</source>
@@ -4871,28 +4871,28 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>부재중 전화</translation>
     </message>
     <message numerus="yes">
       <source>Storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>%n 서버에서 백업 저장소가 구성되지 않았습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>%n 서버에서 백업 저장소가 구성되지 않았습니다</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule is invalid</source>
-      <translation type="unfinished">Recording schedule is invalid</translation>
+      <translation>카메라 녹화 일정이 잘못되었습니다</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      <translation>
+        <numerusform>%n 카메라의 녹화 일정이 잘못되었습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4904,11 +4904,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Check out %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1</translation>
+      <translation>%1을 확인하세요</translation>
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
-      <translation type="unfinished">Remote archive synchronization failed</translation>
+      <translation>원격 아카이브 동기화</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
@@ -4918,29 +4918,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      <translation>
+        <numerusform>시스템 저장소는 %n 서버의 분석 데이터에 사용됩니다</numerusform>
       </translation>
     </message>
     <message>
       <source>Connect to your Site from anywhere!</source>
-      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+      <translation>어디서든 귀하의 사이트에 접속하세요!</translation>
     </message>
     <message>
       <source>No online server in the site has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+      <translation>이 사이트의 온라인 서버에는 시간 동기화를 위한 인터넷 접속이 없습니다.</translation>
     </message>
     <message>
       <source>You cannot receive Site notifications by email.</source>
-      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+      <translation>사이트 알림을 이메일로 받을 수 없습니다.</translation>
     </message>
     <message>
       <source>They cannot receive Site notifications by email.</source>
-      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+      <translation>이들은 이메일로 사이트 알림을 받을 수 없습니다.</translation>
     </message>
     <message>
       <source>Some cameras are set to record in a mode they do not support.</source>
-      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+      <translation>일부 카메라는 지원하지 않는 모드로 녹화하도록 설정되어 있습니다.</translation>
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
@@ -4950,57 +4950,57 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site will stop functioning soon</source>
-      <translation type="unfinished">Site will stop functioning soon</translation>
+      <translation>사이트가 곧 작동을 중단합니다</translation>
     </message>
     <message>
       <source>Site has stopped functioning</source>
-      <translation type="unfinished">Site has stopped functioning</translation>
+      <translation>사이트가 작동을 멈췄습니다</translation>
     </message>
     <message>
       <source>Site will stop functioning today</source>
-      <translation type="unfinished">Site will stop functioning today</translation>
+      <translation>오늘 사이트가 작동하지 않습니다</translation>
     </message>
     <message>
       <source>Site will stop functioning tomorrow</source>
-      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+      <translation>사이트는 내일 작동을 중단합니다</translation>
     </message>
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
-      <translation type="unfinished">
-        <numerusform>Site will stop functioning in %n days</numerusform>
+      <translation>
+        <numerusform>사이트는 %n 일 후에 작동을 중단합니다</numerusform>
       </translation>
     </message>
     <message>
       <source>Notification and interface languages differ</source>
-      <translation type="unfinished">Notification and interface languages differ</translation>
+      <translation>알림 및 인터페이스 언어가 다릅니다</translation>
     </message>
     <message>
       <source>Notifications language differs from the interface language</source>
-      <translation type="unfinished">Notifications language differs from the interface language</translation>
+      <translation>알림 언어가 인터페이스 언어와 다릅니다</translation>
     </message>
     <message>
       <source>Recording disabled</source>
-      <translation type="unfinished">Recording disabled</translation>
+      <translation>녹음이 비활성화되었습니다</translation>
     </message>
     <message>
       <source>Cloud storage backup disabled</source>
-      <translation type="unfinished">Cloud storage backup disabled</translation>
+      <translation>클라우드 스토리지 백업이 비활성화되었습니다</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>유료 통합 서비스가 과도하게 사용됨</translation>
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation type="unfinished">Cloud storage is available</translation>
+      <translation>클라우드 스토리지를 이용할 수 있습니다</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation type="unfinished">Cloud storage is enabled</translation>
+      <translation>클라우드 스토리지 사용</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
-      <translation type="unfinished">Cloud Storage is enabled</translation>
+      <translation>클라우드 스토리지 사용</translation>
     </message>
   </context>
   <context>
@@ -5023,19 +5023,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
-      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+      <translation>이 기능을 활성화하면 새로운 카메라와 서버가 지속적으로 검색되고, 상태 업데이트를 위해 카메라에 검색 요청이 전송됩니다.</translation>
     </message>
     <message>
       <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about site, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>카메라 모델 및 펌웨어 버전, 서버 수 등과 같은 시스템 관련 정보가 포함됩니다.</translation>
     </message>
     <message>
       <source>Allow optimize device settings</source>
-      <translation type="unfinished">Allow optimize device settings</translation>
+      <translation>장치 설정 자동 변경</translation>
     </message>
     <message>
       <source>Allow optimize camera settings</source>
-      <translation type="unfinished">Allow optimize camera settings</translation>
+      <translation>카메라 설정 최적화</translation>
     </message>
   </context>
   <context>
@@ -5150,7 +5150,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Auto-refresh every %1</source>
-      <translation type="unfinished">Auto-refresh every %1</translation>
+      <translation>%1마다 자동 새로 고침</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -5370,15 +5370,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>시스템 종료</translation>
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
+      <translation>비디오 월을 추가하려면 사이트가 활성 상태여야 합니다. %1</translation>
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
-      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+      <translation>호환되는 클라이언트 버전을 찾을 수 없습니다: %1</translation>
     </message>
   </context>
   <context>
@@ -5621,11 +5621,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to move device</source>
-      <translation type="unfinished">Unable to move device</translation>
+      <translation>장치를 이동 하지 못했습니다</translation>
     </message>
     <message>
       <source>Maximum number of devices for this server is reached</source>
-      <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+      <translation>이 서버의 최대 장치 수에 도달했습니다</translation>
     </message>
   </context>
   <context>
@@ -5805,11 +5805,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Is listed</source>
-      <translation type="unfinished">Is listed</translation>
+      <translation>나열되어 있습니다</translation>
     </message>
     <message>
       <source>Is not listed</source>
-      <translation type="unfinished">Is not listed</translation>
+      <translation>나열되지 않음</translation>
     </message>
     <message>
       <source>In</source>
@@ -5817,56 +5817,56 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n removed devices</source>
-      <translation type="unfinished">
-        <numerusform>%n removed devices</numerusform>
+      <translation>
+        <numerusform>%n 제거된 장치</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
+      <translation>
+        <numerusform>제거된 카메라</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed servers</source>
-      <translation type="unfinished">
-        <numerusform>%n removed servers</numerusform>
+      <translation>
+        <numerusform>%n 서버 제거됨</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
+      <translation>
+        <numerusform>%n 레이아웃이 제거되었습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
-      <translation type="unfinished">
-        <numerusform>%n subjects more</numerusform>
+      <translation>
+        <numerusform>%n 주제 더 보기</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices more</source>
-      <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
+      <translation>
+        <numerusform>%n 장치 검색됨</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras more</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras more</numerusform>
+      <translation>
+        <numerusform>%n 카메라 검색됨</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers more</source>
-      <translation type="unfinished">
-        <numerusform>%n servers more</numerusform>
+      <translation>
+        <numerusform>%n 서버 더</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts more</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
+      <translation>
+        <numerusform>%n 레이아웃 더 보기</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5881,19 +5881,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>TierUsageStrings</name>
     <message>
       <source>Number of servers per Site</source>
-      <translation type="unfinished">Number of servers per Site</translation>
+      <translation>사이트당 서버 수</translation>
     </message>
     <message>
       <source>Number of devices per server</source>
-      <translation type="unfinished">Number of devices per server</translation>
+      <translation>서버당 장치 수</translation>
     </message>
     <message>
       <source>Number of items on layout</source>
-      <translation type="unfinished">Number of items on layout</translation>
+      <translation>레이아웃의 항목 수</translation>
     </message>
     <message>
       <source>Number of days of archive</source>
-      <translation type="unfinished">Number of days of archive</translation>
+      <translation>보관 일수</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -5905,7 +5905,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cross-Site features</source>
-      <translation type="unfinished">Cross-Site features</translation>
+      <translation>크로스 사이트 기능</translation>
     </message>
   </context>
   <context>
@@ -5913,17 +5913,17 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
+      <translation>이것 외에도</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>시작</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
+      <translation>이벤트 전</translation>
     </message>
     <message>
       <source>End</source>
@@ -5933,7 +5933,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
+      <translation>이벤트 후</translation>
     </message>
   </context>
   <context>
@@ -6104,8 +6104,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n rules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
+      <translation>
+        <numerusform>%n 사용자 삭제?</numerusform>
       </translation>
     </message>
   </context>
@@ -6147,11 +6147,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>트랜스 코딩이 필요합니다. 내보내기 세션이 다시 시작되었습니다.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>트랜스 코딩이 필요합니다. 내보내기 세션이 다시 시작되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -6317,11 +6317,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>소리 재생</translation>
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
-      <translation type="unfinished">Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</translation>
+      <translation>사용자가 기기의 오디오 스트림에 액세스할 수 있도록 합니다. View Live 및/또는 View Archive와 함께 사용됩니다.</translation>
     </message>
   </context>
   <context>
@@ -6353,11 +6353,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
       <source>Add To List</source>
-      <translation type="unfinished">Add To List</translation>
+      <translation>목록에 추가</translation>
     </message>
     <message>
       <source>Create New List...</source>
-      <translation type="unfinished">Create New List...</translation>
+      <translation>새로운 목록 만들기...</translation>
     </message>
   </context>
   <context>
@@ -6594,7 +6594,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation type="unfinished">Site is currently suspended</translation>
+      <translation>현재 사이트가 중단되었습니다</translation>
     </message>
   </context>
   <context>
@@ -6627,15 +6627,15 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
       <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
-      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+      <translation>%1 선택한 모든 장치에 대한 백업을 활성화하려면 더 적합한 클라우드 스토리지 서비스가 필요합니다</translation>
     </message>
     <message>
       <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
-      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+      <translation>하지만 이것이 가능한 카메라에 대한 백업을 활성화하기 위해 공통 스위치를 계속 사용할 수 있습니다</translation>
     </message>
     <message>
       <source>Backup will not be activated for %1 devices: </source>
-      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+      <translation>%1 기기에 대해서는 백업이 활성화되지 않습니다.</translation>
     </message>
     <message>
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
@@ -6643,7 +6643,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>사이트의 모든 서버에서 새로 추가된 카메라에 대한 백업이 꺼집니다</translation>
     </message>
   </context>
   <context>
@@ -6688,19 +6688,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>시스템 종료</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>클라우드 저장소에 백업을 수행하려면 사이트가 활성 상태여야 합니다. %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>클라우드 백업은 계속되지만 사이트가 현재 일시 중단되었습니다. 기기의 &quot;백업 대상&quot; 및 &quot;품질&quot; 설정을 수정하거나 클라우드 백업을 활성화하려면 사이트가 활성화되어 있어야 합니다. 비활성화할 수도 있습니다. %1</translation>
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>백업을 위해 선택한 장치 수가 사용 가능한 서비스를 초과합니다. 서비스를 추가하거나 백업용으로 구성된 장치 수를 줄이세요. %1 에서는 사이트에서 사용 가능한 서비스에 맞춰 백업되는 장치 수를 자동으로 제한합니다</translation>
     </message>
   </context>
   <context>
@@ -6772,15 +6772,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>놓친 전화</translation>
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>통화 요청</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>통화 요청이 누락되었습니다</translation>
     </message>
     <message>
       <source>Source: %1</source>
@@ -6892,19 +6892,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on performance</translation>
+      <translation>시스템 성능에 잠재적으로 영향을 미칠 수 있다고 생각되시면 설정을 변경하지 마십시오</translation>
     </message>
     <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+      <translation>보관함에서 되돌릴 수 없는 변경 사항을 방지하려면 &quot;카메라 시간 설정 유지&quot; 를 비활성화한 다음 &quot;자동으로 비디오 가져오기&quot;를 활성화하는 것이 좋습니다;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+      <translation>이 설정을 활성화하면 보관 파일에 되돌릴 수 없는 변경 사항이 발생할 수 있습니다. &quot;"동영상 자동 가져오기"&quot; 가 활성화되어 있는 동안에는 활성화하지 않는 것이 좋습니다</translation>
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>이 옵션을 활성화한 후 발생한 카메라 또는 서버 오프라인 기간만 자동으로 가져옵니다. 참고: 이 옵션을 비활성화하면 아직 가져오지 않은 오프라인 기간은 모두 손실되며 나중에 복구할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -6919,11 +6919,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Camera in place</source>
-      <translation type="unfinished">Open Camera in place</translation>
+      <translation>카메라를 제자리에 켜세요</translation>
     </message>
     <message>
       <source>Open Layout in new Tab</source>
-      <translation type="unfinished">Open Layout in new Tab</translation>
+      <translation>새 탭에서 레이아웃 열기</translation>
     </message>
   </context>
   <context>
@@ -6934,7 +6934,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>뾰족한</translation>
     </message>
     <message>
       <source>Place Hotspot</source>
@@ -6950,7 +6950,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Target...</source>
-      <translation type="unfinished">Select Target...</translation>
+      <translation>대상을 선택하세요...</translation>
     </message>
   </context>
   <context>
@@ -6965,15 +6965,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>뾰족한</translation>
     </message>
     <message>
       <source>Target resource does not exist</source>
-      <translation type="unfinished">Target resource does not exist</translation>
+      <translation>대상 리소스가 존재하지 않습니다</translation>
     </message>
     <message>
       <source>Select Camera or Layout...</source>
-      <translation type="unfinished">Select Camera or Layout...</translation>
+      <translation>카메라 또는 레이아웃을 선택하세요...</translation>
     </message>
     <message>
       <source>Target</source>
@@ -6984,11 +6984,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
     <message>
       <source>Select Hotspot Target</source>
-      <translation type="unfinished">Select Hotspot Target</translation>
+      <translation>핫스팟 대상 선택</translation>
     </message>
     <message>
       <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
-      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+      <translation>팬, 틸트 및/또는 줌 기능이 있는 장치가 감지되었습니다. 사전 설정이나 움직임을 통해 시야가 변경되면 핫스팟이 더 이상 적용되지 않을 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -7015,7 +7015,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation type="unfinished">Use this link to add the camera to another site</translation>
+      <translation>이 링크를 사용하여 다른 사이트에 카메라를 추가하세요</translation>
     </message>
   </context>
   <context>
@@ -7120,20 +7120,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>서버를 이용할 수 없기 때문에 카메라 교체 작업이 불가능합니다.</translation>
     </message>
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the site and replaced by the selected camera</translation>
+      <translation>%1 는 사이트에서 제거되고 선택한 카메라로 대체됩니다</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>카메라의 데이터를 새 카메라로 전송할 수 있는지 확인합니다.</translation>
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>
-      <translation type="unfinished">Some data and settings may not be supported for the new camera</translation>
+      <translation>일부 데이터 및 설정은 새 카메라에서 지원되지 않을 수 있습니다</translation>
     </message>
   </context>
   <context>
@@ -7168,11 +7168,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+      <translation>녹화는 계속되지만 사이트가 현재 중단된 상태입니다. 기기의 녹화 설정을 변경하거나 녹화를 활성화하려면 사이트가 활성화되어 있어야 합니다. 도움이 필요하면 채널 파트너에게 문의하세요.</translation>
     </message>
     <message>
       <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
+      <translation>사이트가 종료되어 녹화가 중단되었습니다. 기기에서 녹화를 활성화하려면 사이트를 활성화해야 합니다. 도움이 필요하면 채널 파트너에게 문의하세요.</translation>
     </message>
   </context>
   <context>
@@ -7417,11 +7417,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ChannelPartnerUserNotificationManager</name>
     <message>
       <source>Channel Partner users have access to this site</source>
-      <translation type="unfinished">Channel Partner users have access to this site</translation>
+      <translation>채널 파트너 사용자는 이 사이트에 액세스할 수 있습니다</translation>
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&apos;#&apos;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>채널 파트너 사용자&apos; 의 액세스는 조직 수준에서 관리되며 사이트 사용자 관리에는 표시되지 않습니다;</translation>
     </message>
   </context>
   <context>
@@ -7587,7 +7587,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Are you sure you want to disconnect?</source>
-      <translation type="unfinished">Are you sure you want to disconnect?</translation>
+      <translation>정말로 연결을 끊으시겠습니까?</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -7622,17 +7622,17 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>사이트를 %1에 연결하세요</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>사이트를 %1에 연결하시겠습니까?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect Site to %1</translation>
+      <translation>%1시스템 연결을 위한 계정 암호 입력</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -7661,11 +7661,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Merge Server to the Site</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the Site</translation>
+      <translation>서버를 시스템에 병합</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the Site</source>
-      <translation type="unfinished">Enter your account password to merge Server to the Site</translation>
+      <translation>서버를 시스템에 병합하려면 계정 암호를 입력하십시오</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -7739,11 +7739,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your site administrator to do it.</translation>
+      <translation>이 카메라 설정위해 암호가 필요. 관리자에게 문의.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your site administrator to do it.</translation>
+      <translation>선택된 카메라중 일부는 암호 재설정 필요. 관리자에게 문의.</translation>
     </message>
   </context>
   <context>
@@ -7875,11 +7875,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>사이트 운영자</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
-      <translation type="unfinished">Maximum number of Devices for the Site is reached</translation>
+      <translation>사이트의 최대 장치 수에 도달했습니다</translation>
     </message>
   </context>
   <context>
@@ -7954,7 +7954,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
-      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+      <translation>서버가 적절한 시간 내에 답변할 수 없습니다. 기간을 좁히거나 필터를 적용해 보세요.</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
@@ -7963,15 +7963,15 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>%1 부터 %2 까지의 이벤트 로그 - 처음 %n 개의 이벤트를 표시합니다. 특정 이벤트를 찾으려면 날짜 범위를 조정하거나 추가 필터를 적용하세요</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>%1 에 대한 이벤트 로그 - 처음 %n 개의 이벤트를 표시합니다. 특정 이벤트를 찾으려면 날짜 범위를 조정하거나 추가 필터를 적용하세요</numerusform>
       </translation>
     </message>
   </context>
@@ -7995,15 +7995,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open event video</source>
-      <translation type="unfinished">Open event video</translation>
+      <translation>오픈 이벤트 영상</translation>
     </message>
     <message>
       <source>Open event device</source>
-      <translation type="unfinished">Open event device</translation>
+      <translation>이벤트 장치 열기</translation>
     </message>
     <message>
       <source>Open event camera</source>
-      <translation type="unfinished">Open event camera</translation>
+      <translation>이벤트 카메라 열기</translation>
     </message>
   </context>
   <context>
@@ -8045,11 +8045,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventTile</name>
     <message>
       <source>UNKNOWN</source>
-      <translation type="unfinished">UNKNOWN</translation>
+      <translation>알려지지 않음</translation>
     </message>
     <message numerus="yes">
       <source> + %n</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform> + %n</numerusform>
       </translation>
     </message>
@@ -8387,7 +8387,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View video without redaction</source>
-      <translation type="unfinished">View video without redaction</translation>
+      <translation>편집 없이 비디오 보기</translation>
     </message>
   </context>
   <context>
@@ -8498,34 +8498,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>시스템은 곧 병합 완료 됩니다</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
+      <translation>다른 시스템의 서바가 서버 리소스 트리에 곧 표시 됩니다.</translation>
     </message>
     <message>
       <source>Connecting to the current Site...</source>
-      <translation type="unfinished">Connecting to the current Site...</translation>
+      <translation>현재 시스템에 연결 중...</translation>
     </message>
     <message>
       <source>Server will be connected to Site shortly</source>
-      <translation type="unfinished">Server will be connected to Site shortly</translation>
+      <translation>서버가 곧 시스템에 연결됩니다</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
-      <translation type="unfinished">Failed to merge %1 to our site.</translation>
+      <translation>시스템에 %1 을 병합하지 못했습니다.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
     <message>
       <source>API Integrations approval requests are permitted</source>
-      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+      <translation>API 통합 승인 요청이 허용됩니다</translation>
     </message>
     <message>
       <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
+      <translation>API 통합 등록 요청이 활성화되었습니다. 안전 장치가 있지만 장시간 사용하지 않는 것이 좋습니다. 필요한 모든 통합을 설치한 후 이 옵션을 비활성화하는 것이 좋습니다.</translation>
     </message>
   </context>
   <context>
@@ -8612,7 +8612,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already in use. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already in use. Use Generate button to find a free ID.</translation>
+      <translation>이 ID는 이미 시스템에서 사용 중입니다. 사용가능한 아이디를 찾으려면 생성 버튼을 사용하십시오.</translation>
     </message>
   </context>
   <context>
@@ -8709,7 +8709,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>모든 LDAP 사용자와 그룹이 시스템에서 삭제됩니다.&lt;br&gt;&lt;br&gt;LDAP 설정도 삭제됩니다.</translation>
     </message>
   </context>
   <context>
@@ -8811,12 +8811,12 @@ The Logging Level &quot;%1&quot; will provide you with more granular information
     <message>
       <source>The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>선택한 로깅 레벨은 시스템 성능을 저하시킬 수 있습니다.
+충분한 로그를 수집한 후에는 로깅 레벨을 기본 설정으로 되돌리는 것을 잊지 마세요.</translation>
     </message>
     <message>
       <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
-      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
+      <translation>크기별 분할 파일은 10MB보다 커야 하며 최대 볼륨 제한에 설정된 값의 절반 이하여야 합니다</translation>
     </message>
   </context>
   <context>
@@ -8878,11 +8878,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logging level degrades performance</source>
-      <translation type="unfinished">Logging level degrades performance</translation>
+      <translation>로깅 수준이 성능을 저하시킵니다</translation>
     </message>
     <message>
       <source>&lt;None&gt;</source>
-      <translation type="unfinished">&lt;None&gt;</translation>
+      <translation>&lt;없음&gt;</translation>
     </message>
   </context>
   <context>
@@ -8911,35 +8911,35 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled on the client</source>
-      <translation type="unfinished">Debug logging is enabled on the client</translation>
+      <translation>클라이언트에서 디버그 로깅이 활성화되었습니다</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Client performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Client performance is degraded.</translation>
+      <translation>디버그 로깅이 활성화되었습니다.
+클라이언트 성능이 저하됩니다.</translation>
     </message>
     <message>
       <source>Debug logging is enabled</source>
-      <translation type="unfinished">Debug logging is enabled</translation>
+      <translation>디버그 로깅이 활성화되었습니다</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Site performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Site performance is degraded.</translation>
+      <translation>디버그 로깅이 활성화되었습니다.
+사이트 성능이 저하됩니다.</translation>
     </message>
     <message>
       <source>Logs download canceled</source>
-      <translation type="unfinished">Logs download canceled</translation>
+      <translation>로그 다운로드 취소됨</translation>
     </message>
     <message>
       <source>Downloading logs...</source>
-      <translation type="unfinished">Downloading logs...</translation>
+      <translation>로그를 다운로드하는 중...</translation>
     </message>
     <message>
       <source>Logs download failed</source>
-      <translation type="unfinished">Logs download failed</translation>
+      <translation>로그 다운로드에 실패했습니다</translation>
     </message>
   </context>
   <context>
@@ -8950,26 +8950,26 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Downloading...</source>
-      <translation type="unfinished">Downloading...</translation>
+      <translation>다운로드 중...</translation>
     </message>
     <message>
       <source>Download completed with errors</source>
-      <translation type="unfinished">Download completed with errors</translation>
+      <translation>다운로드가 완료되었지만 오류가 있습니다</translation>
     </message>
     <message>
       <source>Download success</source>
-      <translation type="unfinished">Download success</translation>
+      <translation>다운로드 성공</translation>
     </message>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
+      <translation>
+        <numerusform>%n 선택됨:</numerusform>
       </translation>
     </message>
     <message>
       <source>Retry (%1)</source>
-      <translation type="unfinished">Retry (%1)</translation>
+      <translation>다시 시도 (%1)</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -8984,11 +8984,11 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Lookup List remove request failed</source>
-      <translation type="unfinished">Lookup List remove request failed</translation>
+      <translation>조회 목록 네트워크 요청이 실패했습니다</translation>
     </message>
     <message>
       <source>Could not add object to the List</source>
-      <translation type="unfinished">Could not add object to the List</translation>
+      <translation>목록에 객체를 추가할 수 없습니다</translation>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
@@ -8996,11 +8996,11 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Object was added to the List</source>
-      <translation type="unfinished">Object was added to the List</translation>
+      <translation>목록에 객체가 추가되었습니다</translation>
     </message>
     <message>
       <source>An object has been added to the &quot;%1&quot; successfully</source>
-      <translation type="unfinished">An object has been added to the &quot;%1&quot; successfully</translation>
+      <translation>&quot;%1&quot; 에 객체가 성공적으로 추가되었습니다</translation>
     </message>
   </context>
   <context>
@@ -9030,7 +9030,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::LookupListExportProcessor</name>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>텍스트 파일</translation>
     </message>
     <message>
       <source>All</source>
@@ -9038,22 +9038,22 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Export List</source>
-      <translation type="unfinished">Export List</translation>
+      <translation>내보내기 목록</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
-      <translation type="unfinished">Import Lookup List</translation>
+      <translation>가져오기 조회 목록</translation>
     </message>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>텍스트 파일</translation>
     </message>
     <message>
       <source>All other text files</source>
-      <translation type="unfinished">All other text files</translation>
+      <translation>다른 모든 텍스트 파일</translation>
     </message>
   </context>
   <context>
@@ -9094,11 +9094,11 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+      <translation>이 그룹은 조직 수준에서 할당되었으며 조직 수준에서만 관리할 수 있습니다</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>사용자는 조직 수준에서 이 그룹에 할당되었으며 조직 수준에서만 할당을 해제할 수 있습니다</translation>
     </message>
   </context>
   <context>
@@ -9141,7 +9141,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
-      <translation type="unfinished">Enter your account password to merge Sites</translation>
+      <translation>사이트를 병합하려면 계정 비밀번호를 입력하세요</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9154,19 +9154,19 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
-      <translation type="unfinished">This is the current Site URL.</translation>
+      <translation>이는 현재 사이트 URL입니다.</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>데이터베이스 동기화가 완료되면 다른 사이트의 서버가 리소스 트리에 나타납니다.</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>사이트는 곧 병합됩니다</translation>
     </message>
     <message>
       <source>Failed to merge Sites</source>
-      <translation type="unfinished">Failed to merge Sites</translation>
+      <translation>사이트를 병합하지 못했습니다</translation>
     </message>
     <message>
       <source>Remote</source>
@@ -9221,64 +9221,64 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Site was not found.</source>
-      <translation type="unfinished">Site was not found.</translation>
+      <translation>사이트를 찾을 수 없습니다.</translation>
     </message>
     <message>
       <source>The discovered Site %1 has an incompatible version %2.</source>
       <comment>%1 is name of Site, %2 is version information</comment>
-      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+      <translation>발견된 사이트 %1 에는 호환되지 않는 버전 %2이 있습니다.</translation>
     </message>
     <message>
       <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+      <translation>선택한 사이트에는 현재 사이트와 호환되지 않는 이전 소프트웨어 버전이 있습니다. 선택한 사이트를 최신 빌드로 업데이트하여 현재 사이트와 통합하세요.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+      <translation>Starter 라이선스와 사이트를 병합하려고 합니다.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>사이트당 Starter 라이선스는 하나만 허용되므로 두 번째 라이선스는 비활성화됩니다.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+      <translation>사이트를 NVR 라이선스와 병합하려고 합니다.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>사이트당 NVR 라이선스는 하나만 허용되므로 두 번째 라이선스는 비활성화됩니다.</translation>
     </message>
     <message>
       <source>Could not configure the remote Site %1.</source>
       <comment>%1 is name of the Site</comment>
-      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+      <translation>원격 사이트 %1을(를) 구성할 수 없습니다.</translation>
     </message>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</translation>
+      <translation>%1 사이트는%1가 아닌 사이트와만 병합할 수 있습니다. 사이트 이름과 비밀번호는 %1 사이트에서 가져옵니다.</translation>
     </message>
     <message>
       <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
+      <translation>두 사이트 모두 %1에 연결되어 있습니다. 병합은 허용되지 않습니다.</translation>
     </message>
     <message>
       <source>%1 sites have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 sites have different owners. Merge is not allowed.</translation>
+      <translation>%1 사이트의 소유자가 서로 다릅니다. 병합은 허용되지 않습니다.</translation>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>동일한 ID를 가진 서버가 하나 이상 있으므로 사이트를 병합할 수 없습니다. 이 서버를 제거하고 다시 시도하세요.</translation>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
-      <translation type="unfinished">Site name is not configured yet.</translation>
+      <translation>사이트 이름이 아직 구성되지 않았습니다.</translation>
     </message>
     <message>
       <source>Maximum number of Servers for the Site is reached.</source>
-      <translation type="unfinished">Maximum number of Servers for the Site is reached.</translation>
+      <translation>사이트의 서버 최대 수에 도달했습니다.</translation>
     </message>
   </context>
   <context>
@@ -9308,8 +9308,8 @@ You can force it, but it may significantly increase CPU load.</source>
 You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
-You can force motion detection, but it may lead to a substantial increase in CPU load.</translation>
+      <translation>비디오 스트림이 %1 * %2 해상도를 초과하기 때문에 이 카메라의 동작 감지가 현재 비활성화되어 있습니다.
+동작 감지를 강제로 실행할 수 있지만 CPU 부하가 상당히 증가할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -9582,24 +9582,24 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+      <translation>일부 구성 요소의 OS 버전이 더 이상 지원되지 않습니다. 사이트에서 해당 구성 요소를 제거하거나 지원되는 버전으로 OS를 업데이트하세요.</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">Incompatible %1 instance. To update disconnect Site from %1 first.</translation>
+      <translation>호환되지 않는 %1 인스턴스입니다. 업데이트하려면 먼저 %1 에서 사이트의 연결을 끊으세요.</translation>
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>
-      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+      <translation>주말에 업데이트를 적용하는 것은 권장되지 않습니다</translation>
     </message>
     <message>
       <source>Site updated to</source>
-      <translation type="unfinished">Site updated to</translation>
+      <translation>사이트가 업데이트되었습니다</translation>
     </message>
     <message>
       <source>Site update in process</source>
-      <translation type="unfinished">Site update in process</translation>
+      <translation>사이트 업데이트 진행 중</translation>
     </message>
   </context>
   <context>
@@ -9613,7 +9613,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
     <message>
       <source>Possible formats:</source>
-      <translation type="unfinished">Possible formats:</translation>
+      <translation>가능한 형식:</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -9717,11 +9717,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
-      <translation type="unfinished">LDAP Default group cannot be deleted as long as the site is connected to LDAP server</translation>
+      <translation>사이트가 LDAP 서버에 연결되어 있는 한 LDAP 기본 그룹을 삭제할 수 없습니다</translation>
     </message>
     <message>
       <source>User management for organization users is available only at the organization level, not the site level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+      <translation>조직 사용자를 위한 사용자 관리 기능은 사이트 수준이 아닌 조직 수준에서만 사용할 수 있습니다</translation>
     </message>
   </context>
   <context>
@@ -9732,7 +9732,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Unable to acknowledge event on inaccessible camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on inaccessible camera.</translation>
+      <translation>접근할 수 없는 카메라에서 이벤트를 인식할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -9756,40 +9756,40 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Current Site</source>
-      <translation type="unfinished">Current Site</translation>
+      <translation>현재 사이트</translation>
     </message>
     <message>
       <source>Any Notification</source>
-      <translation type="unfinished">Any Notification</translation>
+      <translation>모든 알림</translation>
     </message>
     <message>
       <source>Event Notifications</source>
-      <translation type="unfinished">Event Notifications</translation>
+      <translation>이벤트 알림</translation>
     </message>
     <message>
       <source>Choose Types...</source>
-      <translation type="unfinished">Choose Types...</translation>
+      <translation>유형을 선택하세요...</translation>
     </message>
     <message>
       <source>Any notification</source>
-      <translation type="unfinished">Any notification</translation>
+      <translation>모든 알림</translation>
     </message>
     <message numerus="yes">
       <source>%n notification types</source>
-      <translation type="unfinished">
-        <numerusform>%n notification types</numerusform>
+      <translation>
+        <numerusform>%n 알림 유형</numerusform>
       </translation>
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>사이트 알림</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
     <message>
       <source>Select Notification Types</source>
-      <translation type="unfinished">Select Notification Types</translation>
+      <translation>알림 유형 선택</translation>
     </message>
   </context>
   <context>
@@ -10087,11 +10087,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Auto-refresh integration</source>
-      <translation type="unfinished">Auto-refresh integration</translation>
+      <translation>자동 새로 고침 통합</translation>
     </message>
     <message>
       <source>Auto-refresh web page</source>
-      <translation type="unfinished">Auto-refresh web page</translation>
+      <translation>웹 페이지 자동 새로 고침</translation>
     </message>
   </context>
   <context>
@@ -10421,8 +10421,8 @@ You can still change quality and FPS directly on the camera.</source>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>품질 및 FPS 설정이 "시스템 관리" 옵션인 "시스템이 카메라 설정을 최적화하도록 허용" 때문에 비활성화된다.
+당신은 카메라에서 직접 화질과 FPS를 변경할 수 있다.</translation>
     </message>
     <message>
       <source>Mbps</source>
@@ -10528,21 +10528,21 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
-      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+      <translation>서버 머신에 추가 구성이 필요할 수 있습니다.</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>다른 시스템에서 아카이브를 복원하려면 암호화 암호가 필요합니다.
+주의: 이 암호는 재설정할 수 없습니다. 잃어버리면 아카이브를 복구할 수 없습니다.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+      <translation>아카이브 데이터를 암호화하여 시스템 외부에서 볼 수 없도록 합니다. 이 시스템 내에서 비디오 아카이브를 보기 위해 암호화 암호를 입력할 필요가 없습니다.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+      <translation>무제한 사용자 세션 수명은 전체 시스템 보안을 위협하고 시스템 성능 저하로 이어질 수 있습니다</translation>
     </message>
   </context>
   <context>
@@ -10553,13 +10553,13 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message numerus="yes">
       <source>%n objects selected</source>
-      <translation type="unfinished">
-        <numerusform>%n objects selected</numerusform>
+      <translation>
+        <numerusform>%n 객체가 선택됨</numerusform>
       </translation>
     </message>
     <message>
       <source>All objects</source>
-      <translation type="unfinished">All objects</translation>
+      <translation>모든 객체</translation>
     </message>
   </context>
   <context>
@@ -10664,7 +10664,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>인증서 세부 정보</translation>
     </message>
   </context>
   <context>
@@ -10973,15 +10973,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
+      <translation>사이트가 조직&apos;의 한도를 초과하여 곧 작동하지 않을 수 있습니다. 서비스 중단을 방지하려면 사용량을 조정하세요.</translation>
     </message>
     <message>
       <source>Open Settings</source>
-      <translation type="unfinished">Open Settings</translation>
+      <translation>설정 열기</translation>
     </message>
     <message>
       <source>Open Services</source>
-      <translation type="unfinished">Open Services</translation>
+      <translation>오픈 서비스</translation>
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
@@ -11023,12 +11023,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Your access to the Site expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the Site expires %1</translation>
+      <translation>사이트 접속이 만료되었습니다 %1</translation>
     </message>
     <message>
       <source>Your access to the Site expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the Site expires in %1</translation>
+      <translation>귀하의 사이트 접속은 %1에 만료됩니다</translation>
     </message>
   </context>
   <context>
@@ -11095,7 +11095,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
-      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+      <translation>이 작업은 다른 사이트의 알림에는 지원되지 않습니다</translation>
     </message>
   </context>
   <context>
@@ -11253,7 +11253,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>이 이름을 가진 그룹이 여러 개 있습니다. 명확하고 체계적인 구조를 유지하려면 각 그룹에 고유한 이름을 지정하는 것이 좋습니다.</translation>
     </message>
   </context>
   <context>
@@ -11312,7 +11312,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Site Error</source>
-      <translation type="unfinished">Site Error</translation>
+      <translation>사이트 오류</translation>
     </message>
   </context>
   <context>
@@ -11364,15 +11364,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>이 로그인을 사용하는 다른 사용자가 있습니다. 문제를 방지하려면 모든 사용자가 고유한 로그인을 가져야 합니다.</translation>
     </message>
     <message>
       <source>Organization user</source>
-      <translation type="unfinished">Organization user</translation>
+      <translation>조직 사용자</translation>
     </message>
     <message>
       <source>Channel Partner user</source>
-      <translation type="unfinished">Channel Partner user</translation>
+      <translation>채널 파트너 사용자</translation>
     </message>
   </context>
   <context>
@@ -11518,7 +11518,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
+      <translation>이렇게 하면 해당 사용자의 사이트 액세스 권한이 즉시 제거됩니다</translation>
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
@@ -11828,11 +11828,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Unavailable in dedicated window mode</source>
-      <translation type="unfinished">Unavailable in dedicated window mode</translation>
+      <translation>전용 창 모드에서는 사용할 수 없습니다</translation>
     </message>
     <message>
       <source>Move this window to the Layout to use this functionality</source>
-      <translation type="unfinished">Move this window to the Layout to use this functionality</translation>
+      <translation>이 기능을 사용하려면 이 창을 레이아웃으로 이동하세요</translation>
     </message>
   </context>
   <context>
@@ -11858,7 +11858,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Unable to connect to the site because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the site because it has become offline</translation>
+      <translation>사이트가 오프라인이 되어서 접속이 불가능합니다</translation>
     </message>
   </context>
   <context>
@@ -11934,7 +11934,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Skip Version</source>
-      <translation type="unfinished">Skip Version</translation>
+      <translation>버전 건너뛰기</translation>
     </message>
   </context>
   <context>
@@ -12065,7 +12065,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Other Sites</source>
-      <translation type="unfinished">Other Sites</translation>
+      <translation>다른 사이트</translation>
     </message>
   </context>
   <context>
@@ -12115,7 +12115,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>In progress...</source>
-      <translation type="unfinished">In progress...</translation>
+      <translation>처리 중...</translation>
     </message>
   </context>
   <context>
@@ -12202,11 +12202,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Resource not found</source>
-      <translation type="unfinished">Resource not found</translation>
+      <translation>리소스를 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Parameter not found</source>
-      <translation type="unfinished">Parameter not found</translation>
+      <translation>매개변수를 찾을 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -12233,7 +12233,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot maximize the item</source>
-      <translation type="unfinished">Cannot maximize the item</translation>
+      <translation>항목을 최대화할 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -12401,11 +12401,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Add Title or Comment</source>
-      <translation type="unfinished">Add Title or Comment</translation>
+      <translation>제목이나 댓글 추가</translation>
     </message>
     <message>
       <source>The rule is not valid and may not work</source>
-      <translation type="unfinished">The rule is not valid and may not work</translation>
+      <translation>일부 규칙은 유효하지 않으며 작동하지 않을 수 있습니다</translation>
     </message>
   </context>
   <context>
@@ -12424,20 +12424,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Token</source>
-      <translation type="unfinished">Token</translation>
+      <translation>토큰</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
     <message>
       <source>No custom headers</source>
-      <translation type="unfinished">No custom headers</translation>
+      <translation>사용자 정의 헤더 없음</translation>
     </message>
     <message numerus="yes">
       <source>%n custom headers</source>
       <comment>%n is a number of custom headers</comment>
-      <translation type="unfinished">
-        <numerusform>%n custom headers</numerusform>
+      <translation>
+        <numerusform>%n 사용자 정의 헤더</numerusform>
       </translation>
     </message>
   </context>
@@ -12445,15 +12445,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>설정 없음 모델</translation>
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>매개 변수 없이</translation>
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>매개변수 세트</translation>
     </message>
   </context>
   <context>
@@ -12567,11 +12567,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>최소한 하나의 레이아웃을 선택하세요</translation>
     </message>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>최소한 한 명의 사용자를 선택하세요</translation>
     </message>
     <message>
       <source>Site</source>
@@ -12596,19 +12596,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::StatePicker</name>
     <message>
       <source>When event occurs</source>
-      <translation type="unfinished">When event occurs</translation>
+      <translation>이벤트가 발생할 때</translation>
     </message>
     <message>
       <source>When event starts</source>
-      <translation type="unfinished">When event starts</translation>
+      <translation>이벤트가 시작되면</translation>
     </message>
     <message>
       <source>When event stops</source>
-      <translation type="unfinished">When event stops</translation>
+      <translation>이벤트가 중지되면</translation>
     </message>
     <message>
       <source>Select state</source>
-      <translation type="unfinished">Select state</translation>
+      <translation>주 선택</translation>
     </message>
   </context>
   <context>
@@ -12631,11 +12631,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Not contains keywords</source>
-      <translation type="unfinished">Not contains keywords</translation>
+      <translation>키워드가 포함되어 있지 않습니다</translation>
     </message>
     <message>
       <source>Not contains list entries</source>
-      <translation type="unfinished">Not contains list entries</translation>
+      <translation>목록 항목이 포함되어 있지 않습니다</translation>
     </message>
   </context>
   <context>
@@ -12649,28 +12649,28 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: %1</source>
-      <translation type="unfinished">Delete rule error: %1</translation>
+      <translation>규칙 삭제 오류: %1</translation>
     </message>
     <message>
       <source>Save rule error: %1</source>
-      <translation type="unfinished">Save rule error: %1</translation>
+      <translation>저장 규칙 오류: %1</translation>
     </message>
     <message>
       <source>Reset rules error: %1</source>
-      <translation type="unfinished">Reset rules error: %1</translation>
+      <translation>규칙 재설정 오류: %1</translation>
     </message>
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
+      <translation>
+        <numerusform>일부 규칙이 활성화되지 않았습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      <translation>
+        <numerusform>선택한 규칙 중 일부는 매개변수가 잘못되어 활성화할 수 없습니다. 매개변수를 수정하고 규칙을 다시 활성화하세요.</numerusform>
       </translation>
     </message>
   </context>
@@ -12701,27 +12701,27 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
-      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
+      <translation>이 서비스를 사용하는 기기 수가 사용 가능한 용량을 초과합니다. 서비스를 추가하거나 일부 기기에서 서비스를 비활성화하세요.</translation>
     </message>
     <message>
       <source>On %1, the system will automatically disable the service on some devices.</source>
       <comment>%1 will be substituted with date and time</comment>
-      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
+      <translation>%1에서는 시스템이 일부 기기에서 서비스를 자동으로 비활성화합니다.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::saas::TierUsageModel</name>
     <message>
       <source>Limitation</source>
-      <translation type="unfinished">Limitation</translation>
+      <translation>제한 사항</translation>
     </message>
     <message>
       <source>Allowed</source>
-      <translation type="unfinished">Allowed</translation>
+      <translation>허용된</translation>
     </message>
     <message>
       <source>Current</source>
-      <translation type="unfinished">Current</translation>
+      <translation>현재의</translation>
     </message>
   </context>
   <context>
@@ -13015,10 +13015,10 @@ We recommend you not to open this web page. If you understand the risks, you can
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>분석 데이터베이스는 로컬 드라이브에만 저장해야 하며 많은 공간을 차지할 수 있습니다.
+분석 데이터를 저장할 위치를 선택하면 기존 데이터가 손실되지 않고는 쉽게 변경할 수 없습니다. 위치를 신중하게 선택하고 시스템 파티션을 사용하지 않는 것이 좋습니다. 심각한 오작동을 유발할 수 있습니다.
+기본적으로 분석 데이터는 %1에 저장됩니다.
+서버 설정 대화 상자의 &quot;저장소 관리&quot; 탭에서 다른 저장 위치를 선택할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -13165,7 +13165,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Client auto-updates</source>
-      <translation type="unfinished">Client auto-updates</translation>
+      <translation>클라이언트 자동 업데이트</translation>
     </message>
   </context>
   <context>

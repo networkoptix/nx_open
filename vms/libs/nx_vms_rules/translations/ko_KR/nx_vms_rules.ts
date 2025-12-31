@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>예상치 못한 검증 정책</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
@@ -111,7 +111,7 @@
     </message>
     <message>
       <source>Not all servers are suitable</source>
-      <translation type="unfinished">Not all servers are suitable</translation>
+      <translation>모든 서버가 적합한 것은 아닙니다</translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
@@ -127,7 +127,7 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>발생 시점</translation>
     </message>
     <message>
       <source>Begin When</source>
@@ -159,40 +159,40 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>되감기</translation>
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>레이아웃에</translation>
     </message>
     <message>
       <source>Event Devices</source>
-      <translation type="unfinished">Event Devices</translation>
+      <translation>장치 선택</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>유형의</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>그리고 캡션</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>상세</translation>
     </message>
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>지정된 검증 정책에 대해 필드 %1 값을 제공해야 합니다</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>선택한 로컬 레이아웃은 소유자에게만 표시됩니다. %1</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>선택한 사용자 중 누구도 선택한 레이아웃에 액세스 할 수 없습니다. 동작이 작동하지 않습니다</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
@@ -204,47 +204,47 @@
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>선택된 기기들이 제거되었습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>선택된 카메라가 제거되었습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>선택된 서버가 제거되었습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>선택된 레이아웃이 제거되었습니다</numerusform>
       </translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>시간 값은 0보다 작을 수 없습니다</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>기간은 0보다 작을 수 없습니다</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>값은 %1보다 작을 수 없습니다</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>값은 %1보다 클 수 없습니다</translation>
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>사용자에게</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -252,23 +252,23 @@
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>필드 &quot;%1&quot; 는 객체여야 합니다</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
-      <translation type="unfinished">Unable to deserialize properties for field: %1</translation>
+      <translation>%1필드에 대한 속성을 역직렬화할 수 없습니다</translation>
     </message>
     <message>
       <source>Event: %1 is not registered</source>
-      <translation type="unfinished">Event: %1 is not registered</translation>
+      <translation>이벤트: %1 가 등록되지 않았습니다</translation>
     </message>
     <message>
       <source>Action: %1 is not registered</source>
-      <translation type="unfinished">Action: %1 is not registered</translation>
+      <translation>동작: %1 가 등록되지 않았습니다</translation>
     </message>
     <message>
       <source>Rule validation failed: %1</source>
-      <translation type="unfinished">Rule validation failed: %1</translation>
+      <translation>규칙 검증에 실패했습니다: %1</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -288,28 +288,28 @@
     </message>
     <message>
       <source>Select Integration Action</source>
-      <translation type="unfinished">Select Integration Action</translation>
+      <translation>통합 작업 선택</translation>
     </message>
     <message>
       <source>Integration not found for Integration Action %1</source>
-      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+      <translation>통합 작업 %1에 대한 통합을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
-      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+      <translation>키 %1에 지원되지 않는 JSON 값 유형이 있습니다</translation>
     </message>
     <message>
       <source>Total number of events</source>
-      <translation type="unfinished">Total number of events</translation>
+      <translation>총 이벤트 수</translation>
     </message>
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>삭제된 제목</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>디바이스 제거</translation>
     </message>
     <message>
       <source>Removed camera</source>
@@ -317,11 +317,11 @@
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>제거된 서버</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>레이아웃이 제거되었습니다</translation>
     </message>
   </context>
   <context>
@@ -335,7 +335,7 @@
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>빈 텍스트는 허용되지 않습니다</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
@@ -361,14 +361,14 @@
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>그리고 속성</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
       <source>Analytics event type is not selected</source>
-      <translation type="unfinished">Analytics event type is not selected</translation>
+      <translation>분석 이벤트 유형이 선택되지 않았습니다</translation>
     </message>
   </context>
   <context>
@@ -383,7 +383,7 @@
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>Ptz 개체</translation>
     </message>
     <message>
       <source>%1 at %2</source>
@@ -395,14 +395,14 @@
     <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
       <source>Analytics object type is not selected</source>
-      <translation type="unfinished">Analytics object type is not selected</translation>
+      <translation>분석 객체 유형이 선택되지 않았습니다</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BookmarkAction</name>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>북마크 생성</translation>
     </message>
     <message>
       <source>Add Tags</source>
@@ -463,30 +463,30 @@
     </message>
     <message>
       <source>Device disconnected</source>
-      <translation type="unfinished">Device disconnected</translation>
+      <translation>장치 연결 끊김</translation>
     </message>
     <message>
       <source>Camera disconnected</source>
-      <translation type="unfinished">Camera disconnected</translation>
+      <translation>카메라 연결이 끊어졌습니다</translation>
     </message>
     <message>
       <source>I/O Module disconnected</source>
-      <translation type="unfinished">I/O Module disconnected</translation>
+      <translation>I/O 모듈 연결이 끊어졌었습니다</translation>
     </message>
     <message>
       <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device disconnected at %1</translation>
+      <translation>장치 연결 끊김</translation>
     </message>
     <message>
       <source>Camera disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera disconnected at %1</translation>
+      <translation>카메라 연결 끊김</translation>
     </message>
     <message>
       <source>I/O Module disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module disconnected at %1</translation>
+      <translation>I/O 모듈이 %1에서 연결 해제되었습니다</translation>
     </message>
   </context>
   <context>
@@ -516,12 +516,12 @@
     <message>
       <source>Device #%1: %2 (%3)</source>
       <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+      <translation>장치 #%1: %2 (%3)</translation>
     </message>
     <message>
       <source>Camera #%1: %2 (%3)</source>
       <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
+      <translation>카메라 #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -584,7 +584,7 @@
     </message>
     <message>
       <source>Fan failure at %1</source>
-      <translation type="unfinished">Fan failure at %1</translation>
+      <translation>%1에서 팬 고장</translation>
     </message>
   </context>
   <context>
@@ -678,11 +678,11 @@
     <name>nx::vms::rules::IntegrationAction</name>
     <message>
       <source>Integration Action</source>
-      <translation type="unfinished">Integration Action</translation>
+      <translation>통합 작업 선택</translation>
     </message>
     <message>
       <source>Integration Action Parameters</source>
-      <translation type="unfinished">Integration Action Parameters</translation>
+      <translation>통합 작업 매개변수</translation>
     </message>
   </context>
   <context>
@@ -1199,7 +1199,7 @@
     <name>nx::vms::rules::StateFieldValidator</name>
     <message>
       <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
-      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
+      <translation>`%1` 상태는 주어진 매개변수를 사용하는 `%2` 이벤트 및 `%3` 작업에 유효하지 않습니다</translation>
     </message>
   </context>
   <context>
@@ -1250,25 +1250,25 @@
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>%1. 에 저장을 위한 HDD/SSD 속도 정보.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>이벤트 설명자를 가져오지 못했습니다</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation type="unfinished">Event does not have source camera</translation>
+      <translation>이벤트에 소스 카메라가 없습니다</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>최소한 하나의 레이아웃을 선택하세요</translation>
     </message>
   </context>
   <context>
@@ -1283,18 +1283,18 @@
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+      <translation>주어진 id &apos;%1&apos; 를 갖는 목록은 일반 목록이 아닙니다</translation>
     </message>
     <message>
       <source>Invalid UUID string</source>
-      <translation type="unfinished">Invalid UUID string</translation>
+      <translation>잘못된 UUID 문자열</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>텍스트 오버레이 표시</translation>
     </message>
     <message>
       <source>Custom Text</source>
@@ -1302,30 +1302,30 @@
     </message>
     <message>
       <source>Show To</source>
-      <translation type="unfinished">Show To</translation>
+      <translation>표시</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
       <source>Url cannot be empty</source>
-      <translation type="unfinished">Url cannot be empty</translation>
+      <translation>Url은 비워둘 수 없습니다</translation>
     </message>
     <message>
       <source>Url must be valid</source>
-      <translation type="unfinished">Url must be valid</translation>
+      <translation>Url은 유효해야 합니다</translation>
     </message>
     <message>
       <source>Url should not contains user or password</source>
-      <translation type="unfinished">Url should not contains user or password</translation>
+      <translation>Url에는 사용자 또는 비밀번호가 포함되어서는 안 됩니다</translation>
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>호스트는 비어 있을 수 없습니다</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>엔드포인트는&apos;t에 공백을 포함해서는 안 됩니다</translation>
     </message>
   </context>
   <context>
