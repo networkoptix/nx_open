@@ -696,7 +696,7 @@
     </message>
     <message>
       <source>Motions</source>
-      <translation type="unfinished">Motions</translation>
+      <translation>Gerakan</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -1468,16 +1468,16 @@
     </message>
     <message>
       <source>No results</source>
-      <translation type="unfinished">No results</translation>
+      <translation>Tidak ada hasil</translation>
     </message>
     <message>
       <source>Not available</source>
-      <translation type="unfinished">Not available</translation>
+      <translation>Tidak tersedia</translation>
     </message>
     <message>
       <source>You do not have permission&lt;br&gt;to view the archive</source>
       <comment>&lt;br&gt; is a line break</comment>
-      <translation type="unfinished">You do not have permission&lt;br&gt;to view the archive</translation>
+      <translation>Anda tidak memiliki izin&lt;br&gt;untuk melihat archive</translation>
     </message>
   </context>
   <context>

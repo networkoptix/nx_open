@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Site Servers</source>
-      <translation type="unfinished">Site Servers</translation>
+      <translation>사이트 서버</translation>
     </message>
   </context>
   <context>
@@ -131,11 +131,11 @@
     </message>
     <message>
       <source>with</source>
-      <translation type="unfinished">with</translation>
+      <translation>~와 함께</translation>
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation type="unfinished">Simultaneous Streams</translation>
+      <translation>동시 스트림</translation>
     </message>
   </context>
   <context>
@@ -228,7 +228,7 @@
     </message>
     <message>
       <source>Site actions</source>
-      <translation type="unfinished">Site actions</translation>
+      <translation>사이트 작업</translation>
     </message>
   </context>
   <context>
@@ -528,11 +528,11 @@
     </message>
     <message>
       <source>Use site presets</source>
-      <translation type="unfinished">Use site presets</translation>
+      <translation>사이트 사전 설정 사용</translation>
     </message>
     <message>
       <source>Native camera presets will not be available.</source>
-      <translation type="unfinished">Native camera presets will not be available.</translation>
+      <translation>기본 카메라 사전 설정을 사용할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -606,7 +606,7 @@
     </message>
     <message>
       <source>Restreaming Link</source>
-      <translation type="unfinished">Restreaming Link</translation>
+      <translation>리스트림 링크</translation>
     </message>
   </context>
   <context>
@@ -760,7 +760,7 @@
     </message>
     <message>
       <source>This site is connected to</source>
-      <translation type="unfinished">This site is connected to</translation>
+      <translation>이 사이트는 다음에 연결되어 있습니다</translation>
     </message>
   </context>
   <context>
@@ -823,7 +823,7 @@
     </message>
     <message>
       <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
+      <translation>사이트 관리 데이터 백업을 만들거나 기존 백업에서 사이트 관리 데이터를 복원합니다</translation>
     </message>
   </context>
   <context>
@@ -977,11 +977,11 @@
     </message>
     <message>
       <source>Non-obfuscated video</source>
-      <translation type="unfinished">Non-obfuscated video</translation>
+      <translation>난독화되지 않은 비디오</translation>
     </message>
     <message>
       <source>Obfuscation is used to protect sensitive information but also increases CPU usage and export time</source>
-      <translation type="unfinished">Obfuscation is used to protect sensitive information but also increases CPU usage and export time</translation>
+      <translation>난독화는 민감한 정보를 보호하는 데 사용되지만 CPU 사용량과 내보내기 시간을 증가시킵니다</translation>
     </message>
   </context>
   <context>
@@ -1145,14 +1145,14 @@
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
-      <translation type="unfinished">Connect to the previous site on startup</translation>
+      <translation>시작 시 이전 시스템에 연결</translation>
     </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>사이트 세팅</translation>
     </message>
   </context>
   <context>
@@ -1328,7 +1328,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>사용자&apos;s 로컬 레이아웃</translation>
     </message>
   </context>
   <context>
@@ -1497,7 +1497,7 @@
     </message>
     <message>
       <source>Open files folder</source>
-      <translation type="unfinished">Open files folder</translation>
+      <translation>파일 폴더 열기</translation>
     </message>
   </context>
   <context>
@@ -1552,11 +1552,11 @@
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
-      <translation type="unfinished">Show timestamp on LIVE</translation>
+      <translation>LIVE에 타임스탬프 표시</translation>
     </message>
     <message>
       <source>Custom Background Image</source>
-      <translation type="unfinished">Custom Background Image</translation>
+      <translation>사용자 정의 배경 이미지</translation>
     </message>
   </context>
   <context>
@@ -1664,7 +1664,7 @@
     </message>
     <message>
       <source>Address or Subnet Mask</source>
-      <translation type="unfinished">Address or Subnet Mask</translation>
+      <translation>주소 또는 서브넷 마스크</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1692,13 +1692,13 @@
     </message>
     <message>
       <source>Find Devices</source>
-      <translation type="unfinished">Find Devices</translation>
+      <translation>%n 장치들</translation>
     </message>
     <message>
       <source>Enter address, subnet range or subnet mask, login and password
 and click on the &quot;Search&quot; button</source>
-      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
-and click on the &quot;Search&quot; button</translation>
+      <translation>주소, 서브넷 범위 또는 서브넷 마스크, 로그인 및 비밀번호를 입력하세요
+ 그리고 &quot;검색&quot; 버튼을 클릭하세요</translation>
     </message>
   </context>
   <context>
@@ -1755,7 +1755,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Signature</source>
-      <translation type="unfinished">Signature</translation>
+      <translation>서명</translation>
     </message>
   </context>
   <context>
@@ -1785,7 +1785,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>알림 표시</translation>
     </message>
   </context>
   <context>
@@ -1921,14 +1921,14 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
+      <translation>이 연결 옵션을 제거하면 사이트가 제대로 작동하지 않을 수 있습니다.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>사이트 관리</translation>
     </message>
   </context>
   <context>
@@ -2092,11 +2092,11 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
-      <translation type="unfinished">Organization&apos;s limits violation</translation>
+      <translation>조직&apos;s 제한 위반</translation>
     </message>
     <message>
       <source>Service Allocation</source>
-      <translation type="unfinished">Service Allocation</translation>
+      <translation>서비스 할당</translation>
     </message>
   </context>
   <context>
@@ -2206,7 +2206,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Video Redaction</source>
-      <translation type="unfinished">Video Redaction</translation>
+      <translation>영상 편집</translation>
     </message>
     <message>
       <source>Configure...</source>
@@ -2214,19 +2214,19 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Blur</source>
-      <translation type="unfinished">Blur</translation>
+      <translation>흐림</translation>
     </message>
     <message>
       <source>Exclude Cameras</source>
-      <translation type="unfinished">Exclude Cameras</translation>
+      <translation>카메라 제외</translation>
     </message>
     <message>
       <source>Apply session duration to Cloud users</source>
-      <translation type="unfinished">Apply session duration to Cloud users</translation>
+      <translation>클라우드 사용자에게 세션 기간 적용</translation>
     </message>
     <message>
       <source>Remote Access Tool</source>
-      <translation type="unfinished">Remote Access Tool</translation>
+      <translation>원격 액세스 도구</translation>
     </message>
     <message>
       <source>Administrators</source>
@@ -2307,11 +2307,11 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Remote Access</source>
-      <translation type="unfinished">Remote Access</translation>
+      <translation>원격 액세스</translation>
     </message>
     <message>
       <source>Enable hardware decoding</source>
-      <translation type="unfinished">Enable hardware decoding</translation>
+      <translation>하드웨어 디코딩 활성화</translation>
     </message>
   </context>
   <context>
@@ -2602,11 +2602,11 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Every</source>
-      <translation type="unfinished">Every</translation>
+      <translation>모든</translation>
     </message>
     <message>
       <source>Force open in a dedicated window</source>
-      <translation type="unfinished">Force open in a dedicated window</translation>
+      <translation>전용 창에서 강제로 열기</translation>
     </message>
   </context>
   <context>

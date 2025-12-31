@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>클라우드 알림 언어</translation>
     </message>
   </context>
   <context>
@@ -123,23 +123,23 @@
     </message>
     <message>
       <source>Offline client updates</source>
-      <translation type="unfinished">Offline client updates</translation>
+      <translation>클라이언트 업데이트 설치 중</translation>
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
-      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+      <translation>오프라인 업데이트가 활성화되고 파일은 서버에 저장됩니다.</translation>
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>이 옵션을 켜면 인터넷 접속이 없어도 연결된 클라이언트를 업데이트하는 데 사용할 수 있는 추가 파일을 서버로 다운로드할 수 있습니다.</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>이렇게 하면 서버의 모든 업데이트 파일이 삭제됩니다.</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>그래도 계속할까요?</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -168,7 +168,7 @@
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>전체 선택/선택 해제</translation>
     </message>
   </context>
   <context>
@@ -230,19 +230,19 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>파일설정</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>테이블 설정</translation>
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>테이블 보기로 전환</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>카드 보기로 전환</translation>
     </message>
   </context>
   <context>
@@ -261,11 +261,11 @@
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>이 플러그인을 구성하려면 시스템 관리 설정을 확인하세요.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>이 플러그인에는 이 카메라에 대한 설정이 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -284,8 +284,8 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>통합을 통해 VMS의 다양한 장치에서 비디오 분석을 원활하게 활용할 수 있습니다.
+통합을 선택하여 매개변수 구성을 시작하세요.</translation>
     </message>
   </context>
   <context>
@@ -347,7 +347,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>잘못된 페어링 코드</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -405,7 +405,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BookmarkView</name>
     <message>
       <source>Shared by link</source>
-      <translation type="unfinished">Shared by link</translation>
+      <translation>링크로 공유됨</translation>
     </message>
   </context>
   <context>
@@ -643,7 +643,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>사용자 정의 HTTP 헤더</translation>
     </message>
     <message>
       <source>Add</source>
@@ -740,24 +740,24 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>유형을 선택하세요</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>속성을 제거하면 연관된 모든 데이터가 삭제됩니다</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>목록을 삭제하면 목록 안의 모든 데이터가 지워집니다.</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>목록을 삭제하시겠습니까?</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>이 목록은 %n 이벤트 규칙과 연결되어 있습니다. 삭제하시겠습니까?</numerusform>
       </translation>
     </message>
     <message>
@@ -769,7 +769,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>이벤트 테스트</translation>
     </message>
     <message>
       <source>Test</source>
@@ -798,15 +798,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>목록 내보내기</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>수출</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>파일 폴더 열기...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -882,7 +882,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>필터는 Base DN에서 어떤 사용자 및/또는 그룹이 허용되는지 지정하여 사이트 액세스와 동기화를 제어하는 데 도움이 됩니다.</translation>
     </message>
   </context>
   <context>
@@ -979,7 +979,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>일부 값은 자동으로 일치시킬 수 없습니다. 수동으로 매핑해 주세요.</translation>
     </message>
     <message>
       <source>Back</source>
@@ -1001,11 +1001,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>사이트 수준에서 그룹 구성원은 다음과 같은 권한을 갖습니다:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>사이트 수준에서 사용자는 다음과 같은 권한을 갖습니다:</translation>
     </message>
   </context>
   <context>
@@ -1129,7 +1129,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>동일한 이름의 다른 그룹이 있습니다. 각 그룹에 고유한 이름을 지정하는 것이 좋습니다.</translation>
     </message>
   </context>
   <context>
@@ -1177,12 +1177,12 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>내장형</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>관습</translation>
     </message>
   </context>
   <context>
@@ -1226,7 +1226,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>다이제스트 인증은 더 이상 사용되지 않으며 다음 릴리스에서 비활성화될 예정입니다. 따라서 기본 베어러 인증을 사용할 수 없는 경우에만 사용해야 합니다.</translation>
     </message>
   </context>
   <context>
@@ -1299,7 +1299,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>통합 Api 슬랙 관리</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1314,7 +1314,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>이 플러그인에는 사이트 수준의 설정이 없습니다.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -1364,7 +1364,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>조이스틱 조사</translation>
     </message>
   </context>
   <context>
@@ -1410,7 +1410,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>레이아웃을 여는 방법을 구성하려면 사이트에 로그인하세요</translation>
     </message>
   </context>
   <context>
@@ -1480,19 +1480,19 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>사용자 관리를 더 쉽게 하기 위해 사이트를 LDAP 서버에 연결하세요</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>이 시스템에서는 LDAP 서버와의 지속적인 동기화가 비활성화되어 있습니다. 그룹 및 사용자와 그룹 멤버십에 대한 업데이트는 수동 동기화를 통해서만 이루어집니다.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>동기화 설정과 일치하는 사용자나 그룹이 없으며 시스템 DB에 추가됩니다. LDAP 서버 매개변수와 검색 기준이 올바르게 구성되었는지 확인하세요.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>LDAP 설정을 변경할 때는 주의하세요. 잘못된 구성은 많은 수의 사용자에게 동시에 시스템 가용성을 방해할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -1553,11 +1553,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>목록 가져오기</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>가져오기 옵션</translation>
     </message>
     <message>
       <source>File:</source>
@@ -1569,11 +1569,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>분리 기호:</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>데이터에 헤더가 포함되어 있습니다</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1589,31 +1589,31 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>가져오기</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>파일을 열 수 없습니다</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>파일이 존재하고 선택한 파일에 액세스할 수 있는지 확인하세요</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>가져온 항목 수정</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>선택한 파일을 가져올 수 없습니다</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>파일이 비어 있는 것 같습니다.</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>선택한 파일이 있는지, 그리고 접근 권한이 있는지 확인하세요.</translation>
     </message>
   </context>
   <context>
@@ -1640,7 +1640,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 선택됨:</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1656,11 +1656,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>파일을 저장할 수 없습니다</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>선택한 폴더에 대한 액세스 권한이 있고 디스크 공간이 충분한지 확인하세요</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -1668,7 +1668,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>선택한 항목 내보내기</translation>
     </message>
   </context>
   <context>
@@ -1782,8 +1782,8 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>%n 속성 포함</numerusform>
       </translation>
     </message>
     <message>
@@ -1830,7 +1830,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation>통합 페어링 코드</translation>
     </message>
   </context>
   <context>
@@ -1922,15 +1922,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>필수 권한 그룹</translation>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>권한이 없습니다</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>권한 숨기기</translation>
     </message>
   </context>
   <context>
@@ -1968,11 +1968,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>오브젝트 선택</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>모든 객체</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2063,18 +2063,18 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>필터링 기준</translation>
     </message>
     <message>
       <source>Find similar</source>
-      <translation type="unfinished">Find similar</translation>
+      <translation>비슷한 것을 찾아보세요</translation>
     </message>
   </context>
   <context>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>속성 선택</translation>
     </message>
   </context>
   <context>
@@ -2202,11 +2202,11 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>서버가 원격 액세스 기능에 대해 구성되지 않았습니다</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>원격 액세스 도구가 현재 비활성화되어 있습니다. 활성화하거나 관리자에게 문의하여 켜세요.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -2218,15 +2218,15 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>%1 클라이언트 애플리케이션을 로컬호스트에 연결합니다:%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>로컬 포트</translation>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation type="unfinished">An error occurred</translation>
+      <translation>오류가 발생했습니다</translation>
     </message>
     <message>
       <source>Username</source>
@@ -2238,7 +2238,7 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>원격 접속이 불가능합니다</translation>
     </message>
   </context>
   <context>
@@ -2445,19 +2445,19 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>사이트가 일시 중단되었습니다. 현재 기기에서 통합 기능을 활성화/비활성화하려면 사이트가 활성 상태여야 합니다. 자세한 내용은 채널 파트너에게 문의하세요</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>사이트가 일시 중단되었습니다. 일부 기기에서 통합 기능을 활성화/비활성화하려면 사이트가 활성 상태여야 합니다. 자세한 내용은 채널 파트너에게 문의하세요</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>사이트가 종료되었습니다. 현재 기기에서 이 통합 기능을 사용하려면 사이트가 활성 상태여야 합니다. 자세한 내용은 채널 파트너에게 문의하세요</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>사이트가 종료되었습니다. 일부 기기에서 이 통합 사용을 활성화하려면 사이트가 활성 상태여야 합니다. 자세한 내용은 채널 파트너에게 문의하세요</translation>
     </message>
   </context>
   <context>
@@ -2533,11 +2533,11 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation type="unfinished">Accept API Integrations registration requests</translation>
+      <translation>API 통합 등록 요청 수락</translation>
     </message>
     <message>
       <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+      <translation>API 통합 등록 요청을 활성화하면 제3자가 통합을 통해 승인 요청을 제출할 수 있습니다. 안전 장치가 있지만 장시간 사용하는 것은 권장하지 않습니다. 사용량을 면밀히 모니터링하고 필요한 모든 통합을 설치한 후에는 이 옵션을 비활성화하세요.</translation>
     </message>
   </context>
   <context>
@@ -2733,19 +2733,19 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>즐겨찾는 사이트 없음</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>숨겨진 사이트 없음</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>컨텍스트 메뉴에서 사이트를 즐겨찾기에 추가할 수 있습니다</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>컨텍스트 메뉴에서 주 목록에서 사이트를 숨길 수 있습니다</translation>
     </message>
   </context>
   <context>
@@ -2898,7 +2898,7 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>링크가 있는 임시</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2906,11 +2906,11 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>추가된 사이트는 기존 클라우드 계정이 있는 사용자에게 빠르게 표시되며, 기존 클라우드 계정이 없는 사용자는 이메일로 지침을 받게 됩니다.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>알림 언어</translation>
     </message>
   </context>
   <context>
@@ -3050,11 +3050,11 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>알림 언어</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>인터페이스 언어</translation>
     </message>
   </context>
   <context>
@@ -3069,7 +3069,7 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>모든 사이트</translation>
     </message>
   </context>
   <context>
@@ -3104,7 +3104,7 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 선택됨:</translation>
     </message>
     <message>
       <source>Schedule</source>
@@ -3120,7 +3120,7 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>테스트 이벤트...</translation>
     </message>
   </context>
   <context>

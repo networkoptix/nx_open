@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>오디오 재생</translation>
     </message>
     <message>
       <source>View Archive</source>
@@ -60,14 +60,14 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>시스템 이벤트</translation>
     </message>
   </context>
   <context>
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>지역 / 라이선스 지원</translation>
     </message>
   </context>
   <context>
@@ -181,7 +181,7 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>시스템 상태 뷰어</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
@@ -245,14 +245,14 @@
     <name>QnCameraAnalyticsEventsPolicy</name>
     <message>
       <source>Analytics events are not available for %1</source>
-      <translation type="unfinished">Analytics events are not available for %1</translation>
+      <translation>%1에 대하여 분석할 수 없습니다</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsObjectsPolicy</name>
     <message>
       <source>Analytics objects are not available for %1</source>
-      <translation type="unfinished">Analytics objects are not available for %1</translation>
+      <translation>%1에 대한 분석 객체를 사용할 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -577,11 +577,11 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>이 카메라는 현재 선택된 레이아웃에 없습니다</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>이 카메라는 현재 선택된 레이아웃 중 일부에 없습니다</translation>
     </message>
   </context>
   <context>
@@ -1931,7 +1931,7 @@
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>
-      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+      <translation>보안 쿠키 값을 인코딩하는 데 사용되는 암호화 키입니다.</translation>
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
@@ -1939,7 +1939,7 @@
     </message>
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
-      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+      <translation>서버가 미디어 데이터를 스트리밍할 때 소켓 전송 시간 초과(초).</translation>
     </message>
   </context>
 </TS>

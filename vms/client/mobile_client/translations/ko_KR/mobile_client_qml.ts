@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>앱 정보</translation>
     </message>
   </context>
   <context>
@@ -45,27 +45,27 @@
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation type="unfinished">Download video to this device</translation>
+      <translation>이 기기에 비디오를 다운로드하세요</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation type="unfinished">Optimize Network</translation>
+      <translation>네트워크 최적화</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation type="unfinished">Apply network optimization methods</translation>
+      <translation>네트워크 최적화 방법을 적용합니다</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation type="unfinished">Parallel Decoding</translation>
+      <translation>병렬 디코딩</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation type="unfinished">Use multiple decoders to improve performance</translation>
+      <translation>성능 향상을 위해 여러 개의 디코더를 사용하십시오</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation type="unfinished">Please restart the app to apply changes</translation>
+      <translation>변경 사항을 적용하려면 앱을 재시작하세요</translation>
     </message>
   </context>
   <context>
@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>필요한 정보</translation>
     </message>
   </context>
   <context>
@@ -137,7 +137,7 @@
     <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation type="unfinished">Log in to the site in %1</translation>
+      <translation>%1사용하여 시스템에 로그인 하십시오</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
@@ -150,17 +150,17 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+      <translation>사이트가 &lt;font color=&apos;%2&apos;&gt;이고&lt;/a&gt; 에서 %1로 연결되지 않은 경우</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>사이트 관리의 %1 탭에서 &quot;사이트를 %1&quot; 에 연결하기를 클릭하세요</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
+      <translation>시스템이 &lt;font color=&apos;&apos;&gt;이고&lt;/a&gt; 에서 %2로 연결되지 않은 경우</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
+      <translation>시스템 설정 페이지를 열고 소유자 이름 옆에 있는 "변경" 링크를 클릭합니다</translation>
     </message>
   </context>
   <context>
@@ -288,7 +288,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>공유 옵션을 설정한 후 공유하면 재생 링크를 생성하기 위한 새 북마크 대화 상자가 열립니다</translation>
     </message>
   </context>
   <context>
@@ -307,11 +307,11 @@
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation type="unfinished">Copy Client ID</translation>
+      <translation>고객 ID 복사</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation type="unfinished">Force Crash</translation>
+      <translation>강제 충돌</translation>
     </message>
   </context>
   <context>
@@ -361,7 +361,7 @@
     <message>
       <source>Enter your %1 account password to connect to the Site</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
+      <translation>시스템을 %1에 연결하려면 계정 비밀번호를 입력하세요</translation>
     </message>
   </context>
   <context>
@@ -382,14 +382,14 @@
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
-      <translation type="unfinished">SHARED</translation>
+      <translation>공유됨</translation>
     </message>
   </context>
   <context>
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation type="unfinished">Looking for</translation>
+      <translation>찾고있는</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -431,23 +431,23 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>피드</translation>
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>알림 비활성화</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>푸시 알림이 발견되지 않았습니다.</translation>
     </message>
     <message>
       <source>Unviewed</source>
-      <translation type="unfinished">Unviewed</translation>
+      <translation>미읽음</translation>
     </message>
     <message>
       <source>Viewed</source>
-      <translation type="unfinished">Viewed</translation>
+      <translation>조회</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -459,15 +459,15 @@
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation type="unfinished">No New Notifications</translation>
+      <translation>알림 없음</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+      <translation>새로운 푸시 알림이 없습니다. 전체 알림 내역을 확인할 수 있습니다.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation type="unfinished">View All</translation>
+      <translation>모두 보기</translation>
     </message>
     <message>
       <source>All</source>
@@ -475,15 +475,15 @@
     </message>
     <message>
       <source>Notifications Off</source>
-      <translation type="unfinished">Notifications Off</translation>
+      <translation>알림이 꺼져있습니다</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+      <translation>현재 이 앱의 알림이 비활성화되어 있습니다. 알림을 활성화하려면 휴대전화 설정에서 변경해 주세요</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+      <translation>이 사이트에 대한 푸시 알림을 비활성화하셨습니다. 푸시 알림을 활성화하려면 설정 페이지로 이동하세요.</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -505,7 +505,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>공유 전용</translation>
     </message>
   </context>
   <context>
@@ -579,7 +579,7 @@
     </message>
     <message>
       <source>Live Previews</source>
-      <translation type="unfinished">Live Previews</translation>
+      <translation>실시간 미리보기</translation>
     </message>
     <message>
       <source>Server Time</source>
@@ -587,7 +587,7 @@
     </message>
     <message>
       <source>Show server time on cameras</source>
-      <translation type="unfinished">Show server time on cameras</translation>
+      <translation>카메라에 서버 시간을 표시합니다</translation>
     </message>
   </context>
   <context>
@@ -613,7 +613,7 @@
     </message>
     <message>
       <source>Open external link in browser?</source>
-      <translation type="unfinished">Open external link in browser?</translation>
+      <translation>외부 링크를 브라우저에서 열겠습니까?</translation>
     </message>
   </context>
   <context>
@@ -635,7 +635,7 @@
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation type="unfinished">App Settings</translation>
+      <translation>앱 설정</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -648,7 +648,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>서버 추가</translation>
     </message>
   </context>
   <context>
@@ -681,7 +681,7 @@
     <name>Notification</name>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>더보기</translation>
     </message>
     <message>
       <source>No data</source>
@@ -696,7 +696,7 @@
     </message>
     <message>
       <source>Motions</source>
-      <translation type="unfinished">Motions</translation>
+      <translation>모션</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -744,19 +744,19 @@
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation type="unfinished">Hardware Acceleration</translation>
+      <translation>하드웨어 가속</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation type="unfinished">Can improve performance and battery life</translation>
+      <translation>성능과 배터리 수명 증가</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation type="unfinished">Software Decoder Fallback</translation>
+      <translation>소프트웨어 디코더 대체 기능</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation type="unfinished">Can decode rare video formats using software</translation>
+      <translation>소프트웨어를 사용하여 희귀한 비디오 형식을 디코딩할 수 있습니다</translation>
     </message>
   </context>
   <context>
@@ -812,15 +812,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>모든 사이트</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation type="unfinished">Selected Sites</translation>
+      <translation>선택된 사이트</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation type="unfinished">At least one site has to be selected</translation>
+      <translation>최소한 하나의 사이트를 선택해야 합니다</translation>
     </message>
   </context>
   <context>
@@ -903,15 +903,15 @@
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this layout</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this layout</translation>
+      <translation>해당 사이트에서 어떠한 카메라도 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
+      <translation>해당 사이트에서 어떠한 카메라도 찾을 수 없습니다.</translation>
     </message>
     <message>
       <source>Stop Connecting</source>
-      <translation type="unfinished">Stop Connecting</translation>
+      <translation>연결 중지</translation>
     </message>
   </context>
   <context>
@@ -957,15 +957,15 @@
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation type="unfinished">Save Passwords</translation>
+      <translation>비밀번호 저장</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation type="unfinished">How to handle saved passwords?</translation>
+      <translation>저장된 비밀번호를 어떻게 관리해야 할까요?</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation type="unfinished">Server Certificate Check</translation>
+      <translation>서버 인증서 오류</translation>
     </message>
   </context>
   <context>
@@ -988,7 +988,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>호스트: 포트</translation>
     </message>
   </context>
   <context>
@@ -1031,7 +1031,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>연결 방법?</translation>
     </message>
     <message>
       <source>Folder is empty</source>
@@ -1039,27 +1039,27 @@
     </message>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>리소스 접근 거부됨</translation>
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>클라우드 포털에서 조직을 만들어 여기에서 액세스하세요</translation>
     </message>
     <message>
       <source>The resources in this organization are not available to your permission group</source>
-      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+      <translation>이 조직의 리소스는 귀하의 권한 그룹에서 사용할 수 없습니다</translation>
     </message>
     <message>
       <source>Connect a site to the organization to access it here</source>
-      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+      <translation>조직에 사이트를 연결하여 여기에서 액세스하세요</translation>
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>접근 가능한 사이트를 찾을 수 없습니다. 클라우드 계정에 로그인하거나 로컬 서버에 연결하세요</translation>
     </message>
     <message>
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
+      <translation>접근 가능한 사이트를 찾을 수 없습니다. 기존 사이트에 대한 접근을 요청하거나 로컬 서버에 연결하세요</translation>
     </message>
   </context>
   <context>
@@ -1078,7 +1078,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>시스템 설정에서 푸시 알림이 해제되어 있습니다</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -1098,7 +1098,7 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+      <translation>푸시 알림을 사용하기 위해 클라우드에 로그인</translation>
     </message>
     <message>
       <source>About</source>
@@ -1109,7 +1109,7 @@
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>새로운 북마크</translation>
     </message>
     <message>
       <source>Name</source>
@@ -1121,7 +1121,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>비밀번호로 보호(선택 사항)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1129,23 +1129,23 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>만들고 공유하세요</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>저장 및 공유</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>1시간 후에 만료됩니다</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>하루 안에 만료됩니다</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>한 달 후에 만료됩니다</translation>
     </message>
     <message>
       <source>Never expires</source>
@@ -1153,7 +1153,7 @@
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
+      <translation>공유 링크 옵션</translation>
     </message>
     <message>
       <source>Sharing</source>
@@ -1161,11 +1161,11 @@
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>링크 공유</translation>
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>만료일 선택</translation>
     </message>
     <message>
       <source>Expiration</source>
@@ -1208,7 +1208,7 @@
     </message>
     <message>
       <source>Host:Port</source>
-      <translation type="unfinished">Host:Port</translation>
+      <translation>호스트:포트</translation>
     </message>
   </context>
   <context>
@@ -1246,7 +1246,7 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>신규</translation>
     </message>
     <message>
       <source>SUSPENDED</source>
@@ -1258,18 +1258,18 @@
     </message>
     <message>
       <source>PENDING</source>
-      <translation type="unfinished">PENDING</translation>
+      <translation>보류 중</translation>
     </message>
   </context>
   <context>
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>리소스 접근 거부됨</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>일시 중단 또는 종료 상태의 시스템은 에서 사용할 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -1312,7 +1312,7 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>열기 %1</translation>
     </message>
   </context>
   <context>
@@ -1330,7 +1330,7 @@
     </message>
     <message>
       <source>Open account settings</source>
-      <translation type="unfinished">Open account settings</translation>
+      <translation>계정 설정</translation>
     </message>
   </context>
   <context>
@@ -1417,11 +1417,11 @@
     </message>
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
+      <translation>이 아카이브를 해독하려면 데스크톱 클라이언트에서 암호화 비밀번호를 입력하거나 사이트 관리자에게 도움을 요청하세요.</translation>
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>필요한 정보</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -1429,7 +1429,7 @@
     </message>
     <message>
       <source>2FA Disabled</source>
-      <translation type="unfinished">2FA Disabled</translation>
+      <translation>2FA 비활성화 됨</translation>
     </message>
   </context>
   <context>
@@ -1468,16 +1468,16 @@
     </message>
     <message>
       <source>No results</source>
-      <translation type="unfinished">No results</translation>
+      <translation>결과가 없습니다</translation>
     </message>
     <message>
       <source>Not available</source>
-      <translation type="unfinished">Not available</translation>
+      <translation>사용할수 없음</translation>
     </message>
     <message>
       <source>You do not have permission&lt;br&gt;to view the archive</source>
       <comment>&lt;br&gt; is a line break</comment>
-      <translation type="unfinished">You do not have permission&lt;br&gt;to view the archive</translation>
+      <translation>보관함을 볼 수 있는 권한이 없습니다</translation>
     </message>
   </context>
   <context>
@@ -1489,7 +1489,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>연결이 끊어졌습니다. 다시 연결하는 중입니다...</translation>
     </message>
   </context>
 </TS>

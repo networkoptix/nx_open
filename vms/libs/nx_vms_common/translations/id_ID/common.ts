@@ -1939,7 +1939,7 @@
     </message>
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
-      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+      <translation>Soket mengirimkan waktu tunggu saat Server melakukan streaming data media (Detik).</translation>
     </message>
   </context>
 </TS>

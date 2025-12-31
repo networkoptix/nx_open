@@ -19,7 +19,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>공유만 가능</translation>
     </message>
   </context>
   <context>
@@ -59,7 +59,7 @@
     </message>
     <message>
       <source>Cannot change notifications settings</source>
-      <translation type="unfinished">Cannot change notifications settings</translation>
+      <translation>푸시 알림 설정을 변경할 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -67,7 +67,7 @@
     <message>
       <source>%1 ago</source>
       <comment>notification time, like &apos;1 min ago&apos;</comment>
-      <translation type="unfinished">%1 ago</translation>
+      <translation>%1 전</translation>
     </message>
   </context>
   <context>
@@ -79,7 +79,7 @@
     <message>
       <source>Expires in %1</source>
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>%1에 만료됩니다</translation>
     </message>
     <message>
       <source>Error</source>
@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>북마크를 공유할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -99,7 +99,7 @@
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>사이트에 연결할 수 없습니다 &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -121,18 +121,18 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsLoaderDelegate</name>
     <message>
       <source>Unknown Object</source>
-      <translation type="unfinished">Unknown Object</translation>
+      <translation>알 수 없는 이벤트</translation>
     </message>
     <message numerus="yes">
       <source>Objects (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Objects (%n)</numerusform>
+      <translation>
+        <numerusform>객체(%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Objects (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Objects (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>객체(%n)</numerusform>
       </translation>
     </message>
   </context>
@@ -144,14 +144,14 @@
     </message>
     <message numerus="yes">
       <source>Bookmarks (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Bookmarks (%n)</numerusform>
+      <translation>
+        <numerusform>북마크(%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Bookmarks (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Bookmarks (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>북마크(&gt;%n)</numerusform>
       </translation>
     </message>
   </context>
@@ -159,18 +159,18 @@
     <name>nx::vms::client::mobile::timeline::MotionLoaderDelegate</name>
     <message>
       <source>Motion detected</source>
-      <translation type="unfinished">Motion detected</translation>
+      <translation>모션 감지</translation>
     </message>
     <message numerus="yes">
       <source>Motions (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motions (&gt;%n)</numerusform>
+      <translation>
+        <numerusform>동작(&gt;%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Motions (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motions (%n)</numerusform>
+      <translation>
+        <numerusform>동작(%n)</numerusform>
       </translation>
     </message>
   </context>
