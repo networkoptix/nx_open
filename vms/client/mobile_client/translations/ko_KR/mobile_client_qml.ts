@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>앱 정보</translation>
     </message>
   </context>
   <context>
@@ -57,11 +57,11 @@
     </message>
     <message>
       <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <translation>최대 디코더 개수</translation>
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <translation>하드웨어 디코더를 최대한 활용하여 비디오 디코딩 성능을 향상시키세요</translation>
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>
@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>필요한 정보</translation>
     </message>
   </context>
   <context>
@@ -137,7 +137,7 @@
     <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation type="unfinished">Log in to the site in %1</translation>
+      <translation>%1사용하여 시스템에 로그인 하십시오</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
@@ -150,17 +150,17 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+      <translation>사이트가 &lt;font color=&apos;%2&apos;&gt;이고&lt;/a&gt; 에서 %1로 연결되지 않은 경우</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>사이트 관리의 %1 탭에서 &quot;사이트를 %1&quot; 에 연결하기를 클릭하세요</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
+      <translation>시스템이 &lt;font color=&apos;&apos;&gt;이고&lt;/a&gt; 에서 %2로 연결되지 않은 경우</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
+      <translation>시스템 설정 페이지를 열고 소유자 이름 옆에 있는 "변경" 링크를 클릭합니다</translation>
     </message>
   </context>
   <context>
@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>공유 옵션을 설정한 후 공유하면 재생 링크를 생성하기 위한 새 북마크 대화 상자가 열립니다</translation>
     </message>
   </context>
   <context>
@@ -246,11 +246,11 @@
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation type="unfinished">Copy Client ID</translation>
+      <translation>고객 ID 복사</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation type="unfinished">Force Crash</translation>
+      <translation>강제 충돌</translation>
     </message>
   </context>
   <context>
@@ -300,7 +300,7 @@
     <message>
       <source>Enter your %1 account password to connect to the Site</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
+      <translation>시스템을 %1에 연결하려면 계정 비밀번호를 입력하세요</translation>
     </message>
   </context>
   <context>
@@ -321,14 +321,14 @@
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
-      <translation type="unfinished">SHARED</translation>
+      <translation>공유됨</translation>
     </message>
   </context>
   <context>
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation type="unfinished">Looking for</translation>
+      <translation>찾고있는</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -381,7 +381,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>공유 전용</translation>
     </message>
   </context>
   <context>
@@ -488,7 +488,7 @@
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation type="unfinished">App Settings</translation>
+      <translation>앱 설정</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -501,7 +501,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>서버 추가</translation>
     </message>
   </context>
   <context>
@@ -556,11 +556,11 @@
     </message>
     <message>
       <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <translation>소프트웨어 디코더 폴백을 활성화합니다</translation>
     </message>
     <message>
       <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <translation>소프트웨어를 사용하여 희귀한 비디오 형식을 디코딩할 수 있습니다</translation>
     </message>
   </context>
   <context>
@@ -616,15 +616,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>모든 사이트</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation type="unfinished">Selected Sites</translation>
+      <translation>선택된 사이트</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation type="unfinished">At least one site has to be selected</translation>
+      <translation>최소한 하나의 사이트를 선택해야 합니다</translation>
     </message>
   </context>
   <context>
@@ -704,7 +704,7 @@
     </message>
     <message>
       <source>Stop Connecting</source>
-      <translation type="unfinished">Stop Connecting</translation>
+      <translation>연결 중지</translation>
     </message>
   </context>
   <context>
@@ -777,7 +777,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>호스트: 포트</translation>
     </message>
   </context>
   <context>
@@ -820,7 +820,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>연결 방법?</translation>
     </message>
     <message>
       <source>Folder is empty</source>
@@ -828,27 +828,27 @@
     </message>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>리소스 접근 거부됨</translation>
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>클라우드 포털에서 조직을 만들어 여기에서 액세스하세요</translation>
     </message>
     <message>
       <source>The resources in this organization are not available to your permission group</source>
-      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+      <translation>이 조직의 리소스는 귀하의 권한 그룹에서 사용할 수 없습니다</translation>
     </message>
     <message>
       <source>Connect a site to the organization to access it here</source>
-      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+      <translation>조직에 사이트를 연결하여 여기에서 액세스하세요</translation>
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>접근 가능한 사이트를 찾을 수 없습니다. 클라우드 계정에 로그인하거나 로컬 서버에 연결하세요</translation>
     </message>
     <message>
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
+      <translation>접근 가능한 사이트를 찾을 수 없습니다. 기존 사이트에 대한 접근을 요청하거나 로컬 서버에 연결하세요</translation>
     </message>
   </context>
   <context>
@@ -875,7 +875,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>시스템 설정에서 푸시 알림이 해제되어 있습니다</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -895,14 +895,14 @@
     </message>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>앱 정보</translation>
     </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>새로운 북마크</translation>
     </message>
     <message>
       <source>Name</source>
@@ -914,7 +914,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>비밀번호로 보호(선택 사항)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -922,23 +922,23 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>만들고 공유하세요</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>저장 및 공유</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>1시간 후에 만료됩니다</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>하루 안에 만료됩니다</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>한 달 후에 만료됩니다</translation>
     </message>
     <message>
       <source>Never expires</source>
@@ -946,7 +946,7 @@
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
+      <translation>공유 링크 옵션</translation>
     </message>
     <message>
       <source>Sharing</source>
@@ -954,11 +954,11 @@
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>링크 공유</translation>
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>만료일 선택</translation>
     </message>
     <message>
       <source>Expiration</source>
@@ -973,7 +973,7 @@
     </message>
     <message>
       <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
+      <translation>다음으로 로그인</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1005,7 +1005,7 @@
     </message>
     <message>
       <source>Host:Port</source>
-      <translation type="unfinished">Host:Port</translation>
+      <translation>호스트:포트</translation>
     </message>
   </context>
   <context>
@@ -1043,7 +1043,7 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>신규</translation>
     </message>
     <message>
       <source>SUSPENDED</source>
@@ -1055,18 +1055,18 @@
     </message>
     <message>
       <source>PENDING</source>
-      <translation type="unfinished">PENDING</translation>
+      <translation>보류 중</translation>
     </message>
   </context>
   <context>
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>리소스 접근 거부됨</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>일시 중단 또는 종료 상태의 시스템은 에서 사용할 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -1102,7 +1102,7 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>열기 %1</translation>
     </message>
   </context>
   <context>
@@ -1204,11 +1204,11 @@
     </message>
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
+      <translation>이 아카이브를 해독하려면 데스크톱 클라이언트에서 암호화 비밀번호를 입력하거나 사이트 관리자에게 도움을 요청하세요.</translation>
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>필요한 정보</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -1278,7 +1278,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>연결이 끊어졌습니다. 다시 연결하는 중입니다...</translation>
     </message>
   </context>
 </TS>

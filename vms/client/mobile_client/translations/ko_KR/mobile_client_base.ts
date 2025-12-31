@@ -19,7 +19,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>공유만 가능</translation>
     </message>
   </context>
   <context>
@@ -71,7 +71,7 @@
     <message>
       <source>Expires in %1</source>
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>%1에 만료됩니다</translation>
     </message>
     <message>
       <source>Error</source>
@@ -79,7 +79,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>북마크를 공유할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -91,7 +91,7 @@
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>사이트에 연결할 수 없습니다 &quot;%1&quot;</translation>
     </message>
   </context>
 </TS>
