@@ -288,10 +288,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>User %1 is not allowed to modify the Showreel with parentId %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Modifying of %1 entries out of %2 is not allowed for %3.</source>
         <comment>%3 is a C++ type name</comment>
         <translation type="unfinished"></translation>
@@ -337,6 +333,10 @@
     </message>
     <message>
         <source>Storage with the same url already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User %1 is not allowed to %2 the Showreel with parentId %3</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
