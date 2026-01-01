@@ -990,7 +990,7 @@
     </message>
     <message>
       <source>Add User...</source>
-      <translation type="unfinished">Add User...</translation>
+      <translation>Хэрэглэгч нэмэх...</translation>
     </message>
     <message>
       <source>Integration...</source>
@@ -1534,7 +1534,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Идэвхтэй</translation>
     </message>
     <message>
       <source>Not configured</source>
@@ -2187,7 +2187,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Activity</source>
-      <translation type="unfinished">Activity</translation>
+      <translation>Үйл ажиллагаа</translation>
     </message>
     <message>
       <source>Date</source>
@@ -2683,11 +2683,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>Та сайтаас гарах болно. Сайтад зөвхөн орон нутгийн сүлжээгээр дамжуулан хандах боломжтой</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>Энэ сайтад зөвхөн орон нутгийн сүлжээгээр хандах боломжтой</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
@@ -3037,7 +3037,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Тэмдэглэгээнүүд</translation>
     </message>
     <message>
       <source>Device List</source>
@@ -3797,7 +3797,7 @@ License Key: %2</translation>
     <name>QnRecordingStatsModel</name>
     <message>
       <source>Space</source>
-      <translation type="unfinished">Space</translation>
+      <translation>Орон зай</translation>
     </message>
     <message>
       <source>Calendar Days</source>
@@ -3859,7 +3859,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Zoom Window</source>
-      <translation type="unfinished">Zoom Window</translation>
+      <translation>Томруулах цонх</translation>
     </message>
     <message>
       <source>Move to a dedicated window</source>
@@ -4402,7 +4402,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>Одоогийн аналитик өгөгдөлтэй юу хийх вэ?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -4568,7 +4568,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>орон нутгийн</translation>
     </message>
     <message>
       <source>ram</source>
@@ -4584,7 +4584,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>сүлжээ</translation>
     </message>
     <message>
       <source>smb</source>
@@ -4600,7 +4600,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>cloud</source>
-      <translation type="unfinished">cloud</translation>
+      <translation>үүл</translation>
     </message>
     <message>
       <source>Path</source>
@@ -4636,7 +4636,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>салгаж авах боломжтой</translation>
     </message>
     <message>
       <source>Unknown size</source>
@@ -4656,7 +4656,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Adaptive</source>
-      <translation type="unfinished">Adaptive</translation>
+      <translation>Дасан зохицох</translation>
     </message>
   </context>
   <context>
@@ -4698,7 +4698,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add this storage anyway?</source>
-      <translation type="unfinished">Add this storage anyway?</translation>
+      <translation>Энэ санг нэмэх үү?</translation>
     </message>
     <message>
       <source>Storage path used by another server</source>
@@ -4706,7 +4706,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Storage</source>
-      <translation type="unfinished">Add Storage</translation>
+      <translation>Хадгалах сан нэмэх</translation>
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
@@ -5850,7 +5850,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Авто</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -6491,7 +6491,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>ИДЭВХГҮЙ БАЙДАЛТАЙ</translation>
     </message>
   </context>
   <context>
@@ -6939,7 +6939,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Auto</source>
       <comment>Automatic RTP transport type</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Авто</translation>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
@@ -6995,11 +6995,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Auto</source>
       <comment>Automatic profile selection</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Авто</translation>
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Авто</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
@@ -7217,7 +7217,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Дараагийн</translation>
     </message>
     <message>
       <source>Finish</source>
@@ -8152,7 +8152,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Bookmarks</source>
       <comment>Bookmarks tab title</comment>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Тэмдэглэгээнүүд</translation>
     </message>
     <message>
       <source>Events</source>
@@ -8603,7 +8603,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ImageControlWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Авто</translation>
     </message>
     <message>
       <source>%1 degrees</source>
@@ -8769,7 +8769,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>ИДЭВХГҮЙ БАЙДАЛТАЙ</translation>
     </message>
   </context>
   <context>
@@ -9007,7 +9007,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>Дэлгэрэнгүй</translation>
     </message>
     <message>
       <source>Default Logging level</source>
@@ -9177,7 +9177,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Бүгд</translation>
     </message>
     <message>
       <source>Export List</source>
@@ -10416,7 +10416,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::SaasInfoWidget</name>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Идэвхтэй</translation>
     </message>
     <message>
       <source>Suspended</source>
@@ -10431,7 +10431,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Бүгд</translation>
     </message>
   </context>
   <context>
@@ -10630,7 +10630,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>Хэрэглэгчийн бүх үйлдлийг хянаж, бүртгэдэг.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
@@ -10646,7 +10646,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>RTSP хөдөлгөөний шифрлэлтийг идэвхжүүлдэг.</translation>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
@@ -10832,7 +10832,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerListModel</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Авто</translation>
     </message>
   </context>
   <context>
@@ -11184,7 +11184,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>мөн</translation>
     </message>
     <message>
       <source>Your access to the Site expires %1</source>
@@ -11201,9 +11201,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... болон %n дэлгэрэнгүй</numerusform>
+        <numerusform>... болон %n дэлгэрэнгүй</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11607,7 +11607,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>Нэвтрэх талбар хоосон байж болохгүй</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed</source>
@@ -11656,7 +11656,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>мөн</translation>
     </message>
     <message>
       <source>New User</source>
@@ -11910,7 +11910,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>(%1 of %2)</source>
       <comment>Uploaded and total number of files will be substituted</comment>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%2-с %1)</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
@@ -12154,7 +12154,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Тэмдэглэгээнүүд</translation>
     </message>
     <message>
       <source>High-Res</source>
@@ -12203,7 +12203,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Вэб хуудсууд</translation>
     </message>
     <message>
       <source>Users</source>
@@ -12450,7 +12450,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::menu::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Авто</translation>
     </message>
     <message>
       <source>Low</source>
@@ -12943,7 +12943,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Дараагийн</translation>
     </message>
     <message>
       <source>Name is necessary</source>

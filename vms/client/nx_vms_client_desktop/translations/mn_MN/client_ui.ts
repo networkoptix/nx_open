@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Авто</translation>
     </message>
     <message>
       <source>Black level</source>
@@ -142,7 +142,7 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Авто</translation>
     </message>
     <message>
       <source>Keep Archive For...</source>
@@ -380,7 +380,7 @@
     <name>CameraExpertSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Авто</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
@@ -570,7 +570,7 @@
     </message>
     <message>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>Камерын ID</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -663,7 +663,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Дараагийн</translation>
     </message>
     <message>
       <source>New Device</source>
@@ -1369,7 +1369,7 @@
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation type="unfinished">Activate Free License</translation>
+      <translation>Үнэгүй лицензийг идэвхжүүлэх</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -1575,7 +1575,7 @@
     </message>
     <message>
       <source>Take system name and settings from</source>
-      <translation type="unfinished">Take system name and settings from</translation>
+      <translation>Системийн нэр болон тохиргоог эндээс авна уу</translation>
     </message>
   </context>
   <context>
@@ -2186,11 +2186,11 @@
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Серверүүдийг зөвхөн шифрлэгдсэн холболтыг хүлээн авахыг албадах</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Ширээний компьютер болон гар утасны үйлчлүүлэгч рүү видео урсгалыг шифрлэх</translation>
     </message>
     <message>
       <source>Manage Users</source>
@@ -2511,7 +2511,7 @@
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Хэрэглэгч нэмэх</translation>
     </message>
     <message>
       <source>Del</source>
