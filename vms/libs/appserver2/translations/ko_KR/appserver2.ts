@@ -288,10 +288,6 @@
       <translation>내장된 사용자 그룹 %1(%2)을 삭제할 수 없습니다.</translation>
     </message>
     <message>
-      <source>User %1 is not allowed to modify the Showreel with parentId %2.</source>
-      <translation>사용자 %1 는 parentId %2를 사용하여 쇼릴을 수정할 수 없습니다.</translation>
-    </message>
-    <message>
       <source>Modifying of %1 entries out of %2 is not allowed for %3.</source>
       <comment>%3 is a C++ type name</comment>
       <translation>%2 에서 %1 항목을 수정하는 것은 %3에서 허용되지 않습니다.</translation>
@@ -338,6 +334,10 @@
     <message>
       <source>Storage with the same url already exists</source>
       <translation>같은 이름을 가진 그룹이 이미 존재합니다</translation>
+    </message>
+    <message>
+      <source>User %1 is not allowed to %2 the Showreel with parentId %3</source>
+      <translation type="unfinished">User %1 is not allowed to %2 the Showreel with parentId %3</translation>
     </message>
   </context>
 </TS>

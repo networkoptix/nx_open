@@ -288,10 +288,6 @@
       <translation>Kan ikke slette den indbyggede brugergruppe %1(%2).</translation>
     </message>
     <message>
-      <source>User %1 is not allowed to modify the Showreel with parentId %2.</source>
-      <translation>Bruger %1 har ikke tilladelse til at ændre Showreel med overordnede Id %2.</translation>
-    </message>
-    <message>
       <source>Modifying of %1 entries out of %2 is not allowed for %3.</source>
       <comment>%3 is a C++ type name</comment>
       <translation>Ændring af %1 poster ud af %2 er ikke tilladt for %3.</translation>
@@ -338,6 +334,10 @@
     <message>
       <source>Storage with the same url already exists</source>
       <translation>Lagerplads med den samme Url findes allerede</translation>
+    </message>
+    <message>
+      <source>User %1 is not allowed to %2 the Showreel with parentId %3</source>
+      <translation type="unfinished">User %1 is not allowed to %2 the Showreel with parentId %3</translation>
     </message>
   </context>
 </TS>

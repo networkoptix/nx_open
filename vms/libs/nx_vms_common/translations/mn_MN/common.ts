@@ -187,7 +187,7 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>Сайтын хэвийн ажиллагааны үзэгчид</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
@@ -1590,7 +1590,7 @@
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon.</translation>
+      <translation>Синхрончлолын хугацаа эпсилон. Хэрэв хугацааны дельта нь эпсилоноос бага бол шинэ утга хэрэглэхгүй.</translation>
     </message>
     <message>
       <source>Cloud owner account.</source>
@@ -1814,7 +1814,7 @@
     </message>
     <message>
       <source>Default video codec.</source>
-      <translation type="unfinished">Default video codec.</translation>
+      <translation>Анхдагч видео кодек.</translation>
     </message>
     <message>
       <source>Default codec for export video.</source>

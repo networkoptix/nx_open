@@ -288,10 +288,6 @@
       <translation>Non se pode eliminar o grupo de usuarios integrado %1(%2).</translation>
     </message>
     <message>
-      <source>User %1 is not allowed to modify the Showreel with parentId %2.</source>
-      <translation>O usuario %1 non ten permiso para modificar o Showreel co ID parental %2.</translation>
-    </message>
-    <message>
       <source>Modifying of %1 entries out of %2 is not allowed for %3.</source>
       <comment>%3 is a C++ type name</comment>
       <translation>Non se permite a modificación das entradas %1 de %2 para %3.</translation>
@@ -338,6 +334,10 @@
     <message>
       <source>Storage with the same url already exists</source>
       <translation type="unfinished">Storage with the same url already exists</translation>
+    </message>
+    <message>
+      <source>User %1 is not allowed to %2 the Showreel with parentId %3</source>
+      <translation type="unfinished">User %1 is not allowed to %2 the Showreel with parentId %3</translation>
     </message>
   </context>
 </TS>

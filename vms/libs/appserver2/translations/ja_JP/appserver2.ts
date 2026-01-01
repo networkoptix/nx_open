@@ -288,10 +288,6 @@
       <translation>ビルトインユーザーグループ %1(%2) は削除できません。</translation>
     </message>
     <message>
-      <source>User %1 is not allowed to modify the Showreel with parentId %2.</source>
-      <translation>ユーザー %1 には、parentId %2 のシーケンシャル表示を変更する権限がありません。</translation>
-    </message>
-    <message>
       <source>Modifying of %1 entries out of %2 is not allowed for %3.</source>
       <comment>%3 is a C++ type name</comment>
       <translation>%3 では、 %2 件中 %1 エントリーは変更できません。</translation>
@@ -338,6 +334,10 @@
     <message>
       <source>Storage with the same url already exists</source>
       <translation>同じ URL のストレージがすでに存在します。</translation>
+    </message>
+    <message>
+      <source>User %1 is not allowed to %2 the Showreel with parentId %3</source>
+      <translation type="unfinished">User %1 is not allowed to %2 the Showreel with parentId %3</translation>
     </message>
   </context>
 </TS>

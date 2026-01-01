@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Таны сайт</translation>
     </message>
     <message>
       <source>Owner: %1</source>
