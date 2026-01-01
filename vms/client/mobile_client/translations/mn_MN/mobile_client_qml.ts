@@ -37,7 +37,7 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Бета онцлогууд</translation>
     </message>
     <message>
       <source>Video Download</source>
@@ -333,7 +333,7 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Тэмдэглэгээнүүд</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -348,7 +348,7 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Тэмдэглэгээнүүд</translation>
     </message>
     <message>
       <source>No objects</source>
@@ -864,7 +864,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Бүгд</translation>
     </message>
     <message>
       <source>Log in to the cloud to use push notifications</source>
@@ -880,7 +880,7 @@
     </message>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Бета онцлогууд</translation>
     </message>
     <message>
       <source>Early access to new features</source>
@@ -1263,7 +1263,7 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Тэмдэглэгээнүүд</translation>
     </message>
     <message>
       <source>Objects</source>
