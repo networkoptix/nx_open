@@ -288,10 +288,6 @@
       <translation>Tidak dapat menghapus Grup User bawaan %1(%2).</translation>
     </message>
     <message>
-      <source>User %1 is not allowed to modify the Showreel with parentId %2.</source>
-      <translation>User %1 tidak diizinkan mengubah Showreel dengan parentId %2.</translation>
-    </message>
-    <message>
       <source>Modifying of %1 entries out of %2 is not allowed for %3.</source>
       <comment>%3 is a C++ type name</comment>
       <translation>Modifikasi %1 entri dari %2 tidak diizinkan untuk %3.</translation>
@@ -338,6 +334,10 @@
     <message>
       <source>Storage with the same url already exists</source>
       <translation>Penyimpanan dengan url yang sama sudah ada</translation>
+    </message>
+    <message>
+      <source>User %1 is not allowed to %2 the Showreel with parentId %3</source>
+      <translation type="unfinished">User %1 is not allowed to %2 the Showreel with parentId %3</translation>
     </message>
   </context>
 </TS>

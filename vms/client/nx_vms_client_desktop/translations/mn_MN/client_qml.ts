@@ -154,7 +154,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Бүгд</translation>
     </message>
   </context>
   <context>
@@ -362,7 +362,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Авто</translation>
     </message>
   </context>
   <context>
@@ -1366,7 +1366,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Дараагийн</translation>
     </message>
     <message>
       <source>Joystick Investigation</source>
@@ -2112,7 +2112,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Дараагийн</translation>
     </message>
   </context>
   <context>
@@ -2354,7 +2354,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Вэб хуудсууд</translation>
     </message>
     <message>
       <source>Health Monitors</source>
@@ -2414,7 +2414,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Вэб хуудсууд</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -2429,7 +2429,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>Урьдчилсан хувилбарыг ачаалж чадсангүй</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
@@ -2448,7 +2448,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Тэмдэглэгээнүүд</translation>
     </message>
     <message>
       <source>Events</source>
@@ -2825,9 +2825,9 @@ Press Alt + Click to follow object</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... болон %n дэлгэрэнгүй</numerusform>
+        <numerusform>... болон %n дэлгэрэнгүй</numerusform>
       </translation>
     </message>
   </context>
@@ -2855,7 +2855,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Хэрэглэгч нэмэх</translation>
     </message>
   </context>
   <context>
@@ -3136,7 +3136,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Идэвхгүй болгох</translation>
     </message>
     <message>
       <source>Test events...</source>
