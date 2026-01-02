@@ -337,7 +337,7 @@
     </message>
     <message>
       <source>User %1 is not allowed to %2 the Showreel with parentId %3</source>
-      <translation type="unfinished">User %1 is not allowed to %2 the Showreel with parentId %3</translation>
+      <translation>Användaren %1 har inte tillåtelse att %2 visa showreelen med parentId %3</translation>
     </message>
   </context>
 </TS>
