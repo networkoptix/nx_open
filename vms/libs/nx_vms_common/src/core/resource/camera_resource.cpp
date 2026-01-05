@@ -2777,13 +2777,13 @@ CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
 
 CameraMediaStreamInfo QnVirtualCameraResource::streamInfo(nx::vms::api::StreamIndex index) const
 {
-    const auto streams = mediaStreams().streams;
-    auto stream = std::find_if(streams.cbegin(), streams.cend(),
+    const auto data = mediaStreams();
+    auto stream = std::find_if(data.streams.cbegin(), data.streams.cend(),
         [index](const CameraMediaStreamInfo& stream)
         {
             return stream.getEncoderIndex() == index;
         });
-    if (stream != streams.cend())
+    if (stream != data.streams.cend())
         return *stream;
 
     return CameraMediaStreamInfo();
