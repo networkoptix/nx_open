@@ -30,7 +30,7 @@ public:
     - mjpeg (motion jpeg over http)
     - webrtc
     */
-    std::vector<QString> transports;
+    std::vector<std::string> transports;
     //!if \a true this stream is produced by transcoding one of native (having this flag set to \a false) stream
     bool transcodingRequired;
     int codec;
