@@ -7,12 +7,34 @@
 
 namespace nx::vms::api {
 
-bool PixelationSettings::operator==(const PixelationSettings& other) const
+bool ObjectTypeSettings::operator==(const ObjectTypeSettings& other) const
 {
-    return nx::reflect::equals(*this, other);
+    return reflect::equals(*this, other);
 }
 
+bool ObjectTypeSettings::empty() const
+{
+    return !isAllObjectTypes && objectTypeIds.empty();
+}
+
+bool ObjectTypeSettings::contains(const QString& typeId) const
+{
+    return isAllObjectTypes || objectTypeIds.contains(typeId);
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectTypeSettings, (json), ObjectTypeSettings_Fields)
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PixelationSettings, (json), PixelationSettings_Fields)
+
+QByteArray ObjectTypeSettings::toString() const
+{
+    return QJson::serialized(this);
+}
+
+bool PixelationSettings::operator==(const PixelationSettings& other) const
+{
+    return reflect::equals(*this, other);
+}
 
 QByteArray PixelationSettings::toString() const
 {
@@ -24,7 +46,7 @@ bool PixelationSettings::isPixelationRequiredForCamera(nx::Uuid cameraId) const
     if (excludeCameraIds.contains(cameraId))
         return false;
 
-    return isAllObjectTypes || !objectTypeIds.empty();
+    return !empty();
 }
 
 } // namespace nx::vms::api

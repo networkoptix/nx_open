@@ -1,13 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #pragma once
 
 #include <QtGui/QColor>
 
 #include <analytics/common/object_metadata.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/settings/types/detected_object.h>
+#include <nx/vms/common/utils/detected_object.h>
 
 namespace nx::vms::client::core {
 
@@ -29,7 +28,7 @@ protected:
     static const std::map</*name*/ QString, /*hexRgb*/ QString> kBoundingBoxPalette;
 
 private:
-    DetectedObjectSettingsMap m_settingsMap;
+    nx::vms::common::DetectedObjectSettingsMap m_settingsMap;
 };
 
 } // namespace nx::vms::client::core

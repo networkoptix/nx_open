@@ -625,6 +625,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         transcodeParams.rotation = parameters.rotationAngle;
         transcodeParams.zoomWindow = parameters.zoomRect;
         transcodeParams.watermark = context()->watermark();
+        transcodeParams.objectExportSettings = std::nullopt;
         auto filters = nx::core::transcoding::createFilterChain(
             transcodeParams,
             parameters.sharedParameters.timestampParams,

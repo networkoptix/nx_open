@@ -25,7 +25,6 @@ class QnAspectRatio;
 struct QnCameraAdvancedParams;
 
 namespace nx::vms::api::dewarping { struct MediaData; }
-namespace nx::vms::client::core { enum class StandardRotation; }
 
 namespace nx::vms::client::desktop {
 

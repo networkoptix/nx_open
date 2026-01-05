@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <QtGui/QColor>
-
 #include <unordered_map>
+
+#include <QtGui/QColor>
 
 #include <nx/reflect/instrument.h>
 #include <nx/vms/common/serialization/qt_gui_types.h>
 
-namespace nx::vms::client::core {
+namespace nx::vms::common {
 
 struct DetectedObjectSettings
 {
@@ -21,4 +21,4 @@ NX_REFLECTION_INSTRUMENT(DetectedObjectSettings, (color))
 
 using DetectedObjectSettingsMap = std::unordered_map<QString, DetectedObjectSettings>;
 
-} // namespace nx::vms::client::core
+} // namespace nx::vms::common

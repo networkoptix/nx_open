@@ -21,11 +21,11 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/pixelation_settings.h>
 #include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
-#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/object_display_settings.h>
+#include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -401,9 +401,8 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
             timestamp);
 
         auto pixSetting = systemContext()->globalSettings()->pixelationSettings();
-        if ((!accessController()->hasGlobalPermissions(GlobalPermission::viewUnredactedVideo) &&
-            pixSetting.isAllObjectTypes) ||
-            pixSetting.objectTypeIds.contains(objectInfo.rawData.typeId))
+        if (!accessController()->hasGlobalPermissions(GlobalPermission::viewUnredactedVideo)
+            && (pixSetting.contains(objectInfo.rawData.typeId)))
         {
             const auto watcher = systemContext()->analyticsTaxonomyStateWatcher();
             const auto state = NX_ASSERT(watcher) ? watcher->state() : nullptr;

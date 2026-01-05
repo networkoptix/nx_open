@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include "export_settings_dialog_state_reducer.h"
+
 #include <QtCore/QFileInfo>
 #include <QtCore/QStandardPaths>
 
@@ -7,10 +9,10 @@
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/reflect/from_string.h>
 #include <nx/utils/file_system.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/common/html/html.h>
-
-#include "export_settings_dialog_state.h"
 
 using nx::core::transcoding::TimestampFormat;
 
@@ -99,6 +101,21 @@ int calculateMaximumFontSize(TimestampFormat format, const QFont& font, int maxW
     return --pixelFontSize;
 }
 
+static nx::core::transcoding::ObjectExportSettings buildExportSettings(
+    const nx::vms::api::ObjectTypeSettings& typeSettings,
+    bool showAttributes)
+{
+    return {
+        .showAttributes = showAttributes,
+        .typeSettings = typeSettings,
+        .taxonomyState = nx::vms::client::core::appContext()->currentSystemContext()
+            ? nx::vms::client::core::appContext()->currentSystemContext()->analyticsTaxonomyState()
+            : nullptr,
+        .textColor = nx::vms::client::core::colorTheme()->color("light1"),
+        .frameColors =
+            nx::vms::client::core::appContext()->coreSettings()->detectedObjectSettings()};
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -130,8 +147,8 @@ void ExportSettingsDialogState::applyTranscodingSettings()
     }
 
     settings.pixelationSettings = exportMediaPersistentSettings.pixelate
-            ? systemPixelationSettings
-            : api::PixelationSettings(false);
+        ? systemPixelationSettings
+        : api::PixelationSettings({.isAllObjectTypes = false});
 }
 
 void ExportSettingsDialogState::updateBookmarkText()
@@ -248,6 +265,50 @@ std::pair<bool, State> ExportSettingsDialogStateReducer::setApplyFilters(State s
     return {false, std::move(state)};
 }
 
+State ExportSettingsDialogStateReducer::setExportMetadataSettings(
+    State state,
+    bool motions,
+    bool objects,
+    bool showAttributes,
+    const api::ObjectTypeSettings& objectTypeSettings)
+{
+    auto& metadataSettings = state.exportMediaPersistentSettings.metadataSettings;
+
+    metadataSettings.exportMotion = motions;
+    metadataSettings.exportObjects = objects;
+    metadataSettings.showAttributes = showAttributes;
+    metadataSettings.typeSettings = std::move(objectTypeSettings);
+
+    if (!objects || metadataSettings.typeSettings.empty())
+    {
+        state.exportMediaSettings.transcodingSettings.objectExportSettings.reset();
+    }
+    else
+    {
+        state.exportMediaSettings.transcodingSettings.objectExportSettings =
+            buildExportSettings(objectTypeSettings, showAttributes);
+    }
+    return state;
+}
+
+State ExportSettingsDialogStateReducer::selectMetadata(State state, bool select)
+{
+    // TODO: @pprivalov VMS-60399 add motion as well
+    auto& metadataSettings = state.exportMediaPersistentSettings.metadataSettings;
+    metadataSettings.exportObjects = select;
+    if (!select)
+    {
+        state.exportMediaSettings.transcodingSettings.objectExportSettings.reset();
+    }
+    else
+    {
+        state.exportMediaSettings.transcodingSettings.objectExportSettings =
+            buildExportSettings(metadataSettings.typeSettings, metadataSettings.showAttributes);
+    }
+
+    return state;
+}
+
 State ExportSettingsDialogStateReducer::setTimestampOverlaySettings(
     State state,
     const ExportTimestampOverlayPersistentSettings& settings)
@@ -312,7 +373,8 @@ State ExportSettingsDialogStateReducer::setMediaResourceSettings(State state, bo
 {
     state.availableTranscodingSettings = settings;
     state.exportMediaPersistentSettings.hasVideo = hasVideo;
-    state.systemPixelationSettings = settings.pixelationSettings.value_or(api::PixelationSettings(false));
+    state.systemPixelationSettings =
+        settings.pixelationSettings.value_or(api::PixelationSettings({.isAllObjectTypes = false}));
     state.applyTranscodingSettings();
 
     return state;
@@ -488,9 +550,12 @@ State ExportSettingsDialogStateReducer::setMediaFilename(State state, const File
     if (nx::core::layout::isLayoutExtension(filename.completeFileName()))
         state = clearSelection(std::move(state));
 
+    const auto& objectExportSettings =
+        state.exportMediaSettings.transcodingSettings.objectExportSettings;
     bool needTranscoding = state.exportMediaSettings.transcodingSettings.watermark.visible()
         || state.exportMediaPersistentSettings.applyFilters
-        || state.exportMediaPersistentSettings.areFiltersForced();
+        || state.exportMediaPersistentSettings.areFiltersForced()
+        || (objectExportSettings && !objectExportSettings.value().typeSettings.empty());
 
     state.exportMediaPersistentSettings.setTranscoding(needTranscoding);
     state.applyTranscodingSettings();

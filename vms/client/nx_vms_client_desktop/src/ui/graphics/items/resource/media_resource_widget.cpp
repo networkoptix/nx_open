@@ -62,6 +62,7 @@
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
+#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
@@ -81,7 +82,6 @@
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
-#include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/scene/resource_widget/dialogs/encrypted_archive_password_dialog.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>

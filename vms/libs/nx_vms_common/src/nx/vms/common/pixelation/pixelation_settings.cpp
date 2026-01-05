@@ -98,9 +98,7 @@ bool PixelationSettings::isPixelationRequired(
         d->resourceAccessManager()->hasGlobalPermission(
             user, GlobalPermission::viewUnredactedVideo);
 
-    const bool pixelateObject = d->settings.isAllObjectTypes
-        || objectTypeId.isNull()
-        || d->objectTypeIds.contains(objectTypeId);
+    const bool pixelateObject = objectTypeId.isNull() || d->settings.contains(objectTypeId);
 
     return !canViewUnredacted
         && !d->settings.excludeCameraIds.contains(cameraId)

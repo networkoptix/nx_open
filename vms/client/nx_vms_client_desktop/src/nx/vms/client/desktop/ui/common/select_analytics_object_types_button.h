@@ -15,6 +15,7 @@ class SelectAnalyticsObjectTypesButton: public QPushButton
 public:
     SelectAnalyticsObjectTypesButton(QWidget* parent = nullptr);
 
+    void clearSelection();
     void setSelectedObjectTypes(SystemContext* context, const QStringList& ids);
     void setSelectedAllObjectTypes();
 };

@@ -19,10 +19,10 @@
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
 #include <nx/vms/client/core/system_logon/connection_data.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
+#include <nx/vms/common/utils/detected_object.h>
 
 #include "search_addresses_info.h"
 #include "system_visibility_scope_info.h"
-#include "types/detected_object.h"
 
 namespace nx::vms::client::core {
 
@@ -80,7 +80,8 @@ public:
     SecureProperty<SystemAuthenticationCacheData> systemAuthenticationCacheData{
         this, "systemAuthenticationCacheData"};
 
-    Property<DetectedObjectSettingsMap> detectedObjectSettings{this, "detectedObjectSettings"};
+    Property<nx::vms::common::DetectedObjectSettingsMap> detectedObjectSettings{
+        this, "detectedObjectSettings"};
 
     // Password for cloud connections to the old systems. Needed for the compatibility.
     SecureProperty<std::string> digestCloudPassword{this, "digestCloudPassword"};

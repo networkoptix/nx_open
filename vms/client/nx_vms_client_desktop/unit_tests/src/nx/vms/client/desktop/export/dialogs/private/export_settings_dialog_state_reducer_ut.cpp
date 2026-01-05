@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/vms/client/desktop/export/dialogs/private/export_settings_dialog_state.h>
+#include <nx/vms/client/desktop/export/dialogs/private/export_settings_dialog_state_reducer.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 
 namespace nx::vms::client::desktop {

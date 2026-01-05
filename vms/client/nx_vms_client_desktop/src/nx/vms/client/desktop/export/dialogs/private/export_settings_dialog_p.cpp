@@ -29,6 +29,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 
+#include "export_settings_dialog_state_reducer.h"
+
 namespace nx::vms::client::desktop {
 
 using Reducer = ExportSettingsDialogStateReducer;

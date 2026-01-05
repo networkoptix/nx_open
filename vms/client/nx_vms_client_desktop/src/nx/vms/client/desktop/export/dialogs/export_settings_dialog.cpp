@@ -12,6 +12,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/user_resource.h>
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/utils/math/math.h>
@@ -33,6 +34,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -41,9 +43,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <utils/common/event_processors.h>
 
-#include "core/resource/user_resource.h"
-#include "nx/vms/common/system_settings.h"
 #include "private/export_settings_dialog_p.h"
+#include "private/export_settings_dialog_state_reducer.h"
 
 namespace nx::vms::client::desktop {
 
@@ -109,6 +110,11 @@ NX_DECLARE_COLORIZED_ICON(kCheckedRapidReviewIcon,
 NX_DECLARE_COLORIZED_ICON(kCheckedSettingsIcon,
     "20x20/Outline/settings.svg", kIconSubstitutionsSettings,
     "20x20/Outline/settings.svg", kCheckedIconSubstitutionsSettings)
+NX_DECLARE_COLORIZED_ICON(kDisabledPersonIcon,
+    "20x20/Outline/person.svg", kDisabledIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kCheckedPersonIcon,
+    "20x20/Outline/person.svg", kIconSubstitutionsSettings,
+    "20x20/Outline/person.svg", kCheckedIconSubstitutionsSettings)
 
 template<class Widget>
 void setMaxOverlayWidth(Widget* settingsWidget, int width)
@@ -262,6 +268,20 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->rapidReviewSettingsPage, &RapidReviewSettingsWidget::speedChanged,
         this, updateRapidReviewData);
 
+    connect(
+        ui->exportMetadataSettingsPage,
+        &ExportMetadataSettingsWidget::dataEdited,
+        d.get(),
+        [this](const ExportMetadataSettingsWidget::Data& data)
+        {
+            d->dispatch(
+                Reducer::setExportMetadataSettings,
+                data.motionChecked,
+                data.objectsChecked,
+                data.showAttributes,
+                data.objectTypeSettings);
+        });
+
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::deleteClicked,
         ui->timestampButton, &SelectableTextButton::deactivate);
 
@@ -279,6 +299,9 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     connect(ui->rapidReviewSettingsPage, &RapidReviewSettingsWidget::deleteClicked,
         ui->speedButton, d->dispatchTo(Reducer::hideRapidReview));
+
+    connect(ui->exportMetadataSettingsPage, &ExportMetadataSettingsWidget::deleteClicked,
+        ui->metadataButton, &SelectableTextButton::deactivate);
 
     connect(ui->tabWidget, &QTabWidget::tabBarClicked, this,
         [this](int index)
@@ -402,6 +425,32 @@ void ExportSettingsDialog::setupSettingsButtons()
             }
         });
 
+    ui->metadataButton->setDeactivatable(true);
+    ui->metadataButton->setDeactivatedText(tr("Add Metadata"));
+    ui->metadataButton->setDeactivationToolTip(tr("Reset metadata settings"));
+    ui->metadataButton->setText(tr("Metadata"));
+    ui->metadataButton->setDeactivatedIcon(qnSkin->icon(kDisabledPersonIcon));
+    ui->metadataButton->setIcon(qnSkin->icon(kCheckedPersonIcon));
+    ui->metadataButton->setProperty(
+        kPagePropertyName,
+        QVariant::fromValue(ui->exportMetadataSettingsPage));
+
+    connect(ui->metadataButton, &SelectableTextButton::stateChanged, this,
+        [this](SelectableTextButton::State state)
+        {
+            switch (state)
+            {
+                case SelectableTextButton::State::selected:
+                    d->dispatch(Reducer::selectMetadata, true);
+                    break;
+                case SelectableTextButton::State::deactivated:
+                    d->dispatch(Reducer::selectMetadata, false);
+                    break;
+                default:
+                    break;
+            }
+        });
+
     ui->bookmarkButton->setDeactivatable(true);
     ui->bookmarkButton->setDeactivatedText(tr("Add Bookmark Info"));
     ui->bookmarkButton->setDeactivationToolTip(tr("Delete Bookmark Info"));
@@ -423,6 +472,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     group->add(ui->textButton);
     group->add(ui->infoButton);
     group->add(ui->speedButton);
+    group->add(ui->metadataButton);
     group->setSelectionFallback(ui->cameraExportSettingsButton);
 
     connect(group, &SelectableTextButtonGroup::selectionChanged, this,
@@ -551,6 +601,14 @@ void ExportSettingsDialog::initSettingsWidgets()
     ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
     ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
     ui->infoSettingsPage->setData(mediaPersistentSettings.infoOverlay);
+
+    ui->exportMetadataSettingsPage->setData(
+        {
+            .motionChecked = mediaPersistentSettings.metadataSettings.exportMotion,
+            .objectsChecked = mediaPersistentSettings.metadataSettings.exportObjects,
+            .showAttributes = mediaPersistentSettings.metadataSettings.showAttributes,
+            .objectTypeSettings = mediaPersistentSettings.metadataSettings.typeSettings
+        });
 
     ui->mediaFilenamePanel->setFilename(d->selectedFileName(ExportMode::media));
     ui->layoutFilenamePanel->setFilename(d->selectedFileName(ExportMode::layout));

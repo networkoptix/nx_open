@@ -210,8 +210,10 @@ private:
             rtspClient->setMediaRole(hasTranscoding
                 ? PlaybackMode::exportWithTranscoding
                 : PlaybackMode::export_);
-            if (settings.transcodingSettings.pixelationSettings.has_value() &&
-                settings.transcodingSettings.pixelationSettings.value().isPixelationRequiredForCamera(camera->getId()))
+            if (settings.transcodingSettings.objectExportSettings.has_value()
+                || (settings.transcodingSettings.pixelationSettings.has_value()
+                    && settings.transcodingSettings.pixelationSettings.value()
+                            .isPixelationRequiredForCamera(camera->getId())))
             {
                 archiveReader->setStreamDataFilter(api::StreamDataFilter::media | api::StreamDataFilter::objects | api::StreamDataFilter::motion);
                 rtspClient->setStreamDataFilter(api::StreamDataFilter::media | api::StreamDataFilter::objects | api::StreamDataFilter::motion);

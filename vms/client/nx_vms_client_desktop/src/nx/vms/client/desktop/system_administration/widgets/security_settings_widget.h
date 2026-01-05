@@ -54,7 +54,7 @@ private:
     std::chrono::seconds calculateSessionLimit() const;
     void showArchiveEncryptionPasswordDialog(bool viaButton);
     void updateLimitSessionControls();
-    void openPixelationObjectSelectionDialog();
+    void openObjectTypeSelectionDialog();
     void openPixelationConfigurationDialog();
     void openExcludeCameraSelectionDialog();
     void updatePixelationSettings();

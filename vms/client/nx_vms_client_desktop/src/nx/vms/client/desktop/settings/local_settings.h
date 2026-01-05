@@ -13,7 +13,6 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/property_storage/storage.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
-#include <nx/vms/client/core/settings/types/detected_object.h>
 #include <nx/vms/client/core/system_logon/connection_data.h>
 #include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
@@ -22,6 +21,7 @@
 #include <nx/vms/client/desktop/jsapi/auth_allowed_urls.h>
 #include <nx/vms/client/desktop/webpage/web_page_settings.h>
 #include <nx/vms/common/system_health/message_type.h>
+#include <nx/vms/common/utils/detected_object.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 
 #include "types/background_image.h"
@@ -157,7 +157,8 @@ public:
     Property<int> maximumLiveBufferMs{this, "maximumLiveBufferMs", 500,
         "Maximum live buffer lengths, in milliseconds."};
 
-    Property<core::DetectedObjectSettingsMap> detectedObjectSettings{this, "detectedObjectSettings"};
+    Property<nx::vms::common::DetectedObjectSettingsMap> detectedObjectSettings{
+        this, "detectedObjectSettings"};
 
     Property<AuthAllowedUrls> authAllowedUrls{this, "authAllowedUrls", {},
         "Approved URLs that have access to a session token using jsapi."};

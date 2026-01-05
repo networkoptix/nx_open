@@ -6,7 +6,7 @@
 
 #include <nx/utils/math/fuzzy.h>
 
-namespace nx::vms::client::core {
+namespace nx::vms::common {
 
 namespace {
 
@@ -88,4 +88,4 @@ bool Rotation::operator!=(const Rotation& other) const
     return !(*this == other);
 }
 
-} // namespace nx::vms::client::core
+} // namespace nx::vms::common

@@ -11,10 +11,25 @@
 
 namespace nx::vms::api {
 
-struct NX_VMS_API PixelationSettings
+struct NX_VMS_API ObjectTypeSettings
 {
     bool isAllObjectTypes = false;
     QStringList objectTypeIds;
+
+    bool operator==(const ObjectTypeSettings& other) const;
+    QByteArray toString() const;
+
+    bool empty() const;
+    bool contains(const QString& typeId) const;
+};
+
+#define ObjectTypeSettings_Fields (isAllObjectTypes)(objectTypeIds)
+NX_REFLECTION_INSTRUMENT(ObjectTypeSettings, ObjectTypeSettings_Fields)
+
+QN_FUSION_DECLARE_FUNCTIONS(ObjectTypeSettings, (json), NX_VMS_API)
+
+struct NX_VMS_API PixelationSettings: public ObjectTypeSettings
+{
     double intensity = 1.0; /**<%apidoc[opt]:float */
     QSet<nx::Uuid> excludeCameraIds; /**<%apidoc:uuidArray */
 
@@ -24,7 +39,7 @@ struct NX_VMS_API PixelationSettings
     bool isPixelationRequiredForCamera(nx::Uuid cameraId) const;
 };
 
-#define PixelationSettings_Fields (isAllObjectTypes)(objectTypeIds)(intensity)(excludeCameraIds)
+#define PixelationSettings_Fields ObjectTypeSettings_Fields(intensity)(excludeCameraIds)
 NX_REFLECTION_INSTRUMENT(PixelationSettings, PixelationSettings_Fields)
 
 QN_FUSION_DECLARE_FUNCTIONS(PixelationSettings, (json), NX_VMS_API)

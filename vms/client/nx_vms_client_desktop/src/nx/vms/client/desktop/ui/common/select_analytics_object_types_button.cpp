@@ -15,14 +15,19 @@ SelectAnalyticsObjectTypesButton::SelectAnalyticsObjectTypesButton(QWidget* pare
     setProperty(nx::style::Properties::kPushButtonMargin, nx::style::Metrics::kStandardPadding);
 }
 
+void SelectAnalyticsObjectTypesButton::clearSelection()
+{
+    setIcon({});
+    setText(tr("No objects"));
+}
+
 void SelectAnalyticsObjectTypesButton::setSelectedObjectTypes(
     SystemContext* context,
-    const QStringList &ids)
+    const QStringList& ids)
 {
     if (ids.empty())
     {
-        setIcon({});
-        setText(tr("No objects"));
+        clearSelection();
     }
     else if (ids.size() == 1)
     {

@@ -3,6 +3,7 @@
 #include "filter_chain.h"
 
 #include <core/resource/media_resource.h>
+#include <nx/core/transcoding/filters/object_info_filter.h>
 #include <nx/core/transcoding/filters/paint_image_filter.h>
 #include <nx/core/transcoding/filters/pixelation_image_filter.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
@@ -28,8 +29,7 @@ namespace nx::core::transcoding {
 
 const QSize FilterChain::kDefaultResolutionLimit(8192 - 16, 8192 - 16);
 
-FilterChain::FilterChain(const Settings& settings)
-    :
+FilterChain::FilterChain(const Settings& settings):
     m_settings(settings)
 {
 }
@@ -46,6 +46,7 @@ void FilterChain::prepare(const QSize& srcFrameResolution, const QSize& resoluti
         m_filters.push_back(QnAbstractImageFilterPtr(new QnTiledImageFilter(m_settings.layout)));
 
     createPixelationImageFilter();
+    createObjectInfoFilter();
     prepareZoomWindowFilter();
     prepareDewarpingFilter();
     prepareImageEnhancementFilter();
@@ -73,6 +74,7 @@ void FilterChain::prepareForImage(const QSize& fullImageResolution)
         return;
 
     createPixelationImageFilter();
+    createObjectInfoFilter();
     prepareImageArFilter(fullImageResolution);
     prepareZoomWindowFilter();
     prepareDewarpingFilter();
@@ -121,6 +123,8 @@ void FilterChain::setMetadata(const std::list<QnConstAbstractCompressedMetadataP
     {
         if (auto pixelationFilter = filter.dynamicCast<PixelationImageFilter>())
             pixelationFilter->setMetadata(metadata);
+        if (auto objectInfoFilter = filter.dynamicCast<ObjectInfoFilter>())
+            objectInfoFilter->setMetadata(metadata);
     }
 }
 
@@ -280,6 +284,16 @@ void FilterChain::createPixelationImageFilter()
         m_filters.push_front(QnAbstractImageFilterPtr(
             new PixelationImageFilter(*m_settings.pixelationSettings)));
     }
+}
+
+void FilterChain::createObjectInfoFilter()
+{
+    // TODO: @pprivalov VMS-60399 group filters that transform the frame to QImage
+    const auto& oESettings = m_settings.objectExportSettings;
+    if (!oESettings || !oESettings->taxonomyState || oESettings->typeSettings.empty())
+        return;
+
+    m_filters.push_back(QnAbstractImageFilterPtr(new ObjectInfoFilter(*oESettings)));
 }
 
 void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,

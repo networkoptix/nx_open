@@ -108,6 +108,7 @@
             <widget class="nx::vms::client::desktop::TextOverlaySettingsWidget" name="textSettingsPage"/>
             <widget class="nx::vms::client::desktop::InfoOverlaySettingsWidget" name="infoSettingsPage"/>
             <widget class="nx::vms::client::desktop::RapidReviewSettingsWidget" name="rapidReviewSettingsPage"/>
+            <widget class="nx::vms::client::desktop::ExportMetadataSettingsWidget" name="exportMetadataSettingsPage"/>
            </widget>
           </item>
           <item row="1" column="0" colspan="2">
@@ -192,6 +193,13 @@
                  <widget class="nx::vms::client::desktop::SelectableTextButton" name="speedButton">
                   <property name="text">
                    <string notr="true">&lt;Speed&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="nx::vms::client::desktop::SelectableTextButton" name="metadataButton">
+                  <property name="text">
+                   <string notr="true">Metadata</string>
                   </property>
                  </widget>
                 </item>
@@ -643,6 +651,12 @@
    <class>nx::vms::client::desktop::MessageBarBlock</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::ExportMetadataSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/export/widgets/export_metadata_settings_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -184,6 +184,27 @@ struct ExportRapidReviewPersistentSettings
 NX_REFLECTION_INSTRUMENT(ExportRapidReviewPersistentSettings,
     ExportRapidReviewPersistentSettings_Fields)
 
+struct ExportMetadataPersistentSettings
+{
+    bool exportMotion = false;
+    bool exportObjects = false;
+    bool showAttributes = true;
+    api::ObjectTypeSettings typeSettings = {.isAllObjectTypes = true};
+
+    explicit ExportMetadataPersistentSettings() = default;
+    ExportMetadataPersistentSettings(
+        bool motion,
+        bool objects,
+        bool showAttributes,
+        const api::ObjectTypeSettings& typeSettings);
+
+    bool operator==(const ExportMetadataPersistentSettings&) const = default;
+};
+#define ExportMetadataPersistentSettings_Fields \
+    (exportMotion)(exportObjects)(showAttributes)(typeSettings)
+NX_REFLECTION_INSTRUMENT(ExportMetadataPersistentSettings,
+    ExportMetadataPersistentSettings_Fields)
+
 struct NX_VMS_CLIENT_DESKTOP_API ExportMediaPersistentSettings
 {
     bool applyFilters = false;
@@ -203,6 +224,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportMediaPersistentSettings
     ExportTimestampOverlayPersistentSettings timestampOverlay;
     ExportBookmarkOverlayPersistentSettings bookmarkOverlay;
     ExportInfoOverlayPersistentSettings infoOverlay;
+    ExportMetadataPersistentSettings metadataSettings;
 
     ExportMediaPersistentSettings() = default;
     ExportMediaPersistentSettings(const QVector<ExportOverlayType>& used): usedOverlays(used) {}

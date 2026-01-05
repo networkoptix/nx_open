@@ -19,8 +19,8 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_administration/dialogs/object_type_selection_dialog.h>
 #include <nx/vms/client/desktop/system_administration/dialogs/pixelation_intensity_dialog.h>
-#include <nx/vms/client/desktop/system_administration/dialogs/pixelation_object_selection_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/watermark/watermark_edit_settings.h>
 #include <nx/vms/common/html/html.h>
@@ -141,7 +141,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(
     updateWatermarkState(ui->displayWatermarkCheckBox->checkState());
 
     connect(ui->pixelateObjectTypesButton, &QPushButton::clicked,
-        this, &SecuritySettingsWidget::openPixelationObjectSelectionDialog);
+        this, &SecuritySettingsWidget::openObjectTypeSelectionDialog);
 
     ui->configurePixelationButton->setIcon(qnSkin->icon(kSettingsIcon));
 
@@ -394,33 +394,16 @@ void SecuritySettingsWidget::loadDataToUi()
     ui->showServersInTreeCheckBox->setChecked(systemSettings()->showServersInTreeForNonAdmins());
 }
 
-void SecuritySettingsWidget::openPixelationObjectSelectionDialog()
+void SecuritySettingsWidget::openObjectTypeSelectionDialog()
 {
-    auto dialog = new PixelationObjectSelectionDialog(
-        systemContext(),
-        m_pixelationSettings.isAllObjectTypes,
-        m_pixelationSettings.objectTypeIds,
-        mainWindowWidget());
-
-    connect(
-        dialog,
-        &QmlDialogWrapper::done,
+    ObjectTypeSelectionDialog::openSelectionDialog(
+        m_pixelationSettings,
         this,
-        [this, dialog](bool accepted)
+        [this]()
         {
-            if (accepted)
-            {
-                m_pixelationSettings.isAllObjectTypes = dialog->allObjects();
-                m_pixelationSettings.objectTypeIds = dialog->objectTypeIds();
-
-                emit hasChangesChanged();
-                updatePixelationSettings();
-            }
-
-            dialog->deleteLater();
+            emit hasChangesChanged();
+            updatePixelationSettings();
         });
-
-    dialog->open();
 }
 
 void SecuritySettingsWidget::openPixelationConfigurationDialog()
@@ -478,11 +461,11 @@ void SecuritySettingsWidget::updatePixelationSettings()
     else
     {
         ui->pixelateObjectTypesButton->setSelectedObjectTypes(
-            systemContext(), m_pixelationSettings.objectTypeIds);
+            systemContext(),
+            m_pixelationSettings.objectTypeIds);
     }
 
-    const bool isPixelationEnabled =
-        m_pixelationSettings.isAllObjectTypes || !m_pixelationSettings.objectTypeIds.empty();
+    const bool isPixelationEnabled = !m_pixelationSettings.empty();
 
     ui->configurePixelationButton->setVisible(isPixelationEnabled);
     ui->excludeCamerasLabelWidget->setVisible(isPixelationEnabled);

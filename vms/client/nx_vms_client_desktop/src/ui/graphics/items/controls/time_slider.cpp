@@ -68,7 +68,6 @@ using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::workbench::timeline;
 using namespace nx::vms::common;
-using nx::vms::client::core::Geometry;
 
 namespace {
 

@@ -3,8 +3,8 @@
 #include "workbench_action_handler.h"
 
 #include <QtCore/QProcess>
-#include <QtCore/QScopedValueRollback>
 #include <QtCore/QScopeGuard>
+#include <QtCore/QScopedValueRollback>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImage>
 #include <QtGui/QImageWriter>
@@ -604,7 +604,7 @@ void ActionHandler::addToLayout(
         // adjusted to grid, valid rect will be set as is.
         const auto size = params.size.value_or(QSizeF());
         data.combinedGeometry = QRectF(params.position.value(), size);
-        data.combinedGeometry.translate(-Geometry::toPoint(size) / 2.0);
+        data.combinedGeometry.translate(-core::Geometry::toPoint(size) / 2.0);
     }
     else
     {
@@ -2362,7 +2362,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
 
     qreal displayAspectRatio = viewportGeometry.isNull()
         ? desiredItemAspectRatio
-        : Geometry::aspectRatio(viewportGeometry);
+        : core::Geometry::aspectRatio(viewportGeometry);
 
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 

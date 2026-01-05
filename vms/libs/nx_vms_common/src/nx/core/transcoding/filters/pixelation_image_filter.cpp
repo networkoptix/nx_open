@@ -3,6 +3,7 @@
 #include "pixelation_image_filter.h"
 
 #include <optional>
+
 #include <QImage>
 
 #include <analytics/common/object_metadata.h>
@@ -10,7 +11,7 @@
 #include <nx/media/ffmpeg/frame_info.h>
 
 extern "C" {
-    #include <libavutil/pixdesc.h>
+#include <libavutil/pixdesc.h>
 };
 
 namespace nx::core::transcoding {
@@ -147,7 +148,7 @@ void PixelationImageFilter::setMetadata(const std::list<QnConstAbstractCompresse
 CLVideoDecoderOutputPtr PixelationImageFilter::updateImage(
     const CLVideoDecoderOutputPtr& frame)
 {
-    if (m_metadata.empty() || (m_settings.objectTypeIds.empty() && !m_settings.isAllObjectTypes))
+    if (m_metadata.empty() || m_settings.empty())
         return frame;
 
     int w = frame->width;
@@ -160,8 +161,7 @@ CLVideoDecoderOutputPtr PixelationImageFilter::updateImage(
         {
             for (const auto& objectMetadata: objectDataPacket->objectMetadataList)
             {
-                if (m_settings.isAllObjectTypes
-                    || m_settings.objectTypeIds.contains(objectMetadata.typeId))
+                if (m_settings.contains(objectMetadata.typeId))
                 {
                     QRect box = { (int)(objectMetadata.boundingBox.x() * w),
                         (int)(objectMetadata.boundingBox.y() * h),

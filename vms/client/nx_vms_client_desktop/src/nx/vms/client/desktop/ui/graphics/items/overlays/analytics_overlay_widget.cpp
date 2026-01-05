@@ -12,6 +12,7 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
+#include <nx/vms/common/utils/object_painter_helper.h>
 #include <ui/common/fixed_rotation.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
@@ -31,142 +32,6 @@ using namespace nx::vms::client::core;
 
 static constexpr int kAreaLineWidth = 1;
 static constexpr bool kNoFillForObjects = false;
-
-static constexpr qreal kMinimalTooltipOffset = 16;
-
-struct BestSide
-{
-    Qt::Edge edge = static_cast<Qt::Edge>(0);
-    qreal proportion = 0;
-};
-
-bool hasHorizontalSpace(const QMarginsF& space)
-{
-    return space.left() > kMinimalTooltipOffset && space.right() > kMinimalTooltipOffset;
-}
-
-bool hasVerticalSpace(const QMarginsF& space)
-{
-    return space.top() > kMinimalTooltipOffset && space.bottom() > kMinimalTooltipOffset;
-}
-
-/** Tries to find the appropriate side to which place the tooltip. */
-BestSide findBestSide(
-    const QSizeF& labelSize,
-    const QMarginsF& space)
-{
-    if (space.bottom() - kMinimalTooltipOffset >= labelSize.height() && hasHorizontalSpace(space))
-        return {Qt::BottomEdge, /*proportion*/ 1};
-    else if (space.top() - kMinimalTooltipOffset >= labelSize.height() && hasHorizontalSpace(space))
-        return {Qt::TopEdge, /*proportion*/ 1};
-    else if (space.left() - kMinimalTooltipOffset >= labelSize.width() && hasVerticalSpace(space))
-        return {Qt::LeftEdge, /*proportion*/ 1};
-    else if (space.right() - kMinimalTooltipOffset >= labelSize.width() && hasVerticalSpace(space))
-        return {Qt::RightEdge, /*proportion*/ 1};
-
-    BestSide result;
-    auto checkSide =
-        [&result](Qt::Edge side, qreal labelSize, qreal space)
-        {
-            const qreal proportion = space / labelSize;
-            if (proportion >= 1.0 || proportion >= result.proportion)
-            {
-                result.proportion = proportion;
-                result.edge = side;
-            }
-        };
-
-    checkSide(Qt::LeftEdge, labelSize.width(), space.left());
-    checkSide(Qt::RightEdge, labelSize.width(), space.right());
-    checkSide(Qt::TopEdge, labelSize.height(), space.top());
-    checkSide(Qt::BottomEdge, labelSize.height(), space.bottom());
-    return result;
-}
-
-QRectF calculateLabelGeometry(
-    QRectF boundingRect,
-    QSizeF labelSize,
-    QMarginsF labelMargins,
-    QRectF objectRect)
-{
-    constexpr qreal kTitleAreaHeight = 24;
-    boundingRect = boundingRect.adjusted(0, kTitleAreaHeight, 0, 0);
-    labelSize = Geometry::bounded(labelSize, boundingRect.size());
-
-    const QMarginsF space(
-        objectRect.left() - boundingRect.left(),
-        objectRect.top() - boundingRect.top(),
-        boundingRect.right() - objectRect.right(),
-        boundingRect.bottom() - objectRect.bottom());
-
-    BestSide bestSide = findBestSide(labelSize, space);
-
-    static constexpr qreal kLabelPadding = 2.0;
-    QRectF availableRect = Geometry::dilated(boundingRect.intersected(objectRect), kLabelPadding);
-
-    if (bestSide.proportion < 1.0
-        && availableRect.width() / labelSize.width() > bestSide.proportion
-        && availableRect.height() / labelSize.height() > bestSide.proportion)
-    {
-        labelSize = Geometry::bounded(labelSize, availableRect.size());
-        return Geometry::aligned(labelSize, availableRect, Qt::AlignTop | Qt::AlignRight);
-    }
-
-    static constexpr qreal kArrowBase = 6;
-    QPointF pos;
-    switch (bestSide.edge)
-    {
-        case Qt::LeftEdge:
-            pos = QPointF(
-                objectRect.left() - labelSize.width(),
-                objectRect.top() - labelMargins.top() - kArrowBase);
-            availableRect = QRectF(
-                boundingRect.left(), boundingRect.top(),
-                space.left(), boundingRect.height());
-            break;
-        case Qt::RightEdge:
-            pos = QPointF(
-                objectRect.right(),
-                objectRect.top() - labelMargins.top() - kArrowBase);
-            availableRect = QRectF(
-                objectRect.right(), boundingRect.top(),
-                space.right(), boundingRect.height());
-            break;
-        case Qt::TopEdge:
-            pos = QPointF(
-                objectRect.left() - labelMargins.left() - kArrowBase,
-                objectRect.top() - labelSize.height());
-            availableRect = QRectF(
-                boundingRect.left(), boundingRect.top(),
-                boundingRect.width(), space.top());
-            break;
-        case Qt::BottomEdge:
-            pos = QPointF(
-                objectRect.left() - labelMargins.left() - kArrowBase,
-                objectRect.bottom());
-            availableRect = QRectF(
-                boundingRect.left(), std::max(objectRect.bottom(), boundingRect.top()),
-                boundingRect.width(), space.bottom());
-            break;
-    }
-
-    labelSize = Geometry::bounded(labelSize, availableRect.size());
-    return Geometry::movedInto(QRectF(pos, labelSize), availableRect);
-}
-
-static QColor calculateTooltipColor(const QColor& frameColor)
-{
-    static constexpr int kTooltipBackgroundLightness = 10;
-    static constexpr int kTooltipBackgroundAlpha = 127;
-
-    auto color = frameColor.toHsl();
-    color = QColor::fromHsl(
-        color.hslHue(),
-        color.hslSaturation(),
-        kTooltipBackgroundLightness,
-        kTooltipBackgroundAlpha);
-    return color;
-}
 
 AreaTooltipItem::Fonts makeFonts(const QFont& baseFont)
 {
@@ -277,8 +142,11 @@ void AnalyticsOverlayWidget::Private::updateArea(Area& area)
     const QRectF& objectRect = figure->boundingRect(q->size());
     const auto& naturalTooltipSize = area.tooltipItem->boundingRect().size();
 
-    const auto& tooltipGeometry = calculateLabelGeometry(
-        q->rect(), naturalTooltipSize, area.tooltipItem->textMargins(), objectRect);
+    const auto& tooltipGeometry = common::ObjectPainterHelper::calculateLabelGeometry(
+        q->rect(),
+        naturalTooltipSize,
+        area.tooltipItem->textMargins(),
+        objectRect);
     area.tooltipItem->setPos(tooltipGeometry.topLeft());
     const auto scaleFactor =
         std::min(1.0, Geometry::scaleFactor(naturalTooltipSize, tooltipGeometry.size()));
@@ -290,7 +158,7 @@ void AnalyticsOverlayWidget::Private::updateArea(Area& area)
     const bool useFigureBacgrkoundColor =
         Geometry::eroded(objectRect, 0.5).contains(tooltipGeometry.center()) || !highlighted;
     area.tooltipItem->setBackgroundColor(useFigureBacgrkoundColor
-        ? calculateTooltipColor(figure->color())
+        ? common::ObjectPainterHelper::calculateTooltipColor(figure->color())
         : QColor());
 }
 

@@ -175,8 +175,7 @@ CodecParametersPtr ExportStorageStreamRecorder::getVideoCodecParameters(
         m_videoTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(
             config,
             appContext()->currentSystemContext()->metrics().get());
-        m_videoTranscoder->setFilterChain(
-            std::make_unique<nx::core::transcoding::FilterChain>(m_transcodeSettings));
+        m_videoTranscoder->setFilterChain(std::make_unique<FilterChain>(m_transcodeSettings));
         if (!m_videoTranscoder->open(videoData))
         {
             NX_WARNING(this, "Failed to open video transcoder");
