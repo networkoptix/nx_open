@@ -835,6 +835,10 @@ ApplicationContext::~ApplicationContext()
         if (d->mainSystemContext->messageProcessor())
             d->mainSystemContext->deleteMessageProcessor();
 
+        // LocalProxyServer holds SystemContextAware class instances that should be deleted before
+        // the SystemContext itself.
+        d->localProxyServer.reset();
+
         // Remote session must be fully destroyed while application context still exists.
         removeSystemContext(d->mainSystemContext.release());
     }
