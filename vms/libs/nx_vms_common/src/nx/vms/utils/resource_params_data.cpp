@@ -53,29 +53,32 @@ ResourceParamsData ResourceParamsData::load(QFile&& file)
 }
 
 ResourceParamsData ResourceParamsData::getWithGreaterVersion(
-    const std::vector<ResourceParamsData>& datas)
+    std::vector<ResourceParamsData> datas)
 {
     ResourceParamsData result;
     nx::utils::SoftwareVersion resultVersion;
-    for (const auto& data: datas)
+    for (auto& data: datas)
     {
         if (data.value.isEmpty())
             continue;
-        auto version = QnResourceDataPool::getVersion(data.value);
-        if (!result.value.isEmpty() && version <= resultVersion)
+
+        const auto deserialized = QnResourceDataPool::deserializeData(data.value);
+        if (!NX_ASSERT(deserialized.has_value(),
+            "Skip invalid resource_data.json from %1: %2", data.location, deserialized.error()))
+        {
+            continue;
+        }
+
+        if (deserialized->version <= resultVersion)
         {
             NX_DEBUG(NX_SCOPE_TAG,
                 "Skip resource_data.json version %1 from %2. Version %3 from %4 is greater.",
-                version, data.location, resultVersion, result.location);
+                deserialized->version, data.location, resultVersion, result.location);
             continue;
         }
-        if (!NX_ASSERT(QnResourceDataPool::validateData(data.value),
-            "Skip invalid resource_data.json from %1", data.location))
-        {
-            continue;
-        }
-        resultVersion = std::move(version);
-        result = data;
+
+        resultVersion = deserialized->version;
+        result = std::move(data);
     }
     return result;
 }

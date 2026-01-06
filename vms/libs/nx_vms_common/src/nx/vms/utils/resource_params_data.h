@@ -21,7 +21,7 @@ struct NX_VMS_COMMON_API ResourceParamsData
     static ResourceParamsData load(QFile&& file);
 
     static ResourceParamsData getWithGreaterVersion(
-        const std::vector<ResourceParamsData>& datas);
+        std::vector<ResourceParamsData> datas);
 };
 
 } // namespace nx::vms::utils

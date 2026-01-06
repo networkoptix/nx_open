@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <expected>
+
 #include <QtCore/QJsonObject>
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
@@ -14,6 +16,23 @@
 class NX_VMS_COMMON_API QnResourceDataPool: public QObject
 {
     Q_OBJECT;
+public:
+
+    struct QnResourceDataPoolChunk
+    {
+        QList<QString> keys;
+        QnResourceData data;
+    };
+
+    struct ResourceDataPoolData
+    {
+        QJsonObject jsonData;
+        nx::utils::SoftwareVersion version;
+        std::vector<QnResourceDataPoolChunk> chunks;
+    };
+
+    using DeserializeResult = std::expected<ResourceDataPoolData, QString>;
+
 public:
     QnResourceDataPool(QObject *parent = NULL);
     virtual ~QnResourceDataPool();
@@ -45,8 +64,7 @@ public:
      */
     void setExternalSource(QnResourceDataPool* source);
 
-    static nx::utils::SoftwareVersion getVersion(const QByteArray& data);
-    static bool validateData(const QByteArray& data);
+    static DeserializeResult deserializeData(const QByteArray& data);
 
     bool loadFile(const QString& fileName);
     bool loadData(const QByteArray& data);

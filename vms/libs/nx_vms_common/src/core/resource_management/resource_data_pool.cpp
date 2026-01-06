@@ -19,22 +19,16 @@ static const QString tagData = "data";
 
 } // namespace
 
-struct QnResourceDataPoolChunk
-{
-    QList<QString> keys;
-    QnResourceData data;
-};
-
 static bool deserialize(
     QnJsonContext* ctx,
     const QJsonValue& value,
-    QnResourceDataPoolChunk* target)
+    QnResourceDataPool::QnResourceDataPoolChunk* target)
 {
     QJsonObject map;
     if(!QJson::deserialize(ctx, value, &map))
         return false;
 
-    QnResourceDataPoolChunk result;
+    QnResourceDataPool::QnResourceDataPoolChunk result;
     if(!QJson::deserialize(ctx, map, tagKeys, &result.keys)
        || !QJson::deserialize(ctx, value, &result.data))
     {
@@ -47,36 +41,28 @@ static bool deserialize(
     return true;
 }
 
-nx::utils::SoftwareVersion QnResourceDataPool::getVersion(const QByteArray& data)
-{
-    QJsonObject map;
-    if (!QJson::deserialize(data, &map))
-        return nx::utils::SoftwareVersion();
-    QString version;
-    if (!QJson::deserialize(map, tagVersion, &version))
-        return nx::utils::SoftwareVersion();
-    return nx::utils::SoftwareVersion(version);
-}
-
-static bool validateDataInternal(
-    const QByteArray& data,
-    QJsonObject& map,
-    QList<QnResourceDataPoolChunk>& chunks)
+QnResourceDataPool::DeserializeResult QnResourceDataPool::deserializeData(
+    const QByteArray& data)
 {
     if (data.isEmpty())
-        return false; /* Read error. */
+        return std::unexpected("Empty data");
 
-    if (!QJson::deserialize(data, &map))
-        return false;
+    QJsonParseError error;
+    QJsonDocument document = QJsonDocument::fromJson(data, &error);
+    if (error.error != QJsonParseError::NoError)
+        return std::unexpected(error.errorString());
 
-    QString version;
-    if (!QJson::deserialize(map, tagVersion, &version))
-        return false;
+    ResourceDataPoolData result{.jsonData = document.object()};
 
-    if (!QJson::deserialize(map, tagData, &chunks))
-        return false;
+    QString versionStr;
+    if (!QJson::deserialize(result.jsonData, tagVersion, &versionStr))
+        return std::unexpected("Unabled to deserialize version");
+    result.version = nx::utils::SoftwareVersion(versionStr);
 
-    return true;
+    if (!QJson::deserialize(result.jsonData, tagData, &result.chunks))
+        return std::unexpected("Unabled to deserialize chunks");
+
+    return result;
 }
 
 QnResourceDataPool::QnResourceDataPool(QObject* parent):
@@ -165,29 +151,21 @@ bool QnResourceDataPool::loadInternal(const QString& fileName)
     return loadData(file.readAll());
 }
 
-bool QnResourceDataPool::validateData(const QByteArray& data)
-{
-    QJsonObject map;
-    QList<QnResourceDataPoolChunk> chunks;
-    return validateDataInternal(data, map, chunks);
-}
-
 bool QnResourceDataPool::loadData(const QByteArray& data)
 {
-    QJsonObject map;
-    QList<QnResourceDataPoolChunk> chunks;
+    auto result = deserializeData(data);
 
-    if(!validateDataInternal(data, map, chunks))
+    if (!result.has_value())
         return false;
 
     decltype(m_dataByKey) dataByKey;
-    for(const auto& chunk: std::as_const(chunks))
+    for (const auto& chunk: result->chunks)
     {
-        for(const auto& rawKey: chunk.keys)
+        for (const auto& rawKey: chunk.keys)
             dataByKey.emplace_back(Key::fromString(rawKey), chunk.data);
     }
 
-    setData(std::move(map), std::move(dataByKey));
+    setData(std::move(result->jsonData), std::move(dataByKey));
     return true;
 }
 
