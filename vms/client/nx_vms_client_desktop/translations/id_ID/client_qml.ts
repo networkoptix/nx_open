@@ -1779,6 +1779,21 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
   </context>
   <context>
+    <name>ObjectTypeSelectionDialog</name>
+    <message>
+      <source>Select Objects</source>
+      <translation type="unfinished">Select Objects</translation>
+    </message>
+    <message>
+      <source>All Objects</source>
+      <translation type="unfinished">All Objects</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation type="unfinished">Objects</translation>
+    </message>
+  </context>
+  <context>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
@@ -1962,21 +1977,6 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     <message>
       <source>Intensity</source>
       <translation>Intensitas</translation>
-    </message>
-  </context>
-  <context>
-    <name>PixelationObjectSelectionDialog</name>
-    <message>
-      <source>Select Objects</source>
-      <translation>Pilih Objek</translation>
-    </message>
-    <message>
-      <source>All Objects</source>
-      <translation>Semua Objek</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Objek</translation>
     </message>
   </context>
   <context>

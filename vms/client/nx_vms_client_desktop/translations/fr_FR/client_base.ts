@@ -8378,6 +8378,18 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
       <translation>Vous n'êtes pas autorisé à exporter des archives pour certaines des caméras sélectionnées. La vidéo de ces caméras ne sera pas exportée vers le fichier résultant.</translation>
     </message>
+    <message>
+      <source>Add Metadata</source>
+      <translation type="unfinished">Add Metadata</translation>
+    </message>
+    <message>
+      <source>Reset metadata settings</source>
+      <translation type="unfinished">Reset metadata settings</translation>
+    </message>
+    <message>
+      <source>Metadata</source>
+      <translation type="unfinished">Metadata</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -12252,14 +12264,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>Local Files</source>
       <translation>Fichiers locaux</translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>Caméras &amp; ressources</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation>Mises en page partagées</translation>
     </message>
     <message>
       <source>Health Monitors</source>

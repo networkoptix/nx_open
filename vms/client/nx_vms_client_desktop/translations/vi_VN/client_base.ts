@@ -8247,6 +8247,18 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
       <translation>Bạn không có quyền xuất bản lưu trữ cho một số camera đã chọn. Video từ những camera đó sẽ không được xuất sang tệp đích.</translation>
     </message>
+    <message>
+      <source>Add Metadata</source>
+      <translation type="unfinished">Add Metadata</translation>
+    </message>
+    <message>
+      <source>Reset metadata settings</source>
+      <translation type="unfinished">Reset metadata settings</translation>
+    </message>
+    <message>
+      <source>Metadata</source>
+      <translation type="unfinished">Metadata</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -12072,14 +12084,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Local Files</source>
       <translation>Tập tin cục bộ</translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>Camera &amp; Nguồn</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation>Bố cục được chia sẻ</translation>
     </message>
     <message>
       <source>Health Monitors</source>

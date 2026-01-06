@@ -8378,6 +8378,18 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
       <translation>Du har ikke tillatelse til å eksportere arkiv for noen av de valgte kameraene. Video fra disse kameraene blir ikke eksportert til resultatfilen.</translation>
     </message>
+    <message>
+      <source>Add Metadata</source>
+      <translation type="unfinished">Add Metadata</translation>
+    </message>
+    <message>
+      <source>Reset metadata settings</source>
+      <translation type="unfinished">Reset metadata settings</translation>
+    </message>
+    <message>
+      <source>Metadata</source>
+      <translation type="unfinished">Metadata</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -12247,14 +12259,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Local Files</source>
       <translation>Lokale filer</translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>Kameraer og ressurser</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation>Delte visninger</translation>
     </message>
     <message>
       <source>Health Monitors</source>

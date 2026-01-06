@@ -1779,6 +1779,21 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
   </context>
   <context>
+    <name>ObjectTypeSelectionDialog</name>
+    <message>
+      <source>Select Objects</source>
+      <translation type="unfinished">Select Objects</translation>
+    </message>
+    <message>
+      <source>All Objects</source>
+      <translation type="unfinished">All Objects</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation type="unfinished">Objects</translation>
+    </message>
+  </context>
+  <context>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
@@ -1962,21 +1977,6 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
       <source>Intensity</source>
       <translation>강도</translation>
-    </message>
-  </context>
-  <context>
-    <name>PixelationObjectSelectionDialog</name>
-    <message>
-      <source>Select Objects</source>
-      <translation>오브젝트 선택</translation>
-    </message>
-    <message>
-      <source>All Objects</source>
-      <translation>모든 객체</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>객체</translation>
     </message>
   </context>
   <context>

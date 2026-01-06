@@ -8509,6 +8509,18 @@ If you intended to move analytics data to another storage location, please conta
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
       <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
     </message>
+    <message>
+      <source>Add Metadata</source>
+      <translation type="unfinished">Add Metadata</translation>
+    </message>
+    <message>
+      <source>Reset metadata settings</source>
+      <translation type="unfinished">Reset metadata settings</translation>
+    </message>
+    <message>
+      <source>Metadata</source>
+      <translation type="unfinished">Metadata</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -12430,14 +12442,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Local Files</source>
       <translation type="unfinished">Local Files</translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation type="unfinished">Cameras &amp; Resources</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation type="unfinished">Shared Layouts</translation>
     </message>
     <message>
       <source>Health Monitors</source>

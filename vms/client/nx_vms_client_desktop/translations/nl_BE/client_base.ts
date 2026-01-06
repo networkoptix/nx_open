@@ -8378,6 +8378,18 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
       <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
     </message>
+    <message>
+      <source>Add Metadata</source>
+      <translation type="unfinished">Add Metadata</translation>
+    </message>
+    <message>
+      <source>Reset metadata settings</source>
+      <translation type="unfinished">Reset metadata settings</translation>
+    </message>
+    <message>
+      <source>Metadata</source>
+      <translation type="unfinished">Metadata</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -12250,14 +12262,6 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <message>
       <source>Local Files</source>
       <translation>Lokale bestanden</translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>Cameras &amp; Resources</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation>Gedeelde lay-outs</translation>
     </message>
     <message>
       <source>Health Monitors</source>

@@ -1806,6 +1806,21 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
   </context>
   <context>
+    <name>ObjectTypeSelectionDialog</name>
+    <message>
+      <source>Select Objects</source>
+      <translation type="unfinished">Select Objects</translation>
+    </message>
+    <message>
+      <source>All Objects</source>
+      <translation type="unfinished">All Objects</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation type="unfinished">Objects</translation>
+    </message>
+  </context>
+  <context>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
@@ -1992,21 +2007,6 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <message>
       <source>Intensity</source>
       <translation>Intensywność</translation>
-    </message>
-  </context>
-  <context>
-    <name>PixelationObjectSelectionDialog</name>
-    <message>
-      <source>Select Objects</source>
-      <translation>Wybierz obiekty</translation>
-    </message>
-    <message>
-      <source>All Objects</source>
-      <translation>Wszystkie obiekty</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Obiekty</translation>
     </message>
   </context>
   <context>

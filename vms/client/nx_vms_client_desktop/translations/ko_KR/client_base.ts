@@ -8247,6 +8247,18 @@ If you intended to move analytics data to another storage location, please conta
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
       <translation>선택한 카메라 중 일부에 대한 아카이브를 내보낼 권한이 없습니다. 해당 카메라의 비디오는 결과 파일에 내보내지지 않습니다.</translation>
     </message>
+    <message>
+      <source>Add Metadata</source>
+      <translation type="unfinished">Add Metadata</translation>
+    </message>
+    <message>
+      <source>Reset metadata settings</source>
+      <translation type="unfinished">Reset metadata settings</translation>
+    </message>
+    <message>
+      <source>Metadata</source>
+      <translation type="unfinished">Metadata</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -12070,14 +12082,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Local Files</source>
       <translation>로컬 파일</translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>카메라 및 리소스</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation>공유 레이아웃</translation>
     </message>
     <message>
       <source>Health Monitors</source>

@@ -1788,6 +1788,21 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     </message>
   </context>
   <context>
+    <name>ObjectTypeSelectionDialog</name>
+    <message>
+      <source>Select Objects</source>
+      <translation type="unfinished">Select Objects</translation>
+    </message>
+    <message>
+      <source>All Objects</source>
+      <translation type="unfinished">All Objects</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation type="unfinished">Objects</translation>
+    </message>
+  </context>
+  <context>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
@@ -1972,21 +1987,6 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     <message>
       <source>Intensity</source>
       <translation>Intensité</translation>
-    </message>
-  </context>
-  <context>
-    <name>PixelationObjectSelectionDialog</name>
-    <message>
-      <source>Select Objects</source>
-      <translation>Sélectionner des objets</translation>
-    </message>
-    <message>
-      <source>All Objects</source>
-      <translation>Tous les objets</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Objets</translation>
     </message>
   </context>
   <context>

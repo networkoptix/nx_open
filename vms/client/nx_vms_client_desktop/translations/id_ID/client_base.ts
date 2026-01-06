@@ -8247,6 +8247,18 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
       <translation>Anda tidak memiliki izin untuk mengekspor archive untuk beberapa kamera yang dipilih. Video dari kamera tersebut tidak akan diekspor ke file yang dihasilkan.</translation>
     </message>
+    <message>
+      <source>Add Metadata</source>
+      <translation type="unfinished">Add Metadata</translation>
+    </message>
+    <message>
+      <source>Reset metadata settings</source>
+      <translation type="unfinished">Reset metadata settings</translation>
+    </message>
+    <message>
+      <source>Metadata</source>
+      <translation type="unfinished">Metadata</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -12072,14 +12084,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>Local Files</source>
       <translation>File Lokal</translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>Kamera &amp; Resource</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation>Layout yang Dibagikan</translation>
     </message>
     <message>
       <source>Health Monitors</source>

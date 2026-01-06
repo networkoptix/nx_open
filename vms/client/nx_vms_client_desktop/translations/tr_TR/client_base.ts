@@ -8377,6 +8377,18 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
       <translation>Seçilen kameralardan bazıları için arşivi dışa aktarma izniniz yok. Bu kameralardan gelen video, çıkan dosyaya aktarılmayacaktır.</translation>
     </message>
+    <message>
+      <source>Add Metadata</source>
+      <translation type="unfinished">Add Metadata</translation>
+    </message>
+    <message>
+      <source>Reset metadata settings</source>
+      <translation type="unfinished">Reset metadata settings</translation>
+    </message>
+    <message>
+      <source>Metadata</source>
+      <translation type="unfinished">Metadata</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -12245,14 +12257,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>Local Files</source>
       <translation>Yerel Dosya</translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>Kameralar ve Kaynaklar</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation>Paylaşılan ekran düzenleri</translation>
     </message>
     <message>
       <source>Health Monitors</source>
