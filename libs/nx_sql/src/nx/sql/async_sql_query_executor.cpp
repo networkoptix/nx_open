@@ -49,8 +49,6 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     m_dropConnectionThread = std::thread(
         std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
 
-    m_queryTimeoutThread = std::thread([this]() { reportQueryTimeoutThreadMain(); });
-
     m_queryQueue.setOnItemStayTimeout([this](auto&&... args) {
         reportQueryCancellation(std::forward<decltype(args)>(args)...);
     });
@@ -75,6 +73,8 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
         m_queryQueue.setConcurrentModificationQueryLimit(
             *m_connectionOptions.concurrentModificationQueryLimit);
     }
+
+    m_queryTimeoutThread = std::thread([this]() { reportQueryTimeoutThreadMain(); });
 }
 
 AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
