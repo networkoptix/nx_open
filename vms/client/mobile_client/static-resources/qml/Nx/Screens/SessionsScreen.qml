@@ -182,6 +182,7 @@ Page
 
                 rightButton
                 {
+                    visible: !emptyListPlaceholder.visible
                     icon.source: feedStateProvider.buttonIconSource
                     onClicked: Workflow.openFeedScreen(feedStateProvider)
                 }
