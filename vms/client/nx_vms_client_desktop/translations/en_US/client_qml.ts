@@ -1783,6 +1783,21 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
 </context>
 <context>
+    <name>ObjectTypeSelectionDialog</name>
+    <message>
+        <source>Select Objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
         <source>with %n attributes</source>
@@ -1966,21 +1981,6 @@ Select an Integration to begin configuring its parameters.</source>
     <name>PixelationIntensityDialog</name>
     <message>
         <source>Intensity</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>PixelationObjectSelectionDialog</name>
-    <message>
-        <source>Select Objects</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>All Objects</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Objects</source>
         <translation></translation>
     </message>
 </context>

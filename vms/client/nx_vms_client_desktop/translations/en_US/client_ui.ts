@@ -985,6 +985,37 @@
     </message>
 </context>
 <context>
+    <name>ExportMetadataSettingsWidget</name>
+    <message>
+        <source>Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Object type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has attributes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display attributes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ExportPasswordWidget</name>
     <message>
         <source>Protect with password</source>
