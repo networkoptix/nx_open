@@ -1968,11 +1968,11 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation>Chọn đối tượng</translation>
+      <translation type="unfinished">Select Objects</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation>Tất cả các Đối tượng</translation>
+      <translation type="unfinished">All Objects</translation>
     </message>
     <message>
       <source>Objects</source>
