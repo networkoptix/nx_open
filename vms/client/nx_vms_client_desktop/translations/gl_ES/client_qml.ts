@@ -1970,11 +1970,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation>Seleccionar obxectos</translation>
+      <translation type="unfinished">Select Objects</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation>Todos os obxectos</translation>
+      <translation type="unfinished">All Objects</translation>
     </message>
     <message>
       <source>Objects</source>

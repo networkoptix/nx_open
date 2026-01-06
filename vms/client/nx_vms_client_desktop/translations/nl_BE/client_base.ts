@@ -2107,14 +2107,14 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>This server is removed from Site</source>
       <translation type="unfinished">
-        <numerusform>This server is removed from Site</numerusform>
+        <numerusform>Deze server is verwijderd van de Site</numerusform>
         <numerusform>This server is removed from Site</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>This user is removed from Site</source>
       <translation type="unfinished">
-        <numerusform>This user is removed from Site</numerusform>
+        <numerusform>Deze gebruiker is verwijderd van de site.</numerusform>
         <numerusform>This user is removed from Site</numerusform>
       </translation>
     </message>
