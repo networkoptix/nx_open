@@ -7,16 +7,95 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/media/jpeg.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/thumbnails/camera_async_image_request.h>
+#include <nx/vms/client/core/thumbnails/proxy_image_result.h>
 #include <nx/vms/client/mobile/system_context.h>
 
 namespace {
 
+using namespace nx::vms::client::core;
+
 const int refreshInterval = 30000;
-const QSize defaultSize(0, 200);
+const int maxImageHeight = 200;
 
 QString getThumbnailId(const nx::Uuid& id, const qint64 time)
 {
     return id.toSimpleString() + ':' + QString::number(time);
+}
+
+// This class ensures that a camera thumbnail request is not sent again
+// if the same request is being processed.
+class CameraRequestManager: public QObject
+{
+    using Key = QPair<QnVirtualCameraResourcePtr, int>;
+    QHash<Key, std::shared_ptr<CameraAsyncImageRequest>> m_requests;
+
+public:
+    std::unique_ptr<AsyncImageResult> request(
+        const QnVirtualCameraResourcePtr& camera,
+        std::function<void(const QImage& image)> callback,
+        int maximumSize)
+    {
+        if (!NX_ASSERT(camera && camera->resourcePool()))
+            return {};
+
+        const auto key = Key(camera, maximumSize);
+        if (m_requests.contains(key))
+            return std::make_unique<ProxyImageResult>(m_requests.value(key));
+
+        const auto request = std::make_shared<CameraAsyncImageRequest>(camera, maximumSize);
+
+        if (request->isReady())
+            return std::make_unique<ProxyImageResult>(request);
+
+        const std::function<void()> onReady = nx::utils::guarded(this,
+            [this, key, callback]()
+            {
+                if (callback) {
+                    callback(m_requests.value(key)->image());
+                }
+                m_requests.remove(key);
+                NX_VERBOSE(this, "Camera requests count: %1", m_requests.size());
+            });
+
+        connect(request.get(), &AsyncImageResult::ready, this, onReady);
+
+        connect(camera->resourcePool(), &QnResourcePool::resourcesRemoved,
+            this, &CameraRequestManager::handleResourcesRemoved, Qt::UniqueConnection);
+
+        m_requests[key] = request;
+        NX_VERBOSE(this, "Camera requests count: %1", m_requests.size());
+
+        return std::make_unique<ProxyImageResult>(request);
+    }
+
+private:
+    void handleResourcesRemoved(const QnResourceList& resources)
+    {
+        QSet<QnVirtualCameraResourcePtr> removedCameras;
+        for (const auto& resource: resources)
+        {
+            if (auto cameraResource = resource.dynamicCast<QnVirtualCameraResource>())
+                removedCameras.insert(cameraResource);
+        }
+
+        if (removedCameras.empty())
+            return;
+
+        for (auto it = m_requests.begin(); it != m_requests.end(); )
+        {
+            if (removedCameras.contains(it.key().first))
+                it = m_requests.erase(it);
+            else
+                ++it;
+        }
+    }
+};
+
+static CameraRequestManager* cameraRequestManager()
+{
+    static CameraRequestManager instance;
+    return &instance;
 }
 
 } // namespace
@@ -26,21 +105,12 @@ QnCameraThumbnailCache::QnCameraThumbnailCache(
     QObject* parent)
     :
     QnThumbnailCacheBase(parent),
-    SystemContextAware(context),
-    m_decompressThread(new QThread(this))
+    SystemContextAware(context)
 {
-    m_request.size = defaultSize;
-
-    // Getting screenshot from NVR can be very long, so mobile client hangs trying to request some.
-    m_request.ignoreExternalArchive = true;
-    m_decompressThread->setObjectName("QnCameraThumbnailCache_decompressThread");
-    m_decompressThread->start();
 }
 
 QnCameraThumbnailCache::~QnCameraThumbnailCache()
 {
-    m_decompressThread->quit();
-    m_decompressThread->wait();
 }
 
 void QnCameraThumbnailCache::start()
@@ -146,50 +216,38 @@ void QnCameraThumbnailCache::refreshThumbnail(const nx::Uuid& id)
     if (thumbnailData.time > 0 && thumbnailData.time + refreshInterval > m_elapsedTimer.elapsed())
         return;
 
-    const auto handleReply =
-        [this, id](
-            bool success,
-            rest::Handle /*requestId*/,
-            QByteArray imageData,
-            const nx::network::http::HttpHeaders& /*headers*/)
+    auto callback = [this, id](const QImage& image)
+    {
+        ThumbnailData& thumbnailData = m_thumbnailByResourceId[id];
+        if (image.isNull())
         {
-            bool thumbnailLoaded = false;
-            QString thumbnailId;
+            thumbnailData.loading = false;
+            return;
+        }
 
-            {
-                QPixmap pixmap;
-                if (success && !imageData.isEmpty())
-                    pixmap = QPixmap::fromImage(decompressJpegImage(imageData));
+        bool thumbnailLoaded = false;
+        QString thumbnailId;
 
-                NX_MUTEX_LOCKER lock(&m_mutex);
+        auto pixmap = QPixmap::fromImage(image);
 
-                ThumbnailData& thumbnailData = m_thumbnailByResourceId[id];
+        if (!pixmap.isNull())
+        {
+            thumbnailId = getThumbnailId(id, thumbnailData.time);
+            m_pixmaps.remove(thumbnailData.thumbnailId);
+            m_pixmaps.insert(thumbnailId, pixmap);
+            thumbnailLoaded = true;
+        }
+        thumbnailData.thumbnailId = thumbnailId;
+        thumbnailData.time = m_elapsedTimer.elapsed();
+        thumbnailData.loading = false;
 
-                if (success)
-                {
-                    if (!pixmap.isNull())
-                    {
-                        thumbnailId = getThumbnailId(id, thumbnailData.time);
-                        m_pixmaps.remove(thumbnailData.thumbnailId);
-                        m_pixmaps.insert(thumbnailId, pixmap);
-                        thumbnailLoaded = true;
-                    }
-                    thumbnailData.thumbnailId = thumbnailId;
-                    thumbnailData.time = m_elapsedTimer.elapsed();
-                }
+        if (thumbnailLoaded)
+            emit thumbnailUpdated(id, thumbnailId);
+    };
 
-                thumbnailData.loading = false;
-            }
+    auto request = cameraRequestManager()->request(camera, callback, maxImageHeight);
 
-            if (thumbnailLoaded)
-                emit thumbnailUpdated(id, thumbnailId);
-        };
-
-    m_request.camera = camera;
-    int handle = api->cameraThumbnailAsync(
-        m_request, nx::utils::guarded(this, handleReply), m_decompressThread);
-
-    if (handle == -1)
+    if (!request)
     {
         thumbnailData.loading = false;
         return;

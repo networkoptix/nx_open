@@ -57,6 +57,4 @@ private:
     QElapsedTimer m_elapsedTimer;
     QHash<nx::Uuid, ThumbnailData> m_thumbnailByResourceId;
     QHash<QString, QPixmap> m_pixmaps;
-    nx::api::CameraImageRequest m_request;
-    QThread* const m_decompressThread;
 };
