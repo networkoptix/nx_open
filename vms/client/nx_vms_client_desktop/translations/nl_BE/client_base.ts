@@ -12774,7 +12774,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <name>nx::vms::client::desktop::rules::SoundPicker</name>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Beheren</translation>
     </message>
   </context>
   <context>

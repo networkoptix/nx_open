@@ -1530,7 +1530,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>No es válido el URL.</translation>
     </message>
     <message>
       <source>Active</source>
@@ -1968,7 +1968,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
@@ -1987,7 +1987,7 @@ License Key: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
+      <translation>El sitio se ha apagado. Para agregar a un VideoWall, el Sitio debe estar en estado activo.%1</translation>
     </message>
   </context>
   <context>
