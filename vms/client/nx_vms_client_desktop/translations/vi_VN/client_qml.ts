@@ -1782,15 +1782,15 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     <name>ObjectTypeSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Chọn đối tượng</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Tất cả các Đối tượng</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Đối tượng</translation>
     </message>
   </context>
   <context>

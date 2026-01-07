@@ -105,16 +105,16 @@
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
-      <source>Cameras</source>
-      <translation>Máy ảnh</translation>
-    </message>
-    <message>
       <source>All Devices</source>
       <translation>Tất cả thiết bị</translation>
     </message>
     <message>
       <source>Layouts</source>
       <translation>Bố cục</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation type="unfinished">Cameras &amp; Devices</translation>
     </message>
   </context>
   <context>

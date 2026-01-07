@@ -111,16 +111,16 @@
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
-      <source>Cameras</source>
-      <translation>מצלמות</translation>
-    </message>
-    <message>
       <source>All Devices</source>
       <translation>כל ההתקנים</translation>
     </message>
     <message>
       <source>Layouts</source>
       <translation>פריסות</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation type="unfinished">Cameras &amp; Devices</translation>
     </message>
   </context>
   <context>

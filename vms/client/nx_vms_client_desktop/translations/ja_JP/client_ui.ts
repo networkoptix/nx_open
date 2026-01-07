@@ -988,31 +988,31 @@
     <name>ExportMetadataSettingsWidget</name>
     <message>
       <source>Metadata</source>
-      <translation type="unfinished">Metadata</translation>
+      <translation>メタデータ</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>モーション</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>オブジェクト</translation>
     </message>
     <message>
       <source>Object type</source>
-      <translation type="unfinished">Object type</translation>
+      <translation>オブジェクトタイプ</translation>
     </message>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>属性あり</translation>
     </message>
     <message>
       <source>Display attributes</source>
-      <translation type="unfinished">Display attributes</translation>
+      <translation>表示属性</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>削除</translation>
     </message>
   </context>
   <context>

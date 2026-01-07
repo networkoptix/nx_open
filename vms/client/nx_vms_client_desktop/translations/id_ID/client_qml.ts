@@ -1782,15 +1782,15 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     <name>ObjectTypeSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Pilih Objek</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Semua Objek</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objek</translation>
     </message>
   </context>
   <context>

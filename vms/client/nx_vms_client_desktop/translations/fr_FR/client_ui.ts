@@ -992,11 +992,11 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Mouvement</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objets</translation>
     </message>
     <message>
       <source>Object type</source>
@@ -1004,7 +1004,7 @@
     </message>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>A des attributs</translation>
     </message>
     <message>
       <source>Display attributes</source>
@@ -1012,7 +1012,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Supprimer</translation>
     </message>
   </context>
   <context>

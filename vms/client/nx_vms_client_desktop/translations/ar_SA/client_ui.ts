@@ -992,7 +992,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Motion</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -1012,7 +1012,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>حذف</translation>
     </message>
   </context>
   <context>

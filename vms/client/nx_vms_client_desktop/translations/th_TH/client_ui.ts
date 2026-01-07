@@ -992,11 +992,11 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>โมชั่น</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>วัตถุ</translation>
     </message>
     <message>
       <source>Object type</source>
@@ -1012,7 +1012,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>ลบ</translation>
     </message>
   </context>
   <context>

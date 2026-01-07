@@ -2005,7 +2005,7 @@
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
-      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+      <translation>Actualizar el intervalo para las llaves públicas de la Nube.</translation>
     </message>
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>

@@ -1791,15 +1791,15 @@ Vælg en Integration for at begynde at konfigurere dens parametre.</translation>
     <name>ObjectTypeSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Vælg Objekter</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Alle Objekter</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objekter</translation>
     </message>
   </context>
   <context>

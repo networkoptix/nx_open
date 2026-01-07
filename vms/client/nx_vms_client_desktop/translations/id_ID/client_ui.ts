@@ -988,31 +988,31 @@
     <name>ExportMetadataSettingsWidget</name>
     <message>
       <source>Metadata</source>
-      <translation type="unfinished">Metadata</translation>
+      <translation>Metadata</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Motion</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objek</translation>
     </message>
     <message>
       <source>Object type</source>
-      <translation type="unfinished">Object type</translation>
+      <translation>Jenis objek</translation>
     </message>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>Memiliki atribut</translation>
     </message>
     <message>
       <source>Display attributes</source>
-      <translation type="unfinished">Display attributes</translation>
+      <translation>Tampilan atribut</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Delete</translation>
     </message>
   </context>
   <context>

@@ -109,16 +109,16 @@
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
-      <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
-    </message>
-    <message>
       <source>All Devices</source>
       <translation type="unfinished">All Devices</translation>
     </message>
     <message>
       <source>Layouts</source>
       <translation type="unfinished">Layouts</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation type="unfinished">Cameras &amp; Devices</translation>
     </message>
   </context>
   <context>

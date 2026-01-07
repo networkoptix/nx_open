@@ -1799,7 +1799,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objetos</translation>
     </message>
   </context>
   <context>

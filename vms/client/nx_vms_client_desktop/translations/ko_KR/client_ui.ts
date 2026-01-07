@@ -992,11 +992,11 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>움직임</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>객체</translation>
     </message>
     <message>
       <source>Object type</source>
@@ -1004,7 +1004,7 @@
     </message>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>속성이 있습니다</translation>
     </message>
     <message>
       <source>Display attributes</source>
@@ -1012,7 +1012,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>삭제</translation>
     </message>
   </context>
   <context>

@@ -1791,15 +1791,15 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     <name>ObjectTypeSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Sélectionner des objets</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Tous les objets</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objets</translation>
     </message>
   </context>
   <context>

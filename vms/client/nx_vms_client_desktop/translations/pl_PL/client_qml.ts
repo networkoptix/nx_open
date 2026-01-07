@@ -1809,15 +1809,15 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>ObjectTypeSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Wybierz obiekty</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Wszystkie obiekty</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Obiekty</translation>
     </message>
   </context>
   <context>

@@ -8380,15 +8380,15 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Add Metadata</source>
-      <translation type="unfinished">Add Metadata</translation>
+      <translation>Lägg till Metadata</translation>
     </message>
     <message>
       <source>Reset metadata settings</source>
-      <translation type="unfinished">Reset metadata settings</translation>
+      <translation>Återställ metadatainställningar</translation>
     </message>
     <message>
       <source>Metadata</source>
-      <translation type="unfinished">Metadata</translation>
+      <translation>Metadata</translation>
     </message>
   </context>
   <context>

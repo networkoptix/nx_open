@@ -1790,7 +1790,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>物件</translation>
     </message>
   </context>
   <context>

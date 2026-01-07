@@ -105,16 +105,16 @@
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
-      <source>Cameras</source>
-      <translation>กล้อง</translation>
-    </message>
-    <message>
       <source>All Devices</source>
       <translation>อุปกรณ์ทั้งหมด</translation>
     </message>
     <message>
       <source>Layouts</source>
       <translation>เค้าโครง</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation type="unfinished">Cameras &amp; Devices</translation>
     </message>
   </context>
   <context>
