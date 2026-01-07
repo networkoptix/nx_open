@@ -96,10 +96,13 @@ struct CloudCrossSystemContext::Private
         crossSystemAccessController = static_cast<CrossSystemAccessController*>(
             systemContext->accessController());
 
-        systemContext->startModuleDiscovery(
-            new nx::vms::discovery::Manager(systemContext.get()));
-        systemContext->moduleDiscoveryManager()->startModuleConnectorOnly();
-
+        if (appContext()->mode() == core::ApplicationContext::Mode::mobileClient
+            && ini().mobileUseModuleDiscoveryForCrossSite)
+        {
+            systemContext->startModuleDiscovery(
+                new nx::vms::discovery::Manager(systemContext.get()));
+            systemContext->moduleDiscoveryManager()->startModuleConnectorOnly();
+        }
         systemContext->resourceDataPool()->setExternalSource(
             appContext()->currentSystemContext()->resourceDataPool());
 

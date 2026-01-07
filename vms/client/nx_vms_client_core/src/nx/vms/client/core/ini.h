@@ -151,6 +151,14 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         " * \"vmsClientQrCodeDeployment\" - disables QR code deployment feature.\n"
         " * \"vmsClientCrashReporting\" - disables crash reporting feature.\n"
         "Features can be combined using space, comma or semicolon when implemented.");
+
+    // MOBILE-2733
+    // Enabling cross-site module discovery may not scale for organizations with many sites. Each
+    // ModuleDiscovery spawns a UDP listener in its own thread, consuming a file descriptor.
+    // Per-process FD limits (e.g. ~256 on macOS) can be reached quickly; increasing the limit via
+    // setMaxFileDescriptors() does not scale well.
+    NX_INI_FLAG(false, mobileUseModuleDiscoveryForCrossSite,
+        "[Dev] If set to true, cross site module discovery is used in mobile client.\n");
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();
