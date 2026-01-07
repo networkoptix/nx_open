@@ -1970,11 +1970,11 @@ Select an Integration to begin configuring its parameters.</source>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>オブジェクトを選択</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>すべてのオブジェクト</translation>
     </message>
     <message>
       <source>Objects</source>

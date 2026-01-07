@@ -1978,11 +1978,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Objetos seleccionados</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Todos los Objetos</translation>
     </message>
     <message>
       <source>Objects</source>

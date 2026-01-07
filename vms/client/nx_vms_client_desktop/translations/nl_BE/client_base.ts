@@ -2121,11 +2121,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>Deze server is verwijderd van de Site</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>Deze gebruiker is verwijderd van de site.</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -12813,7 +12813,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <name>nx::vms::client::desktop::rules::SoundPicker</name>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Beheren</translation>
     </message>
   </context>
   <context>
