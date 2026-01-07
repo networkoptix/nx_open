@@ -28,7 +28,7 @@ ResourceTreeItemFactory::ResourceTreeItemFactory(SystemContext* systemContext):
 AbstractItemPtr ResourceTreeItemFactory::createCamerasItem() const
 {
     return GenericItemBuilder()
-        .withRole(Qt::DisplayRole, tr("Cameras"))
+        .withRole(Qt::DisplayRole, tr("Cameras & Devices"))
         .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::camerasAndDevices))
         .withRole(core::ResourceIconKeyRole, static_cast<int>(ResourceIconCache::Cameras))
         .withFlags({Qt::ItemIsEnabled | Qt::ItemIsSelectable});
