@@ -2,6 +2,8 @@
 
 #include "primary_resolver.h"
 
+#include <regex>
+
 #include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/analytics/taxonomy/common.h>
@@ -33,18 +35,23 @@ std::optional<ProcessingError> validateId(const Descriptor& descriptor, const QS
         return ProcessingError{nx::format("%1: id can't be an empty string", typeName)};
     }
 
-    QRegularExpression idRegExp(
-        "^([A-Za-z_][\\}\\{\\-A-Za-z0-9_\\.]+\\$)?[A-Za-z_][\\}\\{\\-A-Za-z0-9_\\.]+$");
+    static const std::regex kIdRegex(
+        R"(^([A-Za-z_][\}\{\-A-Za-z0-9_\.]+\$)?[A-Za-z_][\}\{\-A-Za-z0-9_\.]+$)",
+        std::regex_constants::ECMAScript);
 
-    if (const auto match = idRegExp.match(descriptor.id); !match.hasMatch())
+    try
     {
-        return ProcessingError{nx::format(
-            "%1: id string can contain only latin letters, numbers, periods and underscores "
-            "and start with a latin letter or an underscore. Given: %2",
-            typeName, descriptor.id)};
+        if (std::regex_match(descriptor.id.toStdString(), kIdRegex))
+            return std::nullopt; //< Valid.
+    }
+    catch (const std::regex_error&)
+    {
     }
 
-    return std::nullopt;
+    return ProcessingError{ nx::format(
+        "%1: id string can contain only latin letters, numbers, periods and underscores "
+        "and start with a latin letter or an underscore. Given: %2",
+        typeName, descriptor.id) };
 }
 
 template<typename Descriptor>
