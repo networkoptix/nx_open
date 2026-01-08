@@ -2,7 +2,6 @@
 
 #include "push_api_helper.h"
 
-#include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/auth_tools.h>
@@ -94,7 +93,7 @@ nx::Url makeRequestUrl(const QString& token)
 {
     const nx::Url url = nx::network::url::Builder()
         .setScheme(nx::network::http::urlScheme(/*isSecure*/ true))
-        .setHost(nx::branding::cloudHost()) //< Always use main cloud host, even if we have custom one.
+        .setHost(nx::network::SocketGlobals::cloud().cloudHost())
         .setPath(QString("/api/notifications/subscriptions/%1").arg(token));
     return url;
 }
