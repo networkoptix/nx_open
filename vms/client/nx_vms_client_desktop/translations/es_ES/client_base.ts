@@ -3006,7 +3006,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
@@ -5653,7 +5653,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>Eliminar diseños?</translation>
     </message>
     <message>
       <source>Delete user?</source>
@@ -8441,7 +8441,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
   </context>
   <context>
@@ -9088,7 +9088,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
     <message>
       <source>Downloading...</source>
@@ -10292,7 +10292,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
   </context>
   <context>
@@ -12653,7 +12653,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>Tiene atributos</translation>
     </message>
     <message>
       <source>Attributes</source>
@@ -13189,7 +13189,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>

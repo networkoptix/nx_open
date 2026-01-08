@@ -177,7 +177,7 @@
     </message>
     <message>
       <source>Server %1 does not exist.</source>
-      <translation type="unfinished">Server %1 does not exist.</translation>
+      <translation>Servidor%1 no existe.</translation>
     </message>
     <message>
       <source>Storage %1 does not belong to this Server.</source>
