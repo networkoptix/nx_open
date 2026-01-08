@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>מצלמות והתקנים</translation>
     </message>
   </context>
   <context>

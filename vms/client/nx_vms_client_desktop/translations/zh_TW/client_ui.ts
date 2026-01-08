@@ -988,7 +988,7 @@
     <name>ExportMetadataSettingsWidget</name>
     <message>
       <source>Metadata</source>
-      <translation type="unfinished">Metadata</translation>
+      <translation>Metadata</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -1000,7 +1000,7 @@
     </message>
     <message>
       <source>Object type</source>
-      <translation type="unfinished">Object type</translation>
+      <translation>物件類型</translation>
     </message>
     <message>
       <source>Has attributes</source>
@@ -1008,7 +1008,7 @@
     </message>
     <message>
       <source>Display attributes</source>
-      <translation type="unfinished">Display attributes</translation>
+      <translation>顯示屬性</translation>
     </message>
     <message>
       <source>Delete</source>

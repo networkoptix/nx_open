@@ -8249,15 +8249,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Metadata</source>
-      <translation type="unfinished">Add Metadata</translation>
+      <translation>增加 Metadata</translation>
     </message>
     <message>
       <source>Reset metadata settings</source>
-      <translation type="unfinished">Reset metadata settings</translation>
+      <translation>重置Metadata設定</translation>
     </message>
     <message>
       <source>Metadata</source>
-      <translation type="unfinished">Metadata</translation>
+      <translation>Metadata</translation>
     </message>
   </context>
   <context>

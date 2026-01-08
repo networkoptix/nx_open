@@ -116,7 +116,7 @@
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Cámaras y dispositivos</translation>
     </message>
   </context>
   <context>

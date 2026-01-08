@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>카메라 및 장치</translation>
     </message>
   </context>
   <context>
