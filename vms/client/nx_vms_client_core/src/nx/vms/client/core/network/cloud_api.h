@@ -3,6 +3,8 @@
 #pragma once
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 
 #include <nx/cloud/db/client/data/system_data.h>
 #include <nx/cloud/db/client/cdb_connection.h>
@@ -137,9 +139,15 @@ NX_REFLECTION_INSTRUMENT(ChannelStruct, (organizations)(channelPartners));
 template<typename T>
 using CloudResult = nx::utils::expected<T, nx::cloud::db::api::ResultCode>;
 
-// Makes a GET request to the cloud API. Resumes on the main thread.
 template<typename T>
-nx::coro::Task<CloudResult<T>> cloudGet(
+concept Paginated = requires(T t) {
+    { t.next } -> std::convertible_to<std::string>;
+    { t.results } -> std::ranges::range;
+};
+
+// Makes a single GET request to the cloud API. Resumes on the main thread.
+template<typename T>
+nx::coro::Task<CloudResult<T>> cloudGetSinglePage(
     CloudStatusWatcher* statusWatcher,
     const std::string& path,
     const nx::UrlQuery& query = {})
@@ -234,6 +242,64 @@ nx::coro::Task<CloudResult<T>> cloudGet(
         }
         co_return result;
     }
+}
+
+// Makes a GET request to the cloud API. Resumes on the main thread. For non-paginated types,
+// returns the result directly.
+template<typename T> requires (!Paginated<T>)
+nx::coro::Task<CloudResult<T>> cloudGet(
+    CloudStatusWatcher* statusWatcher,
+    const std::string& path,
+    const nx::UrlQuery& query = {})
+{
+    co_return co_await cloudGetSinglePage<T>(statusWatcher, path, query);
+}
+
+// Makes a GET request to the cloud API for paginated types. Automatically fetches all pages and
+// merges results.
+template<Paginated T>
+nx::coro::Task<CloudResult<T>> cloudGet(
+    CloudStatusWatcher* statusWatcher,
+    const std::string& path,
+    const nx::UrlQuery& query = {})
+{
+    auto firstPage = co_await cloudGetSinglePage<T>(statusWatcher, path, query);
+    if (!firstPage)
+        co_return firstPage;
+
+    T result = std::move(*firstPage);
+
+    // Fetch remaining pages if pagination is present.
+    std::string nextUrl = result.next;
+    while (!nextUrl.empty())
+    {
+        // Extract path and query from the full URL (next contains absolute URL).
+        QUrl url(QString::fromStdString(nextUrl));
+        QUrlQuery urlQuery(url);
+
+        // Merge original query parameters with pagination query. Pagination query takes precedence.
+        nx::UrlQuery mergedQuery = query;
+        for (const auto& item: urlQuery.queryItems())
+            mergedQuery.addQueryItem(item.first, item.second);
+
+        auto nextPage = co_await cloudGetSinglePage<T>(
+            statusWatcher,
+            url.path().toStdString(),
+            mergedQuery);
+
+        if (!nextPage)
+            co_return nextPage;
+
+        result.results.insert(
+            result.results.end(),
+            std::make_move_iterator(nextPage->results.begin()),
+            std::make_move_iterator(nextPage->results.end()));
+
+        result.next = nextPage->next;
+        nextUrl = result.next;
+    }
+
+    co_return result;
 }
 
 } // namespace nx::vms::client::core
