@@ -91,7 +91,14 @@ std::optional<size_t> parseApiVersion(const QString& path, bool withException = 
 {
     if (path.startsWith("/rest/"))
     {
-        auto name = path.split('/')[2];
+        const auto subpaths = path.split('/');
+        if (subpaths.size() <= 2)
+        {
+            if (withException)
+                throw Exception::notFound(NX_FMT("Unknown path %1", path));
+            return {};
+        }
+        const auto& name = subpaths[2];
         if (!name.startsWith('v'))
         {
             if (withException)
