@@ -36,7 +36,7 @@ public:
 };
 
 static constexpr int kDefaultDisabledServerVersions =
-    SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1;
+    SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1;
 
 void sslKeyLogFileCallback(const SSL* /*ssl*/, const char* line)
 {
@@ -245,7 +245,15 @@ bool Context::setAllowedServerVersions(const std::string& versionsStr)
     }
 
     NX_INFO(this, "Set server SSL versions: %1", containerString(versions));
-    m_disabledServerVersions = disabledVersions;
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_disabledServerVersions != disabledVersions)
+    {
+        SSL_CTX_clear_options(m_defaultServerContext.get(), m_disabledServerVersions);
+        SSL_CTX_set_options(m_defaultServerContext.get(), disabledVersions);
+        m_disabledServerVersions = disabledVersions;
+    }
+
     return true;
 }
 
