@@ -337,7 +337,7 @@
     </message>
     <message>
       <source>User %1 is not allowed to %2 the Showreel with parentId %3</source>
-      <translation type="unfinished">User %1 is not allowed to %2 the Showreel with parentId %3</translation>
+      <translation>使用者 %1 無權 %2 parent Id 為 %3 的幻燈片</translation>
     </message>
   </context>
 </TS>

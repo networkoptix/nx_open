@@ -1566,7 +1566,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>No es válido el URL.</translation>
     </message>
     <message>
       <source>Active</source>
@@ -2004,7 +2004,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
@@ -2023,7 +2023,7 @@ License Key: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
+      <translation>El sitio se ha apagado. Para agregar a un VideoWall, el Sitio debe estar en estado activo.%1</translation>
     </message>
   </context>
   <context>
@@ -3039,7 +3039,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
@@ -5678,7 +5678,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>Eliminar diseños?</translation>
     </message>
     <message>
       <source>Delete user?</source>
@@ -8461,7 +8461,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
   </context>
   <context>
@@ -9109,7 +9109,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
     <message>
       <source>Downloading...</source>
@@ -10321,7 +10321,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
   </context>
   <context>
@@ -12692,7 +12692,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>Tiene atributos</translation>
     </message>
     <message>
       <source>Attributes</source>
@@ -13228,7 +13228,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccione el Folder</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
