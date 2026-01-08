@@ -120,7 +120,7 @@ QVariant MainTreeResourceItemDecorator::data(int role) const
         {
             const auto resource = m_sourceItem->data(core::ResourceRole).value<QnResourcePtr>();
             const auto overridenIcon = resource->isOnline()
-                ? ResourceIconCache::HealthMonitor | ResourceIconCache::Online
+                ? ResourceIconCache::HealthMonitor
                 : ResourceIconCache::HealthMonitor | ResourceIconCache::Offline;
             return QVariant::fromValue<int>(overridenIcon);
         }

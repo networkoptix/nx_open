@@ -314,6 +314,7 @@ ResourceIconCache::ResourceIconCache(QObject* parent):
     m_cache.insert(Server | Control | ReadOnly, IconWithDescription(kServerIncompatibleIcon));
     m_cache.insert(HealthMonitors, IconWithDescription(kHealthMonitorsIcon));
     m_cache.insert(HealthMonitor, IconWithDescription(kHealthMonitorIcon));
+    m_cache.insert(HealthMonitor | Control, IconWithDescription(kHealthMonitorIcon));
     m_cache.insert(HealthMonitor | Offline, IconWithDescription(kHealthMonitorOfflineIcon));
 
     // Layouts.
