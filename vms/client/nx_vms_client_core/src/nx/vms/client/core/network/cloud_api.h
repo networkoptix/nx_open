@@ -273,19 +273,13 @@ nx::coro::Task<CloudResult<T>> cloudGet(
     std::string nextUrl = result.next;
     while (!nextUrl.empty())
     {
-        // Extract path and query from the full URL (next contains absolute URL).
+        // Extract path from the full URL (next contains absolute URL).
         QUrl url(QString::fromStdString(nextUrl));
-        QUrlQuery urlQuery(url);
-
-        // Merge original query parameters with pagination query. Pagination query takes precedence.
-        nx::UrlQuery mergedQuery = query;
-        for (const auto& item: urlQuery.queryItems())
-            mergedQuery.addQueryItem(item.first, item.second);
 
         auto nextPage = co_await cloudGetSinglePage<T>(
             statusWatcher,
             url.path().toStdString(),
-            mergedQuery);
+            nx::UrlQuery(QUrlQuery(url)));
 
         if (!nextPage)
             co_return nextPage;
