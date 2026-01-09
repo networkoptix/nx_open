@@ -47,6 +47,7 @@ QuickControls.Page
         {
             id: column
             width: parent.width
+            bottomPadding: 1
 
             ToolBar
             {
