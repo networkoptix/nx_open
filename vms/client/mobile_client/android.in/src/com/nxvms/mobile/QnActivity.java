@@ -138,6 +138,12 @@ public class QnActivity extends QtActivity
         initializeTextControlWorkaround();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        // QTBUG-131968: Prevent state restoration to ensure correct application restart.
+    }
+
     /**
      *  Workarounds QTBUG-134417.
      *  This is a workaround preventing showing of overlapping fullscreen native
