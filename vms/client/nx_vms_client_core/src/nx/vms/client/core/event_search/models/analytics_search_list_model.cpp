@@ -38,6 +38,7 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/text/human_readable.h>
 #include <storage/server_storage_manager.h>
+#include <utils/common/synctime.h>
 
 #include "detail/analytic_data_storage.h"
 #include "detail/object_track_facade.h"
@@ -56,6 +57,8 @@ using Facade = detail::ObjectTrackFacade;
 static constexpr milliseconds kMetadataTimerInterval = 1000ms;
 static constexpr milliseconds kDataChangedInterval = 500ms;
 
+static constexpr auto kMaxTimestamp = milliseconds::max();
+
 using GetCallback = std::function<void(bool, rest::Handle, nx::analytics::db::LookupResult&&)>;
 using ObjectTrackFetchedData = FetchedData<nx::analytics::db::LookupResult>;
 
@@ -71,6 +74,19 @@ void subtractKeysFromSet(Set& minuend, const Hash& subtrahend)
 {
     for (const auto& [key, value]: nx::utils::constKeyValueRange(subtrahend))
         minuend.remove(key);
+}
+
+milliseconds metadataTimestamp(const QnAbstractCompressedMetadataPtr& packet)
+{
+    return packet->isSpecialTimeValue()
+        ? kMaxTimestamp
+        : duration_cast<milliseconds>(microseconds(packet->timestamp));
+}
+
+bool lessByTimestamp(
+    const QnAbstractCompressedMetadataPtr& left, const QnAbstractCompressedMetadataPtr& right)
+{
+    return metadataTimestamp(left) < metadataTimestamp(right);
 }
 
 } // namespace
@@ -125,8 +141,13 @@ public:
 
     LiveTimestampGetter liveTimestampGetter;
 
+    struct MetadataBlock
+    {
+        QList<QnAbstractCompressedMetadataPtr> packets;
+        milliseconds receivedAt{};
+    };
     using MetadataByCamera =
-        QHash<QnVirtualCameraResourcePtr, QList<QnAbstractCompressedMetadataPtr>>;
+        QHash<QnVirtualCameraResourcePtr, QList<MetadataBlock>>;
 
     /**
      * Temporary storage for the data which can't be applied now because view stream data from the
@@ -180,6 +201,15 @@ public:
     void updateMetadataReceivers();
 
     void processMetadata();
+
+    using MetadataList = std::vector<QnAbstractCompressedMetadataPtr>;
+    std::tuple<MetadataList, int /*numSources*/> synchronizeAndFetchReceivedMetadata();
+
+    QList<QnAbstractCompressedMetadataPtr> mergeMetadataBlocks(QList<MetadataBlock> blocks) const;
+
+    QList<QnAbstractCompressedMetadataPtr> mergeMetadataBlocks(
+        QList<QnAbstractCompressedMetadataPtr> sortedFirst,
+        QList<QnAbstractCompressedMetadataPtr> sortedSecond) const;
 
     using CleanupFunction = AbstractSearchListModel::ItemCleanupFunction<
         nx::analytics::db::ObjectTrack>;
@@ -672,84 +702,11 @@ void AnalyticsSearchListModel::Private::processMetadata()
         return;
 
     //---------------------------------------------------------------------------------------------
-    // Fetch all metadata packets from receiver buffers and deferred packets storage.
+    // Process all metadata packets.
 
-    std::vector<QnAbstractCompressedMetadataPtr> metadataPackets;
-    int numSources = 0;
-
-    static constexpr auto kMaxTimestamp = std::numeric_limits<milliseconds>::max();
-
-    milliseconds liveTimestamp{};
-    if (liveTimestampGetter && ini().delayRightPanelLiveAnalytics)
-    {
-        // Choose "live" of a camera with the longest delay.
-        for (const auto& receiver: metadataReceivers)
-        {
-            const auto timestamp = liveTimestampGetter(receiver->camera());
-            if (timestamp > 0ms && timestamp != kMaxTimestamp)
-                liveTimestamp = std::max(liveTimestamp, timestamp);
-        }
-    }
-
-    MetadataByCamera currentMetadata;
-    currentMetadata.swap(deferredMetadata);
-
-    // Adds all new available packages to the temporary metadata.
-    for (const auto& receiver: metadataReceivers)
-        currentMetadata[receiver->camera()].append(receiver->takeData());
-
-    for (auto&& [camera, packets]: nx::utils::keyValueRange(currentMetadata))
-    {
-        if (packets.empty())
-            continue;
-
-        const auto metadataTimestamp =
-            [](const QnAbstractCompressedMetadataPtr& packet) -> milliseconds
-            {
-                return packet->isSpecialTimeValue()
-                    ? kMaxTimestamp
-                    : duration_cast<milliseconds>(microseconds(packet->timestamp));
-            };
-
-        // TODO: #vkutin Normally packets should be sorted except maybe best shot packets.
-        // Try to get rid of this additional sort in the future.
-        std::stable_sort(packets.begin(), packets.end(),
-            [metadataTimestamp](const auto& left, const auto& right)
-            {
-                return metadataTimestamp(left) < metadataTimestamp(right);
-            });
-
-        if (liveTimestamp > 0ms)
-        {
-            const auto pos = std::lower_bound(packets.begin(), packets.end(), liveTimestamp,
-                [metadataTimestamp](const auto& left, milliseconds right)
-                {
-                    return metadataTimestamp(left) < right;
-                });
-
-            if (pos == packets.begin())
-            {
-                deferredMetadata[camera].swap(packets);
-            }
-            else if (pos != packets.end())
-            {
-                deferredMetadata[camera] = packets.mid(pos - packets.begin());
-                packets.erase(pos, packets.end());
-            }
-        }
-
-        metadataPackets.insert(metadataPackets.end(),
-            std::make_move_iterator(packets.begin()),
-            std::make_move_iterator(packets.end()));
-
-        ++numSources;
-    }
-
+    const auto [metadataPackets, numSources] = synchronizeAndFetchReceivedMetadata();
     if (metadataPackets.empty())
         return;
-
-    //---------------------------------------------------------------------------------------------
-    // Process all metadata packets.
 
     NX_VERBOSE(q, "Processing %1 live metadata packets from %2 sources",
         (int) metadataPackets.size(), numSources);
@@ -959,6 +916,150 @@ void AnalyticsSearchListModel::Private::processMetadata()
         emit q->availableNewTracksChanged();
     else
         q->commitAvailableNewTracks();
+}
+
+//
+// Fetch all metadata packets from the receiver buffers and the deferred packets storage.
+// Synchronize with current live video playback on the scene, if present.
+// Put all packets that are too new into the deferred packets storage, return the rest.
+//
+std::tuple<AnalyticsSearchListModel::Private::MetadataList, int /*numSources*/>
+    AnalyticsSearchListModel::Private::synchronizeAndFetchReceivedMetadata()
+{
+    MetadataList metadataPackets;
+    int numSources = 0;
+
+    const bool synchronizeWithPlayback = liveTimestampGetter
+        && ini().maxRightPanelLiveAnalyticsDelay > 0;
+
+    MetadataByCamera currentMetadata;
+    currentMetadata.swap(deferredMetadata);
+
+    for (const auto& receiver: metadataReceivers)
+    {
+        const auto& camera = receiver->camera();
+        auto& blocks = currentMetadata[camera];
+
+        const auto now = duration_cast<milliseconds>(qnSyncTime->currentTimePoint());
+        auto incomingPackets = receiver->takeData();
+
+        // Bestshot packets may come out of order.
+        std::stable_sort(incomingPackets.begin(), incomingPackets.end(), &lessByTimestamp);
+
+        if (!incomingPackets.empty())
+            blocks.append({incomingPackets, now});
+
+        if (blocks.empty())
+            continue;
+
+        const milliseconds livePlaybackTimestamp = synchronizeWithPlayback
+            ? liveTimestampGetter(camera)
+            : kMaxTimestamp;
+
+        int totalCount = 0;
+        if (livePlaybackTimestamp != kMaxTimestamp)
+        {
+            for (auto& block: blocks)
+            {
+                totalCount += (int) block.packets.size();
+
+                if ((now - block.receivedAt) > seconds(ini().maxRightPanelLiveAnalyticsDelay))
+                    continue;
+
+                const auto pos = std::upper_bound(
+                    block.packets.begin(), block.packets.end(), livePlaybackTimestamp,
+                    [](milliseconds left, const auto& right)
+                    {
+                        return left < metadataTimestamp(right);
+                    });
+
+                if (pos == block.packets.begin())
+                {
+                    deferredMetadata[camera].push_back(block);
+                    block.packets.clear();
+                }
+                else if (pos != block.packets.end())
+                {
+                    deferredMetadata[camera].push_back(
+                        {block.packets.mid(pos - block.packets.begin()), now});
+                    block.packets.erase(pos, block.packets.end());
+                }
+            }
+        }
+
+        auto packets = mergeMetadataBlocks(std::move(blocks));
+
+        if (!packets.empty())
+        {
+            const auto oldestTimestamp = metadataTimestamp(packets.front());
+            const auto newestTimestamp = metadataTimestamp(packets.back());
+
+            if (livePlaybackTimestamp != kMaxTimestamp)
+            {
+                NX_TRACE(this, "Accepted %1 (of %2) metadata packets for %3 (%4...%5),"
+                    " playback is at %6 (%7...%8 deviation)",
+                    packets.size(), totalCount, camera, oldestTimestamp, newestTimestamp,
+                    livePlaybackTimestamp, oldestTimestamp - livePlaybackTimestamp,
+                    newestTimestamp - livePlaybackTimestamp);
+            }
+            else
+            {
+                NX_TRACE(this, "Accepted %1 (of %2) metadata packets for %3 (%4...%5)",
+                    packets.size(), totalCount, camera, oldestTimestamp, newestTimestamp);
+            }
+
+            metadataPackets.insert(metadataPackets.end(),
+                std::make_move_iterator(packets.begin()),
+                std::make_move_iterator(packets.end()));
+        }
+
+        ++numSources;
+    }
+
+    return {metadataPackets, numSources};
+}
+
+QList<QnAbstractCompressedMetadataPtr> AnalyticsSearchListModel::Private::mergeMetadataBlocks(
+    QList<AnalyticsSearchListModel::Private::MetadataBlock> blocks) const
+{
+    const auto nextBlock =
+        [&]() -> QList<QnAbstractCompressedMetadataPtr>
+        {
+            while (!blocks.empty() && blocks.front().packets.empty())
+                blocks.pop_front();
+
+            return blocks.empty()
+                ? QList<QnAbstractCompressedMetadataPtr>{}
+                : blocks.takeFirst().packets;
+        };
+
+    auto result = nextBlock();
+    while (!blocks.empty())
+        result = mergeMetadataBlocks(std::move(result), nextBlock());
+
+    return result;
+}
+
+QList<QnAbstractCompressedMetadataPtr> AnalyticsSearchListModel::Private::mergeMetadataBlocks(
+    QList<QnAbstractCompressedMetadataPtr> sortedFirst,
+    QList<QnAbstractCompressedMetadataPtr> sortedSecond) const
+{
+    if (sortedSecond.empty())
+        return sortedFirst;
+
+    if (sortedFirst.empty())
+        return sortedSecond;
+
+    QList<QnAbstractCompressedMetadataPtr> result(sortedFirst.size() + sortedSecond.size());
+    std::merge(
+        std::make_move_iterator(sortedFirst.begin()),
+        std::make_move_iterator(sortedFirst.end()),
+        std::make_move_iterator(sortedSecond.begin()),
+        std::make_move_iterator(sortedSecond.end()),
+        result.begin(),
+        &lessByTimestamp);
+
+    return result;
 }
 
 AnalyticsSearchListModel::Private::CleanupFunction

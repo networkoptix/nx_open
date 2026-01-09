@@ -40,10 +40,13 @@ public:
         std::chrono::microseconds timestamp,
         std::chrono::microseconds* outImageTimestamp = nullptr) const;
 
-    void add(const nx::Uuid& resourceId, const CLConstVideoDecoderOutputPtr& frame);
+    bool add(const nx::Uuid& resourceId, const CLConstVideoDecoderOutputPtr& frame);
 
     void setCacheSize(std::chrono::microseconds value);
     std::chrono::microseconds cacheSize() const;
+
+    int fpsLimit() const;
+    void setFpsLimit(int value);
 
 private:
     void setCachedDevices(const QSet<nx::Uuid>& value);
@@ -53,6 +56,8 @@ private:
     QMap<intptr_t, QSet<nx::Uuid>> m_cachedDevices;
     QMap<nx::Uuid, std::deque<CLConstVideoDecoderOutputPtr>> m_cache;
     std::chrono::microseconds m_cacheSize{};
+    int m_fpsLimit = 0;
+    qint64 m_minDeltaUs = 0;
 };
 
 } // namespace nx::vms::client::core

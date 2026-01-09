@@ -89,7 +89,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     m_analyticsSetup->setLiveTimestampGetter(
         [this](const QnVirtualCameraResourcePtr& camera) -> milliseconds
         {
-            static constexpr auto kMaxTimestamp = std::numeric_limits<milliseconds>::max();
+            static constexpr auto kMaxTimestamp = milliseconds::max();
 
             auto widgets = display()->widgets(camera);
             if (widgets.empty())

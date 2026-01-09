@@ -2,6 +2,8 @@
 
 #include "system_context.h"
 
+#include <chrono>
+
 #include <QtQml/QtQml>
 
 #include <client/client_message_processor.h>
@@ -63,6 +65,8 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
                 std::make_unique<nx::vms::rules::IntegrationActionInitializer>(this));
             d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
+            d->videoCache->setFpsLimit(ini().clientVideoCacheFpsLimit);
+            d->videoCache->setCacheSize(std::chrono::milliseconds(ini().clientVideoCacheLengthMs));
             d->sessionTimeoutWatcher =
                 std::make_unique<RemoteSessionTimeoutWatcher>(globalSettings());
             d->trafficRelayUrlWatcher = std::make_unique<TrafficRelayUrlWatcher>(this);

@@ -33,7 +33,6 @@ TEST(videoCache, cacheSize)
     cache.image(id, 700ms, &result);
     ASSERT_EQ(result, 800ms);
 
-
     cache.add(id, makeFrame(1001ms));
     cache.image(id, 0ms, &result);
     ASSERT_EQ(result, 100ms);
@@ -70,6 +69,35 @@ TEST(videoCache, resourceList)
     ASSERT_EQ(result, 1ms);
     cache.image(id3, 0ms, &result);
     ASSERT_EQ(result, 1ms);
+}
+
+TEST(videoCache, fpsLimit)
+{
+    VideoCache cache;
+    cache.setCacheSize(1s);
+    cache.setFpsLimit(10);
+    nx::Uuid id = nx::Uuid::createUuid();
+    cache.setCachedDevices(0, QSet<nx::Uuid>{id});
+
+    microseconds result;
+    cache.add(id, makeFrame(1ms));
+    cache.image(id, 0ms, &result);
+    ASSERT_EQ(result, 1ms);
+    cache.add(id, makeFrame(501ms));
+    cache.image(id, 500ms, &result);
+    ASSERT_EQ(result, 501ms);
+    cache.add(id, makeFrame(100ms)); //< Dropped.
+    cache.image(id, 100ms, &result);
+    ASSERT_EQ(result, 501ms);
+    cache.add(id, makeFrame(101ms)); //< Passed.
+    cache.image(id, 100ms, &result);
+    ASSERT_EQ(result, 101ms);
+    cache.add(id, makeFrame(402ms)); //< Dropped.
+    cache.image(id, 400ms, &result);
+    ASSERT_EQ(result, 501ms);
+    cache.add(id, makeFrame(401ms)); //< Passed.
+    cache.image(id, 400ms, &result);
+    ASSERT_EQ(result, 401ms);
 }
 
 } // namespace test

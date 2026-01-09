@@ -91,9 +91,15 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
     NX_INI_INT(4, intervalPreviewSpeedFactor,
         "[Design] Interval preview video playback speed multiplier.");
 
-    NX_INI_FLAG(false, delayRightPanelLiveAnalytics,
-        "[Support] Prohibits showing right panel live analytics before the corresponding frame\n"
-        "appears on the camera if the camera is playing live");
+    NX_INI_INT(2, maxRightPanelLiveAnalyticsDelay,
+        "[Support] Maximum delay in seconds to hold back right panel live analytics before\n"
+        "the corresponding frame appears on the camera if the camera is playing live.");
+
+    NX_INI_INT(10, clientVideoCacheFpsLimit,
+        "[Support] The FPS limit of played back video frames to store in the client video cache.");
+
+    NX_INI_INT(2000, clientVideoCacheLengthMs,
+        "[Support] The length in milliseconds of the client video cache per camera.");
 
     // VMS-52885
     NX_INI_FLAG(false, allowCslBookmarkSearch,
