@@ -3088,7 +3088,7 @@ Presione Alt + Clic para seguir el objeto</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Duplicar</translation>
     </message>
     <message>
       <source>Delete</source>
