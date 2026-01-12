@@ -284,7 +284,7 @@ struct AnalyticsEventType: public ExtendedType
     /**%apidoc[opt] */
     QString groupId;
     /**%apidoc[opt] */
-    QString provider = "";
+    QString provider;
 
     bool isStateful() const noexcept { return flags.testFlag(EventTypeFlag::stateDependent); }
 };

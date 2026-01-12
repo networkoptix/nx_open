@@ -27,8 +27,8 @@ namespace nx::vms::api::analytics {
 struct DescriptorScope
 {
     nx::Uuid engineId;
-    mutable QString groupId;
-    mutable QString provider;
+    QString groupId;
+    QString provider;
     mutable bool hasTypeEverBeenSupportedInThisScope = false;
 
     bool operator==(const DescriptorScope& other) const = default;

@@ -50,19 +50,19 @@ static InternalState makeInitialInternalState(
     InternalState internalState;
 
     for (auto& [id, descriptor]: descriptors.pluginDescriptors)
-        internalState.integrationById[id] = new Integration(std::move(descriptor));
+        internalState.integrationById[id] = new Integration(std::move(descriptor), resourceSupportProxy);
 
     for (auto& [id, descriptor]: descriptors.engineDescriptors)
-        internalState.engineById[id.toString(QUuid::WithBraces)] = new Engine(std::move(descriptor));
+        internalState.engineById[id.toString(QUuid::WithBraces)] = new Engine(std::move(descriptor), resourceSupportProxy);
 
     for (auto& [id, descriptor]: descriptors.groupDescriptors)
-        internalState.groupById[id] = new Group(std::move(descriptor));
+        internalState.groupById[id] = new Group(std::move(descriptor), resourceSupportProxy);
 
     for (auto& [id, descriptor]: descriptors.enumTypeDescriptors)
-        internalState.enumTypeById[id] = new EnumType(std::move(descriptor));
+        internalState.enumTypeById[id] = new EnumType(std::move(descriptor), resourceSupportProxy);
 
     for (auto& [id, descriptor]: descriptors.colorTypeDescriptors)
-        internalState.colorTypeById[id] = new ColorType(std::move(descriptor));
+        internalState.colorTypeById[id] = new ColorType(std::move(descriptor), resourceSupportProxy);
 
     for (auto& [id, descriptor]: descriptors.eventTypeDescriptors)
     {

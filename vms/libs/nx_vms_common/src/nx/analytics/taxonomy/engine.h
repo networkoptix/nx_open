@@ -15,7 +15,7 @@ class Engine: public AbstractEngine
 {
 public:
     Engine(nx::vms::api::analytics::EngineDescriptor engineDescriptor,
-        QObject* parent = nullptr);
+        QObject* parent);
 
     virtual QString id() const override;
 
