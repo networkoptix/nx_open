@@ -134,8 +134,9 @@ function executeLater(callback, parent)
 function assert(testValue, text)
 {
     if (testValue)
-        return
+        return testValue
 
     console.log("Assert violation: " + text)
     console.trace()
+    return testValue
 }

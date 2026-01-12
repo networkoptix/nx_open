@@ -13,7 +13,6 @@ NxObject
     property real spacing: 0.0
 
     // Output properties:
-    // Their number is minimized in order to eliminate circular dependencies.
     readonly property int defaultColumnsCount: d.calculateDefaultColumnsCount()
     readonly property int columnsCount: d.userDefinedColumnsCount !== kInvalidColumnsCount
         ? MathUtils.bound(1, d.userDefinedColumnsCount, defaultColumnsCount)
@@ -22,6 +21,15 @@ NxObject
     readonly property int normalCellWidth: d.calculateNormalCellWidth()
     readonly property int enlargedCellWidth: d.calculateEnlargedCellWidth()
     readonly property int enlargedCellsCount: d.calculateEnlargedCellsCount()
+    readonly property int enlargedRowsCount:
+    {
+        if (enlargedCellsCount === 0)
+            return 0
+        return enlargedCellsCount < columnsCount ? 1 : 2
+    }
+    readonly property int enlargedCellsCountInFirstRow: enlargedRowsCount > 0
+        ? Math.floor(enlargedCellsCount / enlargedRowsCount)
+        : 0
 
     // Constants:
     readonly property int kInvalidColumnsCount: -1
@@ -35,8 +43,21 @@ NxObject
             d.userDefinedColumnsCount = kInvalidColumnsCount
         else if (newColumnsCount >= 1 && newColumnsCount < defaultColumnsCount)
             d.userDefinedColumnsCount = newColumnsCount
-        else
-            assert(false, "Invalid new userDefinedColumnsCount value: " + newColumnsCount)
+        else //< Display size changed.
+            d.userDefinedColumnsCount = kInvalidColumnsCount
+    }
+
+    readonly property int totalLayoutHeight:
+    {
+        const enlargedRowsTotalHeight =
+            enlargedRowsCount * (calculateCellHeight(enlargedCellWidth) + spacing) - spacing
+
+        const normalRowsCount = Math.ceil((cellsCount - enlargedCellsCount) / columnsCount)
+        const normalRowsTotalHeight =
+            normalRowsCount * (calculateCellHeight(normalCellWidth) + spacing) - spacing
+
+        return enlargedRowsTotalHeight + normalRowsTotalHeight
+            + ((enlargedRowsCount > 0 && normalRowsCount > 0) ? spacing : 0)
     }
 
     function getUserDefinedColumnsCount()
@@ -45,45 +66,6 @@ NxObject
             return defaultColumnsCount
         else
             return d.userDefinedColumnsCount
-    }
-
-    function getCellY(cellIndex)
-    {
-        if (cellIndex < 0)
-            return 0
-
-        const normalCellHeight = calculateCellHeight(normalCellWidth)
-
-        let calculateRowY =
-            function (rowIndex, cellHeight)
-            {
-                return rowIndex * (cellHeight + spacing)
-            }
-
-        if (enlargedCellsCount > 0)
-        {
-            const enlargedRowHeight = calculateCellHeight(enlargedCellWidth)
-
-            if (cellIndex < enlargedCellsCount)
-            {
-                if (enlargedCellsCount < columnsCount)
-                    return 0
-
-                const kEnlargedRowsCount = 2
-                const cellsInFirstRow = Math.floor(enlargedCellsCount / kEnlargedRowsCount)
-                const rowIndex = Math.floor(cellIndex / cellsInFirstRow)
-                return calculateRowY(rowIndex, enlargedRowHeight)
-            }
-
-            const enlargedRowsNumber = Math.ceil(enlargedCellsCount / columnsCount)
-            const enlargedRowsHeight = enlargedRowsNumber * (enlargedRowHeight + spacing) - spacing
-
-            const normalRowIndex = Math.floor((cellIndex - enlargedCellsCount) / columnsCount)
-            return enlargedRowsHeight + spacing + calculateRowY(normalRowIndex, normalCellHeight)
-        }
-
-        const rowIndex = Math.floor(cellIndex / columnsCount)
-        return calculateRowY(rowIndex, normalCellHeight)
     }
 
     function calculateCellHeight(cellWidth)
@@ -109,6 +91,14 @@ NxObject
         id: d
 
         property int userDefinedColumnsCount: kInvalidColumnsCount
+
+        function getCellHeight(cellIndex)
+        {
+            const cellWidth = (cellIndex < enlargedCellsCount)
+                ? enlargedCellWidth
+                : normalCellWidth
+            return calculateCellHeight(cellWidth)
+        }
 
         function calculateCellWidth(cellHeight)
         {
