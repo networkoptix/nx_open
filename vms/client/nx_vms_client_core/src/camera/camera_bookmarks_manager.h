@@ -6,6 +6,7 @@
 
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/event/event_fwd.h>
 
@@ -27,11 +28,16 @@ public:
 
      /* Direct API section */
 
-    /// @brief                  Asynchronously gathers bookmarks using specified filter.
-    /// @param filter           Filter parameters.
-    /// @param callback         Callback for receiving bookmarks data.
-    /// @returns                Internal id of the request.
-    int getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter, BookmarksCallbackType callback);
+    /**
+     * @brief Asynchronously requests bookmarks using specified filter.
+     * @param filter Filter parameters.
+     * @param callback Callback for receiving bookmarks data.
+     * @param executor Callback execution thread control object.
+     * @returns Internal id of the request.
+     */
+    int getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter,
+        BookmarksCallbackType callback,
+        nx::utils::AsyncHandlerExecutor executor);
 
     /**
      * @brief Requests bookmarks around specified central point. Calculates tail (new bookmarks

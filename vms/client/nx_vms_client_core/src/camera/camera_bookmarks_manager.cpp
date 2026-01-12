@@ -24,9 +24,9 @@ QnCameraBookmarksManager::~QnCameraBookmarksManager()
 }
 
 int QnCameraBookmarksManager::getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter,
-    BookmarksCallbackType callback)
+    BookmarksCallbackType callback, nx::utils::AsyncHandlerExecutor executor)
 {
-    return d->getBookmarksAsync(filter, callback);
+    return d->getBookmarksAsync(filter, callback, executor);
 }
 
 int QnCameraBookmarksManager::getBookmarksAroundPointAsync(
@@ -57,7 +57,7 @@ int QnCameraBookmarksManager::getBookmarksAroundPointAsync(
             callback(success, id, std::move(fetched));
         });
 
-    return getBookmarksAsync(filter, std::move(bookmarksCallback));
+    return getBookmarksAsync(filter, std::move(bookmarksCallback), d.get());
 }
 
 int QnCameraBookmarksManager::getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback)

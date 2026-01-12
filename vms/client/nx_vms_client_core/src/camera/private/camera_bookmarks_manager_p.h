@@ -13,6 +13,7 @@
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <nx/network/http/http_types.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/vms/client/core/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
 
@@ -44,8 +45,10 @@ public:
     /// @brief                  Asynchronously gathers bookmarks using specified filter.
     /// @param filter           Filter parameters.
     /// @param callback         Callback for receiving bookmarks data.
+    /// @param executor         Callback execution thread control object.
     /// @returns                Internal id of the request.
-    int getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter, BookmarksCallbackType callback);
+    int getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter,
+        BookmarksCallbackType callback, nx::utils::AsyncHandlerExecutor executor);
 
     /**
      *  Gathers bookmarks around specified time point using usual bookmarks request. Heuristically

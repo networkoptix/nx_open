@@ -16,6 +16,10 @@
 namespace nx::vms::client::mobile {
 namespace timeline {
 
+/**
+ * An abstract delegate that loads model data for one tile of `DataTimeline`.
+ * See `ObjectsLoader` and `MultiObjectData`.
+ */
 class AbstractLoaderDelegate: public QObject
 {
     Q_OBJECT
@@ -24,7 +28,7 @@ public:
     explicit AbstractLoaderDelegate(QObject* parent = nullptr): QObject(parent) {}
 
     virtual QFuture<MultiObjectData> load(const QnTimePeriod& period,
-        std::chrono::milliseconds minimumStackDuration) const = 0;
+        std::chrono::milliseconds minimumStackDuration) = 0;
 
     static QString makeImageRequest(const nx::Uuid& cameraId, qint64 timestampMs, int resolution);
     static constexpr int kLowImageResolution = 320;

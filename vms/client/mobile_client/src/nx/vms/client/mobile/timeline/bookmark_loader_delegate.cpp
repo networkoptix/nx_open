@@ -4,17 +4,14 @@
 
 #include <memory>
 
+#include <QtCore/QFutureWatcher>
 #include <QtCore/QPointer>
 #include <QtCore/QPromise>
-#include <QtCore/QWeakPointer>
 
-#include <camera/camera_bookmarks_manager.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/range_adapters.h>
-#include <nx/vms/client/core/system_context.h>
 
 namespace nx::vms::client::mobile {
 namespace timeline {
@@ -34,17 +31,16 @@ QString bookmarkTitle(const QnCameraBookmark& bookmark)
 
 struct BookmarkLoaderDelegate::Private
 {
-    const QWeakPointer<QnResource> resource;
+    const BackendPtr backend;
     const int maxBookmarksPerBucket;
 
     static void handleLoadingFinished(
-        core::SystemContext* /*systemContext*/,
         QPromise<MultiObjectData>& promise,
         const QnTimePeriod& period,
         milliseconds minimumStackDuration,
         int limit,
         const nx::Uuid& cameraId,
-        QnCameraBookmarkList&& result)
+        QnCameraBookmarkList result)
     {
         QnTimePeriodList chunks;
         if ((int) result.size() > limit)
@@ -59,16 +55,6 @@ struct BookmarkLoaderDelegate::Private
             for (auto it = result.crbegin(); it != result.crend(); ++it)
                 chunks.push_back(QnTimePeriod(it->startTimeMs, it->durationMs).intersected(period));
         }
-
-        // Remove bookmarks that started before the requested time period.
-        // `result` is sorted by `QnCameraBookmark::statTimeMs` in descending order.
-        const auto newEnd = std::upper_bound(result.begin(), result.end(), period.startTime(),
-            [](milliseconds time, const QnCameraBookmark& bookmark)
-            {
-                return time > bookmark.startTimeMs;
-            });
-
-        result.erase(newEnd, result.end());
 
         const int count = (int) result.size();
         if (count == 1)
@@ -154,13 +140,14 @@ struct BookmarkLoaderDelegate::Private
 };
 
 BookmarkLoaderDelegate::BookmarkLoaderDelegate(
-    const QnResourcePtr& resource,
+    const BackendPtr& backend,
     int maxBookmarksPerBucket,
     QObject* parent)
     :
     AbstractLoaderDelegate(parent),
-    d(new Private{.resource = resource, .maxBookmarksPerBucket = maxBookmarksPerBucket})
+    d(new Private{.backend = backend, .maxBookmarksPerBucket = maxBookmarksPerBucket})
 {
+    NX_ASSERT(d->backend);
 }
 
 BookmarkLoaderDelegate::~BookmarkLoaderDelegate()
@@ -169,51 +156,45 @@ BookmarkLoaderDelegate::~BookmarkLoaderDelegate()
 }
 
 QFuture<MultiObjectData> BookmarkLoaderDelegate::load(
-    const QnTimePeriod& period, milliseconds minimumStackDuration) const
+    const QnTimePeriod& period, milliseconds minimumStackDuration)
 {
-    const auto resource = d->resource.lock();
-    if (!resource || period.isEmpty())
+    if (!d->backend || period.isEmpty())
         return {};
 
-    const QPointer<core::SystemContext> systemContext =
-        resource->systemContext()->as<core::SystemContext>();
-
-    const auto manager = systemContext->cameraBookmarksManager();
-    if (!NX_ASSERT(manager))
+    // `maxBookmarksPerBucket + 1` limit should be requested to see if there's exactly
+    // `maxBookmarksPerBucket` or more bookmarks in the requested `period`.
+    const auto nativeDataFuture = d->backend->load(period, d->maxBookmarksPerBucket + 1);
+    if (nativeDataFuture.isCanceled())
         return {};
 
-    const auto promise = std::make_shared<QPromise<MultiObjectData>>();
+    using Watcher = QFutureWatcher<QnCameraBookmarkList>;
+    const auto nativeDataReadinessWatcher = new Watcher(this);
 
-    const int limit = d->maxBookmarksPerBucket;
-    const auto cameraId = resource->getId();
+    QPromise<MultiObjectData> resultPromise;
+    resultPromise.start();
+    const auto resultFuture = resultPromise.future();
 
-    auto responseHandler = nx::utils::guarded(this,
-        [systemContext, promise, period, minimumStackDuration, limit, cameraId](
-            bool success,
-            rest::Handle /*handle*/,
-            QnCameraBookmarkList result)
+    connect(nativeDataReadinessWatcher, &Watcher::finished, this,
+        [this, nativeDataReadinessWatcher, resultPromise = std::move(resultPromise), period,
+            minimumStackDuration]() mutable
         {
-            if (success && systemContext)
+            const auto resource = d->backend->resource();
+            if (resource
+                && !resultPromise.isCanceled()
+                && nativeDataReadinessWatcher->future().isValid()
+                && nativeDataReadinessWatcher->future().isResultReadyAt(0))
             {
-                Private::handleLoadingFinished(systemContext, *promise, period,
-                    minimumStackDuration, limit, cameraId, std::move(result));
+                Private::handleLoadingFinished(resultPromise, period, minimumStackDuration,
+                    d->maxBookmarksPerBucket, resource->getId(),
+                    nativeDataReadinessWatcher->future().takeResult());
             }
-            promise->finish();
+
+            resultPromise.finish();
+            nativeDataReadinessWatcher->deleteLater();
         });
 
-    const QnCameraBookmarkSearchFilter filter{
-        .startTimeMs = period.startTime(),
-        .endTimeMs = period.endTime() - 1ms, //< Bookmark request treats endTime as included.
-        .limit = d->maxBookmarksPerBucket + 1,
-        .orderBy = common::BookmarkSortOrder{
-            api::BookmarkSortField::startTime, Qt::DescendingOrder},
-        .cameras = {resource->getId()}};
-
-    if (!manager->getBookmarksAsync(filter, responseHandler))
-        return {};
-
-    promise->start();
-    return promise->future();
+    nativeDataReadinessWatcher->setFuture(nativeDataFuture);
+    return resultFuture;
 }
 
 } // namespace timeline

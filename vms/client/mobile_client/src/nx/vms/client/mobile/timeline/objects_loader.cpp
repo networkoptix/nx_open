@@ -15,6 +15,10 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
+#include <nx/vms/client/core/timeline/backends/aggregating_proxy_backend.h>
+#include <nx/vms/client/core/timeline/backends/analytics_backend.h>
+#include <nx/vms/client/core/timeline/backends/bookmarks_backend.h>
+#include <nx/vms/client/core/timeline/backends/caching_proxy_backend.h>
 #include <recording/time_period.h>
 
 #include "analytics_loader_delegate.h"
@@ -25,6 +29,10 @@ namespace nx::vms::client::mobile {
 namespace timeline {
 
 using namespace std::chrono;
+using namespace nx::vms::client::core::timeline;
+
+// ------------------------------------------------------------------------------------------------
+// ObjectsLoader::InternalBucket
 
 struct ObjectsLoader::InternalBucket: public ObjectBucket
 {
@@ -35,7 +43,16 @@ struct ObjectsLoader::InternalBucket: public ObjectBucket
     InternalBucket& operator=(InternalBucket&&) = default;
 
     InternalBucket(const qint64& startTimeMs): ObjectBucket{.startTimeMs = startTimeMs} {}
+
+    ~InternalBucket()
+    {
+        if (runningLoadingTask)
+            runningLoadingTask->cancel();
+    }
 };
+
+// ------------------------------------------------------------------------------------------------
+// ObjectsLoader::Private
 
 struct ObjectsLoader::Private
 {
@@ -71,6 +88,8 @@ struct ObjectsLoader::Private
     std::optional<milliseconds> bottomBound;
 
     QPointer<core::ChunkProvider> chunkProvider;
+    BackendPtr<ObjectTrackList> analyticsBackend;
+    BackendPtr<QnCameraBookmarkList> bookmarksBackend;
     std::unique_ptr<AbstractLoaderDelegate> loaderDelegate;
 
     QTimer pollingTimer;
@@ -346,11 +365,11 @@ struct ObjectsLoader::Private
 
     void update(BucketList::iterator bucketIt, QFuture<MultiObjectData>&& future)
     {
-        if (!future.isValid())
+        if (future.isCanceled())
         {
             handleBucketLoaded(bucketIt, std::nullopt);
         }
-        else if (future.isFinished())
+        else if (future.isFinished() && NX_ASSERT(future.isValid() && future.isResultReadyAt(0)))
         {
             handleBucketLoaded(bucketIt, future.result());
         }
@@ -370,8 +389,9 @@ struct ObjectsLoader::Private
                             return;
                         }
 
-                        auto objectsData = bucketIt->runningLoadingTask->future().isResultReadyAt(0)
-                            ? std::optional<MultiObjectData>(bucketIt->runningLoadingTask->resultAt(0))
+                        auto future = bucketIt->runningLoadingTask->future();
+                        auto objectsData = future.isValid() && future.isResultReadyAt(0)
+                            ? std::optional<MultiObjectData>(future.takeResult())
                             : std::nullopt;
 
                         bucketIt->runningLoadingTask.release()->deleteLater();
@@ -453,13 +473,13 @@ struct ObjectsLoader::Private
                 break;
 
             case ObjectsType::bookmarks:
-                loaderDelegate.reset(new BookmarkLoaderDelegate(chunkProvider->resource(),
-                    maxObjectsPerBucket));
+                loaderDelegate.reset(new BookmarkLoaderDelegate(ensureBookmarksBackend(),
+				    maxObjectsPerBucket));
                 break;
 
             case ObjectsType::analytics:
                 loaderDelegate.reset(new AnalyticsLoaderDelegate(chunkProvider,
-                    maxObjectsPerBucket));
+                    ensureAnalyticsBackend(), maxObjectsPerBucket));
                 break;
         }
     }
@@ -493,7 +513,39 @@ struct ObjectsLoader::Private
         else
             setBottomBound(std::nullopt);
     }
+
+    const BackendPtr<ObjectTrackList>& ensureAnalyticsBackend()
+    {
+        if (analyticsBackend || !NX_ASSERT(chunkProvider))
+            return analyticsBackend;
+
+        analyticsBackend =
+            std::make_shared<CachingProxyBackend<ObjectTrackList>>(
+                std::make_shared<AggregatingProxyBackend<ObjectTrackList>>(
+                    std::make_shared<AnalyticsBackend>(chunkProvider->resource())));
+
+        return analyticsBackend;
+    }
+
+    const BackendPtr<QnCameraBookmarkList>& ensureBookmarksBackend()
+    {
+        if (bookmarksBackend || !NX_ASSERT(chunkProvider))
+            return bookmarksBackend;
+
+        const auto cachingBackend = std::make_shared<CachingProxyBackend<QnCameraBookmarkList>>(
+            std::make_shared<AggregatingProxyBackend<QnCameraBookmarkList>>(
+                std::make_shared<BookmarksBackend>(chunkProvider->resource())));
+
+        // Bookmarks can be modified in the past, therefore the cache blocks are always expirable.
+        cachingBackend->setAgeThreshold(std::nullopt);
+
+        bookmarksBackend = cachingBackend;
+        return bookmarksBackend;
+    }
 };
+
+// ------------------------------------------------------------------------------------------------
+// ObjectsLoader
 
 ObjectsLoader::ObjectsLoader(QObject* parent):
     QObject(parent),
@@ -541,6 +593,8 @@ void ObjectsLoader::setChunkProvider(core::ChunkProvider* value)
 
     d->clear();
     d->chunkProvider = value;
+    d->analyticsBackend.reset();
+    d->bookmarksBackend.reset();
     d->initializeLoaderDelegate();
     emit chunkProviderChanged();
 
@@ -549,6 +603,16 @@ void ObjectsLoader::setChunkProvider(core::ChunkProvider* value)
 
     if (!d->chunkProvider)
         return;
+
+    connect(d->chunkProvider, &core::ChunkProvider::resourceChanged, this,
+        [this]()
+        {
+            d->clear();
+            d->analyticsBackend.reset();
+            d->bookmarksBackend.reset();
+            d->initializeLoaderDelegate();
+            d->handleWindowChanged();
+        });
 
     connect(d->chunkProvider, &core::ChunkProvider::periodsUpdated, this,
         [this](Qn::TimePeriodContent type)

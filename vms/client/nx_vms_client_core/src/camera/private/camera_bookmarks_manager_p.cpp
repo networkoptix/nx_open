@@ -72,11 +72,11 @@ bool checkBookmarkForQuery(const QnCameraBookmarksQueryPtr &query, const QnCamer
 
 template<class ResponseType>
 QnCameraBookmarksManagerPrivate::RawResponseType makeUbjsonResponseWrapper(
-    QObject* guard,
+    nx::utils::AsyncHandlerExecutor executor,
     std::function<void (bool, rest::Handle, ResponseType)> callback)
 {
     return
-        [internalCallback = nx::utils::AsyncHandlerExecutor(guard).bind(std::move(callback))](
+        [internalCallback = executor.bind(std::move(callback))](
             bool success,
             rest::Handle handle,
             QByteArray body,
@@ -369,8 +369,9 @@ int QnCameraBookmarksManagerPrivate::sendGetRequest(
 }
 
 int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
-    const QnCameraBookmarkSearchFilter &filter,
-    BookmarksCallbackType callback)
+    const QnCameraBookmarkSearchFilter& filter,
+    BookmarksCallbackType callback,
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::vms::common::GetBookmarksRequestData requestData;
     requestData.filter = filter;
@@ -383,7 +384,7 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
     return sendGetRequest(
         "/ec2/bookmarks",
         requestData,
-        makeUbjsonResponseWrapper(this, callback));
+        makeUbjsonResponseWrapper(std::move(executor), callback));
 }
 
 int QnCameraBookmarksManagerPrivate::getBookmarkstAroundPointHeuristic(
@@ -690,7 +691,7 @@ rest::Handle QnCameraBookmarksManagerPrivate::sendQueryRequest(
             handleQueryReply(queryId, success, requestId, std::move(bookmarks), callback);
         };
 
-    info.requestId = getBookmarksAsync(filter, internalCallback);
+    info.requestId = getBookmarksAsync(filter, internalCallback, this);
     info.requestTimer.restart();
     NX_VERBOSE(this, "Sending initial request [%1] with filter %2",
         info.requestId,
@@ -717,7 +718,7 @@ void QnCameraBookmarksManagerPrivate::sendQueryTailRequest(
         };
 
     QueryInfo& info = m_queries[query->id()];
-    info.requestId = getBookmarksAsync(filter, internalCallback);
+    info.requestId = getBookmarksAsync(filter, internalCallback, this);
     info.requestTimer.restart();
     NX_VERBOSE(this,
         "Sending partial request [%1] with filter %2",

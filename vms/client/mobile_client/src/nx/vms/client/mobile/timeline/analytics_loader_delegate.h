@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include <analytics/db/analytics_db_types.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/timeline/backends/abstract_backend.h>
 
 #include "abstract_loader_delegate.h"
 
@@ -16,14 +17,16 @@ namespace timeline {
 class AnalyticsLoaderDelegate: public AbstractLoaderDelegate
 {
     Q_OBJECT
+    using BackendPtr = core::timeline::BackendPtr<analytics::db::LookupResult>;
 
 public:
-    explicit AnalyticsLoaderDelegate(
-        core::ChunkProvider* chunkProvider, int maxTracksPerBucket, QObject* parent = nullptr);
+    explicit AnalyticsLoaderDelegate(core::ChunkProvider* chunkProvider, const BackendPtr& backend,
+        int maxTracksPerBucket, QObject* parent = nullptr);
+
     virtual ~AnalyticsLoaderDelegate() override;
 
     virtual QFuture<MultiObjectData> load(const QnTimePeriod& period,
-        std::chrono::milliseconds minimumStackDuration) const override;
+        std::chrono::milliseconds minimumStackDuration) override;
 
 private:
     struct Private;

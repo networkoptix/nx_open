@@ -21,7 +21,7 @@ public:
     virtual ~MotionLoaderDelegate() override;
 
     virtual QFuture<MultiObjectData> load(const QnTimePeriod& period,
-        std::chrono::milliseconds minimumStackDuration) const override;
+        std::chrono::milliseconds minimumStackDuration) override;
 
 private:
     struct Private;

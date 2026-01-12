@@ -4,15 +4,14 @@
 
 #include <memory>
 
+#include <QtCore/QFutureWatcher>
 #include <QtCore/QPointer>
 #include <QtCore/QPromise>
 
 #include <analytics/db/analytics_db_types.h>
-#include <api/server_rest_connection.h>
 #include <core/resource/resource.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/analytics/taxonomy/object_type.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
 #include <nx/utils/range_adapters.h>
@@ -115,6 +114,7 @@ core::analytics::AttributeList preprocessAttributes(
 struct AnalyticsLoaderDelegate::Private
 {
     const QPointer<core::ChunkProvider> chunkProvider;
+    const BackendPtr backend;
     const int maxTracksPerBucket;
 
     static QString makeTitleImageRequest(const ObjectTrackEx& track)
@@ -151,17 +151,6 @@ struct AnalyticsLoaderDelegate::Private
         int limit,
         LookupResult&& result)
     {
-        // Remove tracks that started before the requested time period.
-        // `result` is sorted by `ObjectTrackEx::firstAppearanceTimeUs` in descending order.
-        const auto newEnd = std::upper_bound(result.begin(), result.end(),
-            duration_cast<microseconds>(period.startTime()).count(),
-            [](qint64 timeUs, const ObjectTrackEx& track)
-            {
-                return timeUs > track.firstAppearanceTimeUs;
-            });
-
-        result.erase(newEnd, result.end());
-
         const int count = (int) result.size();
         if (count == 1)
         {
@@ -258,12 +247,17 @@ struct AnalyticsLoaderDelegate::Private
 
 AnalyticsLoaderDelegate::AnalyticsLoaderDelegate(
     core::ChunkProvider* chunkProvider,
+    const BackendPtr& backend,
     int maxTracksPerBucket,
     QObject* parent)
     :
     AbstractLoaderDelegate(parent),
-    d(new Private{.chunkProvider = chunkProvider, .maxTracksPerBucket = maxTracksPerBucket})
+    d(new Private{
+        .chunkProvider = chunkProvider,
+        .backend = backend,
+        .maxTracksPerBucket = maxTracksPerBucket})
 {
+    NX_ASSERT(d->backend);
 }
 
 AnalyticsLoaderDelegate::~AnalyticsLoaderDelegate()
@@ -272,56 +266,46 @@ AnalyticsLoaderDelegate::~AnalyticsLoaderDelegate()
 }
 
 QFuture<MultiObjectData> AnalyticsLoaderDelegate::load(
-    const QnTimePeriod& period, milliseconds minimumStackDuration) const
+    const QnTimePeriod& period, milliseconds minimumStackDuration)
 {
-    if (!d->chunkProvider || period.isEmpty())
+    if (!d->chunkProvider || !d->backend || period.isEmpty())
         return {};
 
-    const auto resource = d->chunkProvider->resource();
-    if (!NX_ASSERT(resource))
+    // `maxTracksPerBucket + 1` limit should be requested to see if there's exactly
+    // `maxTracksPerBucket` or more tracks in the requested `period`.
+    const auto nativeDataFuture = d->backend->load(period, d->maxTracksPerBucket + 1);
+    if (nativeDataFuture.isCanceled())
         return {};
 
-    const QPointer<core::SystemContext> systemContext =
-        resource->systemContext()->as<core::SystemContext>();
+    using Watcher = QFutureWatcher<LookupResult>;
+    const auto nativeDataReadinessWatcher = new Watcher(this);
 
-    const auto api = systemContext->connectedServerApi();
-    if (!NX_ASSERT(api))
-        return {};
+    QPromise<MultiObjectData> resultPromise;
+    resultPromise.start();
+    const auto resultFuture = resultPromise.future();
 
-    const auto chunks = d->chunkProvider->periods(Qn::AnalyticsContent);
-    const auto intersected = chunks.intersected(period);
-    if (intersected.empty())
-        return {};
-
-    Filter filter;
-    filter.deviceIds.insert(resource->getId());
-    filter.maxObjectTracksToSelect = d->maxTracksPerBucket + 1;
-    filter.sortOrder = Qt::DescendingOrder;
-
-    // Object track request treats timePeriod.endTimeMs as included, so we need to cut the last ms.
-    filter.timePeriod = QnTimePeriod{period.startTime(), period.duration() - 1ms};
-
-    const auto promise = std::make_shared<QPromise<MultiObjectData>>();
-
-    const auto responseHandler = nx::utils::guarded(this,
-        [systemContext, promise, period, minimumStackDuration, limit = d->maxTracksPerBucket](
-            bool success,
-            rest::Handle /*handle*/,
-            LookupResult&& result)
+    connect(nativeDataReadinessWatcher, &Watcher::finished, this,
+        [this, nativeDataReadinessWatcher, resultPromise = std::move(resultPromise), period,
+            minimumStackDuration]() mutable
         {
-            if (success && systemContext)
+            const auto resource = d->backend->resource();
+            if (resource
+                && !resultPromise.isCanceled()
+                && nativeDataReadinessWatcher->future().isValid()
+                && nativeDataReadinessWatcher->future().isResultReadyAt(0))
             {
-                Private::handleLoadingFinished(systemContext, *promise, period,
-                    minimumStackDuration, limit, std::move(result));
+                Private::handleLoadingFinished(
+                    resource->systemContext()->as<core::SystemContext>(), resultPromise, period,
+                    minimumStackDuration, d->maxTracksPerBucket,
+                    nativeDataReadinessWatcher->future().takeResult());
             }
-            promise->finish();
+
+            resultPromise.finish();
+            nativeDataReadinessWatcher->deleteLater();
         });
 
-    if (!api->lookupObjectTracks(filter, /*isLocal*/ false, responseHandler, thread()))
-        return {};
-
-    promise->start();
-    return promise->future();
+    nativeDataReadinessWatcher->setFuture(nativeDataFuture);
+    return resultFuture;
 }
 
 } // namespace timeline

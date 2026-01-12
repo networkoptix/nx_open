@@ -37,7 +37,7 @@ MotionLoaderDelegate::~MotionLoaderDelegate()
 }
 
 QFuture<MultiObjectData> MotionLoaderDelegate::load(
-    const QnTimePeriod& period, milliseconds /*minimumStackDuration*/) const
+    const QnTimePeriod& period, milliseconds /*minimumStackDuration*/)
 {
     if (!d->chunkProvider || period.isEmpty())
         return {};
