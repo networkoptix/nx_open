@@ -198,7 +198,8 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
             || hardLimitReached)
         {
             while (!m_prebuffer.isEmpty() && (!isPrimaryStream(m_prebuffer.front())
-                || m_prebuffer.front()->timestamp < m_nextIFrameTime))
+                || m_prebuffer.front()->timestamp < m_nextIFrameTime
+                || m_prebuffer.size() > kPrebufferHardLimit))
             {
                 QnConstAbstractMediaDataPtr d;
                 m_prebuffer.pop(d);
