@@ -6,57 +6,11 @@ import Nx.Core
 
 NxObject
 {
-    // Input properties:
-
-    property real availableWidth: 0.0
-    property int cellsCount: 0
-    property int columnsCount: 0
-    property real normalCellWidth: 0.0
-    property int enlargedCellsCount: 0
-    property real enlargedCellWidth: 0.0
-    property real spacing: 0.0
-
-    // Constants:
-
-    readonly property int kPaddingOfCellsInTheMiddleOfRow: 0
-
-    // Normal rows:
-
-    readonly property int normalCellsPadding: d.calculatePadding(normalCellWidth, columnsCount)
-
-    // Enlarged top rows:
-
-    readonly property bool singleRowIsEnlarged: enlargedCellsCount < columnsCount
-
-    readonly property int firstEnlargedRowPadding:
-    {
-        if (enlargedCellsCount === 0)
-            return 0 //< To make potential visual errors noticible.
-
-        const firstRowLength = singleRowIsEnlarged
-            ? enlargedCellsCount
-            : Math.floor(enlargedCellsCount / 2)
-
-        return d.calculatePadding(enlargedCellWidth, firstRowLength)
-    }
-
-    readonly property int secondEnlargedRowPadding:
-    {
-        if (enlargedCellsCount === 0 || singleRowIsEnlarged)
-            return 0 //< To make potential visual errors noticible.
-
-        const secondRowLength = Math.ceil(enlargedCellsCount / 2)
-
-        return d.calculatePadding(enlargedCellWidth, secondRowLength)
-    }
-
-    // Repositioned tail rows:
-
     readonly property int repositionedTailCellsCount:
     {
-        if (enlargedCellsCount > 0
-            || columnsCount === 1
-            || cellsCount % columnsCount === 0)
+        if (sizesCalculator.enlargedCellsCount > 0
+            || sizesCalculator.columnsCount === 1
+            || sizesCalculator.cellsCount % sizesCalculator.columnsCount === 0)
         {
             return 0
         }
@@ -64,29 +18,47 @@ NxObject
         return sizesCalculator.getCellsCountToReorder()
     }
 
-    readonly property bool singleRowIsRepositioned:
-        paddingsCalculator.repositionedTailCellsCount < columnsCount
-
-    readonly property int firstRepositionedRowPadding:
+    readonly property int repositionedTailRowsCount:
     {
         if (repositionedTailCellsCount === 0)
-            return 0 //< To make potential visual errors noticible.
-
-        const firstRowLength = singleRowIsRepositioned
-            ? repositionedTailCellsCount
-            : Math.ceil(repositionedTailCellsCount / 2)
-
-        return d.calculatePadding(normalCellWidth, firstRowLength)
+            return 0
+        return repositionedTailCellsCount < sizesCalculator.columnsCount ? 1 : 2
     }
 
-    readonly property int secondRepositionedRowPadding:
+    readonly property int repositionedCellsInFirstRow: repositionedTailRowsCount > 0
+        ? Math.ceil(repositionedTailCellsCount / repositionedTailRowsCount)
+        : 0
+
+    // Methods:
+
+    function calculateRowPaddingForCell(cellIndex)
     {
-        if (repositionedTailCellsCount === 0 || singleRowIsRepositioned)
-            return 0 //< To make potential visual errors noticible.
+        if (sizesCalculator.columnsCount === 1)
+            return d.normalCellsPadding
 
-        const secondRowLength = Math.floor(repositionedTailCellsCount / 2)
+        if (cellIndex < sizesCalculator.enlargedCellsCount)
+        {
+            return cellIndex < sizesCalculator.enlargedCellsCountInFirstRow
+                ? d.firstEnlargedRowPadding
+                : d.secondEnlargedRowPadding
+        }
 
-        return d.calculatePadding(normalCellWidth, secondRowLength)
+        if (cellIndex >= sizesCalculator.cellsCount - repositionedTailCellsCount)
+        {
+            const repositionedCellIndex = toRepositionedCellIndex(cellIndex)
+
+            return repositionedCellIndex < repositionedCellsInFirstRow
+                ? d.firstRepositionedRowPadding
+                : d.secondRepositionedRowPadding
+        }
+
+        return d.normalCellsPadding
+    }
+
+    // Returns negative value if the cell is not repositioned.
+    function toRepositionedCellIndex(cellIndex)
+    {
+        return cellIndex - (sizesCalculator.cellsCount - repositionedTailCellsCount)
     }
 
     QtObject
@@ -95,7 +67,58 @@ NxObject
 
         function calculatePadding(cellWidth, rowLength)
         {
-            return Math.floor((availableWidth + spacing - (cellWidth + spacing) * rowLength) / 2)
+            return Math.floor((sizesCalculator.availableWidth + sizesCalculator.spacing
+            - (cellWidth + sizesCalculator.spacing) * rowLength) / 2)
+        }
+
+        // Normal rows:
+
+        readonly property int normalCellsPadding:
+            d.calculatePadding(sizesCalculator.normalCellWidth, sizesCalculator.columnsCount)
+
+        // Enlarged top rows:
+
+        readonly property int firstEnlargedRowPadding:
+        {
+            if (sizesCalculator.enlargedRowsCount === 0)
+                return 0 //< To make potential visual errors noticeable.
+
+            return d.calculatePadding(
+                sizesCalculator.enlargedCellWidth,
+                sizesCalculator.enlargedCellsCountInFirstRow)
+        }
+
+        readonly property int secondEnlargedRowPadding:
+        {
+            if (sizesCalculator.enlargedCellsCount === 0
+                || sizesCalculator.enlargedRowsCount === 1)
+            {
+                return 0 //< To make potential visual errors noticeable.
+            }
+
+            return d.calculatePadding(
+                sizesCalculator.enlargedCellWidth,
+                sizesCalculator.enlargedCellsCount - sizesCalculator.enlargedCellsCountInFirstRow)
+        }
+
+        // Repositioned tail rows:
+
+        readonly property int firstRepositionedRowPadding:
+        {
+            if (repositionedTailCellsCount === 0)
+                return 0 //< To make potential visual errors noticeable.
+
+            return d.calculatePadding(sizesCalculator.normalCellWidth, repositionedCellsInFirstRow)
+        }
+
+        readonly property int secondRepositionedRowPadding:
+        {
+            if (repositionedTailCellsCount === 0 || repositionedTailRowsCount === 1)
+                return 0 //< To make potential visual errors noticeable.
+
+            return d.calculatePadding(
+                sizesCalculator.normalCellWidth,
+                repositionedTailCellsCount - repositionedCellsInFirstRow)
         }
     }
 }

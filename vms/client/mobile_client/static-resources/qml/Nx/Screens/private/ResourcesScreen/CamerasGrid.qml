@@ -12,23 +12,69 @@ Item
 {
     id: control
 
+    readonly property int kColumnsAnimationDuration: 250
+
     property alias layout: camerasModel.layout
     property alias count: repeater.count
     property bool keepStatuses: false
     property bool active: false
     property alias filterIds: camerasModel.filterIds
-    property alias spacing: flow.spacing
+    property int spacing: 2
 
     property int leftMargin: 0
     property int rightMargin: 0
     property int topMargin: 0
     property int bottomMargin: 0
 
+    property bool animationsEnabled: false
+
     signal openVideoScreen(var resource, var thumbnailUrl, var camerasModel)
 
-    function getMediaPlayer(cameraIndex)
+    // Index of the cell which should be kept in the center of the screen during columns count
+    // change animation.
+    property int centeringIndex: -1
+
+    function findIndexClosestToViewportCenter()
     {
-        const loader = repeater.itemAt(cameraIndex)
+        const viewportCenterY = flickable.contentY + flickable.height / 2
+
+        let closestCellIndex = -1
+        let minimumDistance = Number.MAX_VALUE
+
+        for (let i = 0; i < repeater.count; ++i)
+        {
+            const loader = repeater.itemAt(i)
+            const cellCenterY = loader.y + loader.height / 2
+            const distance = Math.abs(cellCenterY - viewportCenterY)
+
+            if (distance < minimumDistance)
+            {
+                minimumDistance = distance
+                closestCellIndex = i
+            }
+        }
+
+        return closestCellIndex
+    }
+
+    function contentYToCenterIndex(index)
+    {
+        if (index === -1)
+            return flickable.contentY
+
+        const loader = repeater.itemAt(index)
+        if (!CoreUtils.assert(loader, "Invalid item index: " + index))
+            return flickable.contentY
+
+        return (loader.y + loader.height / 2) - flickable.height / 2
+    }
+
+    function getMediaPlayer(index)
+    {
+        const loader = repeater.itemAt(index)
+        if (!CoreUtils.assert(loader, "Invalid item index: " + index))
+            return null
+
         return loader && loader.item ? loader.item.mediaPlayer : null
     }
 
@@ -50,6 +96,8 @@ Item
             loadedTargetColumnsCount !== sizesCalculator.kInvalidColumnsCount
                 ? loadedTargetColumnsCount
                 : sizesCalculator.defaultColumnsCount)
+
+        wheelHandler.updateStartLogicalRotation()
     }
 
     function saveLayoutPosition()
@@ -79,9 +127,13 @@ Item
         id: flickable
 
         anchors.fill: parent
+        anchors.leftMargin: parent.leftMargin
+        anchors.rightMargin: parent.rightMargin
+        anchors.topMargin: parent.topMargin
+        anchors.bottomMargin: parent.bottomMargin
 
         contentWidth: width
-        contentHeight: flow.implicitHeight
+        contentHeight: layoutItem.implicitHeight
 
         clip: true
         boundsBehavior: Flickable.StopAtBounds
@@ -107,13 +159,12 @@ Item
             }
         }
 
-        Flow
+        Item
         {
-            id: flow
+            id: layoutItem
 
             width: parent.width
-
-            spacing: 2
+            implicitHeight: sizesCalculator.totalLayoutHeight
 
             Repeater
             {
@@ -125,6 +176,7 @@ Item
 
                     function updateControlState()
                     {
+                        control.animationsEnabled = false
                         Qt.callLater(
                             function()
                             {
@@ -147,18 +199,70 @@ Item
                     required property string thumbnail
                     required property var resource
 
-                    readonly property int itemWidth: index < sizesCalculator.enlargedCellsCount
-                        ? sizesCalculator.enlargedCellWidth
-                        : sizesCalculator.normalCellWidth
-                    readonly property int itemHeight:
-                        sizesCalculator.calculateCellHeight(itemWidth)
+                    readonly property var geometry: geometryCalculator.calculateCellGeometry(index)
+                    x: geometry.x
+                    y: geometry.y
+                    width: geometry.width
+                    height: geometry.height
+
+                    Behavior on x
+                    {
+                        enabled: control.animationsEnabled
+                        onEnabledChanged: if (!enabled) xAnimation.complete()
+
+                        NumberAnimation
+                        {
+                            id: xAnimation
+                            duration: control.kColumnsAnimationDuration
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+
+                    Behavior on y
+                    {
+                        enabled: control.animationsEnabled
+                        onEnabledChanged: if (!enabled) yAnimation.complete()
+
+                        NumberAnimation
+                        {
+                            id: yAnimation
+                            duration: control.kColumnsAnimationDuration
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+
+                    Behavior on width
+                    {
+                        enabled: control.animationsEnabled
+                        onEnabledChanged: if (!enabled) widthAnimation.complete()
+
+                        NumberAnimation
+                        {
+                            id: widthAnimation
+                            duration: control.kColumnsAnimationDuration
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+
+                    Behavior on height
+                    {
+                        enabled: control.animationsEnabled
+                        onEnabledChanged: if (!enabled) heightAnimation.complete()
+
+                        NumberAnimation
+                        {
+                            id: heightAnimation
+                            duration: control.kColumnsAnimationDuration
+                            easing.type: Easing.OutCubic
+                        }
+                    }
 
                     active:
                     {
-                        const margin = flickable.height
+                        const margin = flickable.height / 2
                         const viewTop = flickable.contentY - margin
                         const viewBottom = flickable.contentY + flickable.height + margin
-                        const center = y + itemHeight / 2
+                        const center = y + height / 2
                         return center >= viewTop && center <= viewBottom
                     }
 
@@ -177,7 +281,7 @@ Item
                         const visibleAreaBottom = flickable.contentY + flickable.height
 
                         const itemIsVisible =
-                            loader.y + loader.itemHeight > visibleAreaTop
+                            loader.y + loader.height > visibleAreaTop
                                 && loader.y < visibleAreaBottom
 
                         item.setPlayerActive(itemIsVisible)
@@ -185,9 +289,6 @@ Item
 
                     sourceComponent: Item
                     {
-                        width: cameraItem.x + cameraItem.width
-                        height: cameraItem.height
-
                         function setPlayerActive(active)
                         {
                             cameraItem.setPlayerActive(active)
@@ -197,53 +298,7 @@ Item
                         {
                             id: cameraItem
 
-                            x: {
-                                if (sizesCalculator.columnsCount === 1)
-                                    return paddingsCalculator.normalCellsPadding
-
-                                // Enlarged top rows.
-                                if (rowIndexChecker.isEnlargedCell(index))
-                                {
-                                    if (rowIndexChecker.isFirstEnlargedRowBeginning(index))
-                                        return paddingsCalculator.firstEnlargedRowPadding
-
-                                    if (!paddingsCalculator.singleRowIsEnlarged
-                                        && rowIndexChecker.isSecondEnlargedRowBeginning(index))
-                                    {
-                                        return paddingsCalculator.secondEnlargedRowPadding
-                                    }
-
-                                    return paddingsCalculator.kPaddingOfCellsInTheMiddleOfRow
-                                }
-
-                                // Repositioned tail cells.
-                                if (rowIndexChecker.isRepositionedTailCell(index))
-                                {
-                                    if (rowIndexChecker.isFirstRepositionedTailRowBeginning(index))
-                                        return paddingsCalculator.firstRepositionedRowPadding
-
-                                    if (!paddingsCalculator.singleRowIsRepositioned
-                                        && rowIndexChecker.isSecondRepositionedTailRowBeginning(index))
-                                    {
-                                        return paddingsCalculator.secondRepositionedRowPadding
-                                    }
-
-                                    return paddingsCalculator.kPaddingOfCellsInTheMiddleOfRow
-                                }
-
-                                // Normal cells.
-                                const indexInNormalCells =
-                                    index - sizesCalculator.enlargedCellsCount
-                                const isAtTheBeginningOfRow =
-                                    indexInNormalCells % sizesCalculator.columnsCount === 0
-
-                                return isAtTheBeginningOfRow
-                                    ? paddingsCalculator.normalCellsPadding
-                                    : paddingsCalculator.kPaddingOfCellsInTheMiddleOfRow
-                            }
-
-                            width: itemWidth
-                            height: itemHeight
+                            anchors.fill: parent
 
                             aspectRatio: sizesCalculator.kAspectRatio
 
@@ -289,39 +344,51 @@ Item
 
         WheelHandler
         {
-            acceptedDevices: PointerDevice.Mouse
+            id: wheelHandler
+
             property real logicalRotation: 0
+            readonly property real kDefaultRotationStep: 120
+
+            acceptedDevices: PointerDevice.Mouse
 
             onWheel: (event) =>
             {
-                if (transitionOverlay.layoutTransitionRunning)
-                    return
+                const minModifier = 1
+                const kMaxModifier = sizesCalculator.defaultColumnsCount
 
-                logicalRotation += event.angleDelta.y
+                // Limit logicalRotation to prevent unbounded accumulation
+                const maxLogicalRotation = kMaxModifier * kDefaultRotationStep
+                const minLogicalRotation = minModifier * kDefaultRotationStep
 
-                const kDefaultRotationStep = 120
-                let newColumnsCountUserModifier =
+                logicalRotation = MathUtils.bound(
+                    minLogicalRotation,
+                    logicalRotation + event.angleDelta.y,
+                    maxLogicalRotation)
+
+                const newColumnsCountUserModifier =
                     Math.floor(logicalRotation / kDefaultRotationStep)
 
-                const minModifier = 1 - sizesCalculator.defaultColumnsCount
-                const kMaxModifier = 0
+                if (newColumnsCountUserModifier === sizesCalculator.getUserDefinedColumnsCount())
+                    return
 
-                newColumnsCountUserModifier =
-                    MathUtils.bound(minModifier, newColumnsCountUserModifier, kMaxModifier)
+                const anchorIndex = control.findIndexClosestToViewportCenter()
+                if (anchorIndex >= 0)
+                {
+                    control.centeringIndex = anchorIndex
+                    centeringTimer.restart()
+                }
 
-                logicalRotation = newColumnsCountUserModifier * kDefaultRotationStep
-                transitionOverlay.animateWheelLayoutChange(newColumnsCountUserModifier)
+                control.animationsEnabled = true
+                sizesCalculator.setUserDefinedColumnsCount(newColumnsCountUserModifier)
+                control.saveTargetColumnsCount()
+            }
+
+            function updateStartLogicalRotation()
+            {
+                const currentUserModifier = sizesCalculator.getUserDefinedColumnsCount()
+                logicalRotation = currentUserModifier * kDefaultRotationStep
             }
         }
-    }
-
-    TransitionOverlay
-    {
-        id: transitionOverlay
-
-        anchors.fill: parent
-
-        onUserDefinedColumnsCountChanged: control.saveTargetColumnsCount()
     }
 
     Rectangle
@@ -334,7 +401,9 @@ Item
         readonly property real animationFactor:
             MathUtils.bound(0, flickable.contentY / kAnimationZoneHeight, 1)
 
-        width: parent.width
+        x: flickable.x
+        y: flickable.y
+        width: flickable.width
         height: 32
 
         visible: opacity > 0
@@ -355,11 +424,12 @@ Item
                 / topShadow.kAnimationZoneHeight,
             1)
 
+        x: flickable.x
         // +1 is added, because for an unknown reason, 1px gap appears otherwise,
         // for some window size.
-        y: flickable.height - height + 1
+        y: flickable.y + flickable.height - height + 1
 
-        width: parent.width
+        width: flickable.width
         height: topShadow.height
 
         visible: opacity > 0
@@ -374,16 +444,39 @@ Item
 
     PinchHandler
     {
+        id: pinchHandler
+
         target: null
         acceptedDevices: PointerDevice.TouchScreen
         grabPermissions: PointerHandler.CanTakeOverFromAnything
         minimumPointCount: 2
         maximumPointCount: 2
 
+        // Gesture reference point.
+        property int baseColumnsCount: 0
+        property real baseScale: 1.0
+
+        // The cell closest to the viewport center at pinch start.
+        property int anchorIndex: -1
+
+        property bool hasGrab: false
+
         onActiveChanged:
         {
-            if (!active)
-                transitionOverlay.finalizePinchWithAnimation()
+            if (active)
+            {
+                flickable.cancelFlick()
+                baseColumnsCount = sizesCalculator.getUserDefinedColumnsCount()
+                baseScale = activeScale
+                anchorIndex = control.findIndexClosestToViewportCenter()
+                return
+            }
+
+            // Keep centering for the last layout animation.
+            if (control.centeringIndex >= 0)
+                centeringTimer.restart()
+
+            control.saveTargetColumnsCount()
         }
 
         onActiveScaleChanged:
@@ -391,15 +484,71 @@ Item
             if (!active)
                 return
 
-            transitionOverlay.animatePinchLayoutChange(activeScale)
+            if (baseScale <= 0.0)
+                baseScale = 1.0
+
+            const relativeScale = activeScale / baseScale
+
+            let targetColumnsCount = Math.round(baseColumnsCount / relativeScale)
+            targetColumnsCount = MathUtils.bound(
+                1,
+                targetColumnsCount,
+                sizesCalculator.defaultColumnsCount)
+
+            if (targetColumnsCount === sizesCalculator.getUserDefinedColumnsCount())
+                return
+
+            if (anchorIndex < 0)
+                anchorIndex = control.findIndexClosestToViewportCenter()
+
+            control.centeringIndex = anchorIndex
+
+            control.animationsEnabled = true
+            sizesCalculator.setUserDefinedColumnsCount(targetColumnsCount)
+
+            baseColumnsCount = sizesCalculator.getUserDefinedColumnsCount()
+            baseScale = activeScale
         }
 
         onGrabChanged: (transition) =>
         {
-            flickable.interactive =
-                transition !== PointerDevice.GrabExclusive
-                    && transition !== PointerDevice.GrabPassive
+            hasGrab = transition === PointerDevice.GrabExclusive
+                || transition === PointerDevice.GrabPassive
+
+            flickable.interactive = !hasGrab && !centeringTimer.running
         }
+    }
+
+    Timer
+    {
+        id: centeringTimer
+
+        interval: control.kColumnsAnimationDuration
+        repeat: false
+
+        onTriggered:
+        {
+            control.animationsEnabled = false
+
+            if (pinchHandler.active || control.centeringIndex < 0)
+                return
+
+            const oldCenteringIndex = control.centeringIndex
+            control.centeringIndex = -1
+            flickable.contentY = control.contentYToCenterIndex(oldCenteringIndex)
+
+            if (!pinchHandler.hasGrab)
+                flickable.interactive = true
+        }
+    }
+
+    Binding
+    {
+        target: flickable
+        property: "contentY"
+        restoreMode: Binding.RestoreNone
+        when: control.centeringIndex >= 0 && (pinchHandler.active || centeringTimer.running)
+        value: control.contentYToCenterIndex(control.centeringIndex)
     }
 
     SizesCalculator
@@ -407,29 +556,13 @@ Item
         id: sizesCalculator
 
         cellsCount: repeater.count
-        availableWidth: control.width - control.leftMargin - control.rightMargin
-        availableHeight: control.height - control.topMargin - control.bottomMargin
-        spacing: flow.spacing
+        availableWidth: flickable.width
+        availableHeight: flickable.height
+        spacing: control.spacing
     }
 
-    PaddingsCalculator
+    GeometryCalculator
     {
-        id: paddingsCalculator
-
-        availableWidth: sizesCalculator.availableWidth
-        cellsCount: repeater.count
-        columnsCount: sizesCalculator.columnsCount
-        normalCellWidth: sizesCalculator.normalCellWidth
-        enlargedCellsCount: sizesCalculator.enlargedCellsCount
-        enlargedCellWidth: sizesCalculator.enlargedCellWidth
-        spacing: sizesCalculator.spacing
-    }
-
-    RowIndexChecker
-    {
-        id: rowIndexChecker
-
-        cellsCount: repeater.count
-        enlargedCellsCount: sizesCalculator.enlargedCellsCount
+        id: geometryCalculator
     }
 }
