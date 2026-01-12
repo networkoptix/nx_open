@@ -10,7 +10,7 @@ namespace nx::analytics::taxonomy {
 class Group: public AbstractGroup
 {
 public:
-    Group(nx::vms::api::analytics::GroupDescriptor groupDescriptor, QObject* parent = nullptr);
+    Group(nx::vms::api::analytics::GroupDescriptor groupDescriptor, QObject* parent);
 
     virtual QString id() const override;
 

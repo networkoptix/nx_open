@@ -12,7 +12,7 @@ class Integration: public AbstractIntegration
 public:
     Integration(
         nx::vms::api::analytics::PluginDescriptor pluginDescriptor,
-        QObject* parent = nullptr);
+        QObject* parent);
 
     virtual QString id() const override;
 

@@ -15,7 +15,7 @@ class EnumType: public AbstractEnumType
 public:
     EnumType(
         nx::vms::api::analytics::EnumTypeDescriptor enumTypeDescriptor,
-        QObject* parent = nullptr);
+        QObject* parent);
 
     virtual QString id() const override;
 

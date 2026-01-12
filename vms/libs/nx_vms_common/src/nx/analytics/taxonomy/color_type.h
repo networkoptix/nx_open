@@ -16,7 +16,7 @@ class ColorType: public AbstractColorType
 public:
     ColorType(
         nx::vms::api::analytics::ColorTypeDescriptor colorTypeDescriptor,
-        QObject* parent = nullptr);
+        QObject* parent);
 
     virtual QString id() const override;
 
