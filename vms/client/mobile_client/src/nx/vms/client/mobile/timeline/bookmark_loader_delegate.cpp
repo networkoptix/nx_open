@@ -74,7 +74,7 @@ struct BookmarkLoaderDelegate::Private
             promise.emplaceResult(MultiObjectData{
                 .caption = bookmarkTitle(bookmark),
                 .description = bookmark.description,
-                .iconPaths = {"image://skin/20x20/Solid/bookmark.svg"},
+                .iconPaths = {"image://skin/20x20/Outline/bookmark.svg"},
                 .imagePaths = {makeImageRequest(cameraId, bookmark.startTimeMs.count(),
                     kLowImageResolution)},
                 .positionMs = bookmark.startTimeMs.count(),
@@ -123,7 +123,7 @@ struct BookmarkLoaderDelegate::Private
 
             promise.emplaceResult(MultiObjectData{
                 .caption = title,
-                .iconPaths = {"image://skin/20x20/Solid/bookmark.svg"},
+                .iconPaths = {"image://skin/20x20/Outline/bookmark.svg"},
                 .imagePaths = imagePaths,
                 .positionMs = firstPosition.count(),
                 .durationMs = duration.count(),
