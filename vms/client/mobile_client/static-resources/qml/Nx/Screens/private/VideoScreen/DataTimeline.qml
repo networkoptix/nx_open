@@ -373,8 +373,7 @@ Rectangle
                 }
                 else
                 {
-                    // Object tapped. Set playback position.
-                    timeline.setPosition(modelData.positionMs)
+                    // Single object or a tight stack tapped.
                     timeline.objectTileTapped(modelData)
                 }
             }
