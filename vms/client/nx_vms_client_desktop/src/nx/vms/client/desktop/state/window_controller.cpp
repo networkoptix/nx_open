@@ -29,6 +29,16 @@ void WindowController::setWindowRect(const QRect& rect)
     m_window->setGeometry(rect);
 }
 
+QSize WindowController::minimumSize() const
+{
+    return m_window->minimumSize();
+}
+
+void WindowController::setMinimumSize(const QSize& size)
+{
+    m_window->setMinimumSize(size);
+}
+
 Qt::WindowStates WindowController::windowState() const
 {
     return m_window->windowState();
