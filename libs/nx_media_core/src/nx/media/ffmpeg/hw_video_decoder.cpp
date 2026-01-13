@@ -349,7 +349,7 @@ bool HwVideoDecoder::decode(
     if (!sendPacket(data))
         return false;
 
-    if (!receiveFrame(outFrame))
+    if (!receiveFrame(outFrame) || (outFrame && (*outFrame)->format == -1))
         return false;
 
     return true;
