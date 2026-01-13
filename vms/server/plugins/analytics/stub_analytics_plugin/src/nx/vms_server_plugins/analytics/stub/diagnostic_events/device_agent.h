@@ -51,6 +51,7 @@ private:
     std::unique_ptr<std::thread> m_eventThread;
     std::mutex m_eventThreadMutex;
     std::condition_variable m_eventThreadCondition;
+    std::atomic<bool> m_stopping{false};
     std::atomic<bool> m_terminated{false};
 
     struct DeviceAgentSettings

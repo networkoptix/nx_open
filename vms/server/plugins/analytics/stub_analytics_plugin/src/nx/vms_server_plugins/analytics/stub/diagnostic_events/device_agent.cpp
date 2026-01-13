@@ -61,6 +61,9 @@ std::string DeviceAgent::manifestString() const
 
 Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
 {
+    if (m_stopping)
+        return nullptr;
+
     m_deviceAgentSettings.generateEvents =
         toBool(settingValue(kGenerateIntegrationDiagnosticEventsFromDeviceAgentSetting));
 
@@ -122,6 +125,9 @@ void DeviceAgent::startEventThread()
 
 void DeviceAgent::stopEventThread()
 {
+    if (m_stopping.exchange(true))
+        return;
+
     {
         std::unique_lock<std::mutex> lock(m_eventThreadMutex);
         m_terminated = true;
