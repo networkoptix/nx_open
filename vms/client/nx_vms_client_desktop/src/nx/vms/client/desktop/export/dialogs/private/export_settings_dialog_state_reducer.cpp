@@ -101,7 +101,7 @@ int calculateMaximumFontSize(TimestampFormat format, const QFont& font, int maxW
     return --pixelFontSize;
 }
 
-static nx::core::transcoding::ObjectExportSettings buildExportSettings(
+nx::core::transcoding::ObjectExportSettings buildExportSettings(
     const nx::vms::api::ObjectTypeSettings& typeSettings,
     bool showAttributes)
 {
@@ -114,6 +114,13 @@ static nx::core::transcoding::ObjectExportSettings buildExportSettings(
         .textColor = nx::vms::client::core::colorTheme()->color("light1"),
         .frameColors =
             nx::vms::client::core::appContext()->coreSettings()->detectedObjectSettings()};
+}
+
+nx::core::transcoding::MotionExportSettings buildMotionSettings()
+{
+    return {
+        .foreground = nx::vms::client::core::colorTheme()->color("camera.motionGrid.foreground"),
+        .background = nx::vms::client::core::colorTheme()->color("camera.motionGrid.background")};
 }
 
 } // namespace
@@ -288,22 +295,28 @@ State ExportSettingsDialogStateReducer::setExportMetadataSettings(
         state.exportMediaSettings.transcodingSettings.objectExportSettings =
             buildExportSettings(objectTypeSettings, showAttributes);
     }
+    if (motions)
+        state.exportMediaSettings.transcodingSettings.motionExportSettings = buildMotionSettings();
+    else
+        state.exportMediaSettings.transcodingSettings.motionExportSettings.reset();
     return state;
 }
 
 State ExportSettingsDialogStateReducer::selectMetadata(State state, bool select)
 {
-    // TODO: @pprivalov VMS-60399 add motion as well
     auto& metadataSettings = state.exportMediaPersistentSettings.metadataSettings;
     metadataSettings.exportObjects = select;
+    metadataSettings.exportMotion = select;
     if (!select)
     {
         state.exportMediaSettings.transcodingSettings.objectExportSettings.reset();
+        state.exportMediaSettings.transcodingSettings.motionExportSettings.reset();
     }
     else
     {
         state.exportMediaSettings.transcodingSettings.objectExportSettings =
             buildExportSettings(metadataSettings.typeSettings, metadataSettings.showAttributes);
+        state.exportMediaSettings.transcodingSettings.motionExportSettings = buildMotionSettings();
     }
 
     return state;
@@ -555,6 +568,7 @@ State ExportSettingsDialogStateReducer::setMediaFilename(State state, const File
     bool needTranscoding = state.exportMediaSettings.transcodingSettings.watermark.visible()
         || state.exportMediaPersistentSettings.applyFilters
         || state.exportMediaPersistentSettings.areFiltersForced()
+        || state.exportMediaSettings.transcodingSettings.motionExportSettings.has_value()
         || (objectExportSettings && !objectExportSettings.value().typeSettings.empty());
 
     state.exportMediaPersistentSettings.setTranscoding(needTranscoding);

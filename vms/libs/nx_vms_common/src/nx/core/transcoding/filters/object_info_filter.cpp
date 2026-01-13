@@ -13,6 +13,7 @@
 #include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/utils/geometry.h>
 #include <nx/vms/common/utils/object_painter_helper.h>
 #include <transcoding/transcoding_utils.h>
 
@@ -43,7 +44,9 @@ qreal getTopPosition(const QRectF& tooltipRect, const QRectF& objectRect)
             objectRect.top() - kArrowHalfSize,
             objectRect.top(),
             objectRect.bottom() - kArrowHalfSize),
-        tooltipRect.bottom() - kArrowMargin - kArrowSize.width());
+        qMax(
+            tooltipRect.bottom() - kArrowMargin - kArrowSize.width(),
+            tooltipRect.top() + kArrowMargin));
 }
 
 qreal getLeftPosition(const QRectF& tooltipRect, const QRectF& objectRect)
@@ -54,7 +57,9 @@ qreal getLeftPosition(const QRectF& tooltipRect, const QRectF& objectRect)
             objectRect.left() - kArrowHalfSize,
             objectRect.left(),
             objectRect.right() - kArrowHalfSize),
-        tooltipRect.right() - kArrowMargin - kArrowSize.width());
+        qMax(
+            tooltipRect.right() - kArrowMargin - kArrowSize.width(),
+            tooltipRect.left() + kArrowMargin));
 }
 
 void paintArrow(QPainter* painter, const QRectF& tooltipGeometry, const QRectF& frameRect)
@@ -269,8 +274,19 @@ void ObjectInfoFilter::drawDescription(
 
 CLVideoDecoderOutputPtr ObjectInfoFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
+    QImage image = frame->toImage();
+    updateImage(image);
+
+    CLVideoDecoderOutputPtr resFrame(new CLVideoDecoderOutput(
+        image, SWS_CS_ITU601));
+    resFrame->assignMiscData(frame.get());
+    return resFrame;
+}
+
+void ObjectInfoFilter::updateImage(QImage& image)
+{
     if (m_metadata.empty() || m_settings.typeSettings.empty())
-        return frame;
+        return;
 
     std::set<Uuid> oldFramesObjectsSet;
     std::transform(
@@ -282,15 +298,14 @@ CLVideoDecoderOutputPtr ObjectInfoFilter::updateImage(const CLVideoDecoderOutput
             return pair.first;
         });
 
-    const int width = frame->width;
-    const int height = frame->height;
+    const int width = image.width();
+    const int height = image.height();
     const int lineWidth = std::max(std::min(width, height) / kAreaLineDivider, kAreaLineMinWidth);
 
-    auto resImage = frame->toImage();
-    QPainter painter(&resImage);
-    for (const auto& metadata: m_metadata)
+    QPainter painter(&image);
+    for (auto iter = m_metadata.rbegin(); iter != m_metadata.rend(); ++iter)
     {
-        const auto objectDataPacket = objectDataPacketFromMetadata(metadata);
+        const auto objectDataPacket = objectDataPacketFromMetadata(*iter);
         if (!objectDataPacket)
             continue;
 
@@ -318,14 +333,12 @@ CLVideoDecoderOutputPtr ObjectInfoFilter::updateImage(const CLVideoDecoderOutput
             if (m_settings.showAttributes)
                 drawDescription(box, frameColor, painter, objectMetadata, width, height);
         }
+
+        break;
     }
 
-    CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput(resImage));
-    result->assignMiscData(frame.get());
     for (const auto id: oldFramesObjectsSet)
         m_descriptions.erase(id);
-
-    return result;
 }
 
 } // namespace nx::core::transcoding

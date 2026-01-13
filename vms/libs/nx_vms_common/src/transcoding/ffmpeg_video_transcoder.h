@@ -65,7 +65,7 @@ public:
     //!Returns picture size (in pixels) of output video stream
     QSize getOutputResolution() const;
 
-    // Process metadata, required for the pixelation filter.
+    // Process metadata, required for the pixelation filter, object info filter and motion filter.
     void processMetadata(const QnConstAbstractCompressedMetadataPtr& metadata);
 
 private:
@@ -96,7 +96,10 @@ private:
     nx::metric::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;
     std::optional<int64_t> m_lastEncodedPts;
-    nx::analytics::CachingMetadataConsumer<QnConstAbstractCompressedMetadataPtr> m_metadataCache;
+    nx::analytics::CachingMetadataConsumer<QnConstAbstractCompressedMetadataPtr>
+        m_metadataObjectsCache;
+    nx::analytics::CachingMetadataConsumer<QnConstAbstractCompressedMetadataPtr>
+        m_metadataMotionCache;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

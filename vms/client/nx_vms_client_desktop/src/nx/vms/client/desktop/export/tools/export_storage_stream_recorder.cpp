@@ -386,6 +386,11 @@ bool ExportStorageStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md
         if (metadata->metadataType == MetadataType::ObjectDetection && m_videoTranscoder)
             m_videoTranscoder->processMetadata(metadata);
     }
+    else if (auto metadata = std::dynamic_pointer_cast<const QnMetaDataV1>(md))
+    {
+        if (metadata->metadataType == MetadataType::Motion && m_videoTranscoder)
+            m_videoTranscoder->processMetadata(metadata);
+    }
 
     return QnStreamRecorder::saveData(md);
 }

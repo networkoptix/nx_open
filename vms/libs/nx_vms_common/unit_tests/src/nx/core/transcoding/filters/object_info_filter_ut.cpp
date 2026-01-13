@@ -98,7 +98,7 @@ protected:
         painter.drawRect(24, 18, 24, 18);
         ASSERT_EQ(image.size(), resImage.size());
         ASSERT_EQ(image.format(), resImage.format());
-        ASSERT_EQ(CLVideoDecoderOutput(image).toImage(), resImage);
+        ASSERT_EQ(image, resImage);
     }
 
     std::shared_ptr<nx::analytics::taxonomy::AbstractState> m_taxonomyState =
@@ -116,9 +116,10 @@ TEST_F(ObjectInfoFilterTest, noMetadata)
 {
     ObjectInfoFilter filter(makeSettings(true));
     filter.setMetadata({});
-    CLVideoDecoderOutputPtr frame(new CLVideoDecoderOutput(prepareImage()));
-    auto resFrame = filter.updateImage(frame);
-    ASSERT_EQ(frame->toImage(), resFrame->toImage());
+    auto image = prepareImage();
+    auto referenceImage = prepareImage();
+    filter.updateImage(image);
+    ASSERT_EQ(referenceImage, image);
 }
 
 TEST_F(ObjectInfoFilterTest, IncorrectMetadata)
@@ -146,9 +147,10 @@ TEST_F(ObjectInfoFilterTest, TypeMismatch)
     auto metadata = generateMetadataList(packet);
     filter.setMetadata(metadata);
 
-    CLVideoDecoderOutputPtr frame(new CLVideoDecoderOutput(prepareImage()));
-    auto resFrame = filter.updateImage(frame);
-    ASSERT_EQ(frame->toImage(), resFrame->toImage());
+    auto image = prepareImage();
+    auto referenceImage = prepareImage();
+    filter.updateImage(image);
+    ASSERT_EQ(referenceImage, image);
 }
 
 TEST_F(ObjectInfoFilterTest, TypeMatch)
@@ -161,10 +163,10 @@ TEST_F(ObjectInfoFilterTest, TypeMatch)
     filter.setMetadata(metadata);
 
     auto image = prepareImage();
-    CLVideoDecoderOutputPtr frame(new CLVideoDecoderOutput(image));
-    auto resImage = filter.updateImage(frame)->toImage();
-    ASSERT_NE(frame->toImage(), resImage);
-    compareImages(image, resImage);
+    auto referenceImage = prepareImage();
+    filter.updateImage(image);
+    ASSERT_NE(image, referenceImage);
+    compareImages(referenceImage, image);
 }
 
 TEST_F(ObjectInfoFilterTest, AllTypes)
@@ -177,11 +179,11 @@ TEST_F(ObjectInfoFilterTest, AllTypes)
     filter.setMetadata(metadata);
 
     auto image = prepareImage();
-    CLVideoDecoderOutputPtr frame(new CLVideoDecoderOutput(image));
-    auto resImage = filter.updateImage(frame)->toImage();
+    auto referenceImage = prepareImage();
+    filter.updateImage(image);
 
-    ASSERT_NE(image, resImage);
-    compareImages(image, resImage);
+    ASSERT_NE(referenceImage, image);
+    compareImages(referenceImage, image);
 }
 
 TEST_F(ObjectInfoFilterTest, ColorSpecified)
@@ -194,9 +196,9 @@ TEST_F(ObjectInfoFilterTest, ColorSpecified)
     filter.setMetadata(metadata);
 
     auto image = prepareImage();
-    CLVideoDecoderOutputPtr frame(new CLVideoDecoderOutput(image));
-    auto resImage = filter.updateImage(frame)->toImage();
+    auto referenceImage = prepareImage();
+    filter.updateImage(image);
 
-    ASSERT_NE(image, resImage);
-    compareImages(image, resImage, QColor(0xffff00));
+    ASSERT_NE(referenceImage, image);
+    compareImages(referenceImage, image, QColor(0xffff00));
 }

@@ -2,9 +2,11 @@
 
 #pragma once
 
+#include <QtCore/QPointF>
+#include <QtCore/QRectF>
 #include <QtGui/QPainter>
 
-#include <nx/vms/common/utils/geometry.h>
+#include <nx/media/meta_data_packet.h>
 
 namespace nx::vms::common {
 
@@ -31,6 +33,9 @@ struct NX_VMS_COMMON_API ObjectPainterHelper
         QRectF objectRect);
 
     static QColor calculateTooltipColor(const QColor& frameColor);
+    static QVector<QVector<QPointF>> calculateMotionGrid(
+        const QRectF& rect,
+        const QnConstMetaDataV1Ptr& motion);
 };
 
 } // namespace nx::vms::common

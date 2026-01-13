@@ -32,9 +32,11 @@ ExportMetadataSettingsWidget::ExportMetadataSettingsWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    // TODO: @pprivalov enable motion checkbox under VMS-60399
-    ui->motionCheckBox->setChecked(false);
-    ui->motionCheckBox->setEnabled(false);
+    connect(
+        ui->motionCheckBox,
+        &QCheckBox::clicked,
+        this,
+        &ExportMetadataSettingsWidget::emitDataEdited);
     connect(
         ui->objectsCheckBox,
         &QCheckBox::clicked,

@@ -3,13 +3,13 @@
 #include "filter_chain.h"
 
 #include <core/resource/media_resource.h>
+#include <nx/core/transcoding/filters/motion_filter.h>
 #include <nx/core/transcoding/filters/object_info_filter.h>
 #include <nx/core/transcoding/filters/paint_image_filter.h>
 #include <nx/core/transcoding/filters/pixelation_image_filter.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/core/transcoding/filters/watermark_filter.h>
 #include <nx/utils/log/assert.h>
-#include <nx/vms/api/data/pixelation_settings.h>
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/crop_image_filter.h>
 #include <transcoding/filters/dewarping_image_filter.h>
@@ -47,6 +47,8 @@ void FilterChain::prepare(const QSize& srcFrameResolution, const QSize& resoluti
 
     createPixelationImageFilter();
     createObjectInfoFilter();
+    createMotionFilter();
+
     prepareZoomWindowFilter();
     prepareDewarpingFilter();
     prepareImageEnhancementFilter();
@@ -75,6 +77,8 @@ void FilterChain::prepareForImage(const QSize& fullImageResolution)
 
     createPixelationImageFilter();
     createObjectInfoFilter();
+    createMotionFilter();
+
     prepareImageArFilter(fullImageResolution);
     prepareZoomWindowFilter();
     prepareDewarpingFilter();
@@ -114,23 +118,34 @@ bool FilterChain::isReady() const
 void FilterChain::reset()
 {
     m_filters.clear();
+    m_metadataFilters.clear();
     m_ready = false;
 }
 
-void FilterChain::setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata)
+void FilterChain::setMetadata(
+    const std::list<QnConstAbstractCompressedMetadataPtr>& objectsData,
+    const std::list<QnConstAbstractCompressedMetadataPtr>& motionData)
 {
     for (auto filter: m_filters)
     {
         if (auto pixelationFilter = filter.dynamicCast<PixelationImageFilter>())
-            pixelationFilter->setMetadata(metadata);
+            pixelationFilter->setMetadata(objectsData);
+    }
+    for (auto filter: m_metadataFilters)
+    {
         if (auto objectInfoFilter = filter.dynamicCast<ObjectInfoFilter>())
-            objectInfoFilter->setMetadata(metadata);
+            objectInfoFilter->setMetadata(objectsData);
+
+        if (auto motionFilter = filter.dynamicCast<MotionFilter>())
+            motionFilter->setMetadata(motionData);
     }
 }
 
 QSize FilterChain::apply(const QSize& resolution) const
 {
     auto result = resolution;
+    for (auto filter: m_metadataFilters)
+        result = filter->updatedResolution(result);
     for (auto filter: m_filters)
         result = filter->updatedResolution(result);
     return result;
@@ -138,13 +153,30 @@ QSize FilterChain::apply(const QSize& resolution) const
 
 CLVideoDecoderOutputPtr FilterChain::apply(const CLVideoDecoderOutputPtr& source) const
 {
-    if (m_filters.empty() || !source)
+    if ((m_filters.empty() && m_metadataFilters.empty()) || !source)
         return source;
 
-    // Make a deep copy of the source frame since modifying a frame received from a decoder can
-    // affect further decoding process.
-    CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput());
-    result->copyFrom(source.get());
+    CLVideoDecoderOutputPtr result;
+    if (!m_metadataFilters.empty())
+    {
+        auto image = source->toImage();
+        for (auto filter: m_metadataFilters)
+            filter->updateImage(image);
+
+        // Force color scheme to translate colors used to draw metadata precisely.
+        // Otherwise, them are changed into blurred and unclear colors with incorrect opacity
+        // level.
+        result = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput(
+            image, SWS_CS_ITU601));
+        result->assignMiscData(source.get());
+    }
+    else
+    {
+        // Make a deep copy of the source frame since modifying a frame received from a decoder can
+        // affect further decoding process.
+        result = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
+        result->copyFrom(source.get());
+    }
 
     for (auto filter: m_filters)
         result = filter->updateImage(result);
@@ -286,14 +318,20 @@ void FilterChain::createPixelationImageFilter()
     }
 }
 
+void FilterChain::createMotionFilter()
+{
+    const auto& motionSettings = m_settings.motionExportSettings;
+    if (motionSettings)
+        m_metadataFilters.push_back(AbstractMetadataFilterPtr(new MotionFilter(*motionSettings)));
+}
+
 void FilterChain::createObjectInfoFilter()
 {
-    // TODO: @pprivalov VMS-60399 group filters that transform the frame to QImage
     const auto& oESettings = m_settings.objectExportSettings;
     if (!oESettings || !oESettings->taxonomyState || oESettings->typeSettings.empty())
         return;
 
-    m_filters.push_back(QnAbstractImageFilterPtr(new ObjectInfoFilter(*oESettings)));
+    m_metadataFilters.push_back(AbstractMetadataFilterPtr(new ObjectInfoFilter(*oESettings)));
 }
 
 void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,

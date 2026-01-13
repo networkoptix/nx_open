@@ -4,25 +4,26 @@
 
 #include <analytics/common/object_metadata.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
-#include <transcoding/filters/abstract_image_filter.h>
 
+#include "abstract_metadata_filter.h"
 #include "transcoding_settings.h"
 
 class QTextDocument;
 namespace nx::core::transcoding {
 namespace detail { class ImageToFramePainter; } // namespace detail
 
-class NX_VMS_COMMON_API ObjectInfoFilter: public QnAbstractImageFilter
+class NX_VMS_COMMON_API ObjectInfoFilter: public AbstractMetadataFilter
 {
 public:
     ObjectInfoFilter(const ObjectExportSettings& settings);
     virtual ~ObjectInfoFilter() override;
 
     CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
+    void updateImage(QImage& image) override;
 
     QSize updatedResolution(const QSize& sourceSize) override;
 
-    void setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata);
+    void setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata) override;
 
 private:
     QColor getFrameColor(const common::metadata::ObjectMetadata& objectMetadata) const;

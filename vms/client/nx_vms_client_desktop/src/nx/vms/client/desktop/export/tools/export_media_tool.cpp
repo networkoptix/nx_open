@@ -211,6 +211,7 @@ private:
                 ? PlaybackMode::exportWithTranscoding
                 : PlaybackMode::export_);
             if (settings.transcodingSettings.objectExportSettings.has_value()
+                || settings.transcodingSettings.motionExportSettings.has_value()
                 || (settings.transcodingSettings.pixelationSettings.has_value()
                     && settings.transcodingSettings.pixelationSettings.value()
                             .isPixelationRequiredForCamera(camera->getId())))

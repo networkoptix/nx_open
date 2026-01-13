@@ -100,13 +100,20 @@ static bool convertImageFormat(
     uint8_t* const targetSlice[],
     const int targetStride[],
     AVPixelFormat targetFormat,
-    const nx::log::Tag& logTag)
+    const nx::log::Tag& logTag,
+    std::optional<int> colorSpace = std::nullopt)
 {
     if (const auto context = sws_getContext(
         width, height, sourceFormat,
         width, height, targetFormat,
         SWS_BILINEAR, /*srcFilter*/ nullptr, /*dstFilter*/ nullptr, /*param*/nullptr))
     {
+        if (colorSpace.has_value())
+        {
+            const int* matrix = sws_getCoefficients(colorSpace.value());
+            constexpr int range = 1;
+            sws_setColorspaceDetails(context, matrix, range, matrix, range, 0, 1 << 16, 1 << 16);
+        }
         sws_scale(context, sourceSlice, sourceStride, 0, height, targetSlice, targetStride);
         sws_freeContext(context);
         return true;
@@ -333,7 +340,7 @@ bool CLVideoDecoderOutput::isPixelFormatSupported(AVPixelFormat format)
     return format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV444P;
 }
 
-CLVideoDecoderOutput::CLVideoDecoderOutput(const QImage& srcImage):
+CLVideoDecoderOutput::CLVideoDecoderOutput(const QImage& srcImage, std::optional<int> colorSpace):
     AVFrame()
 {
     const auto imageFormat = srcImage.format();
@@ -353,7 +360,7 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(const QImage& srcImage):
     // Ignore the potential error (already logged) - no clear way to handle it here.
     convertImageFormat(width, height,
         srcData, srcLinesize, AV_PIX_FMT_BGRA,
-        data, linesize, AV_PIX_FMT_YUV420P, /*logTag*/ this);
+        data, linesize, AV_PIX_FMT_YUV420P, /*logTag*/ this, colorSpace);
 }
 
 QByteArray CLVideoDecoderOutput::rawData() const

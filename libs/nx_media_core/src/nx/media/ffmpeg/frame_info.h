@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <memory>
+#include <optional>
 
 #include <QtCore/QSharedPointer>
 #include <QtCore/QSize>
@@ -59,7 +60,7 @@ public:
 
     CLVideoDecoderOutput();
     CLVideoDecoderOutput(int targetWidth, int targetHeight, int targetFormat);
-    CLVideoDecoderOutput(const QImage& image);
+    CLVideoDecoderOutput(const QImage& image, std::optional<int> colorSpace = std::nullopt);
     ~CLVideoDecoderOutput();
 
     MemoryType memoryType() const { return m_memoryType; }

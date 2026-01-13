@@ -144,6 +144,8 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/math/color_transformations.h>
 
+#include "nx/vms/common/utils/object_painter_helper.h"
+
 using namespace std::chrono;
 
 using namespace nx::vms::client::desktop;
@@ -1990,65 +1992,21 @@ void QnMediaResourceWidget::paintEffects(QPainter* painter)
         paintWatermark(painter, rect());
 }
 
-void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion)
+void QnMediaResourceWidget::paintMotionGrid(
+    QPainter* painter,
+    int channel,
+    const QRectF& rect,
+    const QnMetaDataV1Ptr& motion)
 {
-    // 5-7 fps
-
-    qreal xStep = rect.width() / MotionGrid::kWidth;
-    qreal yStep = rect.height() / MotionGrid::kHeight;
-
-    QVector<QPointF> gridLines[2];
-
+    QVector<QVector<QPointF>> gridLines(2);
     if (motion && motion->channelNumber == (quint32)channel)
     {
-        // 2-3 fps
-
         motion->removeMotion(reinterpret_cast<const simd128i*>(d->motionSkipMask(channel)));
-
-        /* Horizontal lines. */
-        for (int y = 1; y < MotionGrid::kHeight; ++y)
-        {
-            bool isMotion = motion->isMotionAt(0, y - 1) || motion->isMotionAt(0, y);
-            gridLines[isMotion] << QPointF(0, y * yStep);
-            int x = 1;
-            while (x < MotionGrid::kWidth)
-            {
-                while (x < MotionGrid::kWidth && isMotion == (motion->isMotionAt(x, y - 1) || motion->isMotionAt(x, y)))
-                    x++;
-                gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                if (x < MotionGrid::kWidth)
-                {
-                    isMotion = !isMotion;
-                    gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                }
-            }
-        }
-
-        /* Vertical lines. */
-        for (int x = 1; x < MotionGrid::kWidth; ++x)
-        {
-            bool isMotion = motion->isMotionAt(x - 1, 0) || motion->isMotionAt(x, 0);
-            gridLines[isMotion] << QPointF(x * xStep, 0);
-            int y = 1;
-            while (y < MotionGrid::kHeight)
-            {
-                while (y < MotionGrid::kHeight && isMotion == (motion->isMotionAt(x - 1, y) || motion->isMotionAt(x, y)))
-                    y++;
-                gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                if (y < MotionGrid::kHeight)
-                {
-                    isMotion = !isMotion;
-                    gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                }
-            }
-        }
+        gridLines = nx::vms::common::ObjectPainterHelper::calculateMotionGrid(rect, motion);
     }
     else
     {
-        for (int x = 1; x < MotionGrid::kWidth; ++x)
-            gridLines[0] << QPointF(x * xStep, 0.0) << QPointF(x * xStep, rect.height());
-        for (int y = 1; y < MotionGrid::kHeight; ++y)
-            gridLines[0] << QPointF(0.0, y * yStep) << QPointF(rect.width(), y * yStep);
+        gridLines = nx::vms::common::ObjectPainterHelper::calculateMotionGrid(rect, {});
     }
 
     QnScopedPainterTransformRollback transformRollback(painter);

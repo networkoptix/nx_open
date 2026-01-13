@@ -2,7 +2,15 @@
 
 #include "object_painter_helper.h"
 
+#include <nx/vms/common/utils/geometry.h>
+
 namespace nx::vms::common {
+namespace {
+
+static constexpr int kWidth = Qn::kMotionGridWidth;
+static constexpr int kHeight = Qn::kMotionGridHeight;
+
+} // namespace
 
 bool ObjectPainterHelper::hasHorizontalSpace(const QMarginsF& space)
 {
@@ -137,6 +145,71 @@ QColor ObjectPainterHelper::calculateTooltipColor(const QColor& frameColor)
         kTooltipBackgroundLightness,
         kTooltipBackgroundAlpha);
     return color;
+}
+
+QVector<QVector<QPointF>> ObjectPainterHelper::calculateMotionGrid(
+    const QRectF& rect,
+    const QnConstMetaDataV1Ptr& motion)
+{
+    // 5-7 fps
+    qreal xStep = rect.width() / kWidth;
+    qreal yStep = rect.height() / kHeight;
+
+    QVector<QVector<QPointF>> gridLines(2);
+    if (motion)
+    {
+        /* Horizontal lines. */
+        for (int y = 1; y < kHeight; ++y)
+        {
+            bool isMotion = motion->isMotionAt(0, y - 1) || motion->isMotionAt(0, y);
+            gridLines[isMotion] << QPointF(0, y * yStep);
+            int x = 1;
+            while (x < kWidth)
+            {
+                while (x < kWidth
+                    && isMotion == (motion->isMotionAt(x, y - 1) || motion->isMotionAt(x, y)))
+                {
+                    x++;
+                }
+                gridLines[isMotion] << QPointF(x * xStep, y * yStep);
+                if (x < kWidth)
+                {
+                    isMotion = !isMotion;
+                    gridLines[isMotion] << QPointF(x * xStep, y * yStep);
+                }
+            }
+        }
+
+        /* Vertical lines. */
+        for (int x = 1; x < kWidth; ++x)
+        {
+            bool isMotion = motion->isMotionAt(x - 1, 0) || motion->isMotionAt(x, 0);
+            gridLines[isMotion] << QPointF(x * xStep, 0);
+            int y = 1;
+            while (y < kHeight)
+            {
+                while (y < kHeight
+                    && isMotion == (motion->isMotionAt(x - 1, y) || motion->isMotionAt(x, y)))
+                {
+                    y++;
+                }
+                gridLines[isMotion] << QPointF(x * xStep, y * yStep);
+                if (y < kHeight)
+                {
+                    isMotion = !isMotion;
+                    gridLines[isMotion] << QPointF(x * xStep, y * yStep);
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int x = 1; x < kWidth; ++x)
+            gridLines[0] << QPointF(x * xStep, 0.0) << QPointF(x * xStep, rect.height());
+        for (int y = 1; y < kHeight; ++y)
+            gridLines[0] << QPointF(0.0, y * yStep) << QPointF(rect.width(), y * yStep);
+    }
+    return gridLines;
 }
 
 } // namespace nx::vms::common

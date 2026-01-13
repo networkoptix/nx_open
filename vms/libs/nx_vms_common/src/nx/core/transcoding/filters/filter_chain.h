@@ -10,6 +10,8 @@
 #include <nx/media/meta_data_packet.h>
 #include <transcoding/filters/abstract_image_filter.h>
 
+#include "abstract_metadata_filter.h"
+
 class CLVideoDecoderOutput;
 using CLVideoDecoderOutputPtr = QSharedPointer<CLVideoDecoderOutput>;
 
@@ -44,7 +46,9 @@ public:
     void reset();
     bool empty();
 
-    void setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata);
+    void setMetadata(
+        const std::list<QnConstAbstractCompressedMetadataPtr>& objectsData,
+        const std::list<QnConstAbstractCompressedMetadataPtr>& motionData);
     QSize apply(const QSize& resolution) const;
     CLVideoDecoderOutputPtr apply(const CLVideoDecoderOutputPtr& source) const;
 
@@ -63,12 +67,14 @@ private:
     void createScaleImageFilter(const QSize& dstSize);
     void createPixelationImageFilter();
     void createObjectInfoFilter();
+    void createMotionFilter();
 
 private:
     bool m_ready = false;
     Settings m_settings;
     std::list<QnAbstractImageFilterPtr> m_legacyFilters;
     std::list<QnAbstractImageFilterPtr> m_filters;
+    std::list<AbstractMetadataFilterPtr> m_metadataFilters;
 };
 
 using FilterChainPtr = std::unique_ptr<FilterChain>;

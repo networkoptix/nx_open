@@ -52,6 +52,11 @@ struct ObjectExportSettings
     vms::common::DetectedObjectSettingsMap frameColors;
 };
 
+struct MotionExportSettings
+{
+    QColor foreground, background;
+};
+
 struct Settings
 {
     // Forced aspect ratio, requires transcoding if not empty.
@@ -78,6 +83,7 @@ struct Settings
 
     std::optional<nx::vms::api::PixelationSettings> pixelationSettings;
     std::optional<ObjectExportSettings> objectExportSettings;
+    std::optional<MotionExportSettings> motionExportSettings;
 
     // The target resolution to which the image will be scaled before other filters.
     std::optional<QSize> resolution;
@@ -92,7 +98,7 @@ struct Settings
 
     inline bool metadataRequired() const
     {
-        return objectExportSettings.has_value()
+        return objectExportSettings.has_value() || motionExportSettings.has_value()
             || (pixelationSettings.has_value() && !pixelationSettings->empty());
     }
 
