@@ -18,6 +18,9 @@ public:
     virtual QRect windowRect() const override;
     virtual void setWindowRect(const QRect& rect) override;
 
+    virtual QSize minimumSize() const override;
+    virtual void setMinimumSize(const QSize& size) override;
+
     virtual Qt::WindowStates windowState() const override;
     virtual void setWindowState(Qt::WindowStates state) override;
 

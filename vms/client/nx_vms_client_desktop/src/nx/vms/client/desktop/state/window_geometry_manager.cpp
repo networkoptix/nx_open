@@ -32,10 +32,6 @@ const int kWindowShiftY = 20;
 const double kWindowScreenRatioX = 0.75;
 const double kWindowScreenRatioY = 0.75;
 
-// Minimum size of new window.
-const int kMinWindowWidth = 800;
-const int kMinWindowHeight = 600;
-
 DelegateState serializeState(const WindowGeometryState& geometry)
 {
     DelegateState state;
@@ -81,6 +77,16 @@ struct WindowGeometryManager::Private
     {
     }
 
+    inline int minHeight() const
+    {
+        return control->minimumSize().height();
+    }
+
+    inline int minWidth() const
+    {
+        return control->minimumSize().width();
+    }
+
     WindowControlInterfacePtr control;
 };
 
@@ -108,6 +114,29 @@ bool WindowGeometryManager::loadState(
         success = nx::reflect::json::deserialize(
             QJson::serialized(state.value(kWindowGeometryKey)).toStdString(), &geometry);
 
+        if (params.windowGeometry.isValid())
+        {
+            const auto size = params.windowGeometry.size();
+            const auto minSize = d->control->minimumSize();
+
+            if (size.height() < minSize.height() || size.width() < minSize.width())
+            {
+                // The minimum size value is set by MainWindow and may depend on external factors,
+                // such as --light-mode parameter. From now, we allow GeometryManager to overwrite
+                // that value on demand if the window geometry requested by a user is smaller than
+                // the default (recommended) value.
+                const auto newSize = minSize.boundedTo(size);
+                d->control->setMinimumSize(newSize);
+
+                // Output a warning both to logs and to console.
+                auto text = QString("Minimum window size changed to %1x%2. "
+                    "Setting the window size to less than 800x600 may cause glitches.")
+                        .arg(newSize.width()).arg(newSize.height());
+                NX_WARNING(this, text);
+                std::cout << text.toStdString() << std::endl;
+            }
+        }
+
         const auto surface = d->control->suitableSurface();
         if (params.screen >= 0 && params.screen < surface.size())
         {
@@ -128,10 +157,10 @@ bool WindowGeometryManager::loadState(
 
                 // Put the window into the screen rect.
                 geometry.geometry.setWidth(qMax(
-                    kMinWindowWidth,
+                    d->minWidth(),
                     (int)(kWindowScreenRatioX * surface[params.screen].width())));
                 geometry.geometry.setHeight(qMax(
-                    kMinWindowHeight,
+                    d->minHeight(),
                     (int)(kWindowScreenRatioY * surface[params.screen].height())));
                 geometry.geometry.moveCenter(screenRect.center());
             }
@@ -206,10 +235,10 @@ void WindowGeometryManager::createInheritedState(
 
             // Update normal window size, so it wouldn't be larger than 3/4 of the target screen.
             geometry.setWidth(qMax(
-                kMinWindowWidth,
+                d->minWidth(),
                 qMin(geometry.width(), (int)(kWindowScreenRatioX * surface[target].width()))));
             geometry.setHeight(qMax(
-                kMinWindowHeight,
+                d->minHeight(),
                 qMin(geometry.height(), (int)(kWindowScreenRatioY * surface[target].height()))));
 
             // If new window could be placed using the same top&left margins on the target screen,
@@ -252,13 +281,13 @@ WindowGeometryState WindowGeometryManager::calculateDefaultGeometry() const
     // Calculate default window size.
     const auto screenRect = (d->control->suitableSurface().size() > 0)
         ? d->control->suitableSurface().first()
-        : QRect(0, 0, kMinWindowWidth, kMinWindowHeight); //< Safe option. Should be unreachable.
+        : QRect(0, 0, d->minWidth(), d->minHeight()); //< Safe option. Should be unreachable.
     const auto windowWidth = qMax(
         (int)(kWindowScreenRatioX * screenRect.width()),
-        kMinWindowWidth);
+        d->minWidth());
     const auto windowHeight = qMax(
         (int)(kWindowScreenRatioY * screenRect.height()),
-        kMinWindowHeight);
+        d->minHeight());
 
     // Safe option: place the window in top-left corner of the screen.
     window.geometry = QRect(screenRect.left(), screenRect.top(), windowWidth, windowHeight);
@@ -345,15 +374,9 @@ void WindowGeometryManager::fixWindowGeometryIfNeeded(WindowGeometryState* state
     }
 
     if (onScreen)
-    {
         state->geometry &= boundingGeometry;
-        state->geometry.setWidth(std::max(state->geometry.width(), kMinWindowWidth));
-        state->geometry.setHeight(std::max(state->geometry.height(), kMinWindowHeight));
-    }
     else
-    {
         *state = calculateDefaultGeometry();
-    }
 }
 
 } // namespace nx::vms::client::desktop
