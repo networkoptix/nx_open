@@ -110,7 +110,7 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "[Feature] Enables Objects tab and Objects search dialog for Cross System Layouts.");
 
     // VMS-55962
-    NX_INI_FLAG(false, useShortLivedCloudTokens,
+    NX_INI_FLAG(true, useShortLivedCloudTokens,
         "[Feature] Short-lived tokens improve security by reducing the time a token remains valid.\n"
         "It can be removed once the required functionality is available on all cloud instances.");
 
