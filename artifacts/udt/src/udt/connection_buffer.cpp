@@ -202,7 +202,7 @@ int SendBuffer::addBufferFromFile(fstream& ifs, int len)
     return total;
 }
 
-std::optional<BufferRef> SendBuffer::readData(int32_t& msgno)
+std::optional<BufferRef> SendBuffer::readData(CPacket* packet)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -215,14 +215,14 @@ std::optional<BufferRef> SendBuffer::readData(int32_t& msgno)
     if (m_pCurrBlock->m_iLength >= 0)
         data = BufferRef{m_pCurrBlock->m_pcData, m_pCurrBlock->m_iLength};
 
-    msgno = m_pCurrBlock->m_iMsgNo;
+    packet->setMsgNo(m_pCurrBlock->m_iMsgNo);
 
     m_pCurrBlock = m_pCurrBlock->m_pNext;
 
     return data;
 }
 
-std::optional<BufferRef> SendBuffer::readData(const int offset, int32_t& msgno, int& msglen)
+std::optional<BufferRef> SendBuffer::readData(const int offset, CPacket* packet, int& msglen)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -234,7 +234,8 @@ std::optional<BufferRef> SendBuffer::readData(const int offset, int32_t& msgno, 
     if ((p->m_iTTL >= std::chrono::milliseconds::zero()) &&
         ((CTimer::getTime() - p->m_OriginTime) > p->m_iTTL))
     {
-        msgno = p->m_iMsgNo & 0x1FFFFFFF;
+        const int32_t msgno = p->m_iMsgNo & 0x1FFFFFFF;
+        packet->setMsgNo(msgno);
 
         msglen = 1;
         p = p->m_pNext;
@@ -254,7 +255,7 @@ std::optional<BufferRef> SendBuffer::readData(const int offset, int32_t& msgno, 
 
     // TODO: #akolesnikov Avoid copying here by switching Block::m_pcData to Buffer.
     auto data = BufferRef{p->m_pcData, p->m_iLength};
-    msgno = p->m_iMsgNo;
+    packet->setMsgNo(p->m_iMsgNo);
 
     return data;
 }
@@ -464,7 +465,7 @@ void ReceiveBuffer::dropMsg(int32_t msgno)
     std::lock_guard<std::mutex> lock(m_mutex);
 
     for (int i = m_iStartPos, n = (m_iLastAckPos + m_iMaxPos) % m_iSize; i != n; i = (i + 1) % m_iSize)
-        if (m_pUnit[i] && (msgno == m_pUnit[i]->packet()->m_iMsgNo))
+        if (m_pUnit[i] && (msgno == m_pUnit[i]->packet()->msgNo()))
             m_pUnit[i]->setFlag(Unit::Flag::msgDropped);
 }
 

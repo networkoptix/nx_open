@@ -21,7 +21,6 @@ public:
 
 private:
     std::deque<std::unique_ptr<CPacket>> m_availablePackets;
-    int m_takenPackets = 0;
     std::mutex m_mutex;
 };
 
@@ -41,14 +40,11 @@ UnitQueueImpl::UnitQueueImpl(int initialQueueSize)
 
 UnitQueueImpl::~UnitQueueImpl()
 {
-    assert(m_takenPackets == 0);
 }
 
 Unit UnitQueueImpl::takeNextAvailUnit()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-
-    ++m_takenPackets;
 
     if (!m_availablePackets.empty())
     {
@@ -68,8 +64,6 @@ void UnitQueueImpl::putBack(std::unique_ptr<CPacket> packet)
     std::lock_guard<std::mutex> lock(m_mutex);
 
     m_availablePackets.push_back(std::move(packet));
-
-    --m_takenPackets;
 }
 
 //-------------------------------------------------------------------------------------------------

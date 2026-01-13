@@ -75,7 +75,9 @@ public:
     /**
      * If packet does not contain connection request, non-zero is returned.
      */
-    int processConnectionRequest(const detail::SocketAddress& addr, const CPacket* packet);
+    int processConnectionRequest(
+        const detail::SocketAddress& addr,
+        Unit* unit);
 
     void addEPoll(const int eid);
     void removeEPoll(const int eid);
@@ -365,7 +367,7 @@ public: // internal API
     Result<> sample(CPerfMon* perf, bool clear = true);
 
     // Generation and processing of packets
-    void sendCtrl(ControlPacketType pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
+    void sendCtrl(ControlPacketType pkttype, std::optional<int32_t> lparam = std::nullopt, void* rparam = NULL, int size = 0);
     void processCtrl(const CPacket* ctrlpkt);
     int packData(CPacket* packet, std::chrono::microseconds& ts);
     Result<> processData(Unit unit);

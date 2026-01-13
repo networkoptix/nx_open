@@ -143,6 +143,8 @@ Yunhong Gu, last updated 02/12/2011
 //      the original sequence numbers in the field.
 
 #include <cstring>
+#include <type_traits>
+
 #include "log.h"
 #include "packet.h"
 
@@ -175,29 +177,6 @@ std::string to_string(ControlPacketType packetType)
 
 //-------------------------------------------------------------------------------------------------
 
-// Set up the aliases in the constructor
-CPacket::CPacket():
-    m_iSeqNo((int32_t&)(m_nHeader[0])),
-    m_iMsgNo((int32_t&)(m_nHeader[1])),
-    m_iTimeStamp((int32_t&)(m_nHeader[2])),
-    m_iID((int32_t&)(m_nHeader[3]))
-{
-    memset(m_nHeader, 0, sizeof(m_nHeader));
-}
-
-CPacket::~CPacket()
-{
-}
-
-std::unique_ptr<CPacket> CPacket::clone() const
-{
-    auto pkt = std::make_unique<CPacket>();
-    memcpy(pkt->m_nHeader, m_nHeader, sizeof(m_nHeader));
-    memcpy(pkt->m_payload, m_payload, m_payloadSize);
-    pkt->m_payloadSize = m_payloadSize;
-    return pkt;
-}
-
 int CPacket::getLength() const
 {
     return m_payloadSize;
@@ -211,8 +190,11 @@ void CPacket::setLength(int len)
     m_payloadSize = std::max(len, 0);
 }
 
-void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
+void CPacket::pack(ControlPacketType pkttype, std::optional<int32_t> lparam, int payloadSize)
 {
+    static_assert(offsetof(CPacket, m_payload) == sizeof(PacketHeader),
+        "Unexpected padding between header and payload");
+
     const int32_t __pad = 0;
 
     // Set (bit-0 = 1) and (bit-1~15 = type)
@@ -223,8 +205,8 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
     {
         case ControlPacketType::Acknowledgment: //0010 - Acknowledgment (ACK)
                                           // ACK packet seq. no.
-            if (NULL != lparam)
-                m_nHeader[1] = *(int32_t *)lparam;
+            if (lparam.has_value())
+                m_nHeader[1] = *lparam;
 
             // data ACK seq. no.
             // optional: RTT (microseconds), RTT variance (microseconds) advertised flow window size (packets), and estimated link capacity (packets per second)
@@ -234,7 +216,7 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
 
         case ControlPacketType::AcknowledgmentOfAcknowledgment: //0110 - Acknowledgment of Acknowledgment (ACK-2)
                                                            // ACK packet seq. no.
-            m_nHeader[1] = *(int32_t *)lparam;
+            m_nHeader[1] = *lparam;
 
             // control info field should be none
             // but "writev" does not allow this
@@ -277,7 +259,7 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
 
         case ControlPacketType::MsgDropRequest: //0111 - Message Drop Request
                                          // msg id
-            m_nHeader[1] = *(int32_t *)lparam;
+            m_nHeader[1] = *lparam;
 
             //first seq no, last seq no
             m_payloadSize = payloadSize;
@@ -286,7 +268,7 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
 
         case ControlPacketType::RemotePeerFailure: //1000 - Error Signal from the Peer Side
                                             // Error type
-            m_nHeader[1] = *(int32_t *)lparam;
+            m_nHeader[1] = *lparam;
 
             // control info field should be none
             // but "writev" does not allow this
@@ -297,7 +279,7 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
         case ControlPacketType::Reserved: //0x7FFF - Reserved for user defined control packets
                                    // for extended control packet
                                    // "lparam" contains the extended type information for bit 16 - 31
-            m_nHeader[0] |= *(int32_t *)lparam;
+            m_nHeader[0] |= *lparam;
 
             if (payloadSize > 0)
                 m_payloadSize = payloadSize;

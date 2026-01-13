@@ -592,7 +592,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
         auto request = std::make_unique<CPacket>();
         request->pack(ControlPacketType::Handshake, NULL, m_iPayloadSize);
         // ID = 0, connection request
-        request->m_iID = 0;
+        request->setId(0);
 
         m_ConnReq.serialize((char*) request->payload(), m_iPayloadSize);
         request->setLength(m_iPayloadSize);
@@ -626,13 +626,13 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
             auto request = std::make_unique<CPacket>();
             request->pack(ControlPacketType::Handshake, NULL, m_iPayloadSize);
             // ID = 0, connection request
-            request->m_iID = 0;
+            request->setId(0);
 
             int hs_size = m_iPayloadSize;
             m_ConnReq.serialize((char*) request->payload(), hs_size);
             request->setLength(hs_size);
             if (m_bRendezvous)
-                request->m_iID = m_ConnRes.m_iID;
+                request->setId(m_ConnRes.m_iID);
             sndQueue().sendto(serv_addr, std::move(request));
             m_llLastReqTime = CTimer::getTime();
         }
@@ -826,7 +826,7 @@ Result<> CUDT::connect(const detail::SocketAddress& peer, CHandShake* hs)
     int size = CHandShake::m_iContentSize;
     response->pack(ControlPacketType::Handshake, NULL, size);
     hs->serialize((char*) response->payload(), size);
-    response->m_iID = m_PeerID;
+    response->setId(m_PeerID);
     sndQueue().sendto(peer, std::move(response));
 
     return success();
@@ -1377,8 +1377,7 @@ Result<int64_t> CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int 
         {
             // Sending the sender a signal so it will not be blocked forever.
             static constexpr int fileIoErrorCode = 4000;
-            int32_t err_code = fileIoErrorCode;
-            sendCtrl(ControlPacketType::RemotePeerFailure, &err_code);
+            sendCtrl(ControlPacketType::RemotePeerFailure, fileIoErrorCode);
 
             return Error(OsErrorCode::io);
         }
@@ -1518,7 +1517,7 @@ void CUDT::releaseSynch()
     m_RecvLock.unlock();
 }
 
-void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int size)
+void CUDT::sendCtrl(ControlPacketType pkttype, std::optional<int32_t> lparam, void* rparam, int size)
 {
     switch (pkttype)
     {
@@ -1544,7 +1543,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             {
                 ctrlpkt->pack(pkttype, NULL, size);
                 memcpy(ctrlpkt->payload(), &ack, size);
-                ctrlpkt->m_iID = m_PeerID;
+                ctrlpkt->setId(m_PeerID);
                 sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                 break;
@@ -1599,18 +1598,18 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 {
                     data[4] = m_pRcvTimeWindow->getPktRcvSpeed();
                     data[5] = m_pRcvTimeWindow->getBandwidth();
-                    ctrlpkt->pack(pkttype, &m_iAckSeqNo, 24);
+                    ctrlpkt->pack(pkttype, m_iAckSeqNo, 24);
                     memcpy(ctrlpkt->payload(), data, 24);
 
                     m_ullLastAckTime = CTimer::getTime();
                 }
                 else
                 {
-                    ctrlpkt->pack(pkttype, &m_iAckSeqNo, 16);
+                    ctrlpkt->pack(pkttype, m_iAckSeqNo, 16);
                     memcpy(ctrlpkt->payload(), data, 16);
                 }
 
-                ctrlpkt->m_iID = m_PeerID;
+                ctrlpkt->setId(m_PeerID);
                 sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                 m_pACKWindow->store(m_iAckSeqNo, m_iRcvLastAck);
@@ -1626,7 +1625,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         {
             auto ctrlpkt = std::make_unique<CPacket>();
             ctrlpkt->pack(pkttype, lparam);
-            ctrlpkt->m_iID = m_PeerID;
+            ctrlpkt->setId(m_PeerID);
             sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
@@ -1651,7 +1650,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                     ctrlpkt->setPayload((const uint8_t*) rparam, 8);
                 }
 
-                ctrlpkt->m_iID = m_PeerID;
+                ctrlpkt->setId(m_PeerID);
                 sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                 ++m_iSentNAK;
@@ -1672,7 +1671,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 {
                     ctrlpkt->setLength(losslen * sizeof(int32_t));
 
-                    ctrlpkt->m_iID = m_PeerID;
+                    ctrlpkt->setId(m_PeerID);
                     sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                     ++m_iSentNAK;
@@ -1698,7 +1697,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         {
             auto ctrlpkt = std::make_unique<CPacket>();
             ctrlpkt->pack(pkttype);
-            ctrlpkt->m_iID = m_PeerID;
+            ctrlpkt->setId(m_PeerID);
             sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             CTimer::rdtsc(m_ullLastWarningTime);
@@ -1710,7 +1709,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         {
             auto ctrlpkt = std::make_unique<CPacket>();
             ctrlpkt->pack(pkttype);
-            ctrlpkt->m_iID = m_PeerID;
+            ctrlpkt->setId(m_PeerID);
             sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
@@ -1721,7 +1720,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             auto ctrlpkt = std::make_unique<CPacket>();
             ctrlpkt->pack(pkttype, NULL, sizeof(CHandShake));
             ctrlpkt->setPayload((const uint8_t*) rparam, sizeof(CHandShake));
-            ctrlpkt->m_iID = m_PeerID;
+            ctrlpkt->setId(m_PeerID);
             sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
@@ -1731,7 +1730,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         {
             auto ctrlpkt = std::make_unique<CPacket>();
             ctrlpkt->pack(pkttype);
-            ctrlpkt->m_iID = m_PeerID;
+            ctrlpkt->setId(m_PeerID);
             sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
@@ -1742,7 +1741,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             auto ctrlpkt = std::make_unique<CPacket>();
             ctrlpkt->pack(pkttype, lparam, 8);
             ctrlpkt->setPayload((const uint8_t*) rparam, 8);
-            ctrlpkt->m_iID = m_PeerID;
+            ctrlpkt->setId(m_PeerID);
             sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
@@ -1752,7 +1751,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         {
             auto ctrlpkt = std::make_unique<CPacket>();
             ctrlpkt->pack(pkttype, lparam);
-            ctrlpkt->m_iID = m_PeerID;
+            ctrlpkt->setId(m_PeerID);
             sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
@@ -1801,7 +1800,7 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
             const auto now = CTimer::getTime();
             if ((currtime - m_ullSndLastAck2Time > m_iSYNInterval) || (ack == m_iSndLastAck2))
             {
-                sendCtrl(ControlPacketType::AcknowledgmentOfAcknowledgment, &ack);
+                sendCtrl(ControlPacketType::AcknowledgmentOfAcknowledgment, ack);
                 m_iSndLastAck2 = ack;
                 m_ullSndLastAck2Time = now;
             }
@@ -2085,24 +2084,25 @@ int CUDT::packData(CPacket* packet, std::chrono::microseconds& ts)
         m_ullTimeDiff += entertime - m_ullTargetTime;
 
     // Loss retransmission always has higher priority.
-    if ((packet->m_iSeqNo = m_pSndLossList->getLostSeq()) >= 0)
+    packet->setSeqNo(m_pSndLossList->getLostSeq());
+    if (packet->seqNo() >= 0)
     {
         // protect m_iSndLastDataAck from updating by ACK processing
         std::lock_guard<std::mutex> ackLocker(m_AckLock);
 
-        int offset = CSeqNo::seqoff(m_iSndLastDataAck, packet->m_iSeqNo);
+        int offset = CSeqNo::seqoff(m_iSndLastDataAck, packet->seqNo());
         if (offset < 0)
             return 0;
 
         int msglen;
 
-        auto data = m_pSndBuffer->readData(offset, packet->m_iMsgNo, msglen);
+        auto data = m_pSndBuffer->readData(offset, packet, msglen);
         if (!data)
         {
             int32_t seqpair[2];
-            seqpair[0] = packet->m_iSeqNo;
+            seqpair[0] = packet->seqNo();
             seqpair[1] = CSeqNo::incseq(seqpair[0], msglen);
-            sendCtrl(ControlPacketType::MsgDropRequest, &packet->m_iMsgNo, seqpair, 8);
+            sendCtrl(ControlPacketType::MsgDropRequest, packet->msgNo(), seqpair, 8);
 
             // only one msg drop request is necessary
             m_pSndLossList->remove(seqpair[1]);
@@ -2130,16 +2130,16 @@ int CUDT::packData(CPacket* packet, std::chrono::microseconds& ts)
         int cwnd = (m_iFlowWindowSize < (int)m_dCongestionWindow) ? m_iFlowWindowSize : (int)m_dCongestionWindow;
         if (cwnd >= CSeqNo::seqlen(m_iSndLastAck, CSeqNo::incseq(m_iSndCurrSeqNo)))
         {
-            auto data = m_pSndBuffer->readData(packet->m_iMsgNo);
+            auto data = m_pSndBuffer->readData(packet);
             if (data && !data->empty())
             {
                 m_iSndCurrSeqNo = CSeqNo::incseq(m_iSndCurrSeqNo);
                 m_congestionControl.setSndCurrSeqNo(m_iSndCurrSeqNo);
 
-                packet->m_iSeqNo = m_iSndCurrSeqNo;
+                packet->setSeqNo(m_iSndCurrSeqNo);
 
                 // every 16 (0xF) packets, a packet pair is sent
-                if (0 == (packet->m_iSeqNo & 0xF))
+                if (0 == (packet->seqNo() & 0xF))
                     probe = true;
             }
             else
@@ -2161,8 +2161,8 @@ int CUDT::packData(CPacket* packet, std::chrono::microseconds& ts)
         }
     }
 
-    packet->m_iTimeStamp = (int) (CTimer::getTime() - m_StartTime).count();
-    packet->m_iID = m_PeerID;
+    packet->setTimeStamp((int32_t) (CTimer::getTime() - m_StartTime).count());
+    packet->setId(m_PeerID);
 
     const auto payloadSize = payload.size;
     packet->setPayload((const uint8_t*) payload.data, payload.size);
@@ -2217,15 +2217,15 @@ Result<> CUDT::processData(Unit unit)
     m_pRcvTimeWindow->onPktArrival();
 
     // check if it is probing packet pair
-    if (0 == (packet->m_iSeqNo & 0xF))
+    if (0 == (packet->seqNo() & 0xF))
         m_pRcvTimeWindow->probe1Arrival();
-    else if (1 == (packet->m_iSeqNo & 0xF))
+    else if (1 == (packet->seqNo() & 0xF))
         m_pRcvTimeWindow->probe2Arrival();
 
     ++m_llTraceRecv;
     ++m_llRecvTotal;
 
-    int32_t offset = CSeqNo::seqoff(m_iRcvLastAck, packet->m_iSeqNo);
+    int32_t offset = CSeqNo::seqoff(m_iRcvLastAck, packet->seqNo());
     if ((offset < 0) || (offset >= m_pRcvBuffer->getAvailBufSize()))
         return Error(UDT::ProtocolError::outOfWindowDataReceived);
 
@@ -2233,20 +2233,20 @@ Result<> CUDT::processData(Unit unit)
         return Error(UDT::ProtocolError::retransmitReceived);
 
     // Loss detection.
-    if (CSeqNo::seqcmp(packet->m_iSeqNo, CSeqNo::incseq(m_iRcvCurrSeqNo)) > 0)
+    if (CSeqNo::seqcmp(packet->seqNo(), CSeqNo::incseq(m_iRcvCurrSeqNo)) > 0)
     {
         // If loss found, insert them to the receiver loss list
-        m_pRcvLossList->insert(CSeqNo::incseq(m_iRcvCurrSeqNo), CSeqNo::decseq(packet->m_iSeqNo));
+        m_pRcvLossList->insert(CSeqNo::incseq(m_iRcvCurrSeqNo), CSeqNo::decseq(packet->seqNo()));
 
         // pack loss list for NAK
         int32_t lossdata[2];
         lossdata[0] = CSeqNo::incseq(m_iRcvCurrSeqNo) | 0x80000000;
-        lossdata[1] = CSeqNo::decseq(packet->m_iSeqNo);
+        lossdata[1] = CSeqNo::decseq(packet->seqNo());
 
         // Generate loss report immediately.
-        sendCtrl(ControlPacketType::LossReport, NULL, lossdata, (CSeqNo::incseq(m_iRcvCurrSeqNo) == CSeqNo::decseq(packet->m_iSeqNo)) ? 1 : 2);
+        sendCtrl(ControlPacketType::LossReport, NULL, lossdata, (CSeqNo::incseq(m_iRcvCurrSeqNo) == CSeqNo::decseq(packet->seqNo())) ? 1 : 2);
 
-        int loss = CSeqNo::seqlen(m_iRcvCurrSeqNo, packet->m_iSeqNo) - 2;
+        int loss = CSeqNo::seqlen(m_iRcvCurrSeqNo, packet->seqNo()) - 2;
         m_iTraceRcvLoss += loss;
         m_iRcvLossTotal += loss;
     }
@@ -2258,10 +2258,10 @@ Result<> CUDT::processData(Unit unit)
 
     // Update the current largest sequence number that has been received.
     // Or it is a retransmitted packet, remove it from receiver loss list.
-    if (CSeqNo::seqcmp(packet->m_iSeqNo, m_iRcvCurrSeqNo) > 0)
-        m_iRcvCurrSeqNo = packet->m_iSeqNo;
+    if (CSeqNo::seqcmp(packet->seqNo(), m_iRcvCurrSeqNo) > 0)
+        m_iRcvCurrSeqNo = packet->seqNo();
     else
-        m_pRcvLossList->remove(packet->m_iSeqNo);
+        m_pRcvLossList->remove(packet->seqNo());
 
     return success();
 }
@@ -2724,8 +2724,9 @@ ServerSideConnectionAcceptor::ServerSideConnectionAcceptor(
 
 int ServerSideConnectionAcceptor::processConnectionRequest(
     const detail::SocketAddress& addr,
-    const CPacket* packet)
+    Unit* unit)
 {
+    auto& packet = unit->packet();
     if (m_closing)
         return 1002;
 
@@ -2753,10 +2754,10 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
 
     if (1 == hs.m_iReqType)
     {
-        auto response = packet->clone();
+        auto& response = packet;
 
         hs.m_iCookie = *(int*)cookie;
-        response->m_iID = hs.m_iID;
+        response->setId(hs.m_iID);
         int size = response->getLength();
         hs.serialize((char*) response->payload(), size);
         m_sendQueue->sendto(addr, std::move(response));
@@ -2783,11 +2784,11 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
         if ((hs.m_iVersion != UDT::kVersion) || (hs.m_iType != m_iSockType))
         {
             // mismatch, reject the request
-            auto response = packet->clone();
+            auto& response = packet;
             hs.m_iReqType = 1002;
             int size = CHandShake::m_iContentSize;
             hs.serialize((char*) response->payload(), size);
-            response->m_iID = id;
+            response->setId(id);
             m_sendQueue->sendto(addr, std::move(response));
         }
         else
@@ -2800,10 +2801,10 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
             // new connection response should be sent in connect()
             if (!result.ok() || result.get() != 1)
             {
-                auto response = packet->clone();
+                auto& response = packet;
                 int size = CHandShake::m_iContentSize;
                 hs.serialize((char*) response->payload(), size);
-                response->m_iID = id;
+                response->setId(id);
                 m_sendQueue->sendto(addr, std::move(response));
             }
             else

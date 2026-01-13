@@ -139,15 +139,22 @@ static constexpr int kMaxPayloadSize = UDT::kMSSMax - kPacketHeaderSize;
 class UDT_API CPacket
 {
 private:
-    PacketHeader m_nHeader;
+    PacketHeader m_nHeader{};
     uint8_t m_payload[kMaxPayloadSize];
     int m_payloadSize = 0;
 
 public:
-    int32_t& m_iSeqNo;                   // alias: sequence number
-    int32_t& m_iMsgNo;                   // alias: message number
-    int32_t& m_iTimeStamp;               // alias: timestamp
-    int32_t& m_iID;                      // alias: socket ID
+    inline int32_t seqNo() const { return (int32_t) m_nHeader[0]; };
+    inline void setSeqNo(int32_t value) { m_nHeader[0] = value; };
+
+    inline int32_t msgNo() const { return (int32_t) m_nHeader[1]; };
+    inline void setMsgNo(int32_t value) { m_nHeader[1] = value;; };
+
+    inline int32_t timeStamp() const { return (int32_t) m_nHeader[2]; };
+    inline void setTimeStamp(int32_t value) { m_nHeader[2] = value; };
+
+    inline int32_t id() const { return (int32_t) m_nHeader[3]; };
+    inline void setId(int32_t value) { m_nHeader[3] = value; };
 
     const uint8_t* payload() const { return m_payload; }
     uint8_t* payload() { return m_payload; }
@@ -159,8 +166,8 @@ public:
     }
 
 public:
-    CPacket();
-    ~CPacket();
+    CPacket() = default;
+    ~CPacket() = default;
 
     int getLength() const;
     void setLength(int len);
@@ -176,7 +183,7 @@ public:
     // Returned value:
     //    None.
 
-    void pack(ControlPacketType pkttype, void* lparam = NULL, int payloadSize = 0);
+    void pack(ControlPacketType pkttype, std::optional<int32_t> lparam = std::nullopt, int payloadSize = 0);
 
     char* buffer() { return (char*) &m_nHeader; }
     constexpr int bufferSize() const { return kPacketHeaderSize + sizeof(m_payload); }
@@ -244,13 +251,12 @@ public:
 
     int32_t getMsgSeq() const;
 
-    // TODO: #akolesnikov Get rid of this function. Replace it with a copy constructor.
-    std::unique_ptr<CPacket> clone() const;
-
     const uint32_t* header() const { return m_nHeader; }
     uint32_t* header() { return m_nHeader; }
 
 private:
+    CPacket(const CPacket&) = delete;
+    CPacket(CPacket&&) = delete;
     CPacket& operator=(const CPacket&) = delete;
     CPacket& operator=(CPacket&&) = delete;
 };

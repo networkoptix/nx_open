@@ -624,9 +624,9 @@ void CRendezvousQueue::updateConnStatus()
             }
 
             auto request = std::make_unique<CPacket>();
-            request->pack(ControlPacketType::Handshake, nullptr, udtSocket->payloadSize());
+            request->pack(ControlPacketType::Handshake, std::nullopt, udtSocket->payloadSize());
             // ID = 0, connection request
-            request->m_iID = !udtSocket->rendezvous() ? 0 : udtSocket->connRes().m_iID;
+            request->setId(!udtSocket->rendezvous() ? 0 : udtSocket->connRes().m_iID);
             int hs_size = udtSocket->payloadSize();
             udtSocket->connReq().serialize((char*) request->payload(), hs_size);
             request->setLength(hs_size);
@@ -744,14 +744,14 @@ void CRcvQueue::timerCheck()
 
 Result<> CRcvQueue::processUnit(Unit unit, const detail::SocketAddress& addr)
 {
-    int32_t id = unit.packet()->m_iID;
+    int32_t id = unit.packet()->id();
 
     // ID 0 is for connection request, which should be passed to the listening socket or rendezvous sockets
     if (0 == id)
     {
         if (auto listener = m_listener.lock())
         {
-            listener->processConnectionRequest(addr, unit.packet().get());
+            listener->processConnectionRequest(addr, &unit);
         }
         else if (auto u = m_pRendezvousQueue->getByAddr(addr, id))
         {
@@ -760,7 +760,7 @@ Result<> CRcvQueue::processUnit(Unit unit, const detail::SocketAddress& addr)
             if (!u->synRecving())
                 u->connect(unit.packet().get()); // TODO: #akolesnikov The result code is ignored here.
             else
-                storePkt(id, unit.packet()->clone());
+                storePkt(id, std::move(unit.packet()));
         }
     }
     else if (id > 0)
@@ -790,7 +790,7 @@ Result<> CRcvQueue::processUnit(Unit unit, const detail::SocketAddress& addr)
             if (!u->synRecving())
                 u->connect(unit.packet().get()); // TODO: #akolesnikov The result code is ignored here.
             else
-                storePkt(id, unit.packet()->clone());
+                storePkt(id, std::move(unit.packet()));
         }
     }
 

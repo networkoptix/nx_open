@@ -85,7 +85,7 @@ public:
     // Parameters:
     //    0) [out] msgno: message number of the packet.
 
-    std::optional<BufferRef> readData(int32_t& msgno);
+    std::optional<BufferRef> readData(CPacket* packet);
 
     // Functionality:
     //    Find data position to pack a DATA packet for a retransmission.
@@ -94,7 +94,7 @@ public:
     //    1) [out] msgno: message number of the packet.
     //    2) [out] msglen: length of the message
 
-    std::optional<BufferRef> readData(const int offset, int32_t& msgno, int& msglen);
+    std::optional<BufferRef> readData(const int offset, CPacket* packet, int& msglen);
 
     // Functionality:
     //    Update the ACK point and may release/unmap/return the user data according to the flag.
