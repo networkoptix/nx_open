@@ -80,6 +80,9 @@ R"json(
 
 Result<const ISettingsResponse*> Engine::settingsReceived()
 {
+    if (m_stopping)
+        return nullptr;
+
     m_engineSettings.generateEvents =
         toBool(settingValue(kGenerateIntegrationDiagnosticEventsFromEngineSetting));
 
@@ -141,11 +144,17 @@ void Engine::startEventThread()
 
 void Engine::stopEventThread()
 {
+    if (m_stopping.exchange(true))
+        return;
+
     {
         std::unique_lock<std::mutex> lock(m_eventThreadMutex);
         m_terminated = true;
         m_eventThreadCondition.notify_all();
     }
+
+    if (!m_eventThread || !m_eventThread->joinable())
+        return;
 
     m_eventThread->join();
 }
