@@ -25,6 +25,8 @@ std::vector<ManifestError> validate(const IntegrationManifest& integrationManife
 
     // NOTE: `vendor` is allowed to be omitted because some Nx plugins may have it empty.
 
+    // NOTE: `loadPluginInSeparateProcess` is optional.
+
     return result;
 }
 

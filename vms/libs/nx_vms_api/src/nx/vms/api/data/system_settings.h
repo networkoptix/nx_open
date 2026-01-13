@@ -21,6 +21,11 @@
 
 namespace nx::vms::api {
 
+NX_REFLECTION_ENUM_CLASS(IntegrationProcessMode,
+    manifestControlled,
+    forceLoadingInSeparateProcess,
+    forceLoadingInCurrentProcess);
+
 struct SaveableSettingsBase
 {
     std::optional<QString> defaultExportVideoCodec;
@@ -53,6 +58,7 @@ struct SaveableSettingsBase
     std::optional<MetadataStorageChangePolicy> metadataStorageChangePolicy;
 
     std::optional<bool> allowRegisteringIntegrations;
+    std::optional<IntegrationProcessMode> integrationProcessMode;
 
     std::optional<QString> additionalLocalFsTypes;
     std::optional<bool> arecontRtspEnabled;
@@ -137,7 +143,7 @@ struct SaveableSettingsBase
     (useHttpsOnlyForCameras)(videoTrafficEncryptionForced) \
     (storageEncryption)(showServersInTreeForNonAdmins)(updateNotificationsEnabled)(emailSettings) \
     (timeSynchronizationEnabled)(primaryTimeServer)(customReleaseListUrl)(clientUpdateSettings) \
-    (backupSettings)(metadataStorageChangePolicy)(allowRegisteringIntegrations) \
+    (backupSettings)(metadataStorageChangePolicy)(allowRegisteringIntegrations)(integrationProcessMode) \
     (additionalLocalFsTypes) \
     (arecontRtspEnabled) \
     (auditTrailPeriodDays) \

@@ -109,5 +109,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(EngineCapabilities)
 NX_REFLECTION_INSTRUMENT(EngineManifest, EngineManifest_Fields);
 
 NX_VMS_API std::vector<ManifestError> validate(const EngineManifest& manifest);
+NX_VMS_API bool isPixelFormatSpecified(const EngineManifest& manifest);
 
 } // namespace nx::vms::api::analytics

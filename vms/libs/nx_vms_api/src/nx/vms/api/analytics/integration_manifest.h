@@ -36,11 +36,15 @@ public: //< Required for Qt MOC run.
     /**%apidoc[opt] */
     bool isLicenseRequired = false;
 
+    /**%apidoc[opt] */
+    bool loadPluginInSeparateProcess = false;
+
     bool operator==(const IntegrationManifest& other) const = default;
 };
 
 #define nx_vms_api_analytics_IntegrationManifest_Fields \
-    (id)(name)(description)(version)(vendor)(engineSettingsModel)(isLicenseRequired)
+    (id)(name)(description)(version)(vendor) \
+    (engineSettingsModel)(isLicenseRequired)(loadPluginInSeparateProcess)
 
 QN_FUSION_DECLARE_FUNCTIONS(IntegrationManifest, (json), NX_VMS_API)
 

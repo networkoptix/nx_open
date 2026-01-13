@@ -89,7 +89,7 @@ void validateList(
         [](const auto& entry) { return entry.name; });
 }
 
-static bool isPixelFormatSpecified(const EngineManifest& manifest)
+bool isPixelFormatSpecified(const EngineManifest& manifest)
 {
     using Capability = EngineCapability;
 

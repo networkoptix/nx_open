@@ -35,6 +35,7 @@ struct WatermarkSettings;
 struct PixelationSettings;
 enum class ProxyConnectionAccessPolicy;
 enum class SystemSettingName;
+enum class IntegrationProcessMode;
 
 } // nx::vms::api
 
@@ -93,6 +94,7 @@ struct NX_VMS_COMMON_API SystemSettingNames
     DECLARE_SETTING_NAME(proxyConnectionAccessPolicy);
     DECLARE_SETTING_NAME(deviceStorageInfoUpdateIntervalS);
     DECLARE_SETTING_NAME(secureCookieStorageKey);
+    DECLARE_SETTING_NAME(integrationProcessMode);
 
     static const inline std::set<QString> kReadOnlyNames = {
         cloudAccountName,
@@ -577,6 +579,9 @@ public:
     bool isAllowRegisteringIntegrationsEnabled() const;
     void setAllowRegisteringIntegrationsEnabled(bool value);
 
+    nx::vms::api::IntegrationProcessMode integrationProcessMode() const;
+    void setIntegrationProcessMode(nx::vms::api::IntegrationProcessMode value);
+
     QByteArray secureCookieStorageKey() const;
     void setSecureCookieStorageKey(QByteArray);
 
@@ -637,6 +642,7 @@ signals:
     void securityForPowerUsersChanged();
     void cloudPollingIntervalChanged();
     void allowRegisteringIntegrationsChanged();
+    void integrationProcessModeChanged();
     void lastMergeIdChanged();
     void insecureDeprecatedAuthEnabledChanged();
 

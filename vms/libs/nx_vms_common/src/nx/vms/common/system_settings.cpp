@@ -246,6 +246,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* showMouseTimelinePreviewAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::chrono::seconds>* cloudPollingIntervalSAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* allowRegisteringIntegrationsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::vms::api::IntegrationProcessMode>* integrationProcessModeAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* secureCookieStorageKey = nullptr;
 
     AdaptorList allAdaptors;
@@ -996,6 +997,19 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
                 return tr("Enable or disable the creation of new Integration registration requests");
             });
 
+    d->integrationProcessModeAdaptor =
+        new QnReflectLexicalResourcePropertyAdaptor<nx::vms::api::IntegrationProcessMode>(
+            Names::integrationProcessMode,
+            nx::vms::api::IntegrationProcessMode::manifestControlled,
+            this,
+            []()
+            {
+                return tr("Controls how integrations are loaded. Possible values are: "
+                    "\"manifestControlled\", "
+                    "\"forceLoadingInSeparateProcess\","
+                     "\"forceLoadingInCurrentProcess\"");
+            });
+
     d->secureCookieStorageKey = new QnLexicalResourcePropertyAdaptor<QByteArray>("secureCookieStorageKey",
             /*defaultValue*/ QByteArray{},
             this,
@@ -1338,6 +1352,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
+        d->integrationProcessModeAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::integrationProcessModeChanged,
+        Qt::QueuedConnection);
+
+    connect(
         d->insecureDeprecatedAuthEnabledAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
@@ -1443,6 +1464,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->exposeServerEndpointsAdaptor
         << d->cloudPollingIntervalSAdaptor
         << d->allowRegisteringIntegrationsAdaptor
+        << d->integrationProcessModeAdaptor
     ;
 
     return result;
@@ -1606,6 +1628,16 @@ bool SystemSettings::isAllowRegisteringIntegrationsEnabled() const
 void SystemSettings::setAllowRegisteringIntegrationsEnabled(bool value)
 {
     d->allowRegisteringIntegrationsAdaptor->setValue(value);
+}
+
+nx::vms::api::IntegrationProcessMode SystemSettings::integrationProcessMode() const
+{
+    return d->integrationProcessModeAdaptor->value();
+}
+
+void SystemSettings::setIntegrationProcessMode(nx::vms::api::IntegrationProcessMode value)
+{
+    d->integrationProcessModeAdaptor->setValue(value);
 }
 
 QByteArray SystemSettings::secureCookieStorageKey() const
