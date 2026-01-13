@@ -22,6 +22,16 @@ public:
         m_screenRect = rect;
     }
 
+    virtual QSize minimumSize() const override
+    {
+        return m_minimumSize;
+    }
+
+    virtual void setMinimumSize(const QSize& size) override
+    {
+        m_minimumSize = size;
+    }
+
     virtual Qt::WindowStates windowState() const override
     {
         return m_state;
@@ -49,6 +59,7 @@ public:
 
 private:
     QRect m_screenRect = {0, 0, 800, 600};
+    QSize m_minimumSize = {800, 600};
     Qt::WindowStates m_state = Qt::WindowNoState;
 };
 

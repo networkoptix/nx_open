@@ -20,6 +20,9 @@ public:
     virtual QRect windowRect() const = 0;
     virtual void setWindowRect(const QRect& rect) = 0;
 
+    virtual QSize minimumSize() const = 0;
+    virtual void setMinimumSize(const QSize& size) = 0;
+
     virtual Qt::WindowStates windowState() const = 0;
     virtual void setWindowState(Qt::WindowStates state) = 0;
 
