@@ -289,7 +289,7 @@ private:
     std::mutex m_mutex;
     std::condition_variable m_cond;
 
-    volatile bool m_bClosing = false;        // closing the worker
+    std::atomic<bool> m_bClosing = false;        // closing the worker
 
     std::thread m_WorkerThread;
 };
@@ -334,6 +334,7 @@ public:
         std::chrono::microseconds timeout = kDefaultRecvTimeout);
 
     bool setListener(std::weak_ptr<ServerSideConnectionAcceptor> listener);
+    std::shared_ptr<ServerSideConnectionAcceptor> getListener() const;
 
     void registerConnector(
         const UDTSOCKET& id,
@@ -373,7 +374,7 @@ private:
     const int m_iIPversion;
 
     // closing the worker
-    volatile bool m_bClosing = false;
+    std::atomic<bool> m_bClosing = false;
 
     // pointer to the (unique, if any) listening UDT entity
     std::weak_ptr<ServerSideConnectionAcceptor> m_listener;
@@ -382,7 +383,7 @@ private:
 
     // newly added entries, to be inserted
     std::vector<std::weak_ptr<CUDT>> m_vNewEntry;
-    std::mutex m_mutex;
+    mutable std::mutex m_mutex;
     std::condition_variable m_cond;
 
     // temporary buffer for rendezvous connection request

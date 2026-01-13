@@ -750,7 +750,7 @@ Result<> CRcvQueue::processUnit(Unit unit, const detail::SocketAddress& addr)
     // ID 0 is for connection request, which should be passed to the listening socket or rendezvous sockets
     if (0 == id)
     {
-        if (auto listener = m_listener.lock())
+        if (auto listener = getListener())
         {
             listener->processConnectionRequest(addr, unit.packet().get());
         }
@@ -836,6 +836,12 @@ bool CRcvQueue::setListener(std::weak_ptr<ServerSideConnectionAcceptor> listener
 
     m_listener = listener;
     return true;
+}
+
+std::shared_ptr<ServerSideConnectionAcceptor> CRcvQueue::getListener() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_listener.lock();
 }
 
 void CRcvQueue::registerConnector(
