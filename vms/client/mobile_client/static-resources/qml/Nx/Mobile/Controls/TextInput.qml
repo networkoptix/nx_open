@@ -31,13 +31,14 @@ T.TextField
         }
 
     implicitWidth: 268
-    implicitHeight: 56
+    implicitHeight: 56 + fieldBackground.bottomTextHeight
 
     topPadding: 30
     leftPadding: 12
     rightPadding: actionButton.visible
         ? 8 + actionButton.width + actionButton.anchors.rightMargin
         : 12
+    bottomInset: fieldBackground.bottomTextHeight
 
     font.pixelSize: 16
     font.weight: 500
