@@ -21,6 +21,7 @@ Rectangle
     property alias labelText: label.text
     property string supportText
     property string errorText
+    property alias bottomTextHeight: bottomText.height
 
     property int mode: FieldBackground.Mode.Dark
     property bool compactLabelMode: owner.activeFocus || !!owner.text
@@ -88,6 +89,7 @@ Rectangle
             ? ColorTheme.colors.red_core
             : ColorTheme.colors.light10
         visible: !!text
+        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         elide: Text.ElideRight
     }
 }

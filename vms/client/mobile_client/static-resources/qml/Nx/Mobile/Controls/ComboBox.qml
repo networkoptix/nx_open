@@ -25,7 +25,7 @@ T.ComboBox
     property alias errorText: fieldBackground.errorText
 
     implicitWidth: 268
-    implicitHeight: 56
+    implicitHeight: 56 + fieldBackground.bottomTextHeight
 
     textRole: "display"
     font.pixelSize: 16
@@ -38,6 +38,7 @@ T.ComboBox
     rightPadding: indicatorImage.visible
         ? control.spacing + indicatorImage.width + indicatorImage.anchors.rightMargin
         : indicatorImage.anchors.rightMargin
+    bottomInset: fieldBackground.bottomTextHeight
 
     background: FieldBackground
     {

@@ -44,7 +44,7 @@ BaseBottomSheet
     {
         id: contentColumn
 
-        spacing: 24
+        spacing: 8
         width: parent.width
     }
 }
