@@ -88,12 +88,16 @@ TreeViewDelegate
             }
             Label
             {
-                textFormat: Text.RichText
+                textFormat: highlightRegExp
+                    ? Text.RichText
+                    : Text.PlainText
                 anchors.verticalCenter: parent.verticalCenter
                 text: highlightRegExp
                     ? NxGlobals.highlightMatch(model.display, highlightRegExp, ColorTheme.colors.yellow_l)
                     : model.display
                 horizontalAlignment: Text.AlignLeft
+                elide: Text.ElideRight
+                width: contentItem.width - rightMargin - x
                 color: ColorTheme.colors.light10
                 font.pixelSize: 14
                 font.family: "Roboto"
