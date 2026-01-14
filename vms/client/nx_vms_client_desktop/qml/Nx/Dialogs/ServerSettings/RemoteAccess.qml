@@ -106,11 +106,10 @@ Item
                         {
                             anchors.verticalCenter: title.verticalCenter
                             anchors.right: tileHeader.right
-                            toolTipText: qsTr("Connect %1 client application to localhost:%2")
-                                .arg(title.text).arg(portLabel.text)
+                            toolTipText: tile.port ? qsTr("Connect %1 client application to localhost:%2")
+                                .arg(title.text).arg(portLabel.text) : ""
 
                             helpTopic: HelpTopic.RemoteAccess
-                            visible: tile.port
                         }
                     }
 
