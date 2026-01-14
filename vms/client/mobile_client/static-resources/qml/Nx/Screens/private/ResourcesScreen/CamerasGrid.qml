@@ -13,6 +13,7 @@ Item
     id: control
 
     readonly property int kColumnsAnimationDuration: 250
+    readonly property real kCenterAnchorRelativePosition: 0.5
 
     property alias layout: camerasModel.layout
     property alias count: repeater.count
@@ -30,43 +31,54 @@ Item
 
     signal openVideoScreen(var resource, var thumbnailUrl, var camerasModel)
 
-    // Index of the cell which should be kept in the center of the screen during columns count
-    // change animation.
-    property int centeringIndex: -1
+    // Index of the cell which should be kept at the screen during columns count change animation.
+    property int anchorIndex: -1
 
-    function findIndexClosestToViewportCenter()
-    {
-        const viewportCenterY = flickable.contentY + flickable.height / 2
-
-        let closestCellIndex = -1
-        let minimumDistance = Number.MAX_VALUE
-
-        for (let i = 0; i < repeater.count; ++i)
-        {
-            const loader = repeater.itemAt(i)
-            const cellCenterY = loader.y + loader.height / 2
-            const distance = Math.abs(cellCenterY - viewportCenterY)
-
-            if (distance < minimumDistance)
-            {
-                minimumDistance = distance
-                closestCellIndex = i
-            }
-        }
-
-        return closestCellIndex
-    }
+    // Stores the relative position of the anchored cell within the viewport before pinch gesture.
+    property real anchorRelativePosition: 0.0
 
     function contentYToCenterIndex(index)
     {
         if (index === -1)
+            return 0 //< Strange case, most possibly the grid is empty.
+
+        if (repeater.count === 0)
+            return 0
+
+        const cellItem = repeater.itemAt(index)
+        if (!CoreUtils.assert(cellItem, "Invalid item index: " + index))
             return flickable.contentY
 
-        const loader = repeater.itemAt(index)
-        if (!CoreUtils.assert(loader, "Invalid item index: " + index))
-            return flickable.contentY
+        // Calculate target contentY to preserve the cell's relative position in viewport.
+        let targetContentY =
+            cellItem.y - (flickable.height - cellItem.height) * anchorRelativePosition
 
-        return (loader.y + loader.height / 2) - flickable.height / 2
+        // Ensure the cell is fully visible with minimal adjustment.
+        const cellTop = cellItem.y
+        const cellBottom = cellItem.y + cellItem.height
+        const viewportTop = targetContentY
+        const viewportBottom = targetContentY + flickable.height
+
+        if (targetContentY < 0)
+            return 0
+
+        const lastItem = repeater.itemAt(repeater.count - 1)
+        const currentContentHeight = lastItem.y + lastItem.height
+        // We cannot use flickable.contentHeight here, because it contains the final value,
+        // after the layout animation is complete.
+        if (targetContentY + flickable.height > currentContentHeight)
+        {
+            // Handle the case when the content height is less than the viewport height.
+            return Math.max(0, currentContentHeight - flickable.height)
+        }
+
+        // If cell doesn't fit in viewport, adjust minimally to show it fully.
+        if (cellTop < viewportTop)
+            return cellTop
+        if (cellBottom > viewportBottom)
+            return cellBottom - flickable.height
+
+        return targetContentY
     }
 
     function getMediaPlayer(index)
@@ -356,7 +368,7 @@ Item
                 const minModifier = 1
                 const kMaxModifier = sizesCalculator.defaultColumnsCount
 
-                // Limit logicalRotation to prevent unbounded accumulation
+                // Limit logicalRotation to prevent unbounded accumulation.
                 const maxLogicalRotation = kMaxModifier * kDefaultRotationStep
                 const minLogicalRotation = minModifier * kDefaultRotationStep
 
@@ -371,12 +383,9 @@ Item
                 if (newColumnsCountUserModifier === sizesCalculator.getUserDefinedColumnsCount())
                     return
 
-                const anchorIndex = control.findIndexClosestToViewportCenter()
-                if (anchorIndex >= 0)
-                {
-                    control.centeringIndex = anchorIndex
-                    centeringTimer.restart()
-                }
+                control.anchorIndex = cellsSearcher.findCellClosestToViewportCenter()
+                control.anchorRelativePosition = kCenterAnchorRelativePosition
+                centeringTimer.restart()
 
                 control.animationsEnabled = true
                 sizesCalculator.setUserDefinedColumnsCount(newColumnsCountUserModifier)
@@ -456,9 +465,6 @@ Item
         property int baseColumnsCount: 0
         property real baseScale: 1.0
 
-        // The cell closest to the viewport center at pinch start.
-        property int anchorIndex: -1
-
         property bool hasGrab: false
 
         onActiveChanged:
@@ -468,12 +474,14 @@ Item
                 flickable.cancelFlick()
                 baseColumnsCount = sizesCalculator.getUserDefinedColumnsCount()
                 baseScale = activeScale
-                anchorIndex = control.findIndexClosestToViewportCenter()
+
+                updateAnchor()
+
                 return
             }
 
             // Keep centering for the last layout animation.
-            if (control.centeringIndex >= 0)
+            if (control.anchorIndex >= 0)
                 centeringTimer.restart()
 
             control.saveTargetColumnsCount()
@@ -498,10 +506,8 @@ Item
             if (targetColumnsCount === sizesCalculator.getUserDefinedColumnsCount())
                 return
 
-            if (anchorIndex < 0)
-                anchorIndex = control.findIndexClosestToViewportCenter()
-
-            control.centeringIndex = anchorIndex
+            if (control.anchorIndex < 0)
+                updateAnchor()
 
             control.animationsEnabled = true
             sizesCalculator.setUserDefinedColumnsCount(targetColumnsCount)
@@ -517,6 +523,32 @@ Item
 
             flickable.interactive = !hasGrab && !centeringTimer.running
         }
+
+        function updateAnchor()
+        {
+            const cellIndex = cellsSearcher.findClosestFullyVisibleCell(centroid.scenePosition)
+            // Relative position must be calculated before setting anchorIndex.
+            control.anchorRelativePosition = calculateAnchorRelativePosition(cellIndex)
+            control.anchorIndex = cellIndex
+        }
+
+        function calculateAnchorRelativePosition(index)
+        {
+            if (index < 0)
+                return kCenterAnchorRelativePosition
+
+            const cellItem = repeater.itemAt(index)
+            if (!cellItem)
+                return kCenterAnchorRelativePosition
+
+            const cellTopRelativeToViewport = cellItem.y - flickable.contentY
+            const availableSpace = flickable.height - cellItem.height
+            if (availableSpace <= 0)
+                return kCenterAnchorRelativePosition
+
+            const relativePosition = cellTopRelativeToViewport / availableSpace
+            return MathUtils.bound(0, relativePosition, 1)
+        }
     }
 
     Timer
@@ -530,12 +562,12 @@ Item
         {
             control.animationsEnabled = false
 
-            if (pinchHandler.active || control.centeringIndex < 0)
+            if (pinchHandler.active || control.anchorIndex < 0)
                 return
 
-            const oldCenteringIndex = control.centeringIndex
-            control.centeringIndex = -1
-            flickable.contentY = control.contentYToCenterIndex(oldCenteringIndex)
+            const oldAnchorIndex = control.anchorIndex
+            control.anchorIndex = -1
+            flickable.contentY = control.contentYToCenterIndex(oldAnchorIndex)
 
             if (!pinchHandler.hasGrab)
                 flickable.interactive = true
@@ -547,8 +579,8 @@ Item
         target: flickable
         property: "contentY"
         restoreMode: Binding.RestoreNone
-        when: control.centeringIndex >= 0 && (pinchHandler.active || centeringTimer.running)
-        value: control.contentYToCenterIndex(control.centeringIndex)
+        when: control.anchorIndex >= 0 && (pinchHandler.active || centeringTimer.running)
+        value: control.contentYToCenterIndex(control.anchorIndex)
     }
 
     SizesCalculator
@@ -564,5 +596,14 @@ Item
     GeometryCalculator
     {
         id: geometryCalculator
+    }
+
+    CellsSearcher
+    {
+        id: cellsSearcher
+
+        repeater: repeater
+        flickable: flickable
+        spacing: control.spacing
     }
 }
