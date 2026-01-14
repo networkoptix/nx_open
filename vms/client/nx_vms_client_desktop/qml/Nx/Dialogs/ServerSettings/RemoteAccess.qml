@@ -110,6 +110,7 @@ Item
                                 .arg(title.text).arg(portLabel.text)
 
                             helpTopic: HelpTopic.RemoteAccess
+                            visible: tile.port
                         }
                     }
 
