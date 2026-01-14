@@ -48,9 +48,9 @@ public:
      */
     bool popData(uint64_t sampleCount, uint8_t** buffers);
 
-    uint32_t sampleCount() const { return m_dataSize / m_sampleSize; }
-    uint32_t planeCount() const { return m_planeCount; }
-    uint32_t sampleSize() const { return m_sampleSize; }
+    [[nodiscard]] uint32_t sampleCount() const { return static_cast<uint32_t>(m_dataSize / m_sampleSize); }
+    [[nodiscard]] uint32_t planeCount() const { return m_planeCount; }
+    [[nodiscard]] uint32_t sampleSize() const { return m_sampleSize; }
 
 private:
     bool allocBuffers(uint64_t sampleCount);
