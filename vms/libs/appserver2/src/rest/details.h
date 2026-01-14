@@ -105,7 +105,9 @@ inline void throwError(Result r)
 }
 
 template<typename IgnoredDbType, typename DbType, typename Model, typename Id>
-void assertModelToDbTypesProducedValidResult(const DbType& value, const Id& id)
+void assertModelToDbTypesProducedValidResult(
+    [[maybe_unused]] const DbType& value,
+    [[maybe_unused]] const Id& id)
 {
     using nx::utils::model::getId;
 
