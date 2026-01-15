@@ -25,6 +25,7 @@ using namespace std::chrono;
 static constexpr auto kErrorRetryDelay = 5s;
 static constexpr auto kUpdateDelay = 20s;
 static constexpr size_t kMaxConcurrentRequests = 10;
+static constexpr int kMaximumPageSize = 1000;
 
 struct TreeNode
 {
@@ -1093,7 +1094,8 @@ coro::Task<bool> OrganizationsModel::Private::loadOrgAsync(struct Organization o
             systemsPath,
             nx::UrlQuery()
                 .addQueryItem("rootOnly", "false")
-                .addQueryItem("showAllStatuses", "true")));
+                .addQueryItem("showAllStatuses", "true")
+                .addQueryItem("page_size", kMaximumPageSize)));
 
     if (groupStructure)
         setOrgStructure(org.id, *groupStructure);
