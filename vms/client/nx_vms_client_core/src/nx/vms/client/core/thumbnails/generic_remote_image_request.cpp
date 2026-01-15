@@ -39,11 +39,15 @@ GenericRemoteImageRequest::GenericRemoteImageRequest(
     base_type(parent),
     d(new Private{})
 {
-    if (!NX_ASSERT(!requestLine.isEmpty())
-        || !NX_ASSERT(systemContext)
-        || !NX_ASSERT(d->threadPool()))
+    if (!NX_ASSERT(!requestLine.isEmpty()) || !NX_ASSERT(d->threadPool()))
     {
         setError("Invalid operation");
+        return;
+    }
+
+    if (!systemContext)
+    {
+        setError("No system context");
         return;
     }
 

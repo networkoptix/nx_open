@@ -3,12 +3,52 @@
 #include "remote_async_image_provider.h"
 
 #include <QtCore/QPointer>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 
+#include <nx/utils/log/format.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/common/utils/thread_pool.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/thumbnails/generic_remote_image_request.h>
 
 namespace nx::vms::client::core {
+
+namespace {
+
+static const QString kSystemIdParameter = "___systemId";
+
+struct InternalParams
+{
+    QString systemId;
+};
+
+SystemContext* getSystemContext(const QString& crossSystemId = QString{})
+{
+    if (crossSystemId.isEmpty())
+        return appContext()->currentSystemContext();
+
+    const auto crossSystem = appContext()->cloudCrossSystemManager()->systemContext(crossSystemId);
+    return crossSystem ? crossSystem->systemContext() : nullptr;
+}
+
+std::tuple<InternalParams, QString /*preprocessedLine*/> extractInternalParams(
+    const QString& requestLine)
+{
+    QUrl url(requestLine);
+    QUrlQuery query(url);
+
+    const InternalParams result{
+        .systemId = query.queryItemValue(kSystemIdParameter)};
+
+    query.removeQueryItem(kSystemIdParameter);
+    url.setQuery(query);
+
+    return {result, url.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority)};
+}
+
+} // namespace
 
 class RemoteAsyncImageResponse: public QQuickImageResponse
 {
@@ -58,7 +98,15 @@ QQuickImageResponse* RemoteAsyncImageProvider::requestImageResponse(
     // If a particular request allows to obtain images of different sizes, the desired size must be
     // included in `requestLine`.
 
-    return new RemoteAsyncImageResponse(appContext()->currentSystemContext(), requestLine);
+    const auto [internalParams, preprocessedLine] = extractInternalParams(requestLine);
+
+    return new RemoteAsyncImageResponse(
+        getSystemContext(internalParams.systemId), preprocessedLine);
+}
+
+QString RemoteAsyncImageProvider::systemIdParameter()
+{
+    return kSystemIdParameter;
 }
 
 } // namespace nx::vms::client::core

@@ -61,7 +61,6 @@ QFuture<MultiObjectData> MotionLoaderDelegate::load(
     promise.start();
 
     const auto last = end - 1;
-    const auto cameraId = d->chunkProvider->resource()->getId();
 
     const auto getPreviewTimeMs =
         [](const QnTimePeriod& motion) { return motion.startTimeMs + motion.durationMs / 2; };
@@ -78,13 +77,13 @@ QFuture<MultiObjectData> MotionLoaderDelegate::load(
             .startTimeMs = begin->startTimeMs,
             .durationMs = begin->durationMs,
             .title = tr("Motion detected"),
-            .imagePath = makeImageRequest(cameraId, previewTimeMs, kHighImageResolution)};
+            .imagePath = makeImageRequest(resource, previewTimeMs, kHighImageResolution)};
 
         promise.emplaceResult(MultiObjectData{
             .caption = tr("Motion detected"),
             .description = durationText,
             .iconPaths = {"image://skin/20x20/Outline/motion.svg"},
-            .imagePaths = {makeImageRequest(cameraId, previewTimeMs, kLowImageResolution)},
+            .imagePaths = {makeImageRequest(resource, previewTimeMs, kLowImageResolution)},
             .positionMs = begin->startTimeMs,
             .durationMs = begin->durationMs,
             .count = 1,
@@ -96,7 +95,7 @@ QFuture<MultiObjectData> MotionLoaderDelegate::load(
         for (auto it = last;; --it)
         {
             imagePaths.push_back(
-                makeImageRequest(cameraId, getPreviewTimeMs(*it), kLowImageResolution));
+                makeImageRequest(resource, getPreviewTimeMs(*it), kLowImageResolution));
             if (it == begin || imagePaths.size() >= kMaxPreviewImageCount)
                 break;
         }

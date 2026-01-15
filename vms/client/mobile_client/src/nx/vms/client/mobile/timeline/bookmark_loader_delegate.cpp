@@ -39,7 +39,7 @@ struct BookmarkLoaderDelegate::Private
         const QnTimePeriod& period,
         milliseconds minimumStackDuration,
         int limit,
-        const nx::Uuid& cameraId,
+        const QnResourcePtr& resource,
         QnCameraBookmarkList result)
     {
         QnTimePeriodList chunks;
@@ -67,7 +67,7 @@ struct BookmarkLoaderDelegate::Private
                 .durationMs = bookmark.durationMs.count(),
                 .title = bookmarkTitle(bookmark),
                 .description = bookmark.description,
-                .imagePath = makeImageRequest(cameraId, bookmark.startTimeMs.count(),
+                .imagePath = makeImageRequest(resource, bookmark.startTimeMs.count(),
                     kHighImageResolution),
                 .tags = QStringList{bookmark.tags.cbegin(), bookmark.tags.cend()}};
 
@@ -75,7 +75,7 @@ struct BookmarkLoaderDelegate::Private
                 .caption = bookmarkTitle(bookmark),
                 .description = bookmark.description,
                 .iconPaths = {"image://skin/20x20/Outline/bookmark.svg"},
-                .imagePaths = {makeImageRequest(cameraId, bookmark.startTimeMs.count(),
+                .imagePaths = {makeImageRequest(resource, bookmark.startTimeMs.count(),
                     kLowImageResolution)},
                 .positionMs = bookmark.startTimeMs.count(),
                 .durationMs = bookmark.durationMs.count(),
@@ -106,7 +106,7 @@ struct BookmarkLoaderDelegate::Private
                         .durationMs = bookmark.durationMs.count(),
                         .title = bookmarkTitle(bookmark),
                         .description = bookmark.description,
-                        .imagePath = makeImageRequest(cameraId, bookmark.startTimeMs.count(),
+                        .imagePath = makeImageRequest(resource, bookmark.startTimeMs.count(),
                             kHighImageResolution),
                         .tags = QStringList{bookmark.tags.cbegin(), bookmark.tags.cend()}});
                 }
@@ -115,8 +115,9 @@ struct BookmarkLoaderDelegate::Private
             QStringList imagePaths;
             for (const auto& bookmark: result)
             {
-                imagePaths.push_back(
-                    makeImageRequest(cameraId, bookmark.startTimeMs.count(), kLowImageResolution));
+                imagePaths.push_back(makeImageRequest(resource, bookmark.startTimeMs.count(),
+                    kLowImageResolution));
+
                 if (imagePaths.size() >= kMaxPreviewImageCount)
                     break;
             }
@@ -185,7 +186,7 @@ QFuture<MultiObjectData> BookmarkLoaderDelegate::load(
                 && nativeDataReadinessWatcher->future().isResultReadyAt(0))
             {
                 Private::handleLoadingFinished(resultPromise, period, minimumStackDuration,
-                    d->maxBookmarksPerBucket, resource->getId(),
+                    d->maxBookmarksPerBucket, resource,
                     nativeDataReadinessWatcher->future().takeResult());
             }
 

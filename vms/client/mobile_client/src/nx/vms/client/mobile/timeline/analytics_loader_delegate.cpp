@@ -117,40 +117,47 @@ struct AnalyticsLoaderDelegate::Private
     const BackendPtr backend;
     const int maxTracksPerBucket;
 
-    static QString makeTitleImageRequest(const ObjectTrackEx& track)
+    static QString makeTitleImageRequest(
+        const ObjectTrackEx& track, const QString& crossSystemId = {})
     {
         const QString requestTemplate =
-            "rest/v4/analytics/objectTracks/%1/titleImage.jpg?deviceId=%2";
+            "rest/v4/analytics/objectTracks/%1/titleImage.jpg?deviceId=%2%3";
+
+        const auto systemIdParam =
+            crossSystemId.isEmpty() ? "" : nx::format("&%1=%2", systemIdParameter(), crossSystemId);
+
         return nx::format(requestTemplate,
-            track.id.toSimpleString(), track.deviceId.toSimpleString());
+            track.id.toSimpleString(), track.deviceId.toSimpleString(), systemIdParam);
     }
 
-    static QString makeImageRequest(const ObjectTrackEx& track, int resolution)
+    static QString makeImageRequest(
+        const QnResourcePtr& resource, const ObjectTrackEx& track, int resolution)
     {
-        if (track.title.value_or(Title{}).hasImage)
-            return makeTitleImageRequest(track);
+        if (!NX_ASSERT(resource && resource->getId() == track.deviceId))
+            return {};
 
-        const QString requestTemplate = "ec2/cameraThumbnails?cameraId=%2&time=%1&objectTrackId=%3"
-            "&width=%4&height=0&method=precise&imageFormat=jpg";
+        if (track.title.value_or(Title{}).hasImage)
+            return makeTitleImageRequest(track, AbstractLoaderDelegate::crossSystemId(resource));
 
         const milliseconds timestamp = duration_cast<milliseconds>(
             microseconds(track.bestShot.timestampUs));
 
-        return nx::format(requestTemplate,
-            timestamp.count(),
-            track.deviceId.toSimpleString(),
-            track.id.toSimpleString(),
-            resolution);
+        return AbstractLoaderDelegate::makeImageRequest(resource, timestamp.count(), resolution,
+            {{"objectTrackId", track.id.toSimpleString()}});
     }
 
     static void handleLoadingFinished(
-        core::SystemContext* systemContext,
+        const QnResourcePtr& resource,
         QPromise<MultiObjectData>& promise,
         const QnTimePeriod& period,
         milliseconds minimumStackDuration,
         int limit,
         LookupResult&& result)
     {
+        const auto systemContext = resource->systemContext()->as<core::SystemContext>();
+        if (!NX_ASSERT(systemContext))
+            return;
+
         const int count = (int) result.size();
         if (count == 1)
         {
@@ -172,14 +179,14 @@ struct AnalyticsLoaderDelegate::Private
                 .startTimeMs = position.count(),
                 .durationMs = duration.count(),
                 .title = title,
-                .imagePath = makeImageRequest(track, kHighImageResolution),
+                .imagePath = makeImageRequest(resource, track, kHighImageResolution),
                 .attributes = preprocessAttributes(systemContext, track)};
 
             promise.emplaceResult(MultiObjectData{
                 .caption = title,
                 .description = durationText,
                 .iconPaths = {iconPath(objectType)},
-                .imagePaths = {makeImageRequest(track, kLowImageResolution)},
+                .imagePaths = {makeImageRequest(resource, track, kLowImageResolution)},
                 .positionMs = position.count(),
                 .durationMs = duration.count(),
                 .count = 1,
@@ -219,7 +226,7 @@ struct AnalyticsLoaderDelegate::Private
                         .startTimeMs = position.count(),
                         .durationMs = duration.count(),
                         .title = title,
-                        .imagePath = makeImageRequest(track, kHighImageResolution),
+                        .imagePath = makeImageRequest(resource, track, kHighImageResolution),
                         .attributes = preprocessAttributes(systemContext, track)});
                 }
             }
@@ -227,7 +234,7 @@ struct AnalyticsLoaderDelegate::Private
             QStringList imagePaths;
             for (const auto& track: result)
             {
-                imagePaths.push_back(makeImageRequest(track, kLowImageResolution));
+                imagePaths.push_back(makeImageRequest(resource, track, kLowImageResolution));
                 if (imagePaths.size() >= kMaxPreviewImageCount)
                     break;
             }
@@ -294,8 +301,7 @@ QFuture<MultiObjectData> AnalyticsLoaderDelegate::load(
                 && nativeDataReadinessWatcher->future().isValid()
                 && nativeDataReadinessWatcher->future().isResultReadyAt(0))
             {
-                Private::handleLoadingFinished(
-                    resource->systemContext()->as<core::SystemContext>(), resultPromise, period,
+                Private::handleLoadingFinished(resource, resultPromise, period,
                     minimumStackDuration, d->maxTracksPerBucket,
                     nativeDataReadinessWatcher->future().takeResult());
             }

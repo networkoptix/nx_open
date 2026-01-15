@@ -8,6 +8,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <recording/time_period.h>
 
@@ -27,10 +28,27 @@ class AbstractLoaderDelegate: public QObject
 public:
     explicit AbstractLoaderDelegate(QObject* parent = nullptr): QObject(parent) {}
 
+    /** Asynchronous model data loading method to implement in descendants. */
     virtual QFuture<MultiObjectData> load(const QnTimePeriod& period,
         std::chrono::milliseconds minimumStackDuration) = 0;
 
-    static QString makeImageRequest(const nx::Uuid& cameraId, qint64 timestampMs, int resolution);
+    // Helper functions for descendants.
+
+    /** Returns a cloud system id for a cross-system camera or an empty string otherwise. */
+    static QString crossSystemId(const QnResourcePtr& resource);
+
+    /**
+     * Returns the name of the internal parameter for an image URL for `RemoteAsyncImageProvider`
+     * to pass the system id for a cross-system camera thumbnail.
+     */
+    static QString systemIdParameter();
+
+    /**
+     * Builds the path plus query part of a camera thumbnail URL for `RemoteAsyncImageProvider`.
+     */
+    static QString makeImageRequest(const QnResourcePtr& resource, qint64 timestampMs,
+        int resolution, const QList<std::pair<QString, QString>>& extraParams = {});
+
     static constexpr int kLowImageResolution = 320;
     static constexpr int kHighImageResolution = 800;
 
