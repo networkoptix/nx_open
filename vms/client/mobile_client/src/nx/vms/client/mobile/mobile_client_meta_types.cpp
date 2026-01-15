@@ -45,7 +45,6 @@
 #include <private/qqmlvaluetype_p.h>
 #include <resources/camera_access_rights_helper.h>
 #include <settings/qml_settings_adaptor.h>
-#include <ui/models/ordered_systems_model.h>
 #include <ui/models/systems_model.h>
 #include <ui/timeline/timeline.h>
 #include <utils/developer_settings_helper.h>
@@ -82,7 +81,7 @@ void registerQmlTypes()
         "nx.vms.client.core", 1, 0, "UserWatcher",
         "Use UserWatcher instance from the System Context");
 
-    qmlRegisterType<QnOrderedSystemsModel>("Nx.Models", 1, 0, "OrderedSystemsModel");
+    qmlRegisterType<QnSystemsModel>("Nx.Models", 1, 0, "SystemsModel");
     qmlRegisterType<QnMobileClientUiController>("Nx.Mobile", 1, 0, "Controller");
     qmlRegisterType<nx::client::mobile::utils::DeveloperSettingsHelper>(
         "Nx.Settings", 1, 0, "DeveloperSettingsHelper");

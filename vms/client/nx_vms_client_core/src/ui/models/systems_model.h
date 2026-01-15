@@ -57,7 +57,7 @@ public:
     static const QHash<int, QByteArray> kRoleNames;
 
 public:
-    QnSystemsModel(AbstractSystemsController* controller, QObject* parent = nullptr);
+    QnSystemsModel(AbstractSystemsController* controller = nullptr, QObject* parent = nullptr);
     virtual ~QnSystemsModel();
 
 public: // overrides
