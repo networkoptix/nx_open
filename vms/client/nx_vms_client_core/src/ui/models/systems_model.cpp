@@ -18,6 +18,7 @@
 #include <nx/vms/common/network/server_compatibility_validator.h>
 
 #include "abstract_systems_controller.h"
+#include "systems_controller.h"
 #include "system_hosts_model.h"
 
 using namespace nx::vms::common;
@@ -118,6 +119,9 @@ QnSystemsModel::QnSystemsModel(AbstractSystemsController* controller, QObject* p
     d_ptr(new QnSystemsModelPrivate(this))
 {
     Q_D(QnSystemsModel);
+
+    if (!controller)
+        controller = new SystemsController(this);
 
     d->controller = controller;
 

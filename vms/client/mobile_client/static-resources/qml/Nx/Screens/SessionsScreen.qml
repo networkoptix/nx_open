@@ -212,9 +212,9 @@ Page
         }
     }
 
-    OrderedSystemsModel
+    SystemsModel
     {
-        id: orderedSystemsModel
+        id: systemsModel
     }
 
     OrganizationsModel
@@ -222,7 +222,7 @@ Page
         id: organizationsModel
 
         statusWatcher: cloudUserProfileWatcher.statusWatcher
-        systemsModel: orderedSystemsModel.sourceModel
+        systemsModel: systemsModel
     }
 
     ModelDataAccessor
