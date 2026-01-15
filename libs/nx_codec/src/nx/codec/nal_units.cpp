@@ -237,9 +237,13 @@ int isStartCode(const void* _data, size_t size)
 void convertToStartCodes(uint8_t* const data, const int size)
 {
     uint8_t* offset = data;
-    while (offset + 4 < data + size)
+    const uint8_t* end = data + size;
+    while (end - offset >= 4)
     {
-        size_t naluSize = ntohl(*(uint32_t*)offset);
+        int64_t naluSize = (offset[0] << 24) | (offset[1] << 16) | (offset[2] << 8) | offset[3];
+        if (end - offset < int64_t(kStartCode.size()) + naluSize)
+            break;
+
         memcpy(offset, kStartCode.data(), kStartCode.size());
         offset += kStartCode.size() + naluSize;
     }
