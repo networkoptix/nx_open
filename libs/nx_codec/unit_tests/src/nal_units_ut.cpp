@@ -185,6 +185,9 @@ TEST(NalUnits, convertStartCodesToSizes)
         ASSERT_EQ(converted[3], 0x02);
         ASSERT_EQ(converted[4], 0x1c);
         ASSERT_EQ(converted[5], 0xe8);
+
+        nx::media::nal::convertToStartCodes(converted.data(), converted.size());
+        ASSERT_EQ(0, memcmp(converted.data(), data, sizeof(data)));
     }
     {
         uint8_t data[] = {
@@ -204,6 +207,9 @@ TEST(NalUnits, convertStartCodesToSizes)
         ASSERT_EQ(converted[7], 0x00);
         ASSERT_EQ(converted[8], 0x00);
         ASSERT_EQ(converted[9], 0x05);
+
+        nx::media::nal::convertToStartCodes(converted.data(), converted.size());
+        ASSERT_EQ(0, memcmp(converted.data(), data, sizeof(data)));
     }
     // Padding.
     {
