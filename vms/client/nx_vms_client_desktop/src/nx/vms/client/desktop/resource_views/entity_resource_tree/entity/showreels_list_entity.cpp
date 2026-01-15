@@ -17,7 +17,7 @@ ShowreelsListEntity::ShowreelsListEntity(
     const common::ShowreelManager* showreelManager,
     const QnUserResourcePtr& user)
     :
-    base_type(showreelItemCreator, core::entity_item_model::numericOrder()),
+    base_type(showreelItemCreator, nx::vms::client::desktop::entity_item_model::numericOrder()),
     m_showreelManager(showreelManager),
     m_user(user)
 {
