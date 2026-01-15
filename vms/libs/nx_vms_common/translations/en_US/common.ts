@@ -2011,5 +2011,9 @@
         <source>Socket sending timeout when Server streams media data (Seconds).</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
