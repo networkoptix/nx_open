@@ -4,14 +4,6 @@
   <context>
     <name>ParametersVisualizationModel::Private</name>
     <message numerus="yes">
-      <source>%n Object Types</source>
-      <comment>%n is number of types</comment>
-      <translation>
-        <numerusform>%n Tipos de obxectos</numerusform>
-        <numerusform>%n Tipos de obxectos</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n Object Attributes</source>
       <comment>%n is number of attributes</comment>
       <translation>

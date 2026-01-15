@@ -1941,5 +1941,9 @@
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
       <translation>서버가 미디어 데이터를 스트리밍할 때 소켓 전송 시간 초과(초).</translation>
     </message>
+    <message>
+      <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
+      <translation type="unfinished">Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</translation>
+    </message>
   </context>
 </TS>

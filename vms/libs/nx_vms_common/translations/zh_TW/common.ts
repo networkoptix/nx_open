@@ -1941,5 +1941,9 @@
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
       <translation>伺服器串流媒體資料時的socket發送逾時秒數。</translation>
     </message>
+    <message>
+      <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
+      <translation type="unfinished">Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</translation>
+    </message>
   </context>
 </TS>
