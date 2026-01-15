@@ -50,6 +50,8 @@ struct EventDescriptor
     std::string prolongedEventKey;
     EventIsActive isActive;
 
+    EventDescriptor() = default;
+
     EventDescriptor(
         std::string eventTypeId,
         std::string caption,
@@ -135,8 +137,33 @@ static const std::vector<EventDescriptor> kEventsToFire = {
         kAdditionalEventType,
         "Caption: Additional Event",
         "Description: Additional Event",
+    },
+    {
+        kAdditionalEventType2,
+        "Caption: Additional Event 2",
+        "Description: Additional Event 2",
     }
 };
+
+const EventDescriptor& getNextEventDescriptor(
+    int& currentEventTypeIndex,
+    bool declareAdditionalEventTypes)
+{
+    const int eventsCount = static_cast<int>(kEventsToFire.size());
+
+    while (true)
+    {
+        const EventDescriptor& descriptor = kEventsToFire[currentEventTypeIndex];
+        currentEventTypeIndex = (currentEventTypeIndex + 1) % eventsCount;
+
+        if (declareAdditionalEventTypes
+            || (descriptor.eventTypeId != kAdditionalEventType
+                && descriptor.eventTypeId != kAdditionalEventType2))
+        {
+            return descriptor;
+        }
+    }
+}
 
 } // namespace
 
@@ -218,17 +245,26 @@ R"json(
     return result;
 }
 
-Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
+void DeviceAgent::doSetSettings(
+    nx::sdk::Result<const nx::sdk::ISettingsResponse*>* /*outResult*/,
+    const nx::sdk::IStringMap* settings)
 {
-    m_deviceAgentSettings.generateEvents = toBool(settingValue(kGenerateEventsSetting));
+    const char* generateEvents = settings->value(kGenerateEventsSetting.c_str());
+
+    m_deviceAgentSettings.generateEvents = generateEvents
+        ? toBool(generateEvents)
+        : false;
+
+    const char* declareAdditionalEventTypes =
+        settings->value(kDeclareAdditionalEventTypesSetting.c_str());
 
     m_deviceAgentSettings.declareAdditionalEventTypes =
-        toBool(settingValue(kDeclareAdditionalEventTypesSetting));
+        declareAdditionalEventTypes
+            ? toBool(declareAdditionalEventTypes)
+            : false;
 
     // The manifest depends on declareAdditionalEventTypes setting, so sending the new manifest.
     pushManifest(manifestString());
-
-    return nullptr;
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(
@@ -301,7 +337,10 @@ void DeviceAgent::stopEventThread()
 
 Ptr<IMetadataPacket> DeviceAgent::cookSomeEvents()
 {
-    const auto descriptor = kEventsToFire[m_eventContext.currentEventTypeIndex];
+    const EventDescriptor& descriptor = getNextEventDescriptor(
+        m_eventContext.currentEventTypeIndex,
+        m_deviceAgentSettings.declareAdditionalEventTypes);
+
     auto eventMetadataPacket = makePtr<EventMetadataPacket>();
     eventMetadataPacket->setTimestampUs(usSinceEpoch());
     eventMetadataPacket->setDurationUs(0);
@@ -316,9 +355,6 @@ Ptr<IMetadataPacket> DeviceAgent::cookSomeEvents()
     NX_PRINT << "Generating Event: "
         << "type: " << eventMetadata->typeId()
         << ", isActive: " << eventMetadata->isActive();
-
-    m_eventContext.currentEventTypeIndex =
-        (m_eventContext.currentEventTypeIndex + 1) % ((int) kEventsToFire.size());
 
     eventMetadataPacket->addItem(eventMetadata);
 

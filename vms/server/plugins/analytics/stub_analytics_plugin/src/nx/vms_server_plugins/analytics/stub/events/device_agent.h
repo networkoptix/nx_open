@@ -37,7 +37,9 @@ protected:
 
     virtual std::string manifestString() const override;
 
-    virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
+    virtual void doSetSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
+        const nx::sdk::IStringMap* settings) override;
 
 private:
     nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> cookSomeEvents();
