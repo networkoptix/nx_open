@@ -86,8 +86,8 @@ struct BookmarkLoaderDelegate::Private
         else if (count > 1)
         {
             const auto title = count <= limit
-                ? BookmarkLoaderDelegate::tr("Bookmarks (%n)", "", count)
-                : BookmarkLoaderDelegate::tr("Bookmarks (>%n)", "", limit);
+                ? BookmarkLoaderDelegate::tr("Bookmarks (%1)").arg(count)
+                : BookmarkLoaderDelegate::tr("Bookmarks (>%1)").arg(limit);
 
             const auto firstPosition = count <= limit
                 ? result.back().startTimeMs

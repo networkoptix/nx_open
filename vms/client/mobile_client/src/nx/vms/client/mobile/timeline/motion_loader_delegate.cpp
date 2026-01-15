@@ -102,8 +102,8 @@ QFuture<MultiObjectData> MotionLoaderDelegate::load(
 
         promise.emplaceResult(MultiObjectData{
             .caption = count > d->maxMotionsPerBucket
-                ? tr("Motion (>%n)", "", d->maxMotionsPerBucket)
-                : tr("Motion (%n)", "", count),
+                ? tr("Motion (>%1)").arg(d->maxMotionsPerBucket)
+                : tr("Motion (%1)").arg(count),
             .iconPaths = {"image://skin/20x20/Outline/motion.svg"},
             .imagePaths = imagePaths,
             .positionMs = begin->startTimeMs,

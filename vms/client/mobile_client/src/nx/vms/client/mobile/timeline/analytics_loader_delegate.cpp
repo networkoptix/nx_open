@@ -233,8 +233,8 @@ struct AnalyticsLoaderDelegate::Private
         else if (count > 1)
         {
             const auto title = count <= limit
-                ? AnalyticsLoaderDelegate::tr("Objects (%n)", "", count)
-                : AnalyticsLoaderDelegate::tr("Objects (>%n)", "", limit);
+                ? AnalyticsLoaderDelegate::tr("Objects (%1)").arg(count)
+                : AnalyticsLoaderDelegate::tr("Objects (>%1)").arg(limit);
 
             const auto firstPosition = count <= limit
                 ? duration_cast<milliseconds>(microseconds(result.back().firstAppearanceTimeUs))
