@@ -2,10 +2,12 @@
 
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_list_entity.h>
 
+namespace nx::vms::api { struct ShowreelData; }
 namespace nx::vms::common { class ShowreelManager; }
 
 namespace nx::vms::client::desktop {
@@ -14,7 +16,8 @@ namespace entity_resource_tree {
 using ShowreelItemCreator = std::function<core::entity_item_model::AbstractItemPtr(const nx::Uuid&)>;
 
 /**
- * Entity which represents list of Showreels provided by showreel manager.
+ * Entity which represents list of Showreels filtered by access rights.
+ * Shows only showreels that belong to the current user or are shared (parentId is null).
  */
 class ShowreelsListEntity: public core::entity_item_model::UniqueKeyListEntity<nx::Uuid>
 {
@@ -23,9 +26,17 @@ class ShowreelsListEntity: public core::entity_item_model::UniqueKeyListEntity<n
 public:
     ShowreelsListEntity(
         const ShowreelItemCreator& showreelItemCreator,
-        const common::ShowreelManager* showreelManager);
+        const common::ShowreelManager* showreelManager,
+        const QnUserResourcePtr& user);
 
 private:
+    bool hasAccess(const nx::Uuid& showreelId) const;
+    void onShowreelAdded(const nx::vms::api::ShowreelData& showreel);
+    void onShowreelChanged(const nx::vms::api::ShowreelData& showreel);
+
+private:
+    const common::ShowreelManager* m_showreelManager = nullptr;
+    QnUserResourcePtr m_user;
     nx::utils::ScopedConnections m_connectionsGuard;
 };
 
