@@ -25,6 +25,7 @@ TreeViewDelegate
     readonly property bool isCamera: resourceHelper.isCamera
     readonly property bool isLayout: resourceHelper.isLayout
     readonly property bool isAllDevices: model.nodeType === ResourceTree.NodeType.allDevices
+    readonly property bool isFolder: model.nodeType === ResourceTree.NodeType.customResourceGroup
 
     readonly property int flags: (model && model.resourceExtraStatus) || 0
     readonly property string iconSource:
@@ -85,7 +86,22 @@ TreeViewDelegate
                 height: 20
                 sourceSize: Qt.size(20, 20)
                 source: iconSource
+                visible: !isFolder
             }
+
+            ColoredImage
+            {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 20
+                height: 20
+                sourceSize: Qt.size(20, 20)
+                sourcePath: expanded
+                    ? "image://skin/20x20/Solid/folder_open.svg"
+                    : "image://skin/20x20/Solid/folder_close.svg"
+                primaryColor: ColorTheme.colors.light10
+                visible: isFolder
+            }
+
             Label
             {
                 textFormat: highlightRegExp
