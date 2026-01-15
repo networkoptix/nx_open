@@ -828,7 +828,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createShowreelsGroupEntity() const
 
     return makeFlatteningGroup(
         m_itemFactory->createShowreelsItem(),
-        std::make_unique<ShowreelsListEntity>(showreelItemCreator, showreelManager),
+        std::make_unique<ShowreelsListEntity>(showreelItemCreator, showreelManager, user()),
         FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 
