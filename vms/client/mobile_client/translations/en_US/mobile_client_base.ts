@@ -160,14 +160,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Motions (&gt;%n)</source>
+        <source>Motion (&gt;%n)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>Motions (%n)</source>
+        <source>Motion (%n)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
