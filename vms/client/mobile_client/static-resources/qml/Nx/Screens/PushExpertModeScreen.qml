@@ -69,6 +69,51 @@ Page
                 spacing: 4
                 width: parent.width
 
+                LabeledSwitch
+                {
+                    id: notificationsSwitch
+
+                    width: parent.width
+
+                    text: qsTr("Notifications")
+                    manualStateChange: true
+
+                    showIndicator:
+                        appContext.pushManager.loggedIn && appContext.pushManager.hasOsPermission
+
+                    onClicked:
+                    {
+                        if (!appContext.pushManager.loggedIn)
+                            Workflow.openCloudLoginScreen()
+                        else if (!appContext.pushManager.hasOsPermission)
+                            appContext.pushManager.showOsPushSettings()
+                        else
+                            appContext.pushManager.setEnabled(checkState == Qt.Unchecked)
+                    }
+
+                    Binding on checkState { value: appContext.pushManager.enabledCheckState }
+
+                    extraText:
+                    {
+                        if (!appContext.pushManager.loggedIn)
+                            return qsTr("Log in to the cloud to receive notifications")
+
+                        return appContext.pushManager.hasOsPermission
+                            ? ""
+                            : qsTr("Notifications are turned off in the device settings")
+                    }
+
+                    extraTextColor:
+                    {
+                        if (!appContext.pushManager.loggedIn)
+                            return ColorTheme.colors.brand_core
+
+                        return appContext.pushManager.hasOsPermission
+                            ? notificationsSwitch.extraTextStandardColor
+                            : ColorTheme.colors.red_l2
+                    }
+                }
+
                 StyledRadioButton
                 {
                     id: simpleModeRadioButton

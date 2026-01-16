@@ -29,71 +29,11 @@ BaseSettingsScreen
 
     LabeledSwitch
     {
-        id: notificationsSwitch
-
         width: parent.width
-
         icon: "image://skin/24x24/Solid/notifications.svg?primary=light1"
         text: qsTr("Notifications")
-        manualStateChange: true
-        interactive: !appContext.pushManager.userUpdateInProgress
-        showIndicator: appContext.pushManager.loggedIn && appContext.pushManager.hasOsPermission
-        onClicked: appContext.pushManager.setEnabled(checkState == Qt.Unchecked)
-        showCustomArea: checkState == Qt.Checked && appContext.pushManager.systemsCount > 1
-
-        Binding
-        {
-            target: notificationsSwitch
-            property: "checkState"
-            value: appContext.pushManager.enabledCheckState
-        }
-
-        customArea: Text
-        {
-            id: systemsCountText
-
-            anchors.verticalCenter: parent.verticalCenter
-
-            font.pixelSize: 16
-            color: ColorTheme.colors.light16
-            text: appContext.pushManager.expertMode
-                ? appContext.pushManager.usedSystemsCount
-                    + " / " + appContext.pushManager.systemsCount
-                : qsTr("All");
-        }
-
-        customAreaClickHandler:
-            function()
-            {
-                if (!appContext.pushManager.loggedIn)
-                    Workflow.openCloudLoginScreen()
-                else if (!appContext.pushManager.hasOsPermission)
-                    appContext.pushManager.showOsPushSettings()
-                else if (notificationsSwitch.showCustomArea)
-                    Workflow.openPushExpertModeScreen()
-                else
-                    notificationsSwitch.handleSelectorClicked()
-            }
-
-        extraText:
-        {
-            if (!appContext.pushManager.loggedIn)
-                return qsTr("Log in to the cloud to receive notifications")
-
-            return appContext.pushManager.hasOsPermission
-                ? ""
-                : qsTr("Notifications are turned off in the device settings")
-        }
-
-        extraTextColor:
-        {
-            if (!appContext.pushManager.loggedIn)
-                return ColorTheme.colors.brand_core
-
-            return appContext.pushManager.hasOsPermission
-                ? notificationsSwitch.extraTextStandardColor
-                : ColorTheme.colors.red_l2
-        }
+        showIndicator: false
+        onClicked: Workflow.openPushExpertModeScreen()
     }
 
     LabeledSwitch
