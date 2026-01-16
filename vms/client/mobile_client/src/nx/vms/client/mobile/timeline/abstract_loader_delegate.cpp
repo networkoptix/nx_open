@@ -17,9 +17,9 @@ QString AbstractLoaderDelegate::crossSystemId(const QnResourcePtr& resource)
     return {};
 }
 
-QString AbstractLoaderDelegate::systemIdParameter()
+QString AbstractLoaderDelegate::systemIdParameterName()
 {
-    return core::RemoteAsyncImageProvider::systemIdParameter();
+    return core::RemoteAsyncImageProvider::systemIdParameterName();
 }
 
 QString AbstractLoaderDelegate::makeImageRequest(const QnResourcePtr& resource, qint64 timestampMs,
@@ -37,7 +37,7 @@ QString AbstractLoaderDelegate::makeImageRequest(const QnResourcePtr& resource, 
         result += nx::format(kExtraParamTemplate, key, value);
 
     if (const auto systemId = crossSystemId(resource); !systemId.isEmpty())
-        result += nx::format(kExtraParamTemplate, systemIdParameter(), systemId);
+        result += nx::format(kExtraParamTemplate, systemIdParameterName(), systemId);
 
     return result;
 }

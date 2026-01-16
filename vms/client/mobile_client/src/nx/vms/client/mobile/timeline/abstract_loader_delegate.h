@@ -41,7 +41,7 @@ public:
      * Returns the name of the internal parameter for an image URL for `RemoteAsyncImageProvider`
      * to pass the system id for a cross-system camera thumbnail.
      */
-    static QString systemIdParameter();
+    static QString systemIdParameterName();
 
     /**
      * Builds the path plus query part of a camera thumbnail URL for `RemoteAsyncImageProvider`.

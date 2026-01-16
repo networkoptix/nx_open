@@ -81,6 +81,7 @@ Item
             asynchronous: true
             retainWhileLoading: true
             source: remoteImage.imagePath
+            cache: false //< RemoteAsyncImageProvider does all necessary caching.
         }
     }
 

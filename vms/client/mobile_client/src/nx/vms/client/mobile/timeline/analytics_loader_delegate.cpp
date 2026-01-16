@@ -18,7 +18,9 @@
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/thumbnails/remote_async_image_provider.h>
 #include <nx/vms/text/human_readable.h>
+#include <utils/common/synctime.h>
 
 namespace nx::vms::client::mobile {
 namespace timeline {
@@ -31,6 +33,13 @@ using nx::vms::text::HumanReadable;
 namespace {
 
 constexpr int kMaxTypesPerBucket = 5;
+
+// If the last object detection timestamp is more than this interval old (compared to the current
+// sync time), the track is considered finished and its preview thumbnail is not reloaded by timer.
+// The server uses adjustable timeout which is 3 minutes by default.
+constexpr seconds kTrackTerminationThreshold = 5min;
+
+constexpr seconds kThumbnailExpirationInterval = 30s; //< For ongoing tracks only.
 
 std::shared_ptr<AbstractState> taxonomyState(core::SystemContext* systemContext)
 {
@@ -109,6 +118,15 @@ core::analytics::AttributeList preprocessAttributes(
         preprocessAttributes(track.objectTypeId, track.attributes);
 }
 
+std::optional<seconds> thumbnailExpirationInterval(const ObjectTrackEx& track)
+{
+    const auto timeSinceLastDetection =
+        qnSyncTime->currentTimePoint() - microseconds(track.lastAppearanceTimeUs);
+
+    const bool isTrackTerminated = timeSinceLastDetection > kTrackTerminationThreshold;
+    return isTrackTerminated ? std::nullopt : std::make_optional(kThumbnailExpirationInterval);
+}
+
 } // namespace
 
 struct AnalyticsLoaderDelegate::Private
@@ -117,17 +135,25 @@ struct AnalyticsLoaderDelegate::Private
     const BackendPtr backend;
     const int maxTracksPerBucket;
 
-    static QString makeTitleImageRequest(
-        const ObjectTrackEx& track, const QString& crossSystemId = {})
+    static QString makeTitleImageRequest(const ObjectTrackEx& track,
+        std::optional<seconds> expiration = std::nullopt, const QString& crossSystemId = {})
     {
         const QString requestTemplate =
-            "rest/v4/analytics/objectTracks/%1/titleImage.jpg?deviceId=%2%3";
+            "rest/v4/analytics/objectTracks/%1/titleImage.jpg?deviceId=%2%3%4";
 
-        const auto systemIdParam =
-            crossSystemId.isEmpty() ? "" : nx::format("&%1=%2", systemIdParameter(), crossSystemId);
+        static const QString kExtraParamTemplate = "&%1=%2";
 
-        return nx::format(requestTemplate,
-            track.id.toSimpleString(), track.deviceId.toSimpleString(), systemIdParam);
+        const auto systemIdParam = crossSystemId.isEmpty()
+            ? ""
+            : nx::format(kExtraParamTemplate, systemIdParameterName(), crossSystemId);
+
+        const auto expirationParam = expiration
+            ? nx::format(kExtraParamTemplate,
+                core::RemoteAsyncImageProvider::expirationParameterName(), expiration->count())
+            : "";
+
+        return nx::format(requestTemplate, track.id.toSimpleString(),
+            track.deviceId.toSimpleString(), expirationParam, systemIdParam);
     }
 
     static QString makeImageRequest(
@@ -137,13 +163,25 @@ struct AnalyticsLoaderDelegate::Private
             return {};
 
         if (track.title.value_or(Title{}).hasImage)
-            return makeTitleImageRequest(track, AbstractLoaderDelegate::crossSystemId(resource));
+        {
+            return makeTitleImageRequest(track, thumbnailExpirationInterval(track),
+                AbstractLoaderDelegate::crossSystemId(resource));
+        }
+
+        QList<std::pair<QString, QString>> extraParameters{
+            {"objectTrackId", track.id.toSimpleString()}};
+
+        if (const auto expiration = thumbnailExpirationInterval(track))
+        {
+            extraParameters.emplaceBack(core::RemoteAsyncImageProvider::expirationParameterName(),
+                QString::number(expiration->count()));
+        }
 
         const milliseconds timestamp = duration_cast<milliseconds>(
             microseconds(track.bestShot.timestampUs));
 
         return AbstractLoaderDelegate::makeImageRequest(resource, timestamp.count(), resolution,
-            {{"objectTrackId", track.id.toSimpleString()}});
+            extraParameters);
     }
 
     static void handleLoadingFinished(

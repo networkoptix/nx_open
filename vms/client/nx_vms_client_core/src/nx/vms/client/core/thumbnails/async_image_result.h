@@ -3,7 +3,9 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
 
+#include <QtCore/QFuture>
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtGui/QImage>
@@ -43,6 +45,13 @@ public:
 
     static std::chrono::microseconds timestamp(const QImage& image);
     static void setTimestamp(QImage& image, std::chrono::microseconds value);
+
+    /**
+     * Creates a self-destructing wrapper around given asynchronous image loading request
+     * and returns a QFuture to it.
+     */
+    static QFuture<std::tuple<QImage /*image*/, QString /*errorString*/>> toFuture(
+        std::unique_ptr<AsyncImageResult> asyncResult);
 
 signals:
     /**
