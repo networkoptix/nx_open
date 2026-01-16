@@ -155,15 +155,15 @@
       <translation>Gerakan terdeteksi</translation>
     </message>
     <message numerus="yes">
-      <source>Motions (&gt;%n)</source>
-      <translation>
-        <numerusform>Gerakan (&gt;%n)</numerusform>
+      <source>Motion (&gt;%n)</source>
+      <translation type="unfinished">
+        <numerusform>Motion (&gt;%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Motions (%n)</source>
-      <translation>
-        <numerusform>Gerakan (%n)</numerusform>
+      <source>Motion (%n)</source>
+      <translation type="unfinished">
+        <numerusform>Motion (%n)</numerusform>
       </translation>
     </message>
   </context>

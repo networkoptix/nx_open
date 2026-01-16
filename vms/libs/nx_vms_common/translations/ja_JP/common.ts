@@ -1490,16 +1490,16 @@
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-      <translation>サーバーが RTSP セッションに再接続するまでの連続 RTP エラーの最大数</translation>
+      <translation>サーバーが RTSP セッションに再接続するまでの連続 RTP エラーの最大数。</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation>現在 %1 ソフトウェアで使用されている、非推奨のAPI関数を有効にする (非セキュア)</translation>
+      <translation>現在 %1 ソフトウェアで使用されている、非推奨のAPI関数を有効にする (非セキュア)。</translation>
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation>データ同期のためのクラウドポーリングHTTPリクエストの間隔</translation>
+      <translation>データ同期のためのクラウドポーリングHTTPリクエストの間隔。</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
@@ -1507,7 +1507,7 @@
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation>新規インテグレーション登録リクエストの作成を有効化または無効化する</translation>
+      <translation>新規インテグレーション登録リクエストの作成を有効化する。</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
@@ -1619,7 +1619,7 @@
     </message>
     <message>
       <source>Disable Device vendors.</source>
-      <translation>無効にするデバイスベンダー</translation>
+      <translation>無効にするデバイスベンダー。</translation>
     </message>
     <message>
       <source>Optimize Camera settings.</source>
@@ -1927,7 +1927,7 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation>シーン内最大アイテム数 (0でデフォルト値を使用)</translation>
+      <translation>シーン内最大アイテム数 (0 でデフォルト値を使用)。</translation>
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>
@@ -1943,7 +1943,7 @@
     </message>
     <message>
       <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
-      <translation type="unfinished">Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</translation>
+      <translation>インテグレーションの読み込み方法を制御します。以下より選択してください: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;, &quot;forceLoadingInCurrentProcess&quot;</translation>
     </message>
   </context>
 </TS>

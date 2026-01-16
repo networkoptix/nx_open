@@ -170,21 +170,21 @@
       <translation>Wykryto ruch</translation>
     </message>
     <message numerus="yes">
-      <source>Motions (&gt;%n)</source>
+      <source>Motion (&gt;%n)</source>
       <translation type="unfinished">
-        <numerusform>Ruch (&gt;%n)</numerusform>
-        <numerusform>Motions (&gt;%n)</numerusform>
-        <numerusform>Motions (&gt;%n)</numerusform>
-        <numerusform>Motions (&gt;%n)</numerusform>
+        <numerusform>Motion (&gt;%n)</numerusform>
+        <numerusform>Motion (&gt;%n)</numerusform>
+        <numerusform>Motion (&gt;%n)</numerusform>
+        <numerusform>Motion (&gt;%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Motions (%n)</source>
+      <source>Motion (%n)</source>
       <translation type="unfinished">
-        <numerusform>Ruch (%n)</numerusform>
-        <numerusform>Motions (%n)</numerusform>
-        <numerusform>Motions (%n)</numerusform>
-        <numerusform>Motions (%n)</numerusform>
+        <numerusform>Motion (%n)</numerusform>
+        <numerusform>Motion (%n)</numerusform>
+        <numerusform>Motion (%n)</numerusform>
+        <numerusform>Motion (%n)</numerusform>
       </translation>
     </message>
   </context>

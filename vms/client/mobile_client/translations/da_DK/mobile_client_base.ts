@@ -160,17 +160,17 @@
       <translation>Bevægelse registreret</translation>
     </message>
     <message numerus="yes">
-      <source>Motions (&gt;%n)</source>
-      <translation>
-        <numerusform>Bevægelser (&gt;%n)</numerusform>
-        <numerusform>Bevægelser (&gt;%n)</numerusform>
+      <source>Motion (&gt;%n)</source>
+      <translation type="unfinished">
+        <numerusform>Motion (&gt;%n)</numerusform>
+        <numerusform>Motion (&gt;%n)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Motions (%n)</source>
-      <translation>
-        <numerusform>Bevægelser (%n)</numerusform>
-        <numerusform>Bevægelser (%n)</numerusform>
+      <source>Motion (%n)</source>
+      <translation type="unfinished">
+        <numerusform>Motion (%n)</numerusform>
+        <numerusform>Motion (%n)</numerusform>
       </translation>
     </message>
   </context>
