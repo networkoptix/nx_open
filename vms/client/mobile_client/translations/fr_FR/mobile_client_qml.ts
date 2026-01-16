@@ -44,28 +44,28 @@
       <translation>Télécharger la vidéo</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>Possibilité de télécharger la vidéo</translation>
+      <source>Download video to this device</source>
+      <translation>Télécharger la vidéo sur cet appareil</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>Accélérer les connexions</translation>
+      <source>Optimize Network</source>
+      <translation>Optimiser le réseau</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>Améliorer les performances du réseau</translation>
+      <source>Apply network optimization methods</source>
+      <translation>Appliquer les méthodes d'optimisation du réseau</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>Nombre maximum de décodeurs</translation>
+      <source>Parallel Decoding</source>
+      <translation>Décodage parallèle</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Améliorez les performances de décodage vidéo en utilisant le nombre maximal de décodeurs matériels</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation>Utiliser plusieurs décodeurs pour améliorer les performances</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>Veuillez redémarrer l'application pour appliquer les modifications.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation>Veuillez redémarrer l'application pour appliquer les modifications</translation>
     </message>
   </context>
   <context>
@@ -137,7 +137,7 @@
     <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation type="unfinished">Log in to the site in %1</translation>
+      <translation>Se connecter au site dans %1</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
@@ -150,17 +150,17 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+      <translation>Si le site est &lt;font color=&apos;%2&apos;&gt;pas connecté&lt;/a&gt; à %1</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>Cliquez sur &quot;Connecter le site à %1&quot; dans l'onglet %1 de l'administration du site.</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
+      <translation>Si le site est &lt;font color=&apos;%2&apos;&gt;connecté&lt;/a&gt; à %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
+      <translation>Ouvrez la page des paramètres du site et cliquez sur &quot;changez&quot; lien à côté du nom du propriétaire</translation>
     </message>
   </context>
   <context>
@@ -183,7 +183,7 @@
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
-      <translation>Connecter au serveur</translation>
+      <translation>Se connecter à un serveur</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -246,11 +246,11 @@
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation type="unfinished">Copy Client ID</translation>
+      <translation>Copier l'ID du client</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation type="unfinished">Force Crash</translation>
+      <translation>Forcer le plantage</translation>
     </message>
   </context>
   <context>
@@ -368,6 +368,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation>Flux</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation>Notifications désactivées</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation>Les notifications sont actuellement désactivées pour cette application. Pour activer les notifications, utilisez les paramètres de votre téléphone</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation>Vous avez désactivé les notifications push pour ce site. Pour les activer, allez à la page Paramètres.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Paramètres</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation>Aucune notification</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation>Aucune notification push n'a été trouvée.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Rien trouvé</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation>Essayez de modifier les paramètres de recherche</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation>Aucune nouvelle notification</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation>Aucune nouvelle notification push n'a été trouvée, mais vous pouvez consulter l'historique complet de vos notifications.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation>Voir tout</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation>Non consulté</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation>Consulté</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Tout</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -382,7 +445,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Partagé uniquement</translation>
     </message>
   </context>
   <context>
@@ -451,16 +514,20 @@
       <translation>Interface</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Aperçus en direct</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Afficher les aperçus dans la liste des caméras</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Utiliser l'heure serveur</translation>
+      <source>Live Previews</source>
+      <translation>Aperçus en direct</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>Heure Serveur</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation>Afficher l'heure du serveur sur les caméras</translation>
     </message>
   </context>
   <context>
@@ -468,6 +535,21 @@
     <message>
       <source>Layouts</source>
       <translation>Mises en page</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation>Ouvrir un lien externe dans le navigateur ?</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Ouvrir</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuler</translation>
     </message>
   </context>
   <context>
@@ -502,7 +584,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>Ajouter un serveur</translation>
     </message>
   </context>
   <context>
@@ -514,6 +596,17 @@
     <message>
       <source>CANCEL</source>
       <translation>ANNULER</translation>
+    </message>
+  </context>
+  <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>Aucune donnée</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation>Afficher plus</translation>
     </message>
   </context>
   <context>
@@ -548,20 +641,20 @@
       <translation>Performance</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Activer l'accélération matérielle</translation>
+      <source>Hardware Acceleration</source>
+      <translation>Accélération matérielle</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>Augmente les performances et la durée de vie de la batterie</translation>
+      <source>Can improve performance and battery life</source>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Activer le décodeur logiciel de secours</translation>
+      <source>Software Decoder Fallback</source>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Décoder de rares formats vidéo à l'aide du décodeur logiciel</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -682,6 +775,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>Ressources</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -738,16 +838,8 @@
       <translation>Connecter uniquement les serveurs avec des certificats publics</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Enregistrer les mots de passe</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Se connecter automatiquement aux serveurs</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Que faire avec les mots de passe actuellement enregistrés ?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -756,6 +848,18 @@
     <message>
       <source>Delete</source>
       <translation>Supprimer</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -859,16 +963,8 @@
       <translation>Paramètres</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Notifications push</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Tout</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Connectez-vous au cloud pour utiliser les notifications push</translation>
     </message>
     <message>
       <source>Security</source>
@@ -883,10 +979,6 @@
       <translation>Fonctionnalités bêta</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>Accès anticipé aux nouvelles fonctionnalités</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Interface</translation>
     </message>
@@ -895,8 +987,16 @@
       <translation>Performance</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>Infos sur l'application</translation>
+      <source>Notifications</source>
+      <translation>Notifications</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>À propos</translation>
     </message>
   </context>
   <context>
@@ -1067,7 +1167,7 @@
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Les sites en état de suspension ou d'arrêt ne sont pas disponibles</translation>
     </message>
   </context>
   <context>
@@ -1215,6 +1315,10 @@
       <source>Log In</source>
       <translation>Connexion</translation>
     </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation>2FA désactivé</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -1279,7 +1383,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Connexion perdue. Reconnexion...</translation>
     </message>
   </context>
 </TS>

@@ -44,28 +44,28 @@
       <translation type="unfinished">Video Download</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation type="unfinished">Ability to download video</translation>
+      <source>Download video to this device</source>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>เพิ่มความเร็วของการเชื่อมต่อ</translation>
+      <source>Optimize Network</source>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>ปรับปรุงประสิทธิภาพของเครือข่าย</translation>
+      <source>Apply network optimization methods</source>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <source>Parallel Decoding</source>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>โปรดเริ่มต้นแอปพลิเคชันเพื่อใช้การเปลี่ยนแปลง</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -367,6 +367,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation type="unfinished">Feed</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation type="unfinished">Notifications Off</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>การตั้งค่า</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation type="unfinished">No Notifications</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation type="unfinished">No push notifications were found.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>ไม่พบสิ่งใด</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation>ลองเปลี่ยนพารามิเตอร์การค้นหา</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation type="unfinished">No New Notifications</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation type="unfinished">View All</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>ทั้งหมด</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -450,16 +513,20 @@
       <translation type="unfinished">Interface</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>ตัวอย่างภาพปัจจุบัน</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>แสดงตัวอย่างในรายการกล้อง</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>ใช้เวลาจากเซิร์ฟเวอร์</translation>
+      <source>Live Previews</source>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>เวลาเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -467,6 +534,21 @@
     <message>
       <source>Layouts</source>
       <translation>เค้าโครง</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation type="unfinished">Open external link in browser?</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>เปิด</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>ยกเลิก</translation>
     </message>
   </context>
   <context>
@@ -516,6 +598,17 @@
     </message>
   </context>
   <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>ไม่มีข้อมูล</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation type="unfinished">Show more</translation>
+    </message>
+  </context>
+  <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
@@ -547,20 +640,20 @@
       <translation>ประสิทธิภาพ</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>เปิดใช้งานการเร่งด้วยฮาร์ดแวร์</translation>
+      <source>Hardware Acceleration</source>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>เพิ่มประสิทธิภาพและอายุการใช้งานแบตเตอรี่</translation>
+      <source>Can improve performance and battery life</source>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <source>Software Decoder Fallback</source>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -681,6 +774,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>ทรัพยากร</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -737,16 +837,8 @@
       <translation>เชื่อมต่อเฉพาะเซิร์ฟเวอร์ที่มี public certificates</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>บันทึกรหัสผ่าน</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>เข้าสู่โดยอัตโนมัติไปยังเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>จะทำอย่างไรกับรหัสผ่านที่บันทึกไว้ในปัจจุบัน</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -755,6 +847,18 @@
     <message>
       <source>Delete</source>
       <translation>ลบ</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -858,16 +962,8 @@
       <translation>การตั้งค่า</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>การแจ้งเตือนแบบพุช</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>ทั้งหมด</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>เข้าสู่ระบบคลาวด์เพื่อใช้การแจ้งเตือนแบบพุช</translation>
     </message>
     <message>
       <source>Security</source>
@@ -882,10 +978,6 @@
       <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation type="unfinished">Early access to new features</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation type="unfinished">Interface</translation>
     </message>
@@ -894,8 +986,16 @@
       <translation>ประสิทธิภาพ</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <source>Notifications</source>
+      <translation>การแจ้งเตือน</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>เกี่ยวกับ</translation>
     </message>
   </context>
   <context>
@@ -1213,6 +1313,10 @@
     <message>
       <source>Log In</source>
       <translation>เข้าสู่ระบบ</translation>
+    </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation type="unfinished">2FA Disabled</translation>
     </message>
   </context>
   <context>

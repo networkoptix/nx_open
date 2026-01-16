@@ -44,28 +44,28 @@
       <translation>Tải xuống Video</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>Khả năng tải xuống video</translation>
+      <source>Download video to this device</source>
+      <translation>Tải video về thiết bị này</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>Tăng tốc kết nối</translation>
+      <source>Optimize Network</source>
+      <translation>Tối ưu hóa mạng</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>Cải thiện hiệu suất mạng</translation>
+      <source>Apply network optimization methods</source>
+      <translation>Áp dụng các phương pháp tối ưu hóa mạng</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>Số lượng bộ giải mã tối đa</translation>
+      <source>Parallel Decoding</source>
+      <translation>Giải mã song song</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Cải thiện hiệu suất giải mã video bằng cách sử dụng số lượng bộ giải mã phần cứng tối đa</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation>Sử dụng nhiều bộ giải mã để cải thiện hiệu suất</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>Vui lòng khởi động lại ứng dụng để áp dụng các thay đổi.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation>Vui lòng khởi động lại ứng dụng để áp dụng thay đổi</translation>
     </message>
   </context>
   <context>
@@ -367,6 +367,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation>Nguồn cấp dữ liệu</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation>Tắt thông báo</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation>Hiện tại, tính năng thông báo đã bị tắt cho ứng dụng này. Để bật thông báo, hãy sử dụng cài đặt trên điện thoại của bạn</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation>Bạn đã tắt thông báo đẩy cho Chi nhánh này. Để bật, hãy vào trang Cài đặt.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Cài đặt</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation>Không có thông báo</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation>Không tìm thấy thông báo đẩy nào.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Không tìm thấy kết quả nào</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation>Hãy thử thay đổi các tham số tìm kiếm</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation>Không có thông báo mới</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation>Không tìm thấy thông báo đẩy mới nào, nhưng bạn có thể xem toàn bộ lịch sử thông báo của mình.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation>Xem tất cả</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation>Chưa xem</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation>Đã xem</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Tất cả</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -450,16 +513,20 @@
       <translation>Giao diện</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Xem trước trực tiếp</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Hiển thị xem trước trong danh sách camera</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Sử dụng thời gian máy chủ</translation>
+      <source>Live Previews</source>
+      <translation>Xem trước trực tiếp</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>Thời gian máy chủ</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation>Hiển thị thời gian máy chủ trên camera</translation>
     </message>
   </context>
   <context>
@@ -467,6 +534,21 @@
     <message>
       <source>Layouts</source>
       <translation>Bố cục</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation>Mở liên kết ngoài trong trình duyệt?</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>mở</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Hủy bỏ</translation>
     </message>
   </context>
   <context>
@@ -516,6 +598,17 @@
     </message>
   </context>
   <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>Không có dữ liệu</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation>Xem thêm</translation>
+    </message>
+  </context>
+  <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
@@ -547,20 +640,20 @@
       <translation>Hiệu suất</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Kích hoạt Gia tốc Phần cứng</translation>
+      <source>Hardware Acceleration</source>
+      <translation>Tăng Tốc Phần Cứng</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>Tăng hiệu suất và tuổi thọ pin</translation>
+      <source>Can improve performance and battery life</source>
+      <translation>Có thể cải thiện hiệu suất và tuổi thọ pin</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Bật chế độ dự phòng giải mã phần mềm</translation>
+      <source>Software Decoder Fallback</source>
+      <translation>Phần mềm giải mã dự phòng</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Giải mã một số định dạng video hiếm bằng phần mềm giải mã</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation>Có thể giải mã các định dạng video hiếm bằng phần mềm</translation>
     </message>
   </context>
   <context>
@@ -681,6 +774,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>Tài nguyên</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -737,16 +837,8 @@
       <translation>Chỉ kết nối các máy chủ có chứng chỉ công khai</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Lưu mật khẩu</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Tự động đăng nhập vào máy chủ</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Phải làm gì với mật khẩu hiện đã lưu?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -755,6 +847,18 @@
     <message>
       <source>Delete</source>
       <translation>Xóa bỏ</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation>Lưu mật khẩu</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation>Làm thế nào để xử lý mật khẩu đã lưu?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation>Kiểm tra chứng chỉ máy chủ</translation>
     </message>
   </context>
   <context>
@@ -858,16 +962,8 @@
       <translation>Cài đặt</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Thông báo đẩy</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Tất cả</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Đăng nhập vào đám mây để sử dụng thông báo đẩy</translation>
     </message>
     <message>
       <source>Security</source>
@@ -882,10 +978,6 @@
       <translation>Tính năng Beta</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>Quyền truy cập sớm vào các tính năng mới</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Giao diện</translation>
     </message>
@@ -894,8 +986,16 @@
       <translation>Hiệu suất</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>Thông tin ứng dụng</translation>
+      <source>Notifications</source>
+      <translation>thông báo</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation>Đăng nhập vào đám mây để nhận thông báo</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>Đối với</translation>
     </message>
   </context>
   <context>
@@ -1213,6 +1313,10 @@
     <message>
       <source>Log In</source>
       <translation>Đăng nhập</translation>
+    </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation>Vô hiệu hóa xác thực 2 bước</translation>
     </message>
   </context>
   <context>

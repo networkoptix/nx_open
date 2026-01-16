@@ -44,28 +44,28 @@
       <translation>Descarga de vídeo</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>Capacidade para descargar vídeo</translation>
+      <source>Download video to this device</source>
+      <translation>Descargar vídeo a este dispositivo</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>Acelerar as conexións</translation>
+      <source>Optimize Network</source>
+      <translation>Optimizar a rede</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>Mellorar o rendemento da rede</translation>
+      <source>Apply network optimization methods</source>
+      <translation>Aplicar métodos de optimización de redes</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>Número máximo de descodificadores</translation>
+      <source>Parallel Decoding</source>
+      <translation>Decodificación paralela</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Mellorar o rendemento da descodificación de vídeo usando o máximo número de descodificadores de hardware</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation>Usa varios descodificadores para mellorar o rendemento</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>Por favor, reinicia a aplicación para aplicar os cambios.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation>Por favor, reinicia a aplicación para aplicar os cambios</translation>
     </message>
   </context>
   <context>
@@ -368,6 +368,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation>Alimentación</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation>Notificacións desactivadas</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation>As notificacións están desactivadas actualmente para esta aplicación. Para activalas, usa a configuración do teu teléfono</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation>Desactivaches as notificacións push para este sitio. Para activalas, vai á páxina Configuración.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Configuración</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation>Sen notificacións</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation>Non se atoparon notificacións push.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Non se atopou nada</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation>Proba a cambiar os parámetros de busca</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation>Sen novas notificacións</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation>Non se atoparon novas notificacións push, pero podes ver o teu historial completo de notificacións.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation>Ver todo</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation>Sen ver</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation>Visto</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Todo</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -451,16 +514,20 @@
       <translation>Interface</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Vistas previas en directo</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Mostrar vistas previas na lista de cámaras</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Utilizar a hora do servidor</translation>
+      <source>Live Previews</source>
+      <translation>Vistas previas en directo</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>Hora do servidor</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation>Mostrar a hora do servidor nas cámaras</translation>
     </message>
   </context>
   <context>
@@ -468,6 +535,21 @@
     <message>
       <source>Layouts</source>
       <translation>Deseños</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation>Abrir unha ligazón externa no navegador?</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Abrir</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Cancelar</translation>
     </message>
   </context>
   <context>
@@ -517,6 +599,17 @@
     </message>
   </context>
   <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>Sen datos</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation>Amosar máis</translation>
+    </message>
+  </context>
+  <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
@@ -548,20 +641,20 @@
       <translation>Rendemento</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Activar a aceleración de hardware</translation>
+      <source>Hardware Acceleration</source>
+      <translation>Aceleración de hardware</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>Aumentar o rendemento e a duración da batería</translation>
+      <source>Can improve performance and battery life</source>
+      <translation>Pode mellorar o rendemento e a duración da batería</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Activar a alternativa do descodificador de software</translation>
+      <source>Software Decoder Fallback</source>
+      <translation>Decodificador de software de reserva</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Descodifica algúns formatos de vídeo pouco comúns usando un descodificador de software</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation>Pode descodificar formatos de vídeo pouco comúns usando software</translation>
     </message>
   </context>
   <context>
@@ -682,6 +775,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>Recursos</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -738,16 +838,8 @@
       <translation>Conecta só servidores con certificados públicos</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Garda contrasinais</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Inicia sesión automaticamente nos servidores</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Que facer cos contrasinais gardados actualmente?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -756,6 +848,18 @@
     <message>
       <source>Delete</source>
       <translation>Borrar</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation>Gardar contrasinais</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation>Como xestionar os contrasinais gardados?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation>Comprobación do certificado do servidor</translation>
     </message>
   </context>
   <context>
@@ -859,16 +963,8 @@
       <translation>Configuración</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Notificacións Push</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Todo</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Inicia sesión na nube para usar as notificacións push</translation>
     </message>
     <message>
       <source>Security</source>
@@ -883,10 +979,6 @@
       <translation>Funcións beta</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>Acceso anticipado a novas funcións</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Interface</translation>
     </message>
@@ -895,8 +987,16 @@
       <translation>Rendemento</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>Información da aplicación</translation>
+      <source>Notifications</source>
+      <translation>Notificacións</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation>Inicia sesión na nube para recibir notificacións</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>Acerca de</translation>
     </message>
   </context>
   <context>
@@ -1214,6 +1314,10 @@
     <message>
       <source>Log In</source>
       <translation>Iniciar sesión</translation>
+    </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation>2FA desactivado</translation>
     </message>
   </context>
   <context>

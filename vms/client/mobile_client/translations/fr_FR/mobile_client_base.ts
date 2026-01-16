@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Partagé uniquement</translation>
     </message>
   </context>
   <context>
@@ -52,16 +52,24 @@
   <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
-      <source>Cannot change push notifications settings</source>
-      <translation>Impossible de modifier les paramètres des notifications push</translation>
-    </message>
-    <message>
       <source>Cannot enable push notifications</source>
       <translation>Impossible d'activer les notifications push</translation>
     </message>
     <message>
       <source>Please check your internet connection</source>
       <translation>Veuillez vérifier votre connexion internet</translation>
+    </message>
+    <message>
+      <source>Cannot change notifications settings</source>
+      <translation>Impossible de modifier les paramètres de notification</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::PushNotificationModel</name>
+    <message>
+      <source>%1 ago</source>
+      <comment>notification time, like &apos;1 min ago&apos;</comment>
+      <translation>il y a %1</translation>
     </message>
   </context>
   <context>
@@ -81,7 +89,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>Impossible de partager le signet.</translation>
     </message>
   </context>
   <context>
@@ -94,6 +102,21 @@
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
       <translation>Impossible de se connecter au site &quot;%1&quot;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>Caméras &amp; Périphériques</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation>Tous Périphériques</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>Mises en page</translation>
     </message>
   </context>
 </TS>

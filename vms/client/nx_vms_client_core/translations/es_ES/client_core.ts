@@ -183,6 +183,10 @@
       <source>Failed to access site.</source>
       <translation>Fallo el acceso al sitio.</translation>
     </message>
+    <message>
+      <source>Server or network unavailable. Check the address and connection.</source>
+      <translation>Servidor o la red no está disponible. Revisar la dirección y conexión.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
@@ -489,6 +493,17 @@
     <message>
       <source>Press and hold to speak</source>
       <translation>Pulsa y mantén presionado para grabar</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
+    <message>
+      <source>New Group</source>
+      <translation>Nuevo Grupo</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>Nuevo grupo %1</translation>
     </message>
   </context>
 </TS>

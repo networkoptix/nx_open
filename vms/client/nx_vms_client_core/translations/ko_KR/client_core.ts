@@ -13,7 +13,7 @@
     <name>QnSystemsModel</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>사이트 추가하기</translation>
     </message>
   </context>
   <context>
@@ -137,51 +137,55 @@
     </message>
     <message>
       <source>If this error persists, please contact your site administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+      <translation>오류가 지속될 경우, 관리자에게 문의하시기 바랍니다.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>사이트가 종료된 상태에서는 %1 사용자로 로그인할 수 없습니다. 로컬 사용자로는 계속 접속할 수 있습니다.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>종료 상태에서 시스템에 %1 사용자로 로그인하는 것은 금지되어 있습니다. 로컬 사용자로 연결할 수는 있습니다.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this site with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+      <translation>%2 사용자로 이 시스템에 로그인하려면 %1에 로그인하십시오</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a site administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+      <translation>시스템 관리자가 세션 시간 제한을 변경할 수 있습니다.</translation>
     </message>
     <message>
       <source>Your access to this site has expired.</source>
-      <translation type="unfinished">Your access to this site has expired.</translation>
+      <translation>이 사이트에 대한 귀하의 액세스 권한이 만료되었습니다.</translation>
     </message>
     <message>
       <source>Please contact the site administrator to regain access.</source>
-      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+      <translation>시스템 관리자에게 문의하여 다시 액세스하세요.</translation>
     </message>
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>이 시스템에 로그인하려면 &quot;을 비활성화하세요. %1 계정&quot; 으로 %2에 로그인할 때마다 확인 코드를 요청하세요.</translation>
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+      <translation>이 사용자는 시스템 관리자에 의해 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation type="unfinished">Failed to access site</translation>
+      <translation>사이트에 접속하지 못했습니다</translation>
     </message>
     <message>
       <source>Failed to access site.</source>
-      <translation type="unfinished">Failed to access site.</translation>
+      <translation>사이트에 접속하지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>Server or network unavailable. Check the address and connection.</source>
+      <translation>서버 또는 네트워크를 사용할 수 없습니다. 주소와 연결 상태를 확인하십시오.</translation>
     </message>
   </context>
   <context>
@@ -238,15 +242,15 @@
     </message>
     <message>
       <source>Review the certificate to ensure you trust the server you are connecting to.</source>
-      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
+      <translation>을 검토하여 연결 중인 서버를 신뢰할 수 있는지 확인하십시오.</translation>
     </message>
     <message>
       <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
-      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
+      <translation>연결하려는 사이트를 신뢰할 수 있는지 확인하려면 서버의 인증서를 검토하세요.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+      <translation>만료된 서버 인증서 또는 잘못된 인증서 때문일 수 있습니다. 자세한 조사를 위해 시스템 관리자에게 문의하세요.</translation>
     </message>
   </context>
   <context>
@@ -304,7 +308,7 @@
     <message>
       <source>Site (%1)</source>
       <comment>%1 is ip and port of the site</comment>
-      <translation type="unfinished">Site (%1)</translation>
+      <translation>사이트 (%1)</translation>
     </message>
   </context>
   <context>
@@ -367,7 +371,7 @@
     <name>nx::vms::client::core::OrganizationsFilterModel</name>
     <message>
       <source>Other results</source>
-      <translation type="unfinished">Other results</translation>
+      <translation>다른 결과</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -382,7 +386,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>폴더</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -468,7 +472,7 @@
     <name>nx::vms::client::core::SingleSystemDescription</name>
     <message>
       <source>Unnamed Site</source>
-      <translation type="unfinished">Unnamed Site</translation>
+      <translation>명명 되지 않은 시스템</translation>
     </message>
   </context>
   <context>
@@ -487,6 +491,17 @@
     <message>
       <source>Press and hold to speak</source>
       <translation>누른상태에서 말하세요</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
+    <message>
+      <source>New Group</source>
+      <translation>새 그룹</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>새 그룹 %1</translation>
     </message>
   </context>
 </TS>

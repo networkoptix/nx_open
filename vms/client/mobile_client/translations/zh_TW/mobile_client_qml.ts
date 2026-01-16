@@ -44,28 +44,28 @@
       <translation>下載影片</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>下載影片的能力</translation>
+      <source>Download video to this device</source>
+      <translation>將影像下載到此裝置</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>加速連線</translation>
+      <source>Optimize Network</source>
+      <translation>最佳化網路</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>提升網路效能</translation>
+      <source>Apply network optimization methods</source>
+      <translation>套用網路最佳化方法</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>最大解碼器數量</translation>
+      <source>Parallel Decoding</source>
+      <translation>平行解碼</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>使用最大硬體解碼器數量限制以提升影像解碼效能</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation>使用多個解碼器以提高效能</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>請重新啟動程式以套用設定。</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation>請重新啟動應用程式以套用變更。</translation>
     </message>
   </context>
   <context>
@@ -246,11 +246,11 @@
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation type="unfinished">Copy Client ID</translation>
+      <translation>複製客戶端 ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation type="unfinished">Force Crash</translation>
+      <translation>強制閃退</translation>
     </message>
   </context>
   <context>
@@ -367,6 +367,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation>新聞</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation>通知關閉</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation>此應用程式的通知功能目前已關閉，若要啟用通知，請在手機設定中啟用。</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation>您已停用此站點的推播通知。若要啟用推播通知，請前往「設定」頁面。</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>設定</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation>沒有通知</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation>未找到推播通知。</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>未找到任何內容</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation>嘗試更改搜尋參數</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation>沒有新通知</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation>未發現新的推播通知，但您可以查看完整的通知記錄。</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation>檢視全部</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation>未瀏覽</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation>已瀏覽</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>全部</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -450,16 +513,20 @@
       <translation>網路介面</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>即時預覽</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>於攝影機列表上顯示影像預覽</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>使用伺服器時間當作標準</translation>
+      <source>Live Previews</source>
+      <translation>即時預覽</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>伺服器時間</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation>在攝影機上顯示伺服器時間</translation>
     </message>
   </context>
   <context>
@@ -467,6 +534,21 @@
     <message>
       <source>Layouts</source>
       <translation>佈局</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation>在瀏覽器中開啟外部連結？</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>開啟</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>取消</translation>
     </message>
   </context>
   <context>
@@ -501,7 +583,7 @@
     </message>
     <message>
       <source>Add Server</source>
-      <translation type="unfinished">Add Server</translation>
+      <translation>加入伺服器</translation>
     </message>
   </context>
   <context>
@@ -513,6 +595,17 @@
     <message>
       <source>CANCEL</source>
       <translation>取消</translation>
+    </message>
+  </context>
+  <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>無資料</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation>顯示更多</translation>
     </message>
   </context>
   <context>
@@ -547,19 +640,19 @@
       <translation>效能</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>啟用硬體加速</translation>
+      <source>Hardware Acceleration</source>
+      <translation>硬體加速</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>提高效能與電池壽命</translation>
+      <source>Can improve performance and battery life</source>
+      <translation>可提高效能與電池壽命</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>啟用退回軟體解碼器</translation>
+      <source>Software Decoder Fallback</source>
+      <translation>回退軟體解碼器</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
+      <source>Can decode rare video formats using software</source>
       <translation>使用軟體解碼器來解碼罕見的影像格式</translation>
     </message>
   </context>
@@ -681,6 +774,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>資源</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -737,16 +837,8 @@
       <translation>僅允許連線至使用公開憑證的伺服器</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>儲存使用者密碼</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>自動登入伺服器</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>如何處理目前保存中的密碼？</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -755,6 +847,18 @@
     <message>
       <source>Delete</source>
       <translation>刪除</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation>儲存密碼</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation>如何處理已儲存的密碼？</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation>伺服器憑證檢查</translation>
     </message>
   </context>
   <context>
@@ -858,16 +962,8 @@
       <translation>設定</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>推播通知</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>全部</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>登入雲端以使用推播通知</translation>
     </message>
     <message>
       <source>Security</source>
@@ -882,10 +978,6 @@
       <translation>Beta 版功能</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>提前使用新功能</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>網路介面</translation>
     </message>
@@ -894,8 +986,16 @@
       <translation>效能</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>應用程式資訊</translation>
+      <source>Notifications</source>
+      <translation>通知</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation>登入Cloud以收到通知</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>關於</translation>
     </message>
   </context>
   <context>
@@ -1213,6 +1313,10 @@
     <message>
       <source>Log In</source>
       <translation>登入</translation>
+    </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation>已停用 2FA</translation>
     </message>
   </context>
   <context>

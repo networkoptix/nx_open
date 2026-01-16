@@ -44,28 +44,28 @@
       <translation>映像のダウンロード</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>映像のダウンロード機能</translation>
+      <source>Download video to this device</source>
+      <translation>このデバイスに映像をダウンロード</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>接続の高速化</translation>
+      <source>Optimize Network</source>
+      <translation>ネットワークの最適化</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>ネットワークパフォーマンスを向上させます</translation>
+      <source>Apply network optimization methods</source>
+      <translation>ネットワーク最適化手法を適用します。</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>デコーダー数最大</translation>
+      <source>Parallel Decoding</source>
+      <translation>並列デコード</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>ハードウェアデコーダーを最大限利用して、ビデオデコードパフォーマンスを向上させます</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation>複数のデコーダーを使用してパフォーマンスを向上させます。</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>変更を適用するには、アプリを再起動してください。</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation>変更を適用するにはアプリを再起動してください。</translation>
     </message>
   </context>
   <context>
@@ -367,6 +367,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation>フィード</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation>通知オフ</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation>このアプリの通知は現在無効になっています。通知を有効化するには、お使いの端末の設定をご確認ください。</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation>このサイトのプッシュ通知は無効になっています。通知を有効化するには、設定ページに移動してください。</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>設定</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation>通知はありません</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation>プッシュ通知が見つかりませんでした。</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>見つかりません</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation>異なる検索条件でお試しください。</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation>新しい通知はありません</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation>新しいプッシュ通知は見つかりませんでした。代わりに全通知履歴を表示することもできます。</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation>すべて表示</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation>未読</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation>既読</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>すべて</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -450,16 +513,20 @@
       <translation>インターフェース</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>ライブプレビュー</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>カメラリストにプレビューを表示します</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>サーバー時刻を使用</translation>
+      <source>Live Previews</source>
+      <translation>ライブプレビュー</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>サーバー時刻</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation>カメラにサーバー時刻を表示する</translation>
     </message>
   </context>
   <context>
@@ -467,6 +534,21 @@
     <message>
       <source>Layouts</source>
       <translation>レイアウト</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation>ブラウザで外部リンクを開きますか?</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>開く</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
     </message>
   </context>
   <context>
@@ -516,6 +598,17 @@
     </message>
   </context>
   <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>データがありません</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation>詳細を表示</translation>
+    </message>
+  </context>
+  <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
@@ -547,20 +640,20 @@
       <translation>パフォーマンス</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>ハードウェアアクセラレーションを有効化</translation>
+      <source>Hardware Acceleration</source>
+      <translation>ハードウェアアクセラレーション</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>パフォーマンスとバッテリー効率を向上させます</translation>
+      <source>Can improve performance and battery life</source>
+      <translation>パフォーマンスとバッテリー効率を改善できます。</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>ソフトウェアデコーダーへのフォールバックを有効化</translation>
+      <source>Software Decoder Fallback</source>
+      <translation>ソフトウェアデコーダーへのフォールバック</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>一般的でない映像フォーマットのデコードに、ソフトウェアデコーダーを使用します</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation>一般的でない映像フォーマットをソフトウェアでデコードします。</translation>
     </message>
   </context>
   <context>
@@ -681,6 +774,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>リソース</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -737,16 +837,8 @@
       <translation>正式な証明書を持つサーバーにのみ接続します</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>パスワードを保存</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>サーバーへ自動的にログインします</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>すでに保存済みのパスワードはどうしますか?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -755,6 +847,18 @@
     <message>
       <source>Delete</source>
       <translation>削除</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation>パスワードを保存</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation>保存済みのパスワードはどうしますか?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation>サーバー証明書の確認</translation>
     </message>
   </context>
   <context>
@@ -858,16 +962,8 @@
       <translation>設定</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>プッシュ通知</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>すべて</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>プッシュ通知を使用するには、クラウドにログインしてください。</translation>
     </message>
     <message>
       <source>Security</source>
@@ -882,10 +978,6 @@
       <translation>ベータ版機能</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>新機能の早期公開</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>インターフェース</translation>
     </message>
@@ -894,8 +986,16 @@
       <translation>パフォーマンス</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>アプリ情報</translation>
+      <source>Notifications</source>
+      <translation>通知</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation>通知を受け取るには、クラウドにログインしてください。</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>本製品について</translation>
     </message>
   </context>
   <context>
@@ -1213,6 +1313,10 @@
     <message>
       <source>Log In</source>
       <translation>ログイン</translation>
+    </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation>二要素認証が無効です</translation>
     </message>
   </context>
   <context>

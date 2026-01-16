@@ -52,16 +52,24 @@
   <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
-      <source>Cannot change push notifications settings</source>
-      <translation>No se puede guardar la configuración de notificaciones</translation>
-    </message>
-    <message>
       <source>Cannot enable push notifications</source>
       <translation>No se pueden habilitar las notificaciones push</translation>
     </message>
     <message>
       <source>Please check your internet connection</source>
       <translation>Por favor, compruebe su conexión a internet</translation>
+    </message>
+    <message>
+      <source>Cannot change notifications settings</source>
+      <translation type="unfinished">Cannot change notifications settings</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::PushNotificationModel</name>
+    <message>
+      <source>%1 ago</source>
+      <comment>notification time, like &apos;1 min ago&apos;</comment>
+      <translation>%1 Hace</translation>
     </message>
   </context>
   <context>
@@ -94,6 +102,21 @@
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
       <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>Cámaras y dispositivos</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation>Todos los dispositivos</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>Diseños</translation>
     </message>
   </context>
 </TS>

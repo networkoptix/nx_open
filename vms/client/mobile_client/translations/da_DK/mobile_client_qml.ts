@@ -44,28 +44,28 @@
       <translation>Videodownload</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>Mulighed for at downloade video</translation>
+      <source>Download video to this device</source>
+      <translation>Download video til denne enhed</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>Hurtigere forbindelser</translation>
+      <source>Optimize Network</source>
+      <translation>Optimer netværk</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>Forbedre netværkets ydeevne</translation>
+      <source>Apply network optimization methods</source>
+      <translation>Anvend netværks optimeringsmetoder</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>Maksimalt antal dekodere</translation>
+      <source>Parallel Decoding</source>
+      <translation>Parallel afkodning</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Optimer video afkodnings ydelsen ved hjælp af maksimalt antal hardwaredekodere</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation>Brug flere dekodere til at forbedre ydeevnen</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>Genstart venligst appen for at anvende ændringerne.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation>Genstart venligst app'en for at anvende ændringer</translation>
     </message>
   </context>
   <context>
@@ -368,6 +368,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation>Feed</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation>Notifikationer Fra</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation>Notifikationer er i øjeblikket deaktiveret for denne app. For at aktivere meddelelser skal du bruge din telefon&apos;s indstillinger</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation>Du deaktiverede push notifikationer for dette websted. For at aktivere dem, gå til siden Indstillinger.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Indstillinger</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation>Ingen Notifikationer</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation>Ingen push notifikationer blev fundet.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Intet fundet</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation>Prøv at ændre søgeparametrene</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation>Ingen Nye Notifikationer</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation>Ingen nye push notifikationer blev fundet, men du kan se din fulde notifikations historik.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation>Vis alle</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation>Ikke vist</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation>Vist</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Alle</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -451,16 +514,20 @@
       <translation>Grænseflade</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Liveforhåndsvisning</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Vis forhåndsvisninger i listen over kameraer</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Brug servertid</translation>
+      <source>Live Previews</source>
+      <translation>Live Forhåndsvisning</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>Server Tid</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation>Vis servertid på kameraer</translation>
     </message>
   </context>
   <context>
@@ -468,6 +535,21 @@
     <message>
       <source>Layouts</source>
       <translation>Layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation>Åbn eksternt link i browser?</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Åbn</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuller</translation>
     </message>
   </context>
   <context>
@@ -517,6 +599,17 @@
     </message>
   </context>
   <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>Ingen data</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation>Vis mere</translation>
+    </message>
+  </context>
+  <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
@@ -548,20 +641,20 @@
       <translation>Ydeevne</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Aktiver hardwareacceleration</translation>
+      <source>Hardware Acceleration</source>
+      <translation>Hardware Acceleration</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>Forøg ydeevne og batterilevetid</translation>
+      <source>Can improve performance and battery life</source>
+      <translation>Kan forbedre ydeevnen og batteriets levetid</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Aktiver software dekoder fallback</translation>
+      <source>Software Decoder Fallback</source>
+      <translation>Software Dekoder Fallback</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Afkod nogle sjældne videoformater ved hjælp af softwaredekoder</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation>Kan afkode sjældne videoformater ved hjælp af software</translation>
     </message>
   </context>
   <context>
@@ -682,6 +775,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>Ressourcer</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -738,16 +838,8 @@
       <translation>Tilslut kun servere med offentlige certifikater</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Gem adgangskoder</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Log automatisk ind på servere</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Hvad gør man med de aktuelt gemte adgangskoder?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -756,6 +848,18 @@
     <message>
       <source>Delete</source>
       <translation>Slet</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation>Gem Adgangskoder</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation>Hvordan håndteres gemte adgangskoder?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation>Kontrol af servercertifikat</translation>
     </message>
   </context>
   <context>
@@ -859,16 +963,8 @@
       <translation>Indstillinger</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Push-meddelelser</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Alle</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Log ind på Clouden for at bruge push-beskeder</translation>
     </message>
     <message>
       <source>Security</source>
@@ -883,10 +979,6 @@
       <translation>Beta Funktioner</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>Tidlig adgang til nye funktioner</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Grænseflade</translation>
     </message>
@@ -895,8 +987,16 @@
       <translation>Ydeevne</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>App Info</translation>
+      <source>Notifications</source>
+      <translation>Notifikationer</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation>Log ind på clouden for at modtage notifikationer</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>Om</translation>
     </message>
   </context>
   <context>
@@ -1214,6 +1314,10 @@
     <message>
       <source>Log In</source>
       <translation>Log ind</translation>
+    </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation>2FA Deaktiveret</translation>
     </message>
   </context>
   <context>

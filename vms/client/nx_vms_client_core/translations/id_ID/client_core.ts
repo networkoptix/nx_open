@@ -183,6 +183,10 @@
       <source>Failed to access site.</source>
       <translation>Gagal mengakses site.</translation>
     </message>
+    <message>
+      <source>Server or network unavailable. Check the address and connection.</source>
+      <translation>Server atau jaringan tidak tersedia. Periksa alamat dan koneksi.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
@@ -487,6 +491,17 @@
     <message>
       <source>Press and hold to speak</source>
       <translation>Tekan dan tahan untuk berbicara</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
+    <message>
+      <source>New Group</source>
+      <translation>Grup Baru</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>Grup Baru %1</translation>
     </message>
   </context>
 </TS>

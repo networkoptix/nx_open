@@ -183,6 +183,10 @@
       <source>Failed to access site.</source>
       <translation>Kunne ikke få adgang til site.</translation>
     </message>
+    <message>
+      <source>Server or network unavailable. Check the address and connection.</source>
+      <translation>Server eller netværk er ikke tilgængeligt. Kontroller adressen og forbindelsen.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
@@ -489,6 +493,17 @@
     <message>
       <source>Press and hold to speak</source>
       <translation>Tryk og hold for at tale</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
+    <message>
+      <source>New Group</source>
+      <translation>Ny gruppe</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>Ny gruppe %1</translation>
     </message>
   </context>
 </TS>

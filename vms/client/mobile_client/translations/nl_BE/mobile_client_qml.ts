@@ -44,28 +44,28 @@
       <translation type="unfinished">Video Download</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation type="unfinished">Ability to download video</translation>
+      <source>Download video to this device</source>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation type="unfinished">Speedup connections</translation>
+      <source>Optimize Network</source>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation type="unfinished">Improve network performance</translation>
+      <source>Apply network optimization methods</source>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <source>Parallel Decoding</source>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation type="unfinished">Please restart the app to apply the changes.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -368,6 +368,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation type="unfinished">Feed</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation type="unfinished">Notifications Off</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Instellingen</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation type="unfinished">No Notifications</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation type="unfinished">No push notifications were found.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Niets gevonden</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation type="unfinished">No New Notifications</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation type="unfinished">View All</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Alle</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -451,16 +514,20 @@
       <translation>Interface</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Live voorbeelden</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Toon live previews in de cameralijst</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Gebruik servertijd</translation>
+      <source>Live Previews</source>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>Servertijd</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -468,6 +535,21 @@
     <message>
       <source>Layouts</source>
       <translation>Layouts</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation type="unfinished">Open external link in browser?</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Open</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuleren</translation>
     </message>
   </context>
   <context>
@@ -517,6 +599,17 @@
     </message>
   </context>
   <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>Geen data</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation type="unfinished">Show more</translation>
+    </message>
+  </context>
+  <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
@@ -548,20 +641,20 @@
       <translation>Prestaties</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Schakel hardware acceleratie in</translation>
+      <source>Hardware Acceleration</source>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation type="unfinished">Increase performance and battery life</translation>
+      <source>Can improve performance and battery life</source>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <source>Software Decoder Fallback</source>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -682,6 +775,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>Bronbestanden</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -738,16 +838,8 @@
       <translation>Alleen servers met openbaar certificaat verbinden</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Wachtwoorden opslaan</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Automatisch inloggen op servers</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Wat te doen met de momenteel opgeslagen wachtwoorden?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -756,6 +848,18 @@
     <message>
       <source>Delete</source>
       <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -859,16 +963,8 @@
       <translation>Instellingen</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Push meldingen</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Alle</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Log in op de cloud om push meldingen te gebruiken</translation>
     </message>
     <message>
       <source>Security</source>
@@ -883,10 +979,6 @@
       <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation type="unfinished">Early access to new features</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Interface</translation>
     </message>
@@ -895,8 +987,16 @@
       <translation>Prestaties</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <source>Notifications</source>
+      <translation>Notificaties</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>Over</translation>
     </message>
   </context>
   <context>
@@ -1214,6 +1314,10 @@
     <message>
       <source>Log In</source>
       <translation>Aanmelden</translation>
+    </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation type="unfinished">2FA Disabled</translation>
     </message>
   </context>
   <context>

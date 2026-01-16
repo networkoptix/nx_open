@@ -52,16 +52,24 @@
   <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
-      <source>Cannot change push notifications settings</source>
-      <translation>Kan ikke endre innstillinger for pushvarsler</translation>
-    </message>
-    <message>
       <source>Cannot enable push notifications</source>
       <translation>Kan ikke aktivere pushvarsler</translation>
     </message>
     <message>
       <source>Please check your internet connection</source>
       <translation>Vennligst sjekk Internett-tilkoblingen din</translation>
+    </message>
+    <message>
+      <source>Cannot change notifications settings</source>
+      <translation type="unfinished">Cannot change notifications settings</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::PushNotificationModel</name>
+    <message>
+      <source>%1 ago</source>
+      <comment>notification time, like &apos;1 min ago&apos;</comment>
+      <translation type="unfinished">%1 ago</translation>
     </message>
   </context>
   <context>
@@ -94,6 +102,21 @@
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
       <translation>Kan ikke koble til nettstedet &quot;%1&quot;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>Kameraer og enheter</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation>Alle enheter</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>Visninger</translation>
     </message>
   </context>
 </TS>

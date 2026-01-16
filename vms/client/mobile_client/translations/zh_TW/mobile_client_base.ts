@@ -50,16 +50,24 @@
   <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
-      <source>Cannot change push notifications settings</source>
-      <translation>無法更改推播通知設定</translation>
-    </message>
-    <message>
       <source>Cannot enable push notifications</source>
       <translation>無法啟用推播通知</translation>
     </message>
     <message>
       <source>Please check your internet connection</source>
       <translation>請檢查您的網路連線</translation>
+    </message>
+    <message>
+      <source>Cannot change notifications settings</source>
+      <translation>無法變更通知設定</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::PushNotificationModel</name>
+    <message>
+      <source>%1 ago</source>
+      <comment>notification time, like &apos;1 min ago&apos;</comment>
+      <translation>%1 前</translation>
     </message>
   </context>
   <context>
@@ -92,6 +100,21 @@
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
       <translation>無法連接到站點 &quot;%1&quot;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>攝影機與設備</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation>所有裝置</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>佈局</translation>
     </message>
   </context>
 </TS>

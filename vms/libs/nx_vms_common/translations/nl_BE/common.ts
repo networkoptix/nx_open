@@ -1301,9 +1301,9 @@
     <message numerus="yes">
       <source>Months</source>
       <comment>Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
+      <translation>
+        <numerusform>Maanden</numerusform>
+        <numerusform>Maanden</numerusform>
       </translation>
     </message>
     <message numerus="yes">

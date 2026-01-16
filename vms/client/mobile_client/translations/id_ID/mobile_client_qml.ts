@@ -44,28 +44,28 @@
       <translation>Video Download</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>Kemampuan untuk download video</translation>
+      <source>Download video to this device</source>
+      <translation>Download video ke perangkat ini</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>Mempercepat koneksi</translation>
+      <source>Optimize Network</source>
+      <translation>Optimalkan Jaringan</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>Meningkatkan performa jaringan</translation>
+      <source>Apply network optimization methods</source>
+      <translation>Terapkan metode optimasi jaringan</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>Jumlah dekoder maksimum</translation>
+      <source>Parallel Decoding</source>
+      <translation>Dekoding Paralel</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Tingkatkan kinerja decoding video menggunakan jumlah hardware decoder maksimum</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation>Gunakan beberapa dekoder untuk meningkatkan kinerja</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>Silakan restart aplikasi untuk menerapkan perubahan.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation>Silakan restart aplikasi untuk menerapkan perubahan</translation>
     </message>
   </context>
   <context>
@@ -367,6 +367,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation>Feed</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation>Notifikasi Mati</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation>Notifikasi saat ini dinonaktifkan untuk aplikasi ini. Untuk mengaktifkan notifikasi, gunakan pengaturan ponsel Anda&apos;</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation>Anda menonaktifkan notifikasi push untuk site ini. Untuk mengaktifkannya, buka halaman Pengaturan.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Pengaturan</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation>Tidak ada Notifikasi</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation>Tidak ada push notifikasi yang ditemukan.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Nothing found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation>Coba ubah parameter pencarian</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation>Tidak Ada Notifikasi Baru</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation>Tidak ada push notifikasi baru yang ditemukan, tetapi Anda dapat melihat riwayat lengkap notifikasi.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation>Lihat Semua</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation>Belum dilihat</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation>Dilihat</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>All</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -450,16 +513,20 @@
       <translation>Interface</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Preview live</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Tampilkan preview di daftar kamera</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Gunakan waktu server</translation>
+      <source>Live Previews</source>
+      <translation>Live Preview</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>Server Time</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation>Tampilkan waktu server di kamera</translation>
     </message>
   </context>
   <context>
@@ -467,6 +534,21 @@
     <message>
       <source>Layouts</source>
       <translation>Layouts</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation>Buka link eksternal di browser?</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Open</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Cancel</translation>
     </message>
   </context>
   <context>
@@ -516,6 +598,17 @@
     </message>
   </context>
   <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>Tidak ada data</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation>Tampilkan lebih banyak</translation>
+    </message>
+  </context>
+  <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
@@ -547,19 +640,19 @@
       <translation>Performa</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Aktifkan akselerasi hardware</translation>
+      <source>Hardware Acceleration</source>
+      <translation>Akselerasi Perangkat Keras</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>Meningkatkan performa dan masa pakai baterai</translation>
+      <source>Can improve performance and battery life</source>
+      <translation>Dapat meningkatkan kinerja dan masa pakai baterai</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Aktifkan fallback dekoder software</translation>
+      <source>Software Decoder Fallback</source>
+      <translation>Fallback Dekoder Software</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
+      <source>Can decode rare video formats using software</source>
       <translation>Dekode beberapa format video langka menggunakan dekoder software</translation>
     </message>
   </context>
@@ -681,6 +774,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>Resources</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -737,16 +837,8 @@
       <translation>Koneksikan hanya server dengan sertifikat publik</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Simpan kata sandi</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Secara otomatis masuk ke server</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Apa yang harus dilakukan dengan kata sandi yang disimpan saat ini?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -755,6 +847,18 @@
     <message>
       <source>Delete</source>
       <translation>Hapus</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation>Simpan Kata Sandi</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation>Bagaimana cara menangani kata sandi yang tersimpan?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation>Pemeriksaan Sertifikat Server</translation>
     </message>
   </context>
   <context>
@@ -858,16 +962,8 @@
       <translation>Pengaturan</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Notifikasi push</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Semua</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Masuk ke cloud untuk menggunakan notifikasi push</translation>
     </message>
     <message>
       <source>Security</source>
@@ -882,10 +978,6 @@
       <translation>Fitur Beta</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>Akses awal ke fitur baru</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Interface</translation>
     </message>
@@ -894,8 +986,16 @@
       <translation>Performa</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>Info Aplikasi</translation>
+      <source>Notifications</source>
+      <translation>Notifikasi</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation>Masuk ke cloud untuk menerima notifikasi</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>Tentang</translation>
     </message>
   </context>
   <context>
@@ -1213,6 +1313,10 @@
     <message>
       <source>Log In</source>
       <translation>Masuk</translation>
+    </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation>2FA Dinonaktifkan</translation>
     </message>
   </context>
   <context>

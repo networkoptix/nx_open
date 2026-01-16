@@ -183,6 +183,10 @@
       <source>Failed to access site.</source>
       <translation type="unfinished">Failed to access site.</translation>
     </message>
+    <message>
+      <source>Server or network unavailable. Check the address and connection.</source>
+      <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
@@ -328,7 +332,7 @@
     </message>
     <message>
       <source>Any</source>
-      <translation type="unfinished">Any</translation>
+      <translation>Ямар ч</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
@@ -489,6 +493,17 @@
     <message>
       <source>Press and hold to speak</source>
       <translation>Ярихын тулд удаан дарна уу</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
+    <message>
+      <source>New Group</source>
+      <translation type="unfinished">New Group</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation type="unfinished">New Group %1</translation>
     </message>
   </context>
 </TS>

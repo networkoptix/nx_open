@@ -56,16 +56,24 @@
   <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
-      <source>Cannot change push notifications settings</source>
-      <translation>Не можна змінювати налаштування push сповіщень</translation>
-    </message>
-    <message>
       <source>Cannot enable push notifications</source>
       <translation>Не можна ввімкнути push-сповіщення</translation>
     </message>
     <message>
       <source>Please check your internet connection</source>
       <translation type="unfinished">Please check your internet connection</translation>
+    </message>
+    <message>
+      <source>Cannot change notifications settings</source>
+      <translation type="unfinished">Cannot change notifications settings</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::PushNotificationModel</name>
+    <message>
+      <source>%1 ago</source>
+      <comment>notification time, like &apos;1 min ago&apos;</comment>
+      <translation type="unfinished">%1 ago</translation>
     </message>
   </context>
   <context>
@@ -98,6 +106,21 @@
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
       <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>Камери &amp; Пристрої</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation>Всі Пристрої</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>Розкладки</translation>
     </message>
   </context>
 </TS>

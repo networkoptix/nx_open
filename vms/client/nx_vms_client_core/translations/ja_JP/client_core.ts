@@ -183,6 +183,10 @@
       <source>Failed to access site.</source>
       <translation>サイトへのアクセスに失敗しました。</translation>
     </message>
+    <message>
+      <source>Server or network unavailable. Check the address and connection.</source>
+      <translation>サーバーまたはネットワークが利用できません。アドレスと接続可否を確認してください。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
@@ -487,6 +491,17 @@
     <message>
       <source>Press and hold to speak</source>
       <translation>長押しで話す</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
+    <message>
+      <source>New Group</source>
+      <translation>新規グループ</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>新規グループ %1</translation>
     </message>
   </context>
 </TS>

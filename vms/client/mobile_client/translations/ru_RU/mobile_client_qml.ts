@@ -44,28 +44,28 @@
       <translation type="unfinished">Video Download</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>Возможность загрузки видео</translation>
+      <source>Download video to this device</source>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation type="unfinished">Speedup connections</translation>
+      <source>Optimize Network</source>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation type="unfinished">Improve network performance</translation>
+      <source>Apply network optimization methods</source>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <source>Parallel Decoding</source>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>Чтобы изменения вступили в силу, необходимо перезапустить приложение.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -370,6 +370,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation type="unfinished">Feed</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation type="unfinished">Notifications Off</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Настройки</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation type="unfinished">No Notifications</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation type="unfinished">No push notifications were found.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Ничего не найдено</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation>Попробуйте изменить параметры поиска</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation type="unfinished">No New Notifications</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation type="unfinished">View All</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Все</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -453,16 +516,20 @@
       <translation>Оформление</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Предварительный просмотр</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Предпросмотр в списке камер</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Использовать время сервера</translation>
+      <source>Live Previews</source>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>Время сервера</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -470,6 +537,21 @@
     <message>
       <source>Layouts</source>
       <translation>Раскладки</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation type="unfinished">Open external link in browser?</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Открыть</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Отменить</translation>
     </message>
   </context>
   <context>
@@ -519,6 +601,17 @@
     </message>
   </context>
   <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>Нет данных</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation type="unfinished">Show more</translation>
+    </message>
+  </context>
+  <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
@@ -550,20 +643,20 @@
       <translation>Производительность</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Включить аппаратное ускорение</translation>
+      <source>Hardware Acceleration</source>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation type="unfinished">Increase performance and battery life</translation>
+      <source>Can improve performance and battery life</source>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <source>Software Decoder Fallback</source>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -684,6 +777,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>Ресурсы</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -740,16 +840,8 @@
       <translation>Подключайте только серверы с публичными сертификатами</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Сохранять пароли</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Автоматический вход на серверы</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Что делать с сохраненными паролями?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -758,6 +850,18 @@
     <message>
       <source>Delete</source>
       <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -861,16 +965,8 @@
       <translation>Настройки</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Push-уведомления</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Все</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Войдите в облако, чтобы использовать push-уведомления</translation>
     </message>
     <message>
       <source>Security</source>
@@ -885,10 +981,6 @@
       <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>Ранний доступ к новым функциям</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Оформление</translation>
     </message>
@@ -897,8 +989,16 @@
       <translation>Производительность</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>О приложении</translation>
+      <source>Notifications</source>
+      <translation>Уведомления</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>О программе</translation>
     </message>
   </context>
   <context>
@@ -1216,6 +1316,10 @@
     <message>
       <source>Log In</source>
       <translation>Войти</translation>
+    </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation>Двухфакторная аутентификация отключена</translation>
     </message>
   </context>
   <context>

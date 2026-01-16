@@ -183,6 +183,10 @@
       <source>Failed to access site.</source>
       <translation>Impossible d'accéder au site.</translation>
     </message>
+    <message>
+      <source>Server or network unavailable. Check the address and connection.</source>
+      <translation>Serveur ou réseau indisponible. Vérifiez l'adresse et la connexion.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
@@ -369,7 +373,7 @@
     <name>nx::vms::client::core::OrganizationsFilterModel</name>
     <message>
       <source>Other results</source>
-      <translation type="unfinished">Other results</translation>
+      <translation>Autres résultats</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -489,6 +493,17 @@
     <message>
       <source>Press and hold to speak</source>
       <translation>Appuyez et maintenez pour parler</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
+    <message>
+      <source>New Group</source>
+      <translation>Nouveau Groupe</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>Nouveau groupe %1</translation>
     </message>
   </context>
 </TS>

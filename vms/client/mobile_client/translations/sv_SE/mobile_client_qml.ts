@@ -44,28 +44,28 @@
       <translation>Ladda ner video</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>Möjlighet att ladda ner video</translation>
+      <source>Download video to this device</source>
+      <translation>Ladda ner video till denna enhet</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation>Snabba upp anslutningar</translation>
+      <source>Optimize Network</source>
+      <translation>Optimera nätverk</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>Förbättra nätverksprestanda</translation>
+      <source>Apply network optimization methods</source>
+      <translation>Tillämpa metoder för nätverksoptimering</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>Maximalt antal avkodare</translation>
+      <source>Parallel Decoding</source>
+      <translation>Parallell avkodning</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Förbättra videoavkodningsprestanda med maximalt antal hårdvaruavkodare</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation>Använd flera avkodare för att förbättra prestandan</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>Starta om appen för att tillämpa ändringarna.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation>Starta om appen för att tillämpa ändringarna</translation>
     </message>
   </context>
   <context>
@@ -368,6 +368,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation>Flöde</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation>Aviseringar av</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation>Aviseringar är för närvarande inaktiverade för den här appen. För att aktivera aviseringar använd din telefon&apos;s inställningar</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation>Du inaktiverade push-meddelanden för den här platsen. För att aktivera dem, gå till sidan Inställningar.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Inställningar</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation>Inga aviseringar</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation>Inga push-meddelanden hittades.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Ingenting hittades</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation>Försök att ändra sökparametrar</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation>Inga nya aviseringar</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation>Inga nya push-meddelanden hittades, men du kan se hela din notifikationshistorik.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation>Visa alla</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation>Osedd</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation>Visad</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Alla</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -451,16 +514,20 @@
       <translation>Gränssnitt</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Live-förhandsvisningar</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Visa förhandsvisningar i listan över kameror</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Använd servertid</translation>
+      <source>Live Previews</source>
+      <translation>Liveförhandsvisningar</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>Servertid</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation>Visa servertid på kameror</translation>
     </message>
   </context>
   <context>
@@ -468,6 +535,21 @@
     <message>
       <source>Layouts</source>
       <translation>Vyer</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation>Öppna extern länk i webbläsare?</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Öppna</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
@@ -517,6 +599,17 @@
     </message>
   </context>
   <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>Data saknas</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation>Visa mer</translation>
+    </message>
+  </context>
+  <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
@@ -548,20 +641,20 @@
       <translation>Prestanda</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Aktivera hårdvaruacceleration</translation>
+      <source>Hardware Acceleration</source>
+      <translation>Hårdvaruacceleration</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
-      <translation>Öka prestanda och batteritid</translation>
+      <source>Can improve performance and battery life</source>
+      <translation>Kan förbättra prestanda och batteritid</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Aktivera reserv för programvaruavkodare</translation>
+      <source>Software Decoder Fallback</source>
+      <translation>Programvaruavkodare reserv</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Avkoda några sällsynta videoformat med hjälp av programvaruavkodare</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation>Kan avkoda sällsynta videoformat med hjälp av programvara</translation>
     </message>
   </context>
   <context>
@@ -682,6 +775,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>Resurser</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -738,16 +838,8 @@
       <translation>Anslut endast servrar med offentligt certifikat</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Spara lösenord</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Logga in automatiskt på servrar</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Vad ska man göra med för tillfället sparade lösenord?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -756,6 +848,18 @@
     <message>
       <source>Delete</source>
       <translation>Radera</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation>Spara lösenord</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation>Hur hanterar man sparade lösenord?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation>Kontroll av servercertifikat</translation>
     </message>
   </context>
   <context>
@@ -859,16 +963,8 @@
       <translation>Inställningar</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Pushnotifikationer</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Alla</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Logga in i molnet för att använda push-aviseringar</translation>
     </message>
     <message>
       <source>Security</source>
@@ -883,10 +979,6 @@
       <translation>Betafunktioner</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>Tidig tillgång till nya funktioner</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Gränssnitt</translation>
     </message>
@@ -895,8 +987,16 @@
       <translation>Prestanda</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>Appinformation</translation>
+      <source>Notifications</source>
+      <translation>Aviseringar</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation>Logga in i molnet för att få aviseringar</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>Om</translation>
     </message>
   </context>
   <context>
@@ -1214,6 +1314,10 @@
     <message>
       <source>Log In</source>
       <translation>Logga in</translation>
+    </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation>2FA inaktiverad</translation>
     </message>
   </context>
   <context>

@@ -44,28 +44,28 @@
       <translation type="unfinished">Video Download</translation>
     </message>
     <message>
-      <source>Ability to download video</source>
-      <translation>Możliwość pobierania wideo</translation>
+      <source>Download video to this device</source>
+      <translation>Pobierz wideo na to urządzenie</translation>
     </message>
     <message>
-      <source>Speedup connections</source>
-      <translation type="unfinished">Speedup connections</translation>
+      <source>Optimize Network</source>
+      <translation>Optymalizacja sieci</translation>
     </message>
     <message>
-      <source>Improve network performance</source>
-      <translation>Popraw wydajność sieci</translation>
+      <source>Apply network optimization methods</source>
+      <translation>Zastosuj metody optymalizacji sieci</translation>
     </message>
     <message>
-      <source>Maximum decoders count</source>
-      <translation>Maksymalna liczba dekoderów</translation>
+      <source>Parallel Decoding</source>
+      <translation>Dekodowanie równoległe</translation>
     </message>
     <message>
-      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>Popraw wydajność dekodowania wideo, wykorzystując maksymalną liczbę dekoderów sprzętowych</translation>
+      <source>Use multiple decoders to improve performance</source>
+      <translation>Użyj wielu dekoderów, aby poprawić wydajność</translation>
     </message>
     <message>
-      <source>Please restart the app to apply the changes.</source>
-      <translation>Uruchom ponownie aplikację, aby zastosować zmiany.</translation>
+      <source>Please restart the app to apply changes</source>
+      <translation>Uruchom ponownie aplikację, aby zastosować zmiany</translation>
     </message>
   </context>
   <context>
@@ -370,6 +370,69 @@
     </message>
   </context>
   <context>
+    <name>FeedScreen</name>
+    <message>
+      <source>Feed</source>
+      <translation>Strumień</translation>
+    </message>
+    <message>
+      <source>Notifications Off</source>
+      <translation>Powiadomienia wyłączone</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation>Powiadomienia są obecnie wyłączone dla tej aplikacji. Aby włączyć powiadomienia, skorzystaj z ustawień telefonu</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation>Wyłączyłeś powiadomienia push dla tej witryny. Aby je włączyć, przejdź do strony Ustawienia.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Ustawienia</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation>Brak powiadomień</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation>Nie znaleziono powiadomień push.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Nic nie znaleziono</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation>Spróbuj zmienić parametry wyszukiwania</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation>Brak nowych powiadomień</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation>Nie znaleziono nowych powiadomień push, ale możesz wyświetlić pełną historię powiadomień.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation>Zobacz wszystko</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation>Nieprzeglądane</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation>Przeglądane</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Wszystko</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -453,16 +516,20 @@
       <translation>Wygląd</translation>
     </message>
     <message>
-      <source>Live previews</source>
-      <translation>Podglądy na żywo</translation>
-    </message>
-    <message>
       <source>Show previews in the cameras list</source>
       <translation>Pokaż podglądy na liście kamer</translation>
     </message>
     <message>
-      <source>Use server time</source>
-      <translation>Użyj czasu serwera</translation>
+      <source>Live Previews</source>
+      <translation>Podglądy na żywo</translation>
+    </message>
+    <message>
+      <source>Server Time</source>
+      <translation>Czas serwera</translation>
+    </message>
+    <message>
+      <source>Show server time on cameras</source>
+      <translation>Pokaż czas serwera na kamerach</translation>
     </message>
   </context>
   <context>
@@ -470,6 +537,21 @@
     <message>
       <source>Layouts</source>
       <translation>Układy</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+      <source>Open external link in browser?</source>
+      <translation>Otworzyć zewnętrzny link w przeglądarce?</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Otwórz</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>
@@ -519,6 +601,17 @@
     </message>
   </context>
   <context>
+    <name>Notification</name>
+    <message>
+      <source>No data</source>
+      <translation>Brak danych</translation>
+    </message>
+    <message>
+      <source>Show more</source>
+      <translation>Pokaż więcej</translation>
+    </message>
+  </context>
+  <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
@@ -550,20 +643,20 @@
       <translation>Wydajność</translation>
     </message>
     <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Włącz akcelerację sprzętową</translation>
+      <source>Hardware Acceleration</source>
+      <translation>Przyspieszenie sprzętowe</translation>
     </message>
     <message>
-      <source>Increase performance and battery life</source>
+      <source>Can improve performance and battery life</source>
       <translation>Zwiększ wydajność i żywotność baterii</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <source>Software Decoder Fallback</source>
+      <translation>Dekoder programowy awaryjny</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Dekodowanie niektórych rzadkich formatów wideo za pomocą dekodera programowego</translation>
+      <source>Can decode rare video formats using software</source>
+      <translation>Możliwość dekodowania rzadkich formatów wideo za pomocą oprogramowania</translation>
     </message>
   </context>
   <context>
@@ -684,6 +777,13 @@
     </message>
   </context>
   <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+      <source>Resources</source>
+      <translation>Zasoby</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
@@ -740,16 +840,8 @@
       <translation>Połącz tylko serwery z certyfikatami publicznymi</translation>
     </message>
     <message>
-      <source>Save passwords</source>
-      <translation>Zapisz hasła</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Automatyczne logowanie do serwerów</translation>
-    </message>
-    <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Co zrobić z aktualnie przechowywanymi hasłami?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -758,6 +850,18 @@
     <message>
       <source>Delete</source>
       <translation>Usuń</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation>Zapisz hasła</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation>Jak postępować z zapisanymi hasłami?</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation>Sprawdzanie certyfikatu serwera</translation>
     </message>
   </context>
   <context>
@@ -861,16 +965,8 @@
       <translation>Ustawienia</translation>
     </message>
     <message>
-      <source>Push notifications</source>
-      <translation>Powiadomienia mobilne</translation>
-    </message>
-    <message>
       <source>All</source>
       <translation>Wszystko</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to use push notifications</source>
-      <translation>Zaloguj się do chmury, aby korzystać z powiadomień mobilnych</translation>
     </message>
     <message>
       <source>Security</source>
@@ -885,10 +981,6 @@
       <translation>Funkcje beta</translation>
     </message>
     <message>
-      <source>Early access to new features</source>
-      <translation>Wcześniejszy dostęp do nowych funkcji</translation>
-    </message>
-    <message>
       <source>Interface</source>
       <translation>Wygląd</translation>
     </message>
@@ -897,8 +989,16 @@
       <translation>Wydajność</translation>
     </message>
     <message>
-      <source>App Info</source>
-      <translation>Informacje o aplikacji</translation>
+      <source>Notifications</source>
+      <translation>Powiadomienia</translation>
+    </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation>Zaloguj się do chmury, aby otrzymywać powiadomienia</translation>
+    </message>
+    <message>
+      <source>About</source>
+      <translation>Informacje o programie</translation>
     </message>
   </context>
   <context>
@@ -1216,6 +1316,10 @@
     <message>
       <source>Log In</source>
       <translation>Zaloguj się</translation>
+    </message>
+    <message>
+      <source>2FA Disabled</source>
+      <translation>Weryfikacja 2FA wyłączona</translation>
     </message>
   </context>
   <context>

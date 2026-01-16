@@ -183,6 +183,10 @@
       <source>Failed to access site.</source>
       <translation>Không thể truy cập Chi nhánh.</translation>
     </message>
+    <message>
+      <source>Server or network unavailable. Check the address and connection.</source>
+      <translation>Máy chủ hoặc mạng không khả dụng. Kiểm tra địa chỉ và kết nối.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
@@ -487,6 +491,17 @@
     <message>
       <source>Press and hold to speak</source>
       <translation>Nhấn và giữ để nói</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
+    <message>
+      <source>New Group</source>
+      <translation>Nhóm mới</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>Nhóm mới %1</translation>
     </message>
   </context>
 </TS>
