@@ -584,14 +584,27 @@ Page
 
     Rectangle
     {
-        id: navigationBarTint
+        id: leftNavigationBarTint
 
         color: ColorTheme.colors.dark3
         visible: mainWindow.hasNavigationBar
-        width: mainWindow.width - parent.width
+        width: windowParams.leftMargin
         height: video.height
-        x: windowParams.leftMargin ? -windowParams.leftMargin : parent.width
         anchors.top: video.top
+        anchors.right: parent.left
+        opacity: Math.min(navigator.opacity, d.cameraUiOpacity)
+    }
+
+    Rectangle
+    {
+        id: rightNavigationBarTint
+
+        color: ColorTheme.colors.dark3
+        visible: mainWindow.hasNavigationBar
+        width: windowParams.rightMargin
+        height: video.height
+        anchors.top: video.top
+        anchors.left: parent.right
         opacity: Math.min(navigator.opacity, d.cameraUiOpacity)
     }
 
