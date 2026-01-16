@@ -219,22 +219,22 @@ TYPED_TEST(TimelineAggregatingProxyBackendTest, followUpAggregated)
     // As a follow-up, #3 and #4 are re-aggregated together with #5 which was queued during
     // the initial aggregated request asynchronous processing.
 
-    const auto future1 = LOAD(interval(6ms, 5ms), /*limit*/ 2); //< #1.
+    auto future1 = LOAD(interval(6ms, 5ms), /*limit*/ 2); //< #1.
     const auto future2 = LOAD(interval(5ms, 4ms), /*limit*/ 2); //< #2.
     const auto future3 = LOAD(interval(3ms, 3ms), /*limit*/ 2); //< #3.
     const auto future4 = LOAD(interval(3ms, 2ms), /*limit*/ 2); //< #4.
 
     QFuture<TestDataList> future5;
-    this->source->setBeforeLoadHook(
-        [&]()
+    const auto future1_with_continuation = future1.then(
+        [&](TestDataList result)
         {
-            // This is executed every time the source backend's load() function is entered.
-            // We want to queue the request #5 only once.
-            if (!future5.isValid())
-                future5 = LOAD(interval(2ms, 1ms), /*limit*/ 2);
+            // This will queue up when #1 is fulfilled, eventually getting aggregated into a single
+            // block with not fulfilled #3 and #4.
+            future5 = LOAD(interval(2ms, 1ms), /*limit*/ 2);
+            return result;
         });
 
-    WAIT_AND_CHECK(future1, "AB");
+    WAIT_AND_CHECK(future1_with_continuation, "AB");
     WAIT_AND_CHECK(future2, "DE");
     WAIT_AND_CHECK(future3, "HI");
     WAIT_AND_CHECK(future4, "HI");
