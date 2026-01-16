@@ -2121,11 +2121,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation>Este servidor foi eliminado do sitio</translation>
+      <translation type="unfinished">This server is removed from Site</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation>Este usuario foi eliminado do sitio</translation>
+      <translation type="unfinished">This user is removed from Site</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>

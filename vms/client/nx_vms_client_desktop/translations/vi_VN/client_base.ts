@@ -2100,11 +2100,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation>Máy chủ này đã bị xóa khỏi Chi nhánh</translation>
+      <translation type="unfinished">This server is removed from Site</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation>Người dùng này đã bị xóa khỏi Chi nhánh</translation>
+      <translation type="unfinished">This user is removed from Site</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>

@@ -2121,11 +2121,11 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation>Denna server tas bort från sajten</translation>
+      <translation type="unfinished">This server is removed from Site</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation>Den här användaren tas bort från sajten</translation>
+      <translation type="unfinished">This user is removed from Site</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -9044,7 +9044,7 @@ Kom ihåg att returnera loggnivån till dess standardinställning när du har sa
     </message>
     <message>
       <source>None</source>
-      <translation>Inget</translation>
+      <translation>Ingen</translation>
     </message>
   </context>
   <context>

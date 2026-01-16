@@ -2100,11 +2100,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation>このサーバーはサイトから削除されています。</translation>
+      <translation type="unfinished">This server is removed from Site</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation>このユーザーはサイトから削除されています。</translation>
+      <translation type="unfinished">This user is removed from Site</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>

@@ -2121,11 +2121,11 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation>Denne server er fjernet fra Sitet</translation>
+      <translation type="unfinished">This server is removed from Site</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation>Denne bruger er fjernet fra Sitet</translation>
+      <translation type="unfinished">This user is removed from Site</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -7572,7 +7572,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Learn more</source>
-      <translation>Læs mere</translation>
+      <translation>Lær mere</translation>
     </message>
   </context>
   <context>

@@ -9043,7 +9043,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>None</source>
-      <translation>Yok</translation>
+      <translation>Hiç</translation>
     </message>
   </context>
   <context>

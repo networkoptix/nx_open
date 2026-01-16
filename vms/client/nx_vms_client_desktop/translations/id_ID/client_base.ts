@@ -2100,11 +2100,11 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation>Server ini dihapus dari Site</translation>
+      <translation type="unfinished">This server is removed from Site</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation>User ini dihapus dari Site</translation>
+      <translation type="unfinished">This user is removed from Site</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>

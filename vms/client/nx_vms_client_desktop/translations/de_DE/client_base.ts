@@ -9044,7 +9044,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>None</source>
-      <translation>Keine</translation>
+      <translation>Keines</translation>
     </message>
   </context>
   <context>
