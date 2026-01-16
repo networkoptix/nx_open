@@ -44,28 +44,28 @@
         <translation></translation>
     </message>
     <message>
-        <source>Ability to download video</source>
-        <translation></translation>
+        <source>Download video to this device</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Speedup connections</source>
-        <translation></translation>
+        <source>Optimize Network</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Improve network performance</source>
-        <translation></translation>
+        <source>Apply network optimization methods</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maximum decoders count</source>
-        <translation></translation>
+        <source>Parallel Decoding</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-        <translation></translation>
+        <source>Use multiple decoders to improve performance</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please restart the app to apply the changes.</source>
-        <translation></translation>
+        <source>Please restart the app to apply changes</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -368,6 +368,69 @@
     </message>
 </context>
 <context>
+    <name>FeedScreen</name>
+    <message>
+        <source>Feed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No push notifications were found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try changing the search parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No New Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No new push notifications were found, but you can view your full notification history.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unviewed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Viewed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FiltersPanel</name>
     <message>
         <source>No filters</source>
@@ -451,15 +514,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Live previews</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show previews in the cameras list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use server time</source>
+        <source>Live Previews</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show server time on cameras</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -467,6 +534,21 @@
     <name>LayoutSheet</name>
     <message>
         <source>Layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LinkAboutToOpenDialog</name>
+    <message>
+        <source>Open external link in browser?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -517,6 +599,17 @@
     </message>
 </context>
 <context>
+    <name>Notification</name>
+    <message>
+        <source>No data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show more</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>OptionSelector</name>
     <message>
         <source>Any</source>
@@ -548,19 +641,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable hardware acceleration</source>
+        <source>Hardware Acceleration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Increase performance and battery life</source>
+        <source>Can improve performance and battery life</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable software decoder fallback</source>
+        <source>Software Decoder Fallback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Decode some rare video formats using software decoder</source>
+        <source>Can decode rare video formats using software</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -682,6 +775,13 @@
     </message>
 </context>
 <context>
+    <name>ResourceTreeSheet</name>
+    <message>
+        <source>Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ResourcesScreen</name>
     <message>
         <source>Loading...</source>
@@ -738,15 +838,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Save passwords</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Automatically log in to servers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>What to do with currently saved passwords?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -755,6 +847,18 @@
     </message>
     <message>
         <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Passwords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How to handle saved passwords?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Certificate Check</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -859,15 +963,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Push notifications</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>All</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Log in to the cloud to use push notifications</source>
         <translation></translation>
     </message>
     <message>
@@ -883,10 +979,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Early access to new features</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Interface</source>
         <translation type="unfinished"></translation>
     </message>
@@ -895,7 +987,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>App Info</source>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log in to the cloud to receive notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1213,6 +1313,10 @@
     </message>
     <message>
         <source>Log In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2FA Disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
