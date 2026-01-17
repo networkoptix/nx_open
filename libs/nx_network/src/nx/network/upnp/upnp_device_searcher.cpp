@@ -50,7 +50,6 @@ DeviceSearcher::DeviceSearcher(
     m_isHttpsForced(isHttpsForced),
     m_discoverTryTimeoutMS(discoverTryTimeoutMS),
     m_timerId(0),
-    m_terminated(false),
     m_needToUpdateReceiveSocket(false),
     m_timerManager(timerManager)
 {
@@ -65,9 +64,14 @@ DeviceSearcher::~DeviceSearcher()
 void DeviceSearcher::start()
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
-    m_timerId = m_timerManager->addTimer(
-        this,
+    m_timerId = m_timerManager->addNonStopTimer(
+        [this](auto /*timerId*/)
+        {
+            dispatchDiscoverPackets();
+        },
+        std::chrono::milliseconds(m_discoverTryTimeoutMS),
         std::chrono::milliseconds(m_discoverTryTimeoutMS));
+
     m_cacheTimer.start();
 }
 
@@ -79,44 +83,32 @@ void DeviceSearcher::stop()
 {
     //stopping dispatching discover packets
     NX_DEBUG(this, "Stopping...");
-    {
-        NX_MUTEX_LOCKER lk(&m_mutex);
-        NX_WRITE_LOCKER lock(&m_stoppingLock);
-        m_terminated = true;
-    }
-    //m_timerId cannot be changed after m_terminated set to true
-    if (m_timerId)
-    {
-        m_timerManager->joinAndDeleteTimer(m_timerId);
-        m_timerId = 0;
-    }
 
-    //since dispatching is stopped, no need to synchronize access to m_socketList
-    for (std::map<QString, SocketReadCtx>::const_iterator
-        it = m_socketList.begin();
-        it != m_socketList.end();
-        ++it)
+    if (auto timerId = std::exchange(m_timerId, 0))
+        m_timerManager->joinAndDeleteTimer(timerId);
+
+    // After timer is stopped, no new socket can be added to m_socketList
+    decltype(m_socketList) socketList;
     {
-        it->second.sock->pleaseStopSync();
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        std::swap(socketList, m_socketList);
     }
-    m_socketList.clear();
+    for (auto& [_, ctx]: socketList)
+        ctx.sock->pleaseStopSync();
+    socketList.clear();
+    if (m_receiveSocket)
+        m_receiveSocket->pleaseStopSync();
 
-    auto socket = std::move(m_receiveSocket);
-    m_receiveSocket.reset();
-
-    if (socket)
-        socket->pleaseStopSync();
-
-    // Canceling ongoing http requests.
-    // NOTE: m_httpClients cannot be modified by other threads, since UDP socket processing is
-    // over and m_terminated == true.
-    for (auto it = m_httpClients.begin();
-        it != m_httpClients.end();
-        ++it)
+    // After sockets are stopped, no new httpClient can be added
+    decltype(m_httpClients) httpClients;
     {
-        it->first->pleaseStopSync();     //this method blocks till event handler returns
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        std::swap(httpClients, m_httpClients);
     }
-    m_httpClients.clear();
+    for (auto& [client, _]: httpClients)
+        client->pleaseStopSync();
+    httpClients.clear();
+
     m_handlerGuard.reset();
     NX_DEBUG(this, "Stopped");
 }
@@ -188,18 +180,6 @@ int DeviceSearcher::cacheTimeout() const
     return m_settings->cacheTimeout();
 }
 
-void DeviceSearcher::onTimer(const quint64& /*timerId*/)
-{
-    dispatchDiscoverPackets();
-
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    if (!m_terminated)
-    {
-        m_timerId = m_timerManager->addTimer(
-            this, std::chrono::milliseconds(m_discoverTryTimeoutMS));
-    }
-}
-
 void DeviceSearcher::onSomeBytesRead(
     AbstractCommunicatingSocket* sock,
     SystemError::ErrorCode errorCode,
@@ -208,29 +188,24 @@ void DeviceSearcher::onSomeBytesRead(
 {
     if (errorCode)
     {
-        {
-            NX_MUTEX_LOCKER lk(&m_mutex);
-            if (m_terminated)
-                return;
+        NX_MUTEX_LOCKER lk(&m_mutex);
 
-            if (sock == m_receiveSocket.get())
+        if (sock == m_receiveSocket.get())
+        {
+            m_needToUpdateReceiveSocket = true;
+        }
+        else
+        {
+            // Removing socket from m_socketList
+            for (auto it = m_socketList.begin(); it != m_socketList.end(); ++it)
             {
-                m_needToUpdateReceiveSocket = true;
-            }
-            else
-            {
-                //removing socket from m_socketList
-                for (auto it = m_socketList.begin(); it != m_socketList.end(); ++it)
+                if (it->second.sock.get() == sock)
                 {
-                    if (it->second.sock.get() == sock)
-                    {
-                        m_socketList.erase(it);
-                        break;
-                    }
+                    m_socketList.erase(it);
+                    break;
                 }
             }
         }
-
         return;
     }
 
@@ -289,7 +264,7 @@ void DeviceSearcher::dispatchDiscoverPackets()
 {
     for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
     {
-        const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(address);
+        const auto sock = getSockByIntf(address);
         if (!sock)
             continue;
 
@@ -352,7 +327,7 @@ nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceive
     return oldSock;
 }
 
-std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(
+AbstractDatagramSocket* DeviceSearcher::getSockByIntf(
     const nx::network::HostAddress& address)
 {
 
@@ -388,38 +363,38 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(
         p = m_socketList.emplace(QString::fromStdString(localAddress), SocketReadCtx());
     }
     if (!p.second)
-        return p.first->second.sock;
+        return p.first->second.sock.get();
 
     //creating new socket
-    std::shared_ptr<UDPSocket> sock(new UDPSocket());
 
     using namespace std::placeholders;
 
-    p.first->second.sock = sock;
+    p.first->second.sock = std::make_unique<UDPSocket>();
+    auto sockPtr = p.first->second.sock.get();
     p.first->second.buf.reserve(kReadBufferCapacity);
-    if (!sock->setNonBlockingMode(true) ||
-        !sock->setReuseAddrFlag(true) ||
-        !sock->bind(SocketAddress(localAddress)) ||
-        !sock->setMulticastIF(localAddress) ||
-        !sock->setRecvBufferSize(kMaxUpnpResponsePacketSize))
+    if (!sockPtr->setNonBlockingMode(true) ||
+        !sockPtr->setReuseAddrFlag(true) ||
+        !sockPtr->bind(SocketAddress(localAddress)) ||
+        !sockPtr->setMulticastIF(localAddress) ||
+        !sockPtr->setRecvBufferSize(kMaxUpnpResponsePacketSize))
     {
-        sock->post(
+        sockPtr->post(
             std::bind(
                 &DeviceSearcher::onSomeBytesRead, this,
-                sock.get(), SystemError::getLastOSErrorCode(), nullptr, 0));
+                sockPtr, SystemError::getLastOSErrorCode(), nullptr, 0));
     }
     else
     {
         // TODO: #akolesnikov Something very strange. We start async operation with some internal
         // handle and RETURN this socket.
-        sock->readSomeAsync(
+        sockPtr->readSomeAsync(
             &p.first->second.buf,
             std::bind(
                 &DeviceSearcher::onSomeBytesRead, this,
-                sock.get(), _1, &p.first->second.buf, _2));
+                sockPtr, _1, &p.first->second.buf, _2));
     }
 
-    return sock;
+    return sockPtr;
 }
 
 void DeviceSearcher::startFetchDeviceXml(
@@ -537,10 +512,6 @@ void DeviceSearcher::processPacket(DiscoveredDeviceInfo info)
             if (!lock)
                 return;
 
-            NX_READ_LOCKER stopLock(&m_stoppingLock);
-            if (m_terminated)
-                return;
-
             const SocketAddress devAddress(
                 info.descriptionUrl.host().toStdString(),
                 info.descriptionUrl.port());
@@ -588,8 +559,6 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone(nx::network::http::AsyncH
     }
 
     NX_MUTEX_LOCKER lk(&m_mutex);
-    if (m_terminated)
-        return;
     httpClient->pleaseStopSync();
     m_httpClients.erase(httpClient);
 }

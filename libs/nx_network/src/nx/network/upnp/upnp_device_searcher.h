@@ -51,7 +51,6 @@ public:
  */
 class NX_NETWORK_API DeviceSearcher:
     public QObject,
-    public nx::utils::TimerEventHandler,
     public QnStoppable
 {
     Q_OBJECT
@@ -127,7 +126,7 @@ private:
     class SocketReadCtx
     {
     public:
-        std::shared_ptr<AbstractDatagramSocket> sock;
+        std::unique_ptr<AbstractDatagramSocket> sock;
         nx::Buffer buf;
     };
 
@@ -147,16 +146,13 @@ private:
     std::map<HostAddress, DiscoveredDeviceInfo> m_discoveredDevices;
     std::map<HostAddress, DiscoveredDeviceInfo> m_discoveredDevicesToProcess;
     std::map<QByteArray, UPNPDescriptionCacheItem> m_upnpDescCache;
-    bool m_terminated;
     QElapsedTimer m_cacheTimer;
 
     nx::utils::AtomicUniquePtr<AbstractDatagramSocket> m_receiveSocket;
     nx::Buffer m_receiveBuffer;
     bool m_needToUpdateReceiveSocket;
     nx::utils::TimerManager* m_timerManager;
-    nx::ReadWriteLock m_stoppingLock;
 
-    virtual void onTimer(const quint64& timerId) override;
     void onSomeBytesRead(
         AbstractCommunicatingSocket* sock,
         SystemError::ErrorCode errorCode,
@@ -166,7 +162,7 @@ private:
     void dispatchDiscoverPackets();
     bool needToUpdateReceiveSocket() const;
     nx::utils::AtomicUniquePtr<AbstractDatagramSocket> updateReceiveSocketUnsafe();
-    std::shared_ptr<AbstractDatagramSocket> getSockByIntf(const HostAddress& address);
+    AbstractDatagramSocket* getSockByIntf(const HostAddress& address);
     void startFetchDeviceXml(
         const QByteArray& uuidStr,
         const nx::Url& descriptionUrl,
