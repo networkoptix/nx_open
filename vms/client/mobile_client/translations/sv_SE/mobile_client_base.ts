@@ -117,19 +117,13 @@
       <source>Unknown Object</source>
       <translation>Okänt objekt</translation>
     </message>
-    <message numerus="yes">
-      <source>Objects (%n)</source>
-      <translation>
-        <numerusform>Objekt (%n)</numerusform>
-        <numerusform>Objekt (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Objects (&gt;%1)</source>
+      <translation type="unfinished">Objects (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Objects (&gt;%n)</source>
-      <translation>
-        <numerusform>Objekt (&gt;%n)</numerusform>
-        <numerusform>Objekt (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Objects (%1)</source>
+      <translation type="unfinished">Objects (%1)</translation>
     </message>
   </context>
   <context>
@@ -138,19 +132,13 @@
       <source>Bookmark</source>
       <translation>Bokmärke</translation>
     </message>
-    <message numerus="yes">
-      <source>Bookmarks (%n)</source>
-      <translation>
-        <numerusform>Bokmärken (%n)</numerusform>
-        <numerusform>Bokmärken (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Bookmarks (&gt;%1)</source>
+      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Bookmarks (&gt;%n)</source>
-      <translation>
-        <numerusform>Bokmärken (&gt;%n)</numerusform>
-        <numerusform>Bokmärken (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Bookmarks (%1)</source>
+      <translation type="unfinished">Bookmarks (%1)</translation>
     </message>
   </context>
   <context>
@@ -159,19 +147,13 @@
       <source>Motion detected</source>
       <translation>Rörelse detekterad</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motion (&gt;%n)</numerusform>
-        <numerusform>Motion (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Motion (&gt;%1)</source>
+      <translation type="unfinished">Motion (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motion (%n)</numerusform>
-        <numerusform>Motion (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Motion (%1)</source>
+      <translation type="unfinished">Motion (%1)</translation>
     </message>
   </context>
 </TS>

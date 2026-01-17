@@ -116,17 +116,13 @@
       <source>Unknown Object</source>
       <translation>未知的物件</translation>
     </message>
-    <message numerus="yes">
-      <source>Objects (%n)</source>
-      <translation>
-        <numerusform>物件 (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Objects (&gt;%1)</source>
+      <translation type="unfinished">Objects (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Objects (&gt;%n)</source>
-      <translation>
-        <numerusform>物件 (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Objects (%1)</source>
+      <translation type="unfinished">Objects (%1)</translation>
     </message>
   </context>
   <context>
@@ -135,17 +131,13 @@
       <source>Bookmark</source>
       <translation>寫入書籤</translation>
     </message>
-    <message numerus="yes">
-      <source>Bookmarks (%n)</source>
-      <translation>
-        <numerusform>書籤 (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Bookmarks (&gt;%1)</source>
+      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Bookmarks (&gt;%n)</source>
-      <translation>
-        <numerusform>書籤 (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Bookmarks (%1)</source>
+      <translation type="unfinished">Bookmarks (%1)</translation>
     </message>
   </context>
   <context>
@@ -154,17 +146,13 @@
       <source>Motion detected</source>
       <translation>偵測到位移</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motion (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Motion (&gt;%1)</source>
+      <translation type="unfinished">Motion (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motion (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Motion (%1)</source>
+      <translation type="unfinished">Motion (%1)</translation>
     </message>
   </context>
 </TS>

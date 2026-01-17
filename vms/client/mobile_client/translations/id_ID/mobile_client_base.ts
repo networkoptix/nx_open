@@ -116,17 +116,13 @@
       <source>Unknown Object</source>
       <translation>Objek Tak Dikenal</translation>
     </message>
-    <message numerus="yes">
-      <source>Objects (%n)</source>
-      <translation>
-        <numerusform>Objek (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Objects (&gt;%1)</source>
+      <translation type="unfinished">Objects (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Objects (&gt;%n)</source>
-      <translation>
-        <numerusform>Objek (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Objects (%1)</source>
+      <translation type="unfinished">Objects (%1)</translation>
     </message>
   </context>
   <context>
@@ -135,17 +131,13 @@
       <source>Bookmark</source>
       <translation>Bookmark</translation>
     </message>
-    <message numerus="yes">
-      <source>Bookmarks (%n)</source>
-      <translation>
-        <numerusform>Bookmark (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Bookmarks (&gt;%1)</source>
+      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Bookmarks (&gt;%n)</source>
-      <translation>
-        <numerusform>Bookmark (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Bookmarks (%1)</source>
+      <translation type="unfinished">Bookmarks (%1)</translation>
     </message>
   </context>
   <context>
@@ -154,17 +146,13 @@
       <source>Motion detected</source>
       <translation>Gerakan terdeteksi</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motion (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Motion (&gt;%1)</source>
+      <translation type="unfinished">Motion (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motion (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Motion (%1)</source>
+      <translation type="unfinished">Motion (%1)</translation>
     </message>
   </context>
 </TS>

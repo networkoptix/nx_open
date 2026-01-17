@@ -119,23 +119,13 @@
       <source>Unknown Object</source>
       <translation type="unfinished">Unknown Object</translation>
     </message>
-    <message numerus="yes">
-      <source>Objects (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Objects (%n)</numerusform>
-        <numerusform>Objects (%n)</numerusform>
-        <numerusform>Objects (%n)</numerusform>
-        <numerusform>Objects (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Objects (&gt;%1)</source>
+      <translation type="unfinished">Objects (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Objects (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Objects (&gt;%n)</numerusform>
-        <numerusform>Objects (&gt;%n)</numerusform>
-        <numerusform>Objects (&gt;%n)</numerusform>
-        <numerusform>Objects (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Objects (%1)</source>
+      <translation type="unfinished">Objects (%1)</translation>
     </message>
   </context>
   <context>
@@ -144,23 +134,13 @@
       <source>Bookmark</source>
       <translation>Záložka</translation>
     </message>
-    <message numerus="yes">
-      <source>Bookmarks (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Bookmarks (%n)</numerusform>
-        <numerusform>Bookmarks (%n)</numerusform>
-        <numerusform>Bookmarks (%n)</numerusform>
-        <numerusform>Bookmarks (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Bookmarks (&gt;%1)</source>
+      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Bookmarks (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Bookmarks (&gt;%n)</numerusform>
-        <numerusform>Bookmarks (&gt;%n)</numerusform>
-        <numerusform>Bookmarks (&gt;%n)</numerusform>
-        <numerusform>Bookmarks (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Bookmarks (%1)</source>
+      <translation type="unfinished">Bookmarks (%1)</translation>
     </message>
   </context>
   <context>
@@ -169,23 +149,13 @@
       <source>Motion detected</source>
       <translation type="unfinished">Motion detected</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion (&gt;%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motion (&gt;%n)</numerusform>
-        <numerusform>Motion (&gt;%n)</numerusform>
-        <numerusform>Motion (&gt;%n)</numerusform>
-        <numerusform>Motion (&gt;%n)</numerusform>
-      </translation>
+    <message>
+      <source>Motion (&gt;%1)</source>
+      <translation type="unfinished">Motion (&gt;%1)</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion (%n)</source>
-      <translation type="unfinished">
-        <numerusform>Motion (%n)</numerusform>
-        <numerusform>Motion (%n)</numerusform>
-        <numerusform>Motion (%n)</numerusform>
-        <numerusform>Motion (%n)</numerusform>
-      </translation>
+    <message>
+      <source>Motion (%1)</source>
+      <translation type="unfinished">Motion (%1)</translation>
     </message>
   </context>
 </TS>
