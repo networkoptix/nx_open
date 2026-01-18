@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>Objects (&gt;%1)</source>
-      <translation type="unfinished">Objects (&gt;%1)</translation>
+      <translation>Obiekty (&gt;%1)</translation>
     </message>
     <message>
       <source>Objects (%1)</source>
-      <translation type="unfinished">Objects (%1)</translation>
+      <translation>Obiekty (%1)</translation>
     </message>
   </context>
   <context>
@@ -136,11 +136,11 @@
     </message>
     <message>
       <source>Bookmarks (&gt;%1)</source>
-      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
+      <translation>Zakładki (&gt;%1)</translation>
     </message>
     <message>
       <source>Bookmarks (%1)</source>
-      <translation type="unfinished">Bookmarks (%1)</translation>
+      <translation>Zakładki (%1)</translation>
     </message>
   </context>
   <context>

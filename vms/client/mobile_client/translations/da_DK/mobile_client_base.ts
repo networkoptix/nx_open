@@ -119,11 +119,11 @@
     </message>
     <message>
       <source>Objects (&gt;%1)</source>
-      <translation type="unfinished">Objects (&gt;%1)</translation>
+      <translation>Objekter (&gt;%1)</translation>
     </message>
     <message>
       <source>Objects (%1)</source>
-      <translation type="unfinished">Objects (%1)</translation>
+      <translation>Objekter (%1)</translation>
     </message>
   </context>
   <context>
@@ -134,11 +134,11 @@
     </message>
     <message>
       <source>Bookmarks (&gt;%1)</source>
-      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
+      <translation>Bogmærker (&gt;%1)</translation>
     </message>
     <message>
       <source>Bookmarks (%1)</source>
-      <translation type="unfinished">Bookmarks (%1)</translation>
+      <translation>Bogmærker (%1)</translation>
     </message>
   </context>
   <context>
@@ -149,11 +149,11 @@
     </message>
     <message>
       <source>Motion (&gt;%1)</source>
-      <translation type="unfinished">Motion (&gt;%1)</translation>
+      <translation>Bevægelse (&gt;%1)</translation>
     </message>
     <message>
       <source>Motion (%1)</source>
-      <translation type="unfinished">Motion (%1)</translation>
+      <translation>Bevægelse (%1)</translation>
     </message>
   </context>
 </TS>

@@ -118,11 +118,11 @@
     </message>
     <message>
       <source>Objects (&gt;%1)</source>
-      <translation type="unfinished">Objects (&gt;%1)</translation>
+      <translation>物件 (&gt;%1)</translation>
     </message>
     <message>
       <source>Objects (%1)</source>
-      <translation type="unfinished">Objects (%1)</translation>
+      <translation>物件 (%1)</translation>
     </message>
   </context>
   <context>
@@ -133,11 +133,11 @@
     </message>
     <message>
       <source>Bookmarks (&gt;%1)</source>
-      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
+      <translation>書籤 (&gt;%1)</translation>
     </message>
     <message>
       <source>Bookmarks (%1)</source>
-      <translation type="unfinished">Bookmarks (%1)</translation>
+      <translation>書籤 (%1)</translation>
     </message>
   </context>
   <context>
