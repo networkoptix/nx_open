@@ -103,9 +103,11 @@ bool TextLookupField::match(const QVariant& eventValue) const
     switch (m_checkType)
     {
         case TextLookupCheckType::containsKeywords:
-            return nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
+            return m_list->empty()
+                || nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
         case TextLookupCheckType::doesNotContainKeywords:
-            return !nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
+            return m_list->empty()
+                || !nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
         case TextLookupCheckType::inList:
             return !m_list->empty()
                 && nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
@@ -114,7 +116,7 @@ bool TextLookupField::match(const QVariant& eventValue) const
                 || !nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
     }
 
-    return {};
+    return false;
 }
 
 void TextLookupField::onLookupListChanged(Uuid id)

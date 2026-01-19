@@ -2,14 +2,9 @@
 
 #include "event_parameters.h"
 
-#include <QtCore/QVariant>
-
 #include <nx/fusion/model_functions.h>
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/reflect/json.h>
 #include <utils/common/id.h>
-
-#include "helpers.h"
 
 namespace nx {
 namespace vms {
@@ -135,14 +130,9 @@ bool EventParameters::canHaveVideoLink() const
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    EventMetaData, (ubjson)(json)(xml)(csv_record), EventMetaData_Fields, (brief, true))
+    EventMetaData, (ubjson)(json), EventMetaData_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    EventParameters, (ubjson)(json)(xml)(csv_record), EventParameters_Fields, (brief, true))
-
-bool checkForKeywords(const QString& value, const QString& keywords)
-{
-    return checkForKeywords(value, splitOnPureKeywords(keywords));
-}
+    EventParameters, (ubjson)(json), EventParameters_Fields, (brief, true))
 
 } // namespace event
 } // namespace vms
