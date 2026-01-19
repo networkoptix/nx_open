@@ -170,11 +170,9 @@ struct NX_VMS_COMMON_API EventParameters
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
     (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)(ldapSyncIntervalS) \
     (analyticsEngineId)(objectTrackId)(key)(attributes)(progress)
-QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(xml)(csv_record), NX_VMS_COMMON_API);
 
+QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json), NX_VMS_COMMON_API);
 NX_REFLECTION_INSTRUMENT(EventParameters, EventParameters_Fields)
-
-bool checkForKeywords(const QString& value, const QString& keywords);
 
 } // namespace event
 } // namespace vms

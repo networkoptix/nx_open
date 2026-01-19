@@ -118,24 +118,29 @@ TEST_F(TextLookupFieldTest, emptyLookupList)
 
     field.setCheckType(TextLookupCheckType::inList);
     // An empty List will always return false for 'inList' comparison.
+    ASSERT_FALSE(field.match(QString{}));
     ASSERT_FALSE(field.match(QString{"foo"}));
 
     // And always return true for 'notInList' comparison.
     field.setCheckType(TextLookupCheckType::notInList);
+    ASSERT_TRUE(field.match(QString{}));
     ASSERT_TRUE(field.match(QString{"foo"}));
 }
 
 TEST_F(TextLookupFieldTest, emptyKeywords)
 {
     TextLookupField field{systemContext(), &kDummyDescriptor};
-    field.setValue("");
+    field.setValue({});
 
     // An empty keywords always return true for 'containsKeywords' comparison.
     field.setCheckType(TextLookupCheckType::containsKeywords);
+    ASSERT_TRUE(field.match(QString{}));
     ASSERT_TRUE(field.match(QString{"foo"}));
-    // And always return false for 'doesNotContainKeywords' comparison.
+
+    // And always return true for 'doesNotContainKeywords' comparison.
     field.setCheckType(TextLookupCheckType::doesNotContainKeywords);
-    ASSERT_FALSE(field.match(QString{"foo"}));
+    ASSERT_TRUE(field.match(QString{}));
+    ASSERT_TRUE(field.match(QString{"foo"}));
 }
 
 TEST_F(TextLookupFieldTest, lookupInKeywordsWorksProperly)
@@ -149,12 +154,16 @@ TEST_F(TextLookupFieldTest, lookupInKeywordsWorksProperly)
     ASSERT_TRUE(field.match(QString{"bar"}));
     ASSERT_TRUE(field.match(QString{"foo_bar"}));
     // Check value list does not contains.
+    ASSERT_FALSE(field.match(QString{}));
     ASSERT_FALSE(field.match(QString{"baz"}));
 
     field.setCheckType(TextLookupCheckType::doesNotContainKeywords);
+    // Value contains keywords - no match.
     ASSERT_FALSE(field.match(QString{"foo"}));
     ASSERT_FALSE(field.match(QString{"bar"}));
     ASSERT_FALSE(field.match(QString{"foo_bar"}));
+    // Value does not contain keywords - match.
+    ASSERT_TRUE(field.match(QString{}));
     ASSERT_TRUE(field.match(QString{"baz"}));
 }
 
@@ -179,12 +188,16 @@ TEST_F(TextLookupFieldTest, lookupInListWorksProperly)
     ASSERT_TRUE(field.match(QString{"three123"}));
     // Check attribute lookup list does not contains.
     ASSERT_FALSE(field.match(QString{"four"}));
+    ASSERT_FALSE(field.match(QString{}));
 
     field.setCheckType(TextLookupCheckType::notInList);
+    // Value in list - no match.
     ASSERT_FALSE(field.match(QString{"1"}));
     ASSERT_FALSE(field.match(QString{"2"}));
     ASSERT_FALSE(field.match(QString{"three123"}));
     ASSERT_FALSE(field.match(QString{"three"}));
+    // Value not in list - match.
+    ASSERT_TRUE(field.match(QString{}));
     ASSERT_TRUE(field.match(QString{"four"}));
 }
 
