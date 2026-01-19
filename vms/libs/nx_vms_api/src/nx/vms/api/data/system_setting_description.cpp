@@ -6,6 +6,8 @@
 
 namespace nx::vms::api {
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ComboboxValue, (json), ComboboxValue_Fields)
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemSettingDescription, (json), SystemSettingDescription_Fields)
 
 } // namespace nx::vms::api

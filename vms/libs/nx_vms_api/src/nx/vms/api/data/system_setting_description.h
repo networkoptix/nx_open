@@ -3,6 +3,8 @@
 #pragma once
 
 #include <map>
+#include <optional>
+#include <vector>
 
 #include <QtCore/QJsonValue>
 
@@ -11,6 +13,15 @@
 #include <nx/utils/json/qjson.h>
 
 namespace nx::vms::api {
+
+struct NX_VMS_API ComboboxValue
+{
+    QJsonValue value;
+    QString label;
+};
+#define ComboboxValue_Fields (value)(label)
+QN_FUSION_DECLARE_FUNCTIONS(ComboboxValue, (json), NX_VMS_API);
+NX_REFLECTION_INSTRUMENT(ComboboxValue, ComboboxValue_Fields)
 
 struct NX_VMS_API SystemSettingDescription
 {
@@ -26,6 +37,9 @@ struct NX_VMS_API SystemSettingDescription
      */
     QJsonValue::Type type;
 
+    /**%apidoc Allowed values for dropdown-style settings. */
+    std::optional<std::vector<ComboboxValue>> allowedValues;
+
     bool isReadOnly = false;
     bool isWriteOnly = false;
 
@@ -38,7 +52,7 @@ struct NX_VMS_API SystemSettingDescription
     /** Can only be modified by Administrators. This value depends on `securityForPowerUsers`. */
     bool isOwnerOnly = false;
 };
-#define SystemSettingDescription_Fields (label)(type)(isReadOnly)(isWriteOnly)(isSecurity)(isOwnerOnly)
+#define SystemSettingDescription_Fields (label)(type)(allowedValues)(isReadOnly)(isWriteOnly)(isSecurity)(isOwnerOnly)
 QN_FUSION_DECLARE_FUNCTIONS(SystemSettingDescription, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(SystemSettingDescription, SystemSettingDescription_Fields)
 
