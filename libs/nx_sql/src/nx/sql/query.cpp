@@ -225,6 +225,8 @@ DBResult SqlQuery::getLastError()
         const auto nativeErrorCode = m_sqlQuery.lastError().nativeErrorCode();
         if (nativeErrorCode == "2067") //< SQLITE_CONSTRAINT_UNIQUE
             res.code = DBResultCode::uniqueConstraintViolation;
+        else if (nativeErrorCode == "1555") //< SQLITE_CONSTRAINT_PRIMARYKEY
+            res.code = DBResultCode::uniqueConstraintViolation;
     }
     else if (m_driverType == RdbmsDriverType::mysql)
     {
