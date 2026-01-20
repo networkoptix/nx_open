@@ -212,6 +212,7 @@ void RendezvousConnectorWithVerification::processUdpHolePunchingSynAck(
     NX_VERBOSE(this, nx::format("cross-nat %1. Successfully verified connection to %2")
         .arg(connectSessionId()).arg(remoteAddress().toString()));
 
+    m_aioThreadBinder.cancelSync();
     nx::swapAndCall(m_connectCompletionHandler, SystemError::noError);
 }
 
@@ -230,6 +231,7 @@ void RendezvousConnectorWithVerification::processTunnelConnectionChosen(
     NX_VERBOSE(this, nx::format("cross-nat %1. Successfully notified host %2 about udp tunnel choice")
         .arg(connectSessionId()).arg(remoteAddress().toString()));
 
+    m_aioThreadBinder.cancelSync();
     nx::swapAndCall(m_connectCompletionHandler, SystemError::noError);
 }
 
@@ -247,8 +249,10 @@ void RendezvousConnectorWithVerification::processError(
     NX_ASSERT(errorCode != SystemError::noError);
 
     m_requestPipeline.reset();
+    m_aioThreadBinder.cancelSync();
 
-    nx::swapAndCall(m_connectCompletionHandler, errorCode);
+    if (NX_ASSERT(m_connectCompletionHandler))
+        nx::swapAndCall(m_connectCompletionHandler, errorCode);
 }
 
 } // namespace nx::network::cloud::udp

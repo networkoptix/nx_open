@@ -40,6 +40,7 @@ void RendezvousConnector::pleaseStop(
         [this, completionHandler = std::move(completionHandler)]()
         {
             m_udtConnection.reset();
+            completionHandler();
         });
 }
 
