@@ -15,7 +15,7 @@ NxObject
             ? sizesCalculator.enlargedCellWidth
             : sizesCalculator.normalCellWidth
 
-        const height = sizesCalculator.calculateCellHeight(width)
+        const height = sizesCalculator.cellHeightFromWidth(width)
 
         return Qt.rect(x, y, width, height)
     }
@@ -52,7 +52,7 @@ NxObject
                 }
 
             const enlargedRowHeight =
-                sizesCalculator.calculateCellHeight(sizesCalculator.enlargedCellWidth)
+                sizesCalculator.cellHeightFromWidth(sizesCalculator.enlargedCellWidth)
 
             if (cellIndex < sizesCalculator.enlargedCellsCount)
             {
@@ -65,7 +65,7 @@ NxObject
             }
 
             const normalCellHeight =
-                sizesCalculator.calculateCellHeight(sizesCalculator.normalCellWidth)
+                sizesCalculator.cellHeightFromWidth(sizesCalculator.normalCellWidth)
 
             const enlargedRowsHeight =
                 calculateRowsHeight(sizesCalculator.enlargedRowsCount, enlargedRowHeight)

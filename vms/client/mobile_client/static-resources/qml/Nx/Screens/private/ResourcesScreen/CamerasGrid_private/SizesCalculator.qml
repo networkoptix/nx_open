@@ -50,11 +50,11 @@ NxObject
     readonly property int totalLayoutHeight:
     {
         const enlargedRowsTotalHeight =
-            enlargedRowsCount * (calculateCellHeight(enlargedCellWidth) + spacing) - spacing
+            enlargedRowsCount * (cellHeightFromWidth(enlargedCellWidth) + spacing) - spacing
 
         const normalRowsCount = Math.ceil((cellsCount - enlargedCellsCount) / columnsCount)
         const normalRowsTotalHeight =
-            normalRowsCount * (calculateCellHeight(normalCellWidth) + spacing) - spacing
+            normalRowsCount * (cellHeightFromWidth(normalCellWidth) + spacing) - spacing
 
         return enlargedRowsTotalHeight + normalRowsTotalHeight
             + ((enlargedRowsCount > 0 && normalRowsCount > 0) ? spacing : 0)
@@ -68,9 +68,9 @@ NxObject
             return d.userDefinedColumnsCount
     }
 
-    function calculateCellHeight(cellWidth)
+    function cellHeightFromWidth(cellWidth)
     {
-        return Math.ceil(cellWidth * kAspectRatio)
+        return d.roundDimension(cellWidth * kAspectRatio)
     }
 
     function getCellsCountToReorder()
@@ -92,17 +92,23 @@ NxObject
 
         property int userDefinedColumnsCount: kInvalidColumnsCount
 
+        // Round off logic must be similar for any calculation to avoid visual artifacts.
+        function roundDimension(realWidthOrHeightValue)
+        {
+            return Math.floor(realWidthOrHeightValue)
+        }
+
         function getCellHeight(cellIndex)
         {
             const cellWidth = (cellIndex < enlargedCellsCount)
                 ? enlargedCellWidth
                 : normalCellWidth
-            return calculateCellHeight(cellWidth)
+            return cellHeightFromWidth(cellWidth)
         }
 
-        function calculateCellWidth(cellHeight)
+        function cellWidthFromHeight(cellHeight)
         {
-            return Math.floor(cellHeight / kAspectRatio)
+            return roundDimension(cellHeight / kAspectRatio)
         }
 
         function calculateDefaultColumnsCount()
@@ -114,8 +120,8 @@ NxObject
                     Math.floor((availableWidth + spacing) / (kMinCellWidth + spacing))))
 
             const cellWidthForMaxColumnsCount =
-                Math.floor((availableWidth + spacing) / maxColumnsCount - spacing)
-            const cellHeightForMaxColumnsCount = calculateCellHeight(cellWidthForMaxColumnsCount)
+                roundDimension((availableWidth + spacing) / maxColumnsCount - spacing)
+            const cellHeightForMaxColumnsCount = cellHeightFromWidth(cellWidthForMaxColumnsCount)
 
             let maxFoundCellHeight = cellHeightForMaxColumnsCount
             let columnsCountForMaxFoundCellHeight = maxColumnsCount
@@ -128,14 +134,14 @@ NxObject
                 if (rowsCountToTest * (kMinCellHeight + spacing) <= (availableHeight + spacing))
                 {
                     let cellMaxWidthForTestColumnsCount =
-                        Math.floor((availableWidth + spacing) / columnsCountToTest - spacing)
+                        roundDimension((availableWidth + spacing) / columnsCountToTest - spacing)
 
                     let cellMaxHeightForTestRowsCount =
-                        Math.ceil((availableHeight + spacing) / rowsCountToTest - spacing)
+                        roundDimension((availableHeight + spacing) / rowsCountToTest - spacing)
 
                     cellMaxHeightForTestRowsCount = Math.min(
                         cellMaxHeightForTestRowsCount,
-                        calculateCellHeight(cellMaxWidthForTestColumnsCount))
+                        cellHeightFromWidth(cellMaxWidthForTestColumnsCount))
 
                     if (cellMaxHeightForTestRowsCount > maxFoundCellHeight)
                     {
@@ -153,7 +159,7 @@ NxObject
         function calculateNormalCellWidth()
         {
             const cellWidthCorrespondingToAvailableWidth =
-                Math.floor((availableWidth + spacing) / columnsCount - spacing)
+                roundDimension((availableWidth + spacing) / columnsCount - spacing)
 
             if (cellWidthCorrespondingToAvailableWidth < kMinCellWidth)
                 return cellWidthCorrespondingToAvailableWidth
@@ -166,7 +172,7 @@ NxObject
             }
 
             const cellHeightCorrespondingToAvailableWidth =
-                calculateCellHeight(cellWidthCorrespondingToAvailableWidth)
+                cellHeightFromWidth(cellWidthCorrespondingToAvailableWidth)
 
             const rowsCount = Math.ceil(cellsCount / columnsCount)
 
@@ -177,9 +183,9 @@ NxObject
             }
 
             const cellHeightCorrespondingToAvailableHeight =
-                Math.ceil((availableHeight + spacing) / rowsCount - spacing)
+                roundDimension((availableHeight + spacing) / rowsCount - spacing)
             const cellWidthCorrespondingToAvailableHeight =
-                d.calculateCellWidth(cellHeightCorrespondingToAvailableHeight)
+                d.cellWidthFromHeight(cellHeightCorrespondingToAvailableHeight)
 
             if (cellWidthCorrespondingToAvailableHeight < kMinCellWidth)
                 return cellWidthCorrespondingToAvailableWidth
@@ -187,16 +193,16 @@ NxObject
             return cellWidthCorrespondingToAvailableHeight
         }
 
-        function hasFreeVerticalSpace()
+        function scrollIsRequired()
         {
             const rowsCount = Math.ceil(cellsCount / columnsCount)
-            const normalCellHeight = calculateCellHeight(normalCellWidth)
-            return rowsCount * (normalCellHeight + spacing) < availableHeight + spacing
+            const normalCellHeight = cellHeightFromWidth(normalCellWidth)
+            return rowsCount * (normalCellHeight + spacing) > availableHeight + spacing
         }
 
         function calculateEnlargedCellsCount()
         {
-            if (!hasFreeVerticalSpace())
+            if (scrollIsRequired())
                 return 0
 
             return getCellsCountToReorder()
@@ -207,7 +213,7 @@ NxObject
             if (enlargedCellsCount === 0)
                 return normalCellWidth
 
-            const normalCellHeight = calculateCellHeight(normalCellWidth)
+            const normalCellHeight = cellHeightFromWidth(normalCellWidth)
 
             if (enlargedCellsCount < columnsCount) //< A single row is enlarged.
             {
@@ -216,16 +222,16 @@ NxObject
                     (availableHeight + spacing) - normalRowsCount * (normalCellHeight + spacing)
 
                 const cellWidthCorrespondingToAvailableWidth =
-                    Math.floor((availableWidth + spacing) / enlargedCellsCount - spacing)
+                    roundDimension((availableWidth + spacing) / enlargedCellsCount - spacing)
                 const cellHeightCorrespondingToAvailableWidth =
-                    calculateCellHeight(cellWidthCorrespondingToAvailableWidth)
+                    cellHeightFromWidth(cellWidthCorrespondingToAvailableWidth)
 
                 if (cellHeightCorrespondingToAvailableWidth <= availableHeightForTheEnlargedRow)
                     return cellWidthCorrespondingToAvailableWidth
 
                 const cellHeightCorrespondingToAvailableHeight = availableHeightForTheEnlargedRow
                 const cellWidthCorrespondingToAvailableHeight =
-                    d.calculateCellWidth(cellHeightCorrespondingToAvailableHeight)
+                    d.cellWidthFromHeight(cellHeightCorrespondingToAvailableHeight)
 
                 return cellWidthCorrespondingToAvailableHeight
             }
@@ -238,9 +244,10 @@ NxObject
             const enlargedRowWithMoreCellsLength = Math.ceil(enlargedCellsCount / 2)
 
             const cellWidthCorrespondingToAvailableWidth =
-                Math.floor((availableWidth + spacing) / enlargedRowWithMoreCellsLength - spacing)
+                roundDimension((availableWidth + spacing) / enlargedRowWithMoreCellsLength
+                    - spacing)
             const cellHeightCorrespondingToAvailableWidth =
-                calculateCellHeight(cellWidthCorrespondingToAvailableWidth)
+                cellHeightFromWidth(cellWidthCorrespondingToAvailableWidth)
 
             if ((cellHeightCorrespondingToAvailableWidth * 2 + spacing)
                 <= availableHeightForTwoEnlargedRows)
@@ -249,9 +256,9 @@ NxObject
             }
 
             const cellHeightCorrespondingToAvailableHeight =
-                Math.floor((availableHeightForTwoEnlargedRows - spacing) / 2)
+                roundDimension((availableHeightForTwoEnlargedRows - spacing) / 2)
             const cellWidthCorrespondingToAvailableHeight =
-                d.calculateCellWidth(cellHeightCorrespondingToAvailableHeight)
+                d.cellWidthFromHeight(cellHeightCorrespondingToAvailableHeight)
 
             return cellWidthCorrespondingToAvailableHeight
         }
