@@ -823,6 +823,14 @@
       <source>At least one site has to be selected</source>
       <translation>Hai que seleccionar polo menos un sitio</translation>
     </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
   </context>
   <context>
     <name>QualityDialog</name>
@@ -1070,16 +1078,8 @@
       <translation>Configuración</translation>
     </message>
     <message>
-      <source>All</source>
-      <translation>Todo</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Seguridade</translation>
-    </message>
-    <message>
-      <source>Notifications are turned off in the device settings</source>
-      <translation>As notificacións están desactivadas na configuración do dispositivo</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -1096,10 +1096,6 @@
     <message>
       <source>Notifications</source>
       <translation>Notificacións</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to receive notifications</source>
-      <translation>Inicia sesión na nube para recibir notificacións</translation>
     </message>
     <message>
       <source>About</source>

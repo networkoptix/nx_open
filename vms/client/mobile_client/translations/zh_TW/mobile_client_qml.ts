@@ -822,6 +822,14 @@
       <source>At least one site has to be selected</source>
       <translation>請至少選擇一個站點(site)</translation>
     </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
   </context>
   <context>
     <name>QualityDialog</name>
@@ -1069,16 +1077,8 @@
       <translation>設定</translation>
     </message>
     <message>
-      <source>All</source>
-      <translation>全部</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>安全性</translation>
-    </message>
-    <message>
-      <source>Notifications are turned off in the device settings</source>
-      <translation>裝置設定中的推播通知已關閉</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -1095,10 +1095,6 @@
     <message>
       <source>Notifications</source>
       <translation>通知</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to receive notifications</source>
-      <translation>登入Cloud以收到通知</translation>
     </message>
     <message>
       <source>About</source>

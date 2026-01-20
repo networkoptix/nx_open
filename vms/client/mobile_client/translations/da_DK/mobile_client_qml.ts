@@ -823,6 +823,14 @@
       <source>At least one site has to be selected</source>
       <translation>Mindst ét site skal vælges</translation>
     </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
   </context>
   <context>
     <name>QualityDialog</name>
@@ -1070,16 +1078,8 @@
       <translation>Indstillinger</translation>
     </message>
     <message>
-      <source>All</source>
-      <translation>Alle</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Sikkerhed</translation>
-    </message>
-    <message>
-      <source>Notifications are turned off in the device settings</source>
-      <translation>Notifikationer er slået fra i enhedens indstillinger</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -1096,10 +1096,6 @@
     <message>
       <source>Notifications</source>
       <translation>Notifikationer</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to receive notifications</source>
-      <translation>Log ind på clouden for at modtage notifikationer</translation>
     </message>
     <message>
       <source>About</source>

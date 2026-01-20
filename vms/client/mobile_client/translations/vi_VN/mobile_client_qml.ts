@@ -822,6 +822,14 @@
       <source>At least one site has to be selected</source>
       <translation>Phải chọn ít nhất một Chi nhánh</translation>
     </message>
+    <message>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
   </context>
   <context>
     <name>QualityDialog</name>
@@ -1069,16 +1077,8 @@
       <translation>Cài đặt</translation>
     </message>
     <message>
-      <source>All</source>
-      <translation>Tất cả</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Bảo mật</translation>
-    </message>
-    <message>
-      <source>Notifications are turned off in the device settings</source>
-      <translation>Thông báo đã bị tắt trong cài đặt thiết bị</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -1095,10 +1095,6 @@
     <message>
       <source>Notifications</source>
       <translation>thông báo</translation>
-    </message>
-    <message>
-      <source>Log in to the cloud to receive notifications</source>
-      <translation>Đăng nhập vào đám mây để nhận thông báo</translation>
     </message>
     <message>
       <source>About</source>
