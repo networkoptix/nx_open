@@ -823,6 +823,14 @@
         <source>At least one site has to be selected</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Log in to the cloud to receive notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications are turned off in the device settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QualityDialog</name>
@@ -1070,15 +1078,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>All</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Security</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Notifications are turned off in the device settings</source>
         <translation></translation>
     </message>
     <message>
@@ -1095,10 +1095,6 @@
     </message>
     <message>
         <source>Notifications</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Log in to the cloud to receive notifications</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
