@@ -426,7 +426,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation>All</translation>
+      <translation>Semua</translation>
     </message>
   </context>
   <context>
@@ -971,7 +971,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Notifikasi dimatikan di pengaturan perangkat</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -991,7 +991,7 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation>Masuk ke cloud untuk menerima notifikasi</translation>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
       <source>About</source>

@@ -972,7 +972,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Les notifications sont désactivées dans les paramètres de l'appareil</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>

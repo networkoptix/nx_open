@@ -426,7 +426,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation>所有</translation>
+      <translation>全部</translation>
     </message>
   </context>
   <context>

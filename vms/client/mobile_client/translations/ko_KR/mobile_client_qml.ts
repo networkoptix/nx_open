@@ -971,7 +971,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>시스템 설정에서 푸시 알림이 해제되어 있습니다</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -991,7 +991,7 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation>푸시 알림을 사용하기 위해 클라우드에 로그인</translation>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
       <source>About</source>

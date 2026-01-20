@@ -972,7 +972,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Aviseringar är avstängda i enhetens inställningar</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -992,7 +992,7 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation>Logga in i molnet för att få aviseringar</translation>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
       <source>About</source>

@@ -972,7 +972,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>As notificacións están desactivadas na configuración do dispositivo</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -992,7 +992,7 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation>Inicia sesión na nube para recibir notificacións</translation>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
       <source>About</source>
