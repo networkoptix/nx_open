@@ -3437,6 +3437,9 @@ static void registerUpdateHandlers(
      * %caption Get Persistent Storage Servers
      * %ingroup Update
      * %struct PersistentUpdateStorageRequest
+     * %param infoCategory
+     *     %value[unused] latest
+     *     %value[unused] specific
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
      * %return:{PersistentUpdateStorageInfo}
