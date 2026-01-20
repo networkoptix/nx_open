@@ -876,7 +876,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Notifikationer er slået fra i enhedens indstillinger</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>

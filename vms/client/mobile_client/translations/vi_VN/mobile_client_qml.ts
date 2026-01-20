@@ -875,7 +875,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Thông báo đã bị tắt trong cài đặt thiết bị</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>

@@ -875,7 +875,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>시스템 설정에서 푸시 알림이 해제되어 있습니다</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
