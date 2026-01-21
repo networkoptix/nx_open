@@ -54,6 +54,7 @@ void ExportStorageStreamRecorder::setTranscodeSettings(
 
 void ExportStorageStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex)
 {
+    NX_VERBOSE(this, "Write data %1", md);
     if (md->dataType == QnAbstractMediaData::AUDIO && m_audioTranscoder)
     {
         QnAbstractMediaDataPtr result;
