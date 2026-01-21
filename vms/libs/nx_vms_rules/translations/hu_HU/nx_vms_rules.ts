@@ -282,7 +282,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;Leírás</translation>
+      <translation>Leírás</translation>
     </message>
     <message>
       <source>Source</source>
