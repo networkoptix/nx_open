@@ -84,8 +84,8 @@ AVMediaType toAvMediaType(QnAbstractMediaData::DataType dataType)
 
 QString QnAbstractMediaData::idForToStringFromPtr() const
 {
-    return NX_FMT("%1, codec: %2, timestamp: %3ms, %4",
-        dataType, compressionType, timestamp / 1000, flags);
+    return NX_FMT("%1, codec: %2, timestamp: %3ms, channel: %4, %5",
+        dataType, compressionType, timestamp / 1000, channelNumber, flags);
 }
 
 //------------------------------------- QnEmptyMediaData -----------------------------------------

@@ -159,6 +159,8 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
     if (!md)
         return true; //< skip unknown data
 
+    NX_VERBOSE(this, "Process data %1", md);
+
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && md->timestamp > m_eofDateTimeUs)
