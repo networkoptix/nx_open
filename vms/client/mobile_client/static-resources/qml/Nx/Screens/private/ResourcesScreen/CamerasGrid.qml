@@ -365,12 +365,11 @@ Item
 
             onWheel: (event) =>
             {
-                const minModifier = 1
-                const kMaxModifier = sizesCalculator.defaultColumnsCount
-
                 // Limit logicalRotation to prevent unbounded accumulation.
-                const maxLogicalRotation = kMaxModifier * kDefaultRotationStep
-                const minLogicalRotation = minModifier * kDefaultRotationStep
+                const minLogicalRotation =
+                    sizesCalculator.minColumnsCount * kDefaultRotationStep
+                const maxLogicalRotation =
+                    sizesCalculator.defaultColumnsCount * kDefaultRotationStep
 
                 logicalRotation = MathUtils.bound(
                     minLogicalRotation,
@@ -499,7 +498,7 @@ Item
 
             let targetColumnsCount = Math.round(baseColumnsCount / relativeScale)
             targetColumnsCount = MathUtils.bound(
-                1,
+                sizesCalculator.minColumnsCount,
                 targetColumnsCount,
                 sizesCalculator.defaultColumnsCount)
 
