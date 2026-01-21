@@ -829,7 +829,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>Les notifications sont désactivées dans les paramètres de l'appareil</translation>
     </message>
   </context>
   <context>

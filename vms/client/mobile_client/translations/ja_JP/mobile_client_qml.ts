@@ -824,11 +824,11 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+      <translation>通知を受け取るには、クラウドにログインしてください。</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>デバイス設定で通知がオフになっています。</translation>
     </message>
   </context>
   <context>

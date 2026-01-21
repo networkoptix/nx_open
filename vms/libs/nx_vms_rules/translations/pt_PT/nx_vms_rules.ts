@@ -254,7 +254,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;Descrição</translation>
+      <translation>Descrição</translation>
     </message>
     <message>
       <source>Source</source>
