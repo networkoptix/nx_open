@@ -252,7 +252,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;รายละเอียด</translation>
+      <translation>รายละเอียด</translation>
     </message>
     <message>
       <source>Source</source>
