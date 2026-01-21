@@ -13,9 +13,10 @@ NxObject
     property real spacing: 0.0
 
     // Output properties:
+    readonly property int minColumnsCount: d.calculateMinColumnsCount()
     readonly property int defaultColumnsCount: d.calculateDefaultColumnsCount()
     readonly property int columnsCount: d.userDefinedColumnsCount !== kInvalidColumnsCount
-        ? MathUtils.bound(1, d.userDefinedColumnsCount, defaultColumnsCount)
+        ? MathUtils.bound(minColumnsCount, d.userDefinedColumnsCount, defaultColumnsCount)
         : defaultColumnsCount
 
     readonly property int normalCellWidth: d.calculateNormalCellWidth()
@@ -41,7 +42,7 @@ NxObject
     {
         if (newColumnsCount === defaultColumnsCount)
             d.userDefinedColumnsCount = kInvalidColumnsCount
-        else if (newColumnsCount >= 1 && newColumnsCount < defaultColumnsCount)
+        else if (newColumnsCount >= minColumnsCount && newColumnsCount < defaultColumnsCount)
             d.userDefinedColumnsCount = newColumnsCount
         else //< Display size changed.
             d.userDefinedColumnsCount = kInvalidColumnsCount
@@ -109,6 +110,15 @@ NxObject
         function cellWidthFromHeight(cellHeight)
         {
             return roundDimension(cellHeight / kAspectRatio)
+        }
+
+        function calculateMinColumnsCount()
+        {
+            const maxCellWidthFromHeight = d.cellWidthFromHeight(availableHeight)
+
+            return Math.max(
+                1,
+                Math.ceil((availableWidth + spacing) / (maxCellWidthFromHeight + spacing)))
         }
 
         function calculateDefaultColumnsCount()
