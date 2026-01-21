@@ -825,11 +825,11 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+      <translation>Inicie sesión en la nube para recibir notificaciones</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>Las notificaciones están desactivadas en los ajustes del dispositivo</translation>
     </message>
   </context>
   <context>
