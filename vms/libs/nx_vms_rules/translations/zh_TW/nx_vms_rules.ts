@@ -276,7 +276,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;敘述</translation>
+      <translation>敘述</translation>
     </message>
     <message>
       <source>Source</source>
