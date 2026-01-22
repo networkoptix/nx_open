@@ -361,21 +361,33 @@ Rectangle
 
             property real zoomInMarginFraction: 0.1
 
+            function isZoomable(modelData)
+            {
+                return modelData.count > 1 && modelData.durationMs >= minimumStackDurationMs
+            }
+
             onTapped: (modelData) =>
             {
-                if (modelData.count > 1 && modelData.durationMs >= minimumStackDurationMs)
-                {
-                    // Stack tapped. Zoom into.
-                    const marginMs = Math.round(modelData.durationMs * zoomInMarginFraction)
+                if (!isZoomable(modelData))
+                    return
 
-                    timeline.setWindow(
-                        modelData.positionMs - marginMs, modelData.durationMs + marginMs * 2)
-                }
-                else
-                {
-                    // Single object or a tight stack tapped.
+                // Stack tapped. Zoom into.
+                const marginMs = Math.round(modelData.durationMs * zoomInMarginFraction)
+
+                timeline.setWindow(
+                    modelData.positionMs - marginMs, modelData.durationMs + marginMs * 2)
+            }
+
+            onSingleTapped: (modelData) =>
+            {
+                if (!isZoomable(modelData))
                     timeline.objectTileTapped(modelData)
-                }
+            }
+
+            onDoubleTapped: (modelData) =>
+            {
+                if (!isZoomable(modelData))
+                    timeline.setPosition(modelData.positionMs)
             }
 
             preloaderDelegate: Component

@@ -39,10 +39,12 @@ Item
 
     readonly property alias objectChunks: loader.objectChunks
 
-    signal tapped(Timeline.MultiObjectData modelData)
-
     property Component delegate: Component { ObjectsListDelegate {} }
     property Component preloaderDelegate
+
+    signal tapped(Timeline.MultiObjectData modelData)
+    signal singleTapped(Timeline.MultiObjectData modelData)
+    signal doubleTapped(Timeline.MultiObjectData modelData)
 
     function timeToPosition(timeMs)
     {
@@ -218,8 +220,22 @@ Item
                 // Ensure the handler takes exclusive grab on press.
                 gesturePolicy: TapHandler.WithinBounds
 
+                exclusiveSignals: TapHandler.SingleTap | TapHandler.DoubleTap
+
                 onTapped:
                     view.tapped(delegateHolder.bucket.data)
+
+                onSingleTapped:
+                {
+                    if (enabled) //< This signal is delayed, prevent it when it's not desired.
+                        view.singleTapped(delegateHolder.bucket.data)
+                }
+
+                onDoubleTapped:
+                {
+                    if (enabled) //< This signal is delayed, prevent it when it's not desired.
+                        view.doubleTapped(delegateHolder.bucket.data)
+                }
             }
         }
     }
