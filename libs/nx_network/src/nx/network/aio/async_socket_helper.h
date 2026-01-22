@@ -171,12 +171,15 @@ public:
                 if (code == SystemError::noError && ips.empty())
                     code = SystemError::hostUnreachable;
 
-                m_addressResolverIsInUse = false;
                 this->m_resolveResultScheduler.dispatch(
                     [handler = std::move(handler), code, ips = std::move(ips)]() mutable
                     {
                         handler(code, std::move(ips));
                     });
+
+                // Release resolver atomic only after all direct object accesses, the Socket can be
+                // destroyed right after from it's AIO thread.
+                m_addressResolverIsInUse = false;
             },
             NatTraversalSupport::disabled,
             m_ipVersion,
