@@ -12,6 +12,7 @@ import Nx.Models
 import Nx.Ui
 
 import nx.vms.client.core
+import nx.vms.common
 
 import "private/VideoScreen"
 import "private/VideoScreen/utils.js" as VideoScreenUtils

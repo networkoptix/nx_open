@@ -12,9 +12,6 @@ Item
 {
     id: control
 
-    readonly property int kColumnsAnimationDuration: 250
-    readonly property real kCenterAnchorRelativePosition: 0.5
-
     property alias layout: camerasModel.layout
     property alias count: repeater.count
     property bool keepStatuses: false
@@ -27,59 +24,7 @@ Item
     property int topMargin: 0
     property int bottomMargin: 0
 
-    property bool animationsEnabled: false
-
     signal openVideoScreen(var resource, var thumbnailUrl, var camerasModel)
-
-    // Index of the cell which should be kept at the screen during columns count change animation.
-    property int anchorIndex: -1
-
-    // Stores the relative position of the anchored cell within the viewport before pinch gesture.
-    property real anchorRelativePosition: 0.0
-
-    function contentYToCenterIndex(index)
-    {
-        if (index === -1)
-            return 0 //< Strange case, most possibly the grid is empty.
-
-        if (repeater.count === 0)
-            return 0
-
-        const cellItem = repeater.itemAt(index)
-        if (!CoreUtils.assert(cellItem, "Invalid item index: " + index))
-            return flickable.contentY
-
-        // Calculate target contentY to preserve the cell's relative position in viewport.
-        let targetContentY =
-            cellItem.y - (flickable.height - cellItem.height) * anchorRelativePosition
-
-        // Ensure the cell is fully visible with minimal adjustment.
-        const cellTop = cellItem.y
-        const cellBottom = cellItem.y + cellItem.height
-        const viewportTop = targetContentY
-        const viewportBottom = targetContentY + flickable.height
-
-        if (targetContentY < 0)
-            return 0
-
-        const lastItem = repeater.itemAt(repeater.count - 1)
-        const currentContentHeight = lastItem.y + lastItem.height
-        // We cannot use flickable.contentHeight here, because it contains the final value,
-        // after the layout animation is complete.
-        if (targetContentY + flickable.height > currentContentHeight)
-        {
-            // Handle the case when the content height is less than the viewport height.
-            return Math.max(0, currentContentHeight - flickable.height)
-        }
-
-        // If cell doesn't fit in viewport, adjust minimally to show it fully.
-        if (cellTop < viewportTop)
-            return cellTop
-        if (cellBottom > viewportBottom)
-            return cellBottom - flickable.height
-
-        return targetContentY
-    }
 
     function getMediaPlayer(index)
     {
@@ -88,50 +33,6 @@ Item
             return null
 
         return loader && loader.item ? loader.item.mediaPlayer : null
-    }
-
-    function saveTargetColumnsCount()
-    {
-        const columnCountToSave =
-            sizesCalculator.columnsCount !== sizesCalculator.defaultColumnsCount
-                ? sizesCalculator.columnsCount
-                : sizesCalculator.kInvalidColumnsCount //< Remove saved value.
-
-        camerasGridHelper.saveTargetColumnsCount(layout, columnCountToSave)
-    }
-
-    function loadTargetColumnsCount()
-    {
-        const loadedTargetColumnsCount = camerasGridHelper.loadTargetColumnsCount(layout)
-
-        sizesCalculator.setUserDefinedColumnsCount(
-            loadedTargetColumnsCount !== sizesCalculator.kInvalidColumnsCount
-                ? loadedTargetColumnsCount
-                : sizesCalculator.defaultColumnsCount)
-
-        wheelHandler.updateStartLogicalRotation()
-    }
-
-    function saveLayoutPosition()
-    {
-        camerasGridHelper.saveLayoutPosition(layout, flickable.contentY)
-    }
-
-    function loadLayoutPosition()
-    {
-        let position = camerasGridHelper.loadLayoutPosition(layout)
-
-        if (position < 0 || flickable.height > flickable.contentHeight)
-            position = 0
-        else if (position > (flickable.contentHeight - flickable.height))
-            position = flickable.contentHeight - flickable.height
-
-        flickable.contentY = position
-    }
-
-    CamerasGridHelper
-    {
-        id: camerasGridHelper
     }
 
     Flickable
@@ -150,24 +51,108 @@ Item
         clip: true
         boundsBehavior: Flickable.StopAtBounds
 
-        onWidthChanged: updatePlayersStates()
-        onHeightChanged: updatePlayersStates()
+        property real previousContentY: 0
+
+        onWidthChanged: doDelayedGeometryUpdate()
+        onHeightChanged: doDelayedGeometryUpdate()
         onContentYChanged:
         {
+            if (geometryChangeAccumulatorTimer.running)
+                return
+
             updatePlayersStates()
-            control.saveLayoutPosition()
+            d.saveLayoutPosition()
         }
         onContentHeightChanged: updatePlayersStates()
+
+        Component.onCompleted:
+        {
+            sizesCalculator.availableWidth = width
+            sizesCalculator.availableHeight = height
+        }
+
+        // Postponing geometry updates is required because the width and height change several
+        // times during a single display rotation - we want to handle only the last state.
+        function doDelayedGeometryUpdate()
+        {
+            if (!geometryChangeAccumulatorTimer.running)
+                previousContentY = contentY
+
+            geometryChangeAccumulatorTimer.restart()
+        }
+
+        function updateSizesCalculatorAvailableGeometry()
+        {
+            if (sizesCalculator.availableWidth === width
+                && sizesCalculator.availableHeight === height)
+            {
+                return
+            }
+
+            const centerIndex = cellsSearcher.findCellClosestToViewportCenter(
+                previousContentY, sizesCalculator.availableWidth, sizesCalculator.availableHeight)
+
+            sizesCalculator.availableWidth = width
+            sizesCalculator.availableHeight = height
+
+            if (centerIndex === -1)
+                return //< Just in case.
+
+            contentY = contentYToCenterIndexStatic(centerIndex)
+        }
+
+        // Required for contentY update during screen resize. Must use statically calculated
+        // geometry of items.
+        function contentYToCenterIndexStatic(centerIndex)
+        {
+            if (sizesCalculator.cellsCount === 0)
+                return 0
+
+            const cellGeometry = geometryCalculator.calculateCellGeometry(centerIndex)
+            const lastCellGeometry =
+                geometryCalculator.calculateCellGeometry(sizesCalculator.cellsCount - 1)
+            const currentContentHeight = lastCellGeometry.y + lastCellGeometry.height
+
+            // Calculate target contentY to preserve the cell's relative position in viewport.
+            const targetContentY = cellGeometry.y
+                - (sizesCalculator.availableHeight - cellGeometry.height)
+                    * d.kCenterAnchorRelativePosition
+
+            if (targetContentY < 0)
+                return 0
+
+            if (targetContentY + sizesCalculator.availableHeight > currentContentHeight)
+            {
+                // Handle the case when the content height is less than the viewport height.
+                return Math.max(0, currentContentHeight - sizesCalculator.availableHeight)
+            }
+
+            return d.ensureCellIsFullyVisible(
+                targetContentY, cellGeometry, sizesCalculator.availableHeight)
+        }
 
         function updatePlayersStates()
         {
             for (let index = 0; index < repeater.count; ++index)
             {
                 let cameraLoaderItem = repeater.itemAt(index)
-                if (!cameraLoaderItem)
-                    continue
+                if (cameraLoaderItem)
+                    cameraLoaderItem.updatePlayerState()
+            }
+        }
 
-                cameraLoaderItem.updatePlayerState()
+        Timer
+        {
+            id: geometryChangeAccumulatorTimer
+
+            interval: 40 //< A bit more than 2 frames at 60fps. The value is chosen approximately.
+            repeat: false
+
+            onTriggered:
+            {
+                flickable.updateSizesCalculatorAvailableGeometry()
+                flickable.updatePlayersStates()
+                d.saveLayoutPosition()
             }
         }
 
@@ -188,12 +173,12 @@ Item
 
                     function updateControlState()
                     {
-                        control.animationsEnabled = false
+                        d.animationsEnabled = false
                         Qt.callLater(
                             function()
                             {
-                                control.loadTargetColumnsCount()
-                                control.loadLayoutPosition()
+                                d.loadTargetColumnsCount()
+                                d.loadLayoutPosition()
                             })
                     }
 
@@ -219,52 +204,52 @@ Item
 
                     Behavior on x
                     {
-                        enabled: control.animationsEnabled
+                        enabled: d.animationsEnabled
                         onEnabledChanged: if (!enabled) xAnimation.complete()
 
                         NumberAnimation
                         {
                             id: xAnimation
-                            duration: control.kColumnsAnimationDuration
+                            duration: d.kColumnsAnimationDuration
                             easing.type: Easing.OutCubic
                         }
                     }
 
                     Behavior on y
                     {
-                        enabled: control.animationsEnabled
+                        enabled: d.animationsEnabled
                         onEnabledChanged: if (!enabled) yAnimation.complete()
 
                         NumberAnimation
                         {
                             id: yAnimation
-                            duration: control.kColumnsAnimationDuration
+                            duration: d.kColumnsAnimationDuration
                             easing.type: Easing.OutCubic
                         }
                     }
 
                     Behavior on width
                     {
-                        enabled: control.animationsEnabled
+                        enabled: d.animationsEnabled
                         onEnabledChanged: if (!enabled) widthAnimation.complete()
 
                         NumberAnimation
                         {
                             id: widthAnimation
-                            duration: control.kColumnsAnimationDuration
+                            duration: d.kColumnsAnimationDuration
                             easing.type: Easing.OutCubic
                         }
                     }
 
                     Behavior on height
                     {
-                        enabled: control.animationsEnabled
+                        enabled: d.animationsEnabled
                         onEnabledChanged: if (!enabled) heightAnimation.complete()
 
                         NumberAnimation
                         {
                             id: heightAnimation
-                            duration: control.kColumnsAnimationDuration
+                            duration: d.kColumnsAnimationDuration
                             easing.type: Easing.OutCubic
                         }
                     }
@@ -324,8 +309,7 @@ Item
 
                             property bool mediaPlayerActive: false
 
-                            onClicked: control.openVideoScreen(
-                                loader.resource, loader.thumbnail, camerasModel)
+                            onClicked: control.openVideoScreen(resource, thumbnail, camerasModel)
 
                             onThumbnailRefreshRequested: camerasModel.refreshThumbnail(index)
 
@@ -382,13 +366,20 @@ Item
                 if (newColumnsCountUserModifier === sizesCalculator.getUserDefinedColumnsCount())
                     return
 
-                control.anchorIndex = cellsSearcher.findCellClosestToViewportCenter()
-                control.anchorRelativePosition = kCenterAnchorRelativePosition
+                // If animation is already running, keep the current anchor.
+                // Otherwise, find new anchor based on current viewport.
+                if (d.anchorIndex < 0)
+                {
+                    d.anchorIndex = cellsSearcher.findCellClosestToViewportCenter(
+                        flickable.contentY, flickable.width, flickable.height)
+                    d.anchorRelativePosition = d.kCenterAnchorRelativePosition
+                }
+
                 centeringTimer.restart()
 
-                control.animationsEnabled = true
+                d.animationsEnabled = true
                 sizesCalculator.setUserDefinedColumnsCount(newColumnsCountUserModifier)
-                control.saveTargetColumnsCount()
+                d.saveTargetColumnsCount()
             }
 
             function updateStartLogicalRotation()
@@ -474,16 +465,20 @@ Item
                 baseColumnsCount = sizesCalculator.getUserDefinedColumnsCount()
                 baseScale = activeScale
 
-                updateAnchor()
+                // If the animation is already running, keep the current anchor and ignore the new
+                // pinch point position.
+                // Otherwise, find a new anchor based on the current viewport.
+                if (d.anchorIndex < 0)
+                    updateAnchor()
 
                 return
             }
 
             // Keep centering for the last layout animation.
-            if (control.anchorIndex >= 0)
+            if (d.anchorIndex >= 0)
                 centeringTimer.restart()
 
-            control.saveTargetColumnsCount()
+            d.saveTargetColumnsCount()
         }
 
         onActiveScaleChanged:
@@ -505,10 +500,10 @@ Item
             if (targetColumnsCount === sizesCalculator.getUserDefinedColumnsCount())
                 return
 
-            if (control.anchorIndex < 0)
+            if (d.anchorIndex < 0)
                 updateAnchor()
 
-            control.animationsEnabled = true
+            d.animationsEnabled = true
             sizesCalculator.setUserDefinedColumnsCount(targetColumnsCount)
 
             baseColumnsCount = sizesCalculator.getUserDefinedColumnsCount()
@@ -525,25 +520,28 @@ Item
 
         function updateAnchor()
         {
-            const cellIndex = cellsSearcher.findClosestFullyVisibleCell(centroid.scenePosition)
+            const scenePoint = centroid.scenePosition
+            const flickablePoint = flickable.mapFromItem(null, scenePoint.x, scenePoint.y)
+            const cellIndex = cellsSearcher.findClosestFullyVisibleCell(
+                flickablePoint, flickable.contentY, flickable.height)
             // Relative position must be calculated before setting anchorIndex.
-            control.anchorRelativePosition = calculateAnchorRelativePosition(cellIndex)
-            control.anchorIndex = cellIndex
+            d.anchorRelativePosition = calculateAnchorRelativePosition(cellIndex)
+            d.anchorIndex = cellIndex
         }
 
         function calculateAnchorRelativePosition(index)
         {
             if (index < 0)
-                return kCenterAnchorRelativePosition
+                return d.kCenterAnchorRelativePosition
 
             const cellItem = repeater.itemAt(index)
             if (!cellItem)
-                return kCenterAnchorRelativePosition
+                return d.kCenterAnchorRelativePosition
 
             const cellTopRelativeToViewport = cellItem.y - flickable.contentY
             const availableSpace = flickable.height - cellItem.height
             if (availableSpace <= 0)
-                return kCenterAnchorRelativePosition
+                return d.kCenterAnchorRelativePosition
 
             const relativePosition = cellTopRelativeToViewport / availableSpace
             return MathUtils.bound(0, relativePosition, 1)
@@ -554,19 +552,24 @@ Item
     {
         id: centeringTimer
 
-        interval: control.kColumnsAnimationDuration
+        interval: d.kColumnsAnimationDuration
         repeat: false
 
         onTriggered:
         {
-            control.animationsEnabled = false
+            d.animationsEnabled = false
 
-            if (pinchHandler.active || control.anchorIndex < 0)
+            if (pinchHandler.active || d.anchorIndex < 0)
                 return
 
-            const oldAnchorIndex = control.anchorIndex
-            control.anchorIndex = -1
-            flickable.contentY = control.contentYToCenterIndex(oldAnchorIndex)
+            const oldAnchorIndex = d.anchorIndex
+            d.anchorIndex = -1
+
+            if (CoreUtils.assert(oldAnchorIndex < 0 || oldAnchorIndex < repeater.count,
+                "Invalid item index: " + oldAnchorIndex))
+            {
+                flickable.contentY = d.contentYToCenterIndexDynamic(oldAnchorIndex)
+            }
 
             if (!pinchHandler.hasGrab)
                 flickable.interactive = true
@@ -578,8 +581,8 @@ Item
         target: flickable
         property: "contentY"
         restoreMode: Binding.RestoreNone
-        when: control.anchorIndex >= 0 && (pinchHandler.active || centeringTimer.running)
-        value: control.contentYToCenterIndex(control.anchorIndex)
+        when: d.anchorIndex >= 0 && (pinchHandler.active || centeringTimer.running)
+        value: d.contentYToCenterIndexDynamic(d.anchorIndex)
     }
 
     SizesCalculator
@@ -587,22 +590,124 @@ Item
         id: sizesCalculator
 
         cellsCount: repeater.count
-        availableWidth: flickable.width
-        availableHeight: flickable.height
         spacing: control.spacing
     }
 
     GeometryCalculator
     {
         id: geometryCalculator
+
+        sizesCalculator: sizesCalculator
     }
 
     CellsSearcher
     {
         id: cellsSearcher
 
-        repeater: repeater
-        flickable: flickable
-        spacing: control.spacing
+        sizesCalculator: sizesCalculator
+        geometryCalculator: geometryCalculator
+    }
+
+    CamerasGridHelper
+    {
+        id: camerasGridHelper
+    }
+
+    NxObject
+    {
+        id: d
+
+        readonly property int kColumnsAnimationDuration: 250
+        readonly property real kCenterAnchorRelativePosition: 0.5
+
+        // Is requred for disabling animation when column count change isn't in progress.
+        // Otherwise, animation would be applied on every cell adding/removing.
+        property bool animationsEnabled: false
+
+        // Index of the cell which should be kept at the screen during columns count change
+        // animation.
+        property int anchorIndex: -1
+
+        // Stores the relative position of the anchored cell within the viewport before pinch
+        // gesture.
+        property real anchorRelativePosition: 0.0
+
+        function saveTargetColumnsCount()
+        {
+            const columnCountToSave =
+                sizesCalculator.columnsCount !== sizesCalculator.defaultColumnsCount
+                    ? sizesCalculator.columnsCount
+                    : sizesCalculator.kInvalidColumnsCount //< Remove saved value.
+
+            camerasGridHelper.saveTargetColumnsCount(layout, columnCountToSave)
+        }
+
+        function loadTargetColumnsCount()
+        {
+            const loadedTargetColumnsCount = camerasGridHelper.loadTargetColumnsCount(layout)
+
+            sizesCalculator.setUserDefinedColumnsCount(
+                loadedTargetColumnsCount !== sizesCalculator.kInvalidColumnsCount
+                    ? loadedTargetColumnsCount
+                    : sizesCalculator.defaultColumnsCount)
+
+            wheelHandler.updateStartLogicalRotation()
+        }
+
+        function saveLayoutPosition()
+        {
+            camerasGridHelper.saveLayoutPosition(layout, flickable.contentY)
+        }
+
+        function loadLayoutPosition()
+        {
+            let position = camerasGridHelper.loadLayoutPosition(layout)
+
+            if (position < 0 || flickable.height > flickable.contentHeight)
+                position = 0
+            else if (position > (flickable.contentHeight - flickable.height))
+                position = flickable.contentHeight - flickable.height
+
+            flickable.contentY = position
+        }
+
+        // Required for contentY update during wheel/pinch columns count change animation.
+        // Must use actuall geometry of items, not calculated statically.
+        // Must be defined locally to initiate binding updates when needed.
+        function contentYToCenterIndexDynamic(centerIndex)
+        {
+            if (centerIndex < 0 || centerIndex >= repeater.count)
+                return flickable.contentY
+
+            const cellItem = repeater.itemAt(centerIndex)
+            const targetContentY =
+                cellItem.y - (flickable.height - cellItem.height) * anchorRelativePosition
+            if (targetContentY < 0)
+                return 0
+
+            const lastItem = repeater.itemAt(repeater.count - 1)
+            const currentContentHeight = lastItem.y + lastItem.height
+            if (targetContentY + flickable.height > currentContentHeight)
+                return Math.max(0, currentContentHeight - flickable.height)
+
+            return ensureCellIsFullyVisible(targetContentY, cellItem, flickable.height)
+        }
+
+        // Ensure the cell is fully visible. If cell doesn't fit in viewport,
+        // adjust minimally to show it fully.
+        function ensureCellIsFullyVisible(targetContentY, cellGeometry, totalHeight)
+        {
+            const cellTop = cellGeometry.y
+            const cellBottom = cellGeometry.y + cellGeometry.height
+            const viewportTop = targetContentY
+            const viewportBottom = targetContentY + totalHeight
+
+            if (cellTop < viewportTop)
+                return cellTop
+            if (cellBottom > viewportBottom)
+                return cellBottom - totalHeight
+
+            return targetContentY
+        }
     }
 }

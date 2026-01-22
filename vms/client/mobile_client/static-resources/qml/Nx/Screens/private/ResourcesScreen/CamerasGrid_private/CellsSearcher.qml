@@ -6,30 +6,25 @@ import Nx.Core
 
 NxObject
 {
-    required property var repeater
-    required property var flickable
-    required property int spacing
+    required property var sizesCalculator
+    required property var geometryCalculator
 
-    function findCellClosestToViewportCenter()
+    function findCellClosestToViewportCenter(contentY, flickableWidth, flickableHeight)
     {
-        const viewportCenterY = flickable.contentY + flickable.height / 2
+        const viewportCenter = Qt.point(flickableWidth / 2, contentY + flickableHeight / 2)
 
         let closestCellIndex = -1
         let minDistance = Number.MAX_VALUE
 
-        for (let i = 0; i < repeater.count; ++i)
+        for (let i = 0; i < sizesCalculator.cellsCount; ++i)
         {
-            const cellItem = repeater.itemAt(i)
-            if (!cellItem)
-            {
-                if (minDistance === Number.MAX_VALUE)
-                    continue //< Still haven't found any loaded item.
-                else
-                    break //< No need to check the rest of items - they all unloaded.
-            }
+            const cellGeometry = geometryCalculator.calculateCellGeometry(i)
 
-            const cellCenterY = cellItem.y + cellItem.height / 2
-            const distance = Math.abs(cellCenterY - viewportCenterY)
+            const cellCenter = Qt.point(
+                cellGeometry.x + cellGeometry.width / 2,
+                cellGeometry.y + cellGeometry.height / 2)
+
+            const distance = MathUtils.distance(viewportCenter, cellCenter)
 
             if (distance < minDistance)
             {
@@ -41,37 +36,34 @@ NxObject
         return closestCellIndex
     }
 
-    function findClosestFullyVisibleCell(scenePoint)
+    function findClosestFullyVisibleCell(flickablePoint, contentY, flickableHeight)
     {
-        const flickablePoint = flickable.mapFromItem(null, scenePoint.x, scenePoint.y)
         const contentPoint = Qt.point(
             flickablePoint.x,
-            flickablePoint.y + flickable.contentY)
+            flickablePoint.y + contentY)
 
         let enclosingIndex = -1
-        let nearestIndex = repeater.count - 1
+        let nearestIndex = sizesCalculator.cellsCount - 1
         let minDistance = Number.MAX_VALUE
 
-        for (let i = 0; i < repeater.count; ++i)
+        for (let i = 0; i < sizesCalculator.cellsCount; ++i)
         {
-            const cellItem = repeater.itemAt(i)
-            if (!cellItem)
+            const cellGeometry = geometryCalculator.calculateCellGeometry(i)
+
+            if (!d.cellIsFullyVisible(cellGeometry, contentY, flickableHeight))
                 continue
 
-            if (!d.cellIsFullyVisible(cellItem))
-                continue
-
-            if (contentPoint.x >= cellItem.x
-                && contentPoint.x < cellItem.x + cellItem.width + spacing
-                && contentPoint.y >= cellItem.y
-                && contentPoint.y < cellItem.y + cellItem.height + spacing)
+            if (contentPoint.x >= cellGeometry.x
+                && contentPoint.x < cellGeometry.x + cellGeometry.width + sizesCalculator.spacing
+                && contentPoint.y >= cellGeometry.y
+                && contentPoint.y < cellGeometry.y + cellGeometry.height + sizesCalculator.spacing)
             {
                 enclosingIndex = i
                 break
             }
 
-            const cellCenter =
-                Qt.point(cellItem.x + cellItem.width / 2, cellItem.y + cellItem.height / 2)
+            const cellCenter = Qt.point(
+                cellGeometry.x + cellGeometry.width / 2, cellGeometry.y + cellGeometry.height / 2)
             const distance = MathUtils.distance(contentPoint, cellCenter)
             if (distance < minDistance)
             {
@@ -87,10 +79,10 @@ NxObject
     {
         id: d
 
-        function cellIsFullyVisible(cellItem)
+        function cellIsFullyVisible(cellGeometry, contentY, flickableHeight)
         {
-            return cellItem.y >= flickable.contentY
-                && (cellItem.y + cellItem.height) <= (flickable.contentY + flickable.height)
+            return cellGeometry.y >= contentY
+                && (cellGeometry.y + cellGeometry.height) <= (contentY + flickableHeight)
         }
     }
 }

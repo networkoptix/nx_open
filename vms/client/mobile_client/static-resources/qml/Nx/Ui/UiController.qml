@@ -29,7 +29,7 @@ NxObject
 
         function onVideoScreenRequested(cameraResource, timestamp)
         {
-            Workflow.openVideoScreen(cameraResource, undefined, undefined, undefined, timestamp)
+            Workflow.openVideoScreen(cameraResource, undefined, timestamp)
         }
 
         function onSessionsScreenRequested()

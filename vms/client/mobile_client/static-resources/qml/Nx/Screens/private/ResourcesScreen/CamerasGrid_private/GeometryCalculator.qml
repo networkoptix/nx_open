@@ -6,6 +6,10 @@ import Nx.Core
 
 NxObject
 {
+    id: geometryCalculator
+
+    required property var sizesCalculator
+
     function calculateCellGeometry(index)
     {
         const x = d.calculateCellX(index)
@@ -23,6 +27,8 @@ NxObject
     PaddingsCalculator
     {
         id: paddingsCalculator
+
+        sizesCalculator: geometryCalculator.sizesCalculator
     }
 
     QtObject
@@ -85,8 +91,8 @@ NxObject
                     + (normalRowIndex > 0 ? sizesCalculator.spacing : 0)
             }
 
-            const repositionedRowIndex =
-                Math.floor(repositionedTailCellIndex / paddingsCalculator.repositionedCellsInFirstRow)
+            const repositionedRowIndex = Math.floor(repositionedTailCellIndex
+                / paddingsCalculator.repositionedCellsInFirstRow)
 
             const normalRowsCount =
                 Math.floor((sizesCalculator.cellsCount
