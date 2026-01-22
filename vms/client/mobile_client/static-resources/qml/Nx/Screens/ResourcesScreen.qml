@@ -154,10 +154,7 @@ Page
             if (mediaPlayer)
                 mediaPlayer.stop()
         }
-
-        const point = mapToItem(camerasGrid.parent, width / 2, height / 2)
-        Workflow.openVideoScreen(resource, thumbnailUrl, Math.max(0, point.x),
-            Math.max(0, point.y), undefined, camerasModel)
+        Workflow.openVideoScreen(resource, thumbnailUrl, undefined, camerasModel)
     }
 
     Component

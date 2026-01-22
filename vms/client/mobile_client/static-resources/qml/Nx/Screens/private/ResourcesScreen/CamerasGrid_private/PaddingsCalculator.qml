@@ -6,6 +6,8 @@ import Nx.Core
 
 NxObject
 {
+    required property var sizesCalculator
+
     readonly property int repositionedTailCellsCount:
     {
         if (sizesCalculator.enlargedCellsCount > 0

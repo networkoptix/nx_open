@@ -108,7 +108,7 @@ function openResourcesScreen(systemName, filterIds)
     }
 }
 
-function openVideoScreen(resource, screenshotUrl, xHint, yHint, timestamp, camerasModel)
+function openVideoScreen(resource, screenshotUrl, timestamp, camerasModel)
 {
     var targetTimestamp = timestamp > 0 ? timestamp : -1
     var properties =

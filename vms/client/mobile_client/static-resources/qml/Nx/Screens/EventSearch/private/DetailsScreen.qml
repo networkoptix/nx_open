@@ -662,8 +662,7 @@ Page
 
         function goToCamera()
         {
-            Workflow.openVideoScreen(
-                preview.resource, undefined, 0, 0, slider.from, camerasModel)
+            Workflow.openVideoScreen(preview.resource, undefined, slider.from, camerasModel)
         }
 
         function updateGestureExclusionArea()
