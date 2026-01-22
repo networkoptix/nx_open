@@ -6,6 +6,7 @@ import QtQuick.Layouts
 
 import Nx.Core
 import Nx.Controls
+import Nx.Items
 import Nx.Core.Controls
 import Nx.Mobile
 import Nx.Mobile.Controls
@@ -21,16 +22,21 @@ Sheet
 
     title: qsTr("Resources")
 
-    Column
+    readonly property bool isNothingFound: searchEdit.regExp && treeView.rows === 0
+
+    ColumnLayout
     {
-        width: parent.width
-        spacing: 4
+        anchors.fill: parent
 
         SearchEdit
         {
             id: searchEdit
+
+            Layout.fillWidth: true
             height: 36
-            width: parent.width
+
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
 
             readonly property string text: searchEdit.displayText
             readonly property var regExp: text.length !== 0
@@ -45,66 +51,98 @@ Sheet
             }
         }
 
-        TreeView
+        Item
         {
-            id: treeView
-            model: searchModel
+            id: nothingFoundPlaceholder
 
-            width: parent.width
-            height: control.contentItem.height - control.headerHeight
-            rowSpacing: 4
-            clip: true
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            delegate: ResourceTreeDelegate
+            visible: isNothingFound
+
+            Placeholder
             {
-                id: delegateItem
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                Layout.alignment: Qt.AlignHCenter
+                imageSource: "image://skin/64x64/Outline/notfound.svg?primary=light10"
+                text: qsTr("Nothing Found")
+            }
+        }
 
-                highlightRegExp:
+        ScrollView
+        {
+            id: scrollView
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 8
+
+            visible: !isNothingFound
+
+            TreeView
+            {
+                id: treeView
+                model: searchModel
+
+                width: parent.width
+                clip: true
+                rowSpacing: 4
+
+                delegate: ResourceTreeDelegate
                 {
-                    if (searchEdit.text.length !== 0)
-                        return searchEdit.regExp
+                    id: delegateItem
+
+                    highlightRegExp:
+                    {
+                        if (searchEdit.text.length !== 0)
+                            return searchEdit.regExp
+                    }
+
+                    onClicked:
+                    {
+                        if (hasChildren)
+                        {
+                            treeView.toggleExpanded(row)
+                        }
+                        else if (delegateItem.isCamera)
+                        {
+                            windowContext.depricatedUiController.layout = null
+                            Workflow.openVideoScreen(resource);
+                            control.close()
+                        }
+                        else if (delegateItem.isLayout)
+                        {
+                            Workflow.openResourcesScreen()
+                            windowContext.depricatedUiController.layout = resource
+                            control.close()
+                        }
+                        else if (delegateItem.isAllDevices)
+                        {
+                            Workflow.openResourcesScreen()
+                            windowContext.depricatedUiController.layout = null
+                            control.close()
+                        }
+                    }
                 }
 
-                onClicked:
+                function expandAll()
                 {
-                    if (hasChildren)
-                    {
-                        treeView.toggleExpanded(row)
-                    }
-                    else if (delegateItem.isCamera)
-                    {
-                        windowContext.depricatedUiController.layout = null
-                        Workflow.openVideoScreen(resource);
-                        control.close()
-                    }
-                    else if (delegateItem.isLayout)
-                    {
-                        Workflow.openResourcesScreen()
-                        windowContext.depricatedUiController.layout = resource
-                        control.close()
-                    }
-                    else if (delegateItem.isAllDevices)
-                    {
-                        Workflow.openResourcesScreen()
-                        windowContext.depricatedUiController.layout = null
-                        control.close()
-                    }
+                    expandRecursively(-1, -1)
                 }
-            }
 
-            function expandAll()
-            {
-                expandRecursively(-1, -1)
-            }
-
-            function expandDefault()
-            {
-                collapseRecursively(-1) //< Collapse tree recursively.
-                expandRecursively(-1, 1); //< Expand tree to depth 1.
-                if (windowContext.depricatedUiController.layout)
+                function expandDefault()
                 {
-                    expandToIndex(searchModel.mapFromSource(
-                        treeModel.resourceIndex(windowContext.depricatedUiController.layout)))
+                    collapseRecursively(-1) //< Collapse tree recursively.
+                    expandRecursively(-1, 1); //< Expand tree to depth 1.
+                    if (windowContext.depricatedUiController.layout)
+                    {
+                        expandToIndex(searchModel.mapFromSource(
+                            treeModel.resourceIndex(windowContext.depricatedUiController.layout)))
+                    }
                 }
             }
         }
