@@ -43,9 +43,15 @@ nx_configure_directory(
     @ONLY
     OUTPUT_FILES_VARIABLE configured_files)
 
+set(variants
+    [=[{"name": "ubuntu", "minimumVersion": "20.04"}]=]
+    [=[{"name": "debian", "minimumVersion": "11"}]=]
+)
+list(JOIN variants ", " variants)
+
 nx_generate_package_json(${CMAKE_CURRENT_BINARY_DIR}/package.json
     COMPONENT client
-    VARIANTS "{ \"name\": \"ubuntu\", \"minimumVersion\": \"20.04\" }")
+    VARIANTS ${variants})
 list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/package.json)
 
 nx_get_component_translation_list(client_translation_files "client" SHELL_COMPATIBLE)
