@@ -59,51 +59,31 @@ using namespace std::chrono;
 template<typename Derived, TextureData T>
 class TexturePoolBase
 {
-    static constexpr auto kBufferDuration = 200ms; //< Buffer duration in QnBufferedFrameDisplayer.
-    static constexpr size_t kFramesInFlight = 4; //< Approximate number of frames in other buffers.
-    static constexpr size_t kMinTextureCount = kFramesInFlight; //< 1 fps.
-    static constexpr size_t kDefaultTextureCount = kFramesInFlight + 6; //< 30 fps.
-    static constexpr size_t kMaxTextureCount = kFramesInFlight + 12; //< 60 fps.
+    static constexpr size_t kDefaultTexturePoolSize = 4;
 
 public:
     // Returns a shared texture from the pool. This method is always called from the decoder thread
-    // and can throttle the decoder if the pool is full.
     template<TextureDesc D>
     std::shared_ptr<T> getTexture(const D& desc, const QSize& size)
     {
-        updateMaxTextureCount();
+        if (m_textures.size() > kDefaultTexturePoolSize)
+            removeAtMost(m_textures.size() - kDefaultTexturePoolSize);
 
+
+        // Look for an unused texture.
         const auto format = desc.Format;
-
-        while (true)
+        for (auto& tex: m_textures)
         {
-            // Ensure the pool is not exceeding the maximum size.
-            if (m_textures.size() <= m_maxTextureCount
-                || removeAtMost(m_textures.size() - m_maxTextureCount))
+            if (unused(tex))
             {
-                // Look for an unused texture.
-                for (auto& tex: m_textures)
-                {
-                    if (unused(tex))
-                    {
-                        if (tex->size != size || tex->format != format)
-                            tex = static_cast<Derived*>(this)->newTexture(desc, size);
-                        return tex;
-                    }
-                }
-
-                // Create a new texture if the pool is not full.
-                if (m_textures.size() < m_maxTextureCount)
-                {
-                    m_textures.push_back(static_cast<Derived*>(this)->newTexture(desc, size));
-                    return m_textures.back();
-                }
+                if (tex->size != size || tex->format != format)
+                    tex = static_cast<Derived*>(this)->newTexture(desc, size);
+                return tex;
             }
-
-            // Wait for the next frame to be rendered and one of the textures to be released.
-            // Win32 Sleep() is not very accurate so use a minimal sleep time.
-            Sleep(1);
         }
+
+        m_textures.push_back(static_cast<Derived*>(this)->newTexture(desc, size));
+        return m_textures.back();
     }
 
 private:
@@ -132,37 +112,8 @@ private:
         return remaining == 0;
     }
 
-    // Adjust the maximum texture count based on the frame rate.
-    void updateMaxTextureCount()
-    {
-        if (!m_fpsTimer.isValid())
-            m_fpsTimer.start();
-
-        ++m_frameCount;
-
-        if (m_fpsTimer.elapsed() > 1000)
-        {
-            const float bufferDurationMs = duration_cast<milliseconds>(kBufferDuration).count();
-            const float framesInBuffer = (bufferDurationMs * m_frameCount) / m_fpsTimer.elapsed();
-
-            m_fpsTimer.restart();
-            m_frameCount = 0;
-
-            const auto newTextureCount = std::clamp<int>(
-                std::ceil(framesInBuffer + kFramesInFlight),
-                kMinTextureCount,
-                kMaxTextureCount);
-
-            if (std::abs(newTextureCount - (int) m_maxTextureCount) > 1)
-                m_maxTextureCount = newTextureCount;
-        }
-    }
-
 protected:
     std::vector<std::shared_ptr<T>> m_textures;
-    size_t m_maxTextureCount = kDefaultTextureCount;
-    QElapsedTimer m_fpsTimer;
-    size_t m_frameCount = 0;
 };
 
 } // namespace nx::media

@@ -48,6 +48,8 @@ int getFrameBytes(const VideoFramePtr& frame)
 void GopReverser::Queue::push(VideoFramePtr frame)
 {
     m_sizeBytes += getFrameBytes(frame);
+    if (frame)
+        ++m_actualSize;
     m_queue.push_back(std::move(frame));
 }
 
@@ -55,6 +57,8 @@ VideoFramePtr GopReverser::Queue::pop()
 {
     auto result = std::move(m_queue.front());
     m_queue.pop_front();
+    if (result)
+        --m_actualSize;
     m_sizeBytes -= getFrameBytes(result);
     return result;
 }
@@ -62,13 +66,16 @@ VideoFramePtr GopReverser::Queue::pop()
 void GopReverser::Queue::reset(int index)
 {
     m_sizeBytes -= getFrameBytes(m_queue[index]);
+    if (m_queue[index])
+        --m_actualSize;
     m_queue[index].reset();
 }
 
 // ------------- GopReverser -------------
 
-GopReverser::GopReverser(int64_t maxBufferSizeBytes):
-    m_maxBufferSize(maxBufferSizeBytes)
+GopReverser::GopReverser(int64_t maxBufferSizeBytes, int maxFrames):
+    m_maxBufferSize(maxBufferSizeBytes),
+    m_maxFrames(maxFrames)
 {
 }
 
@@ -84,7 +91,7 @@ void GopReverser::push(VideoFramePtr frame)
     else
     {
         m_queue.push(std::move(frame));
-        while (m_queue.sizeBytes() > m_maxBufferSize)
+        while (m_queue.sizeBytes() > m_maxBufferSize || m_queue.actualSize() > m_maxFrames)
             removeOneElement();
     }
 }

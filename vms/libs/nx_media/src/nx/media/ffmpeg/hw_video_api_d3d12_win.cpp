@@ -353,10 +353,9 @@ class D3D12MemoryBuffer: public QHwVideoBuffer
 {
 public:
     D3D12MemoryBuffer(const AVFrame* frame, std::shared_ptr<DecoderData> decoderData):
-        QHwVideoBuffer(QVideoFrame::NoHandle),
-        m_frame(av_frame_clone(frame))
+        QHwVideoBuffer(QVideoFrame::NoHandle)
     {
-        const auto framesCtx = reinterpret_cast<AVHWFramesContext*>(m_frame->hw_frames_ctx->data);
+        const auto framesCtx = reinterpret_cast<AVHWFramesContext*>(frame->hw_frames_ctx->data);
         const auto ctx = framesCtx->device_ctx;
 
         if (!ctx || ctx->type != AV_HWDEVICE_TYPE_D3D12VA)
@@ -367,12 +366,17 @@ public:
         if (!avDeviceCtx)
             return;
 
-        auto f = reinterpret_cast<AVD3D12VAFrame*>(m_frame->data[0]);
+        auto f = reinterpret_cast<AVD3D12VAFrame*>(frame->data[0]);
 
         try
         {
             m_sharedTexture = decoderData->copyFrameTexture(avDeviceCtx, f);
             m_rhi = decoderData->rhi();
+
+            D3D12_RESOURCE_DESC desc =
+                reinterpret_cast<AVD3D12VAFrame*>(frame->data[0])->texture->GetDesc();
+            const auto qtPixelFormat = toQtPixelFormat(desc.Format);
+            m_videoFormat = QVideoFrameFormat(QSize(frame->width, frame->height), qtPixelFormat);
         }
         catch (const _com_error& e)
         {
@@ -387,7 +391,6 @@ public:
 
     virtual ~D3D12MemoryBuffer() override
     {
-        av_frame_unref(m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode /*mode*/) override
@@ -430,19 +433,11 @@ public:
 
     QVideoFrameFormat format() const override
     {
-        if (!m_frame || !m_frame->hw_frames_ctx || !m_frame->data[0])
-            return {};
-
-        D3D12_RESOURCE_DESC desc =
-            reinterpret_cast<AVD3D12VAFrame*>(m_frame->data[0])->texture->GetDesc();
-
-        const auto qtPixelFormat = toQtPixelFormat(desc.Format);
-
-        return QVideoFrameFormat(QSize(m_frame->width, m_frame->height), qtPixelFormat);
+        return m_videoFormat;
     }
 
 private:
-    AVFrame* m_frame = nullptr;
+    QVideoFrameFormat m_videoFormat;
     QRhi* m_rhi = nullptr;
     std::shared_ptr<SharedTexture> m_sharedTexture;
 };

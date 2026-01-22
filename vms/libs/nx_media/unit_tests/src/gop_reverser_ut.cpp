@@ -21,9 +21,9 @@ class GopReverserTest: public ::testing::Test
 {
 public:
 
-    void init(int64_t size)
+    void init(int64_t bufferSize, int frameSize)
     {
-        reverser = std::make_unique<GopReverser>(size);
+        reverser = std::make_unique<GopReverser>(bufferSize, frameSize);
 
         for (int i = 0; i <= kFramesCount; ++i)
         {
@@ -54,43 +54,49 @@ public:
 
 TEST_F(GopReverserTest, enoughBuffer)
 {
-    init(kFrameSize * kFramesCount);
+    init(kFrameSize * kFramesCount, kFramesCount);
     expectFrames({ 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 });
 }
 
 TEST_F(GopReverserTest, notEnoughBuffer1)
 {
-    init(kFrameSize * (kFramesCount - 1));
+    init(kFrameSize * (kFramesCount - 1), kFramesCount);
+    expectFrames({ 9, 8, 7, 6, /*5,*/ 4, 3, 2, 1, 0 });
+}
+
+TEST_F(GopReverserTest, notEnoughBufferFrames1)
+{
+    init(kFrameSize * kFramesCount, kFramesCount - 1);
     expectFrames({ 9, 8, 7, 6, /*5,*/ 4, 3, 2, 1, 0 });
 }
 
 TEST_F(GopReverserTest, notEnoughBuffer2)
 {
-    init(kFrameSize * (kFramesCount - 2));
+    init(kFrameSize * (kFramesCount - 2), kFramesCount);
     expectFrames({ 9, 8, /*7,*/ 6, 5, /*4,*/ 3, 2, 1, 0 });
 }
 
 TEST_F(GopReverserTest, notEnoughBuffer5)
 {
-    init(kFrameSize * (kFramesCount - 5));
+    init(kFrameSize * (kFramesCount - 5), kFramesCount);
     expectFrames({ 9, /*8,*/ 7, /*6, 5,*/ 4, /*3,*/ 2, /*1,*/ 0 });
 }
 
 TEST_F(GopReverserTest, notEnoughBuffer6)
 {
-    init(kFrameSize * (kFramesCount - 6));
+    init(kFrameSize * (kFramesCount - 6), kFramesCount);
     expectFrames({ 9, 7, 3, 0 });
 }
 
 TEST_F(GopReverserTest, notEnoughBuffer9)
 {
-    init(kFrameSize * (kFramesCount - 9));
+    init(kFrameSize * (kFramesCount - 9), kFramesCount);
     expectFrames({ 0 });
 }
 
 TEST_F(GopReverserTest, notEnoughBuffer10)
 {
-    init(kFrameSize * (kFramesCount - 10));
+    init(kFrameSize * (kFramesCount - 10), kFramesCount);
     expectFrames({});
 }
 

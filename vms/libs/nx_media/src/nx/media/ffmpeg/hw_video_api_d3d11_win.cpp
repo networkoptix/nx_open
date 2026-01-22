@@ -298,31 +298,36 @@ class D3D11MemoryBuffer: public QHwVideoBuffer
 {
 public:
     D3D11MemoryBuffer(const AVFrame* frame, std::shared_ptr<DecoderData> decoderData):
-        QHwVideoBuffer(QVideoFrame::NoHandle),
-        m_frame(av_frame_clone(frame))
+        QHwVideoBuffer(QVideoFrame::NoHandle)
     {
-        const auto fCtx = reinterpret_cast<AVHWFramesContext*>(m_frame->hw_frames_ctx->data);
+        const auto fCtx = reinterpret_cast<AVHWFramesContext*>(frame->hw_frames_ctx->data);
         const auto ctx = fCtx->device_ctx;
 
         if (!ctx || ctx->type != AV_HWDEVICE_TYPE_D3D11VA)
             return;
 
         const ComPtr<ID3D11Texture2D> ffmpegTex = reinterpret_cast<ID3D11Texture2D*>(
-            m_frame->data[0]);
-        const int index = static_cast<int>(reinterpret_cast<intptr_t>(m_frame->data[1]));
+            frame->data[0]);
+        const int index = static_cast<int>(reinterpret_cast<intptr_t>(frame->data[1]));
 
         const auto* avDeviceCtx = static_cast<AVD3D11VADeviceContext*>(ctx->hwctx);
 
         if (!avDeviceCtx)
             return;
 
-        const QSize frameSize{m_frame->width, m_frame->height};
+        const QSize frameSize{frame->width, frame->height};
 
         try
         {
             m_sharedTexture = decoderData->copyFrameTexture(
                 avDeviceCtx, ffmpegTex, index, frameSize);
             m_rhi = decoderData->rhi();
+
+            D3D11_TEXTURE2D_DESC desc;
+            memset(&desc, 0, sizeof(desc));
+            ffmpegTex->GetDesc(&desc);
+            const auto qtPixelFormat = toQtPixelFormat(desc.Format);
+            m_videoFormat = QVideoFrameFormat(frameSize, qtPixelFormat);
         }
         catch (const _com_error& e)
         {
@@ -337,7 +342,6 @@ public:
 
     virtual ~D3D11MemoryBuffer() override
     {
-        av_frame_unref(m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode /*mode*/) override
@@ -370,21 +374,11 @@ public:
 
     QVideoFrameFormat format() const override
     {
-        if (!m_frame)
-            return {};
-
-        const ComPtr<ID3D11Texture2D> ffmpegTex = reinterpret_cast<ID3D11Texture2D*>(
-            m_frame->data[0]);
-        D3D11_TEXTURE2D_DESC desc;
-        memset(&desc, 0, sizeof(desc));
-        ffmpegTex->GetDesc(&desc);
-        const auto qtPixelFormat = toQtPixelFormat(desc.Format);
-
-        return QVideoFrameFormat(QSize(m_frame->width, m_frame->height), qtPixelFormat);
+        return m_videoFormat;
     }
 
 private:
-    AVFrame* m_frame = nullptr;
+    QVideoFrameFormat m_videoFormat;
     QRhi* m_rhi = nullptr;
     std::shared_ptr<SharedTexture> m_sharedTexture;
 };

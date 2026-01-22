@@ -22,6 +22,7 @@ namespace nx::media {
 namespace {
 
 static const int kReorderBufferSizeBytes = 1024*1024 * 300;
+static const int kReorderBufferSizeFrames = 30;
 
 // Max queue length for compressed data (about 3 second).
 static const int kMaxMediaQueueLen = 90;
@@ -317,7 +318,7 @@ void PlayerDataConsumer::onDecodedFrame(VideoFramePtr decodedFrame)
     if (metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_Reverse))
     {
         if (!m_gopReverser)
-            m_gopReverser = std::make_unique<GopReverser>(kReorderBufferSizeBytes);
+            m_gopReverser = std::make_unique<GopReverser>(kReorderBufferSizeBytes, kReorderBufferSizeFrames);
         m_gopReverser->push(std::move(decodedFrame));
         std::vector<VideoFramePtr> frames;
         while (auto frame = m_gopReverser->pop())

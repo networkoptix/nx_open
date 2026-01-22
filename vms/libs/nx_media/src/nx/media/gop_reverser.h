@@ -24,13 +24,16 @@ class NX_MEDIA_API GopReverser
         auto begin() { return m_queue.begin(); }
         auto end() { return m_queue.end(); }
         VideoFramePtr& operator[](size_t index) { return m_queue[index]; }
+
+        int actualSize() const { return m_actualSize; }
     private:
         std::deque<VideoFramePtr> m_queue;
         int64_t m_sizeBytes = 0;
+        int m_actualSize = 0;
     };
 
 public:
-    GopReverser(int64_t maxBufferSizeBytes);
+    GopReverser(int64_t maxBufferSizeBytes, int maxFrames);
 
     void push(VideoFramePtr decodedFrame);
     VideoFramePtr pop();
@@ -40,6 +43,7 @@ private:
 
 private:
     const int64_t m_maxBufferSize;
+    const int m_maxFrames;
     Queue m_queue;
     VideoFramePtr m_nextFrame;
 };
