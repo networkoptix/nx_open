@@ -11,9 +11,8 @@ Popup
 {
     id: control
 
-    default property alias data: contentColumn.data
+    default property alias data: contentFlickable.data
     property alias title: sheetTitleText.text
-    property alias contentSpacing: contentColumn.spacing
     readonly property int headerHeight: 56
 
     parent: Overlay.overlay
@@ -67,25 +66,18 @@ Popup
             }
         }
 
-        Item
+        Flickable
         {
-            y: header.height + 12
+            id: contentFlickable
+
+            readonly property int leftPadding: 16 + windowParams.leftMargin
+            readonly property int rightPadding: 16 + windowParams.rightMargin
+
+            y: header.height + 8
 
             width: parent.width
             height: parent.height - y
             clip: true
-
-            Column
-            {
-                id: contentColumn
-
-                readonly property int leftPadding: 16 + windowParams.leftMargin
-                readonly property int rightPadding: 16 + windowParams.rightMargin
-
-                spacing: control.spacing
-                x: leftPadding
-                width: parent.width - leftPadding - rightPadding
-            }
         }
     }
 }
