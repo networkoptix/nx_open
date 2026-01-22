@@ -593,6 +593,8 @@ struct CloudCrossSystemContext::Private
         for (const auto& serverData: serversData)
         {
             const auto server = systemContext->resourcePool()->getResourceById(serverData.id);
+            if (!server)
+                continue;
 
             const auto descriptorsIter =
                 serverData.parameters.find(nx::analytics::kDescriptorsProperty);
