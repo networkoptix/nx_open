@@ -224,10 +224,10 @@ bool MergeSystemsTool::mergeSystem(
     ctx->mergeData.ignoreIncompatible = ignoreIncompatible;
     ctx->mergeData.ignoreOfflineServerDuplicates = true;
     ctx->mergeData.remoteEndpoint = ctx->target.toString();
+    ctx->mergeData.remoteServerId = ctx->targetInfo.id;
     // FIXME: Use handshake certificate here when CertificateChain PEM serialization
     // will be available.
-    ctx->mergeData.remoteCertificatePem =
-        ctx->targetInfo.userProvidedCertificatePem.empty()
+    ctx->mergeData.remoteCertificatePem = ctx->targetInfo.userProvidedCertificatePem.empty()
         ? ctx->targetInfo.certificatePem
         : ctx->targetInfo.userProvidedCertificatePem;
 
