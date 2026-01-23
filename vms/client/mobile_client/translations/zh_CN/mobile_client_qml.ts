@@ -890,6 +890,10 @@
       <source>Resources</source>
       <translation>资源</translation>
     </message>
+    <message>
+      <source>Nothing Found</source>
+      <translation type="unfinished">Nothing Found</translation>
+    </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
