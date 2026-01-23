@@ -779,6 +779,10 @@
       <source>Resources</source>
       <translation>Tài nguyên</translation>
     </message>
+    <message>
+      <source>Nothing Found</source>
+      <translation type="unfinished">Nothing Found</translation>
+    </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
