@@ -21,8 +21,8 @@ struct Motion
     std::string organizationId;
     std::string siteId;
     std::string deviceId;
-    std::chrono::milliseconds startTimeMs;
-    std::chrono::milliseconds durationMs;
+    std::chrono::milliseconds startTimeMs{0};
+    std::chrono::milliseconds durationMs{0};
     int channel = 0;
 
     /**

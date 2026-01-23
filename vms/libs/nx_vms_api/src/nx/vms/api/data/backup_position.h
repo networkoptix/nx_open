@@ -3,7 +3,6 @@
 #pragma once
 
 #include <chrono>
-
 #include <QtCore/QList>
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -50,9 +49,6 @@ struct NX_VMS_API BackupPositionExV1: BackupPositionV1
 {
     using base_type = BackupPositionV1;
 
-    BackupPositionExV1() = default;
-    BackupPositionExV1(const BackupPositionExV1& other) = default;
-    virtual ~BackupPositionExV1() = default;
     std::chrono::milliseconds toBackupLowMs{0};
     std::chrono::milliseconds toBackupHighMs{0};
 
@@ -74,9 +70,6 @@ using BackupPositionExV1List = std::vector<BackupPositionExV1>;
 
 // V4
 
-/**%apidoc
- * Last processed DB object positions.
- */
 struct NX_VMS_API MetadataBackupPosition
 {
     /**%apidoc[opt] */
@@ -141,20 +134,19 @@ struct NX_VMS_API BackupPositionV4: ServerAndDeviceIdData
 {
     MediaBackupPosition media;
     MetadataBackupPosition metadata;
+    std::optional<MediaBackupPosition> cloud;
 
     const ServerAndDeviceIdData& getId() const { return *this; }
     void setId(ServerAndDeviceIdData id) { static_cast<ServerAndDeviceIdData&>(*this) = std::move(id); }
 
+    MediaBackupPosition getEffectiveMedia(bool useCloud) const;
+
     bool operator==(const BackupPositionV4& other) const = default;
     BackupPositionV1 toV1() const;
-
     static BackupPositionV4 fromV1(const BackupPositionV1& data);
 };
 
-#define BackupPositionV4_Fields \
-    ServerAndDeviceIdData_Fields \
-    (media) \
-    (metadata)
+#define BackupPositionV4_Fields ServerAndDeviceIdData_Fields (media)(metadata)(cloud)
 
 QN_FUSION_DECLARE_FUNCTIONS(BackupPositionV4, (json)(ubjson), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(BackupPositionV4, BackupPositionV4_Fields)
@@ -187,5 +179,17 @@ using BackupPosition = BackupPositionV4;
 using BackupPositionEx = BackupPositionExV4;
 using BackupPositionList = BackupPositionV4List;
 using BackupPositionExList = BackupPositionExV4List;
+
+void updateIfGreater(auto* current, const auto& target)
+{
+    if (target > *current)
+        *current = target;
+}
+
+void NX_VMS_API incrementMediaPosition(
+    MediaBackupPosition& current, const MediaBackupPosition& target);
+
+void NX_VMS_API incrementMetadataPosition(
+    MetadataBackupPosition& current, const MetadataBackupPosition& target);
 
 } // namespace nx::vms::api
