@@ -71,19 +71,24 @@ public:
         m_onRemovedHandler = handler;
     }
 
-    template<typename ResourceSignalClass>
-    void addOnSignalHandler(ResourceSignalClass signal, ResourceHandler handler)
+    template<typename SignalClass, typename... Args, typename Handler>
+    void addOnSignalHandler(void (SignalClass::*signal)(Args...), Handler handler)
     {
-        const ResourceHandler bindToSignal =
+        m_onSignalHandlers <<
             [this, signal, handler](const ResourcePtr& resource)
             {
-                m_connections << connect(
-                    resource.get(),
-                    signal,
-                    this,
-                    [resource, handler]() { handler(resource); });
+                if (auto source = resource.template dynamicCast<SignalClass>())
+                {
+                    m_connections << connect(
+                        source.get(),
+                        signal,
+                        this,
+                        [resource, handler](Args...)
+                        {
+                            handler(resource);
+                        });
+                }
             };
-        m_onSignalHandlers << bindToSignal;
     }
 
     void addOnPropertyChangedHandler(ResourceProperyChangedHandler handler)

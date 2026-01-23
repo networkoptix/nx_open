@@ -1510,14 +1510,16 @@ nx::vms::api::BackupPolicy QnVirtualCameraResource::getBackupPolicy() const
 
 void QnVirtualCameraResource::setBackupPolicy(nx::vms::api::BackupPolicy backupPolicy)
 {
+    nx::vms::api::BackupPolicy previousPolicy;
     {
         NX_MUTEX_LOCKER lock(&m_attributesMutex);
         if (m_userAttributes.backupPolicy == backupPolicy)
             return;
 
+        previousPolicy = m_userAttributes.backupPolicy;
         m_userAttributes.backupPolicy = backupPolicy;
     }
-    emit backupPolicyChanged(::toSharedPointer(this));
+    emit backupPolicyChanged(::toSharedPointer(this), previousPolicy);
 }
 
 bool QnVirtualCameraResource::isBackupEnabled() const
@@ -2673,7 +2675,7 @@ void QnVirtualCameraResource::setUserAttributesAndNotify(
         emit backupContentTypeChanged(::toSharedPointer(this));
 
     if (originalAttributes.backupPolicy != attributes.backupPolicy)
-        emit backupPolicyChanged(::toSharedPointer(this));
+        emit backupPolicyChanged(::toSharedPointer(this), originalAttributes.backupPolicy);
 }
 
 bool QnVirtualCameraResource::isRtspMetatadaRequired() const

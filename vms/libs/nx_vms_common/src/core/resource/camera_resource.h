@@ -915,7 +915,7 @@ signals:
     void twoWayAudioEnabledChanged(const QnResourcePtr& resource);
     void audioOutputDeviceIdChanged(const QnResourcePtr& resource);
     void backupContentTypeChanged(const QnResourcePtr& resource);
-    void backupPolicyChanged(const QnResourcePtr& resource);
+    void backupPolicyChanged(const QnResourcePtr& resource, nx::vms::api::BackupPolicy previousPolicy);
     void mediaCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
     void cameraHotspotsEnabledChanged(const QnVirtualCameraResourcePtr& camera);
     void cameraHotspotsChanged(const QnVirtualCameraResourcePtr& camera);
