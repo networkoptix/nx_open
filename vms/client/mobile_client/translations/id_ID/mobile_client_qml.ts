@@ -892,7 +892,7 @@
     </message>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Tidak ada yang ditemukan</translation>
     </message>
   </context>
   <context>

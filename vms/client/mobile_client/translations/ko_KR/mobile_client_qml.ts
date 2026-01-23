@@ -892,7 +892,7 @@
     </message>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>결과 없음</translation>
     </message>
   </context>
   <context>

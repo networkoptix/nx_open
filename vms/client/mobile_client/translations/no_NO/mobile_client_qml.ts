@@ -893,7 +893,7 @@
     </message>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Ingenting funnet</translation>
     </message>
   </context>
   <context>

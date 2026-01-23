@@ -895,7 +895,7 @@
     </message>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Нічого не знайдено</translation>
     </message>
   </context>
   <context>
