@@ -781,7 +781,7 @@
     </message>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>无搜寻结果</translation>
     </message>
   </context>
   <context>

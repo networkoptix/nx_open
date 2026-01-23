@@ -781,7 +781,7 @@
     </message>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Không tìm thấy kết quả</translation>
     </message>
   </context>
   <context>

@@ -782,7 +782,7 @@
     </message>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Inget hittades</translation>
     </message>
   </context>
   <context>

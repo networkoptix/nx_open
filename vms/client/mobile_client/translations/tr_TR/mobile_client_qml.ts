@@ -782,7 +782,7 @@
     </message>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Hiçbir şey Bulunamadı</translation>
     </message>
   </context>
   <context>
