@@ -151,6 +151,7 @@ Sheet
     onClosed:
     {
         searchEdit.clear()
+        treeView.forceActiveFocus()
     }
 
     onAboutToShow:
