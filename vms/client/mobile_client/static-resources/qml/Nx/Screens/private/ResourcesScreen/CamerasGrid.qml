@@ -455,6 +455,9 @@ Item
         property int baseColumnsCount: 0
         property real baseScale: 1.0
 
+        // Initial columns count at gesture start to limit total change per gesture.
+        property int initialColumnsCount: 0
+
         property bool hasGrab: false
 
         onActiveChanged:
@@ -464,6 +467,9 @@ Item
                 flickable.cancelFlick()
                 baseColumnsCount = sizesCalculator.getUserDefinedColumnsCount()
                 baseScale = activeScale
+
+                // Remember initial state to limit total change during the gesture.
+                initialColumnsCount = baseColumnsCount
 
                 // If the animation is already running, keep the current anchor and ignore the new
                 // pinch point position.
@@ -497,7 +503,13 @@ Item
                 targetColumnsCount,
                 sizesCalculator.defaultColumnsCount)
 
-            if (targetColumnsCount === sizesCalculator.getUserDefinedColumnsCount())
+            // Limit total change to +-1 column per gesture relative to initial state.
+            targetColumnsCount = MathUtils.bound(
+                initialColumnsCount - 1,
+                targetColumnsCount,
+                initialColumnsCount + 1)
+
+            if (targetColumnsCount === sizesCalculator.columnsCount)
                 return
 
             if (d.anchorIndex < 0)
@@ -506,7 +518,7 @@ Item
             d.animationsEnabled = true
             sizesCalculator.setUserDefinedColumnsCount(targetColumnsCount)
 
-            baseColumnsCount = sizesCalculator.getUserDefinedColumnsCount()
+            baseColumnsCount = targetColumnsCount
             baseScale = activeScale
         }
 
