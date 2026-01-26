@@ -27,7 +27,10 @@ NX_REFLECTION_ENUM_CLASS(TokenProviderType,
     apn_sandbox,
 
     /** Native China provider for Android. */
-    baidu
+    baidu,
+
+    /** Fake desktop provider for testing. */
+    desktop
 )
 
 } // namespace nx::vms::client::mobile::details

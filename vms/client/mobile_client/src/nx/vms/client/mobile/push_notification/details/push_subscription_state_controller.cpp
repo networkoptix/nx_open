@@ -248,6 +248,13 @@ void PushSettingsRemoteController::Private::subscribe(
                 resetCurrentRequest(); // < We didn't start request so we have to reset it manually.
                 return;
             }
+            else if (tokenData.provider == TokenProviderType::desktop)
+            {
+                // Skip the subcribe step, enable the UI for testing.
+                callback(true, tokenData);
+                resetCurrentRequest();
+                return;
+            }
 
             const auto subscribeRequest =
                 createSubscribeRequest(targetCredentials, systems, tokenData);

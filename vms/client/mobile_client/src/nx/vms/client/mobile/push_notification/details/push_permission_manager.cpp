@@ -8,7 +8,8 @@ namespace nx::vms::client::mobile::details {
 
 struct PushPermissionManager::Private
 {
-    PushPermission permission = PushPermission::unknown;
+    // Enable notification on desktop for testing.
+    PushPermission permission = PushPermission::authorized;
 };
 
 PushPermissionManager::PushPermissionManager(QObject* parent):

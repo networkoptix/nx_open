@@ -35,11 +35,13 @@ public:
         load(cloudSystemId, imageUrl, threadGuarded(
             [this, imageUrl](const QByteArray& data)
             {
-                m_image.loadFromData(data);
-
-                const auto ptr = reinterpret_cast<const std::byte*>(data.data());
-                std::vector<std::byte> result{ptr, ptr + data.length()};
-                appContext()->pushNotificationStorage()->saveImage(imageUrl.toStdString(), result);
+                if (m_image.loadFromData(data))
+                {
+                    const auto ptr = reinterpret_cast<const std::byte*>(data.data());
+                    std::vector<std::byte> result{ptr, ptr + data.length()};
+                    appContext()->pushNotificationStorage()->saveImage(
+                        imageUrl.toStdString(), result);
+                }
 
                 emit finished();
             }));
