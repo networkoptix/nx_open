@@ -93,6 +93,7 @@ set(translations
     en_GB
     fr_FR
     cs_CZ
+    da_DK
     de_DE
     fi_FI
     ru_RU
