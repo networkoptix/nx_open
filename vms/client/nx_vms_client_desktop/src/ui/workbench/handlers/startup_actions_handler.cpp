@@ -520,8 +520,8 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     logonData.secondaryInstance = true;
     logonData.connectScenario = ConnectScenario::connectUsingCommand;
 
-    if (uri.userAuthType == nx::vms::utils::SystemUri::UserAuthType::cloud
-        || uri.hasCloudSystemAddress())
+    if (uri.userAuthType == SystemUri::UserAuthType::cloud
+        || (uri.userAuthType != SystemUri::UserAuthType::temporary && uri.hasCloudSystemAddress()))
     {
         logonData.userType = nx::vms::api::UserType::cloud;
     }
@@ -667,7 +667,8 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
             this, "Loaded auth data, refresh token length: %1", authData.refreshToken.length());
     }
 
-    if (authData.empty() && uri.hasCloudSystemAddress())
+    if (authData.empty() && uri.hasCloudSystemAddress()
+        && uri.userAuthType != nx::vms::utils::SystemUri::UserAuthType::temporary)
     {
         // Cloud system id is provided without auth data.
         authData = OauthLoginDialog::login(
