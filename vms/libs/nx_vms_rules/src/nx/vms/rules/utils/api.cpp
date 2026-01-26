@@ -51,10 +51,10 @@ int propertyType(const QMetaObject* meta, const QString& name)
 }
 
 // Skip empty strings, arrays, and objects in the API output.
-bool isRequiredInApi(const QJsonValue& value)
+bool isRequiredInApi(const QJsonValue& value, bool allowEmptyArrays = false)
 {
     if (value.isArray() && value.toArray().isEmpty())
-        return false;
+        return allowEmptyArrays;
 
     if (value.isString() && value.toString().isEmpty())
         return false;
@@ -65,7 +65,10 @@ bool isRequiredInApi(const QJsonValue& value)
     return true;
 }
 
-std::pair<QString, QJsonValue> toApi(const QString& fieldName, const Field* field)
+std::pair<QString, QJsonValue> toApi(
+    const QString& fieldName,
+    const Field* field,
+    bool allowEmptyArrays = false)
 {
     auto propMap = serializeProperties(field, nx::utils::propertyNames(field));
     if (propMap.isEmpty())
@@ -75,7 +78,7 @@ std::pair<QString, QJsonValue> toApi(const QString& fieldName, const Field* fiel
     {
         const auto& propValue = propMap.first();
 
-        if (!isRequiredInApi(propValue))
+        if (!isRequiredInApi(propValue, allowEmptyArrays))
             return {};
 
         return toApi(fieldName, propValue, propertyType(field->metaObject(), propMap.firstKey()));
@@ -85,7 +88,7 @@ std::pair<QString, QJsonValue> toApi(const QString& fieldName, const Field* fiel
     for (const auto& [name, value]: propMap.asKeyValueRange())
     {
         const auto converted = toApi(name, value, propertyType(field->metaObject(), name));
-        if (isRequiredInApi(converted.second))
+        if (isRequiredInApi(converted.second, allowEmptyArrays))
             asObject[converted.first] = converted.second;
     }
 
@@ -294,7 +297,7 @@ api::EventInfo serialize(const BasicEvent* event, UuidList ruleIds)
     return result;
 }
 
-nx::vms::api::rules::RuleV4 toApi(const Rule* rule)
+nx::vms::api::rules::RuleV4 toApi(const Rule* rule, bool allowEmptyArrays)
 {
     nx::vms::api::rules::RuleV4 result;
 
@@ -325,7 +328,7 @@ nx::vms::api::rules::RuleV4 toApi(const Rule* rule)
         if (!field->properties().visible)
             continue;
 
-        if (auto actionField = toApi(name, field); !actionField.first.isEmpty())
+        if (auto actionField = toApi(name, field, allowEmptyArrays); !actionField.first.isEmpty())
             result.action.insert(std::move(actionField));
     }
 

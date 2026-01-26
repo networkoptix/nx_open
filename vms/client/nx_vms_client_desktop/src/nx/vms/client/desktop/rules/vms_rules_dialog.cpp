@@ -227,7 +227,7 @@ void VmsRulesDialog::saveRuleImpl(const vms::rules::Rule* rule)
     if (!api)
         return;
 
-    const auto apiRule = vms::rules::toApi(rule);
+    const auto apiRule = vms::rules::toApi(rule, /* allowEmptyArrays */ true);
     api->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
         /*helper*/ nullptr,
         nx::network::http::Method::put,
