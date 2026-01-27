@@ -49,6 +49,12 @@ Sheet
                     ? treeView.expandAll
                     : treeView.expandDefault)
             }
+
+            onAccepted:
+            {
+                if (text.length !== 0)
+                    treeView.expandAll()
+            }
         }
 
         Item
