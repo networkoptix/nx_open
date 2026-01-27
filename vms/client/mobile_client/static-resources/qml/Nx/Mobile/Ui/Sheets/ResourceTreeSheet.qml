@@ -33,7 +33,7 @@ Sheet
             id: searchEdit
 
             Layout.fillWidth: true
-            height: 36
+            implicitHeight: 36
 
             Layout.leftMargin: 16
             Layout.rightMargin: 16
