@@ -123,6 +123,7 @@ private:
     QElapsedTimer m_elapsedTimer;
 
     StatisticsOverlayWidget* m_statisticsOverlayWidget = nullptr;
+    QGraphicsLinearLayout* m_legendOverlayLayout = nullptr;
 
     /** Button bars with corresponding buttons */
     QnImageButtonBar *m_legendButtonBar[ButtonBarCount];

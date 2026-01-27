@@ -346,7 +346,7 @@ protected:
             font.setPixelSize(legendFontSize);
             QnScopedPainterFontRollback fontRollback(painter, font);
             painter->setPen(QPen(m_color, 3));
-            painter->drawText(textRect, m_text);
+            painter->drawText(textRect, Qt::TextDontClip, m_text);
         }
         painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
         base_type::paint(painter, startState, endState, progress, glWidget, imgRect);
@@ -400,19 +400,34 @@ protected:
 
         QRectF rect = option->rect;
 
-        const qreal horizontalOffset = 52;
-        const qreal offsetTop =
+        qreal topOffset =
             m_widget->titleBar()->geometry().y() + m_widget->titleBar()->geometry().height();
+        qreal leftOffset = 36;
+        qreal rightOffset = 36;
+        qreal bottomOffset = 0;
+
+        // If legend is hidden, expand graph into legend area.
+        if (!m_widget->isLegendVisible() && m_widget->m_legendOverlayLayout)
+        {
+            bottomOffset = -m_widget->m_legendOverlayLayout->geometry().height() - 16;
+            leftOffset = 0;
+        }
+
+        // If title is hidden, expand graph into title area.
+        if (!detail::OverlayedBase::isOverlayWidgetVisible(m_widget->titleBar()))
+        {
+            topOffset = 0;
+        }
 
         static constexpr qreal kFramePenWidth = 3.0;
 
-        const qreal gridWidth = rect.width() - horizontalOffset * 2;
-        const qreal gridHeight = rect.height() - offsetTop;
+        const qreal gridWidth = rect.width() - leftOffset - rightOffset;
+        const qreal gridHeight = rect.height() - topOffset - bottomOffset;
 
         if (gridWidth <= 0 || gridHeight <= 0)
             return;
 
-        const QRectF inner(horizontalOffset, offsetTop, gridWidth, gridHeight);
+        const QRectF inner(leftOffset, topOffset, gridWidth, gridHeight);
 
         // One point is cut from the beginning and one from the end.
         const auto pointsLimit = m_widget->m_pointsLimit - 2;
@@ -435,7 +450,7 @@ protected:
             const QSize graphSize = QSize(inner.width() + xStep, inner.height());
 
             painter->setClipRect(inner);
-            painter->translate(horizontalOffset - elapsedStep * xStep, offsetTop);
+            painter->translate(leftOffset - elapsedStep * xStep, topOffset);
 
             paintGraph(painter, graphSize, xStep);
         }
@@ -478,33 +493,25 @@ protected:
             painter->drawRect(inner);
 
             /* Draw text values on the right side */
+            foreach (QString key, m_widget->m_sortedKeys)
             {
-                qreal opacity = painter->opacity();
-                qreal baseOpacity = m_widget->isLegendVisible() ? 1.0 : 0.0;
-                painter->setOpacity(opacity * baseOpacity);
+                const QnServerResourceWidget::GraphData& data = m_widget->m_graphDataByKey[key];
+                if (!data.visible)
+                    continue;
 
-                foreach (QString key, m_widget->m_sortedKeys)
-                {
-                    const QnServerResourceWidget::GraphData &data = m_widget->m_graphDataByKey[key];
-                    if (!data.visible)
-                        continue;
+                qreal interValue = displayValues[key];
+                if (interValue < 0)
+                    continue;
 
-                    qreal interValue = displayValues[key];
-                    if (interValue < 0)
-                        continue;
+                const QString text = QString("%1%").arg(qRound(interValue * 100.0));
 
-                    const QString text = QString("%1%").arg(qRound(interValue * 100.0));
+                const qreal xRight = inner.x() + inner.width()
+                    + (rightOffset - painter->fontMetrics().horizontalAdvance(text)) / 2;
+                const qreal y = inner.y() + qMax(inner.y(), inner.height() * (1.0 - interValue));
 
-                    qreal xRight = inner.x() + inner.width()
-                        + (horizontalOffset - painter->fontMetrics().horizontalAdvance(text)) / 2;
-                    qreal y = inner.y() + qMax(inner.y(), inner.height() * (1.0 - interValue));
-
-                    main_pen.setColor(toTransparent(data.color, data.opacity));
-                    painter->setPen(main_pen);
-                    painter->drawText(xRight, y, text);
-                }
-
-                painter->setOpacity(opacity);
+                main_pen.setColor(toTransparent(data.color, data.opacity));
+                painter->setPen(main_pen);
+                painter->drawText(xRight, y, text);
             }
         }
     }
@@ -710,13 +717,13 @@ void QnServerResourceWidget::addOverlays()
     m_statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
 
     QGraphicsLinearLayout* mainOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    mainOverlayLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
-    mainOverlayLayout->setSpacing(0);
+    mainOverlayLayout->setContentsMargins(16, 16, 16, 16);
+    mainOverlayLayout->setSpacing(16);
     mainOverlayLayout->addItem(m_statisticsOverlayWidget);
 
-    QGraphicsLinearLayout* legendOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    legendOverlayLayout->setContentsMargins(0, 16, 0, 16);
-    legendOverlayLayout->setSpacing(4);
+    m_legendOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    m_legendOverlayLayout->setContentsMargins(0, 0, 0, 0);
+    m_legendOverlayLayout->setSpacing(0);
 
     for (int i = 0; i < ButtonBarCount; ++i)
     {
@@ -728,14 +735,14 @@ void QnServerResourceWidget::addOverlays()
             this, &QnServerResourceWidget::updateGraphVisibility);
 
         QGraphicsLinearLayout* legendRowLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-        legendRowLayout->setContentsMargins(0, 0, 0, 0);
+        legendRowLayout->setContentsMargins(0, 6, 0, 6);
         legendRowLayout->addStretch();
         legendRowLayout->addItem(m_legendButtonBar[i]);
         legendRowLayout->addStretch();
-        legendOverlayLayout->addItem(legendRowLayout);
+        m_legendOverlayLayout->addItem(legendRowLayout);
     }
 
-    mainOverlayLayout->addItem(legendOverlayLayout);
+    mainOverlayLayout->addItem(m_legendOverlayLayout);
 
     QnViewportBoundWidget* mainOverlayWidget = new QnViewportBoundWidget(this);
     mainOverlayWidget->setLayout(mainOverlayLayout);
