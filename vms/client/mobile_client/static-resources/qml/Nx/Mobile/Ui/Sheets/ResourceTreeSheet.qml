@@ -102,29 +102,28 @@ Sheet
                             return searchEdit.regExp
                     }
 
-                    onClicked:
+                    TapHandler
                     {
-                        if (hasChildren)
+                        acceptedButtons: Qt.LeftButton
+                        gesturePolicy: TapHandler.ReleaseWithinBounds
+                        onTapped:
                         {
-                            treeView.toggleExpanded(row)
-                        }
-                        else if (delegateItem.isCamera)
-                        {
-                            windowContext.deprecatedUiController.layout = null
-                            Workflow.openVideoScreen(resource);
-                            control.close()
-                        }
-                        else if (delegateItem.isLayout)
-                        {
-                            Workflow.openResourcesScreen()
-                            windowContext.deprecatedUiController.layout = resource
-                            control.close()
-                        }
-                        else if (delegateItem.isAllDevices)
-                        {
-                            Workflow.openResourcesScreen()
-                            windowContext.deprecatedUiController.layout = null
-                            control.close()
+                            if (hasChildren)
+                            {
+                                treeView.toggleExpanded(row)
+                            }
+                            else if (delegateItem.isCamera)
+                            {
+                                windowContext.deprecatedUiController.layout = null
+                                Workflow.openVideoScreen(resource);
+                                control.close()
+                            }
+                            else if (delegateItem.isLayout || delegateItem.isAllDevices)
+                            {
+                                Workflow.openResourcesScreen()
+                                windowContext.deprecatedUiController.layout = delegateItem.isLayout ? resource : null
+                                control.close()
+                            }
                         }
                     }
                 }
