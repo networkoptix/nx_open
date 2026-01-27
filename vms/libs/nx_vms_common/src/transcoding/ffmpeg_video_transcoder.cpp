@@ -253,9 +253,10 @@ AVCodecParameters* QnFfmpegVideoTranscoder::getCodecParameters()
 
 int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
-    m_encodeTimer.restart();
+    NX_VERBOSE(this, "Transcode video data: %1, target codec: %2", media, m_config.targetCodecId);
 
-    if( result )
+    m_encodeTimer.restart();
+    if (result)
         result->reset();
 
     const auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
