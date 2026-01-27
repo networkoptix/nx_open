@@ -35,6 +35,8 @@ Item
         textField.clear()
     }
 
+    signal accepted()
+
     ColoredImage
     {
         id: searchIcon
@@ -64,7 +66,11 @@ Item
         inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
         cursorColor: color
 
-        onAccepted: Qt.inputMethod.hide()
+        onAccepted:
+        {
+            Qt.inputMethod.hide()
+            control.accepted()
+        }
 
         leftPadding: 32
         rightPadding: clearButton.visible ? 32 : 4
