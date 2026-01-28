@@ -792,6 +792,9 @@ quint64 AsyncClient::bytesRead() const
 void AsyncClient::stopWhileInAioThread()
 {
     m_socket.reset();
+    // Remove close handler before destroying pipeline to prevent callback on destroyed object.
+    if (m_messagePipeline)
+        m_messagePipeline->removeCloseHandler(m_closeHandlerId);
     m_messagePipeline.reset();
     m_requestBody.reset();
 
@@ -864,6 +867,9 @@ void AsyncClient::reportConnectionFailure(SystemError::ErrorCode err)
         return;
 
     m_socket.reset();
+    // Remove close handler before destroying pipeline to prevent callback on destroyed object.
+    if (m_messagePipeline)
+        m_messagePipeline->removeCloseHandler(m_closeHandlerId);
     m_messagePipeline.reset(); //< Closing failed connection so that it is not reused.
 }
 
@@ -877,6 +883,20 @@ void AsyncClient::onRequestSent(SystemError::ErrorCode errorCode)
         {
             m_harEntry->setError(SystemError::toString(errorCode));
             m_harEntry.reset();
+        }
+
+        m_lastSysErrorCode = errorCode;
+
+        // Attempt to reconnect if the reused connection was closed by the server.
+        if (!reconnectIfAppropriate())
+        {
+            m_state = State::sFailed;
+            if (emitDone() != Result::proceed)
+                return;
+            // Remove close handler before destroying pipeline to prevent callback on destroyed object.
+            if (m_messagePipeline)
+                m_messagePipeline->removeCloseHandler(m_closeHandlerId);
+            m_messagePipeline.reset();
         }
         return;
     }
@@ -1070,8 +1090,16 @@ void AsyncClient::onMessageEnd()
 
 void AsyncClient::onConnectionClosed(SystemError::ErrorCode errorCode)
 {
+    // If pipeline is already null, we're being called during destruction/reconnect - ignore.
+    // This can happen when m_messagePipeline.reset() triggers close handlers during its destruction.
+    if (!m_messagePipeline)
+        return;
+
     NX_VERBOSE(this, "Connection is closed in state %1. Url %2. %3",
         toString(m_state), m_contentLocationUrl, SystemError::toString(errorCode));
+
+    if (m_state == State::sInit || m_state == State::sWaitingConnectToHost)
+        return;
 
     m_lastSysErrorCode = errorCode;
 
@@ -1159,6 +1187,8 @@ void AsyncClient::initiateHttpMessageDelivery()
                     break;
 
                 case ConnectionReusePolicy::noReuse:
+                    if (m_messagePipeline)
+                        m_messagePipeline->removeCloseHandler(m_closeHandlerId);
                     m_messagePipeline.reset();
                     initiateTcpConnection();
                     break;
@@ -1608,6 +1638,8 @@ bool AsyncClient::reconnectIfAppropriate()
     if ((m_state == State::sSendingRequest || m_state == State::sReceivingResponse) &&
         m_messageReceivedThroughTheCurrentConnectionCount > 0)
     {
+        if (m_messagePipeline)
+            m_messagePipeline->removeCloseHandler(m_closeHandlerId);
         m_messagePipeline.reset();
         initiateHttpMessageDelivery();
         return true;
