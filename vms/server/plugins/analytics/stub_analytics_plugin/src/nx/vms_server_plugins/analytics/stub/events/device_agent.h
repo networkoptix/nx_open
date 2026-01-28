@@ -5,21 +5,22 @@
 #include <atomic>
 #include <condition_variable>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <thread>
-#include <vector>
 
-#include <nx/sdk/analytics/i_event_metadata.h>
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
+#include <nx/sdk/analytics/i_event_metadata.h>
 
 #include "engine.h"
-#include "stub_analytics_plugin_events_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
 namespace events {
+
+using namespace std::string_literals;
 
 const std::string kDeclareAdditionalEventTypesSetting = "declareAdditionalEventTypesSetting";
 const std::string kGenerateEventsSetting = "generateEvents";
@@ -47,14 +48,12 @@ private:
     int64_t usSinceEpoch() const;
     void startFetchingMetadata(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
     void stopFetchingMetadata();
-    void parseSettings();
+
     void eventThreadLoop();
     void startEventThread();
     void stopEventThread();
 
 private:
-    Engine* const m_engine;
-
     std::unique_ptr<std::thread> m_eventThread;
     std::mutex m_eventThreadMutex;
     std::condition_variable m_eventThreadCondition;
@@ -90,6 +89,9 @@ const std::string kSoundRelatedEventGroup = "nx.stub.soundRelated";
 const std::string kAdditionalEventType = "nx.stub.additionalEvent1";
 const std::string kAdditionalEventType2 = "nx.stub.additionalEvent2";
 const std::string kEventWithImageEventType = "nx.stub.eventWithImage";
+const auto kMixedEventGroup = "nx.stub.mixed"s;
+const auto kInstantEventType = "nx.stub.instant"s;
+const auto kProlongedEventType = "nx.stub.prolonged"s;
 
 } // namespace events
 } // namespace stub

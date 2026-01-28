@@ -2,8 +2,6 @@
 
 #include "engine.h"
 
-#include <nx/sdk/helpers/settings_response.h>
-
 #include "device_agent.h"
 #include "stub_analytics_plugin_events_ini.h"
 
