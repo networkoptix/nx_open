@@ -84,7 +84,7 @@ Page
                     {
                         return ("%1p").arg(player.videoQuality);
                     }
-                    return tr("Unknown");
+                    return qsTr("Unknown", "Unknown video quality");
                 }
                 font.pixelSize: 16
                 color: ColorTheme.colors.light16

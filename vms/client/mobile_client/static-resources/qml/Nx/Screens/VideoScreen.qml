@@ -263,7 +263,7 @@ Page
         y: 0
         x: -windowParams.leftMargin
         width: mainWindow.width
-        height: width / 1.6
+        height: width / (16.0 / 9.0)
 
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
         opacity: d.cameraUiOpacity
@@ -901,19 +901,21 @@ Page
     {
         id: content
 
-        visible: false
-
-        width: windowParams.availableWidth
-        height: windowParams.availableHeight - header.height
-        y: header.visible ? 0 : header.height
+        anchors.top: video.top
+        anchors.bottom: video.bottom
+        width: parent.width
 
         Loader
         {
             id: informationLabelLoader
+
+            y: 8
             anchors.right: parent.right
             anchors.rightMargin: 8
+
             opacity: d.cameraUiOpacity
             active: appContext.settings.showCameraInfo
+
             sourceComponent: InformationLabel
             {
                 videoScreenController: controller
@@ -929,7 +931,7 @@ Page
             y: needOffset ? -header.height : 0
             x: -windowParams.leftMargin
             width: mainWindow.width
-            height: mainWindow.height - (needOffset ? 0 : header.height)
+            height: parent.height + (needOffset ? 0 : header.height)
 
             visible: active
             active: d.cameraWarningVisible
@@ -943,7 +945,7 @@ Page
 
                     rightPadding: 8 + windowParams.rightMargin
                     leftPadding: 8 + windowParams.leftMargin
-                    compact: videoScreen.height < 540
+                    compact: video.height < 500
                     state: controller.dummyState
 
                     onButtonClicked:
@@ -1000,7 +1002,7 @@ Page
 
             x: -windowParams.leftMargin
             width: mainWindow.width
-            height: mainWindow.height
+            height: parent.height
             parent: videoScreen
 
             onClicked:
