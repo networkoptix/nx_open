@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
-      <translation>Sprog Navn</translation>
+      <translation>Danish</translation>
     </message>
   </context>
   <context>
