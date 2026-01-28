@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/kit/ini_config.h>
-#include <nx/sdk/analytics/helpers/pixel_format.h>
 
 namespace nx {
 namespace vms_server_plugins {

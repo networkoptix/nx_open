@@ -2,22 +2,13 @@
 
 #include "device_agent.h"
 
-#include <vector>
-#include <string>
-#include <mutex>
 #include <chrono>
-#include <ctime>
-#include <thread>
-#include <type_traits>
+#include <vector>
 
-#include <nx/kit/utils.h>
-#include <nx/kit/json.h>
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
-#include <nx/sdk/helpers/settings_response.h>
 
 #include "../utils.h"
-
 #include "stub_analytics_plugin_events_ini.h"
 
 #undef NX_PRINT_PREFIX
@@ -47,23 +38,8 @@ struct EventDescriptor
     std::string eventTypeId;
     std::string caption;
     std::string description;
+    EventIsActive isActive = EventIsActive::yes;
     std::string prolongedEventKey;
-    EventIsActive isActive;
-
-    EventDescriptor(
-        std::string eventTypeId,
-        std::string caption,
-        std::string description,
-        EventIsActive isActive = EventIsActive::yes,
-        std::string prolongedEventKey = "")
-        :
-        eventTypeId(std::move(eventTypeId)),
-        caption(std::move(caption)),
-        description(std::move(description)),
-        prolongedEventKey(prolongedEventKey),
-        isActive(isActive)
-    {
-    }
 };
 
 static const std::vector<EventDescriptor> kEventsToFire = {
@@ -135,14 +111,32 @@ static const std::vector<EventDescriptor> kEventsToFire = {
         kAdditionalEventType,
         "Caption: Additional Event",
         "Description: Additional Event",
-    }
+    },
+    {
+        kProlongedEventType,
+        "Prolonged event START",
+        "Prolonged event START description",
+        EventIsActive::yes,
+        "key3"
+    },
+    {
+        kInstantEventType,
+        "Instant event",
+        "Instant event description",
+    },
+    {
+        kProlongedEventType,
+        "Prolonged event STOP",
+        "Prolonged event STOP description",
+        EventIsActive::no,
+        "key3"
+    },
 };
 
 } // namespace
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    ConsumingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT, engine->integration()->instanceId()),
-    m_engine(engine)
+    ConsumingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT, engine->integration()->instanceId())
 {
     startEventThread();
 }
@@ -191,7 +185,9 @@ R"json(
             )
             : ""
         ) + R"json(,
-        { "eventTypeId": ")json" + kEventWithImageEventType + R"json(" }
+        { "eventTypeId": ")json" + kEventWithImageEventType + R"json(" },
+        { "eventTypeId": ")json" + kInstantEventType + R"json(" },
+        { "eventTypeId": ")json" + kProlongedEventType + R"json(" }
     ],
     "typeLibrary": {
         "eventTypes": [
@@ -208,9 +204,26 @@ R"json(
                 "id": ")json" + kGunshotEventType + R"json(",
                 "name": "Gunshot",
                 "groupId": ")json" + kSoundRelatedEventGroup + R"json("
+            },
+            {
+                "id": ")json" + kInstantEventType + R"json(",
+                "name": "Instant event",
+                "groupId": ")json" + kMixedEventGroup + R"json("
+            },
+            {
+                "id": ")json" + kProlongedEventType + R"json(",
+                "name": "Prolonged event",
+                "flags": "stateDependent",
+                "groupId": ")json" + kMixedEventGroup + R"json("
             })json"
             + (m_deviceAgentSettings.declareAdditionalEventTypes ? kAdditionalEventTypes : "")
             + R"json(
+        ],
+        "groups": [
+            {
+                "id": ")json" + kMixedEventGroup + R"json(",
+                "name": "Mixed event duration"
+            }
         ]
     }
 })json";
