@@ -39,7 +39,6 @@ public:
 
     void reset()
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
         ++m_version;
     }
 
@@ -63,16 +62,10 @@ protected:
         return m_value;
     }
 
-    void update(nx::Locker<nx::Mutex>* lock) const
+    void update(nx::Locker<nx::Mutex>* /*lock*/) const
     {
         int version = ++m_version;
-
-        lock->unlock();
         ValueType value = m_valueGenerator();
-        lock->relock();
-
-        if (version < m_valueVersion)
-            return; //< Already updated
 
         m_valueVersion = version;
         m_value = std::move(value);
@@ -83,7 +76,7 @@ protected:
 
     mutable ValueType m_value;
     mutable int64_t m_valueVersion = -1;
-    mutable int64_t m_version = 0;
+    mutable std::atomic<int64_t> m_version = 0;
     const MoveOnlyFunc<ValueType()> m_valueGenerator;
 };
 
