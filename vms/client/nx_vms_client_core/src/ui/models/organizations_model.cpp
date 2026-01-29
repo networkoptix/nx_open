@@ -246,6 +246,13 @@ struct OrganizationsModel::Private
 
     QPersistentModelIndex currentRoot;
 
+    // Cache for change detection to avoid unnecessary model resets
+    std::unordered_map<nx::Uuid /*orgId*/, std::vector<GroupStructure>> orgStructureCache;
+    // Cache systems per organization
+    std::unordered_map<
+        nx::Uuid /*orgId*/,
+        std::unordered_map<nx::Uuid /*systemId*/, SystemInOrganization>> orgSystemsCache;
+
     Private(OrganizationsModel* q): q(q)
     {
         // Create root node and 'Sites' node as it's child at index 0. 'Sites' node will always be
@@ -266,9 +273,8 @@ struct OrganizationsModel::Private
             ? QModelIndex()
             : q->createIndex(parent->row(), 0, parent);
 
-        q->beginInsertRows(parentIndex, row, row);
+        const ScopedInsertRows insertRows(q, parentIndex, row, row);
         parent->insert(row, std::move(node));
-        q->endInsertRows();
     }
 
     // Remove single node at index 'row' under 'parent'. Report model changes.
@@ -281,9 +287,8 @@ struct OrganizationsModel::Private
             ? QModelIndex()
             : q->createIndex(parent->row(), 0, parent);
 
-        q->beginRemoveRows(parentIndex, row, row);
+        const ScopedRemoveRows removeRows(q, parentIndex, row, row);
         parent->remove(row);
-        q->endRemoveRows();
     }
 
     // Remove all nodes under 'parent'. Report model changes.
@@ -299,9 +304,8 @@ struct OrganizationsModel::Private
         if (parent->allChildren().size() == 0)
             return;
 
-        q->beginRemoveRows(parentIndex, 0, parent->allChildren().size() - 1);
+        const ScopedRemoveRows removeRows(q, parentIndex, 0, parent->allChildren().size() - 1);
         parent->clear();
-        q->endRemoveRows();
     }
 
     void setChannelPartners(const ChannelPartnerList& data)
@@ -413,9 +417,7 @@ struct OrganizationsModel::Private
     }
 
     // Set group (folder) structure under 'parent' node recursively.
-    void setNodeGroups(
-        TreeNode* parent,
-        const std::vector<GroupStructure>& groups)
+    void setNodeGroups(TreeNode* parent, const std::vector<GroupStructure>& groups)
     {
         std::unordered_set<nx::Uuid> prevIds;
 
@@ -473,13 +475,24 @@ struct OrganizationsModel::Private
         if (!orgNode)
             return;
 
+        const auto cachedIt = orgStructureCache.find(orgId);
+        if (cachedIt != orgStructureCache.end() && cachedIt->second == data)
+            return;
+
         if (data.empty())
         {
             clear(orgNode);
+            if (cachedIt != orgStructureCache.end())
+                orgStructureCache.erase(cachedIt);
             return;
         }
 
         setNodeGroups(orgNode, data);
+
+        if (cachedIt != orgStructureCache.end())
+            cachedIt->second = data;
+        else
+            orgStructureCache.emplace(orgId, data);
     }
 
     void gatherSystems(TreeNode* parent, std::unordered_set<nx::Uuid>& systems)
@@ -501,25 +514,38 @@ struct OrganizationsModel::Private
         if (!orgNode)
             return;
 
-        // Remove old systems
-        std::unordered_set<nx::Uuid> oldIds;
-        gatherSystems(orgNode, oldIds);
-
+        auto& cachedSystems = orgSystemsCache[orgId];
+        std::unordered_map<nx::Uuid, SystemInOrganization> newSystems;
         for (const auto& system: data)
+            newSystems[system.systemId] = system;
+
+        const auto needsUpdate = [&cachedSystems](const auto& it)
+            {
+                const auto cachedIt = cachedSystems.find(it.first);
+                return cachedIt == cachedSystems.end() || cachedIt->second != it.second;
+            };
+
+        const bool hasChanges = (cachedSystems.size() != newSystems.size())
+            || std::any_of(newSystems.cbegin(), newSystems.cend(), needsUpdate);
+
+        if (!hasChanges)
+            return;
+
+        for (const auto& [systemId, _]: cachedSystems)
         {
-            if (oldIds.contains(system.systemId))
-                oldIds.erase(system.systemId); //< System is still present.
+            if (!newSystems.contains(systemId))
+            {
+                if (const auto node = nodes.find(systemId))
+                    remove(node->row(), node->parentNode());
+            }
         }
 
-        for (const auto& id: oldIds)
-        {
-            if (auto node = nodes.find(id))
-                remove(node->row(), node->parentNode());
-        }
-
-        // Add new systems
+        // Add new or update existing systems
         for (const auto& system: data)
         {
+            if (!needsUpdate(std::pair{system.systemId, system}))
+                continue;
+
             auto parentNode = nodes.find(system.groupId.isNull() ? orgId : system.groupId);
             if (!parentNode)
                 continue;
@@ -535,6 +561,8 @@ struct OrganizationsModel::Private
 
             insert(row, nodes.create(system), parentNode);
         }
+
+        cachedSystems = std::move(newSystems);
     }
 
     QModelIndex sitesRoot() const
@@ -570,9 +598,8 @@ struct OrganizationsModel::Private
         if (prevRowCount == 0)
             return;
 
-        q->beginRemoveRows(sitesRoot(), 0, prevRowCount - 1);
+        const ScopedRemoveRows removeRows(q, sitesRoot(), 0, prevRowCount - 1);
         sitesModelRowCount = 0;
-        q->endRemoveRows();
     }
 
     void endSitesReset()
@@ -581,9 +608,8 @@ struct OrganizationsModel::Private
         if (newRowCount == 0)
             return;
 
-        q->beginInsertRows(sitesRoot(), 0, newRowCount - 1);
+        const ScopedInsertRows insertRows(q, sitesRoot(), 0, newRowCount - 1);
         sitesModelRowCount = newRowCount;
-        q->endInsertRows();
     }
 
     void setHasChannelPartners(bool value);
@@ -922,7 +948,7 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
     return {};
 }
 
-QModelIndex OrganizationsModel::parent(const QModelIndex &index) const
+QModelIndex OrganizationsModel::parent(const QModelIndex& index) const
 {
     if (!index.isValid())
         return {};
@@ -945,7 +971,7 @@ QModelIndex OrganizationsModel::parent(const QModelIndex &index) const
         : QModelIndex{};
 }
 
-QModelIndex OrganizationsModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex OrganizationsModel::index(int row, int column, const QModelIndex& parent) const
 {
     if (!hasIndex(row, column, parent))
         return {};
@@ -966,7 +992,7 @@ QModelIndex OrganizationsModel::index(int row, int column, const QModelIndex &pa
     return {};
 }
 
-bool OrganizationsModel::hasChildren(const QModelIndex &parent) const
+bool OrganizationsModel::hasChildren(const QModelIndex& parent) const
 {
     if (!d->root)
         return false;
@@ -1526,17 +1552,17 @@ void OrganizationsModel::setSystemsModel(QAbstractItemModel* systemsModel)
 
     if (diff > 0)
     {
-        beginInsertRows(sitesRoot, d->sitesModelRowCount, d->sitesModelRowCount + diff - 1);
+        const ScopedInsertRows insertRows(
+            this, sitesRoot, d->sitesModelRowCount, d->sitesModelRowCount + diff - 1);
         d->sitesModel = systemsModel;
         d->sitesModelRowCount = newRowCount;
-        endInsertRows();
     }
     else if (diff < 0)
     {
-        beginRemoveRows(sitesRoot, d->sitesModelRowCount + diff, d->sitesModelRowCount - 1);
+        const ScopedRemoveRows removeRows(
+            this, sitesRoot, d->sitesModelRowCount + diff, d->sitesModelRowCount - 1);
         d->sitesModel = systemsModel;
         d->sitesModelRowCount = newRowCount;
-        endRemoveRows();
     }
     else
     {
