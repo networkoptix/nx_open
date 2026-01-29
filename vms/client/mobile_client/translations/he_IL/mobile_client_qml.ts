@@ -124,6 +124,11 @@
       <source>Change Quality</source>
       <translation>שינוי איכות</translation>
     </message>
+    <message>
+      <source>Unknown</source>
+      <comment>Unknown video quality</comment>
+      <translation type="unfinished">Unknown</translation>
+    </message>
   </context>
   <context>
     <name>ChannelPartner</name>
