@@ -815,7 +815,16 @@ Page
             if (isCurrentRootInvalid)
             {
                 sessionsScreen.rootType = undefined
-                sessionsScreen.rootIndex = NxGlobals.invalidModelIndex()
+                
+                // IMPORTANT:
+                // This property is used by many bindings and state conditions.
+                // Re-assigning it, even with the same value, forces synchronous
+                // re-evaluation of those bindings and may be expensive.
+                // During model population `updateVisibility()` is triggered very
+                // frequently (e.g. on rowsInserted), so we must avoid redundant
+                // assignments to prevent UI stalls.
+                if (sessionsScreen.rootIndex !== NxGlobals.invalidModelIndex())
+                    sessionsScreen.rootIndex = NxGlobals.invalidModelIndex()
 
                 linearizationListModel.resetSourceRoot()
                 siteList.currentRoot = linearizationListModel.sourceRoot

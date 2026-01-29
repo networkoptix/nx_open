@@ -7,6 +7,7 @@
 #include <QtCore/QSortFilterProxyModel>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/utils/persistent_index_watcher.h>
@@ -29,11 +30,11 @@ struct SystemInOrganization;
  * This model doesn't properly track row changes in persistent indexes when source model's layout
  * is changed or rows are moved.
  */
-class NX_VMS_CLIENT_CORE_API OrganizationsModel: public QAbstractItemModel
+class NX_VMS_CLIENT_CORE_API OrganizationsModel: public ScopedModelOperations<QAbstractItemModel>
 {
     Q_OBJECT
 
-    using base_type = QAbstractItemModel;
+    using base_type = ScopedModelOperations<QAbstractItemModel>;
 
 public:
     enum RoleId
