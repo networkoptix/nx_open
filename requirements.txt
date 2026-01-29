@@ -4,7 +4,7 @@ conan==1.66.0
 dmgbuild==1.6.5
 PyYAML==5.1.1
 requests==2.25.1
-cmake==3.30.4
+cmake==3.31.10
 ninja==1.10.2
 
 ## The following requirements were added by pip freeze:

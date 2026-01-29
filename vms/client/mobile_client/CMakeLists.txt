@@ -421,6 +421,14 @@ if(IOS)
         TRANSLATIONS ${translation_files}
     )
 
+    #TODO: Assigning dependencies between generated targets does not look good. We need to find a
+    # better way to make Xcode generator happy.
+    # The issue happens when two targets depend on the same generated file. Xcode generator does
+    # not allow this unless these targets depend on each other. This workaround adds such
+    # dependencies.
+    add_dependencies(mobile_client_copy_assets mobile_client_external_resources)
+    add_dependencies(mobile_client_copy_translations mobile_client_translations)
+
     # Used by ios/extension.
     add_library(push_notification_storage STATIC
         src/nx/vms/client/mobile/push_notification/details/push_notification_storage.cpp)
@@ -466,7 +474,7 @@ if(IOS)
         POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E
         copy_directory "${appex_dir}/../push_notification_extension.appex"
         "${app_dir}/PlugIns/push_notification_extension.appex"
-        MAIN_DEPENDENCY push_notification_extension)
+    )
 endif()
 
 # Add Qt Shaders.
