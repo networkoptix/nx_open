@@ -22,7 +22,9 @@ Sheet
 
     title: qsTr("Resources")
 
-    readonly property bool isNothingFound: searchEdit.regExp && treeView.rows === 0
+    property bool pendingDefaultExpand: true
+    property bool isFiltering: false
+    readonly property bool isNothingFound: treeView.rows === 0
 
     ColumnLayout
     {
@@ -38,21 +40,32 @@ Sheet
             Layout.leftMargin: 16
             Layout.rightMargin: 16
 
-            readonly property string text: searchEdit.displayText
-            readonly property var regExp: text.length !== 0
-                ? new RegExp(`(${NxGlobals.makeSearchRegExpNoAnchors(text)})`, 'i')
-                : new RegExp()
+            readonly property string text: searchEdit.displayText.trim()
 
             onTextChanged:
             {
-                Qt.callLater(text.length !== 0
-                    ? treeView.expandAll
-                    : treeView.expandDefault)
+                if (text.length !== 0)
+                {
+                    if (!isFiltering)
+                    {
+                        treeView.saveExpandedState()
+                        isFiltering = true
+                    }
+                    searchModel.filterRegularExpression
+                        = new RegExp(`(${NxGlobals.makeSearchRegExpNoAnchors(text)})`, 'i')
+                    Qt.callLater(treeView.expandAll)
+                }
+                else
+                {
+                    searchModel.filterRegularExpression = new RegExp()
+                    isFiltering = false
+                    Qt.callLater(treeView.restoreExpandedState)
+                }
             }
 
             onAccepted:
             {
-                if (text.length !== 0)
+                if (isFiltering)
                     treeView.expandAll()
             }
         }
@@ -98,14 +111,18 @@ Sheet
                 clip: true
                 rowSpacing: 4
 
+                // Source model indexes to which the view was expanded on the most recent
+                // saveExpandedState() call.
+                property var storedExpandedState: []
+
                 delegate: ResourceTreeDelegate
                 {
                     id: delegateItem
 
                     highlightRegExp:
                     {
-                        if (searchEdit.text.length !== 0)
-                            return searchEdit.regExp
+                        if (control.isFiltering)
+                            return searchModel.filterRegularExpression
                     }
 
                     TapHandler
@@ -132,6 +149,26 @@ Sheet
                             }
                         }
                     }
+                }
+
+                function saveExpandedState()
+                {
+                    storedExpandedState.length = 0
+                    for (let row = 0; row < rows; ++row)
+                    {
+                        storedExpandedState.push(NxGlobals.toPersistent(
+                            searchModel.mapToSource(treeView.index(row, 0))))
+                    }
+                }
+
+                function restoreExpandedState()
+                {
+                    if (storedExpandedState.length === 0)
+                        return
+                    collapseRecursively(-1) //< Collapse tree recursively.
+                    storedExpandedState.forEach(index =>
+                        expandToIndex(searchModel.mapFromSource(NxGlobals.fromPersistent(index))))
+                    storedExpandedState.length = 0
                 }
 
                 function expandAll()
@@ -161,15 +198,25 @@ Sheet
 
     onAboutToShow:
     {
-        treeView.expandDefault()
+        if (pendingDefaultExpand)
+        {
+            treeView.expandDefault()
+            pendingDefaultExpand = false
+        }
     }
 
-    ResourceTreeModel { id: treeModel }
+    ResourceTreeModel
+    {
+        id: treeModel
+        onModelReset:
+        {
+            pendingDefaultExpand = true
+        }
+    }
 
     ResourceTreeSearchModel
     {
         id: searchModel
         sourceModel: treeModel
-        filterRegularExpression: searchEdit.regExp
     }
 }
