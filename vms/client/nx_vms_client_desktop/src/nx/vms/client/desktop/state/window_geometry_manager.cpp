@@ -318,18 +318,10 @@ WindowGeometryState WindowGeometryManager::windowGeometry() const
 void WindowGeometryManager::setWindowGeometry(const WindowGeometryState& value)
 {
     NX_DEBUG(this, "Geometry: %1", nx::reflect::json::serialize(value));
-    const auto currentState = d->control->windowState();
-    if ((currentState.testFlag(Qt::WindowFullScreen) && value.isFullscreen)
-        || (currentState.testFlag(Qt::WindowMaximized) && value.isMaximized))
-    {
-        return;
-    }
-    if (currentState.testAnyFlags(Qt::WindowFullScreen | Qt::WindowMaximized)
-        && !value.isFullscreen
-        && !value.isMaximized)
-    {
-        d->control->setWindowState(Qt::WindowNoState);
-    }
+
+    // It is necessary to reset the window state flags before setting the geometry
+    // to work correctly on any OS.
+    d->control->setWindowState(Qt::WindowNoState);
 
     if (!value.geometry.isEmpty())
         d->control->setWindowRect(value.geometry);
