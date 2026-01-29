@@ -40,6 +40,11 @@ def generate_conan_package_paths(conanfile):
     for name, path in packages.items():
         content += f"set(CONAN_{name.upper()}_ROOT \"{path}\")\n"
 
+    for reference, package in conanfile.dependencies.build.items():
+        name = reference.ref.name
+        path = toPosixPath(package.package_folder)
+        content += f"set(CONAN_BUILD_{name.upper()}_ROOT \"{path}\")\n"
+
     save(conanfile, "conan_paths.cmake", content)
 
 
