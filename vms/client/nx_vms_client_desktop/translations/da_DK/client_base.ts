@@ -11642,7 +11642,7 @@ Pin ikke dette certifikat, hvis du ikke har ændret %2 Serverens SSL certifikat.
     </message>
     <message>
       <source>Access link has been successfully created!</source>
-      <translation>Adgangslink er blevet oprettet!</translation>
+      <translation>Adgangslinket er oprettet!</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
