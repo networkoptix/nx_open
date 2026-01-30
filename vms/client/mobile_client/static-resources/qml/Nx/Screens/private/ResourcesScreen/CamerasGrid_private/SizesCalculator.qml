@@ -15,9 +15,38 @@ NxObject
     // Output properties:
     readonly property int minColumnsCount: d.calculateMinColumnsCount()
     readonly property int defaultColumnsCount: d.calculateDefaultColumnsCount()
-    readonly property int columnsCount: d.userDefinedColumnsCount !== kInvalidColumnsCount
-        ? MathUtils.bound(minColumnsCount, d.userDefinedColumnsCount, defaultColumnsCount)
-        : defaultColumnsCount
+
+    onMinColumnsCountChanged:
+    {
+        if (d.userDefinedColumnsCount === kInvalidColumnsCount)
+            d.userDefinedColumnsCount = defaultColumnsCount
+
+        if (d.userDefinedColumnsCount < minColumnsCount)
+            d.userDefinedColumnsCount = minColumnsCount
+    }
+
+    onDefaultColumnsCountChanged:
+    {
+        if (d.userDefinedColumnsCount === kInvalidColumnsCount
+            || d.userDefinedColumnsCount > defaultColumnsCount)
+        {
+            d.userDefinedColumnsCount = defaultColumnsCount
+        }
+    }
+
+    readonly property int columnsCount: d.userDefinedColumnsCount
+
+    readonly property bool widthFillingZoomAvailable:
+    {
+        const scrollIsRequired =
+            (kMinCellHeight + spacing) * cellsCount > availableHeight + spacing
+
+        const thereIsUnusedHeightWhenCellWidthIsMaximized =
+            (availableWidth * kAspectRatio + spacing) * cellsCount <= availableHeight + spacing
+
+        return defaultColumnsCount === 1 && !scrollIsRequired
+            && !thereIsUnusedHeightWhenCellWidthIsMaximized
+    }
 
     readonly property int normalCellWidth: d.calculateNormalCellWidth()
     readonly property int enlargedCellWidth: d.calculateEnlargedCellWidth()
@@ -38,14 +67,29 @@ NxObject
     readonly property int kMinCellWidth: 160
     readonly property int kMinCellHeight: 90
 
+    onWidthFillingZoomAvailableChanged:
+    {
+        if (!widthFillingZoomAvailable)
+            setWidthFillingZoomEnabled(false)
+    }
+
     function setUserDefinedColumnsCount(newColumnsCount)
     {
-        if (newColumnsCount === defaultColumnsCount)
-            d.userDefinedColumnsCount = kInvalidColumnsCount
-        else if (newColumnsCount >= minColumnsCount && newColumnsCount < defaultColumnsCount)
-            d.userDefinedColumnsCount = newColumnsCount
-        else //< Display size changed.
-            d.userDefinedColumnsCount = kInvalidColumnsCount
+        d.userDefinedColumnsCount =
+            MathUtils.bound(minColumnsCount, newColumnsCount, defaultColumnsCount)
+    }
+
+    function widthFillingZoomEnabled()
+    {
+        return d.widthFillingZoomEnabled
+    }
+
+    function setWidthFillingZoomEnabled(enabled)
+    {
+        if (widthFillingZoomAvailable && d.widthFillingZoomEnabled === enabled)
+            return
+
+        d.widthFillingZoomEnabled = widthFillingZoomAvailable ? enabled : false
     }
 
     readonly property int totalLayoutHeight:
@@ -92,6 +136,7 @@ NxObject
         id: d
 
         property int userDefinedColumnsCount: kInvalidColumnsCount
+        property bool widthFillingZoomEnabled: false
 
         // Round off logic must be similar for any calculation to avoid visual artifacts.
         function roundDimension(realWidthOrHeightValue)
@@ -116,9 +161,10 @@ NxObject
         {
             const maxCellWidthFromHeight = d.cellWidthFromHeight(availableHeight)
 
-            return Math.max(
+            return MathUtils.bound(
                 1,
-                Math.ceil((availableWidth + spacing) / (maxCellWidthFromHeight + spacing)))
+                Math.ceil((availableWidth + spacing) / (maxCellWidthFromHeight + spacing)),
+                defaultColumnsCount)
         }
 
         function calculateDefaultColumnsCount()
@@ -172,6 +218,9 @@ NxObject
                 roundDimension((availableWidth + spacing) / columnsCount - spacing)
 
             if (cellWidthCorrespondingToAvailableWidth < kMinCellWidth)
+                return cellWidthCorrespondingToAvailableWidth
+
+            if (widthFillingZoomAvailable && d.widthFillingZoomEnabled)
                 return cellWidthCorrespondingToAvailableWidth
 
             // If a user modified columns count, we do not care about scroll.

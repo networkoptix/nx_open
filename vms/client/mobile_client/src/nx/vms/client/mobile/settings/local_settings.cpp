@@ -41,7 +41,7 @@ void LocalSettings::setCameraLayoutCustomColumnCount(
     const LayoutDescriptor& layoutDescriptor,
     int columnsCount)
 {
-    if (!NX_ASSERT(columnsCount > 0
+    if (!NX_ASSERT(columnsCount >= 0
         || columnsCount == LocalSettings::kInvalidCameraLayoutCustomColumnsCount))
     {
         columnsCount = LocalSettings::kInvalidCameraLayoutCustomColumnsCount;
