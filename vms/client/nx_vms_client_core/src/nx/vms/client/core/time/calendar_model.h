@@ -41,9 +41,9 @@ public:
     enum Role
     {
         DateRole = Qt::UserRole + 1,
-        DayStartTimeRole,
         HasArchiveRole,
         AnyCameraHasArchiveRole,
+        IsFutureDateRole,
     };
 
     static void registerQmlType();

@@ -52,7 +52,7 @@ void ResourceHelper::setResource(const QnResourcePtr& value)
         {
             const auto timeWatcher = systemContext->serverTimeWatcher();
             m_connections << connect(timeWatcher, &ServerTimeWatcher::timeZoneChanged,
-                this, &ResourceHelper::displayOffsetChanged);
+                this, &ResourceHelper::timeZoneChanged);
 
             m_connections << connect(systemContext->resourcePool(),
                 &QnResourcePool::resourcesRemoved,
@@ -83,7 +83,7 @@ void ResourceHelper::setResource(const QnResourcePtr& value)
     emit resourceStatusChanged();
     emit oldCameraFirmwareChanged();
     emit defaultCameraPasswordChanged();
-    emit displayOffsetChanged();
+    emit timeZoneChanged();
     emit audioSupportedChanged();
     emit isIoModuleChanged();
     emit hasVideoChanged();
@@ -181,6 +181,21 @@ qint64 ResourceHelper::displayOffset() const
     const milliseconds localOffset = seconds(QDateTime::currentDateTime().offsetFromUtc());
 
     return (resourceOffset - localOffset).count();
+}
+
+QTimeZone ResourceHelper::timeZone() const
+{
+    if (!m_resource)
+        return QTimeZone::LocalTime;
+
+    auto systemContext = SystemContext::fromResource(m_resource);
+    if (!NX_ASSERT(systemContext))
+        return QTimeZone::LocalTime;
+
+    if (systemContext->serverTimeWatcher()->timeMode() == ServerTimeWatcher::clientTimeMode)
+        return QTimeZone::LocalTime;
+
+    return ServerTimeWatcher::timeZone(m_resource.dynamicCast<QnMediaResource>());
 }
 
 } // namespace nx::vms::client::core

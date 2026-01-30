@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QTimeZone>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/types/resource_types.h>
@@ -36,7 +38,8 @@ class ResourceHelper: public QObject
     /** Whether resource is layout resource. */
     Q_PROPERTY(bool isLayout READ isLayout NOTIFY resourceChanged)
 
-    Q_PROPERTY(qint64 displayOffset READ displayOffset NOTIFY displayOffsetChanged)
+    Q_PROPERTY(QTimeZone timeZone READ timeZone NOTIFY timeZoneChanged)
+    Q_PROPERTY(qint64 displayOffset READ displayOffset NOTIFY timeZoneChanged)
 
 public:
     ResourceHelper(QObject* parent = nullptr);
@@ -56,6 +59,7 @@ public:
     bool isCamera() const;
     bool isLayout() const;
 
+    QTimeZone timeZone() const;
     qint64 displayOffset() const;
 
 signals:
@@ -67,7 +71,7 @@ signals:
     void audioSupportedChanged();
     void isIoModuleChanged();
     void hasVideoChanged();
-    void displayOffsetChanged();
+    void timeZoneChanged();
     void resourceRemoved();
 
 private:

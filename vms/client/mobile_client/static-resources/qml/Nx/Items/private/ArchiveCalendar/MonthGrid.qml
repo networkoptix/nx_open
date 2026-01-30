@@ -11,6 +11,7 @@ Item
 
     property real position: new Date()
     property alias displayOffset: calendarModel.displayOffset
+    property alias timeZone: calendarModel.timeZone
     property alias locale: calendarModel.locale
     property alias year: calendarModel.year
     property alias month: calendarModel.month
@@ -50,7 +51,7 @@ Item
 
                 width: grid.cellWidth
                 height: grid.cellHeight
-                enabled: model.date <= new Date()
+                enabled: !model.isFutureDate
 
                 Rectangle
                 {

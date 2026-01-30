@@ -844,6 +844,7 @@ Item
 
         position: timeline.position
         displayOffset: controller.resourceHelper.displayOffset
+        timeZone: controller.resourceHelper.timeZone
         chunkProvider: cameraChunkProvider
 
         onPicked: controller.forcePosition(position, true)

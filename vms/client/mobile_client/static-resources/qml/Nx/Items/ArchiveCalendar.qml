@@ -17,6 +17,7 @@ Pane
 
     property real position: 0
     property real displayOffset: 0
+    property var timeZone
     property ChunkProvider chunkProvider: null
     property bool horizontal: mainWindow.width > 540
 
@@ -222,6 +223,12 @@ Pane
             onPicked: position => control.picked(position)
             locale: control.locale
             periodStorage: control.chunkProvider
+
+            Binding on timeZone
+            {
+                when: control.timeZone !== null && control.timeZone !== undefined
+                value: control.timeZone
+            }
         }
     }
 
