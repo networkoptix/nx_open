@@ -127,7 +127,7 @@
     <message>
       <source>Unknown</source>
       <comment>Unknown video quality</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>不明</translation>
     </message>
   </context>
   <context>
