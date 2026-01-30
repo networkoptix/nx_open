@@ -31,6 +31,7 @@ public:
     virtual ~ExportMetadataSettingsWidget();
 
     void setData(const Data& data);
+    void setDeviceId(const nx::Uuid& deviceId);
 
 signals:
     void dataEdited(Data data);
@@ -42,6 +43,7 @@ private:
 
     QScopedPointer<Ui::ExportMetadataSettingsWidget> ui;
     api::ObjectTypeSettings m_objectTypeSettings;
+    std::optional<nx::Uuid> m_deviceId = std::nullopt;
 
     void emitDataEdited();
 };

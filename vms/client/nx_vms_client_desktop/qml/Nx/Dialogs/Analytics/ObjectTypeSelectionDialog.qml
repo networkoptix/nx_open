@@ -17,18 +17,10 @@ Dialog
 
     property alias allObjects: allObjects.checked
     property var objectTypeIds: []
+    property var availableTypeIds: []
 
     readonly property SystemContext systemContext: WindowContextAware.context.systemContext
     readonly property var taxonomyManager: systemContext.taxonomyManager
-
-    readonly property var availableObjectTypes: [
-        "nx.base.Face",
-        "nx.base.Person",
-        "nx.base.Unknown",
-        "nx.base.Vehicle",
-        "nx.base.Car",
-        "nx.base.Bike",
-    ]
 
     title: qsTr("Select Objects")
     minimumWidth: 500
@@ -58,7 +50,6 @@ Dialog
             id: allObjects
 
             text: qsTr("All Objects")
-
             Layout.fillWidth: true
         }
 
@@ -73,38 +64,59 @@ Dialog
 
             contentItem: ColumnLayout
             {
+                id: scrollViewOwner
+
                 spacing: 8
+                width: parent.width
 
-                Repeater
+                ScrollView
                 {
-                    id: objectTypes
+                    id: scrollView
 
-                    model: availableObjectTypes
+                    clip: true
+                    ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 280
 
-                    CheckListItem
+                    ColumnLayout
                     {
-                        readonly property var id: modelData
-                        readonly property var objectType: taxonomyManager.objectTypeById(id)
+                        id: scrollViewChild
 
-                        text: objectType ? objectType.name : ""
-                        checked: dialog.objectTypeIds.includes(id)
-                        iconSource:
-                            objectType ? Analytics.IconManager.iconUrl(objectType.iconSource) : ""
+                        spacing: 8
+                        width: scrollViewOwner.width - scrollView.effectiveScrollBarWidth
 
-                        Layout.fillWidth: true
-                        Layout.leftMargin: objectType && objectType.baseType ? 20 : 0
+                        Repeater
+                        {
+                            id: objectTypes
 
-                        onClicked: updateSelected()
+                            model: availableTypeIds
+
+                            CheckListItem
+                            {
+                                readonly property var id: modelData
+                                readonly property var objectType: taxonomyManager.objectTypeById(id)
+
+                                text: objectType ? objectType.name : ""
+                                checked: dialog.objectTypeIds.includes(id)
+                                iconSource:
+                                    objectType ? Analytics.IconManager.iconUrl(objectType.iconSource) : ""
+
+                                Layout.fillWidth: true
+                                Layout.leftMargin: objectType ? objectType.baseTypeDepth * 20 : 0
+
+                                onClicked: updateSelected()
+                            }
+                        }
                     }
                 }
             }
         }
-
-        Item { Layout.fillHeight: true }
     }
 
     buttonBox: DialogButtonBox
     {
+        id: buttonBox
+
         buttonLayout: DialogButtonBox.KdeLayout
         standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
     }

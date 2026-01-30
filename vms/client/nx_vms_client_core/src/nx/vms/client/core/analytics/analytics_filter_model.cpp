@@ -249,18 +249,14 @@ void AnalyticsFilterModel::update(
 
         m_liveTypesExcluded = liveTypesExcluded;
 
-        const auto liveTypeFilter =
-            new LiveTypeFilter(m_liveTypesExcluded, m_stateViewBuilder.get());
+        std::vector<AbstractStateViewFilter*> filters;
+        filters.push_back(new LiveTypeFilter(m_liveTypesExcluded, m_stateViewBuilder.get()));
+        filters.push_back(new AttributeConditionStateViewFilter(
+            /*baseFilter*/ nullptr, filterAttributes(m_attributeValues), m_stateViewBuilder.get()));
+        filters.push_back(new ScopeStateViewFilter(
+            m_engine.get(), deviceIds(m_devices), m_stateViewBuilder.get()));
 
-        const auto scopeFilter = new ScopeStateViewFilter(
-            m_engine.get(), deviceIds(m_devices), m_stateViewBuilder.get());
-
-        const auto conditionFilter = new AttributeConditionStateViewFilter(
-            /*baseFilter*/ nullptr, filterAttributes(m_attributeValues), m_stateViewBuilder.get());
-
-        const auto filter = new CompositeFilter(
-            std::vector<AbstractStateViewFilter*>{liveTypeFilter, scopeFilter, conditionFilter},
-            m_stateViewBuilder.get());
+        const auto filter = new CompositeFilter(filters, m_stateViewBuilder.get());
 
         taxonomy::StateView* state = m_stateViewBuilder->stateView(filter);
         setObjectTypes(state->objectTypes());
@@ -380,7 +376,12 @@ void AnalyticsFilterModel::rebuild()
     std::swap(m_stateViewBuilder, newStateViewBuilder);
 
     setEngines(enginesFromFilters(m_stateViewBuilder->engineFilters()));
-    update(m_engine, m_devices, m_attributeValues, m_liveTypesExcluded, /*force*/ true);
+    update(
+        m_engine,
+        m_devices,
+        m_attributeValues,
+        m_liveTypesExcluded,
+        /*force*/ true);
 }
 
 } // namespace nx::vms::client::core::analytics::taxonomy

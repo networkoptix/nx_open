@@ -21,6 +21,7 @@ public:
         SystemContext* systemContext,
         bool allObjects,
         const QStringList& objectTypeIds,
+        const QStringList& availableTypeIds,
         QWidget* parent = nullptr);
 
     bool allObjects() const;
@@ -29,7 +30,8 @@ public:
     static void openSelectionDialog(
         api::ObjectTypeSettings& settings,
         QWidget* parent,
-        const std::function<void()>& callback);
+        const std::function<void()>& callback,
+        const std::optional<nx::Uuid>& cameraResource = std::nullopt);
 };
 
 } // namespace nx::vms::client::desktop

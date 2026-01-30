@@ -21,6 +21,7 @@ class NX_VMS_COMMON_API ObjectType:
     Q_OBJECT
 
     Q_PROPERTY(ObjectType* baseType READ base CONSTANT)
+    Q_PROPERTY(int baseTypeDepth READ baseTypeDepth CONSTANT)
     Q_PROPERTY(std::vector<ObjectType*> derivedTypes READ derivedTypes CONSTANT)
 
     Q_PROPERTY(bool isNonIndexable READ isNonIndexable CONSTANT)
@@ -33,6 +34,7 @@ public:
 
     virtual bool isNonIndexable() const;
     virtual bool isLiveOnly() const;
+    int baseTypeDepth() const;
 };
 
 } // namespace nx::analytics::taxonomy

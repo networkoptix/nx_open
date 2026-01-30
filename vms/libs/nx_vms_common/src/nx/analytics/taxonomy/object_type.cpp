@@ -29,4 +29,12 @@ bool ObjectType::isLiveOnly() const
     return m_descriptor.flags.testFlag(ObjectTypeFlag::liveOnly);
 }
 
+int ObjectType::baseTypeDepth() const
+{
+    if (const auto* baseType = base(); baseType)
+        return baseType->baseTypeDepth() + 1;
+
+    return 0;
+}
+
 } // namespace nx::analytics::taxonomy

@@ -117,8 +117,14 @@ void ExportMetadataSettingsWidget::setData(const Data& data)
     }
 }
 
+void ExportMetadataSettingsWidget::setDeviceId(const nx::Uuid& deviceId)
+{
+    m_deviceId = deviceId;
+}
+
 void ExportMetadataSettingsWidget::openObjectTypeSelectionDialog()
 {
+    NX_ASSERT(m_deviceId);
     ObjectTypeSelectionDialog::openSelectionDialog(
         m_objectTypeSettings,
         this,
@@ -126,7 +132,8 @@ void ExportMetadataSettingsWidget::openObjectTypeSelectionDialog()
         {
             setData(buildDataFromUi());
             emitDataEdited();
-        });
+        },
+        m_deviceId);
 }
 
 } // namespace nx::vms::client::desktop

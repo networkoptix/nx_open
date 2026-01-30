@@ -14,8 +14,6 @@
 #include <nx/vms/client/core/analytics/taxonomy/attribute_set.h>
 #include <nx/vms/client/core/analytics/taxonomy/utils.h>
 
-#include "utils.h"
-
 namespace nx::vms::client::core::analytics::taxonomy {
 
 static bool objectTypeMatchesFilter(

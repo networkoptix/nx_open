@@ -749,6 +749,7 @@ void ExportSettingsDialog::setMediaParams(
     settings.zoomWindow = itemData.zoomRect;
     settings.rotation = itemData.rotation;
     settings.pixelationSettings = systemSettings()->pixelationSettings();
+    ui->exportMetadataSettingsPage->setDeviceId(mediaResource->getId());
 
     d->dispatch(Reducer::setMediaResourceSettings, mediaResource->hasVideo(), settings);
 
