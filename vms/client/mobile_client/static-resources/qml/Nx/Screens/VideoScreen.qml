@@ -887,6 +887,7 @@ Page
         horizontal: true
         position: timeline.positionMs
         displayOffset: controller.resourceHelper.displayOffset
+        timeZone: controller.resourceHelper.timeZone
         chunkProvider: cameraChunkProvider
 
         onPicked: controller.forcePosition(position, true)

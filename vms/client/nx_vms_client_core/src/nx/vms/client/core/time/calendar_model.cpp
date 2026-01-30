@@ -246,6 +246,8 @@ QVariant CalendarModel::data(const QModelIndex& index, int role) const
             return day.hasArchive[(int) PeriodStorageType::currentCamera];
         case AnyCameraHasArchiveRole:
             return day.hasArchive[(int) PeriodStorageType::allCameras];
+        case IsFutureDateRole:
+            return day.date > QDateTime::currentDateTimeUtc().toTimeZone(d->timeZone).date();
     }
 
     return QVariant();
@@ -261,6 +263,7 @@ QHash<int, QByteArray> CalendarModel::roleNames() const
             {DateRole, "date"},
             {HasArchiveRole, "hasArchive"},
             {AnyCameraHasArchiveRole, "anyCameraHasArchive"},
+            {IsFutureDateRole, "isFutureDate"}
         });
     }
     return roleNames;
