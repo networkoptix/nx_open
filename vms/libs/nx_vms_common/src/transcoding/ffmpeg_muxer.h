@@ -26,6 +26,7 @@ public:
 
     struct Config
     {
+        bool utcTimestamps = false;
         bool computeSignature = false;
     };
 

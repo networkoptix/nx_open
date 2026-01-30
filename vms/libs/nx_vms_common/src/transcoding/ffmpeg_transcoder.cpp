@@ -359,7 +359,6 @@ bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const 
     }
 
     std::optional<QnAviArchiveMetadata> metadata;
-    if (m_config.utcTimestamps)
     {
         metadata = QnAviArchiveMetadata();
         if (video)
