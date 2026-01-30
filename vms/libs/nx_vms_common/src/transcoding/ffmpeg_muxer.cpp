@@ -251,11 +251,13 @@ bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
     auto packet = avPacket.get();
 
     bool allowEqualTimestamps = media->dataType == QnAbstractMediaData::GENERIC_METADATA;
-    auto timestamp = m_timestampCorrector.process(
-        std::chrono::microseconds(media->timestamp),
-        streamIndex,
-        allowEqualTimestamps,
-        media->flags & QnAbstractMediaData::MediaFlags_Discontinuity).count();
+    auto timestamp = m_config.utcTimestamps
+        ? media->timestamp
+        : m_timestampCorrector.process(
+            std::chrono::microseconds(media->timestamp),
+            streamIndex,
+            allowEqualTimestamps,
+            media->flags & QnAbstractMediaData::MediaFlags_Discontinuity).count();
 
     packet->pts = av_rescale_q(timestamp, srcRate, stream->time_base);
     packet->data = (uint8_t*)media->data();

@@ -31,7 +31,6 @@ public:
     {
         MediaTranscoder::Config mediaTranscoderConfig;
         FfmpegMuxer::Config muxerConfig;
-        bool utcTimestamps = false;
     };
 
 public:
