@@ -335,11 +335,6 @@ QImage QnCamDisplay::getScreenshot(const nx::core::transcoding::Settings& imageP
     return frame ? frame->toImage() : QImage();
 }
 
-QImage QnCamDisplay::getGrayscaleScreenshot(int channel)
-{
-    return m_display[channel]->getGrayscaleScreenshot();
-}
-
 QSize QnCamDisplay::getFrameSize(int channel) const {
     return m_display[channel]->getImageSize();
 }

@@ -141,10 +141,3 @@ private:
 
     bool convertUsingSimdIntrTo(const AVFrame* avFrame) const;
 };
-
-class ScreenshotInterface
-{
-public:
-    virtual CLVideoDecoderOutputPtr getScreenshot(bool anyQuality) = 0;
-    virtual QImage getGrayscaleScreenshot() = 0;
-};

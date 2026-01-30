@@ -75,16 +75,13 @@ public:
 
     void setPaused(bool value) { m_paused = value; }
     bool isPaused() const { return m_paused; }
-    void setScreenshotInterface(ScreenshotInterface* value);
     void setDisplayedRect(const QRectF& rect);
-
     void setHistogramConsumer(QnHistogramConsumer* value);
 
 private:
     bool isDewarpingAllowed() const;
     void applyMixerSettings(
         qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
-    ImageCorrectionResult calcImageCorrection();
 private:
     QOpenGLFunctions* const m_gl;
     QQuickWidget* const m_quickWidget;
@@ -100,8 +97,6 @@ private:
     bool m_timeChangeEnabled;
     mutable nx::Mutex m_mutex;
     bool m_paused;
-    ScreenshotInterface* m_screenshotInterface;
-    ImageCorrectionResult m_imageCorrector;
     nx::vms::api::ImageCorrectionData m_imgCorrectParam;
     QnHistogramConsumer* m_histogramConsumer;
     QnFisheyePtzController* m_fisheyeController;
@@ -124,7 +119,6 @@ private:
         const QRectF& viewRect,
         int planeCount,
         const unsigned int* textureIds,
-        bool isStillImage,
         qreal opacity);
 
     //!Draws currently binded texture

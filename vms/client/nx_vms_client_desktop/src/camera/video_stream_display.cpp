@@ -110,7 +110,6 @@ int QnVideoStreamDisplay::addRenderer(QnResourceWidgetRenderer* renderer)
     }
 
     NX_MUTEX_LOCKER lock( &m_renderListMtx );
-    renderer->setScreenshotInterface(this);
     m_newList.insert(renderer);
     m_renderListModified = true;
     return m_newList.size();
@@ -926,24 +925,6 @@ void QnVideoStreamDisplay::clearReverseQueue()
 
     m_reverseQueue.clear();
     m_reverseSizeInBytes = 0;
-}
-
-QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
-{
-    NX_MUTEX_LOCKER mutex( &m_lastDisplayedFrameMutex );
-
-    const AVFrame* frame = m_lastDisplayedFrame.data();
-    if (!frame || !frame->width || !frame->data[0])
-        return QImage();
-
-    QImage tmp(frame->data[0],
-        frame->width,
-        frame->height,
-        frame->linesize[0],
-        QImage::Format_Indexed8);
-    QImage rez(frame->width, frame->height, QImage::Format_Indexed8);
-    rez = tmp.copy(0,0, frame->width, frame->height);
-    return rez;
 }
 
 CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)

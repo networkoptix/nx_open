@@ -29,7 +29,7 @@ constexpr int kMaxQueueTime = 1000 * 200;
 /**
   * Display one video stream. Decode the video and pass it to video window.
   */
-class QnVideoStreamDisplay: public ScreenshotInterface
+class QnVideoStreamDisplay
 {
 public:
     enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
@@ -52,8 +52,7 @@ public:
     void setMTDecoding(bool value);
 
     void setSpeed(float value);
-    virtual CLVideoDecoderOutputPtr getScreenshot(bool anyQuality) override;
-    virtual QImage getGrayscaleScreenshot() override;
+    virtual CLVideoDecoderOutputPtr getScreenshot(bool anyQuality);
     qint64 nextReverseTime() const;
     QSize getImageSize() const;
 
