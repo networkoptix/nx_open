@@ -51,7 +51,7 @@ Item
         clip: true
         boundsBehavior: Flickable.StopAtBounds
 
-        property real previousContentY: 0
+        property real previousContentY: -1
 
         onWidthChanged: doDelayedGeometryUpdate()
         onHeightChanged: doDelayedGeometryUpdate()
@@ -78,6 +78,8 @@ Item
             if (!geometryChangeAccumulatorTimer.running)
                 previousContentY = contentY
 
+            resizeOverlay.visible = true
+
             geometryChangeAccumulatorTimer.restart()
         }
 
@@ -89,16 +91,29 @@ Item
                 return
             }
 
-            const centerIndex = cellsSearcher.findCellClosestToViewportCenter(
-                previousContentY, sizesCalculator.availableWidth, sizesCalculator.availableHeight)
+            if (previousContentY < 0)
+            {
+                sizesCalculator.availableWidth = width
+                sizesCalculator.availableHeight = height
+            }
+            else
+            {
+                const centerIndex = cellsSearcher.findCellClosestToViewportCenter(
+                    previousContentY, sizesCalculator.availableWidth, sizesCalculator.availableHeight)
 
-            sizesCalculator.availableWidth = width
-            sizesCalculator.availableHeight = height
+                previousContentY = -1
+                sizesCalculator.availableWidth = width
+                sizesCalculator.availableHeight = height
 
-            if (centerIndex === -1)
-                return //< Just in case.
+                if (centerIndex === -1)
+                    return //< Just in case.
 
-            contentY = contentYToCenterIndexStatic(centerIndex)
+                contentY = contentYToCenterIndexStatic(centerIndex)
+            }
+
+            d.saveTargetColumnsCount()
+
+            resizeOverlay.visible = false
         }
 
         // Required for contentY update during screen resize. Must use statically calculated
@@ -256,11 +271,18 @@ Item
 
                     active:
                     {
-                        const margin = flickable.height / 2
+                        const margin = sizesCalculator.columnsCount <= 2
+                            ? flickable.height
+                            : flickable.height / 2
                         const viewTop = flickable.contentY - margin
                         const viewBottom = flickable.contentY + flickable.height + margin
                         const center = y + height / 2
-                        return center >= viewTop && center <= viewBottom
+
+                        let newState = center >= viewTop && center <= viewBottom
+                        if (d.animationsEnabled)
+                            newState = newState || active
+
+                        return newState
                     }
 
                     function updatePlayerState()
@@ -309,7 +331,14 @@ Item
 
                             property bool mediaPlayerActive: false
 
-                            onClicked: control.openVideoScreen(resource, thumbnail, camerasModel)
+                            onClicked:
+                            {
+                                // CamerasGrid changes sizes on camera opening, so we must disable
+                                // contentY centering to prevent excessive jump.
+                                flickable.previousContentY = -1
+
+                                control.openVideoScreen(resource, thumbnail, camerasModel)
+                            }
 
                             onThumbnailRefreshRequested: camerasModel.refreshThumbnail(index)
 
@@ -355,31 +384,61 @@ Item
                 const maxLogicalRotation =
                     sizesCalculator.defaultColumnsCount * kDefaultRotationStep
 
-                logicalRotation = MathUtils.bound(
-                    minLogicalRotation,
-                    logicalRotation + event.angleDelta.y,
-                    maxLogicalRotation)
+                const newLogicalRotation = logicalRotation + event.angleDelta.y
 
-                const newColumnsCountUserModifier =
-                    Math.floor(logicalRotation / kDefaultRotationStep)
-
-                if (newColumnsCountUserModifier === sizesCalculator.getUserDefinedColumnsCount())
-                    return
-
-                // If animation is already running, keep the current anchor.
-                // Otherwise, find new anchor based on current viewport.
-                if (d.anchorIndex < 0)
+                if ((newLogicalRotation < minLogicalRotation
+                        || newLogicalRotation > maxLogicalRotation)
+                    && sizesCalculator.widthFillingZoomAvailable)
                 {
-                    d.anchorIndex = cellsSearcher.findCellClosestToViewportCenter(
-                        flickable.contentY, flickable.width, flickable.height)
-                    d.anchorRelativePosition = d.kCenterAnchorRelativePosition
+                    const newWidthFillingZoomEnabledValue = newLogicalRotation < minLogicalRotation
+
+                    if (sizesCalculator.widthFillingZoomEnabled()
+                        === newWidthFillingZoomEnabledValue)
+                    {
+                        return
+                    }
+
+                    updateAnchor()
+
+                    d.animationsEnabled = true
+                    sizesCalculator.setWidthFillingZoomEnabled(newWidthFillingZoomEnabledValue)
+                }
+                else
+                {
+                    logicalRotation = MathUtils.bound(
+                        minLogicalRotation,
+                        newLogicalRotation,
+                        maxLogicalRotation)
+
+                    const newColumnsCountUserModifier =
+                        Math.floor(logicalRotation / kDefaultRotationStep)
+
+                    if (newColumnsCountUserModifier
+                        === sizesCalculator.getUserDefinedColumnsCount())
+                    {
+                        return
+                    }
+
+                    updateAnchor()
+
+                    d.animationsEnabled = true
+                    sizesCalculator.setUserDefinedColumnsCount(newColumnsCountUserModifier)
                 }
 
                 centeringTimer.restart()
-
-                d.animationsEnabled = true
-                sizesCalculator.setUserDefinedColumnsCount(newColumnsCountUserModifier)
                 d.saveTargetColumnsCount()
+            }
+
+            function updateAnchor()
+            {
+                // If animation is already running, keep the current anchor.
+                // Otherwise, find new anchor based on current viewport.
+                if (d.anchorIndex >= 0)
+                    return
+
+                d.anchorIndex = cellsSearcher.findCellClosestToViewportCenter(
+                    flickable.contentY, flickable.width, flickable.height)
+                d.anchorRelativePosition = d.kCenterAnchorRelativePosition
             }
 
             function updateStartLogicalRotation()
@@ -441,6 +500,17 @@ Item
         }
     }
 
+    // Overlay shown during resize to hide intermediate states.
+    Rectangle
+    {
+        id: resizeOverlay
+
+        anchors.fill: parent
+        color: "black"
+
+        visible: false
+    }
+
     PinchHandler
     {
         id: pinchHandler
@@ -465,7 +535,7 @@ Item
             if (active)
             {
                 flickable.cancelFlick()
-                baseColumnsCount = sizesCalculator.getUserDefinedColumnsCount()
+                baseColumnsCount = sizesCalculator.columnsCount
                 baseScale = activeScale
 
                 // Remember initial state to limit total change during the gesture.
@@ -496,29 +566,67 @@ Item
                 baseScale = 1.0
 
             const relativeScale = activeScale / baseScale
-
             let targetColumnsCount = Math.round(baseColumnsCount / relativeScale)
-            targetColumnsCount = MathUtils.bound(
-                sizesCalculator.minColumnsCount,
-                targetColumnsCount,
-                sizesCalculator.defaultColumnsCount)
 
-            // Limit total change to +-1 column per gesture relative to initial state.
-            targetColumnsCount = MathUtils.bound(
-                initialColumnsCount - 1,
-                targetColumnsCount,
-                initialColumnsCount + 1)
+            if (sizesCalculator.widthFillingZoomAvailable)
+            {
+                // Zoom beyond minColumnsCount into width filling zoom.
 
-            if (targetColumnsCount === sizesCalculator.columnsCount)
-                return
+                if (targetColumnsCount === sizesCalculator.minColumnsCount)
+                    return
+
+                var newWidthFillingZoomEnabledValue =
+                    targetColumnsCount < sizesCalculator.minColumnsCount
+
+                if (sizesCalculator.widthFillingZoomEnabled() === newWidthFillingZoomEnabledValue)
+                    return
+            }
+            else
+            {
+                // Normal zoom within allowed columns count range.
+
+                targetColumnsCount = MathUtils.bound(
+                    sizesCalculator.minColumnsCount,
+                    targetColumnsCount,
+                    sizesCalculator.defaultColumnsCount)
+
+                // Limit total change to +-1 column per gesture relative to initial state.
+                targetColumnsCount = MathUtils.bound(
+                    initialColumnsCount - 1,
+                    targetColumnsCount,
+                    initialColumnsCount + 1)
+
+                if (targetColumnsCount === sizesCalculator.columnsCount)
+                    return
+            }
+
+            // Common zoom logic.
 
             if (d.anchorIndex < 0)
                 updateAnchor()
-
+            const targetContentY = d.contentYToCenterIndexDynamic(d.anchorIndex)
             d.animationsEnabled = true
-            sizesCalculator.setUserDefinedColumnsCount(targetColumnsCount)
 
-            baseColumnsCount = targetColumnsCount
+            if (sizesCalculator.widthFillingZoomAvailable)
+            {
+                // Zoom beyond minColumnsCount into width filling zoom.
+
+                sizesCalculator.setWidthFillingZoomEnabled(newWidthFillingZoomEnabledValue)
+                baseColumnsCount = 1
+            }
+            else
+            {
+                // Normal zoom within allowed columns count range.
+
+                sizesCalculator.setUserDefinedColumnsCount(targetColumnsCount)
+                baseColumnsCount = targetColumnsCount
+            }
+
+            // Common zoom logic.
+
+            // For an unknown  reason, contentY jumps to 0 after cells geometry change.
+            // So, we restore it to the correct state.
+            flickable.contentY = targetContentY
             baseScale = activeScale
         }
 
@@ -646,22 +754,27 @@ Item
 
         function saveTargetColumnsCount()
         {
-            const columnCountToSave =
-                sizesCalculator.columnsCount !== sizesCalculator.defaultColumnsCount
-                    ? sizesCalculator.columnsCount
-                    : sizesCalculator.kInvalidColumnsCount //< Remove saved value.
+            const theOnlyColumnStretchMode =
+                sizesCalculator.columnsCount === 1 && sizesCalculator.widthFillingZoomEnabled()
 
-            camerasGridHelper.saveTargetColumnsCount(layout, columnCountToSave)
+            camerasGridHelper.saveTargetColumnsCount(
+                layout,
+                theOnlyColumnStretchMode ? 0 : sizesCalculator.columnsCount)
         }
 
         function loadTargetColumnsCount()
         {
             const loadedTargetColumnsCount = camerasGridHelper.loadTargetColumnsCount(layout)
 
-            sizesCalculator.setUserDefinedColumnsCount(
-                loadedTargetColumnsCount !== sizesCalculator.kInvalidColumnsCount
-                    ? loadedTargetColumnsCount
-                    : sizesCalculator.defaultColumnsCount)
+            if (loadedTargetColumnsCount === 0)
+            {
+                sizesCalculator.setUserDefinedColumnsCount(1)
+                sizesCalculator.setWidthFillingZoomEnabled(true)
+                return
+            }
+
+            sizesCalculator.setUserDefinedColumnsCount(loadedTargetColumnsCount)
+            sizesCalculator.setWidthFillingZoomEnabled(false)
 
             wheelHandler.updateStartLogicalRotation()
         }
@@ -674,12 +787,12 @@ Item
         function loadLayoutPosition()
         {
             let position = camerasGridHelper.loadLayoutPosition(layout)
-
             if (position < 0 || flickable.height > flickable.contentHeight)
                 position = 0
             else if (position > (flickable.contentHeight - flickable.height))
                 position = flickable.contentHeight - flickable.height
 
+            flickable.previousContentY = -1
             flickable.contentY = position
         }
 

@@ -141,12 +141,16 @@ CamerasGridHelper::CamerasGridHelper()
 
 CamerasGridHelper::~CamerasGridHelper()
 {
+    if (d->positionHasToBeSaved)
+        d->saveLayoutPosition();
 }
 
 void CamerasGridHelper::saveTargetColumnsCount(
     const QnLayoutResource* layoutResource, int columnsCount)
 {
-    if (!NX_ASSERT(columnsCount > 0
+    // columnsCount == 0 is reserved for the single-column stretch mode.
+
+    if (!NX_ASSERT(columnsCount >= 0
         || columnsCount == LocalSettings::kInvalidCameraLayoutCustomColumnsCount))
     {
         return;
