@@ -5,6 +5,7 @@
 #include <array>
 
 #include <core/resource/resource_property_key.h>
+#include <media/filters/remove_aud_delimiter.h>
 #include <nx/media/config.h>
 #include <nx/media/utils.h>
 #include <nx/rtp/onvif_header_extension.h>
@@ -246,6 +247,8 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(const Config& config, nx::metric::S
 {
     if (m_config.useRtcpNack)
         m_rtcpNackResponder = std::make_unique<nx::rtp::RtcpNackResponder>();
+    if (m_config.webRtcMode)
+        m_transcoder.muxer().setVideoStreamFilter(std::make_unique<H2645RemoveAudDelimiter>());
 }
 
 void QnUniversalRtpEncoder::buildSdp(

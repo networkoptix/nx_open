@@ -6,6 +6,7 @@ extern "C" {
 #include <libavutil/opt.h>
 }
 
+#include <media/filters/abstract_media_data_filter.h>
 #include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/utils.h>
@@ -221,7 +222,7 @@ void FfmpegMuxer::setStartTimeOffset(int64_t value)
     m_timestampCorrector.setOffset(std::chrono::microseconds(value));
 }
 
-bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
+bool FfmpegMuxer::muxPacket(QnConstAbstractMediaDataPtr media)
 {
     int streamIndex = 0;
     if (m_initializedVideo && media->dataType == QnAbstractMediaData::AUDIO)
@@ -245,6 +246,9 @@ bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
         return true;
     }
 
+    if (m_videoStreamFilter && media->dataType == QnAbstractMediaData::VIDEO)
+        media = std::dynamic_pointer_cast<const QnAbstractMediaData>(m_videoStreamFilter->processData(media));
+
     AVStream* stream = m_formatCtx->streams[streamIndex];
     constexpr AVRational srcRate = {1, 1'000'000};
     nx::media::ffmpeg::AvPacket avPacket;
@@ -260,6 +264,7 @@ bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
             media->flags & QnAbstractMediaData::MediaFlags_Discontinuity).count();
 
     packet->pts = av_rescale_q(timestamp, srcRate, stream->time_base);
+
     packet->data = (uint8_t*)media->data();
     packet->size = static_cast<int>(media->dataSize());
     if (media->dataType == QnAbstractMediaData::AUDIO || media->flags & QnAbstractMediaData::MediaFlags_AVKey)
@@ -317,4 +322,9 @@ AVCodecParameters* FfmpegMuxer::getVideoCodecParameters() const
 AVCodecParameters* FfmpegMuxer::getAudioCodecParameters() const
 {
     return m_audioCodecParameters;
+}
+
+void FfmpegMuxer::setVideoStreamFilter(std::unique_ptr<AbstractMediaDataFilter> filter)
+{
+    m_videoStreamFilter = std::move(filter);
 }
