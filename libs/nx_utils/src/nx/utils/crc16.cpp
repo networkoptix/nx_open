@@ -25,6 +25,28 @@ static uint16_t crc16ibmRev(const uint8_t* ptr, size_t count)
    return crc;
 }
 
+constexpr uint16_t crc16xModem(const uint8_t* ptr, size_t count)
+{
+   uint16_t crc = 0;
+   while (count--)
+   {
+      crc ^= ((uint16_t) *ptr++ << 8);
+      for (int i = 0; i < 8; ++i)
+      {
+         if ((crc & 0x8000) != 0)
+            crc = (crc << 1) ^ 0x1021;
+         else
+            crc <<= 1;
+      }
+   }
+   return crc;
+}
+
+static_assert(
+    crc16xModem(
+        std::array<uint8_t, 9>({'1', '2', '3', '4', '5', '6', '7', '8', '9'}).data(), 9) == 0x31C3,
+    "Wrong CRC");
+
 } // namespace
 
 uint16_t crc16(const char* data, std::size_t size, Crc16Type type)
@@ -33,6 +55,8 @@ uint16_t crc16(const char* data, std::size_t size, Crc16Type type)
     {
         case Crc16Type::ibmReversed:
             return crc16ibmRev((const uint8_t*) data, size);
+        case Crc16Type::xModem:
+            return crc16xModem((const uint8_t*) data, size);
         default:
             NX_ASSERT(false); //< Not implemented.
             return 0;

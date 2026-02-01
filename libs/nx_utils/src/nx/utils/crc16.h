@@ -14,6 +14,7 @@ namespace utils {
 enum Crc16Type
 {
     ibmReversed = 0,
+    xModem = 1,
 };
 
 NX_UTILS_API std::uint16_t crc16(const char* data, std::size_t size, Crc16Type type = Crc16Type::ibmReversed);
