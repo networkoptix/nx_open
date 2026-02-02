@@ -47,8 +47,6 @@ Page
     {
         id: shareButton
 
-        anchors.centerIn: parent
-
         padding: 0
         icon.source: backend.isShared && !eventDetailsScreen.isAnalyticsDetails
             ? "image://skin/20x20/Solid/shared.svg?primary=light10&secondary=green"
@@ -99,7 +97,7 @@ Page
     toolBar.contentItem.clip: false
     gradientToolbarBackground: true
 
-    toolBar.background.opacity: mainWindow.isPortraitLayout ? 0 : 1
+    toolBar.background.opacity: LayoutController.isPortrait ? 0 : 1
 
     Rectangle
     {
@@ -127,21 +125,21 @@ Page
 
         audioEnabled: audioController.audioEnabled && eventDetailsScreen.activePage
 
-        y: !mainWindow.isPortraitLayout && header.visible
+        y: !LayoutController.isPortrait && header.visible
            ? -header.height
            : 0
         x: -windowParams.leftMargin
 
         width:
         {
-            return mainWindow.isPortraitLayout
+            return LayoutController.isPortrait
                 ? parent.width
                 : mainWindow.width
         }
 
         height:
         {
-            if (!mainWindow.isPortraitLayout)
+            if (!LayoutController.isPortrait)
                 return eventDetailsScreen.height
 
             const realWidth =
@@ -178,21 +176,21 @@ Page
 
             source: lp("/images/timeline_gradient.png")
             opacity: d.hasControls ? 1 : 0
-            visible: mainWindow.isPortraitLayout && opacity > 0
+            visible: LayoutController.isPortrait && opacity > 0
         }
 
         DownloadMediaButton
         {
             id: downloadButton
 
-            parent: mainWindow.isPortraitLayout
+            parent: LayoutController.isPortrait
                 ? preview
                 : playbackPanel
 
-            x: mainWindow.isPortraitLayout
+            x: LayoutController.isPortrait
                 ? parent.width - width - orientationModeButton.width - goToCameraButton.width
                 : orientationModeButton.x - width
-            y: mainWindow.isPortraitLayout
+            y: LayoutController.isPortrait
                 ? parent.height - height
                 : (parent.height - height) / 2
 
@@ -207,7 +205,7 @@ Page
         {
             id: goToCameraButton
 
-            visible: mainWindow.isPortraitLayout && !preview.cannotDecryptMedia
+            visible: LayoutController.isPortrait && !preview.cannotDecryptMedia
 
             x: parent.width - width - orientationModeButton.width
             y: parent.height - height
@@ -223,14 +221,14 @@ Page
         {
             id: orientationModeButton
 
-            parent: mainWindow.isPortraitLayout
+            parent: LayoutController.isPortrait
                 ? preview
                 : playbackPanel
 
-            x: mainWindow.isPortraitLayout
+            x: LayoutController.isPortrait
                 ? parent.width - width
                 : parent.width - width - 16;
-            y: mainWindow.isPortraitLayout
+            y: LayoutController.isPortrait
                 ? parent.height - height
                 : (parent.height - height) / 2
 
@@ -238,7 +236,7 @@ Page
             height: 48
             visible: !preview.cannotDecryptMedia
 
-            icon.source: mainWindow.isPortraitLayout
+            icon.source: LayoutController.isPortrait
                 ? lp("/images/fullscreen_view_mode.svg")
                 : lp("/images/exit_fullscreen_mode.svg")
             icon.width: 24
@@ -247,7 +245,7 @@ Page
 
             onClicked:
             {
-                if (mainWindow.isPortraitLayout)
+                if (LayoutController.isPortrait)
                 {
                     // Go to landscape mode.
                     if (CoreUtils.isMobilePlatform())
@@ -391,7 +389,7 @@ Page
         {
             labelPadding: 12
             anchors.verticalCenter: parent.verticalCenter
-            visible: !mainWindow.isPortraitLayout
+            visible: !LayoutController.isPortrait
 
             icon.source: lp("/images/go_to_camera.svg")
             text: qsTr("Show on Camera")
@@ -468,15 +466,15 @@ Page
     {
         id: timestampText
 
-        parent: mainWindow.isPortraitLayout
+        parent: LayoutController.isPortrait
             ? preview
             : playbackPanel
 
         visible: !preview.cannotDecryptMedia
-        x: mainWindow.isPortraitLayout
+        x: LayoutController.isPortrait
             ? 16
             : (downloadButton.visible ? downloadButton.x : orientationModeButton.x) - width - 16
-        y: mainWindow.isPortraitLayout
+        y: LayoutController.isPortrait
             ? parent.height - height - 14
             : (parent.height - height) / 2
 
@@ -605,7 +603,7 @@ Page
     {
         target: d
         property: "hasControls"
-        value: mainWindow.isPortraitLayout || d.showControls
+        value: LayoutController.isPortrait || d.showControls
     }
 
     QtObject
@@ -678,9 +676,9 @@ Page
 
     Connections
     {
-        target: mainWindow
+        target: LayoutController
 
-        function onIsPortraitLayoutChanged()
+        function onIsPortraitChanged()
         {
             d.hasControls = true
         }

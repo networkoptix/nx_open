@@ -17,14 +17,14 @@ OptionSelector
 {
     id: control
 
-    text: qsTr("Period")
-
+    descriptionText: qsTr("Period")
     unselectedValue: EventSearch.TimeSelection.anytime
     valueToTextFunc:
         (value) => EventSearchUtils.timeSelectionText(value ?? EventSearch.TimeSelection.anytime)
 
     screenDelegate: RadioGroupEditor
     {
+        selector: control
         model: [EventSearch.TimeSelection.day,
            EventSearch.TimeSelection.week,
            EventSearch.TimeSelection.month]

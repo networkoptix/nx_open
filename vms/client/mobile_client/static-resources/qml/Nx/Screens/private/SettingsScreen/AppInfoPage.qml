@@ -6,17 +6,16 @@ import Nx.Core
 import Nx.Core.Controls
 import Nx.Ui
 
-BaseSettingsScreen
+BaseSettingsPage
 {
-    id: appInfoScreen
+    id: appInfoPage
 
-    objectName: "appInfoScreen"
+    signal developerSettingsRequested
 
     rightControl: ClipboardCopyButton
     {
         id: clipboardCopyButton
 
-        anchors.centerIn: parent
         textToCopy: `${companyNameText.text} ${versionText.text}`
     }
 
@@ -27,6 +26,7 @@ BaseSettingsScreen
         width: parent.width
         height: contentColumn.height
         color: ColorTheme.colors.dark6
+        radius: LayoutController.isTablet ? 8 : 0
 
         Column
         {
@@ -60,7 +60,8 @@ BaseSettingsScreen
                             return
 
                         clicksCount = 0
-                        Workflow.openDeveloperSettingsScreen()
+
+                        appInfoPage.developerSettingsRequested()
                     }
 
                     onClicked:

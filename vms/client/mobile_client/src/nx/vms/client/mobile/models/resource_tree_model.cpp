@@ -83,6 +83,8 @@ void ResourceTreeModel::onContextReady()
                 d->treeBuilder->setUser(user);
                 d->rootEntity = d->treeBuilder->createTreeEntity();
                 d->baseTreeModel->setRootEntity(d->rootEntity.get());
+
+                emit rootEntityUpdated();
             }
         };
 

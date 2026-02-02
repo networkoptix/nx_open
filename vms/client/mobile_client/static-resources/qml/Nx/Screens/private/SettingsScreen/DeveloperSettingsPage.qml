@@ -13,13 +13,11 @@ import Nx.Ui
 import nx.vms.client.core
 import nx.vms.client.mobile
 
-BaseSettingsScreen
+BaseSettingsPage
 {
     id: settingsScreen
-    objectName: "developerSettingsScreen"
 
     title: qsTr("Developer Settings")
-    onLeftButtonClicked: Workflow.popCurrentScreen()
     padding: 16
 
     DeveloperSettingsHelper
@@ -326,6 +324,18 @@ BaseSettingsScreen
             checkState: appContext.settings.forceDeployByQrCodeFeature ? Qt.Checked : Qt.Unchecked
             onCheckStateChanged:
                 appContext.settings.forceDeployByQrCodeFeature = (checkState !== Qt.Unchecked)
+        }
+
+        LabeledSwitch
+        {
+            id: forceTabletMode
+
+            width: parent.width
+            text: "Force tablet mode"
+            checkState: appContext.settings.forceTabletMode ? Qt.Checked : Qt.Unchecked
+            onCheckStateChanged:
+                appContext.settings.forceTabletMode = (checkState !== Qt.Unchecked)
+            onClicked: d.openRestartDialog()
         }
     }
 

@@ -159,13 +159,6 @@ Item
         }
     }
 
-    // Background
-    Rectangle
-    {
-        anchors.fill: parent
-        color: ColorTheme.colors.dark5
-    }
-
     // Navigation list (visible when no organization is selected)
     NavigationListView
     {

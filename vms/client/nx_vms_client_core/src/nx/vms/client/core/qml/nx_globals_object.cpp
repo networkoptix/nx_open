@@ -15,6 +15,7 @@
 #include <QtQuick/private/qquickitemview_p_p.h>
 
 #include <nx/build_info.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/common/html/html.h>
@@ -401,6 +402,11 @@ QString NxGlobalsObject::toPlainText(const QString& value) const
 qint64 NxGlobalsObject::syncNowMs() const
 {
     return qnSyncTime->currentMSecsSinceEpoch();
+}
+
+bool NxGlobalsObject::isValidTime(qint64 value) const
+{
+    return value != DATETIME_INVALID;
 }
 
 QString NxGlobalsObject::shortcutText(const QVariant& var) const

@@ -5,6 +5,7 @@ import QtQuick.Window 2.0
 import QtQuick.Controls 2.4
 
 import Nx.Core 1.0
+import Nx.Ui
 
 import "private"
 
@@ -21,6 +22,8 @@ Control
     property bool manualStateChange: false
     property Item customArea: null
     property var customAreaClickHandler
+    property alias backgroundColor: backgroundRectangle.color
+    property alias backgroundRadius: backgroundRectangle.radius
 
     property alias extraText: extraTextItem.text
     property alias extraTextColor: extraTextItem.color
@@ -40,19 +43,23 @@ Control
 
     background: Rectangle
     {
+        id: backgroundRectangle
+
         color: ColorTheme.colors.dark6
+        radius: LayoutController.isTablet ? 8 : 0
 
         MaterialEffect
         {
             anchors.fill: parent
+            radius: backgroundRectangle.radius
             clip: true
             rippleSize: 160
-            mouseArea: backgroudMouseArea
+            mouseArea: backgroundMouseArea
         }
 
         MouseArea
         {
-            id: backgroudMouseArea
+            id: backgroundMouseArea
 
             anchors.fill: parent
             onClicked:

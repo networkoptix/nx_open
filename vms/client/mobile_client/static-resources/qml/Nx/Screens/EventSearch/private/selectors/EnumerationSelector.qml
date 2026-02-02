@@ -18,6 +18,7 @@ OptionSelector
 
     screenDelegate: RadioGroupEditor
     {
+        selector: control
         model: CoreUtils.toArray(attribute && attribute.enumeration && attribute.enumeration.items)
     }
 }

@@ -1,5 +1,7 @@
 module Nx.Ui
 
 FeedStateProvider 1.0 FeedStateProvider.qml
+singleton LayoutController 1.0 LayoutController.qml
+UiContainer 1.0 UiContainer.qml
 UiController 1.0 UiController.qml
 Workflow 1.0 Workflow.js

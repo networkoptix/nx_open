@@ -10,7 +10,7 @@ import Nx.Models
 import nx.vms.client.core
 import nx.vms.client.mobile
 
-BottomSheet
+AdaptiveSheet
 {
     id: sheet
 
@@ -107,7 +107,7 @@ BottomSheet
             hostsModel.localSystemId, d.login)
     }
 
-    ButtonBox
+    footer: ButtonBox
     {
         id: buttonBox
 

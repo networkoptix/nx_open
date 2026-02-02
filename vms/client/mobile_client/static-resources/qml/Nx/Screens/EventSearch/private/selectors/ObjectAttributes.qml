@@ -1,10 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
 
-import Nx.Core 1.0
+import Nx.Core
+import Nx.Mobile.Controls
 
-import nx.vms.client.core.analytics 1.0
+import nx.vms.client.core.analytics
 
 import "."
 import "../editors"
@@ -20,6 +21,8 @@ Column
     property alias attributes: repeater.model
     property string parentPropertyName
 
+    signal selectorClicked(OptionSelector selector)
+
     spacing: 4
     width: (parent && parent.width) ?? 0
 
@@ -34,6 +37,9 @@ Column
             parentPropertyName: control.parentPropertyName
             width: (parent && parent.width) ?? 0
             attribute: modelData
+
+            onSelectorClicked: control.selectorClicked(selector)
+
             Component.onCompleted: value = d.getSelectorValue(
                 control.value, (attribute && attribute.name) ?? "", control.unselectedValue)
         }

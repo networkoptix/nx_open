@@ -1,6 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-.import QtQuick.Controls 2.4 as Controls
+function openDefaultScreen()
+{
+    if (windowContext.sessionManager.hasSession)
+        openResourcesScreen(windowContext.sessionManager.systemName)
+    else
+        openSessionsScreen()
+}
 
 function focusCurrentScreen()
 {
@@ -33,7 +39,7 @@ function hasScreenInStack(screenName)
 
 function openSessionsScreen()
 {
-    var item = stackView.get(0, Controls.StackView.ForceLoad)
+    var item = stackView.get(0, StackView.ForceLoad)
     if (item && item.objectName === "sessionsScreen")
     {
         if (stackView.depth > 1)
@@ -88,7 +94,7 @@ function openConnectToServerScreen(host, user, password, operationId)
 
 function openResourcesScreen(systemName, filterIds)
 {
-    var item = stackView.get(0, Controls.StackView.ForceLoad)
+    var item = stackView.get(0, StackView.ForceLoad)
     if (item && item.objectName == "resourcesScreen")
     {
         item.filterIds = filterIds
@@ -125,19 +131,16 @@ function openVideoScreen(resource, screenshotUrl, timestamp, camerasModel)
         : stackView.pushScreen(Qt.resolvedUrl("../Screens/DeprecatedVideoScreen.qml"), properties)
 }
 
-function openSettingsScreen()
+// Pushes or replaces Settings screen based on 'push' parameter. Pushing is required to be able
+// to go back to the previous screen.
+// At the moment `push` is used only by the FeedScreen to open the push notifications settings.
+// TODO: Add initial page parameter.
+function openSettingsScreen(push)
 {
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/SettingsScreen.qml"))
-}
-
-function openPushExpertModeScreen()
-{
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/PushExpertModeScreen.qml"))
-}
-
-function openDeveloperSettingsScreen()
-{
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/DeveloperSettingsScreen.qml"))
+    if (push)
+        stackView.pushScreen(Qt.resolvedUrl("../Screens/SettingsScreen.qml"))
+    else
+        stackView.replace(null, Qt.resolvedUrl("../Screens/SettingsScreen.qml"))
 }
 
 function openCloudSummaryScreen()
@@ -154,11 +157,6 @@ function openCloudLoginScreen(forced)
         })
 }
 
-function openSecuritySettingsScreen()
-{
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/SecuritySettingsScreen.qml"))
-}
-
 function openCameraSettingsScreen(mediaPlayer, audioSupported, audioController)
 {
     stackView.pushScreen(
@@ -170,26 +168,29 @@ function openCameraSettingsScreen(mediaPlayer, audioSupported, audioController)
         })
 }
 
-function openEventSearchScreen(selectedResourceId, camerasModel, analyticsSearchMode)
+// Pushes or replaces Event Search screen based on 'push' parameter. Pushing is required to be able
+// to go back to the previous screen.
+// When the search screen is opened from the navigation bar it must replace all the items in stack,
+// otherwise (e.g. when opened from video screen) it must be pushed onto the stack.
+function openEventSearchScreen(push, selectedResourceId, camerasModel, analyticsSearchMode)
 {
     if (hasScreenInStack("eventSearchScreen"))
         popScreens(3) //< Pop video, event details, screen.
 
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/EventSearch/EventSearchScreen.qml"),
-        {
-            'camerasModel': camerasModel,
-            'customResourceId': selectedResourceId,
-            'analyticsSearchMode': !!analyticsSearchMode
-        })
-}
+    let properties = {}
+    if (selectedResourceId)
+        properties['customResourceId'] = selectedResourceId
 
-function openEventFiltersScreen(controller)
-{
-    stackView.pushScreen(
-        Qt.resolvedUrl("../Screens/EventSearch/private/FiltersScreen.qml"),
-        {
-            "controller": controller,
-        })
+    if (camerasModel)
+        properties['camerasModel'] = camerasModel
+
+    if (analyticsSearchMode)
+        properties['analyticsSearchMode'] = analyticsSearchMode
+
+    if (push)
+        stackView.push(Qt.resolvedUrl("../Screens/EventSearch/EventSearchScreen.qml"), properties)
+    else
+        stackView.replace(null, Qt.resolvedUrl("../Screens/EventSearch/EventSearchScreen.qml"), properties)
 }
 
 function openEventDetailsScreen(camerasModel, bookmarksModel, currentIndex, isAnalyticsDetails)
@@ -203,24 +204,12 @@ function openEventDetailsScreen(camerasModel, bookmarksModel, currentIndex, isAn
         })
 }
 
-function openBetaFeaturesScreen()
+function openFeedScreen(push, feedState)
 {
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/BetaFeaturesScreen.qml"))
-}
-
-function openEventSearchMenuScreen()
-{
-    stackView.replace(null, Qt.resolvedUrl("../Screens/EventSearchMenuScreen.qml"))
-}
-
-function openFeedMenuScreen(feedState)
-{
-    stackView.replace(null, Qt.resolvedUrl("../Screens/FeedScreen.qml"), {"feedState": feedState})
-}
-
-function openFeedScreen(feedState)
-{
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/FeedScreen.qml"), {"feedState": feedState})
+    if (push)
+        stackView.push(Qt.resolvedUrl("../Screens/FeedScreen.qml"), {"feedState": feedState})
+    else
+        stackView.replace(null, Qt.resolvedUrl("../Screens/FeedScreen.qml"), {"feedState": feedState})
 }
 
 function openMenuScreen()
@@ -250,19 +239,4 @@ function openStandardDialog(title, message = "", buttonsModel = ["OK"], disableA
             "buttonsModel": buttonsModel
         }
     )
-}
-
-function openInterfaceSettingsScreen()
-{
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/InterfaceSettingsScreen.qml"))
-}
-
-function openPerformanceSettingsScreen()
-{
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/PerformanceSettingsScreen.qml"))
-}
-
-function openAppInfoScreen()
-{
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/AppInfoScreen.qml"))
 }

@@ -10,7 +10,7 @@ import Nx.Mobile.Controls
 
 import nx.vms.client.core
 
-BaseBottomSheet
+BaseAdaptiveSheet
 {
     id: sheet
 

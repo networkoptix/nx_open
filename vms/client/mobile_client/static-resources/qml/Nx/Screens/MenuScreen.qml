@@ -26,7 +26,6 @@ Page
         width: parent.width - x * 2
         height: parent.height - y * 2
         spacing: 6
-
         verticalLayoutDirection: ListView.BottomToTop
 
         model: [
@@ -39,7 +38,7 @@ Page
             {
                 "iconSource": "image://skin/24x24/Outline/settings.svg",
                 "text": qsTr("App Settings"),
-                "action": () => Workflow.openSettingsScreen()
+                "action": () => Workflow.openSettingsScreen(/*push*/ false)
             },
             {
                 "iconSource": "image://skin/24x24/Outline/qr.svg",

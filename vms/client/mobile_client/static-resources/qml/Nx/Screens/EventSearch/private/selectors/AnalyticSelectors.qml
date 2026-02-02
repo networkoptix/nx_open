@@ -21,6 +21,8 @@ Column
     property CommonObjectSearchSetup searchSetup: null
     property AnalyticsSearchSetup analyticsSearchSetup: null
 
+    signal selectorClicked(OptionSelector selector)
+
     spacing: 4
     width: (parent && parent.width) ?? 0
 
@@ -30,6 +32,8 @@ Column
 
         model: d.model.engines
         visible: d.model.engines.length > 1
+
+        onClicked: control.selectorClicked(pluginSelector)
     }
 
     RecursiveObjectTypeSelector
@@ -38,6 +42,8 @@ Column
 
         objectTypes: d.model.objectTypes ?? null
         visible: d.model.objectTypes && d.model.objectTypes.length
+
+        onSelectorClicked: (selector) => control.selectorClicked(selector)
     }
 
     Text
@@ -56,6 +62,7 @@ Column
         id: objectAttributes
 
         attributes: objectTypeSelector.value && objectTypeSelector.value.attributes
+        onSelectorClicked: (selector) => control.selectorClicked(selector)
     }
 
     NxObject

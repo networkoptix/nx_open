@@ -1,17 +1,20 @@
 module Nx.Items
 
+AdaptiveScreen 1.0 AdaptiveScreen.qml
+ArchiveCalendar 1.0 ArchiveCalendar.qml
+BookmarkList 1.0 BookmarkList.qml
+Breadcrumb 1.0 Breadcrumb.qml
+DownloadMediaButton 1.0 DownloadMediaButton.qml
+DummyMessage 1.0 DummyMessage.qml
+HorizontalSlide 1.0 HorizontalSlide.qml
+IssueLabel 1.0 IssueLabel.qml
+LoginButton 1.0 LoginButton.qml
+Panel 1.0 Panel.qml
+Placeholder 1.0 Placeholder.qml
+ProxyItem 1.0 ProxyItem.qml
+ResourceTreeItem 1.0 ResourceTreeItem.qml
 SessionCredentialsEditor 1.0 SessionCredentialsEditor.qml
 SessionItem 1.0 SessionItem.qml
+SiteList 1.0 SiteList.qml
 SiteListItem 1.0 SiteListItem.qml
 Skeleton 1.0 Skeleton.qml
-Placeholder 1.0 Placeholder.qml
-ArchiveCalendar 1.0 ArchiveCalendar.qml
-LoginButton 1.0 LoginButton.qml
-DummyMessage 1.0 DummyMessage.qml
-IssueLabel 1.0 IssueLabel.qml
-BookmarkList 1.0 BookmarkList.qml
-DownloadMediaButton 1.0 DownloadMediaButton.qml
-Breadcrumb 1.0 Breadcrumb.qml
-SiteList 1.0 SiteList.qml
-HorizontalSlide 1.0 HorizontalSlide.qml
-LeftNavigationSidebar 1.0 LeftNavigationSidebar.qml

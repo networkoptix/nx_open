@@ -114,6 +114,9 @@ public:
     /** Returns qnSyncTime->currentMSecsSinceEpoch(). */
     Q_INVOKABLE qint64 syncNowMs() const;
 
+    /** Returns whether the given value is a valid time. */
+    Q_INVOKABLE bool isValidTime(qint64 value) const;
+
     /** Returns native string representation of QQuickAction shortcut property. */
     Q_INVOKABLE QString shortcutText(const QVariant& var) const;
 

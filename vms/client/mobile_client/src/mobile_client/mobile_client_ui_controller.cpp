@@ -2,7 +2,6 @@
 
 #include "mobile_client_ui_controller.h"
 
-#include <core/resource/layout_resource.h>
 #include <core/resource/resource.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <nx/utils/log/log.h>
@@ -23,7 +22,7 @@ class QnMobileClientUiControllerPrivate
 {
 public:
     std::unique_ptr<nx::vms::client::mobile::OperationManager> operationManager;
-    QnLayoutResourcePtr layout;
+    QnResourcePtr resource;
     bool avoidHandlingConnectionStuff = false;
     QnMobileClientUiController::Screen currentScreen =
         QnMobileClientUiController::Screen::UnknownScreen;
@@ -57,7 +56,7 @@ QnMobileClientUiController::QnMobileClientUiController(
             }
             else
             {
-                setRawLayout({});
+                setRawResource({});
                 if (currentScreen() != Screen::DigestLoginToCloudScreen)
                     openSessionsScreen();
             }
@@ -143,24 +142,21 @@ void QnMobileClientUiController::setCurrentScreen(Screen value)
 }
 
 
-QnLayoutResource* QnMobileClientUiController::rawLayout() const
+QnResource* QnMobileClientUiController::rawResource() const
 {
     Q_D(const QnMobileClientUiController);
-    return d->layout.get();
+    return d->resource.get();
 }
 
-void QnMobileClientUiController::setRawLayout(QnLayoutResource* value)
+void QnMobileClientUiController::setRawResource(QnResource* value)
 {
     Q_D(QnMobileClientUiController);
-    const auto layout = value
-        ? value->toSharedPointer().dynamicCast<QnLayoutResource>()
-        : QnLayoutResourcePtr{};
 
-    if (d->layout == layout)
+    if (d->resource == value)
         return;
 
-    d->layout = layout;
-    emit layoutChanged();
+    d->resource = value ? value->toSharedPointer() : QnResourcePtr{};
+    emit resourceChanged();
 }
 
 bool QnMobileClientUiController::avoidHandlingConnectionStuff() const

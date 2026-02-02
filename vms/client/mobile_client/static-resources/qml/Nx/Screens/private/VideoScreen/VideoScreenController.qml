@@ -350,7 +350,9 @@ NxObject
 
     function jumpBackward()
     {
-        forcePosition(chunkPositionWatcher.prevChunkStartTimeMs())
+        const prevChunkStartTimeMs = chunkPositionWatcher.prevChunkStartTimeMs()
+        if (NxGlobals.isValidTime(prevChunkStartTimeMs)) //< FIXME: #vkutin jumpBackward must not be called if there are no chunks.
+            forcePosition(prevChunkStartTimeMs)
     }
 
     function jumpToFirstChunk()

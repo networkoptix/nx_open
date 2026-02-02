@@ -35,6 +35,16 @@ Item
         return loader && loader.item ? loader.item.mediaPlayer : null
     }
 
+    function stopMediaPlayers()
+    {
+        for (let i = 0; i !== count; ++i)
+        {
+            const mediaPlayer = getMediaPlayer(i)
+            if (mediaPlayer)
+                mediaPlayer.stop()
+        }
+    }
+
     Flickable
     {
         id: flickable

@@ -6,12 +6,8 @@ import Nx.Controls
 import Nx.Settings
 import Nx.Ui
 
-BaseSettingsScreen
+BaseSettingsPage
 {
-    id: betaFeaturesScreen
-
-    objectName: "betaFeaturesScreen"
-
     title: qsTr("Beta Features")
 
     LabeledSwitch

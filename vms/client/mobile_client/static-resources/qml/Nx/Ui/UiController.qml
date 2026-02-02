@@ -65,18 +65,6 @@ NxObject
                     return Controller.VideoScreen
                 case "settingsScreen":
                     return Controller.SettingsScreen
-                case "securitySettingsScreen":
-                    return Controller.SecuritySettingsScreen
-                case "interfaceSettingsScreen":
-                    return Controller.InterfaceSettingsScreen
-                case "performanceSettingsScreen":
-                    return Controller.PerformanceSettingsScreen
-                case "appInfoScreen":
-                    return Controller.AppInfoScreen
-                case "betaFeaturesScreen":
-                    return Controller.BetaFeaturesScreen
-                case "pushExpertModeScreen":
-                    return Controller.PushExpertSettingsScreen
                 case "loginToCloudScreen":
                     return Controller.LoginToCloudScreen
                 case "digestLoginToCloudScreen":

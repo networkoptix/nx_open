@@ -64,6 +64,8 @@ public:
 
         CrashReportingEnabled,
 
+        ForceTabletMode,
+
         VariableCount
     };
 
@@ -182,6 +184,11 @@ private:
             crashReportingEnabled, setCrashReportingEnabled,
             CrashReportingEnabled,
             (nx::build_info::publicationType() != nx::build_info::PublicationType::release))
+
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            forceTabletMode, setForceTabletMode,
+            ForceTabletMode, false)
 
     QN_END_PROPERTY_STORAGE()
 

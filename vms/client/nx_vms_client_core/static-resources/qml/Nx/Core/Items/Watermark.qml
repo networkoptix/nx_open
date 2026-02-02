@@ -35,8 +35,11 @@ Image
 
         onSystemContextChanged:
         {
-            systemContext.watermarkWatcher.addWatermarkImageUrlWatcher(
-                control.watermarkId, sourceSize)
+            if (systemContext)
+            {
+                systemContext.watermarkWatcher.addWatermarkImageUrlWatcher(
+                    control.watermarkId, sourceSize)
+            }
         }
 
         onSystemContextIsAboutToBeChanged:

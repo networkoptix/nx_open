@@ -8,7 +8,7 @@ Row
 
     property alias model: repeater.model
 
-    width: parent.width
+    width: parent ? parent.width : implicitWidth
     spacing: repeater.count ? 12 : 0
 
     signal clicked(string id)

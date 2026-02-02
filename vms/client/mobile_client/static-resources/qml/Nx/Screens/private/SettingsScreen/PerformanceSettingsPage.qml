@@ -4,12 +4,8 @@ import QtQuick
 
 import Nx.Controls
 
-BaseSettingsScreen
+BaseSettingsPage
 {
-    id: performanceSettingsScreen
-
-    objectName: "performanceSettingsScreen"
-
     title: qsTr("Performance")
 
     LabeledSwitch

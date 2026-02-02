@@ -4,12 +4,8 @@ import QtQuick
 
 import Nx.Controls
 
-BaseSettingsScreen
+BaseSettingsPage
 {
-    id: interfaceSettingsScreen
-
-    objectName: "interfaceSettingsScreen"
-
     title: qsTr("Interface")
 
     LabeledSwitch

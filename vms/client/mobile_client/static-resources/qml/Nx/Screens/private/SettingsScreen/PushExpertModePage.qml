@@ -8,33 +8,29 @@ import Nx.Mobile
 import Nx.Settings
 import Nx.Ui
 
-Page
+BaseSettingsPage
 {
-    id: pushExpertModeScreen
+    id: pushExpertModePage
 
-    objectName: "pushExpertModeScreen"
+    objectName: "pushExpertModePage"
+
+    function saveSettings()
+    {
+        d.handleBackClicked()
+    }
 
     opacity: enabled ? 1.0 : 0.3
     enabled: !appContext.pushManager.userUpdateInProgress
-
-    customBackHandler: () => d.handleBackClicked()
-    onLeftButtonClicked: () => d.handleBackClicked()
 
     title: !simpleModeRadioButton.checked && d.selectionModel
         ? "%1: %2".arg(qsTr("Sites")).arg(d.selectionModel.selectedSystems.length)
         : qsTr("Notifications")
 
-    toolBar.visible: opacity > 0
-    toolBar.opacity: enabled ? 1.0 : 0.3
-
-    Button
+    rightControl: Button
     {
         id: doneButton
 
-        parent: toolBar
         visible: d.hasChanges
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.right: parent.right
         enabled: !appContext.pushManager.userUpdateInProgress
 
         text: qsTr("Done")
@@ -64,70 +60,93 @@ Page
 
             width: parent.width
 
-            Column
+            Rectangle
             {
-                spacing: 4
                 width: parent.width
+                height: notificationSourceGroup.implicitHeight
+                radius: LayoutController.isTablet ? 8 : 0
+                color: ColorTheme.colors.dark6
 
-                LabeledSwitch
+                Column
                 {
-                    id: notificationsSwitch
+                    id: notificationSourceGroup
 
+                    spacing: 4
                     width: parent.width
 
-                    text: qsTr("Notifications")
-                    manualStateChange: true
-
-                    showIndicator:
-                        appContext.pushManager.loggedIn && appContext.pushManager.hasOsPermission
-
-                    onClicked:
+                    LabeledSwitch
                     {
-                        if (!appContext.pushManager.loggedIn)
-                            Workflow.openCloudLoginScreen()
-                        else if (!appContext.pushManager.hasOsPermission)
-                            appContext.pushManager.showOsPushSettings()
-                        else
-                            appContext.pushManager.setEnabled(checkState == Qt.Unchecked)
+                        id: notificationsSwitch
+
+                        width: parent.width
+
+                        text: qsTr("Notifications")
+                        manualStateChange: true
+
+                        showIndicator:
+                            appContext.pushManager.loggedIn && appContext.pushManager.hasOsPermission
+
+                        onClicked:
+                        {
+                            if (!appContext.pushManager.loggedIn)
+                                Workflow.openCloudLoginScreen()
+                            else if (!appContext.pushManager.hasOsPermission)
+                                appContext.pushManager.showOsPushSettings()
+                            else
+                                appContext.pushManager.setEnabled(checkState == Qt.Unchecked)
+                        }
+
+                        Binding on checkState { value: appContext.pushManager.enabledCheckState }
+
+                        extraText:
+                        {
+                            if (!appContext.pushManager.loggedIn)
+                                return qsTr("Log in to the cloud to receive notifications")
+
+                            return appContext.pushManager.hasOsPermission
+                                ? ""
+                                : qsTr("Notifications are turned off in the device settings")
+                        }
+
+                        extraTextColor:
+                        {
+                            if (!appContext.pushManager.loggedIn)
+                                return ColorTheme.colors.brand_core
+
+                            return appContext.pushManager.hasOsPermission
+                                ? notificationsSwitch.extraTextStandardColor
+                                : ColorTheme.colors.red_l2
+                        }
+
+                        Rectangle
+                        {
+                            id: line
+
+                            x: parent.leftPadding
+                            width: parent.width - x - parent.rightPadding
+                            anchors.bottom: parent.bottom
+
+                            height: 1
+                            color: ColorTheme.colors.dark8
+                        }
                     }
 
-                    Binding on checkState { value: appContext.pushManager.enabledCheckState }
-
-                    extraText:
+                    StyledRadioButton
                     {
-                        if (!appContext.pushManager.loggedIn)
-                            return qsTr("Log in to the cloud to receive notifications")
+                        id: simpleModeRadioButton
 
-                        return appContext.pushManager.hasOsPermission
-                            ? ""
-                            : qsTr("Notifications are turned off in the device settings")
+                        width: parent.width
+                        text: qsTr("All Sites")
                     }
 
-                    extraTextColor:
+                    StyledRadioButton
                     {
-                        if (!appContext.pushManager.loggedIn)
-                            return ColorTheme.colors.brand_core
+                        id: expertModeRadioButton
 
-                        return appContext.pushManager.hasOsPermission
-                            ? notificationsSwitch.extraTextStandardColor
-                            : ColorTheme.colors.red_l2
+                        width: parent.width
+                        text: qsTr("Selected Sites")
+                        backgroundRadius: LayoutController.isTablet ? 8 : 0
                     }
-                }
-
-                StyledRadioButton
-                {
-                    id: simpleModeRadioButton
-
-                    width: parent.width
-                    text: qsTr("All Sites")
-                }
-
-                StyledRadioButton
-                {
-                    id: expertModeRadioButton
-
-                    width: parent.width
-                    text: qsTr("Selected Sites")
                 }
             }
 
@@ -206,15 +225,17 @@ Page
     {
         id: preloaderOverlay
 
-        parent: pushExpertModeScreen
-        blurSource: pushExpertModeScreen
+        parent: pushExpertModePage
+        blurSource: pushExpertModePage
     }
 
     Connections
     {
         target: appContext.pushManager
-        onShowPushSettingsErrorMessage:
-            (title, message) => windowContext.ui.showMessage(title, message)
+        function onShowPushSettingsErrorMessage(title, message)
+        {
+            windowContext.ui.showMessage(title, message)
+        }
     }
 
     NxObject
@@ -249,7 +270,10 @@ Page
                 function(success)
                 {
                     if (!success)
+                    {
+                        pushExpertModePage.error()
                         return
+                    }
 
                     if (d.selectionModel)
                     {
@@ -259,7 +283,7 @@ Page
                         d.selectionModel.resetChangesFlag()
                     }
 
-                    Workflow.popCurrentScreen()
+                    pushExpertModePage.settingsSaved()
                 }
 
             if (expertModeRadioButton.checked)
@@ -272,7 +296,7 @@ Page
         {
             if (!d.hasChanges)
             {
-                Workflow.popCurrentScreen()
+                pushExpertModePage.settingsSaved()
                 return
             }
 
@@ -290,7 +314,8 @@ Page
                             d.tryApplyAndReturn()
                             break
                         case "goBackButton":
-                            Workflow.popCurrentScreen()
+                            // TODO: Reset ui state.
+                            pushExpertModePage.settingsSaved()
                     }
                 });
         }

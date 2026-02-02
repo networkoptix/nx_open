@@ -12,7 +12,8 @@ T.RadioButton
 {
     id: control
 
-    property color backgoundColor: ColorTheme.colors.dark6
+    property int backgroundRadius: 0
+    property color backgroundColor: ColorTheme.colors.dark6
     property color checkedBackgroundColor: ColorTheme.colors.dark6
 
     property alias extraText: extraTextItem.text
@@ -31,9 +32,10 @@ T.RadioButton
 
     background: Rectangle
     {
+        radius: control.backgroundRadius
         color: control.checked
             ? control.checkedBackgroundColor
-            : control.backgoundColor
+            : control.backgroundColor
 
         MaterialEffect
         {

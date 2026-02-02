@@ -25,6 +25,8 @@ Column
 
     readonly property OptionSelector selector: content.item
 
+    signal selectorClicked
+
     spacing: 4
 
     Binding
@@ -81,15 +83,13 @@ Column
         Binding
         {
             target: content.item
-            property: "screenTitle"
+            property: "descriptionText"
             value:
             {
                 if (!content.item)
                     return ""
 
-                return control.attribute && control.attribute.unit
-                    ? `${content.item.text}, ${control.attribute.unit}`
-                    : content.item.text
+                return control.attribute?.name || ""
             }
         }
 
@@ -122,6 +122,11 @@ Column
             {
                 if (!CoreUtils.equalValues(control.value, content.item.value))
                     control.value = content.item.value
+            }
+
+            function onClicked()
+            {
+                control.selectorClicked()
             }
         }
 

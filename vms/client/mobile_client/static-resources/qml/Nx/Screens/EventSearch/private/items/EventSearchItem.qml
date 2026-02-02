@@ -38,7 +38,7 @@ MouseArea
     {
         id: preview
 
-        x: 12
+        x: 20
         width: parent.height * d.kPreviewAspect
         height: parent.height
 

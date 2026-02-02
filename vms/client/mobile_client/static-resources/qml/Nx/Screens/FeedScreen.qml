@@ -30,7 +30,6 @@ Page
     readonly property bool empty: notifications.count === 0
 
     objectName: "feedScreen"
-
     title: qsTr("Feed")
 
     topPadding: 8
@@ -42,8 +41,6 @@ Page
     rightControl: IconButton
     {
         id: filterButton
-
-        anchors.centerIn: parent
 
         icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
         icon.width: 24
@@ -98,7 +95,7 @@ Page
                     "image://skin/64x64/Outline/notification_off.svg?primary=light10"
 
                 placeholder.buttonText: qsTr("Settings")
-                placeholder.onButtonClicked: Workflow.openPushExpertModeScreen()
+                placeholder.onButtonClicked: Workflow.openSettingsScreen(/*push*/ true) //< TODO: required to open the exact page.
             }
         },
         State

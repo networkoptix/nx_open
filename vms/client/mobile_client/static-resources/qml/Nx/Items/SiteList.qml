@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 
 import Nx.Core
@@ -85,7 +86,7 @@ ListView
                 name: "hidden"
                 when: siteList.currentTab !== OrganizationsModel.SitesTab
                     || !!siteList.searchText
-                    || (siteList.count != 0 && siteList.itemAtIndex(0)?.isCloudSystem)
+                    || (siteList.count != 0 && (siteList.itemAtIndex(0)?.isCloudSystem || false))
 
                 PropertyChanges
                 {
@@ -136,15 +137,25 @@ ListView
 
                 visible: headerItem.state == "showButton"
 
-                Layout.fillWidth: true
-                Layout.preferredHeight: 44
-                color: ColorTheme.colors.brand_core
-                textColor: ColorTheme.colors.dark1
+                Layout.fillWidth: LayoutController.isMobile
+                Layout.preferredWidth: siteList.cellWidth
+                Layout.preferredHeight: LayoutController.isMobile ? 44 : 116
+
+                color: LayoutController.isMobile ? ColorTheme.colors.brand_core : ColorTheme.colors.dark8
+                textColor: LayoutController.isMobile ? ColorTheme.colors.dark1 : ColorTheme.colors.brand_core
                 leftPadding: 0
                 rightPadding: 0
                 padding: 0
 
-                text: qsTr("Log In")
+                icon.source: "image://skin/32x32/Outline/cloud.svg?primary=brand_core"
+                icon.width: 32
+                icon.height: 32
+
+                display: LayoutController.isMobile
+                    ? AbstractButton.TextOnly
+                    : AbstractButton.TextUnderIcon
+
+                text: LayoutController.isMobile ? qsTr("Log In") : qsTr("Log In to Cloud")
 
                 onClicked: Workflow.openCloudLoginScreen()
             }

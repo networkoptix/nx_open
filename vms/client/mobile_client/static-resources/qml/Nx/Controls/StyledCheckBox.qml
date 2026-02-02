@@ -12,7 +12,8 @@ CheckBox
 {
     id: control
 
-    property alias backgoundColor: backgroundItem.color
+    property alias backgroundRadius: backgroundItem.radius
+    property alias backgroundColor: backgroundItem.color
     property alias iconSource: icon.source
 
     implicitWidth: leftPadding + rightPadding + indicator.implicitwidth + contentItem.implicitWidth
@@ -49,10 +50,9 @@ CheckBox
         anchors.verticalCenter: parent.verticalCenter
         removeBorderWhenChecked: false
         checked: control.checked
-        color: ColorTheme.colors.dark5
+        color: "transparent"
         checkColor: ColorTheme.colors.brand_core
-        checkedColor: ColorTheme.colors.dark7
-        backgroundColor: ColorTheme.colors.dark9
+        checkedColor: "transparent"
         borderWidth: 1
         lineWidth: 1.5
         checkMarkScale: 1.2

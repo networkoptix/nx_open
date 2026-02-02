@@ -25,6 +25,9 @@ public:
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     Q_INVOKABLE QModelIndex resourceIndex(QnResource* resource) const;
 
+signals:
+    void rootEntityUpdated();
+
 private:
     virtual void onContextReady() override;
 

@@ -34,6 +34,7 @@ OptionSelector
 
     screenDelegate: RadioGroupEditor
     {
+        selector: control
         model: [true, false]
     }
 

@@ -43,15 +43,7 @@ public:
         EventSearchScreen,
         FeedScreen,
         MenuScreen,
-
-        // Application settings related screens.
-        SettingsScreen,
-        SecuritySettingsScreen,
-        InterfaceSettingsScreen,
-        PerformanceSettingsScreen,
-        BetaFeaturesScreen,
-        PushExpertSettingsScreen,
-        AppInfoScreen
+        SettingsScreen
     };
 
     Q_ENUM(Screen)
@@ -62,10 +54,10 @@ private:
         WRITE setCurrentScreen
         NOTIFY currentScreenChanged)
 
-    Q_PROPERTY(QnLayoutResource* layout
-        READ rawLayout
-        WRITE setRawLayout
-        NOTIFY layoutChanged)
+    Q_PROPERTY(QnResource* resource
+        READ rawResource
+        WRITE setRawResource
+        NOTIFY resourceChanged)
 
     Q_PROPERTY(nx::vms::client::mobile::OperationManager* operationManager
         READ operationManager
@@ -94,8 +86,8 @@ public:
     Screen currentScreen() const;
     void setCurrentScreen(Screen value);
 
-    QnLayoutResource* rawLayout() const;
-    void setRawLayout(QnLayoutResource* value);
+    QnResource* rawResource() const;
+    void setRawResource(QnResource* value);
 
     bool avoidHandlingConnectionStuff() const;
     void setAvoidHandlingConnectionStuff(bool value);
@@ -111,7 +103,7 @@ public:
     Q_INVOKABLE void openSessionsScreen();
 
 signals:
-    void layoutChanged();
+    void resourceChanged();
     void resourcesScreenRequested(const QVariant& filterIds);
     void videoScreenRequested(QnResource* cameraResource, qint64 timestamp);
     void sessionsScreenRequested();

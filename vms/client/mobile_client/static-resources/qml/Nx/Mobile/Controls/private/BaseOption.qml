@@ -1,10 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Controls
 
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx.Core
+import Nx.Controls
+import Nx.Ui
 
 /**
 * Implements basic option control implementation. It contains option text, description and area
@@ -23,12 +24,11 @@ Control
     property alias customArea: customAreaLoader.sourceComponent
     property alias customAreaItem: customAreaLoader.item
 
-    implicitHeight: topPadding + bottomPadding + contentItem.height
     implicitWidth: (parent && parent.width) ?? 0
 
     spacing: 16
-    topPadding: 18
-    bottomPadding: 18
+    topPadding: 12
+    bottomPadding: 12
     leftPadding: 16
     rightPadding: 16
 
@@ -37,6 +37,7 @@ Control
     background: Rectangle
     {
         color: ColorTheme.colors.dark6
+        radius: LayoutController.isTabletLayout ? 8 : 0
 
         MaterialEffect
         {
@@ -57,7 +58,8 @@ Control
 
     contentItem: Item
     {
-        height: Math.max(textArea.height, customAreaLoader.height)
+        implicitHeight: textArea.implicitHeight
+        implicitWidth: textArea.implicitWidth
 
         Column
         {
@@ -76,27 +78,27 @@ Control
 
             Text
             {
-                id: textItem
-
-                text: control.text
-
-                width: parent.width
-                color: ColorTheme.colors.light1
-                font.pixelSize: 16
-                wrapMode: Text.Wrap
-                elide: Text.ElideRight
-            }
-
-            Text
-            {
                 id: descriptionTextItem
 
                 visible: !!text
                 text: control.descriptionText
 
                 width: parent.width
-                color: ColorTheme.colors.light12
-                font.pixelSize: 13
+                color: ColorTheme.colors.light16
+                font.pixelSize: 12
+                wrapMode: Text.Wrap
+                elide: Text.ElideRight
+            }
+
+            Text
+            {
+                id: textItem
+
+                text: control.text
+
+                width: parent.width
+                color: ColorTheme.colors.light10
+                font.pixelSize: 18
                 wrapMode: Text.Wrap
                 elide: Text.ElideRight
             }

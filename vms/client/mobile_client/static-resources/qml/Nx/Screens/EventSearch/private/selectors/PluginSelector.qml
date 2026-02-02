@@ -16,12 +16,13 @@ OptionSelector
 
     property var model
 
-    text: qsTr("Plugin")
+    descriptionText: qsTr("Plugin")
     textFieldName: "name"
     unselectedValue: null
 
     screenDelegate: RadioGroupEditor
     {
+        selector: control
         model: control.model
     }
 }

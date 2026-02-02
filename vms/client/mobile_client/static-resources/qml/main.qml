@@ -1,29 +1,30 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
-import QtQuick.Window
 import QtQuick.Controls as Controls
 
-import Nx.Core
 import Nx.Controls
-import Nx.Items
+import Nx.Core
 import Nx.Mobile
+import Nx.Screens
 import Nx.Ui
 
 import nx.vms.client.core
-import nx.vms.client.mobile
 
 Controls.ApplicationWindow
 {
     id: mainWindow
 
+    objectName: "mainWindow"
+
     readonly property bool hasNavigationBar:
         !!windowContext.ui.windowHelpers.navigationBarSize()
 
-    readonly property bool isPortraitLayout: width <= height
+    property alias windowParams: windowParams
+    property alias uiContainer: uiContainer
 
     visible: true
-    color: ColorTheme.colors.dark4 ?? "transparent"
+    background: Rectangle { color: ColorTheme.colors.dark7 }
 
     function lp(path)
     {
@@ -43,7 +44,6 @@ Controls.ApplicationWindow
 
         readonly property real availableWidth: width - windowParams.leftMargin - windowParams.rightMargin
         readonly property real availableHeight: height
-            - topLevelWarning.height
             - windowParams.topMargin
             - windowParams.bottomMargin
     }
@@ -54,63 +54,27 @@ Controls.ApplicationWindow
     Binding { target: mainWindow; property: "leftPadding"; value: windowParams.leftMargin }
     Binding { target: mainWindow; property: "rightPadding"; value: windowParams.rightMargin }
 
-    StackView
+    UiContainer
     {
-        id: stackView
+        id: uiContainer
 
-        objectName: "mainStackView"
-
-        y: topLevelWarning.height
-        width: windowParams.availableWidth
-        height: windowParams.availableHeight - screenNavigationBar.heightOffset
-        focus: true
-
-        function restoreActiveFocus()
-        {
-            if (activeFocusItem == Window.contentItem)
-                Workflow.focusCurrentScreen()
-        }
-
-        onCurrentItemChanged:
-        {
-            mainWindow.color = currentItem.hasOwnProperty("backgroundColor")
-                ? currentItem.backgroundColor
-                : ColorTheme.colors.dark4
-        }
-        onWidthChanged: autoScrollDelayTimer.restart()
-        onHeightChanged: autoScrollDelayTimer.restart()
+        anchors.fill: parent
     }
 
     SnackBar
     {
         id: snackBar
-        parent: Overlay.overlay
-        y: screenNavigationBar.y - height - 16
-    }
 
-    ScreenNavigationBar
-    {
-        id: screenNavigationBar
-    }
-
-    UiController
-    {
-        stackView: stackView
-    }
-
-    WarningPanel
-    {
-        id: topLevelWarning
-
-        width: parent.width
-        text: d.warningText
-        opened: text.length
+        parent: Controls.Overlay.overlay
+        y: LayoutController.isTabletLayout
+            ? uiContainer.navigationBar.y - height - 16
+            : mainWindow.height - height - 16
     }
 
     onActiveFocusItemChanged:
     {
         autoScrollDelayTimer.restart()
-        stackView.restoreActiveFocus()
+        uiContainer.stackView.restoreActiveFocus()
     }
 
     Timer
@@ -141,8 +105,9 @@ Controls.ApplicationWindow
             appContext.cloudStatusWatcher.status === CloudStatusWatcher.Offline
 
         property bool cloudOfflineDelayed: false
-        property bool showCloudOfflineWarning:
-            stackView.currentItem && stackView.currentItem.objectName === "sessionsScreen" && cloudOfflineDelayed
+        property bool showCloudOfflineWarning: uiContainer.stackView.currentItem
+            && uiContainer.stackView.currentItem.objectName === "sessionsScreen"
+            && cloudOfflineDelayed
 
         readonly property string warningText:
         {
@@ -195,6 +160,8 @@ Controls.ApplicationWindow
 
     Component.onCompleted:
     {
+        LayoutController.mainWindow = mainWindow
+
         let startupHandler =
             function()
             {

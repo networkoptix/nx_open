@@ -183,7 +183,7 @@ Grid
         {
             restoreMode: Binding.RestoreNone
             target: control.selector
-            property: "textValue"
+            property: "text"
             value: d.getTextValue(d.selectedIndex)
         }
 

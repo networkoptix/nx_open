@@ -10,6 +10,7 @@ AbstractButton
 {
     id: control
 
+    property int alignment: Qt.AlignCenter
     property bool flat: false
     property color color: ColorTheme.colors.dark9
     property color hoveredColor: Qt.lighter(color)
@@ -51,10 +52,12 @@ AbstractButton
 
     contentItem: IconLabel
     {
+        alignment: control.alignment
         leftPadding: control.labelPadding
         rightPadding: control.labelPadding
         spacing: 8
         icon: control.icon
+        display: control.display
         text: control.text
         font: control.font
         color: control.pressed

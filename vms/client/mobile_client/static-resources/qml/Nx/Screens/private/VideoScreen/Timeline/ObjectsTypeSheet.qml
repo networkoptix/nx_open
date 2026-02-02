@@ -7,7 +7,7 @@ import Nx.Mobile.Controls
 
 import nx.vms.client.mobile.timeline as Timeline
 
-BottomSheet
+AdaptiveSheet
 {
     id: sheet
 
@@ -67,11 +67,10 @@ BottomSheet
         height: 20
     }
 
-    Button
+    footer: Button
     {
         text: qsTr("Close")
         type: Button.LightInterface
-        width: parent.width
 
         onClicked:
             sheet.close()

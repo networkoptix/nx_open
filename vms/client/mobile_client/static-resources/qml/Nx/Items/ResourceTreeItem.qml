@@ -16,27 +16,34 @@ import Nx.Ui
 import nx.vms.client.core
 import nx.vms.client.mobile
 
-Sheet
+Item
 {
     id: control
-
-    title: qsTr("Resources")
 
     property bool pendingDefaultExpand: true
     property bool isFiltering: false
     readonly property bool isNothingFound: treeView.rows === 0
 
+    signal layoutSelected(var layoutResource)
+    signal cameraSelected(var cameraResource)
+
+    function cancelSearch()
+    {
+        searchEdit.clear()
+    }
+
     ColumnLayout
     {
         anchors.fill: parent
+        anchors.margins: 20
+        spacing: 4
 
         SearchEdit
         {
             id: searchEdit
 
             Layout.fillWidth: true
-            implicitHeight: 36
-
+            Layout.preferredHeight: 36
             Layout.leftMargin: 16
             Layout.rightMargin: 16
 
@@ -105,11 +112,11 @@ Sheet
             TreeView
             {
                 id: treeView
-                model: searchModel
 
                 width: parent.width
                 clip: true
                 rowSpacing: 4
+                model: searchModel
 
                 // Source model indexes to which the view was expanded on the most recent
                 // saveExpandedState() call.
@@ -132,21 +139,11 @@ Sheet
                         onTapped:
                         {
                             if (hasChildren)
-                            {
                                 treeView.toggleExpanded(row)
-                            }
                             else if (delegateItem.isCamera)
-                            {
-                                windowContext.deprecatedUiController.layout = null
-                                Workflow.openVideoScreen(resource);
-                                control.close()
-                            }
+                                control.cameraSelected(resource)
                             else if (delegateItem.isLayout || delegateItem.isAllDevices)
-                            {
-                                Workflow.openResourcesScreen()
-                                windowContext.deprecatedUiController.layout = delegateItem.isLayout ? resource : null
-                                control.close()
-                            }
+                                control.layoutSelected(delegateItem.isAllDevices ? null : resource)
                         }
                     }
                 }
@@ -180,34 +177,29 @@ Sheet
                 {
                     collapseRecursively(-1) //< Collapse tree recursively.
                     expandRecursively(-1, 1); //< Expand tree to depth 1.
-                    if (windowContext.deprecatedUiController.layout)
+                    if (windowContext.deprecatedUiController.resource)
                     {
                         expandToIndex(searchModel.mapFromSource(
-                            treeModel.resourceIndex(windowContext.deprecatedUiController.layout)))
+                            treeModel.resourceIndex(windowContext.deprecatedUiController.resource)))
                     }
                 }
             }
         }
     }
 
-    onClosed:
-    {
-        searchEdit.clear()
-        treeView.forceActiveFocus()
-    }
-
-    onAboutToShow:
-    {
-        if (pendingDefaultExpand)
-        {
-            treeView.expandDefault()
-            pendingDefaultExpand = false
-        }
-    }
-
     ResourceTreeModel
     {
         id: treeModel
+
+        onRootEntityUpdated:
+        {
+            if (pendingDefaultExpand)
+            {
+                treeView.expandDefault()
+                pendingDefaultExpand = false
+            }
+        }
+
         onModelReset:
         {
             pendingDefaultExpand = true

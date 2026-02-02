@@ -42,11 +42,11 @@ TreeViewDelegate
         if (hasChildren)
             return false;
 
-        if (resourceHelper.isLayout)
-            return windowContext.deprecatedUiController.layout === resource
+        if (resourceHelper.isLayout || resourceHelper.isCamera)
+            return windowContext.deprecatedUiController.resource === resource
 
         if (model.nodeType === ResourceTree.NodeType.allDevices)
-            return windowContext.deprecatedUiController.layout === null
+            return windowContext.deprecatedUiController.resource === null
 
         return false
     }

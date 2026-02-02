@@ -5,11 +5,13 @@ import QtQuick.Controls
 import QtQml
 
 import Nx.Controls
+import Nx.Common
 import Nx.Core
 import Nx.Items
 import Nx.Mobile
 import Nx.Mobile.Controls
 import Nx.Mobile.Ui.Sheets
+import Nx.Screens
 import Nx.Ui
 
 import nx.vms.client.core
@@ -17,55 +19,194 @@ import nx.vms.client.mobile
 
 import "private/ResourcesScreen"
 
-Page
+AdaptiveScreen
 {
     id: resourcesScreen
+
     objectName: "resourcesScreen"
 
-    leftButtonIcon.source: "image://skin/20x20/Solid/layouts.svg?primary=light10"
-    leftButtonIcon.width: 20
-    leftButtonIcon.height: 20
-    leftButtonEnabled: !loadingDummy.visible
-
-    ResourceTreeSheet
-    {
-        id: resourceTreeSheet
-    }
-
-    customBackHandler:
-        (isEscKeyPressed) =>
-        {
-            if (searchToolBar.visible)
-                searchToolBar.close()
-            else if (loadingDummy.visible)
-                windowContext.sessionManager.stopSessionByUser()
-            else if (!isEscKeyPressed)
-                mainWindow.close()
-        }
-
-    onLeftButtonClicked: resourceTreeSheet.open()
     property alias filterIds: camerasGrid.filterIds
 
-    rightControl: IconButton
+    contentItem: (!windowContext.deprecatedUiController.resource || resourceHelper.isLayout)
+        ? camerasGrid
+        : videoItem
+    overlayItem: overlayItem
+
+    customLeftControl: ToolBarButton
     {
-        id: searchButton
+        id: leftControl
 
         anchors.centerIn: parent
+        visible: state !== ""
+        states:
+        [
+            State
+            {
+                name: "returnToLayout"
+                when: resourcesScreen.contentItem === videoItem && (resourceHelper.isLayout || resourceHelper.resource === null)
 
-        padding: 0
-        icon.source: "image://skin/24x24/Outline/search.svg?primary=light10"
-        icon.width: 24
-        icon.height: 24
-        enabled: camerasGrid.enabled
-        opacity: windowContext.sessionManager.hasReconnectingSession ? 0.2 : 1.0
-        onClicked: searchToolBar.open()
-        alwaysCompleteHighlightAnimation: false
+                PropertyChanges
+                {
+                    leftControl.icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light4"
+                    leftControl.onClicked:
+                    {
+                        resourcesScreen.filterIds = []
+                        videoItem.controller.stop()
+                        resourcesScreen.contentItem = camerasGrid
+                    }
+                }
+            },
+            State
+            {
+                name: "openResourceTreeSplash"
+                when: !LayoutController.isTabletLayout
+
+                PropertyChanges
+                {
+                    leftControl.icon.source: "image://skin/24x24/Outline/resource_tree.svg?primary=light4"
+                    leftControl.onClicked: resourcesScreen.splash.open()
+                    leftControl.enabled: camerasGrid.enabled
+                }
+            }
+        ]
+    }
+
+    customRightControl: ToolBarButton
+    {
+        icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
+        visible: resourcesScreen.contentItem === videoItem
+        onClicked:
+        {
+            videoItem.menu.open()
+        }
+    }
+
+    splashTitle: qsTr("Resources")
+    splashItem: resourceTreeSheet
+
+    leftPanel
+    {
+        title: qsTr("Resources")
+        color: ColorTheme.colors.dark5
+        iconSource: "image://skin/24x24/Outline/resource_tree.svg?primary=dark1"
+        interactive: true
+        item: resourceTreeSheet
+    }
+
+    rightPanel
+    {
+        title: qsTr("Timeline")
+        color: ColorTheme.colors.dark5
+        iconSource: "image://skin/24x24/Outline/timeline.svg?primary=dark1"
+        interactive: true
+        visible: false
+        item: resourcesScreen.contentItem === videoItem ? videoItem.navigatorItem : null
+    }
+
+    ResourceTreeItem
+    {
+        id: resourceTreeSheet
+
+        onLayoutSelected: (layoutResource) =>
+        {
+            resourcesScreen.filterIds = []
+            videoItem.controller.stop()
+            windowContext.deprecatedUiController.resource = layoutResource
+            resourcesScreen.contentItem = camerasGrid
+            rightPanel.visible = false
+
+            if (!LayoutController.isTabletLayout)
+                splash.close()
+        }
+
+        onCameraSelected: (cameraResource) =>
+        {
+            resourcesScreen.filterIds = []
+            windowContext.deprecatedUiController.resource = cameraResource
+            resourcesScreen.contentItem = videoItem
+            videoItem.controller.start(cameraResource, -1)
+
+            if (!LayoutController.isTabletLayout)
+                splash.close()
+        }
+
+        onVisibleChanged:
+        {
+            if (!visible)
+                cancelSearch()
+        }
+    }
+
+    CamerasGrid
+    {
+        id: camerasGrid
+
+        objectName: "camerasGrid"
+        enabled: !windowContext.sessionManager.hasReconnectingSession && !loadingDummy.visible
+        layout: resourceHelper.isLayout ? windowContext.deprecatedUiController.resource : null
+        keepStatuses: !windowContext.sessionManager.hasReconnectingSession && !windowContext.sessionManager.hasConnectedSession
+        active: resourcesScreen.isActive
+        bottomMargin : LayoutController.isTabletLayout ? 20 : 0
+        leftMargin : LayoutController.isTabletLayout ? 20 : 0
+        rightMargin : LayoutController.isTabletLayout ? 20 : 0
+        topMargin : LayoutController.isTabletLayout ? 20 : 0
+
+        onOpenVideoScreen: (resource, thumbnailUrl, camerasModel) =>
+        {
+            stopMediaPlayers()
+
+            videoItem.initialScreenshot = thumbnailUrl ?? ""
+            videoItem.camerasModel = camerasModel
+            videoItem.controller.start(resource, -1)
+
+            resourcesScreen.filterIds = []
+            resourcesScreen.contentItem = videoItem
+        }
+
+        DummyMessage
+        {
+            id: noCamerasPlaceholder
+
+            anchors.fill: parent
+            title: qsTr("No Cameras")
+            titleColor: ColorTheme.colors.light4
+            description:
+            {
+                if (!resourceHelper.isLayout)
+                    return ""
+
+                return windowContext.deprecatedUiController.resource
+                    ? qsTr("We didn't find any cameras on this layout")
+                    : qsTr("We didn't find any cameras on this site. " +
+                        "You can add them in our desktop application")
+            }
+            descriptionColor: ColorTheme.colors.light10
+            descriptionFontPixelSize: 15
+            image: "image://skin/64x64/Outline/camera.svg?primary=light10"
+            visible: camerasGrid.count === 0
+                && windowContext.sessionManager.hasActiveSession
+        }
+    }
+
+    VideoScreen
+    {
+        id: videoItem
+
+        toolBar.visible: false
+        padding:
+        {
+            if (resourcesScreen.fullscreen)
+                return 0
+
+            return LayoutController.isTabletLayout ? 20 : 0
+        }
+        backgroundColor: ColorTheme.colors.dark4
     }
 
     ResourceHelper
     {
-        id: layout
-        resource: windowContext.deprecatedUiController.layout
+        id: resourceHelper
+        resource: windowContext.deprecatedUiController.resource
 
         onResourceChanged:
         {
@@ -78,214 +219,108 @@ Page
     {
         target: resourcesScreen
         property: "title"
-        value: layout.resourceName || windowContext.sessionManager.systemName
+        value: resourceHelper.resourceName || windowContext.sessionManager.systemName
         when: windowContext.sessionManager.hasActiveSession
     }
 
-    SearchToolBar
+    Item
     {
-        id: searchToolBar
-        parent: toolBar
-    }
-
-    CamerasGrid
-    {
-        id: camerasGrid
-        objectName: "camerasGrid"
-
-        anchors
-        {
-            fill: parent
-            topMargin: 4 - camerasGrid.spacing / 2
-            bottomMargin: 4 - camerasGrid.spacing / 2
-            leftMargin: 4 - camerasGrid.spacing / 2
-            rightMargin: 4 - camerasGrid.spacing / 2
-        }
-
-        enabled: !windowContext.sessionManager.hasReconnectingSession && !loadingDummy.visible
-
-        layout: windowContext.deprecatedUiController.layout
-
-        keepStatuses: !windowContext.sessionManager.hasReconnectingSession && !windowContext.sessionManager.hasConnectedSession
-
-        active: activePage
-
-        onOpenVideoScreen:
-            (resource, thumbnailUrl, camerasModel) =>
-                handleOpenVideoScreenRequest(resource, thumbnailUrl, camerasModel)
-    }
-
-    DummyMessage
-    {
-        id: noCamerasPlaceholder
-
-        anchors.fill: parent
-        title: qsTr("No Cameras")
-        titleColor: ColorTheme.colors.light4
-        description: windowContext.deprecatedUiController.layout
-            ? qsTr("We didn't find any cameras on this layout")
-            : qsTr("We didn't find any cameras on this site. " +
-                "You can add them in our desktop application")
-        descriptionColor: ColorTheme.colors.light10
-        descriptionFontPixelSize: 15
-        image: "image://skin/64x64/Outline/camera.svg?primary=light10"
-        visible: camerasGrid.count === 0
-            && windowContext.sessionManager.hasActiveSession
-    }
-
-    Loader
-    {
-        id: searchListLoader
-        anchors.fill: parent
-        active: searchToolBar.text && searchToolBar.opacity == 1.0
-        sourceComponent: searchListComponent
-        enabled: camerasGrid.enabled
-    }
-
-    MouseArea
-    {
-        anchors.fill: parent
-        propagateComposedEvents: true
-        onPressed: (event) =>
-        {
-            event.accepted = false
-            searchToolBar.focus = false
-        }
-    }
-
-    function handleOpenVideoScreenRequest(resource, thumbnailUrl, camerasModel)
-    {
-        for (var i = 0; i !== camerasGrid.count; ++i)
-        {
-            const mediaPlayer = camerasGrid.getMediaPlayer(i)
-            if (mediaPlayer)
-                mediaPlayer.stop()
-        }
-        Workflow.openVideoScreen(resource, thumbnailUrl, undefined, camerasModel)
-    }
-
-    Component
-    {
-        id: searchListComponent
+        id: overlayItem
 
         Rectangle
         {
-            property string filterRegExp:
-                NxGlobals.makeSearchRegExp(`*${searchToolBar.text}*`)
-            onFilterRegExpChanged: camerasList.model.setFilterRegularExpression(filterRegExp)
+            id: offlineDimmer
 
+            anchors.fill: parent
+            color: ColorTheme.transparent(ColorTheme.colors.dark5, 0.8)
+
+            Behavior on opacity { NumberAnimation { duration: 200 } }
+            opacity: windowContext.sessionManager.hasReconnectingSession ? 1.0 : 0.0
+            visible: opacity > 0
+        }
+
+        Rectangle
+        {
+            id: loadingDummy
+
+            anchors.fill: parent
             color: ColorTheme.colors.dark4
+            Behavior on opacity { NumberAnimation { duration: 200 } }
+            visible: opacity > 0
+            opacity: windowContext.sessionManager.hasActiveSession ? 0.0 : 1.0
 
-            CamerasList
+            Column
             {
-                id: camerasList
+                anchors.centerIn: parent
+                anchors.verticalCenterOffset: -28
 
-                anchors.fill: parent
-                anchors.margins: 8
-                displayMarginBeginning: 8
-                displayMarginEnd: 8
+                spacing: 16
 
-                ScrollIndicator.vertical: ScrollIndicator
+                CirclesBusyIndicator
                 {
-                    leftPadding: 4
-                    width: 4
+                    running: loadingDummy.visible
+                    anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
                 }
 
-                onOpenVideoScreen:
-                    (resource, thumbnailUrl, camerasModel) =>
+                Text
+                {
+                    anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
+                    topPadding: 26
+                    text: windowContext.sessionManager.hasConnectingSession
+                        ? qsTr("Connecting...")
+                        : qsTr("Loading...")
+                    font.pixelSize: 22
+                    color: ColorTheme.colors.light16
+                }
+            }
+
+            Button
+            {
+                id: stopConnectingButton
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.leftMargin: 20
+                anchors.rightMargin: 20
+                anchors.bottomMargin: 24
+
+                text: qsTr("Stop Connecting")
+                opacity: 0
+                onClicked: windowContext.sessionManager.stopSessionByUser()
+
+                SequentialAnimation
+                {
+                    id: showAnimation
+
+                    running: windowContext.sessionManager.hasConnectingSession
+                        || windowContext.sessionManager.hasAwaitingResourcesSession
+
+                    PauseAnimation { duration: 2000 }
+
+                    OpacityAnimator
                     {
-                        handleOpenVideoScreenRequest(resource, thumbnailUrl, camerasModel)
+                        target: stopConnectingButton
+                        from: 0
+                        to: 1
+                        duration: 200
                     }
-            }
-
-            DummyMessage
-            {
-                anchors.fill: parent
-                title: qsTr("Nothing found")
-                visible: camerasList.count == 0
-            }
-        }
-    }
-
-    Rectangle
-    {
-        id: offlineDimmer
-
-        anchors.fill: parent
-        color: ColorTheme.transparent(ColorTheme.colors.dark5, 0.8)
-
-        Behavior on opacity { NumberAnimation { duration: 200 } }
-        opacity: windowContext.sessionManager.hasReconnectingSession ? 1.0 : 0.0
-        visible: opacity > 0
-    }
-
-    Rectangle
-    {
-        id: loadingDummy
-
-        anchors.fill: parent
-        color: ColorTheme.colors.dark4
-        Behavior on opacity { NumberAnimation { duration: 200 } }
-        visible: opacity > 0
-        opacity: windowContext.sessionManager.hasActiveSession ? 0.0 : 1.0
-
-        Column
-        {
-            anchors.centerIn: parent
-            anchors.verticalCenterOffset: -28
-
-            spacing: 16
-
-            CirclesBusyIndicator
-            {
-                running: loadingDummy.visible
-                anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
-            }
-
-            Text
-            {
-                anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
-                topPadding: 26
-                text: windowContext.sessionManager.hasConnectingSession
-                    ? qsTr("Connecting...")
-                    : qsTr("Loading...")
-                font.pixelSize: 22
-                color: ColorTheme.colors.light16
-            }
-        }
-
-        Button
-        {
-            id: stopConnectingButton
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.leftMargin: 20
-            anchors.rightMargin: 20
-            anchors.bottomMargin: 24
-
-            text: qsTr("Stop Connecting")
-            opacity: 0
-            onClicked: windowContext.sessionManager.stopSessionByUser()
-
-            SequentialAnimation
-            {
-                id: showAnimation
-
-                running: windowContext.sessionManager.hasConnectingSession
-                    || windowContext.sessionManager.hasAwaitingResourcesSession
-
-                PauseAnimation { duration: 2000 }
-
-                OpacityAnimator
-                {
-                    target: stopConnectingButton
-                    from: 0
-                    to: 1
-                    duration: 200
                 }
             }
         }
+    }
+
+    customBackHandler: (isEscKeyPressed) =>
+    {
+        if (loadingDummy.visible)
+            windowContext.sessionManager.stopSessionByUser()
+        else if (!isEscKeyPressed)
+            mainWindow.close()
+    }
+
+    Component.onCompleted:
+    {
+        if (resourceHelper.isCamera)
+            videoItem.controller.start(resourceHelper.resource, -1)
     }
 }

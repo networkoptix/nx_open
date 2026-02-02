@@ -6,6 +6,7 @@ import Nx.Core
 import Nx.Controls
 import Nx.Mobile
 import Nx.Mobile.Controls
+import Nx.Ui
 
 import nx.vms.client.core
 
@@ -17,8 +18,7 @@ OptionSelector
 {
     id: control
 
-    text: qsTr("Device")
-
+    descriptionText: qsTr("Device")
     unselectedValue: {
         "selection": EventSearch.CameraSelection.all,
         "cameras": []
@@ -32,7 +32,7 @@ OptionSelector
 
         function onValueChanged()
         {
-            control.textValue = EventSearchUtils.cameraSelectionText(
+            control.text = EventSearchUtils.cameraSelectionText(
                 value.selection, value.cameras, windowContext.mainSystemContext)
             control.isDefaultValue = !value || value.selection === EventSearch.CameraSelection.all
         }
@@ -69,6 +69,7 @@ OptionSelector
 
             delegate: StyledCheckBox
             {
+                backgroundRadius: LayoutController.isTabletLayout ? 8 : 0
                 rightPadding: 18
                 height: 56
                 width: (parent && parent.width) ?? 0

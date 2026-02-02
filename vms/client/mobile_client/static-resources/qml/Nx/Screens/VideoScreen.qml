@@ -30,6 +30,8 @@ Page
 
     property Resource initialResource
     property alias initialScreenshot: screenshot.source
+    property alias controller: controller
+    property alias menu: menu
 
     property QnCameraListModel camerasModel:
         QnCameraListModel {} //< Keeps ability to switch between cameras when screen is opened by link.
@@ -173,8 +175,6 @@ Page
     {
         id: menuButton
 
-        anchors.centerIn: parent
-
         icon.source: lp("/images/more_vert.png")
         onClicked:
         {
@@ -242,7 +242,7 @@ Page
             visible: (controller.systemContext?.hasViewBookmarksPermission
                 && !(controller.resource?.flags & ResourceFlag.cross_system)) ?? false
             height: visible ? implicitHeight : 0
-            onTriggered: Workflow.openEventSearchScreen(controller.resource.id, camerasModel)
+            onTriggered: Workflow.openEventSearchScreen(/*push*/ true, controller.resource.id, camerasModel)
         }
 
         MenuItem
@@ -252,7 +252,7 @@ Page
             visible: (controller.systemContext?.hasSearchObjectsPermission
                 && !(controller.resource?.flags & ResourceFlag.cross_system)) ?? false
             height: visible ? implicitHeight : 0
-            onTriggered: Workflow.openEventSearchScreen(controller.resource.id, camerasModel, true)
+            onTriggered: Workflow.openEventSearchScreen(/*push*/ true, controller.resource.id, camerasModel, true)
         }
     }
 
@@ -260,9 +260,7 @@ Page
     {
         id: video
 
-        y: 0
-        x: -windowParams.leftMargin
-        width: mainWindow.width
+        width: parent.width
         height: width / (16.0 / 9.0)
 
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
@@ -361,8 +359,8 @@ Page
             width: boundingSize.width
             height: boundingSize.height
 
-            y: (mainWindow.height - height) / 3
-            x: (mainWindow.width - width) / 2 - windowParams.leftMargin
+            y: (parent.height - height) / 3
+            x: (parent.width - width) / 2 - windowParams.leftMargin
             visible: false//status == Image.Ready && !dummyLoader.visible && source != ""
             opacity: d.cameraUiOpacity
         }
@@ -389,11 +387,10 @@ Page
     {
         id: navigationBar
 
-        width: mainWindow.width
+        width: parent.width
         height: navigationBarContent.height + navigationBarContent.contentMargin * 2
-        anchors.top: video.bottom
-
-        color: ColorTheme.colors.dark4
+        y: LayoutController.isTabletLayout && !videoScreen.activePage ? parent.height - height : video.y + video.height
+        color: LayoutController.isTabletLayout && !videoScreen.activePage ? "transparent" : ColorTheme.colors.dark4
 
         readonly property bool hasChunkNavigation:
             objectsTypeSheet.selectedType !== Timeline.ObjectsLoader.ObjectsType.bookmarks
@@ -406,19 +403,14 @@ Page
 
             component ExpandCollapseAnimation: NumberAnimation { duration: 150 }
 
-            anchors.left: navigationBar.left
-            anchors.leftMargin: contentMargin
-            anchors.right: navigationBar.right
-            anchors.rightMargin: contentMargin
-
             anchors.verticalCenter: navigationBar.verticalCenter
-            height: navigationBarLayout.height
+            anchors.horizontalCenter: navigationBar.horizontalCenter
+            height: navigationBarLayout.implicitHeight
 
             RowLayout
             {
                 id: navigationBarLayout
 
-                width: Math.max(implicitWidth, navigationBarContent.width)
                 anchors.horizontalCenter: navigationBarContent.horizontalCenter
 
                 spacing: 0
@@ -622,15 +614,18 @@ Page
         }
     }
 
-    Item
+    ProxyItem
     {
-        id: navigator
-
         anchors.top: navigationBar.bottom
         anchors.bottom: parent.bottom
-        width: mainWindow.width
+        width: parent.width
+        target: navigator
+        visible: !LayoutController.isTabletLayout || videoScreen.activePage
+    }
 
-        visible: d.canViewArchive
+    property Item navigatorItem: Item
+    {
+        id: navigator
 
         DataTimeline
         {
@@ -640,6 +635,7 @@ Page
             width: navigator.width
             anchors.top: navigator.top
             anchors.bottom: bottomBar.top
+            visible: d.canViewArchive
 
             chunkProvider: cameraChunkProvider
             objectsType: objectsTypeSheet.selectedType
@@ -673,6 +669,7 @@ Page
             width: navigator.width
             height: 68
             anchors.bottom: navigator.bottom
+            visible: d.canViewArchive
 
             color: ColorTheme.colors.dark4
 
@@ -827,51 +824,51 @@ Page
                 }
             }
         }
-    }
 
-    Item
-    {
-        id: noRightsPlaceholder
-
-        anchors.fill: navigator
-        visible: !d.canViewArchive
-
-        Column
+        Item
         {
-            spacing: 24
-            anchors.centerIn: parent
+            id: noRightsPlaceholder
 
-            ColoredImage
-            {
-                sourcePath: "image://skin/64x64/Outline/no_information.svg"
-                sourceSize: Qt.size(64, 64)
-                primaryColor: ColorTheme.colors.light10
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
+            anchors.fill: navigator
+            visible: !d.canViewArchive
 
             Column
             {
-                spacing: 16
-                width: noRightsPlaceholder.width
+                spacing: 24
+                anchors.centerIn: parent
 
-                Text
+                ColoredImage
                 {
-                    text: qsTr("Not available")
-                    font.pixelSize: 16
-                    font.weight: Font.Medium
-                    color: ColorTheme.colors.light4
+                    sourcePath: "image://skin/64x64/Outline/no_information.svg"
+                    sourceSize: Qt.size(64, 64)
+                    primaryColor: ColorTheme.colors.light10
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
-                Text
+                Column
                 {
-                    text: qsTr("You do not have permission<br>to view the archive",
-                        "<br> is a line break")
-                    font.pixelSize: 12
-                    color: ColorTheme.colors.light12
-                    horizontalAlignment: Text.AlignHCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    wrapMode: Text.Wrap
+                    spacing: 16
+                    width: noRightsPlaceholder.width
+
+                    Text
+                    {
+                        text: qsTr("Not available")
+                        font.pixelSize: 16
+                        font.weight: Font.Medium
+                        color: ColorTheme.colors.light4
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Text
+                    {
+                        text: qsTr("You do not have permission<br>to view the archive",
+                            "<br> is a line break")
+                        font.pixelSize: 12
+                        color: ColorTheme.colors.light12
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        wrapMode: Text.Wrap
+                    }
                 }
             }
         }
@@ -906,6 +903,8 @@ Page
     {
         id: content
 
+        visible: false
+        anchors.fill: parent
         anchors.top: video.top
         anchors.bottom: video.bottom
         width: parent.width
@@ -935,8 +934,8 @@ Page
 
             y: needOffset ? -header.height : 0
             x: -windowParams.leftMargin
-            width: mainWindow.width
-            height: parent.height + (needOffset ? 0 : header.height)
+            width: videoScreen.width
+            height: videoScreen.height + (needOffset ? 0 : header.height)
 
             visible: active
             active: d.cameraWarningVisible
@@ -1006,7 +1005,7 @@ Page
             id: moveOnTapOverlay
 
             x: -windowParams.leftMargin
-            width: mainWindow.width
+            width: videoScreen.width
             height: parent.height
             parent: videoScreen
 

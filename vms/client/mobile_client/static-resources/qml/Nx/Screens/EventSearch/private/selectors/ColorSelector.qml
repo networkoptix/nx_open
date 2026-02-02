@@ -34,6 +34,7 @@ OptionSelector
 
     screenDelegate: GridEditor
     {
+        selector: control
         model: CoreUtils.toArray(attribute && attribute.colorSet && attribute.colorSet.items)
         visualDelegate: control.visualDelegate
     }

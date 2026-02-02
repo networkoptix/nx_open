@@ -9,6 +9,8 @@ import "../editors"
  */
 OptionSelector
 {
+    id: control
+
     textFieldName: "text"
 
     valueToTextFunc: (val) =>
@@ -23,6 +25,7 @@ OptionSelector
 
     screenDelegate: RadioGroupEditor
     {
+        selector: control
         model: [true, false]
     }
 }

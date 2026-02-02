@@ -6,7 +6,7 @@ import Nx.Core
 import Nx.Controls
 import Nx.Mobile.Controls
 
-BottomSheet
+AdaptiveSheet
 {
     id: control
 
@@ -37,7 +37,7 @@ BottomSheet
         text: qsTr("Do not show this window again")
     }
 
-    ButtonBox
+    footer: ButtonBox
     {
         model: [
             {id: "cancel", type: Button.Type.LightInterface, text: qsTr("Cancel")},

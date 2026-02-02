@@ -4,168 +4,234 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import Nx.Controls
 import Nx.Core
 import Nx.Core.Controls
 import Nx.Mobile
 import Nx.Mobile.Controls
 import Nx.Ui
 
-import nx.vms.client.mobile
-
 Rectangle
 {
     id: control
 
+    property bool active: //< TODO: Move to some controller.
+    {
+        return switchToResourcesScreenButton.isSelected
+            || switchToEventSearchMenuScreenButton.isSelected
+            || switchToFeedScreenButton.isSelected
+            || (LayoutController.isTabletLayout ? false : switchToMenuScreenButton.isSelected)
+            || (LayoutController.isTabletLayout ? settingsButton.isSelected : false)
+    }
+
     color: ColorTheme.colors.dark4
-
-    readonly property real heightOffset: visible
-        ? height
-        : 0
-
-    visible: d.currentIndex !== -1
-        && windowContext.sessionManager.hasActiveSession
-        && d.buttonModel[d.currentIndex].screenId
-             === windowContext.deprecatedUiController.currentScreen
-
-    x: 0
-    y: parent.height - height
-    width: parent.width
-    height: d.kBarSize
-
-    RowLayout
-    {
-        y: (control.height - d.buttonSize.height) / 2
-        width: parent.width
-        height: d.buttonSize.height
-
-        Repeater
-        {
-            id: repeater
-
-            model: d.buttonModel
-
-            MouseArea
-            {
-                id: mouseArea
-
-                objectName: modelData.objectName
-
-                readonly property bool isSelected: d.currentIndex === index
-
-                Layout.alignment: Qt.AlignCenter
-
-                visible: modelData.visible ?? true
-                width: d.buttonSize.width
-                height: d.buttonSize.height
-
-                Rectangle
-                {
-                    anchors.fill: parent
-                    color: isSelected
-                        ? ColorTheme.colors.brand_core
-                        : "transparent"
-                    radius: 6
-
-                    MaterialEffect
-                    {
-                        anchors.fill: parent
-                        clip: true
-                        radius: parent.radius
-                        mouseArea: mouseArea
-                        rippleSize: 160
-                        highlightColor: "#30ffffff"
-                    }
-                }
-
-                ColoredImage
-                {
-                    anchors.centerIn: parent
-                    sourceSize: Qt.size(24, 24)
-                    sourcePath: modelData.iconSource
-                    primaryColor: isSelected
-                        ? ColorTheme.colors.dark1
-                        : ColorTheme.colors.light1
-
-                    Indicator
-                    {
-                        visible: !!text
-                        text: modelData.iconIndicatorText ?? ""
-                    }
-                }
-
-                onClicked: d.switchToPage(index)
-            }
-        }
-    }
-
-    Connections
-    {
-        target: windowContext.deprecatedUiController
-
-        function onCurrentScreenChanged()
-        {
-            for (let index = 0; index !== d.buttonModel.length; ++index)
-            {
-                if (d.buttonModel[index].screenId
-                    === windowContext.deprecatedUiController.currentScreen)
-                {
-                    d.currentIndex = index
-                    return;
-                }
-            }
-
-            d.currentIndex = -1
-        }
-    }
+    implicitHeight: d.kBarSize
+    implicitWidth: d.kBarSize
 
     QtObject
     {
         id: d
 
-        property int currentIndex: 0
-        readonly property real kBarSize: 70
-        readonly property size buttonSize: Qt.size(64, 46)
-        readonly property var buttonModel: [
-            {
-                "objectName": "switchToResourcesScreenButton",
-                "iconSource": "image://skin/24x24/Outline/camera.svg",
-                "screenId": Controller.ResourcesScreen,
-                "openScreen": () => Workflow.openResourcesScreen(
-                    windowContext.sessionManager.systemName)
-            },
-            // Icon paths below will be fixed as we get them in core icons pack.
-            {
-                "objectName": "switchToEventSearchMenuScreenButton",
-                "iconSource": "image://skin/navigation/event_search_button.svg",
-                "screenId": Controller.EventSearchMenuScreen,
-                "visible": windowContext.mainSystemContext?.hasSearchObjectsPermission
-                    || windowContext.mainSystemContext?.hasViewBookmarksPermission,
-                "openScreen": () => Workflow.openEventSearchMenuScreen()
-            },
-            {
-                "objectName": "switchToFeedScreenButton",
-                "iconSource": feedStateProvider.buttonIconSource,
-                "iconIndicatorText": feedStateProvider.buttonIconIndicatorText,
-                "screenId": Controller.FeedScreen,
-                "openScreen": () => Workflow.openFeedMenuScreen(feedStateProvider)
-            },
-            {
-                "objectName": "switchToMenuScreenButton",
-                "iconSource": "image://skin/navigation/menu_button.svg",
-                "screenId": Controller.MenuScreen,
-                "openScreen": () => Workflow.openMenuScreen()
-            }
-        ]
-
-        function switchToPage(index)
+        readonly property real kBarSize: 72
+        readonly property size buttonSize: Qt.size(kBarSize, kBarSize)
+        readonly property bool hasObjectsOrBookmarkPermissions:
         {
-            if (index < 0)
-                return
+            if (!windowContext.mainSystemContext)
+                return false
 
-            Workflow.popCurrentScreen()
-            d.buttonModel[index].openScreen()
+            return windowContext.mainSystemContext?.hasSearchObjectsPermission
+                || windowContext.mainSystemContext?.hasViewBookmarksPermission
         }
+    }
+
+    component NavigationButton : MouseArea
+    {
+        id: mouseArea
+
+        property bool isSelected: screenId === windowContext.deprecatedUiController.currentScreen
+        property alias iconSource: icon.sourcePath
+        property alias iconIndicatorText: iconIndicator.text
+        required property int screenId
+
+        Layout.alignment: Qt.AlignCenter
+        Layout.fillWidth: !LayoutController.isTabletLayout
+        Layout.preferredWidth: d.buttonSize.width
+        Layout.preferredHeight: d.buttonSize.height
+
+        Rectangle
+        {
+            anchors.fill: parent
+            visible: mouseArea.isSelected
+            rotation: LayoutController.isTabletLayout ? 90 : 0
+            opacity: 0.1
+
+            gradient: Gradient
+            {
+                GradientStop { position: 0.0; color: "#0C1012" }
+                GradientStop { position: 1.0; color: ColorTheme.colors.brand_core }
+            }
+        }
+
+        Rectangle
+        {
+            width: LayoutController.isTabletLayout ? 2 : parent.width
+            height: LayoutController.isTabletLayout ? parent.height : 2
+            anchors.bottom: parent.bottom
+            color: ColorTheme.colors.brand_core
+            visible: mouseArea.isSelected
+        }
+
+        Rectangle
+        {
+            anchors.fill: parent
+            color: "transparent"
+
+            MaterialEffect
+            {
+                anchors.fill: parent
+                clip: true
+                radius: parent.radius
+                mouseArea: mouseArea
+                rippleSize: 160
+                highlightColor: "#30ffffff"
+            }
+        }
+
+        ColoredImage
+        {
+            id: icon
+
+            anchors.centerIn: parent
+            sourceSize: Qt.size(24, 24)
+            primaryColor: isSelected ? ColorTheme.colors.brand_core : ColorTheme.colors.light1
+
+            Indicator
+            {
+                id: iconIndicator
+
+                visible: !!text
+            }
+        }
+    }
+
+    RowLayout
+    {
+        id: mobileLayout
+
+        anchors.fill: parent
+        visible: !LayoutController.isTabletLayout
+        spacing: 24
+
+        LayoutItemProxy
+        {
+            target: switchToResourcesScreenButton
+        }
+
+        LayoutItemProxy
+        {
+            target: switchToEventSearchMenuScreenButton
+            visible: d.hasObjectsOrBookmarkPermissions
+        }
+
+        LayoutItemProxy
+        {
+            target: switchToFeedScreenButton
+        }
+
+        LayoutItemProxy
+        {
+            target: switchToMenuScreenButton
+        }
+    }
+
+    ColumnLayout
+    {
+        id: tabletLayout
+
+        anchors.fill: parent
+        visible: LayoutController.isTabletLayout
+        spacing: 0
+
+        LayoutItemProxy
+        {
+            target: switchToResourcesScreenButton
+        }
+
+        LayoutItemProxy
+        {
+            target: switchToEventSearchMenuScreenButton
+            visible: d.hasObjectsOrBookmarkPermissions
+        }
+
+        LayoutItemProxy
+        {
+            target: switchToFeedScreenButton
+        }
+
+        NavigationButton
+        {
+            id: settingsButton
+
+            objectName: "settingsButton"
+            iconSource: "image://skin/24x24/Outline/settings.svg"
+            screenId: Controller.SettingsScreen
+            onClicked: Workflow.openSettingsScreen(/*push*/ false)
+        }
+
+        Item
+        {
+            Layout.fillHeight: true
+        }
+
+        NavigationButton
+        {
+            id: logoutButton
+
+            objectName: "logoutButton"
+            iconSource: "image://skin/24x24/Outline/logout.svg"
+            screenId: Controller.UnknownScreen
+            onClicked: windowContext.sessionManager.stopSessionByUser()
+        }
+    }
+
+    NavigationButton
+    {
+        id: switchToResourcesScreenButton
+
+        objectName: "switchToResourcesScreenButton"
+        iconSource: "image://skin/24x24/Outline/camera.svg"
+        screenId: Controller.ResourcesScreen
+        onClicked: Workflow.openResourcesScreen(windowContext.sessionManager.systemName)
+    }
+
+    NavigationButton
+    {
+        id: switchToEventSearchMenuScreenButton
+
+        objectName: "switchToEventSearchMenuScreenButton"
+        iconSource: "image://skin/navigation/event_search_button.svg"
+        screenId: Controller.EventSearchScreen
+        onClicked: Workflow.openEventSearchScreen(/*push*/ false)
+    }
+
+    NavigationButton
+    {
+        id: switchToFeedScreenButton
+
+        objectName: "switchToFeedScreenButton"
+        iconSource: feedStateProvider.buttonIconSource
+        iconIndicatorText: feedStateProvider.buttonIconIndicatorText
+        screenId: Controller.FeedScreen
+        onClicked: Workflow.openFeedScreen(/*push*/ false, feedStateProvider)
+    }
+
+    NavigationButton
+    {
+        id: switchToMenuScreenButton
+
+        objectName: "switchToMenuScreenButton"
+        iconSource: "image://skin/navigation/menu_button.svg"
+        screenId: Controller.MenuScreen
+        onClicked: Workflow.openMenuScreen()
     }
 
     FeedStateProvider { id: feedStateProvider }

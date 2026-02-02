@@ -142,11 +142,5 @@ NxObject
             {
                 model: controller.searchModel
             }
-
-    }
-
-    Component.onCompleted:
-    {
-        controller.requestUpdate()
     }
 }

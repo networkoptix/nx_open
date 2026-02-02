@@ -8,7 +8,7 @@ import Nx.Mobile.Controls
 
 import nx.vms.client.core
 
-BaseBottomSheet
+BaseAdaptiveSheet
 {
     id: sheet
 
@@ -144,7 +144,7 @@ BaseBottomSheet
         }
     }
 
-    ButtonBox
+    footer: ButtonBox
     {
         model: [{id: "ok", type: Button.Type.Brand, text: qsTr("OK")}]
         onClicked: sheet.close()

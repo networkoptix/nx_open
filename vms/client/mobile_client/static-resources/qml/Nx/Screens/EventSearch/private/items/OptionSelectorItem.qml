@@ -1,12 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
 
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Mobile.Controls 1.0
-import Nx.Ui 1.0
+import Nx.Core
+import Nx.Controls
+import Nx.Mobile.Controls
+import Nx.Ui
 
+// TODO: update comment below.
 /**
  * Option selection underlying screen implementation. Works in ties with OptionSelector component.
  * Implements basic "apply", "open" and "close functionality" and flickable central area which
@@ -18,79 +19,59 @@ import Nx.Ui 1.0
  *     - "setValue" function to update current selected value.
  *     - "clear" function to clear currently selected value.
  */
-Page
+Item
 {
-    id: screen
+    id: optionSelectorItem
 
-    property alias clearButtonText: clearButton.text
-    property alias delegateItem: delegateLoader.item
+    property string title: selector ? selector.descriptionText : ""
     property OptionSelector selector: null
 
     function apply()
     {
         d.callDelegateFunction("apply")
-        Workflow.popCurrentScreen()
     }
 
-    contentItem: FocusScope
+    function clear()
     {
+        d.callDelegateFunction("clear")
+    }
+
+    signal applyRequested
+
+    FocusScope
+    {
+        anchors.fill: parent
         Flickable
         {
             id: flickable
 
-            y: 16
             width: parent.width
             height: parent.height - y
-            contentWidth: screen.width
+            contentWidth: optionSelectorItem.width
             contentHeight: delegateLoader.height
 
             Loader
             {
                 id: delegateLoader
 
-                width: screen.width
+                width: optionSelectorItem.width
 
                 sourceComponent: selector && selector.screenDelegate
-                onStatusChanged:
+
+                onItemChanged:
                 {
-                    if (status !== Loader.Ready)
+                    if (!item)
                         return
 
                     if (item.hasOwnProperty("selector"))
-                        item.selector = screen.selector
+                        item.selector = optionSelectorItem.selector
                     if (item.hasOwnProperty("setValue"))
                         item.setValue(selector.value)
+                    if (item.hasOwnProperty("applyRequested"))
+                        item.applyRequested.connect(optionSelectorItem.applyRequested)
                 }
             }
         }
-    }
-
-    customBackHandler: () => apply()
-    onLeftButtonClicked: apply()
-
-    rightControl: TextButton
-    {
-        id: clearButton
-
-        anchors.right: parent.right
-        anchors.baseline: parent.baseline
-
-        text: qsTr("Clear")
-        visible: screen.selector && !screen.selector.isDefaultValue
-
-        onClicked: d.callDelegateFunction("clear")
-    }
-
-    Component.onCompleted:
-    {
-        if (delegateLoader.item && delegateLoader.item.hasOwnProperty("applyRequested"))
-            delegateLoader.item.applyRequested.connect(apply)
-    }
-
-    Component.onDestruction:
-    {
-        if (delegateLoader.item && delegateLoader.item.hasOwnProperty("applyRequested"))
-            delegateLoader.item.applyRequested.disconnect(apply)
     }
 
     NxObject

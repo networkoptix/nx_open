@@ -8,7 +8,7 @@ import Nx.Mobile.Controls
 
 import nx.vms.client.mobile
 
-BottomSheet
+AdaptiveSheet
 {
     id: sheet
 
@@ -208,7 +208,7 @@ BottomSheet
         onHasSecretValueChanged: d.setHasChanges(true)
     }
 
-    ButtonBox
+    footer: ButtonBox
     {
         enabled: d.enabled
 

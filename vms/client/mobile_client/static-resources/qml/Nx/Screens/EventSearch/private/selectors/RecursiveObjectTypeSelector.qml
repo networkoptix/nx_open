@@ -1,11 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQml.Models 2.15
+import QtQuick
+import QtQml.Models
 
-import Nx.Core 1.0
+import Nx.Core
+import Nx.Mobile.Controls
 
-import nx.vms.client.core.analytics 1.0
+import nx.vms.client.core.analytics
 
 import "../editors"
 
@@ -18,6 +19,8 @@ Column
 
     property var objectTypes: null
     property var value: null
+
+    signal selectorClicked(OptionSelector selector)
 
     spacing: 4
     width: (parent && parent.width) ?? implicitWidth
@@ -36,6 +39,8 @@ Column
 
         delegate: ObjectTypeSelector
         {
+            id: selector
+
             readonly property ObjectTypeSelector parentSelector: index > 0
                 ? repeater.itemAt(index - 1)
                 : null
@@ -48,7 +53,7 @@ Column
                 : control.objectTypes
             value: model.selectedValue
 
-            text:
+            descriptionText:
             {
                 if (index === 0)
                     return qsTr("Type")
@@ -73,6 +78,8 @@ Column
                 if (!d.updating && index >= 0 && derivedTypes.length)
                     repeater.model.append({})
             }
+
+            onClicked: control.selectorClicked(selector)
         }
     }
 

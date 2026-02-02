@@ -13,8 +13,8 @@ Pane
     property alias backgroundColor: backgroundItem.color
     property alias enableAnimation: heightBehavior.enabled
 
-    implicitWidth: parent ? parent.width : background.width
-    implicitHeight: text.implicitHeight + control.topPadding + control.bottomPadding;
+    implicitWidth: text.implicitWidth + control.leftPadding + control.rightPadding
+    implicitHeight: text.implicitHeight + control.topPadding + control.bottomPadding
 
     topPadding: 12
     bottomPadding: 12

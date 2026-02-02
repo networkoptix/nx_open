@@ -17,23 +17,63 @@ import Nx.Ui
 
 import nx.vms.client.core
 
-Page
+import "private/SessionsScreen"
+
+AdaptiveScreen
 {
     id: sessionsScreen
+
     objectName: "sessionsScreen"
 
-    leftButtonIcon.source: "image://skin/32x32/Outline/avatar.svg"
-    leftButtonIcon.width: state === "inPartnerOrOrg" ? 24 : 32
-    leftButtonIcon.height: state === "inPartnerOrOrg" ? 24 : 32
-
     property var rootIndex: NxGlobals.invalidModelIndex()
-    property var rootType
-    property bool landscapeMode: false
 
     // Shared state for selected tab - controls both sidebar and horizontal tabs
     property int selectedTab: OrganizationsModel.SitesTab
 
-    titleUnderlineVisible: rootIndex.parent !== NxGlobals.invalidModelIndex()
+    property var rootType
+    readonly property bool searching: !!siteList.searchText
+    readonly property bool localSitesVisible: state !== "inPartnerOrOrg"
+        && (selectedTab === OrganizationsModel.SitesTab || !cloudUserProfileWatcher.isOrgUser)
+
+    contentItem: loadingIndicator.loading && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
+        ? loadingIndicator
+        : siteListContainer
+
+    overlayItem: searchCanceller
+
+    leftPanel
+    {
+        title: qsTr("Structure")
+        color: ColorTheme.colors.dark5
+        iconSource: "image://skin/24x24/Outline/resource_tree.svg?primary=dark1"
+        interactive: rootIndex !== NxGlobals.invalidModelIndex()
+        item:
+        {
+            if (LayoutController.isTabletLayout
+                && !organizationsModel.topLevelLoading
+                && cloudUserProfileWatcher.isOrgUser
+                && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations))
+            {
+                return navigationPanel
+            }
+
+            return null
+        }
+    }
+
+    customLeftControl: ToolBarButton
+    {
+        id: avatarButton
+
+        anchors.centerIn: parent
+        icon.source: "image://skin/32x32/Outline/avatar.svg"
+        icon.width: 32
+        icon.height: 32
+        onClicked: searchToolBar.open()
+    }
+
+    titleUnderlineVisible: !LayoutController.isTabletLayout
+        && rootIndex.parent !== NxGlobals.invalidModelIndex()
 
     customBackHandler:
         (isEscKeyPressed) =>
@@ -44,21 +84,16 @@ Page
                 goBack()
         }
 
-    readonly property bool searching: !!siteList.searchText
-    readonly property bool localSitesVisible: state !== "inPartnerOrOrg"
-        && (selectedTab === OrganizationsModel.SitesTab || !cloudUserProfileWatcher.isOrgUser)
+    StackView.onActivated:
+    {
+        forceActiveFocus()
+        resetSearch()
+    }
 
-    StackView.onActivated: forceActiveFocus()
-
-    rightControl: IconButton
+    customRightControl: ToolBarButton
     {
         id: rightButton
-
-        anchors.centerIn: parent
-
         icon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
-        icon.width: 24
-        icon.height: 24
 
         Indicator
         {
@@ -69,35 +104,20 @@ Page
         }
     }
 
-    centerControl:
-    [
-        MouseArea
+    customToolBarClickHandler: () =>
+    {
+        if (!LayoutController.isTabletLayout
+            && sessionsScreen.state === "inPartnerOrOrg"
+            && sessionsScreen.rootType !== OrganizationsModel.ChannelPartner
+            && !breadcrumb.visible)
         {
-            anchors.fill: parent
-            visible: sessionsScreen.state === "inPartnerOrOrg"
-                && sessionsScreen.rootType !== OrganizationsModel.ChannelPartner
-                && !searchField.visible
-                && !breadcrumb.visible
-            onClicked: breadcrumb.openWith(linearizationListModel.sourceRoot?.parent)
-        },
-
-        SearchEdit
-        {
-            id: searchField
-
-            width: parent.width
-            height: 36
-            anchors.verticalCenter: parent.verticalCenter
-            placeholderText: qsTr("Search")
+            breadcrumb.openWith(linearizationListModel.sourceRoot?.parent)
         }
-    ]
+    }
 
     MouseArea
     {
         id: searchCanceller
-
-        z: 1
-        anchors.fill: parent
 
         onPressed: (mouse) =>
         {
@@ -116,25 +136,29 @@ Page
 
             PropertyChanges
             {
+                avatarButton
+                {
+                    icon.source: cloudUserProfileWatcher.avatarUrl
+                    icon.width: 32
+                    icon.height: 32
+                    onClicked: Workflow.openCloudSummaryScreen(cloudUserProfileWatcher)
+                }
                 sessionsScreen
                 {
-                    leftButtonImageSource: cloudUserProfileWatcher.avatarUrl
-                    onLeftButtonClicked:
-                        Workflow.openCloudSummaryScreen(cloudUserProfileWatcher)
-                    title: ""
+                    title: qsTr("Welcome, %1!").arg(cloudUserProfileWatcher.fullName)
+                    leftPanel.visible: true
                 }
                 rightButton
                 {
                     icon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
-                    onClicked: Workflow.openSettingsScreen()
+                    onClicked: Workflow.openSettingsScreen(/*push*/ true)
                 }
-                systemTabs.visible: !sessionsScreen.searching
+                systemTabs.visible: !LayoutController.isTabletLayout
+                    && !sessionsScreen.searching
                     && !loadingIndicator.visible
                     && cloudUserProfileWatcher.isOrgUser
                     && (organizationsModel.hasChannelPartners
                         || organizationsModel.hasOrganizations)
-
-                searchField.visible: true
             }
         },
 
@@ -146,19 +170,21 @@ Page
 
             PropertyChanges
             {
+                avatarButton
+                {
+                    icon.source: ""
+                    onClicked: Workflow.openCloudLoginScreen()
+                }
                 sessionsScreen
                 {
-                    leftButtonImageSource: ""
-                    onLeftButtonClicked: Workflow.openCloudLoginScreen()
                     title: ""
                 }
                 rightButton
                 {
                     icon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
-                    onClicked: Workflow.openSettingsScreen()
+                    onClicked: Workflow.openSettingsScreen(/*push*/ true)
                 }
                 systemTabs.visible: false
-                searchField.visible: true
             }
         },
 
@@ -170,63 +196,33 @@ Page
 
             PropertyChanges
             {
+                avatarButton
+                {
+                    icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light10"
+                    icon.width: 24
+                    icon.height: 24
+                    onClicked: goBack()
+                }
                 sessionsScreen
                 {
-                    leftButtonImageSource:
-                        "image://skin/24x24/Outline/arrow_back.svg?primary=light10"
-                    onLeftButtonClicked: goBack()
-                    title: !searchField.visible
-                        ? accessor.getData(linearizationListModel.sourceRoot, "display")
-                        : ""
+                    title: searchField.displayText
+                        ? ""
+                        : accessor.getData(linearizationListModel.sourceRoot, "display")
                 }
 
                 rightButton
                 {
                     visible: !emptyListPlaceholder.visible
                     icon.source: feedStateProvider.buttonIconSource
-                    onClicked: Workflow.openFeedScreen(feedStateProvider)
+                    onClicked: Workflow.openFeedScreen(/*push*/ true, feedStateProvider) //< TODO: Open in the right panel
                 }
 
                 rightButtonIndicator.text: feedStateProvider.buttonIconIndicatorText
 
                 systemTabs.visible: false
-                searchField.visible: false
             }
         }
     ]
-
-    Breadcrumb
-    {
-        id: breadcrumb
-
-        x: siteList.x
-        y: siteList.y + 8
-        width: siteList.width
-
-        onItemClicked: (nodeId) =>
-        {
-            goBack(organizationsModel.indexFromNodeId(nodeId))
-        }
-
-        function openWith(root)
-        {
-            if (root === NxGlobals.invalidModelIndex())
-                return
-
-            let data = []
-
-            for (let node = root; node && node.row !== -1; node = node.parent)
-            {
-                data.push({
-                    name: accessor.getData(node, "display"),
-                    nodeId: accessor.getData(node, "nodeId")
-                })
-            }
-
-            model = data.reverse()
-            open()
-        }
-    }
 
     SystemsModel
     {
@@ -280,21 +276,78 @@ Page
         cloudSystemIds: organizationsModel.childSystemIds(sessionsScreen.rootIndex)
     }
 
-    // Left navigation sidebar
-    LeftNavigationSidebar
+    Item
     {
-        id: leftNavigationSidebar
+        visible: false
 
-        width: visible ? 330 : 0
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
+        component TabButton: AbstractButton
+        {
+            id: tabButton
 
-        visible: sessionsScreen.landscapeMode
-            && !organizationsModel.topLevelLoading
-            && cloudUserProfileWatcher.isOrgUser
-            && (organizationsModel.hasChannelPartners
-                || organizationsModel.hasOrganizations)
+            implicitHeight: 40
+            implicitWidth: tabText.implicitWidth + leftPadding + rightPadding
+            topPadding: 10
+            leftPadding: 16
+            rightPadding: 16
+            bottomPadding: 10
+            checkable: true
+            focusPolicy: Qt.StrongFocus
+
+            background: Rectangle
+            {
+                color: tabButton.checked ? ColorTheme.colors.dark10 : "transparent"
+                radius: 8
+            }
+
+            contentItem: Text
+            {
+                id: tabText
+                text: tabButton.text
+                color: tabButton.checked ? ColorTheme.colors.light4 : ColorTheme.colors.light10
+                font.pixelSize: 14
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: LayoutController.isTabletLayout ? Text.AlignLeft : Text.AlignHCenter
+            }
+        }
+
+        ButtonGroup
+        {
+            id: tabGroup
+        }
+
+        TabButton
+        {
+            id: partnersTabButton
+            text: qsTr("Partners")
+            visible: organizationsModel.hasChannelPartners
+            ButtonGroup.group: tabGroup
+            checked: sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab
+            onClicked: sessionsScreen.selectedTab = OrganizationsModel.ChannelPartnersTab
+        }
+
+        TabButton
+        {
+            id: organizationsTabButton
+            text: qsTr("Organizations")
+            visible: organizationsModel.hasOrganizations
+            ButtonGroup.group: tabGroup
+            checked: sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab
+            onClicked: sessionsScreen.selectedTab = OrganizationsModel.OrganizationsTab
+        }
+
+        TabButton
+        {
+            id: sitesTabButton
+            text: qsTr("Sites")
+            ButtonGroup.group: tabGroup
+            checked: sessionsScreen.selectedTab === OrganizationsModel.SitesTab
+            onClicked: sessionsScreen.selectedTab = OrganizationsModel.SitesTab
+        }
+    }
+
+    NavigationPanel
+    {
+        id: navigationPanel
 
         hasChannelPartners: organizationsModel.hasChannelPartners
         hasOrganizations: organizationsModel.hasOrganizations
@@ -337,225 +390,239 @@ Page
     {
         id: siteListContainer
 
-        anchors.left: leftNavigationSidebar.right
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-
-        RectangularShadow
+        Breadcrumb
         {
-            anchors.fill: systemTabs
-            blur: 24
-            spread: 0
-            cached: true
-            color: Qt.rgba(0, 0, 0, 0.7)
-            z: 1
-            visible: systemTabs.visible
-        }
+            id: breadcrumb
 
-        Rectangle
-        {
-            id: systemTabs
-
-            color: ColorTheme.colors.dark8
             width: parent.width
-            implicitHeight: 48
-            height: visible ? implicitHeight : 0
-            z: 1
 
-            visible: !sessionsScreen.searching && !organizationsModel.topLevelLoading
-                && cloudUserProfileWatcher.isOrgUser
-                && (organizationsModel.hasChannelPartners
-                    || organizationsModel.hasOrganizations)
-
-            component TabButton: AbstractButton
+            onItemClicked: (nodeId) =>
             {
-                id: tabButton
-
-                height: 40
-                width: tabText.width + 16 * 2
-                checkable: true
-                focusPolicy: Qt.StrongFocus
-
-                background: Rectangle
-                {
-                    color: tabButton.checked ? ColorTheme.colors.dark10 : "transparent"
-                    radius: 8
-                }
-
-                Text
-                {
-                    id: tabText
-                    text: tabButton.text
-                    color: tabButton.checked ? ColorTheme.colors.light4 : ColorTheme.colors.light10
-                    font.pixelSize: 14
-                    anchors.centerIn: parent
-                }
+                goBack(organizationsModel.indexFromNodeId(nodeId))
             }
 
-            Row
+            function openWith(root)
             {
-                id: systemTabsRow
-                spacing: 0
-                x: 20
-                y: 4
-
-                height: visible ? implicitHeight : 0
-
-                TabButton
-                {
-                    id: partnersTabButton
-                    text: qsTr("Partners")
-                    visible: organizationsModel.hasChannelPartners
-                    checked: sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab
-                    onClicked: sessionsScreen.selectedTab = OrganizationsModel.ChannelPartnersTab
-                }
-
-                TabButton
-                {
-                    id: organizationsTabButton
-                    text: qsTr("Organizations")
-                    visible: organizationsModel.hasOrganizations
-                    checked: sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab
-                    onClicked: sessionsScreen.selectedTab = OrganizationsModel.OrganizationsTab
-                }
-
-                TabButton
-                {
-                    id: sitesTabButton
-                    text: qsTr("Sites")
-                    checked: sessionsScreen.selectedTab === OrganizationsModel.SitesTab
-                    onClicked: sessionsScreen.selectedTab = OrganizationsModel.SitesTab
-                }
-            }
-
-            function updateCheckedState(force)
-            {
-                if (organizationsModel.topLevelLoading && !force)
+                if (root === NxGlobals.invalidModelIndex())
                     return
 
-                if (!systemTabs.visible && !force)
+                let data = []
+
+                for (let node = root; node && node.row !== -1; node = node.parent)
                 {
-                    // If no tabs are going to be visible, select the Sites tab.
-                    if (!organizationsModel.hasChannelPartners
-                        && !organizationsModel.hasOrganizations)
-                    {
-                        sessionsScreen.selectedTab = OrganizationsModel.SitesTab
-                    }
-                    return
+                    data.push({
+                        name: accessor.getData(node, "display"),
+                        nodeId: accessor.getData(node, "nodeId")
+                    })
                 }
 
-                // Avoid switching tabs when selected tab is already visible.
-                const currentTabVisible =
-                    (sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab && partnersTabButton.visible) ||
-                    (sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab && organizationsTabButton.visible) ||
-                    (sessionsScreen.selectedTab === OrganizationsModel.SitesTab)
-
-                if (currentTabVisible && !force)
-                    return
-
-                // Select appropriate tab based on the current state.
-                if (cloudUserProfileWatcher.isOrgUser)
-                {
-                    if (organizationsModel.hasChannelPartners)
-                    {
-                        sessionsScreen.selectedTab = OrganizationsModel.ChannelPartnersTab
-                        return
-                    }
-                    if (organizationsModel.hasOrganizations)
-                    {
-                        sessionsScreen.selectedTab = OrganizationsModel.OrganizationsTab
-                        return
-                    }
-                }
-
-                sessionsScreen.selectedTab = OrganizationsModel.SitesTab
+                model = data.reverse()
+                open()
             }
 
             Connections
             {
-                target: organizationsModel
-                function onTopLevelLoadingChanged() { systemTabs.updateCheckedState() }
-                function onHasChannelPartnersChanged()
-                {
-                    systemTabs.updateCheckedState(/*force*/ organizationsModel.hasChannelPartners)
-                }
-                function onHasOrganizationsChanged()
-                {
-                    systemTabs.updateCheckedState(/*force*/ organizationsModel.hasOrganizations)
-                }
-            }
+                target: LayoutController
 
-            Connections
-            {
-                target: cloudUserProfileWatcher
-                function onIsOrgUserChanged() { systemTabs.updateCheckedState(/*force*/ true) }
-            }
-
-            Connections
-            {
-                target: sessionsScreen
-                function onRootTypeChanged() { systemTabs.updateCheckedState() }
+                function onIsTabletLayoutChanged()
+                {
+                    if (LayoutController.isTabletLayout && breadcrumb.visible)
+                        breadcrumb.close()
+                }
             }
         }
 
-        width: parent.width
-        height: parent.height - systemTabs.height
-        y: systemTabs.height
-
-        visible: !organizationsModel.topLevelLoading
-            || appContext.cloudStatusWatcher.status === CloudStatusWatcher.Offline
-
-        SiteList
+        ColumnLayout
         {
-            id: siteList
+            anchors.fill: parent
+            anchors.topMargin: 20 + (breadcrumb.visible ? breadcrumb.height : 0)
+            spacing: 20
 
-            width: parent.width
-            height: parent.height - systemTabs.height
-            y: systemTabs.height
-
-            visible: !loadingIndicator.visible
-            siteModel: linearizationListModel
-            hideOrgSystemsFromSites: cloudUserProfileWatcher.isOrgUser
-            currentTab: sessionsScreen.selectedTab
-            showOnly:
+            SearchEdit
             {
-                if (!systemTabsRow.visible)
+                id: searchField
+
+                Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
+
+                implicitHeight: 36
+                placeholderText: qsTr("Search")
+            }
+
+            Rectangle
+            {
+                id: systemTabs
+
+                Layout.fillWidth: true
+                color: ColorTheme.colors.dark8
+                implicitHeight: 48
+                z: 1
+                visible: !LayoutController.isTabletLayout
+                    && !sessionsScreen.searching
+                    && !organizationsModel.topLevelLoading
+                    && cloudUserProfileWatcher.isOrgUser
+                    && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations)
+
+                readonly property var selectedTab:
+                {
+                    if (tabGroup.checkedButton === partnersTabButton)
+                        return OrganizationsModel.ChannelPartnersTab
+                    if (tabGroup.checkedButton === organizationsTabButton)
+                        return OrganizationsModel.OrganizationsTab
+                    if (tabGroup.checkedButton === sitesTabButton)
+                        return OrganizationsModel.SitesTab
+
+                    return OrganizationsModel.SitesTab
+                }
+
+                Row
+                {
+                    id: systemTabsRow
+                    spacing: 0
+                    x: 20
+                    y: 4
+
+                    height: visible ? implicitHeight : 0
+
+                    LayoutItemProxy
+                    {
+                        target: partnersTabButton
+                        visible: organizationsModel.hasChannelPartners
+                    }
+                    LayoutItemProxy
+                    {
+                        target: organizationsTabButton
+                        visible: organizationsModel.hasOrganizations
+                    }
+                    LayoutItemProxy
+                    {
+                        target: sitesTabButton
+                    }
+                }
+
+                function updateCheckedState(force)
+                {
+                    if (organizationsModel.topLevelLoading && !force)
+                        return
+
+                    if (!systemTabs.visible && !force)
+                    {
+                        // If no tabs are going to be visible, select the Sites tab.
+                        if (!organizationsModel.hasChannelPartners
+                            && !organizationsModel.hasOrganizations)
+                        {
+                            sessionsScreen.selectedTab = OrganizationsModel.SitesTab
+                        }
+
+                        return
+                    }
+
+                    // Avoid switching tabs when selected tab is already visible.
+                    const currentTabVisible =
+                        (sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab && partnersTabButton.visible) ||
+                        (sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab && organizationsTabButton.visible) ||
+                        (sessionsScreen.selectedTab === OrganizationsModel.SitesTab)
+
+                    // Avoid switching tabs when selected tab is already visible.
+                    if (currentTabVisible && !force)
+                        return
+
+                    // Select appropriate tab based on the current state.
+                    if (cloudUserProfileWatcher.isOrgUser)
+                    {
+                        if (organizationsModel.hasChannelPartners)
+                        {
+                            sessionsScreen.selectedTab = OrganizationsModel.ChannelPartnersTab
+                            return
+                        }
+                        if (organizationsModel.hasOrganizations)
+                        {
+                            sessionsScreen.selectedTab = OrganizationsModel.OrganizationsTab
+                            return
+                        }
+                    }
+
+                    sessionsScreen.selectedTab = OrganizationsModel.SitesTab
+                }
+
+                Connections
+                {
+                    target: organizationsModel
+                    function onTopLevelLoadingChanged() { systemTabs.updateCheckedState() }
+                    function onHasChannelPartnersChanged()
+                    {
+                        systemTabs.updateCheckedState(/*force*/ organizationsModel.hasChannelPartners)
+                    }
+                    function onHasOrganizationsChanged()
+                    {
+                        systemTabs.updateCheckedState(/*force*/ organizationsModel.hasOrganizations)
+                    }
+                }
+
+                Connections
+                {
+                    target: cloudUserProfileWatcher
+                    function onIsOrgUserChanged() { systemTabs.updateCheckedState(/*force*/ true) }
+                }
+
+                Connections
+                {
+                    target: sessionsScreen
+                    function onRootTypeChanged() { systemTabs.updateCheckedState() }
+                }
+            }
+
+
+            SiteList
+            {
+                id: siteList
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: !loadingIndicator.visible
+                siteModel: linearizationListModel
+                hideOrgSystemsFromSites: cloudUserProfileWatcher.isOrgUser
+                currentTab: sessionsScreen.selectedTab
+                clip: true
+                showOnly:
+                {
+                    if (!systemTabsRow.visible)
+                        return []
+
+                    if (currentTab === OrganizationsModel.ChannelPartnersTab)
+                        return [OrganizationsModel.ChannelPartner]
+
+                    if (currentTab === OrganizationsModel.OrganizationsTab)
+                        return [OrganizationsModel.Organization]
+
                     return []
-
-                if (currentTab === OrganizationsModel.ChannelPartnersTab)
-                    return [OrganizationsModel.ChannelPartner]
-
-                if (currentTab === OrganizationsModel.OrganizationsTab)
-                    return [OrganizationsModel.Organization]
-
-                return []
-            }
-
-            PropertyUpdateFilter on searchText
-            {
-                source: searchField.displayText
-                minimumIntervalMs: 250
-            }
-
-            onItemClicked: (nodeId, systemId) =>
-            {
-                if (!nodeId)
-                {
-                    sessionsScreen.openSystem(organizationsModel.indexFromSystemId(systemId))
-                    return
                 }
 
-                const current = organizationsModel.indexFromNodeId(nodeId)
+                PropertyUpdateFilter on searchText
+                {
+                    source: searchField.displayText
+                    minimumIntervalMs: 250
+                }
 
-                // Synchronize tree selection with right panel
-                if (leftNavigationSidebar.visible && nodeId)
-                    leftNavigationSidebar.selectNodeById(nodeId)
+                onItemClicked: (nodeId, systemId) =>
+                {
+                    if (!nodeId)
+                    {
+                        sessionsScreen.openSystem(organizationsModel.indexFromSystemId(systemId))
+                        return
+                    }
 
-                if (accessor.getData(current, "type") === OrganizationsModel.System)
-                    sessionsScreen.openSystem(current)
-                else
-                    goInto(organizationsModel.indexFromNodeId(nodeId))
+                    // Synchronize tree selection with right panel
+                    if (nodeId)
+                        navigationPanel.selectNodeById(nodeId)
+
+                    const current = organizationsModel.indexFromNodeId(nodeId)
+                    if (accessor.getData(current, "type") === OrganizationsModel.System)
+                        sessionsScreen.openSystem(current)
+                    else
+                        goInto(organizationsModel.indexFromNodeId(nodeId))
+                }
             }
         }
 
@@ -646,7 +713,6 @@ Page
             }
 
             anchors.centerIn: parent
-            anchors.verticalCenterOffset: -header.height / 2
             imageSource: textData.imageSource
             text: textData.text
             description: textData.description
@@ -654,33 +720,33 @@ Page
             buttonIcon.source: textData.buttonIconSource || ""
             onButtonClicked: textData.clickHandler()
         }
-    }
 
-    IconButton
-    {
-        id: customConnectionButton
-
-        visible: localSitesVisible && !searching && !organizationsModel.topLevelLoading
-
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        anchors.bottomMargin: 20
-        anchors.rightMargin: 20
-
-        icon.source: "image://skin/24x24/Outline/plus.svg?primary=dark1"
-        icon.width: 24
-        icon.height: 24
-        padding: 16
-
-        TapHandler
+        IconButton
         {
-            onTapped: siteConnectionSheet.connectToSite()
-        }
+            id: customConnectionButton
 
-        background: Rectangle
-        {
-            color: ColorTheme.colors.light10
-            radius: 16
+            visible: localSitesVisible && !searching && !organizationsModel.topLevelLoading
+
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            anchors.bottomMargin: 20
+            anchors.rightMargin: 20
+
+            icon.source: "image://skin/24x24/Outline/plus.svg?primary=dark1"
+            icon.width: 24
+            icon.height: 24
+            padding: 16
+
+            TapHandler
+            {
+                onTapped: siteConnectionSheet.connectToSite()
+            }
+
+            background: Rectangle
+            {
+                color: ColorTheme.colors.light10
+                radius: 16
+            }
         }
     }
 
@@ -693,8 +759,7 @@ Page
         property bool currentRootLoading: false
         property bool waitingForLastOpened: appGlobalState.lastOpenedNodeId !== NxGlobals.uuid("")
             && appGlobalState.lastOpenedNodeId !== undefined
-
-        visible: (organizationsModel.topLevelLoading || currentRootLoading || waitingForLastOpened)
+        readonly property bool loading: (organizationsModel.topLevelLoading || currentRootLoading || waitingForLastOpened)
             && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
             || !organizationsModel.firstLoadAttemptFinished
 
@@ -755,12 +820,6 @@ Page
     SiteConnectionSheet
     {
         id: siteConnectionSheet
-    }
-
-    onVisibleChanged:
-    {
-        if (visible)
-            resetSearch()
     }
 
     Component.onCompleted:
@@ -856,8 +915,8 @@ Page
 
         // Synchronize tree selection when navigating into a node
         const nodeId = accessor.getData(newIndex, "nodeId")
-        if (leftNavigationSidebar.visible && nodeId)
-            leftNavigationSidebar.selectNodeById(nodeId)
+        if (nodeId)
+            navigationPanel.selectNodeById(nodeId)
 
         const update = () =>
             {
@@ -875,7 +934,7 @@ Page
 
     function goBack(index)
     {
-        if (searchField.visible)
+        if (searchField.displayText)
         {
             endSearch()
             return
@@ -914,13 +973,16 @@ Page
                 siteList.currentRoot = newIndex
             }
             const newId = accessor.getData(newIndex, "nodeId") ?? d.kRootId
+            if (newId)
+                navigationPanel.selectNodeById(newId)
+
             siteList.contentY = d.listPosition.get(newId) ?? 0
         })
     }
 
     function startSearch()
     {
-        if (searchField.visible)
+        if (searchField.displayText)
             return
 
         siteList.currentRoot = linearizationListModel.sourceRoot
@@ -932,14 +994,11 @@ Page
 
     function endSearch()
     {
-        if (!searchField.visible)
+        if (!searchField.displayText)
             return
 
         if (state === "inPartnerOrOrg")
-        {
             linearizationListModel.sourceRoot = siteList.currentRoot
-            searchField.visible = false
-        }
 
         searchField.clear()
         searchField.resetFocus()

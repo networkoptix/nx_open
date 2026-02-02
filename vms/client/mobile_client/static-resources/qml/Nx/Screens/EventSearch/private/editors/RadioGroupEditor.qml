@@ -1,10 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
 
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Mobile.Controls 1.0
+import Nx.Core
+import Nx.Controls
+import Nx.Mobile.Controls
+import Nx.Ui
 
 import "./helpers.js" as ValueHelpers
 
@@ -15,7 +16,7 @@ Column
 {
     id: control
 
-    property OptionSelector selector: null
+    required property OptionSelector selector
 
     property alias model: repeater.model
 
@@ -45,6 +46,7 @@ Column
 
             height: 56
             width: parent.width
+            backgroundRadius: LayoutController.isTabletLayout ? 8 : 0
             checkedBackgroundColor: ColorTheme.colors.dark8
             text: d.getTextValue(index)
             checked: d.selectedIndex === index
@@ -114,7 +116,7 @@ Column
         {
             restoreMode: Binding.RestoreNone
             target: control.selector
-            property: "textValue"
+            property: "text"
             value: d.getTextValue(d.selectedIndex)
         }
 

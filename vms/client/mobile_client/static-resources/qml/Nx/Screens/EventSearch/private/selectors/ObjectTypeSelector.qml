@@ -69,5 +69,6 @@ OptionSelector
     {
         model: control.objectTypes
         visualDelegate: control.visualDelegate
+        selector: control
     }
 }

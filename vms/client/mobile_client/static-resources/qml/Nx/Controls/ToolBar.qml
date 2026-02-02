@@ -21,12 +21,14 @@ ToolBarBase
     property alias titleOpacity: label.opacity
     property alias titleUnderlineVisible: labelUnderline.visible
 
-    property alias centerControl: centerControlContainer.data
+    property alias leftControl: leftControlContainer.data
+    property alias centerControl: customCenterControlContainer.data
     property alias rightControl: rightControlContainer.data
 
     baselineOffset: label.y + label.baselineOffset
 
     signal leftButtonClicked()
+    signal toolBarClicked()
 
     Item
     {
@@ -58,6 +60,21 @@ ToolBarBase
         anchors.right: rightControlContainer.left
         anchors.rightMargin: 20
         height: parent.height
+
+        MouseArea
+        {
+            anchors.fill: parent
+            onClicked: toolBar.toolBarClicked()
+        }
+
+        Item
+        {
+            id: customCenterControlContainer
+
+            anchors.fill: parent
+            visible: toolBar.centerControl.length
+            data: toolBar.centerControl
+        }
 
         TitleLabel
         {
@@ -126,14 +143,12 @@ ToolBarBase
         spacing: 8
     }
 
-    Item
+    Row
     {
         id: rightControlContainer
         baselineOffset: toolBar.baselineOffset - y
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: 20
-        width: 32
-        height: 32
     }
 }

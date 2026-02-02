@@ -4,9 +4,11 @@ import QtQuick
 import QtQuick.Layouts
 
 import Nx.Core
+import Nx.Controls
 import Nx.Mobile.Controls
+import Nx.Ui
 
-BaseBottomSheet
+BaseAdaptiveSheet
 {
     id: control
 
@@ -37,6 +39,15 @@ BaseBottomSheet
         Row
         {
             id: customArea
+        }
+
+        IconButton
+        {
+            icon.source: "image://skin/24x24/Outline/close.svg?primary=light10"
+            icon.width: 24
+            icon.height: 24
+            visible: LayoutController.isTabletLayout
+            onClicked: control.close()
         }
     }
 
