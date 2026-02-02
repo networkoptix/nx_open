@@ -33,7 +33,7 @@ T.ComboBox
 
     spacing: 8
 
-    topPadding: 30
+    topPadding: control.editable ? 12 : 30
     leftPadding: 12
     rightPadding: indicatorImage.visible
         ? control.spacing + indicatorImage.width + indicatorImage.anchors.rightMargin
