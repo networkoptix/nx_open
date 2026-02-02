@@ -9,7 +9,6 @@ import Nx.Core.Items
 import Nx.Mobile.Controls
 
 import nx.vms.client.core
-import nx.vms.client.mobile.timeline as Timeline
 
 BaseBottomSheet
 {
@@ -22,6 +21,8 @@ BaseBottomSheet
 
     readonly property alias count: swipeView.count
     property alias currentIndex: swipeView.currentIndex
+
+    property var dateFormatter: ((timestampMs) => new Date(timestampMs).toLocaleString())
 
     spacing: 16
     extraBottomPadding: (pageNavigationBar.count > 1) ? 0 : 20
@@ -99,8 +100,9 @@ BaseBottomSheet
                                 Duration.Hours | Duration.Minutes | Duration.Seconds,
                                 Duration.Short)
 
-                            const date = new Date(modelData.startTimeMs).toLocaleString(
-                                undefined, {timezone: timeline.timeZone})
+                            const date = sheet.dateFormatter
+                                ? sheet.dateFormatter(modelData.startTimeMs)
+                                : new Date(modelData.startTimeMs).toLocaleString()
 
                             return `${date} (${duration})`
                         }

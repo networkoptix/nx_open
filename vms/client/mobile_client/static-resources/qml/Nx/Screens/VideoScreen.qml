@@ -645,6 +645,7 @@ Page
             objectsType: objectsTypeSheet.selectedType
 
             interactive: !objectsTypeSheet.opened && !timelineObjectSheet.opened
+            timeZone: video.resourceHelper.timeZone
 
             onObjectTileTapped: (data) =>
             {
@@ -660,6 +661,9 @@ Page
         Timeline.ObjectDetailsSheet
         {
             id: timelineObjectSheet
+
+            dateFormatter: ((timestampMs) => timeline.labelFormatter.formatTimestamp(
+                timestampMs, timeline.timeZone))
         }
 
         Rectangle

@@ -161,6 +161,12 @@ QString LabelFormatter::formatHeader(
     return startDt.toString("d MMM yyyy, HH:mm:ss");
 }
 
+QString LabelFormatter::formatTimestamp(qint64 timestampMs, const QTimeZone& timeZone) const
+{
+    const auto dt = QDateTime::fromMSecsSinceEpoch(timestampMs, timeZone);
+    return dt.toString("d MMM yyyy, H:mm");
+}
+
 QLocale LabelFormatter::locale() const
 {
     return d->locale;

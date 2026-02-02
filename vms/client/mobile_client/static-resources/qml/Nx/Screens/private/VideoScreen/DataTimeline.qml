@@ -27,6 +27,7 @@ Rectangle
     property bool windowAtLive: true //< Window end is at live.
 
     property alias timeZone: timeScale.timeZone
+    readonly property alias labelFormatter: timeScale.labelFormatter
 
     property ChunkProvider chunkProvider
     property alias objectsType: objects.objectsType
