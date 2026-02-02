@@ -198,7 +198,8 @@ inline bool containsId(const std::vector<nx::Uuid>& ids, const nx::Uuid& id)
 
 bool canAccess(const Organization& org)
 {
-    return !containsId(org.ownRolesIds, kOrganizationSystemHealthViewerId);
+    // Organization is accessible if the user has any role in it.
+    return !org.ownRolesIds.empty();
 }
 
 bool canAccess(const ChannelPartner& cp)
@@ -215,7 +216,7 @@ bool canAccess(const Organization& org, const ChannelPartner& parentCp)
 
     const auto accessLevel = nx::Uuid::fromStringSafe(org.channelPartnerAccessLevel);
 
-    if (accessLevel != kOrganizationAdministratorId
+    if (accessLevel.isNull()
         && (cpRolesIds.contains(kChannelPartnerAdministratorId)
             || cpRolesIds.contains(kChannelPartnerManagerId)))
     {
