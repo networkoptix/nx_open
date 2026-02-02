@@ -68,7 +68,6 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
         ctx.renderer->setBlurEnabled(
             appContext()->localSettings()->glBlurEnabled()
             && appContext()->runtimeSettings()->graphicsApi() != GraphicsApi::software);
-        ctx.renderer->setScreenshotInterface(m_screenshotInterface);
         ctx.uploader->setYV12ToRgbShaderUsed(ctx.renderer->isYV12ToRgbShaderUsed());
         ctx.uploader->setNV12ToRgbShaderUsed(ctx.renderer->isNV12ToRgbShaderUsed());
     }
@@ -286,13 +285,6 @@ void QnResourceWidgetRenderer::setPaused(bool value)
 {
     for (const auto& ctx: m_renderingContexts)
         ctx.renderer->setPaused(value);
-}
-
-void QnResourceWidgetRenderer::setScreenshotInterface(ScreenshotInterface* value)
-{
-    m_screenshotInterface = value;
-    for (const auto& ctx: m_renderingContexts)
-        ctx.renderer->setScreenshotInterface(value);
 }
 
 bool QnResourceWidgetRenderer::isEnabled(int channel) const

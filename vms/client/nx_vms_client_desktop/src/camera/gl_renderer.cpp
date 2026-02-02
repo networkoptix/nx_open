@@ -91,7 +91,6 @@ QnGLRenderer::QnGLRenderer(
     m_prevFrameSequence( 0 ),
     m_timeChangeEnabled(true),
     m_paused(false),
-    m_screenshotInterface(0),
     m_histogramConsumer(0),
     m_fisheyeController(0),
 
@@ -428,7 +427,6 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
         targetRect,
         planeCount,
         picLock->glTextures().data(),
-        (picLock->flags() & QnAbstractMediaData::MediaFlags_StillImage) != 0,
         opacity))
     {
         return Qn::CannotRender;
@@ -475,20 +473,6 @@ void QnGLRenderer::drawVideoTextureDirectly(
     shader->release();
 }
 
-void QnGLRenderer::setScreenshotInterface(ScreenshotInterface* value) {
-    m_screenshotInterface = value;
-}
-
-ImageCorrectionResult QnGLRenderer::calcImageCorrection()
-{
-    if (m_screenshotInterface) {
-        QImage img = m_screenshotInterface->getGrayscaleScreenshot();
-        m_imageCorrector.analyseImage((quint8*)img.constBits(), img.width(), img.height(), img.bytesPerLine(), m_imgCorrectParam, m_displayedRect);
-    }
-
-    return m_imageCorrector;
-}
-
 bool QnGLRenderer::drawVideoTextures(
     const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
     QPainter* painter,
@@ -496,7 +480,6 @@ bool QnGLRenderer::drawVideoTextures(
     const QRectF& viewRect,
     int planeCount,
     const unsigned int* textureIds,
-    bool isStillImage,
     qreal opacity)
 {
     // TODO: #vkutin I'm not sure NV12 will work correctly.
@@ -609,10 +592,7 @@ bool QnGLRenderer::drawVideoTextures(
 
             if (programKey.imageCorrection == MediaOutputShaderProgram::YuvImageCorrection::gamma)
             {
-                const auto parameters = isPaused() || isStillImage
-                    ? calcImageCorrection()
-                    : picLock->imageCorrectionResult();
-
+                const auto parameters = picLock->imageCorrectionResult();
                 program.loadGammaCorrection(parameters);
                 if (m_histogramConsumer)
                     m_histogramConsumer->setHistogramData(parameters);
@@ -747,10 +727,7 @@ bool QnGLRenderer::drawVideoTextures(
 
     if (programKey.imageCorrection == MediaOutputShaderProgram::YuvImageCorrection::gamma)
     {
-        const auto parameters = isPaused() || isStillImage
-            ? calcImageCorrection()
-            : picLock->imageCorrectionResult();
-
+        const auto parameters = picLock->imageCorrectionResult();
         program->loadGammaCorrection(parameters);
         if (m_histogramConsumer)
             m_histogramConsumer->setHistogramData(parameters);

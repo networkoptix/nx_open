@@ -86,7 +86,6 @@ public:
 
     QSize getFrameSize(int channel) const;
     QImage getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams, bool anyQuality);
-    QImage getGrayscaleScreenshot(int channel);
     virtual QSize getVideoSize() const override; //< From AbstractVideoDisplay
     virtual bool isRealTimeSource() const override; //< From AbstractVideoDisplay
 

@@ -153,7 +153,6 @@ public:
         Inform render that media stream is paused and no more frames expected
     */
     void setPaused(bool value);
-    void setScreenshotInterface(ScreenshotInterface* value);
     void setHistogramConsumer(QnHistogramConsumer* value);
 
 signals:
@@ -195,7 +194,6 @@ private:
     QOpenGLWidget* const m_openGLWidget;
     QQuickWidget* m_quickWidget = nullptr;
 
-    ScreenshotInterface* m_screenshotInterface = nullptr;
     int m_panoFactor = 1;
     qreal m_blurFactor = 0;
 
