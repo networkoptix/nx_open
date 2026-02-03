@@ -546,10 +546,6 @@
       <source>Open</source>
       <translation>열기</translation>
     </message>
-    <message>
-      <source>Cancel</source>
-      <translation>취소</translation>
-    </message>
   </context>
   <context>
     <name>Login</name>

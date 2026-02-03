@@ -546,10 +546,6 @@
       <source>Open</source>
       <translation>mở</translation>
     </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
-    </message>
   </context>
   <context>
     <name>Login</name>

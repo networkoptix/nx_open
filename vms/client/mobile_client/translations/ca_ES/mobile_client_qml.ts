@@ -547,10 +547,6 @@
       <source>Open</source>
       <translation>Obrir</translation>
     </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Cancel·la</translation>
-    </message>
   </context>
   <context>
     <name>Login</name>

@@ -546,10 +546,6 @@
       <source>Open</source>
       <translation>เปิด</translation>
     </message>
-    <message>
-      <source>Cancel</source>
-      <translation>ยกเลิก</translation>
-    </message>
   </context>
   <context>
     <name>Login</name>

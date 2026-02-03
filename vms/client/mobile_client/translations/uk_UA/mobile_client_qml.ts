@@ -549,10 +549,6 @@
       <source>Open</source>
       <translation>Відкрити</translation>
     </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Скасувати</translation>
-    </message>
   </context>
   <context>
     <name>Login</name>

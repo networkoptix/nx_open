@@ -547,10 +547,6 @@
       <source>Open</source>
       <translation>Aç</translation>
     </message>
-    <message>
-      <source>Cancel</source>
-      <translation>İptal</translation>
-    </message>
   </context>
   <context>
     <name>Login</name>

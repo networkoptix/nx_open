@@ -547,10 +547,6 @@
       <source>Open</source>
       <translation>Avaa</translation>
     </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Peruuta</translation>
-    </message>
   </context>
   <context>
     <name>Login</name>

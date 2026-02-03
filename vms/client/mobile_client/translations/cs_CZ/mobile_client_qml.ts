@@ -549,10 +549,6 @@
       <source>Open</source>
       <translation>Otevřít</translation>
     </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Zrušit</translation>
-    </message>
   </context>
   <context>
     <name>Login</name>

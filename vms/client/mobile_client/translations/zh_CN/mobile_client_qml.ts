@@ -546,10 +546,6 @@
       <source>Open</source>
       <translation>打开</translation>
     </message>
-    <message>
-      <source>Cancel</source>
-      <translation>撤消</translation>
-    </message>
   </context>
   <context>
     <name>Login</name>

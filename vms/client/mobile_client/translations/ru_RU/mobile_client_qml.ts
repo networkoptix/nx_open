@@ -549,10 +549,6 @@
       <source>Open</source>
       <translation>Открыть</translation>
     </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Отменить</translation>
-    </message>
   </context>
   <context>
     <name>Login</name>

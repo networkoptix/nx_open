@@ -547,10 +547,6 @@
       <source>Open</source>
       <translation>Megnyitás</translation>
     </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Mégse</translation>
-    </message>
   </context>
   <context>
     <name>Login</name>
