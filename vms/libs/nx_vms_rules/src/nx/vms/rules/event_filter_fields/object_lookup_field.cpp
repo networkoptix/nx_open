@@ -16,6 +16,21 @@ namespace nx::vms::rules {
 
 namespace {
 
+using Attributes = nx::common::metadata::Attributes;
+
+bool entryMatches(const Attributes& attributes, const nx::vms::api::LookupListEntry& entry)
+{
+    return std::ranges::all_of(entry,
+        [&attributes](const auto& pair)
+        {
+            return pair.second.isEmpty() || std::ranges::any_of(attributes,
+                [&pair](const auto& attribute)
+                {
+                    return attribute.name == pair.first && attribute.value == pair.second;
+                });
+        });
+}
+
 /**
  * Returns whether the list contains an entry that matches the given attributes.
  * For a generic list, it checks that at least one value matches the attribute.
@@ -46,22 +61,7 @@ bool checkForListEntries(
 
     for (const auto& entry: lookupList.entries)
     {
-        bool isMatch{true};
-        for (const auto& attribute: attributes)
-        {
-            const auto entryIt = entry.find(attribute.name);
-
-            if (entryIt == entry.end() || entryIt->second.isEmpty())
-                continue; //< Empty entry value matches any event value.
-
-            if (entryIt->second != attribute.value)
-            {
-                isMatch = false;
-                break;
-            }
-        }
-
-        if (isMatch)
+        if (entryMatches(attributes, entry))
             return true;
     }
 

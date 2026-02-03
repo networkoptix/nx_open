@@ -15,6 +15,13 @@ namespace nx::vms::rules::test {
 
 namespace {
 
+struct TestData
+{
+    std::vector<QString> attributes;
+    std::vector<std::map<QString, QString>> entries;
+    bool isGeneric = true;
+};
+
 const FieldDescriptor kDummyDescriptor;
 
 template<class Field>
@@ -81,7 +88,9 @@ TEST_F(EventFieldContextTest, SourceUserField)
     EXPECT_TRUE(field.match(userIdValue));
 }
 
-class LookupFieldTestBase: public nx::vms::common::test::ContextBasedTest
+class LookupFieldTestBase:
+    public nx::vms::common::test::ContextBasedTest,
+    public testing::WithParamInterface<TestData>
 {
 protected:
     using Attributes = nx::common::metadata::Attributes;
@@ -201,6 +210,8 @@ TEST_F(TextLookupFieldTest, lookupInListWorksProperly)
     ASSERT_TRUE(field.match(QString{"four"}));
 }
 
+//-------------------------------------------------------------------------------------------------
+
 class ObjectLookupFieldTest: public LookupFieldTestBase
 {
 };
@@ -222,7 +233,7 @@ TEST_F(ObjectLookupFieldTest, emptyLookupList)
     ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "bar"}})));
 }
 
-TEST_F(ObjectLookupFieldTest, emptyAttributes)
+TEST_F(ObjectLookupFieldTest, emptyAttributeFilter)
 {
     ObjectLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue("");
@@ -232,29 +243,51 @@ TEST_F(ObjectLookupFieldTest, emptyAttributes)
     ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"baz", "quux"}})));
 }
 
-TEST_F(ObjectLookupFieldTest, emptyListAttributeMatchAnyInputValue)
+TEST_F(ObjectLookupFieldTest, emptyList)
 {
-    const auto listId = makeAndRegisterList({"foo, bar"},
-        {
-            // The entries accept any value for the 'foo' attribute.
-            {{"foo", ""}, {"bar", "1"}},
-            {{"bar", "1"}}
-        },
-        /* isGeneric */ false);
+    const auto listId = makeAndRegisterList({"foo, bar"}, {}, /* isGeneric */ false);
 
     ObjectLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue(listId.toSimpleString());
 
     field.setCheckType(ObjectLookupCheckType::inList);
-    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
-    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}})));
-    // Empty attributes doesn't match lookup list.
-    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{})));
+    EXPECT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
+    EXPECT_FALSE(field.match(QVariant::fromValue(Attributes{})));
 
     field.setCheckType(ObjectLookupCheckType::notInList);
-    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
-    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}})));
+    EXPECT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
+    EXPECT_TRUE(field.match(QVariant::fromValue(Attributes{})));
 }
+
+
+// The entries accept any value for the 'foo' attribute.
+const auto kEmptyEntryData = std::vector<TestData>{
+    {{"foo, bar"}, {{{"foo", ""}, {"bar", "1"}}}, /* isGeneric */ false},
+    {{"foo, bar"}, {{{"bar", "1"}}}, /* isGeneric */ false},
+};
+
+TEST_P(ObjectLookupFieldTest, emptyListAttributeMatchAnyInputValue)
+{
+    const auto& data = GetParam();
+
+    const auto listId = makeAndRegisterList(data.attributes, data.entries, data.isGeneric);
+
+    ObjectLookupField field{systemContext(), &kDummyDescriptor};
+    field.setValue(listId.toSimpleString());
+
+    field.setCheckType(ObjectLookupCheckType::inList);
+    EXPECT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"bar", "1"}})));
+    EXPECT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}, {"bar", "1"}})));
+    // Empty attributes doesn't match lookup list.
+    EXPECT_FALSE(field.match(QVariant::fromValue(Attributes{})));
+
+    field.setCheckType(ObjectLookupCheckType::notInList);
+    EXPECT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"bar", "1"}})));
+    EXPECT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}, {"bar", "1"}})));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    EmptyEntry, ObjectLookupFieldTest, testing::ValuesIn(kEmptyEntryData));
 
 TEST_F(ObjectLookupFieldTest, lookupWithAttributesWorksProperly)
 {
@@ -333,6 +366,10 @@ TEST_F(ObjectLookupFieldTest, lookupInListWorksProperly)
     // Check attribute name list does not contain.
     ASSERT_FALSE(field.match(
         QVariant::fromValue(Attributes{{"unexpected", "1"}, {"baz.baz", "one"}, {"bar.quux", "0x3"}})));
+    // Absent attribute does not match.
+    EXPECT_FALSE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "1"}, {"baz.baz", "one"}})));
+
 
     field.setCheckType(ObjectLookupCheckType::notInList);
     ASSERT_FALSE(field.match(
@@ -345,6 +382,8 @@ TEST_F(ObjectLookupFieldTest, lookupInListWorksProperly)
         QVariant::fromValue(Attributes{{"foo", "1"}, {"baz.baz", "one"}, {"bar.quux", "0x3"}})));
     ASSERT_TRUE(field.match(
         QVariant::fromValue(Attributes{{"unexpected", "1"}, {"baz.baz", "one"}, {"bar.quux", "0x3"}})));
+    EXPECT_TRUE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "1"}, {"baz.baz", "one"}})));
 }
 
 TEST(EventFieldTest, SimpleTypes)
