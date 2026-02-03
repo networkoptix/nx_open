@@ -114,7 +114,7 @@ function openResourcesScreen(systemName, filterIds)
     }
 }
 
-function openVideoScreen(resource, screenshotUrl, timestamp, camerasModel)
+function openVideoScreen(resource, screenshotUrl, timestamp, camerasModel, selectedObjectsType)
 {
     var targetTimestamp = timestamp > 0 ? timestamp : -1
     var properties =
@@ -123,8 +123,12 @@ function openVideoScreen(resource, screenshotUrl, timestamp, camerasModel)
             "initialScreenshot": screenshotUrl ?? "",
             "targetTimestamp": targetTimestamp
         }
+
     if (camerasModel)
         properties["camerasModel"] = camerasModel
+
+    if (selectedObjectsType && appContext.settings.newTimelinePrototype)
+        properties["selectedObjectsType"] = selectedObjectsType
 
     const screen = appContext.settings.newTimelinePrototype
         ? stackView.pushScreen(Qt.resolvedUrl("../Screens/VideoScreen.qml"), properties)

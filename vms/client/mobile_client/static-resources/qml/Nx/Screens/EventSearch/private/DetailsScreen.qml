@@ -20,6 +20,7 @@ import Nx.Ui
 
 import nx.vms.client.core
 import nx.vms.client.mobile
+import nx.vms.client.mobile.timeline as Timeline
 
 import "items"
 
@@ -660,7 +661,10 @@ Page
 
         function goToCamera()
         {
-            Workflow.openVideoScreen(preview.resource, undefined, slider.from, camerasModel)
+            Workflow.openVideoScreen(preview.resource, undefined, slider.from, camerasModel,
+                eventDetailsScreen.isAnalyticsDetails
+                    ? Timeline.ObjectsLoader.ObjectsType.analytics
+                    : Timeline.ObjectsLoader.ObjectsType.bookmarks)
         }
 
         function updateGestureExclusionArea()
