@@ -15,6 +15,12 @@ using namespace std::chrono;
 struct LabelFormatter::Private
 {
     QLocale locale;
+    bool amPm = is12HourFormat();
+
+    bool is12HourFormat() const
+    {
+        return locale.timeFormat().contains("AP", Qt::CaseInsensitive);
+    }
 };
 
 LabelFormatter::LabelFormatter(QObject* parent):
@@ -38,29 +44,39 @@ QString LabelFormatter::formatLabel(
     switch (level)
     {
         case TimelineZoomLevel::Years:
-            return dt.toString("yyyy");
+            return d->locale.toString(dt, "yyyy");
 
         case TimelineZoomLevel::Months:
         case TimelineZoomLevel::Days:
         {
             return (dt.date().month() > 1 || dt.date().day() > 1)
-                ? dt.toString("d MMM")
-                : dt.toString("yyyy\nd MMM");
+                ? d->locale.toString(dt, "d MMM")
+                : d->locale.toString(dt, "yyyy\nd MMM");
         }
 
         case TimelineZoomLevel::Hours:
         case TimelineZoomLevel::Minutes:
         {
+            if (d->amPm)
+            {
+                return (dt.time().hour() > 0 || dt.time().minute() > 0)
+                    ? d->locale.toString(dt, "H:mm AP")
+                    : d->locale.toString(dt, "d MMM\nH:mm AP");
+            }
+
             return (dt.time().hour() > 0 || dt.time().minute() > 0)
-                ? dt.toString("H:mm")
-                : dt.toString("d MMM\nH:mm");
+                ? d->locale.toString(dt, "H:mm")
+                : d->locale.toString(dt, "d MMM\nH:mm");
         }
 
         case TimelineZoomLevel::Seconds:
         {
-            return dt.time().second() > 0
-                ? nx::format("%1s", dt.time().second()).toQString()
-                : dt.toString("H:mm");
+            if (dt.time().second() > 0)
+                return nx::format("%1s", dt.time().second());
+
+            return d->amPm
+                ? d->locale.toString(dt, "H:mm AP")
+                : d->locale.toString(dt, "H:mm");
         }
 
         case TimelineZoomLevel::Milliseconds:
@@ -88,15 +104,23 @@ QString LabelFormatter::formatMarker(
     constexpr qint64 kSecondMs = milliseconds(1s).count();
 
     if (resolution < kSecondMs)
-        return nx::format("%1s", dt.time().toString("ss.zzz"));
+        return nx::format("%1s", d->locale.toString(dt, "ss.zzz"));
 
     if (resolution < kMinuteMs)
-        return dt.time().toString("H:mm:ss");
+    {
+        return d->amPm
+            ? d->locale.toString(dt, "H:mm:ss AP")
+            : d->locale.toString(dt, "H:mm:ss");
+    }
 
     if (resolution < kDayMs)
-        return dt.time().toString("H:mm");
+    {
+        return d->amPm
+            ? d->locale.toString(dt, "H:mm AP")
+            : d->locale.toString(dt, "H:mm");
+    }
 
-    return dt.date().toString("d MMM");
+    return d->locale.toString(dt, "d MMM");
 }
 
 QString LabelFormatter::formatOutsideMarker(
@@ -111,14 +135,26 @@ QString LabelFormatter::formatOutsideMarker(
         case TimelineZoomLevel::Months:
         case TimelineZoomLevel::Days:
         case TimelineZoomLevel::Hours:
-            return dt.toString("d MMM yyyy, H:mm");
+        {
+            return d->amPm
+                ? d->locale.toString(dt, "d MMM yyyy, H:mm AP")
+                : d->locale.toString(dt, "d MMM yyyy, H:mm");
+        }
 
         case TimelineZoomLevel::Minutes:
-            return dt.toString("d MMM yyyy, H:mm:ss");
+        {
+            return d->amPm
+                ? d->locale.toString(dt, "d MMM yyyy, H:mm:ss AP")
+                : d->locale.toString(dt, "d MMM yyyy, H:mm:ss");
+        }
 
         case TimelineZoomLevel::Seconds:
         case TimelineZoomLevel::Milliseconds:
-            return dt.toString("d MMM yyyy, H:mm:ss.zzz");
+        {
+            return d->amPm
+                ? d->locale.toString(dt, "d MMM yyyy, H:mm:ss.zzz AP")
+                : d->locale.toString(dt, "d MMM yyyy, H:mm:ss.zzz");
+        }
     }
 
     NX_ASSERT(false);
@@ -135,36 +171,53 @@ QString LabelFormatter::formatHeader(
     const auto endDate = endDt.date();
 
     if (startDate.year() != endDate.year())
-        return nx::format("%1 - %2", startDate.toString("yyyy"), endDate.toString("yyyy"));
+    {
+        return nx::format("%1 - %2",
+            d->locale.toString(startDt, "yyyy"), d->locale.toString(endDt, "yyyy"));
+    }
 
     if (startDate.month() != endDate.month())
-        return startDate.toString("yyyy");
+        d->locale.toString(startDt, "yyyy");
 
     if (startDate.day() != endDate.day())
-        return startDate.toString("MMM yyyy");
+        d->locale.toString(startDt, "MMM yyyy");
 
     const auto startTime = startDt.time();
     const auto endTime = endDt.time();
 
     if (startTime.hour() != endTime.hour())
-        return startDate.toString("d MMM yyyy");
+        d->locale.toString(startDt, "d MMM yyyy");
 
     if (startTime.minute() != endTime.minute())
     {
-        return nx::format("%1, %2 - %3", startDate.toString("d MMM yyyy"),
-            startTime.toString("HH:mm"), endTime.toString("HH:mm"));
+        if (d->amPm)
+        {
+            return nx::format("%1, %2 - %3", d->locale.toString(startDt, "d MMM yyyy"),
+                d->locale.toString(startDt, "HH:mm AP"), d->locale.toString(endDt, "HH:mm AP"));
+        }
+
+        return nx::format("%1, %2 - %3", d->locale.toString(startDt, "d MMM yyyy"),
+            d->locale.toString(startDt, "HH:mm"), d->locale.toString(endDt, "HH:mm"));
     }
 
     if (startTime.second() != endTime.second())
-        return startDt.toString("d MMM yyyy, HH:mm");
+    {
+        return d->amPm
+            ? d->locale.toString(startDt, "d MMM yyyy, HH:mm AP")
+            : d->locale.toString(startDt, "d MMM yyyy, HH:mm");
+    }
 
-    return startDt.toString("d MMM yyyy, HH:mm:ss");
+    return d->amPm
+        ? d->locale.toString(startDt, "d MMM yyyy, HH:mm:ss AP")
+        : d->locale.toString(startDt, "d MMM yyyy, HH:mm:ss");
 }
 
 QString LabelFormatter::formatTimestamp(qint64 timestampMs, const QTimeZone& timeZone) const
 {
     const auto dt = QDateTime::fromMSecsSinceEpoch(timestampMs, timeZone);
-    return dt.toString("d MMM yyyy, H:mm");
+    return d->amPm
+        ? d->locale.toString(dt, "d MMM yyyy, H:mm AP")
+        : d->locale.toString(dt, "d MMM yyyy, H:mm");
 }
 
 QLocale LabelFormatter::locale() const
@@ -178,6 +231,8 @@ void LabelFormatter::setLocale(QLocale value)
         return;
 
     d->locale = value;
+    d->amPm = d->is12HourFormat();
+
     emit localeChanged();
 }
 
