@@ -16,10 +16,10 @@
     </message>
   </context>
   <context>
-    <name>AppInfoScreen</name>
+    <name>AppInfoPage</name>
     <message>
       <source>App Info</source>
-      <translation>Info Aplikasi</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
@@ -34,38 +34,38 @@
     </message>
   </context>
   <context>
-    <name>BetaFeaturesScreen</name>
+    <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
-      <translation>Fitur Beta</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation>Video Download</translation>
+      <translation type="unfinished">Video Download</translation>
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation>Download video ke perangkat ini</translation>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation>Optimalkan Jaringan</translation>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation>Terapkan metode optimasi jaringan</translation>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation>Dekoding Paralel</translation>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation>Gunakan beberapa dekoder untuk meningkatkan kinerja</translation>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation>Silakan restart aplikasi untuk menerapkan perubahan</translation>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -297,26 +297,26 @@
     </message>
   </context>
   <context>
-    <name>DeveloperSettingsScreen</name>
+    <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Pengaturan Developer</translation>
-    </message>
-    <message>
-      <source>Log Level</source>
-      <translation>Level Log</translation>
-    </message>
-    <message>
-      <source>Copy log ID</source>
-      <translation>Salin ID log</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation>Salin ID Klien</translation>
+      <translation type="unfinished">Copy Client ID</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation type="unfinished">Copy log ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>Paksa Crash</translation>
+      <translation type="unfinished">Force Crash</translation>
+    </message>
+    <message>
+      <source>Log Level</source>
+      <translation type="unfinished">Log Level</translation>
     </message>
   </context>
   <context>
@@ -391,18 +391,18 @@
     </message>
   </context>
   <context>
-    <name>EventSearchMenuScreen</name>
+    <name>EventSearchMenu</name>
     <message>
       <source>Looking for</source>
-      <translation>Mencari</translation>
+      <translation type="unfinished">Looking for</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Bookmarks</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Objek</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
   </context>
   <context>
@@ -430,6 +430,14 @@
     <message>
       <source>Try changing the filters to display the results</source>
       <translation>Coba ubah filter untuk menampilkan hasilnya</translation>
+    </message>
+    <message>
+      <source>Clear All</source>
+      <translation type="unfinished">Clear All</translation>
+    </message>
+    <message>
+      <source>Filters</source>
+      <translation type="unfinished">Filters</translation>
     </message>
   </context>
   <context>
@@ -496,21 +504,14 @@
     </message>
   </context>
   <context>
-    <name>FiltersPanel</name>
-    <message>
-      <source>No filters</source>
-      <translation>Tidak ada filter</translation>
-    </message>
-  </context>
-  <context>
-    <name>FiltersScreen</name>
+    <name>FiltersItem</name>
     <message>
       <source>Search Filters</source>
-      <translation>Filter Pencarian</translation>
+      <translation type="unfinished">Search Filters</translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation>Hanya Dibagikan</translation>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>
@@ -573,26 +574,26 @@
     </message>
   </context>
   <context>
-    <name>InterfaceSettingsScreen</name>
+    <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation>Interface</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>Tampilkan preview di daftar kamera</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Live Previews</source>
-      <translation>Live Preview</translation>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>Server Time</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
-      <translation>Tampilkan waktu server di kamera</translation>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -724,13 +725,6 @@
     </message>
   </context>
   <context>
-    <name>OptionSelectorScreen</name>
-    <message>
-      <source>Clear</source>
-      <translation>Clear</translation>
-    </message>
-  </context>
-  <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
@@ -742,26 +736,26 @@
     </message>
   </context>
   <context>
-    <name>PerformanceSettingsScreen</name>
+    <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation>Performa</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation>Akselerasi Perangkat Keras</translation>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation>Dapat meningkatkan kinerja dan masa pakai baterai</translation>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation>Fallback Dekoder Software</translation>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation>Dekode beberapa format video langka menggunakan dekoder software</translation>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -786,54 +780,54 @@
     </message>
   </context>
   <context>
-    <name>PushExpertModeScreen</name>
+    <name>PushExpertModePage</name>
+    <message>
+      <source>Sites</source>
+      <translation type="unfinished">Sites</translation>
+    </message>
     <message>
       <source>Notifications</source>
-      <translation>Notifikasi</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation>Selesai</translation>
-    </message>
-    <message>
-      <source>SELECT</source>
-      <translation>PILIH</translation>
-    </message>
-    <message>
-      <source>Yes</source>
-      <translation>Ya</translation>
-    </message>
-    <message>
-      <source>No</source>
-      <translation>Tidak</translation>
-    </message>
-    <message>
-      <source>Save changes?</source>
-      <translation>Simpan perubahan?</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Site</translation>
-    </message>
-    <message>
-      <source>All Sites</source>
-      <translation>Semua Site</translation>
-    </message>
-    <message>
-      <source>Selected Sites</source>
-      <translation>Site yang Dipilih</translation>
-    </message>
-    <message>
-      <source>At least one site has to be selected</source>
-      <translation>Setidaknya satu site harus dipilih</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation>Masuk ke cloud untuk menerima notifikasi</translation>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Notifikasi dimatikan di pengaturan perangkat</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>SELECT</source>
+      <translation type="unfinished">SELECT</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation type="unfinished">Yes</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation type="unfinished">No</translation>
+    </message>
+    <message>
+      <source>Save changes?</source>
+      <translation type="unfinished">Save changes?</translation>
     </message>
   </context>
   <context>
@@ -890,14 +884,10 @@
     </message>
   </context>
   <context>
-    <name>ResourceTreeSheet</name>
-    <message>
-      <source>Resources</source>
-      <translation>Resources</translation>
-    </message>
+    <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation>Tidak ada yang ditemukan</translation>
+      <translation type="unfinished">Nothing Found</translation>
     </message>
   </context>
   <context>
@@ -909,10 +899,6 @@
     <message>
       <source>Connecting...</source>
       <translation>Mengkoneksikan...</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Tidak ada yang ditemukan</translation>
     </message>
     <message>
       <source>No Cameras</source>
@@ -930,6 +916,14 @@
       <source>Stop Connecting</source>
       <translation>Berhenti Mengkoneksikan</translation>
     </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
+    </message>
+    <message>
+      <source>Timeline</source>
+      <translation type="unfinished">Timeline</translation>
+    </message>
   </context>
   <context>
     <name>SearchEdit</name>
@@ -939,50 +933,50 @@
     </message>
   </context>
   <context>
-    <name>SecuritySettingsScreen</name>
+    <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation>Keamanan</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>Direkomendasikan</translation>
-    </message>
-    <message>
-      <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Konfirmasi Anda akan diminta untuk menyematkan sertifikat yang ditandatangani sendiri</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>Ketat</translation>
-    </message>
-    <message>
-      <source>Connect only servers with public certificates</source>
-      <translation>Koneksikan hanya server dengan sertifikat publik</translation>
-    </message>
-    <message>
-      <source>Automatically log in to servers</source>
-      <translation>Secara otomatis masuk ke server</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>Tetap</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Hapus</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation>Simpan Kata Sandi</translation>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation>Bagaimana cara menangani kata sandi yang tersimpan?</translation>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation type="unfinished">Keep</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation>Pemeriksaan Sertifikat Server</translation>
+      <translation type="unfinished">Server Certificate Check</translation>
+    </message>
+    <message>
+      <source>Recommended</source>
+      <translation type="unfinished">Recommended</translation>
+    </message>
+    <message>
+      <source>Your confirmation will be requested to pin self-signed certificates</source>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+    </message>
+    <message>
+      <source>Strict</source>
+      <translation type="unfinished">Strict</translation>
+    </message>
+    <message>
+      <source>Connect only servers with public certificates</source>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
   </context>
   <context>
@@ -1078,6 +1072,14 @@
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
       <translation>Tidak ditemukan site yang dapat diakses. Minta akses ke site yang ada atau koneksikan ke server lokal</translation>
     </message>
+    <message>
+      <source>Structure</source>
+      <translation type="unfinished">Structure</translation>
+    </message>
+    <message>
+      <source>Welcome, %1!</source>
+      <translation type="unfinished">Welcome, %1!</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -1086,28 +1088,8 @@
       <translation>Pengaturan</translation>
     </message>
     <message>
-      <source>Security</source>
-      <translation>Keamanan</translation>
-    </message>
-    <message>
-      <source>Beta Features</source>
-      <translation>Fitur Beta</translation>
-    </message>
-    <message>
-      <source>Interface</source>
-      <translation>Interface</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>Performa</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>Notifikasi</translation>
-    </message>
-    <message>
-      <source>About</source>
-      <translation>Tentang</translation>
     </message>
   </context>
   <context>
@@ -1233,6 +1215,10 @@
     <message>
       <source>Log In</source>
       <translation>Masuk</translation>
+    </message>
+    <message>
+      <source>Log In to Cloud</source>
+      <translation type="unfinished">Log In to Cloud</translation>
     </message>
   </context>
   <context>

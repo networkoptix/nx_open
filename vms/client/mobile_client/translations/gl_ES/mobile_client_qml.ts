@@ -16,10 +16,10 @@
     </message>
   </context>
   <context>
-    <name>AppInfoScreen</name>
+    <name>AppInfoPage</name>
     <message>
       <source>App Info</source>
-      <translation>Información da aplicación</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
@@ -34,38 +34,38 @@
     </message>
   </context>
   <context>
-    <name>BetaFeaturesScreen</name>
+    <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
-      <translation>Funcións beta</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation>Descarga de vídeo</translation>
+      <translation type="unfinished">Video Download</translation>
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation>Descargar vídeo a este dispositivo</translation>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation>Optimizar a rede</translation>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation>Aplicar métodos de optimización de redes</translation>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation>Decodificación paralela</translation>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation>Usa varios descodificadores para mellorar o rendemento</translation>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation>Por favor, reinicia a aplicación para aplicar os cambios</translation>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -297,26 +297,26 @@
     </message>
   </context>
   <context>
-    <name>DeveloperSettingsScreen</name>
+    <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Configuración do programador</translation>
-    </message>
-    <message>
-      <source>Log Level</source>
-      <translation>Nivel de rexistro</translation>
-    </message>
-    <message>
-      <source>Copy log ID</source>
-      <translation>Copiar ID de rexistro</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation>Copiar ID de cliente</translation>
+      <translation type="unfinished">Copy Client ID</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation type="unfinished">Copy log ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>Forzar choque</translation>
+      <translation type="unfinished">Force Crash</translation>
+    </message>
+    <message>
+      <source>Log Level</source>
+      <translation type="unfinished">Log Level</translation>
     </message>
   </context>
   <context>
@@ -392,18 +392,18 @@
     </message>
   </context>
   <context>
-    <name>EventSearchMenuScreen</name>
+    <name>EventSearchMenu</name>
     <message>
       <source>Looking for</source>
-      <translation>Buscando</translation>
+      <translation type="unfinished">Looking for</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Marcadores</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Obxectos</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
   </context>
   <context>
@@ -431,6 +431,14 @@
     <message>
       <source>Try changing the filters to display the results</source>
       <translation>Proba a cambiar os filtros para mostrar os resultados</translation>
+    </message>
+    <message>
+      <source>Clear All</source>
+      <translation type="unfinished">Clear All</translation>
+    </message>
+    <message>
+      <source>Filters</source>
+      <translation type="unfinished">Filters</translation>
     </message>
   </context>
   <context>
@@ -497,21 +505,14 @@
     </message>
   </context>
   <context>
-    <name>FiltersPanel</name>
-    <message>
-      <source>No filters</source>
-      <translation>Sen filtros</translation>
-    </message>
-  </context>
-  <context>
-    <name>FiltersScreen</name>
+    <name>FiltersItem</name>
     <message>
       <source>Search Filters</source>
-      <translation>Filtros de busca</translation>
+      <translation type="unfinished">Search Filters</translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation>Só compartido</translation>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>
@@ -574,26 +575,26 @@
     </message>
   </context>
   <context>
-    <name>InterfaceSettingsScreen</name>
+    <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation>Interface</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>Mostrar vistas previas na lista de cámaras</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Live Previews</source>
-      <translation>Vistas previas en directo</translation>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>Hora do servidor</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
-      <translation>Mostrar a hora do servidor nas cámaras</translation>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -725,13 +726,6 @@
     </message>
   </context>
   <context>
-    <name>OptionSelectorScreen</name>
-    <message>
-      <source>Clear</source>
-      <translation>Borrar</translation>
-    </message>
-  </context>
-  <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
@@ -743,26 +737,26 @@
     </message>
   </context>
   <context>
-    <name>PerformanceSettingsScreen</name>
+    <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation>Rendemento</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation>Aceleración de hardware</translation>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation>Pode mellorar o rendemento e a duración da batería</translation>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation>Decodificador de software de reserva</translation>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation>Pode descodificar formatos de vídeo pouco comúns usando software</translation>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -787,54 +781,54 @@
     </message>
   </context>
   <context>
-    <name>PushExpertModeScreen</name>
+    <name>PushExpertModePage</name>
+    <message>
+      <source>Sites</source>
+      <translation type="unfinished">Sites</translation>
+    </message>
     <message>
       <source>Notifications</source>
-      <translation>Notificacións</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation>Feito!</translation>
-    </message>
-    <message>
-      <source>SELECT</source>
-      <translation>SELECCIONAR</translation>
-    </message>
-    <message>
-      <source>Yes</source>
-      <translation>Si</translation>
-    </message>
-    <message>
-      <source>No</source>
-      <translation>Non</translation>
-    </message>
-    <message>
-      <source>Save changes?</source>
-      <translation>Gardar os cambios?</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Sitios web</translation>
-    </message>
-    <message>
-      <source>All Sites</source>
-      <translation>Todos os sitios web</translation>
-    </message>
-    <message>
-      <source>Selected Sites</source>
-      <translation>Sitios seleccionados</translation>
-    </message>
-    <message>
-      <source>At least one site has to be selected</source>
-      <translation>Hai que seleccionar polo menos un sitio</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation>Inicia sesión na nube para recibir notificacións</translation>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>As notificacións están desactivadas na configuración do dispositivo</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>SELECT</source>
+      <translation type="unfinished">SELECT</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation type="unfinished">Yes</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation type="unfinished">No</translation>
+    </message>
+    <message>
+      <source>Save changes?</source>
+      <translation type="unfinished">Save changes?</translation>
     </message>
   </context>
   <context>
@@ -891,14 +885,10 @@
     </message>
   </context>
   <context>
-    <name>ResourceTreeSheet</name>
-    <message>
-      <source>Resources</source>
-      <translation>Recursos</translation>
-    </message>
+    <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation>Non se atopou</translation>
+      <translation type="unfinished">Nothing Found</translation>
     </message>
   </context>
   <context>
@@ -910,10 +900,6 @@
     <message>
       <source>Connecting...</source>
       <translation>Conectando...</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Non se atopou nada</translation>
     </message>
     <message>
       <source>No Cameras</source>
@@ -931,6 +917,14 @@
       <source>Stop Connecting</source>
       <translation>Deixar de conectar</translation>
     </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
+    </message>
+    <message>
+      <source>Timeline</source>
+      <translation type="unfinished">Timeline</translation>
+    </message>
   </context>
   <context>
     <name>SearchEdit</name>
@@ -940,50 +934,50 @@
     </message>
   </context>
   <context>
-    <name>SecuritySettingsScreen</name>
+    <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation>Seguridade</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>Recomendado</translation>
-    </message>
-    <message>
-      <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Solicitarase a túa confirmación para fixar os certificados autoasinados</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>Estrito</translation>
-    </message>
-    <message>
-      <source>Connect only servers with public certificates</source>
-      <translation>Conecta só servidores con certificados públicos</translation>
-    </message>
-    <message>
-      <source>Automatically log in to servers</source>
-      <translation>Inicia sesión automaticamente nos servidores</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>Gardar</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Borrar</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation>Gardar contrasinais</translation>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation>Como xestionar os contrasinais gardados?</translation>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation type="unfinished">Keep</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation>Comprobación do certificado do servidor</translation>
+      <translation type="unfinished">Server Certificate Check</translation>
+    </message>
+    <message>
+      <source>Recommended</source>
+      <translation type="unfinished">Recommended</translation>
+    </message>
+    <message>
+      <source>Your confirmation will be requested to pin self-signed certificates</source>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+    </message>
+    <message>
+      <source>Strict</source>
+      <translation type="unfinished">Strict</translation>
+    </message>
+    <message>
+      <source>Connect only servers with public certificates</source>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
   </context>
   <context>
@@ -1079,6 +1073,14 @@
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
       <translation>Non se atoparon sitios web accesibles. Solicita acceso a sitios web existentes ou conéctate a un servidor local</translation>
     </message>
+    <message>
+      <source>Structure</source>
+      <translation type="unfinished">Structure</translation>
+    </message>
+    <message>
+      <source>Welcome, %1!</source>
+      <translation type="unfinished">Welcome, %1!</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -1087,28 +1089,8 @@
       <translation>Configuración</translation>
     </message>
     <message>
-      <source>Security</source>
-      <translation>Seguridade</translation>
-    </message>
-    <message>
-      <source>Beta Features</source>
-      <translation>Funcións beta</translation>
-    </message>
-    <message>
-      <source>Interface</source>
-      <translation>Interface</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>Rendemento</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>Notificacións</translation>
-    </message>
-    <message>
-      <source>About</source>
-      <translation>Acerca de</translation>
     </message>
   </context>
   <context>
@@ -1234,6 +1216,10 @@
     <message>
       <source>Log In</source>
       <translation>Iniciar sesión</translation>
+    </message>
+    <message>
+      <source>Log In to Cloud</source>
+      <translation type="unfinished">Log In to Cloud</translation>
     </message>
   </context>
   <context>

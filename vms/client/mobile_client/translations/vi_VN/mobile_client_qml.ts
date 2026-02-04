@@ -16,10 +16,10 @@
     </message>
   </context>
   <context>
-    <name>AppInfoScreen</name>
+    <name>AppInfoPage</name>
     <message>
       <source>App Info</source>
-      <translation>Thông tin ứng dụng</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
@@ -34,38 +34,38 @@
     </message>
   </context>
   <context>
-    <name>BetaFeaturesScreen</name>
+    <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
-      <translation>Tính năng Beta</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation>Tải xuống Video</translation>
+      <translation type="unfinished">Video Download</translation>
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation>Tải video về thiết bị này</translation>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation>Tối ưu hóa mạng</translation>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation>Áp dụng các phương pháp tối ưu hóa mạng</translation>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation>Giải mã song song</translation>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation>Sử dụng nhiều bộ giải mã để cải thiện hiệu suất</translation>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation>Vui lòng khởi động lại ứng dụng để áp dụng thay đổi</translation>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -297,26 +297,26 @@
     </message>
   </context>
   <context>
-    <name>DeveloperSettingsScreen</name>
+    <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Cài đặt dành cho nhà phát triển</translation>
-    </message>
-    <message>
-      <source>Log Level</source>
-      <translation>Cấp độ Nhật ký</translation>
-    </message>
-    <message>
-      <source>Copy log ID</source>
-      <translation>Sao chép ID nhật ký</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation>Sao chép ID máy khách</translation>
+      <translation type="unfinished">Copy Client ID</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation type="unfinished">Copy log ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>Bắt buộc sụp đổ</translation>
+      <translation type="unfinished">Force Crash</translation>
+    </message>
+    <message>
+      <source>Log Level</source>
+      <translation type="unfinished">Log Level</translation>
     </message>
   </context>
   <context>
@@ -391,18 +391,18 @@
     </message>
   </context>
   <context>
-    <name>EventSearchMenuScreen</name>
+    <name>EventSearchMenu</name>
     <message>
       <source>Looking for</source>
-      <translation>Tìm kiếm</translation>
+      <translation type="unfinished">Looking for</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Dấu trang</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Đối tượng</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
   </context>
   <context>
@@ -430,6 +430,14 @@
     <message>
       <source>Try changing the filters to display the results</source>
       <translation>Thử thay đổi bộ lọc để hiển thị kết quả</translation>
+    </message>
+    <message>
+      <source>Clear All</source>
+      <translation type="unfinished">Clear All</translation>
+    </message>
+    <message>
+      <source>Filters</source>
+      <translation type="unfinished">Filters</translation>
     </message>
   </context>
   <context>
@@ -496,21 +504,14 @@
     </message>
   </context>
   <context>
-    <name>FiltersPanel</name>
-    <message>
-      <source>No filters</source>
-      <translation>Không lọc</translation>
-    </message>
-  </context>
-  <context>
-    <name>FiltersScreen</name>
+    <name>FiltersItem</name>
     <message>
       <source>Search Filters</source>
-      <translation>Bộ lọc Tìm kiếm</translation>
+      <translation type="unfinished">Search Filters</translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation>Chỉ chia sẻ</translation>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>
@@ -573,26 +574,26 @@
     </message>
   </context>
   <context>
-    <name>InterfaceSettingsScreen</name>
+    <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation>Giao diện</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>Hiển thị xem trước trong danh sách camera</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Live Previews</source>
-      <translation>Xem trước trực tiếp</translation>
+      <translation type="unfinished">Live Previews</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>Thời gian máy chủ</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
-      <translation>Hiển thị thời gian máy chủ trên camera</translation>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -724,13 +725,6 @@
     </message>
   </context>
   <context>
-    <name>OptionSelectorScreen</name>
-    <message>
-      <source>Clear</source>
-      <translation>Xóa</translation>
-    </message>
-  </context>
-  <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
@@ -742,26 +736,26 @@
     </message>
   </context>
   <context>
-    <name>PerformanceSettingsScreen</name>
+    <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation>Hiệu suất</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation>Tăng Tốc Phần Cứng</translation>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation>Có thể cải thiện hiệu suất và tuổi thọ pin</translation>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation>Phần mềm giải mã dự phòng</translation>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation>Có thể giải mã các định dạng video hiếm bằng phần mềm</translation>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -786,54 +780,54 @@
     </message>
   </context>
   <context>
-    <name>PushExpertModeScreen</name>
+    <name>PushExpertModePage</name>
+    <message>
+      <source>Sites</source>
+      <translation type="unfinished">Sites</translation>
+    </message>
     <message>
       <source>Notifications</source>
-      <translation>Thông báo</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation>Hoàn Thành</translation>
-    </message>
-    <message>
-      <source>SELECT</source>
-      <translation>CHỌN</translation>
-    </message>
-    <message>
-      <source>Yes</source>
-      <translation>Đồng ý</translation>
-    </message>
-    <message>
-      <source>No</source>
-      <translation>Không</translation>
-    </message>
-    <message>
-      <source>Save changes?</source>
-      <translation>Lưu thay đổi?</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Các chi nhánh</translation>
-    </message>
-    <message>
-      <source>All Sites</source>
-      <translation>Tất cả Chi nhánh</translation>
-    </message>
-    <message>
-      <source>Selected Sites</source>
-      <translation>Chi nhánh được chọn</translation>
-    </message>
-    <message>
-      <source>At least one site has to be selected</source>
-      <translation>Phải chọn ít nhất một Chi nhánh</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation>Đăng nhập vào đám mây để nhận thông báo</translation>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Thông báo đã bị tắt trong cài đặt thiết bị</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>SELECT</source>
+      <translation type="unfinished">SELECT</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation type="unfinished">Yes</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation type="unfinished">No</translation>
+    </message>
+    <message>
+      <source>Save changes?</source>
+      <translation type="unfinished">Save changes?</translation>
     </message>
   </context>
   <context>
@@ -890,14 +884,10 @@
     </message>
   </context>
   <context>
-    <name>ResourceTreeSheet</name>
-    <message>
-      <source>Resources</source>
-      <translation>Tài nguyên</translation>
-    </message>
+    <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation>Không tìm thấy kết quả</translation>
+      <translation type="unfinished">Nothing Found</translation>
     </message>
   </context>
   <context>
@@ -909,10 +899,6 @@
     <message>
       <source>Connecting...</source>
       <translation>Kết nối...</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Không tìm thấy kết quả nào</translation>
     </message>
     <message>
       <source>No Cameras</source>
@@ -930,6 +916,14 @@
       <source>Stop Connecting</source>
       <translation>Dừng kết nối</translation>
     </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
+    </message>
+    <message>
+      <source>Timeline</source>
+      <translation type="unfinished">Timeline</translation>
+    </message>
   </context>
   <context>
     <name>SearchEdit</name>
@@ -939,50 +933,50 @@
     </message>
   </context>
   <context>
-    <name>SecuritySettingsScreen</name>
+    <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation>Bảo mật</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>Được khuyến nghị</translation>
-    </message>
-    <message>
-      <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Yêu cầu xác nhận của bạn để ghim các chứng chỉ tự ký</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>Nghiêm ngặt</translation>
-    </message>
-    <message>
-      <source>Connect only servers with public certificates</source>
-      <translation>Chỉ kết nối các máy chủ có chứng chỉ công khai</translation>
-    </message>
-    <message>
-      <source>Automatically log in to servers</source>
-      <translation>Tự động đăng nhập vào máy chủ</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>Giữ</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation>Lưu mật khẩu</translation>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation>Làm thế nào để xử lý mật khẩu đã lưu?</translation>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation type="unfinished">Keep</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation>Kiểm tra chứng chỉ máy chủ</translation>
+      <translation type="unfinished">Server Certificate Check</translation>
+    </message>
+    <message>
+      <source>Recommended</source>
+      <translation type="unfinished">Recommended</translation>
+    </message>
+    <message>
+      <source>Your confirmation will be requested to pin self-signed certificates</source>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+    </message>
+    <message>
+      <source>Strict</source>
+      <translation type="unfinished">Strict</translation>
+    </message>
+    <message>
+      <source>Connect only servers with public certificates</source>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
   </context>
   <context>
@@ -1078,6 +1072,14 @@
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
       <translation>Không tìm thấy Chi nhánh nào có thể truy cập được. Hãy yêu cầu quyền truy cập vào các Chi nhánh hiện có hoặc kết nối với máy chủ cục bộ</translation>
     </message>
+    <message>
+      <source>Structure</source>
+      <translation type="unfinished">Structure</translation>
+    </message>
+    <message>
+      <source>Welcome, %1!</source>
+      <translation type="unfinished">Welcome, %1!</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -1086,28 +1088,8 @@
       <translation>Cài đặt</translation>
     </message>
     <message>
-      <source>Security</source>
-      <translation>Bảo mật</translation>
-    </message>
-    <message>
-      <source>Beta Features</source>
-      <translation>Tính năng Beta</translation>
-    </message>
-    <message>
-      <source>Interface</source>
-      <translation>Giao diện</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>Hiệu suất</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>thông báo</translation>
-    </message>
-    <message>
-      <source>About</source>
-      <translation>Đối với</translation>
     </message>
   </context>
   <context>
@@ -1233,6 +1215,10 @@
     <message>
       <source>Log In</source>
       <translation>Đăng nhập</translation>
+    </message>
+    <message>
+      <source>Log In to Cloud</source>
+      <translation type="unfinished">Log In to Cloud</translation>
     </message>
   </context>
   <context>

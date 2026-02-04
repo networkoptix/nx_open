@@ -16,7 +16,7 @@
     </message>
   </context>
   <context>
-    <name>AppInfoScreen</name>
+    <name>AppInfoPage</name>
     <message>
       <source>App Info</source>
       <translation type="unfinished">App Info</translation>
@@ -34,7 +34,7 @@
     </message>
   </context>
   <context>
-    <name>BetaFeaturesScreen</name>
+    <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
       <translation type="unfinished">Beta Features</translation>
@@ -297,26 +297,26 @@
     </message>
   </context>
   <context>
-    <name>DeveloperSettingsScreen</name>
+    <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation>إعدادات المطور</translation>
-    </message>
-    <message>
-      <source>Log Level</source>
-      <translation>مستوى السجل</translation>
-    </message>
-    <message>
-      <source>Copy log ID</source>
-      <translation type="unfinished">Copy log ID</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
       <translation type="unfinished">Copy Client ID</translation>
     </message>
     <message>
+      <source>Copy log ID</source>
+      <translation type="unfinished">Copy log ID</translation>
+    </message>
+    <message>
       <source>Force Crash</source>
       <translation type="unfinished">Force Crash</translation>
+    </message>
+    <message>
+      <source>Log Level</source>
+      <translation type="unfinished">Log Level</translation>
     </message>
   </context>
   <context>
@@ -396,14 +396,14 @@
     </message>
   </context>
   <context>
-    <name>EventSearchMenuScreen</name>
+    <name>EventSearchMenu</name>
     <message>
       <source>Looking for</source>
       <translation type="unfinished">Looking for</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Bookmarks</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -435,6 +435,14 @@
     <message>
       <source>Try changing the filters to display the results</source>
       <translation type="unfinished">Try changing the filters to display the results</translation>
+    </message>
+    <message>
+      <source>Clear All</source>
+      <translation type="unfinished">Clear All</translation>
+    </message>
+    <message>
+      <source>Filters</source>
+      <translation type="unfinished">Filters</translation>
     </message>
   </context>
   <context>
@@ -501,14 +509,7 @@
     </message>
   </context>
   <context>
-    <name>FiltersPanel</name>
-    <message>
-      <source>No filters</source>
-      <translation type="unfinished">No filters</translation>
-    </message>
-  </context>
-  <context>
-    <name>FiltersScreen</name>
+    <name>FiltersItem</name>
     <message>
       <source>Search Filters</source>
       <translation type="unfinished">Search Filters</translation>
@@ -578,22 +579,22 @@
     </message>
   </context>
   <context>
-    <name>InterfaceSettingsScreen</name>
+    <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
       <translation type="unfinished">Interface</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Live Previews</source>
       <translation type="unfinished">Live Previews</translation>
     </message>
     <message>
+      <source>Show previews in the cameras list</source>
+      <translation type="unfinished">Show previews in the cameras list</translation>
+    </message>
+    <message>
       <source>Server Time</source>
-      <translation>Server Time</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -729,13 +730,6 @@
     </message>
   </context>
   <context>
-    <name>OptionSelectorScreen</name>
-    <message>
-      <source>Clear</source>
-      <translation>Clear</translation>
-    </message>
-  </context>
-  <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
@@ -747,10 +741,10 @@
     </message>
   </context>
   <context>
-    <name>PerformanceSettingsScreen</name>
+    <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation>Performance</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -791,34 +785,26 @@
     </message>
   </context>
   <context>
-    <name>PushExpertModeScreen</name>
+    <name>PushExpertModePage</name>
+    <message>
+      <source>Sites</source>
+      <translation type="unfinished">Sites</translation>
+    </message>
     <message>
       <source>Notifications</source>
-      <translation>Notifications</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Done</source>
       <translation type="unfinished">Done</translation>
     </message>
     <message>
-      <source>SELECT</source>
-      <translation type="unfinished">SELECT</translation>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
-      <source>Yes</source>
-      <translation>نعم</translation>
-    </message>
-    <message>
-      <source>No</source>
-      <translation>لا</translation>
-    </message>
-    <message>
-      <source>Save changes?</source>
-      <translation type="unfinished">Save changes?</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>All Sites</source>
@@ -829,16 +815,24 @@
       <translation type="unfinished">Selected Sites</translation>
     </message>
     <message>
+      <source>SELECT</source>
+      <translation type="unfinished">SELECT</translation>
+    </message>
+    <message>
       <source>At least one site has to be selected</source>
       <translation type="unfinished">At least one site has to be selected</translation>
     </message>
     <message>
-      <source>Log in to the cloud to receive notifications</source>
-      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+      <source>Yes</source>
+      <translation type="unfinished">Yes</translation>
     </message>
     <message>
-      <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <source>No</source>
+      <translation type="unfinished">No</translation>
+    </message>
+    <message>
+      <source>Save changes?</source>
+      <translation type="unfinished">Save changes?</translation>
     </message>
   </context>
   <context>
@@ -895,11 +889,7 @@
     </message>
   </context>
   <context>
-    <name>ResourceTreeSheet</name>
-    <message>
-      <source>Resources</source>
-      <translation>Resources</translation>
-    </message>
+    <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
       <translation type="unfinished">Nothing Found</translation>
@@ -914,10 +904,6 @@
     <message>
       <source>Connecting...</source>
       <translation>جارٍ الاتصال...</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Nothing found</translation>
     </message>
     <message>
       <source>No Cameras</source>
@@ -935,6 +921,14 @@
       <source>Stop Connecting</source>
       <translation type="unfinished">Stop Connecting</translation>
     </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
+    </message>
+    <message>
+      <source>Timeline</source>
+      <translation type="unfinished">Timeline</translation>
+    </message>
   </context>
   <context>
     <name>SearchEdit</name>
@@ -944,14 +938,38 @@
     </message>
   </context>
   <context>
-    <name>SecuritySettingsScreen</name>
+    <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation>الأمن</translation>
+      <translation type="unfinished">Security</translation>
+    </message>
+    <message>
+      <source>Save Passwords</source>
+      <translation type="unfinished">Save Passwords</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation type="unfinished">Automatically log in to servers</translation>
+    </message>
+    <message>
+      <source>How to handle saved passwords?</source>
+      <translation type="unfinished">How to handle saved passwords?</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation type="unfinished">Keep</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+    <message>
+      <source>Server Certificate Check</source>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Recommended</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -964,30 +982,6 @@
     <message>
       <source>Connect only servers with public certificates</source>
       <translation type="unfinished">Connect only servers with public certificates</translation>
-    </message>
-    <message>
-      <source>Automatically log in to servers</source>
-      <translation type="unfinished">Automatically log in to servers</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>أبقاء</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Delete</translation>
-    </message>
-    <message>
-      <source>Save Passwords</source>
-      <translation type="unfinished">Save Passwords</translation>
-    </message>
-    <message>
-      <source>How to handle saved passwords?</source>
-      <translation type="unfinished">How to handle saved passwords?</translation>
-    </message>
-    <message>
-      <source>Server Certificate Check</source>
-      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -1083,6 +1077,14 @@
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
       <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
     </message>
+    <message>
+      <source>Structure</source>
+      <translation type="unfinished">Structure</translation>
+    </message>
+    <message>
+      <source>Welcome, %1!</source>
+      <translation type="unfinished">Welcome, %1!</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -1091,28 +1093,8 @@
       <translation>Settings</translation>
     </message>
     <message>
-      <source>Security</source>
-      <translation>الأمن</translation>
-    </message>
-    <message>
-      <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
-    </message>
-    <message>
-      <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>Performance</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>Notifications</translation>
-    </message>
-    <message>
-      <source>About</source>
-      <translation>نبذة</translation>
     </message>
   </context>
   <context>
@@ -1238,6 +1220,10 @@
     <message>
       <source>Log In</source>
       <translation type="unfinished">Log In</translation>
+    </message>
+    <message>
+      <source>Log In to Cloud</source>
+      <translation type="unfinished">Log In to Cloud</translation>
     </message>
   </context>
   <context>

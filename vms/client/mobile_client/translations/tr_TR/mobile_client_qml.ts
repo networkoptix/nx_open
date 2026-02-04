@@ -16,7 +16,7 @@
     </message>
   </context>
   <context>
-    <name>AppInfoScreen</name>
+    <name>AppInfoPage</name>
     <message>
       <source>App Info</source>
       <translation type="unfinished">App Info</translation>
@@ -34,14 +34,14 @@
     </message>
   </context>
   <context>
-    <name>BetaFeaturesScreen</name>
+    <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
-      <translation>Beta Özellikleri</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation>Video İndirme</translation>
+      <translation type="unfinished">Video Download</translation>
     </message>
     <message>
       <source>Download video to this device</source>
@@ -297,26 +297,26 @@
     </message>
   </context>
   <context>
-    <name>DeveloperSettingsScreen</name>
+    <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Geliştirici Ayarları</translation>
-    </message>
-    <message>
-      <source>Log Level</source>
-      <translation>Günlük kayıt seviyesi</translation>
-    </message>
-    <message>
-      <source>Copy log ID</source>
-      <translation>Günlük ID kopyala</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
       <translation type="unfinished">Copy Client ID</translation>
     </message>
     <message>
+      <source>Copy log ID</source>
+      <translation type="unfinished">Copy log ID</translation>
+    </message>
+    <message>
       <source>Force Crash</source>
       <translation type="unfinished">Force Crash</translation>
+    </message>
+    <message>
+      <source>Log Level</source>
+      <translation type="unfinished">Log Level</translation>
     </message>
   </context>
   <context>
@@ -392,18 +392,18 @@
     </message>
   </context>
   <context>
-    <name>EventSearchMenuScreen</name>
+    <name>EventSearchMenu</name>
     <message>
       <source>Looking for</source>
       <translation type="unfinished">Looking for</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Yer imleri</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Nesneler</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
   </context>
   <context>
@@ -431,6 +431,14 @@
     <message>
       <source>Try changing the filters to display the results</source>
       <translation>Sonuçları görüntülemek için filtreleri değiştirmeyi deneyin</translation>
+    </message>
+    <message>
+      <source>Clear All</source>
+      <translation type="unfinished">Clear All</translation>
+    </message>
+    <message>
+      <source>Filters</source>
+      <translation type="unfinished">Filters</translation>
     </message>
   </context>
   <context>
@@ -497,17 +505,10 @@
     </message>
   </context>
   <context>
-    <name>FiltersPanel</name>
-    <message>
-      <source>No filters</source>
-      <translation>Filtre yok</translation>
-    </message>
-  </context>
-  <context>
-    <name>FiltersScreen</name>
+    <name>FiltersItem</name>
     <message>
       <source>Search Filters</source>
-      <translation>Arama Filtreleri</translation>
+      <translation type="unfinished">Search Filters</translation>
     </message>
     <message>
       <source>Shared Only</source>
@@ -574,22 +575,22 @@
     </message>
   </context>
   <context>
-    <name>InterfaceSettingsScreen</name>
+    <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation>Arayüz</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>Kamera listesinde canlı önizlemeyi göster</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Live Previews</source>
       <translation type="unfinished">Live Previews</translation>
     </message>
     <message>
+      <source>Show previews in the cameras list</source>
+      <translation type="unfinished">Show previews in the cameras list</translation>
+    </message>
+    <message>
       <source>Server Time</source>
-      <translation>Sunucu Saati</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -725,13 +726,6 @@
     </message>
   </context>
   <context>
-    <name>OptionSelectorScreen</name>
-    <message>
-      <source>Clear</source>
-      <translation>Temizle</translation>
-    </message>
-  </context>
-  <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
@@ -743,10 +737,10 @@
     </message>
   </context>
   <context>
-    <name>PerformanceSettingsScreen</name>
+    <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation>Performans</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -787,34 +781,26 @@
     </message>
   </context>
   <context>
-    <name>PushExpertModeScreen</name>
+    <name>PushExpertModePage</name>
+    <message>
+      <source>Sites</source>
+      <translation type="unfinished">Sites</translation>
+    </message>
     <message>
       <source>Notifications</source>
-      <translation>Bildirimler</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation>Bitti</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
-      <source>SELECT</source>
-      <translation>SEÇ</translation>
+      <source>Log in to the cloud to receive notifications</source>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
-      <source>Yes</source>
-      <translation>Evet</translation>
-    </message>
-    <message>
-      <source>No</source>
-      <translation>Hayır</translation>
-    </message>
-    <message>
-      <source>Save changes?</source>
-      <translation>Değişiklikler kaydedilsin mi?</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Siteler</translation>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>All Sites</source>
@@ -825,16 +811,24 @@
       <translation type="unfinished">Selected Sites</translation>
     </message>
     <message>
+      <source>SELECT</source>
+      <translation type="unfinished">SELECT</translation>
+    </message>
+    <message>
       <source>At least one site has to be selected</source>
       <translation type="unfinished">At least one site has to be selected</translation>
     </message>
     <message>
-      <source>Log in to the cloud to receive notifications</source>
-      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+      <source>Yes</source>
+      <translation type="unfinished">Yes</translation>
     </message>
     <message>
-      <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <source>No</source>
+      <translation type="unfinished">No</translation>
+    </message>
+    <message>
+      <source>Save changes?</source>
+      <translation type="unfinished">Save changes?</translation>
     </message>
   </context>
   <context>
@@ -891,14 +885,10 @@
     </message>
   </context>
   <context>
-    <name>ResourceTreeSheet</name>
-    <message>
-      <source>Resources</source>
-      <translation>Kaynaklar</translation>
-    </message>
+    <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation>Hiçbir şey Bulunamadı</translation>
+      <translation type="unfinished">Nothing Found</translation>
     </message>
   </context>
   <context>
@@ -910,10 +900,6 @@
     <message>
       <source>Connecting...</source>
       <translation>Bağlantı kuruluyor...</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Hiçbir şey bulunamadı</translation>
     </message>
     <message>
       <source>No Cameras</source>
@@ -931,6 +917,14 @@
       <source>Stop Connecting</source>
       <translation type="unfinished">Stop Connecting</translation>
     </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
+    </message>
+    <message>
+      <source>Timeline</source>
+      <translation type="unfinished">Timeline</translation>
+    </message>
   </context>
   <context>
     <name>SearchEdit</name>
@@ -940,50 +934,50 @@
     </message>
   </context>
   <context>
-    <name>SecuritySettingsScreen</name>
+    <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation>Güvenlik</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>Önerilen</translation>
-    </message>
-    <message>
-      <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Kendinden imzalı sertifikaları sabitlemek için onayınız istenecek</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>Sıkı</translation>
-    </message>
-    <message>
-      <source>Connect only servers with public certificates</source>
-      <translation>Yalnızca genel sertifikalara sahip sunucuları bağlayın</translation>
-    </message>
-    <message>
-      <source>Automatically log in to servers</source>
-      <translation>Sunuculara otomatik olarak oturum aç</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>Tut</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Sil</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Save Passwords</source>
       <translation type="unfinished">Save Passwords</translation>
     </message>
     <message>
+      <source>Automatically log in to servers</source>
+      <translation type="unfinished">Automatically log in to servers</translation>
+    </message>
+    <message>
       <source>How to handle saved passwords?</source>
       <translation type="unfinished">How to handle saved passwords?</translation>
     </message>
     <message>
+      <source>Keep</source>
+      <translation type="unfinished">Keep</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+    <message>
       <source>Server Certificate Check</source>
       <translation type="unfinished">Server Certificate Check</translation>
+    </message>
+    <message>
+      <source>Recommended</source>
+      <translation type="unfinished">Recommended</translation>
+    </message>
+    <message>
+      <source>Your confirmation will be requested to pin self-signed certificates</source>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+    </message>
+    <message>
+      <source>Strict</source>
+      <translation type="unfinished">Strict</translation>
+    </message>
+    <message>
+      <source>Connect only servers with public certificates</source>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
   </context>
   <context>
@@ -1079,6 +1073,14 @@
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
       <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
     </message>
+    <message>
+      <source>Structure</source>
+      <translation type="unfinished">Structure</translation>
+    </message>
+    <message>
+      <source>Welcome, %1!</source>
+      <translation type="unfinished">Welcome, %1!</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -1087,28 +1089,8 @@
       <translation>Ayarlar</translation>
     </message>
     <message>
-      <source>Security</source>
-      <translation>Güvenlik</translation>
-    </message>
-    <message>
-      <source>Beta Features</source>
-      <translation>Beta Özellikleri</translation>
-    </message>
-    <message>
-      <source>Interface</source>
-      <translation>Arayüz</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>Performans</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>Bildirimler</translation>
-    </message>
-    <message>
-      <source>About</source>
-      <translation>Hakkında</translation>
     </message>
   </context>
   <context>
@@ -1234,6 +1216,10 @@
     <message>
       <source>Log In</source>
       <translation>Oturum Aç</translation>
+    </message>
+    <message>
+      <source>Log In to Cloud</source>
+      <translation type="unfinished">Log In to Cloud</translation>
     </message>
   </context>
   <context>
