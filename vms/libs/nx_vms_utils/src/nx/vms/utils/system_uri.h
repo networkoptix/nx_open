@@ -107,7 +107,7 @@ public:
     SystemAction systemAction = SystemAction::View;
     Referral referral;
     QList<nx::Uuid> resourceIds;
-    qint64 timestamp = -1;
+    qint64 timestamp = -1; //< Milliseconds.
     nx::network::http::Credentials credentials;
 
     /** Authentication code for Cloud login. */

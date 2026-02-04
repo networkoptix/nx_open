@@ -43,9 +43,8 @@ public:
     virtual void setStorageLocation(nx::vms::api::StorageLocation value) override;
 
 private:
-    void at_timePeriodsReceived(bool success,
-        rest::Handle requestHandle,
-        const MultiServerPeriodDataList &timePeriods);
+    void at_timePeriodsReceived(
+        bool success, rest::Handle requestHandle, MultiServerPeriodDataList&& timePeriods);
 
 private:
     rest::Handle sendRequest(qint64 startTimeMs, qint64 resolutionMs);

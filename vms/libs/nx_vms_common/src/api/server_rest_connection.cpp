@@ -391,6 +391,11 @@ void ServerConnection::setUserId(const nx::Uuid& id)
     d->userId = id;
 }
 
+nx::Uuid ServerConnection::serverId() const
+{
+    return d->serverId;
+}
+
 Handle ServerConnection::cameraHistoryAsync(
     const QnChunksRequestData& request,
     Callback<nx::vms::api::CameraHistoryDataList> callback,

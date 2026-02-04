@@ -12,6 +12,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/camera/camera_history_pool.h>
 #include <nx/vms/client/core/cross_system/cross_system_access_controller.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/ini.h>
@@ -45,6 +46,8 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
 
     d->analyticsAttributeHelper = std::make_unique<
         analytics::AttributeHelper>(analyticsTaxonomyStateWatcher());
+
+    setCameraHistoryPool(new CameraHistoryPool(this));
 
     switch (mode)
     {

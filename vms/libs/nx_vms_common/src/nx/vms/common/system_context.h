@@ -281,6 +281,7 @@ public:
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
+    void setCameraHistoryPool(QnCameraHistoryPool* pool);
 
 signals:
     void credentialsChanged();

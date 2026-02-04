@@ -25,7 +25,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     d->resourceDataPool = std::make_unique<QnResourceDataPool>();
     d->resourceStatusDictionary = std::make_unique<QnResourceStatusDictionary>();
     d->resourcePropertyDictionary = std::make_unique<QnResourcePropertyDictionary>(this);
-    d->cameraHistoryPool = std::make_unique<QnCameraHistoryPool>(this);
 
     d->serverAdditionalAddressesDictionary =
         std::make_unique<QnServerAdditionalAddressesDictionary>();
@@ -309,6 +308,11 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     d->messageProcessor = messageProcessor;
     runtimeInfoManager()->setMessageProcessor(messageProcessor);
     cameraHistoryPool()->setMessageProcessor(messageProcessor);
+}
+
+void SystemContext::setCameraHistoryPool(QnCameraHistoryPool* pool)
+{
+    d->cameraHistoryPool.reset(pool);
 }
 
 QnCameraNamesWatcher* SystemContext::cameraNamesWatcher() const

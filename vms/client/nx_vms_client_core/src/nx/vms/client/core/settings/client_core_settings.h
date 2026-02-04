@@ -129,7 +129,7 @@ public:
     /** Adapter for the preferredCloudServers property. */
     void setPreferredCloudServer(const QString& systemId, const nx::Uuid& serverId);
 
-    void setSystemAuthenticationCache(const QString& systemId, const std::string& cache);
+    void setSystemAuthenticationCache(const QString& systemId, std::string cache);
     std::string systemAuthenticationCache(const QString& systemId);
 
     Property<bool> muteOnAudioTransmit{this, "muteOnAudioTransmit", true,

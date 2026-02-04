@@ -8,10 +8,10 @@
 enum class QnConnectionState
 {
     Disconnected,
-    Connecting,
-    Connected,
+    Connecting, //< Initiating message bus connection.
+    Connected, //< Message bus connected to remote peer.
     Reconnecting,
-    Ready
+    Ready //< Initial resource info received.
 };
 
 QString toString(QnConnectionState state);

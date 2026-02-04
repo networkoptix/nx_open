@@ -137,6 +137,8 @@ public:
 
     void setUserId(const nx::Uuid& userId);
 
+    nx::Uuid serverId() const;
+
     using PostCallback = Callback<EmptyResponseType>;   // use this type for POST requests without result data
 
     /**

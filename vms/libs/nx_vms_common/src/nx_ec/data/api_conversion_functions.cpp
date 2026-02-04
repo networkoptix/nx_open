@@ -463,14 +463,13 @@ void fromResourceToApi(const QnResourcePtr& src, ResourceData& dst)
     //dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
 }
 
-void fromApiToResource(const ResourceData& src, QnResource* dst) {
+void fromApiToResource(const ResourceData& src, QnResource* dst)
+{
     dst->setIdUnsafe(src.id);
-    //dst->setGuid(guid);
     dst->QnResource::setName(src.name); //setting resource name, but not camera name or server name
     dst->setTypeId(src.typeId);
     dst->setParentId(src.parentId);
     dst->setUrl(src.url);
-    //dst->setStatus(src.status, true);
 }
 
 void fromApiToResource(const ResourceTypeData& src, QnResourceTypePtr& dst)

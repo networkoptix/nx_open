@@ -58,7 +58,7 @@ void DesktopResource::initializeConnection(
         server,
         userId,
         systemContext()->peerId(),
-        systemContext()->messageBusConnection()->credentials()));
+        systemContext()->credentials()));
     m_connection->start();
 
     NX_DEBUG(this, "Desktop camera connection opened. User id: %1", userId);

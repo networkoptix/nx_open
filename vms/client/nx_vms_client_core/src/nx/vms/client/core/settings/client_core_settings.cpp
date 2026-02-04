@@ -161,13 +161,13 @@ void Settings::setCloudAuthData(const CloudAuthData& authData)
         nx::network::http::BearerAuthToken(authData.refreshToken));
 }
 
-void Settings::setSystemAuthenticationCache(const QString& systemId, const std::string& cache)
+void Settings::setSystemAuthenticationCache(const QString& systemId, std::string cache)
 {
     auto cacheData = systemAuthenticationCacheData();
     if (cache.empty())
         cacheData.erase(systemId);
     else
-        cacheData[systemId] = cache;
+        cacheData[systemId] = std::move(cache);
     systemAuthenticationCacheData = cacheData;
 }
 

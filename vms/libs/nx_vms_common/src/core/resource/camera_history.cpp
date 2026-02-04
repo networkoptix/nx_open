@@ -254,25 +254,21 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
     if (!NX_ASSERT(camera->systemContext() == this->systemContext()))
         return StartResult::failed;
 
-    auto connection = messageBusConnection();
-    if (!connection) //< Reconnecting to the server after idle.
+    const auto api = connectedServerApi();
+    if (!api) //< Reconnecting to the server after idle.
         return StartResult::failed;
 
     if (isCameraHistoryValid(camera))
         return StartResult::ommited;
 
-    // TODO: #sivanov Resource context should have access to the corresponding rest connection.
-    // Message bus connection exists on the server side and in the main client context.
-    const nx::Uuid serverId = connection->moduleInformation().id;
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
-    if (!NX_ASSERT(server))
-        return StartResult::failed;
-
-    // if camera belongs to a single server not need to do API request to build detailed history information. generate it instead.
+    // if camera belongs to a single server not need to do API request to build detailed history
+    // information. Generate it instead, if the resource is fully loaded.
     QnMediaServerResourceList serverList = getCameraFootageData(camera->getId(), true);
     NX_VERBOSE(this, "Request camera history for %1, servers: %2", camera, serverList.size());
 
-    if (serverList.size() <= 1)
+    const bool pending = serverList.empty() && camera->hasFlags(Qn::fake);
+
+    if (serverList.size() <= 1 && !pending)
     {
         nx::vms::api::CameraHistoryItemDataList items;
         if (serverList.size() == 1)
@@ -282,6 +278,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
             return StartResult::ommited;
     }
 
+    const auto serverId = api->serverId();
     QnChunksRequestData request;
     request.format = Qn::SerializationFormat::ubjson;
     request.resList << camera.dynamicCast<QnVirtualCameraResource>();
@@ -295,33 +292,15 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
             return StartResult::ommited;
         }
 
-        QPointer<QnCameraHistoryPool> guard(this);
-
-        auto handle = server->restConnection()->cameraHistoryAsync(request,
-            [
-                this,
-                callback,
-                serverId,
-                guard = QPointer<QnCameraHistoryPool>(this),
-                thread = this->thread()
-            ](
-                bool success,
-                rest::Handle handle,
-                nx::vms::api::CameraHistoryDataList periods)
+        const auto handle = api->cameraHistoryAsync(
+            request,
+            [this, callback = std::move(callback), serverId](
+                bool success, rest::Handle handle, nx::vms::api::CameraHistoryDataList periods)
             {
-                if (!guard)
-                    return;
-
                 AsyncRequestInfo requestInfo{serverId, handle};
-                const auto timerCallback =
-                    [this, guard, success, requestInfo, periods, callback]()
-                    {
-                        if (guard)
-                            at_cameraPrepared(success, requestInfo, periods, callback);
-                    };
-
-                executeDelayed(timerCallback, kDefaultDelay, thread);
-            });
+                at_cameraPrepared(success, requestInfo, std::move(periods), std::move(callback));
+            },
+            this);
 
         const bool started = handle > 0;
         if (!started)
@@ -338,7 +317,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
 void QnCameraHistoryPool::at_cameraPrepared(
     bool success,
     const AsyncRequestInfo& requestInfo,
-    const nx::vms::api::CameraHistoryDataList& periods,
+    nx::vms::api::CameraHistoryDataList&& historyDataList,
     callbackFunction callback)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -356,12 +335,13 @@ void QnCameraHistoryPool::at_cameraPrepared(
         return; //< request has been canceled
 
     QSet<nx::Uuid> loadedCamerasIds;
-    if (success) {
-        for (const auto &detail: periods)
+    if (success)
+    {
+        for (auto& history: historyDataList)
         {
-            m_historyDetail[detail.cameraId] = detail.items;
-            m_historyValidCameras.insert(detail.cameraId);
-            loadedCamerasIds.insert(detail.cameraId);
+            m_historyDetail[history.cameraId] = std::move(history.items);
+            m_historyValidCameras.insert(history.cameraId);
+            loadedCamerasIds.insert(history.cameraId);
         }
     }
 
@@ -478,22 +458,36 @@ QnVirtualCameraResourcePtr QnCameraHistoryPool::toCamera(const nx::Uuid& guid) c
     return resourcePool()->getResourceById<QnVirtualCameraResource>(guid);
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::toMediaServer(const nx::Uuid& guid) const
+QnMediaServerResourcePtr QnCameraHistoryPool::toMediaServer(nx::Uuid guid) const
 {
     return resourcePool()->getResourceById<QnMediaServerResource>(guid);
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, QnTimePeriod* foundPeriod) const
+rest::ServerConnectionPtr QnCameraHistoryPool::connectedServerApi() const
 {
-    NX_ASSERT(!camera.isNull(), "Camera resource is null!");
-    if (camera.isNull())
-        return QnMediaServerResourcePtr();
+    if (const auto mbc = messageBusConnection())
+    {
+        if (const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+            mbc->moduleInformation().id))
+        {
+            return server->restConnection();
+        }
+    }
+
+    return {};
+}
+
+QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(
+    const QnVirtualCameraResourcePtr &camera, qint64 timestamp, QnTimePeriod* foundPeriod) const
+{
+    if (!NX_ASSERT(!camera.isNull()))
+        return {};
 
     if (foundPeriod)
         foundPeriod->clear();
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-    const auto& itr = m_historyDetail.find(camera->getId());
+    const auto itr = m_historyDetail.find(camera->getId());
     if (itr == m_historyDetail.end() || itr.value().empty())
         return camera->getParentServer(); // no history data. use current server constantly
 

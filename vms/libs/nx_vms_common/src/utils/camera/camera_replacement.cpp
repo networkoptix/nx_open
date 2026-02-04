@@ -6,20 +6,26 @@
 #include <core/resource/resource_type.h>
 #include <nx/utils/log/assert.h>
 
-namespace {
+namespace nx::vms::common::utils::camera_replacement {
 
 using namespace nx::vms::api;
 
-// Constant redefinition. The same constant defined in the nx_vms_server module is unreachable.
-static constexpr auto kArchiveCameraResourceTypeName = "ARCHIVE_CAMERA";
+namespace {
+
+using namespace Qt::StringLiterals;
 
 // Constant redefinition. The same constant defined in the nx_vms_server module is unreachable.
-static constexpr auto kReplacedWithIdPropertyName = "replaceWithId";
+constexpr auto kArchiveCameraResourceTypeName = QStringView(u"ARCHIVE_CAMERA");
+
+// Constant redefinition. The same constant defined in the nx_vms_server module is unreachable.
+static const auto kReplacedWithIdPropertyName = u"replaceWithId"_s;
 
 bool isArchiveCamera(const QnVirtualCameraResource& device)
 {
-    const auto resourceTypeName = qnResTypePool->getResourceType(device.getTypeId())->getName();
-    return resourceTypeName.compare(kArchiveCameraResourceTypeName, Qt::CaseSensitive) == 0;
+    if (auto type = qnResTypePool->getResourceType(device.getTypeId()))
+        return type->getName().compare(kArchiveCameraResourceTypeName, Qt::CaseSensitive) == 0;
+
+    return false;
 }
 
 bool cameraSupportsReplacement(const QnVirtualCameraResource& device)
@@ -49,19 +55,13 @@ bool cameraCanBeReplaced(const QnVirtualCameraResource& device)
 
 } // namespace
 
-namespace nx::vms::common {
-namespace utils {
-namespace camera_replacement {
-
-using namespace nx::vms::api;
-
 bool cameraSupportsReplacement(const QnResourcePtr& resource)
 {
     const auto device = resource.dynamicCast<QnVirtualCameraResource>();
     if (!device)
         return false;
 
-    return ::cameraSupportsReplacement(*device);
+    return cameraSupportsReplacement(*device);
 }
 
 bool cameraCanBeReplaced(const QnResourcePtr& resource)
@@ -70,7 +70,7 @@ bool cameraCanBeReplaced(const QnResourcePtr& resource)
     if (!device)
         return false;
 
-    return ::cameraCanBeReplaced(*device);
+    return cameraCanBeReplaced(*device);
 }
 
 bool cameraCanBeUsedAsReplacement(
@@ -104,6 +104,4 @@ bool isReplacedCamera(const QnResourcePtr& resource)
     return !camera->getProperty(kReplacedWithIdPropertyName).isEmpty();
 }
 
-} // namespace camera_replacement
-} // namespace utils
-} // namespace nx::vms::common
+} // namespace nx::vms::common::utils::camera_replacement

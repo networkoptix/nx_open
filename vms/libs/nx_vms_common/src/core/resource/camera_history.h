@@ -43,7 +43,7 @@ class NX_VMS_COMMON_API QnCameraHistoryPool:
 
 public:
     QnCameraHistoryPool(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
-    virtual ~QnCameraHistoryPool();
+    virtual ~QnCameraHistoryPool() override;
 
     /** Reset information about camera footage presence on different servers. */
     void resetServerFootageData(const nx::vms::api::ServerFootageDataList& serverFootageDataList);
@@ -156,6 +156,10 @@ signals:
      */
     void cameraHistoryChanged(const QnVirtualCameraResourcePtr &camera);
 
+protected:
+    virtual QnMediaServerResourcePtr toMediaServer(nx::Uuid guid) const;
+    virtual rest::ServerConnectionPtr connectedServerApi() const;
+
 private:
     struct AsyncRequestInfo
     {
@@ -169,12 +173,11 @@ private:
         const nx::vms::api::CameraHistoryItemDataList& dataList) const;
 
     QnVirtualCameraResourcePtr toCamera(const nx::Uuid& guid) const;
-    QnMediaServerResourcePtr toMediaServer(const nx::Uuid& guid) const;
 
     void at_cameraPrepared(
         bool success,
         const AsyncRequestInfo& requestInfo,
-        const nx::vms::api::CameraHistoryDataList& periods,
+        nx::vms::api::CameraHistoryDataList&& periods,
         callbackFunction callback);
 
     /** Mark camera history as dirty and subject to update. */
@@ -195,7 +198,7 @@ private:
 private:
     int m_historyCheckDelay;
     mutable nx::Mutex m_mutex;
-    QMap<nx::Uuid, QSet<nx::Uuid>> m_archivedCamerasByServer; // archived cameras by server
+    QMap<nx::Uuid, QSet<nx::Uuid>> m_archivedCamerasByServer; // Server to cameras map.
 
     typedef QMap<nx::Uuid, nx::vms::api::CameraHistoryItemDataList> DetailHistoryMap;
     DetailHistoryMap m_historyDetail; // camera move detail by camera

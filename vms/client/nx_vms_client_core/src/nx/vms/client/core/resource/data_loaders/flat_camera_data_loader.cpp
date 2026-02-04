@@ -6,13 +6,11 @@
 #include <api/helpers/chunks_request_data.h>
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/datetime.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
-#include <recording/time_period_list.h>
 #include <nx/vms/client/core/system_context.h>
+#include <recording/time_period_list.h>
 #include <utils/common/synctime.h>
 
 namespace nx::vms::client::core {
@@ -146,17 +144,17 @@ rest::Handle FlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolu
         .storageLocation = m_storageLocation
     };
 
-    return connection->recordedTimePeriods(requestData,
-        nx::utils::guarded(this,
-            [this](bool success, rest::Handle handle, const MultiServerPeriodDataList& timePeriods)
-            {
-                at_timePeriodsReceived(success, handle, timePeriods);
-            }), thread());
+    return connection->recordedTimePeriods(
+        requestData,
+        [this](bool success, rest::Handle handle, MultiServerPeriodDataList timePeriods)
+        {
+            at_timePeriodsReceived(success, handle, std::move(timePeriods));
+        },
+        this);
 }
 
-void FlatCameraDataLoader::at_timePeriodsReceived(bool success,
-    rest::Handle requestHandle,
-    const MultiServerPeriodDataList &timePeriods)
+void FlatCameraDataLoader::at_timePeriodsReceived(
+    bool success, rest::Handle requestHandle, MultiServerPeriodDataList&& timePeriods)
 {
     NX_VERBOSE(this, "Received answer for req %1 (%2)", requestHandle, m_dataType);
     if (requestHandle != m_loading.handle)
@@ -168,11 +166,12 @@ void FlatCameraDataLoader::at_timePeriodsReceived(bool success,
     }
 
     std::vector<QnTimePeriodList> rawPeriods;
+    rawPeriods.reserve(timePeriods.size());
 
-    for(auto period: timePeriods)
+    for(auto& period: timePeriods)
     {
-        rawPeriods.push_back(period.periods);
         NX_VERBOSE(this, "Received\n%1", periodsLogString(period.periods));
+        rawPeriods.push_back(std::move(period.periods));
     }
 
     QnTimePeriodList periods(QnTimePeriodList::mergeTimePeriods(rawPeriods));
