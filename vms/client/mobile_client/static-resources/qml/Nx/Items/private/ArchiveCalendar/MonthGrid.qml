@@ -51,7 +51,7 @@ Item
 
                 width: grid.cellWidth
                 height: grid.cellHeight
-                enabled: !model.isFutureDate
+                enabled: !model.isFutureDate && model.display
 
                 Rectangle
                 {
@@ -63,7 +63,7 @@ Item
                     height: 3
                     radius: height / 2
                     color: ColorTheme.colors.green_core
-                    visible: model.hasArchive
+                    visible: model.hasArchive && model.display
                 }
 
                 Rectangle
