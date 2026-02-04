@@ -614,6 +614,16 @@ void ObjectsLoader::setChunkProvider(core::ChunkProvider* value)
             d->handleWindowChanged();
         });
 
+    connect(d->chunkProvider, &core::ChunkProvider::motionFilterChanged, this,
+        [this]()
+        {
+            if (d->objectsType != ObjectsType::motion)
+                return;
+
+            d->clear();
+            d->handleWindowChanged();
+        });
+
     connect(d->chunkProvider, &core::ChunkProvider::periodsUpdated, this,
         [this](Qn::TimePeriodContent type)
         {

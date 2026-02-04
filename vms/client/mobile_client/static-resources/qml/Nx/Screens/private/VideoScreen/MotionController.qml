@@ -37,6 +37,8 @@ Item
         d.customFirstPoint = undefined
         d.customSecondPoint = undefined
         updateDefaultRoi()
+
+        controller.motionFilter = ""
     }
 
     function updateDefaultRoi()
@@ -183,7 +185,6 @@ Item
         if (!motionSearchMode)
         {
             clearCustomRoi()
-            controller.motionFilter = ""
         }
         else if (!d.customInitialPoint)
         {

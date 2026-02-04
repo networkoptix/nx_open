@@ -38,6 +38,8 @@ Page
 
     property real targetTimestamp: -1
 
+    property alias selectedObjectsType: objectsTypeSheet.selectedType
+
     backgroundColor: "black"
 
     clip: false
@@ -190,7 +192,9 @@ Page
         [
             MotionAreaButton
             {
-                visible: video.motionController.customRoiExists
+                visible: selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.motion
+                    && video.motionController.customRoiExists
+
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: qsTr("Area")
@@ -269,8 +273,13 @@ Page
         resourceHelper: controller.resourceHelper
         mediaPlayer: controller.mediaPlayer
         videoCenterHeightOffsetFactor: 1 / 3
-        motionController.motionSearchMode: controller.contentType === CommonGlobals.MotionContent
-        motionController.enabled: d.hasArchive && !d.ptzMode
+
+        motionController
+        {
+            allowDrawing: motionController.motionSearchMode
+            motionSearchMode: controller.chunkContentType === CommonGlobals.MotionContent
+            enabled: d.hasArchive && !d.ptzMode
+        }
 
         readonly property string roiHintText: qsTr("Tap and hold to select an area")
 
@@ -286,17 +295,6 @@ Page
         Connections
         {
             target: video.motionController
-
-            function onDrawingRoiChanged()
-            {
-                if (target.drawingRoi)
-                    objectsTypeSheet.selectedType = Timeline.ObjectsLoader.ObjectsType.motion
-            }
-
-            function onRequestUnallowedDrawing()
-            {
-                banner.showText(qsTr("Enable motion search first to select an area"))
-            }
 
             function onEmptyRoiCleared()
             {
@@ -393,7 +391,7 @@ Page
         color: LayoutController.isTabletLayout && !videoScreen.activePage ? "transparent" : ColorTheme.colors.dark4
 
         readonly property bool hasChunkNavigation:
-            objectsTypeSheet.selectedType !== Timeline.ObjectsLoader.ObjectsType.bookmarks
+            videoScreen.selectedObjectsType !== Timeline.ObjectsLoader.ObjectsType.bookmarks
 
         Item
         {
@@ -638,7 +636,7 @@ Page
             visible: d.canViewArchive
 
             chunkProvider: cameraChunkProvider
-            objectsType: objectsTypeSheet.selectedType
+            objectsType: videoScreen.selectedObjectsType
 
             interactive: !objectsTypeSheet.opened && !timelineObjectSheet.opened
             timeZone: video.resourceHelper.timeZone
@@ -742,6 +740,8 @@ Page
 
                 ButtonBar
                 {
+                    id: zoomButtons
+
                     ControlButton
                     {
                         id: zoomOutButton
@@ -879,6 +879,7 @@ Page
         id: cameraChunkProvider
 
         resource: controller.resource
+        motionFilter: video.motionController.motionFilter
     }
 
     CalendarPanel
