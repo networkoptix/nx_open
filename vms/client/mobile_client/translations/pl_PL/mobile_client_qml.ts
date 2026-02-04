@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation>Informacje o aplikacji</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
@@ -37,7 +37,7 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation>Funkcje beta</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
@@ -234,23 +234,23 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Ustawienia programisty</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Poziom dziennika</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation>Kopiuj identyfikator dziennika</translation>
+      <translation type="unfinished">Copy log ID</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation>Kopiuj identyfikator klienta</translation>
+      <translation type="unfinished">Copy Client ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>Wymuszona awaria</translation>
+      <translation type="unfinished">Force Crash</translation>
     </message>
   </context>
   <context>
@@ -380,11 +380,11 @@
     <name>FiltersScreen</name>
     <message>
       <source>Search Filters</source>
-      <translation>Filtry wyszukiwania</translation>
+      <translation type="unfinished">Search Filters</translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation>Tylko udostępnione</translation>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>
@@ -450,7 +450,7 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation>Wygląd</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Live previews</source>
@@ -458,7 +458,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Pokaż podglądy na liście kamer</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Use server time</source>
@@ -547,7 +547,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Wydajność</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -595,11 +595,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Gotowe</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>WYBIERZ</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -611,7 +611,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Czy zapisać zmiany?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -619,15 +619,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation>Wszystkie witryny</translation>
+      <translation type="unfinished">All Sites</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation>Wybrane witryny</translation>
+      <translation type="unfinished">Selected Sites</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation>Należy wybrać co najmniej jedną witrynę</translation>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -721,23 +721,23 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Bezpieczeństwo</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Zalecane</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Zostaniesz poproszony o przypięcie certyfikatów z podpisem własnym</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>Ścisły</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>Połącz tylko serwery z certyfikatami publicznymi</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
     <message>
       <source>Save passwords</source>
@@ -745,7 +745,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Automatyczne logowanie do serwerów</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
@@ -753,7 +753,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Zachowaj</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -874,15 +874,15 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>Bezpieczeństwo</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Powiadomienia są wyłączone w ustawieniach urządzenia</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
-      <translation>Funkcje beta</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Early access to new features</source>
@@ -890,15 +890,15 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation>Wygląd</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>Wydajność</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>App Info</source>
-      <translation>Informacje o aplikacji</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>

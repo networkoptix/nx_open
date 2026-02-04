@@ -37,7 +37,7 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation>Funciones beta</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
@@ -234,11 +234,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Configuración del programador</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Nivel de registro</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
@@ -246,11 +246,11 @@
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation>Copiar identificación del Cliente</translation>
+      <translation type="unfinished">Copy Client ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>Forzar el cierre de la aplicación</translation>
+      <translation type="unfinished">Force Crash</translation>
     </message>
   </context>
   <context>
@@ -456,7 +456,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Mostrar vistas previas en la lista de cámaras</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Use server time</source>
@@ -545,7 +545,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Rendimiento</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -593,15 +593,15 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Hecho</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>SELECCIONE</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation>Sí</translation>
+      <translation>Si</translation>
     </message>
     <message>
       <source>No</source>
@@ -609,7 +609,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>¿Guardar los cambios?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -719,11 +719,11 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Seguridad</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Recomendado</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -731,7 +731,7 @@
     </message>
     <message>
       <source>Strict</source>
-      <translation>Estricto</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
@@ -743,7 +743,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Iniciar sesión automáticamente en servidores</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
@@ -751,7 +751,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Guardar</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -872,15 +872,15 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>Seguridad</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Las notificaciones están desactivadas en los ajustes del dispositivo</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
-      <translation>Funciones beta</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Early access to new features</source>
@@ -892,7 +892,7 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation>Rendimiento</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>App Info</source>

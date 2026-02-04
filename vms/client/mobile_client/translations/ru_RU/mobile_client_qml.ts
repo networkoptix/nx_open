@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation>О приложении</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
@@ -234,11 +234,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Настройки для разработчиков</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Уровень журналирования</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
@@ -250,7 +250,7 @@
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>Принудительное завершение</translation>
+      <translation type="unfinished">Force Crash</translation>
     </message>
   </context>
   <context>
@@ -450,7 +450,7 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation>Оформление</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Live previews</source>
@@ -458,7 +458,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Предпросмотр в списке камер</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Use server time</source>
@@ -547,7 +547,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Производительность</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -595,11 +595,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Готово</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>ВЫБРАТЬ</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -611,7 +611,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Сохранить изменения?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -721,23 +721,23 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Безопасность</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Рекомендованные</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Ваше подтверждение будет запрошено для закрепления самоподписанных сертификатов</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>Строгий</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>Подключайте только серверы с публичными сертификатами</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
     <message>
       <source>Save passwords</source>
@@ -745,7 +745,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Автоматический вход на серверы</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
@@ -753,7 +753,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Сохранить</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -874,7 +874,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>Безопасность</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -890,15 +890,15 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation>Оформление</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>Производительность</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>App Info</source>
-      <translation>О приложении</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>

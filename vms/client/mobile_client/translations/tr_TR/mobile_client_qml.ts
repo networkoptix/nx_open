@@ -37,11 +37,11 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation>Beta Özellikleri</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation>Video İndirme</translation>
+      <translation type="unfinished">Video Download</translation>
     </message>
     <message>
       <source>Ability to download video</source>
@@ -234,15 +234,15 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Geliştirici Ayarları</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Günlük kayıt seviyesi</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation>Günlük ID kopyala</translation>
+      <translation type="unfinished">Copy log ID</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
@@ -333,7 +333,7 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Yer imleri</translation>
+      <translation>Yer İmleri</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -378,7 +378,7 @@
     <name>FiltersScreen</name>
     <message>
       <source>Search Filters</source>
-      <translation>Arama Filtreleri</translation>
+      <translation type="unfinished">Search Filters</translation>
     </message>
     <message>
       <source>Shared Only</source>
@@ -448,7 +448,7 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation>Arayüz</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Live previews</source>
@@ -456,7 +456,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Kamera listesinde canlı önizlemeyi göster</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Use server time</source>
@@ -545,7 +545,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Performans</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -593,11 +593,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Bitti</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>SEÇ</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -609,7 +609,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Değişiklikler kaydedilsin mi?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -719,23 +719,23 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Güvenlik</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Önerilen</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Kendinden imzalı sertifikaları sabitlemek için onayınız istenecek</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>Sıkı</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>Yalnızca genel sertifikalara sahip sunucuları bağlayın</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
     <message>
       <source>Save passwords</source>
@@ -743,7 +743,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Sunuculara otomatik olarak oturum aç</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
@@ -751,7 +751,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Tut</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -872,7 +872,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>Güvenlik</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -880,7 +880,7 @@
     </message>
     <message>
       <source>Beta Features</source>
-      <translation>Beta Özellikleri</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Early access to new features</source>
@@ -888,11 +888,11 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation>Arayüz</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>Performans</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>App Info</source>

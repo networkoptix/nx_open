@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation>App informasjon</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
@@ -37,11 +37,11 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation>Betafunksjoner</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation>Nedlasting av video</translation>
+      <translation type="unfinished">Video Download</translation>
     </message>
     <message>
       <source>Ability to download video</source>
@@ -234,15 +234,15 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Utviklerinnstillinger</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Lognivå</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation>Kopier logg-ID</translation>
+      <translation type="unfinished">Copy log ID</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
@@ -382,7 +382,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation>Kun delt</translation>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>
@@ -448,7 +448,7 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation>Grensesnitt</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Live previews</source>
@@ -456,7 +456,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Vis forhåndsvisninger i kameralisten</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Use server time</source>
@@ -545,7 +545,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Ytelse</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -593,11 +593,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Ferdig</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>VELG</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -609,7 +609,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Lagre endringer?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -617,15 +617,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation>Alle nettsteder</translation>
+      <translation type="unfinished">All Sites</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation>Utvalgte nettsteder</translation>
+      <translation type="unfinished">Selected Sites</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation>Minst ett nettsted må velges</translation>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -719,23 +719,23 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Sikkerhet</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Anbefalt</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Din bekreftelse vil bli bedt om å feste selvsignerte sertifikater</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>Streng</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>Koble kun til servere med offentlig sertifikat</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
     <message>
       <source>Save passwords</source>
@@ -743,7 +743,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Logg inn på servere automatisk</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
@@ -751,7 +751,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Behold</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -872,15 +872,15 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>Sikkerhet</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Varsler er slått av i enhetsinnstillingene</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
-      <translation>Betafunksjoner</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Early access to new features</source>
@@ -888,15 +888,15 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation>Grensesnitt</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>Ytelse</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>App Info</source>
-      <translation>App informasjon</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>

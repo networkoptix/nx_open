@@ -234,11 +234,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Entwicklereinstellungen</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Loglevel</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
@@ -448,7 +448,7 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation>Schnittstelle</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Live previews</source>
@@ -456,7 +456,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Vorschau in der Kameraliste anzeigen</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Use server time</source>
@@ -545,7 +545,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Leistung</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -593,11 +593,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Fertig</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>WÄHLEN</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -609,7 +609,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Änderungen speichern?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -719,23 +719,23 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Sicherheit</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Empfohlen</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Sie werden um eine Bestätigung gebeten, um selbstsignierte Zertifikate zu pinnen</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>Strikt</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>Nur Server mit öffentlichen Zertifikaten verbinden</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
     <message>
       <source>Save passwords</source>
@@ -743,7 +743,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Melden Sie sich automatisch bei Servern an</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
@@ -751,7 +751,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Behalten</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -872,7 +872,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>Sicherheit</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -888,11 +888,11 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation>Schnittstelle</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>Leistung</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>App Info</source>

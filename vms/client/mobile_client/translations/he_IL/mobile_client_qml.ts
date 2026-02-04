@@ -234,11 +234,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>הגדרות מפתח</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>רמת יומן</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
@@ -458,7 +458,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>הצג תצוגה מקדימה ברשימת המצלמות</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Use server time</source>
@@ -547,7 +547,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>ביצועים</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -595,11 +595,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>בוצע</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>בחר</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -611,7 +611,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>האם לשמור שינויים?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -721,11 +721,11 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>אבטחה</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>מומלץ</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -745,7 +745,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>התחבר אוטומטית לשרתים</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
@@ -753,7 +753,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>שמור</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -874,7 +874,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>אבטחה</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -894,7 +894,7 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation>ביצועים</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>App Info</source>

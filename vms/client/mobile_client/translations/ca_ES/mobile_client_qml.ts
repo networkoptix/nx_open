@@ -234,11 +234,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Configuració per a desenvolupadors</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Nivell del registre</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
@@ -456,7 +456,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Mostra les previsualitzacions a la llista de càmeres</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Use server time</source>
@@ -545,7 +545,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Rendiment</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -593,11 +593,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Fet</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>SELECCIONA</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -609,7 +609,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Voleu desar els canvis?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -719,11 +719,11 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Seguretat</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Recomanat</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -743,7 +743,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Inicia la sessió automàticament als servidors</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
@@ -751,7 +751,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Conserva</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -872,7 +872,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>Seguretat</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -892,7 +892,7 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation>Rendiment</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>App Info</source>
