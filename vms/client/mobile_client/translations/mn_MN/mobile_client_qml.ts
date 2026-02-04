@@ -37,7 +37,7 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation>Бета онцлогууд</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
@@ -234,11 +234,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Хөгжүүлэлтийн тохиргоо</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Бүртгэлийн түвшин</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
@@ -698,7 +698,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Өөрчлөлтийг хадгалах уу?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -819,11 +819,11 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Хамгаалалт</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Санал болгож буй</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -843,7 +843,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Үлдээх</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -968,7 +968,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>Хамгаалалт</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -976,7 +976,7 @@
     </message>
     <message>
       <source>Beta Features</source>
-      <translation>Бета онцлогууд</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Interface</source>

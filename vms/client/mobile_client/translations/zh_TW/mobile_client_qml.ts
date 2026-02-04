@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation>應用程式資訊</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
@@ -37,35 +37,35 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation>Beta 版功能</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation>下載影片</translation>
+      <translation type="unfinished">Video Download</translation>
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation>將影像下載到此裝置</translation>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation>最佳化網路</translation>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation>套用網路最佳化方法</translation>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation>平行解碼</translation>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation>使用多個解碼器以提高效能</translation>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation>請重新啟動應用程式以套用變更。</translation>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -234,23 +234,23 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>開發人員進階設定</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>應用程式日誌等級</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation>複製日誌 ID</translation>
+      <translation type="unfinished">Copy log ID</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation>複製客戶端 ID</translation>
+      <translation type="unfinished">Copy Client ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>強制閃退</translation>
+      <translation type="unfinished">Force Crash</translation>
     </message>
   </context>
   <context>
@@ -328,7 +328,7 @@
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation>尋找</translation>
+      <translation type="unfinished">Looking for</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -440,11 +440,11 @@
     <name>FiltersScreen</name>
     <message>
       <source>Search Filters</source>
-      <translation>搜尋條件</translation>
+      <translation type="unfinished">Search Filters</translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation>僅共享</translation>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>
@@ -510,23 +510,23 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation>網路介面</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>於攝影機列表上顯示影像預覽</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Live Previews</source>
-      <translation>即時預覽</translation>
+      <translation type="unfinished">Live Previews</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>伺服器時間</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
-      <translation>在攝影機上顯示伺服器時間</translation>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -633,23 +633,23 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>效能</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation>硬體加速</translation>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation>可提高效能與電池壽命</translation>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation>回退軟體解碼器</translation>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation>使用軟體解碼器來解碼罕見的影像格式</translation>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -681,11 +681,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>完成</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>選擇</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -697,7 +697,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>是否儲存變更？</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -705,15 +705,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation>所有站點</translation>
+      <translation type="unfinished">All Sites</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation>已選擇的站點</translation>
+      <translation type="unfinished">Selected Sites</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation>請至少選擇一個站點(site)</translation>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -773,7 +773,7 @@
     <name>ResourceTreeSheet</name>
     <message>
       <source>Resources</source>
-      <translation>資源</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <source>Nothing Found</source>
@@ -818,31 +818,31 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>安全性</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>建議選項</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>當伺服器使用自簽憑證時，您需要於登入的時候進行確認並同意</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>嚴格</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>僅允許連線至使用公開憑證的伺服器</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>自動登入伺服器</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation>保留</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -850,15 +850,15 @@
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation>儲存密碼</translation>
+      <translation type="unfinished">Save Passwords</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation>如何處理已儲存的密碼？</translation>
+      <translation type="unfinished">How to handle saved passwords?</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation>伺服器憑證檢查</translation>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -967,23 +967,23 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>安全性</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>裝置設定中的推播通知已關閉</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
-      <translation>Beta 版功能</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Interface</source>
-      <translation>網路介面</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>效能</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -991,7 +991,7 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation>登入Cloud以收到通知</translation>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
       <source>About</source>

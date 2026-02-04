@@ -234,11 +234,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Configurações do desenvolvedor</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Nível de Log</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
@@ -511,11 +511,11 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation>Interface</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Mostrar pré-visualizações na lista de câmeras</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Live Previews</source>
@@ -523,7 +523,7 @@
     </message>
     <message>
       <source>Server Time</source>
-      <translation>Hora Servidor</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -634,7 +634,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Desempenho</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -682,11 +682,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Concluído</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>SELECIONAR</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -698,7 +698,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Salvar as alterações?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -774,7 +774,7 @@
     <name>ResourceTreeSheet</name>
     <message>
       <source>Resources</source>
-      <translation>Recursos</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <source>Nothing Found</source>
@@ -819,31 +819,31 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Segurança</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Recomendado</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Sua confirmação será solicitada para fixar certificados autoassinados</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>Rigoroso</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>Conecte apenas servidores com certificados públicos</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Faça login automaticamente nos servidores</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation>Manter</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -968,7 +968,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>Segurança</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -980,11 +980,11 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation>Interface</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>Desempenho</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Notifications</source>

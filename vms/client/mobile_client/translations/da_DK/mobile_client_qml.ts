@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation>App Info</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
@@ -37,35 +37,35 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation>Beta Funktioner</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation>Videodownload</translation>
+      <translation type="unfinished">Video Download</translation>
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation>Download video til denne enhed</translation>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation>Optimer netværk</translation>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation>Anvend netværks optimeringsmetoder</translation>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation>Parallel afkodning</translation>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation>Brug flere dekodere til at forbedre ydeevnen</translation>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation>Genstart venligst app'en for at anvende ændringer</translation>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -234,23 +234,23 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Udvikler indstillinger</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Lognings niveau</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation>Kopiér log ID</translation>
+      <translation type="unfinished">Copy log ID</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation>Kopier Klient ID</translation>
+      <translation type="unfinished">Copy Client ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>Gennemtving Nedbrud</translation>
+      <translation type="unfinished">Force Crash</translation>
     </message>
   </context>
   <context>
@@ -329,7 +329,7 @@
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation>Leder efter</translation>
+      <translation type="unfinished">Looking for</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -441,11 +441,11 @@
     <name>FiltersScreen</name>
     <message>
       <source>Search Filters</source>
-      <translation>Søgefiltre</translation>
+      <translation type="unfinished">Search Filters</translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation>Kun delt</translation>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>
@@ -511,23 +511,23 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation>Grænseflade</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Vis forhåndsvisninger i listen over kameraer</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Live Previews</source>
-      <translation>Live Forhåndsvisning</translation>
+      <translation type="unfinished">Live Previews</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>Server Tid</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
-      <translation>Vis servertid på kameraer</translation>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -634,23 +634,23 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Ydeevne</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation>Hardware Acceleration</translation>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation>Kan forbedre ydeevnen og batteriets levetid</translation>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation>Software Dekoder Fallback</translation>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation>Kan afkode sjældne videoformater ved hjælp af software</translation>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -682,11 +682,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Udført</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>VÆLG</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -698,7 +698,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Gem ændringer?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -706,15 +706,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation>Alle Sites</translation>
+      <translation type="unfinished">All Sites</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation>Valgte Sites</translation>
+      <translation type="unfinished">Selected Sites</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation>Mindst ét site skal vælges</translation>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -774,7 +774,7 @@
     <name>ResourceTreeSheet</name>
     <message>
       <source>Resources</source>
-      <translation>Ressourcer</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <source>Nothing Found</source>
@@ -819,31 +819,31 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Sikkerhed</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Anbefalet</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Din bekræftelse er påkrævet for at fastgøre selvsignerede certifikater</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>Streng</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>Tilslut kun servere med offentlige certifikater</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Log automatisk ind på servere</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation>Behold</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -851,15 +851,15 @@
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation>Gem Adgangskoder</translation>
+      <translation type="unfinished">Save Passwords</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation>Hvordan håndteres gemte adgangskoder?</translation>
+      <translation type="unfinished">How to handle saved passwords?</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation>Kontrol af servercertifikat</translation>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -968,23 +968,23 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>Sikkerhed</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Notifikationer er slået fra i enhedens indstillinger</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
-      <translation>Beta Funktioner</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Interface</source>
-      <translation>Grænseflade</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>Ydeevne</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -992,7 +992,7 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation>Log ind på clouden for at modtage notifikationer</translation>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
       <source>About</source>

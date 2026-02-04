@@ -234,11 +234,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>开发者设置</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>日志等级</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
@@ -510,11 +510,11 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation>接口</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>显示预览在摄像机列表中</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Live Previews</source>
@@ -522,7 +522,7 @@
     </message>
     <message>
       <source>Server Time</source>
-      <translation>服务器时间</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -633,7 +633,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>高性能</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -681,11 +681,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>完成</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>选择</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -697,7 +697,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>是否保存更改？</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -773,7 +773,7 @@
     <name>ResourceTreeSheet</name>
     <message>
       <source>Resources</source>
-      <translation>资源</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <source>Nothing Found</source>
@@ -818,31 +818,31 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>安全性</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>建议选项</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>当服务器使用自签凭证时，需要于登录时进行确认并同意</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>严格</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>仅允许连线至绑定公开凭证的服务器</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>自动登录服务器</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation>保留</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -967,7 +967,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>安全性</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -979,11 +979,11 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation>接口</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>高性能</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Notifications</source>

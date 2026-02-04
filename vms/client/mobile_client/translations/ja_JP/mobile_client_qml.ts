@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation>アプリ情報</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
@@ -37,35 +37,35 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation>ベータ版機能</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation>映像のダウンロード</translation>
+      <translation type="unfinished">Video Download</translation>
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation>このデバイスに映像をダウンロード</translation>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation>ネットワークの最適化</translation>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation>ネットワーク最適化手法を適用します。</translation>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation>並列デコード</translation>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation>複数のデコーダーを使用してパフォーマンスを向上させます。</translation>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation>変更を適用するにはアプリを再起動してください。</translation>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -234,23 +234,23 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>開発者向けの設定</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>ログレベル</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation>ログIDをコピー</translation>
+      <translation type="unfinished">Copy log ID</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation>クライアントIDをコピー</translation>
+      <translation type="unfinished">Copy Client ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>強制クラッシュ</translation>
+      <translation type="unfinished">Force Crash</translation>
     </message>
   </context>
   <context>
@@ -328,7 +328,7 @@
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation>検索</translation>
+      <translation type="unfinished">Looking for</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -440,11 +440,11 @@
     <name>FiltersScreen</name>
     <message>
       <source>Search Filters</source>
-      <translation>検索フィルター</translation>
+      <translation type="unfinished">Search Filters</translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation>共有のみ</translation>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>
@@ -510,23 +510,23 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation>インターフェース</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>カメラリストにプレビューを表示します</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Live Previews</source>
-      <translation>ライブプレビュー</translation>
+      <translation type="unfinished">Live Previews</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>サーバー時刻</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
-      <translation>カメラにサーバー時刻を表示する</translation>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -633,23 +633,23 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>パフォーマンス</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation>ハードウェアアクセラレーション</translation>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation>パフォーマンスとバッテリー効率を改善できます。</translation>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation>ソフトウェアデコーダーへのフォールバック</translation>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation>一般的でない映像フォーマットをソフトウェアでデコードします。</translation>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -681,11 +681,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>完了</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>選択</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -697,7 +697,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>変更を保存しますか?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -705,15 +705,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation>すべてのサイト</translation>
+      <translation type="unfinished">All Sites</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation>選択されたサイト</translation>
+      <translation type="unfinished">Selected Sites</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation>少なくとも1つのサイトを選択する必要があります</translation>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -773,7 +773,7 @@
     <name>ResourceTreeSheet</name>
     <message>
       <source>Resources</source>
-      <translation>リソース</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <source>Nothing Found</source>
@@ -818,31 +818,31 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>セキュリティ</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>推奨</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>自己署名証明書をピン留めするために確認が求められます</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>厳格</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>正式な証明書を持つサーバーにのみ接続します</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>サーバーへ自動的にログインします</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation>維持</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -850,15 +850,15 @@
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation>パスワードを保存</translation>
+      <translation type="unfinished">Save Passwords</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation>保存済みのパスワードはどうしますか?</translation>
+      <translation type="unfinished">How to handle saved passwords?</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation>サーバー証明書の確認</translation>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -967,23 +967,23 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>セキュリティ</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>デバイス設定で通知がオフになっています。</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
-      <translation>ベータ版機能</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Interface</source>
-      <translation>インターフェース</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>パフォーマンス</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -991,7 +991,7 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation>通知を受け取るには、クラウドにログインしてください。</translation>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
       <source>About</source>

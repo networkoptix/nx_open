@@ -234,11 +234,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Fejlesztői beállítások</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Rendszernapló szintje</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
@@ -515,7 +515,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Az előnézetek megjelenítése a kamerák listájában</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Live Previews</source>
@@ -523,7 +523,7 @@
     </message>
     <message>
       <source>Server Time</source>
-      <translation>Szerveridő</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -634,7 +634,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Teljesítmény</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -682,11 +682,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Kész</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>KIVÁLASZTÁS</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -698,7 +698,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Menti a módosításokat?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -774,7 +774,7 @@
     <name>ResourceTreeSheet</name>
     <message>
       <source>Resources</source>
-      <translation>Források</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <source>Nothing Found</source>
@@ -819,11 +819,11 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Biztonság</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Ajánlott</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -839,11 +839,11 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Automatikus bejelentkezés a kiszolgálókra</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation>Megtart</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -968,7 +968,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>Biztonság</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -984,7 +984,7 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation>Teljesítmény</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Notifications</source>

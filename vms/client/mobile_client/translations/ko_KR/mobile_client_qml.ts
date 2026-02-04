@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation>앱 정보</translation>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
@@ -37,35 +37,35 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation>베타 기능</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation>동영상 내려받기</translation>
+      <translation type="unfinished">Video Download</translation>
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation>이 기기에 비디오를 다운로드하세요</translation>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation>네트워크 최적화</translation>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation>네트워크 최적화 방법을 적용합니다</translation>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation>병렬 디코딩</translation>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation>성능 향상을 위해 여러 개의 디코더를 사용하십시오</translation>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation>변경 사항을 적용하려면 앱을 재시작하세요</translation>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -234,23 +234,23 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>개발자 옵션</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>로그 수준</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation>로그 ID 복사</translation>
+      <translation type="unfinished">Copy log ID</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation>고객 ID 복사</translation>
+      <translation type="unfinished">Copy Client ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>강제 충돌</translation>
+      <translation type="unfinished">Force Crash</translation>
     </message>
   </context>
   <context>
@@ -328,7 +328,7 @@
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation>찾고있는</translation>
+      <translation type="unfinished">Looking for</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -440,11 +440,11 @@
     <name>FiltersScreen</name>
     <message>
       <source>Search Filters</source>
-      <translation>필터 검색</translation>
+      <translation type="unfinished">Search Filters</translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation>공유 전용</translation>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>
@@ -510,23 +510,23 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation>인터페이스</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>카메라 목록에서 미리보기 보여줌</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Live Previews</source>
-      <translation>실시간 미리보기</translation>
+      <translation type="unfinished">Live Previews</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>서버시간</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
-      <translation>카메라에 서버 시간을 표시합니다</translation>
+      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -633,23 +633,23 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>성능</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation>하드웨어 가속</translation>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation>성능과 배터리 수명 증가</translation>
+      <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation>소프트웨어 디코더 대체 기능</translation>
+      <translation type="unfinished">Software Decoder Fallback</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation>소프트웨어를 사용하여 희귀한 비디오 형식을 디코딩할 수 있습니다</translation>
+      <translation type="unfinished">Can decode rare video formats using software</translation>
     </message>
   </context>
   <context>
@@ -681,11 +681,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>완료</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>선택</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -697,7 +697,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>변경 내용을 저장 하시겠습니까?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -705,15 +705,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation>모든 사이트</translation>
+      <translation type="unfinished">All Sites</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation>선택된 사이트</translation>
+      <translation type="unfinished">Selected Sites</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation>최소한 하나의 사이트를 선택해야 합니다</translation>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -773,7 +773,7 @@
     <name>ResourceTreeSheet</name>
     <message>
       <source>Resources</source>
-      <translation>리소스</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <source>Nothing Found</source>
@@ -818,31 +818,31 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>보안</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation>권장</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>자체 서명된 인증서를 고정하려면 확인이 요청됩니다.</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>엄격한</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>공인인증서가 있는 서버만 연결</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>서버에 자동 로그인</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation>유지</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -850,15 +850,15 @@
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation>비밀번호 저장</translation>
+      <translation type="unfinished">Save Passwords</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation>저장된 비밀번호를 어떻게 관리해야 할까요?</translation>
+      <translation type="unfinished">How to handle saved passwords?</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation>서버 인증서 오류</translation>
+      <translation type="unfinished">Server Certificate Check</translation>
     </message>
   </context>
   <context>
@@ -967,23 +967,23 @@
     </message>
     <message>
       <source>Security</source>
-      <translation>보안</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>시스템 설정에서 푸시 알림이 해제되어 있습니다</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>Beta Features</source>
-      <translation>베타 기능</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Interface</source>
-      <translation>인터페이스</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>성능</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -991,7 +991,7 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation>푸시 알림을 사용하기 위해 클라우드에 로그인</translation>
+      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
     </message>
     <message>
       <source>About</source>
