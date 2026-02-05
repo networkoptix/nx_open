@@ -23,12 +23,17 @@ NX_VMS_COMMON_API AVCodecID findVideoEncoder(const QString& codecName);
 class NX_VMS_COMMON_API QnFfmpegVideoTranscoder: public AbstractCodecTranscoder
 {
 public:
-    struct Config
+    struct TranscodePolicy
     {
-        DecoderConfig decoderConfig;
-        AVCodecID targetCodecId = AV_CODEC_ID_NONE;
         bool useMultiThreadEncode = false;
         bool useRealTimeOptimization = false;
+        bool disableTranscoding = false;
+        DecoderConfig decoderConfig;
+    };
+
+    struct Config: public TranscodePolicy
+    {
+        AVCodecID targetCodecId = AV_CODEC_ID_NONE;
         QSize outputResolutionLimit;
         // Source resolution, if empty - first video frame will be used (it can be low quality, and
         // in that case result will be transcoded to low quality resolution). So if source stream

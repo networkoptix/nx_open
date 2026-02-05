@@ -48,8 +48,8 @@ public:
 
     void setRtcpPacket(uint8_t* data, int size);
     bool getNextNackPacket(nx::utils::ByteArray& sendBuffer);
-    void setSrtpEncryptionData(const nx::vms::server::rtsp::EncryptionData& data);
-    nx::vms::server::rtsp::SrtpEncryptor* encryptor() const;
+    void setSrtpEncryptionData(const nx::rtsp::EncryptionData& data);
+    nx::rtsp::SrtpEncryptor* encryptor() const;
     FfmpegMuxer::PacketTimestamp getLastTimestamps() const;
     int payloadType() const;
 private:
@@ -76,7 +76,7 @@ private:
     bool m_isVideo = false;
     int m_payloadType = 0;
     nx::rtp::RtcpSenderReporter m_rtcpReporter;
-    std::unique_ptr<nx::vms::server::rtsp::SrtpEncryptor> m_encryptor;
+    std::unique_ptr<nx::rtsp::SrtpEncryptor> m_encryptor;
     std::unique_ptr<nx::rtp::RtcpNackResponder> m_rtcpNackResponder;
 };
 
