@@ -300,7 +300,7 @@
     <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Entwicklereinstellungen</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Loglevel</translation>
     </message>
   </context>
   <context>
@@ -399,11 +399,11 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Lesezeichen</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objekte</translation>
     </message>
   </context>
   <context>
@@ -434,7 +434,7 @@
     </message>
     <message>
       <source>Clear All</source>
-      <translation type="unfinished">Clear All</translation>
+      <translation>Alle Entfernen</translation>
     </message>
     <message>
       <source>Filters</source>
@@ -578,7 +578,7 @@
     <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Schnittstelle</translation>
     </message>
     <message>
       <source>Live Previews</source>
@@ -586,11 +586,11 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation type="unfinished">Show previews in the cameras list</translation>
+      <translation>Vorschau in der Kameraliste anzeigen</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Serverzeit</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -740,7 +740,7 @@
     <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Leistung</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -788,11 +788,11 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Benachrichtigungen</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Fertig</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
@@ -812,7 +812,7 @@
     </message>
     <message>
       <source>SELECT</source>
-      <translation type="unfinished">SELECT</translation>
+      <translation>WÄHLEN</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
@@ -820,15 +820,15 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ja</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Nein</translation>
     </message>
     <message>
       <source>Save changes?</source>
-      <translation type="unfinished">Save changes?</translation>
+      <translation>Änderungen speichern?</translation>
     </message>
   </context>
   <context>
@@ -888,7 +888,7 @@
     <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Nichts gefunden</translation>
     </message>
   </context>
   <context>
@@ -919,11 +919,11 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Ressourcen</translation>
     </message>
     <message>
       <source>Timeline</source>
-      <translation type="unfinished">Timeline</translation>
+      <translation>Timeline</translation>
     </message>
   </context>
   <context>
@@ -937,7 +937,7 @@
     <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Sicherheit</translation>
     </message>
     <message>
       <source>Save Passwords</source>
@@ -945,7 +945,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation type="unfinished">Automatically log in to servers</translation>
+      <translation>Melden Sie sich automatisch bei Servern an</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
@@ -953,11 +953,11 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Behalten</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Löschen</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
@@ -965,19 +965,19 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Empfohlen</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+      <translation>Sie werden um eine Bestätigung gebeten, um selbstsignierte Zertifikate zu pinnen</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Strikt</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation type="unfinished">Connect only servers with public certificates</translation>
+      <translation>Nur Server mit öffentlichen Zertifikaten verbinden</translation>
     </message>
   </context>
   <context>
@@ -1433,10 +1433,6 @@
     <message>
       <source>Tap and hold to select an area</source>
       <translation>Tippen und halten Sie, um einen Bereich auszuwählen</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Aktivieren Sie zuerst die Bewegungssuche, um einen Bereich auszuwählen</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>

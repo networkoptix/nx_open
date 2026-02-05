@@ -300,7 +300,7 @@
     <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Kehittäjän asetukset</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Lokitaso</translation>
     </message>
   </context>
   <context>
@@ -399,11 +399,11 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Kirjanmerkit</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektit</translation>
     </message>
   </context>
   <context>
@@ -512,7 +512,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Vain Jaettu</translation>
     </message>
   </context>
   <context>
@@ -590,7 +590,7 @@
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Palvelimen aika</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -740,7 +740,7 @@
     <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Suorituskyky</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -788,7 +788,7 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Ilmoitukset</translation>
     </message>
     <message>
       <source>Done</source>
@@ -820,11 +820,11 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Kyllä</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Ei</translation>
     </message>
     <message>
       <source>Save changes?</source>
@@ -888,7 +888,7 @@
     <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Mitään ei löytynyt</translation>
     </message>
   </context>
   <context>
@@ -919,7 +919,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Resurssit</translation>
     </message>
     <message>
       <source>Timeline</source>
@@ -937,7 +937,7 @@
     <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Turvallisuus</translation>
     </message>
     <message>
       <source>Save Passwords</source>
@@ -953,11 +953,11 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Säilytä</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Poista</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
@@ -965,7 +965,7 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Suositeltu</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -1433,10 +1433,6 @@
     <message>
       <source>Tap and hold to select an area</source>
       <translation>Valitse alue valitsemalla ja pitämällä sitä alhaalla</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Ota ensin käyttöön liikkeenhaku ja valitse alue</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>

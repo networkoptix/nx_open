@@ -37,11 +37,11 @@
     <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Beta Özellikleri</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation type="unfinished">Video Download</translation>
+      <translation>Video İndirme</translation>
     </message>
     <message>
       <source>Download video to this device</source>
@@ -300,7 +300,7 @@
     <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Geliştirici Ayarları</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
@@ -308,7 +308,7 @@
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation type="unfinished">Copy log ID</translation>
+      <translation>Günlük ID kopyala</translation>
     </message>
     <message>
       <source>Force Crash</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Kayıt düzeyi</translation>
     </message>
   </context>
   <context>
@@ -399,11 +399,11 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Yer işaretleri</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Nesneler</translation>
     </message>
   </context>
   <context>
@@ -434,11 +434,11 @@
     </message>
     <message>
       <source>Clear All</source>
-      <translation type="unfinished">Clear All</translation>
+      <translation>Tümünü Temizle</translation>
     </message>
     <message>
       <source>Filters</source>
-      <translation type="unfinished">Filters</translation>
+      <translation>Filtreler</translation>
     </message>
   </context>
   <context>
@@ -508,7 +508,7 @@
     <name>FiltersItem</name>
     <message>
       <source>Search Filters</source>
-      <translation type="unfinished">Search Filters</translation>
+      <translation>Arama Filtreleri</translation>
     </message>
     <message>
       <source>Shared Only</source>
@@ -578,7 +578,7 @@
     <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Arayüz</translation>
     </message>
     <message>
       <source>Live Previews</source>
@@ -586,11 +586,11 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation type="unfinished">Show previews in the cameras list</translation>
+      <translation>Kamera listesinde canlı önizlemeyi göster</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Sunucu Saati</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -740,7 +740,7 @@
     <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Performans</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -784,15 +784,15 @@
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Siteler</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Bildirimler</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Tamamlandı</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
@@ -812,7 +812,7 @@
     </message>
     <message>
       <source>SELECT</source>
-      <translation type="unfinished">SELECT</translation>
+      <translation>SEÇ</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
@@ -820,15 +820,15 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Evet</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Hayır</translation>
     </message>
     <message>
       <source>Save changes?</source>
-      <translation type="unfinished">Save changes?</translation>
+      <translation>Değişiklikler kaydedilsin mi?</translation>
     </message>
   </context>
   <context>
@@ -888,7 +888,7 @@
     <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Hiçbir şey Bulunamadı</translation>
     </message>
   </context>
   <context>
@@ -919,11 +919,11 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Kaynaklar</translation>
     </message>
     <message>
       <source>Timeline</source>
-      <translation type="unfinished">Timeline</translation>
+      <translation>Timeline</translation>
     </message>
   </context>
   <context>
@@ -937,7 +937,7 @@
     <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Güvenlik</translation>
     </message>
     <message>
       <source>Save Passwords</source>
@@ -945,7 +945,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation type="unfinished">Automatically log in to servers</translation>
+      <translation>Sunuculara otomatik olarak oturum aç</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
@@ -953,11 +953,11 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Tut</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Sil</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
@@ -965,19 +965,19 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Önerilen</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+      <translation>Kendinden imzalı sertifikaları sabitlemek için onayınız istenecek</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Sıkı</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation type="unfinished">Connect only servers with public certificates</translation>
+      <translation>Yalnızca genel sertifikalara sahip sunucuları bağlayın</translation>
     </message>
   </context>
   <context>
@@ -1433,10 +1433,6 @@
     <message>
       <source>Tap and hold to select an area</source>
       <translation>Bir alan seçmek için dokunun ve basılı tutun</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Bir alan seçmek için önce hareket aramayı etkinleştirin</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>

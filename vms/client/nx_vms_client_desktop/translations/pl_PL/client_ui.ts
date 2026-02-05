@@ -988,7 +988,7 @@
     <name>ExportMetadataSettingsWidget</name>
     <message>
       <source>Metadata</source>
-      <translation type="unfinished">Metadata</translation>
+      <translation>Metadane</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -1000,15 +1000,15 @@
     </message>
     <message>
       <source>Object type</source>
-      <translation type="unfinished">Object type</translation>
+      <translation>Typ obiektu</translation>
     </message>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>Ma atrybuty</translation>
     </message>
     <message>
       <source>Display attributes</source>
-      <translation type="unfinished">Display attributes</translation>
+      <translation>Wyświetl atrybuty</translation>
     </message>
     <message>
       <source>Delete</source>

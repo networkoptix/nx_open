@@ -8641,15 +8641,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Metadata</source>
-      <translation type="unfinished">Add Metadata</translation>
+      <translation>Dodaj metadane</translation>
     </message>
     <message>
       <source>Reset metadata settings</source>
-      <translation type="unfinished">Reset metadata settings</translation>
+      <translation>Zresetuj ustawienia metadanych</translation>
     </message>
     <message>
       <source>Metadata</source>
-      <translation type="unfinished">Metadata</translation>
+      <translation>Metadane</translation>
     </message>
   </context>
   <context>

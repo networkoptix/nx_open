@@ -37,7 +37,7 @@
     <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Funciones beta</translation>
     </message>
     <message>
       <source>Video Download</source>
@@ -300,11 +300,11 @@
     <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Configuración del programador</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation type="unfinished">Copy Client ID</translation>
+      <translation>Copiar identificación del Cliente</translation>
     </message>
     <message>
       <source>Copy log ID</source>
@@ -312,11 +312,11 @@
     </message>
     <message>
       <source>Force Crash</source>
-      <translation type="unfinished">Force Crash</translation>
+      <translation>Forzar el cierre de la aplicación</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Nivel de registro</translation>
     </message>
   </context>
   <context>
@@ -399,11 +399,11 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Marcadores</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objetos</translation>
     </message>
   </context>
   <context>
@@ -434,7 +434,7 @@
     </message>
     <message>
       <source>Clear All</source>
-      <translation type="unfinished">Clear All</translation>
+      <translation>Limpiar todo</translation>
     </message>
     <message>
       <source>Filters</source>
@@ -586,11 +586,11 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation type="unfinished">Show previews in the cameras list</translation>
+      <translation>Mostrar vistas previas en la lista de cámaras</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Hora del servidor</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -740,7 +740,7 @@
     <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Rendimiento</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -784,23 +784,23 @@
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Sitios</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notificaciones</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Hecho</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+      <translation>Inicie sesión en la nube para recibir notificaciones</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>Las notificaciones están desactivadas en los ajustes del dispositivo</translation>
     </message>
     <message>
       <source>All Sites</source>
@@ -812,7 +812,7 @@
     </message>
     <message>
       <source>SELECT</source>
-      <translation type="unfinished">SELECT</translation>
+      <translation>SELECCIONE</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
@@ -820,15 +820,15 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Si</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>No</translation>
     </message>
     <message>
       <source>Save changes?</source>
-      <translation type="unfinished">Save changes?</translation>
+      <translation>¿Guardar los cambios?</translation>
     </message>
   </context>
   <context>
@@ -888,7 +888,7 @@
     <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>No hay resultados</translation>
     </message>
   </context>
   <context>
@@ -919,7 +919,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Recursos</translation>
     </message>
     <message>
       <source>Timeline</source>
@@ -937,7 +937,7 @@
     <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Seguridad</translation>
     </message>
     <message>
       <source>Save Passwords</source>
@@ -945,7 +945,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation type="unfinished">Automatically log in to servers</translation>
+      <translation>Iniciar sesión automáticamente en servidores</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
@@ -953,11 +953,11 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Guardar</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>borrar</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
@@ -965,7 +965,7 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Recomendado</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -973,7 +973,7 @@
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Estricto</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
@@ -1433,10 +1433,6 @@
     <message>
       <source>Tap and hold to select an area</source>
       <translation>Mantenga pulsado para seleccionar un área</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Habilitar la búsqueda de movimiento primero para seleccionar un área</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>

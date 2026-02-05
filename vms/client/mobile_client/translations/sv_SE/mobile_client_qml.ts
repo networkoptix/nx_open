@@ -19,7 +19,7 @@
     <name>AppInfoPage</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>Appinformation</translation>
     </message>
   </context>
   <context>
@@ -37,35 +37,35 @@
     <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Betafunktioner</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation type="unfinished">Video Download</translation>
+      <translation>Ladda ner video</translation>
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation type="unfinished">Download video to this device</translation>
+      <translation>Ladda ner video till denna enhet</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation type="unfinished">Optimize Network</translation>
+      <translation>Optimera nätverk</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation type="unfinished">Apply network optimization methods</translation>
+      <translation>Tillämpa metoder för nätverksoptimering</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation type="unfinished">Parallel Decoding</translation>
+      <translation>Parallell avkodning</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation type="unfinished">Use multiple decoders to improve performance</translation>
+      <translation>Använd flera avkodare för att förbättra prestandan</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation type="unfinished">Please restart the app to apply changes</translation>
+      <translation>Starta om appen för att tillämpa ändringarna</translation>
     </message>
   </context>
   <context>
@@ -300,23 +300,23 @@
     <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Utvecklarinställningar</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation type="unfinished">Copy Client ID</translation>
+      <translation>Kopiera klient-ID</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation type="unfinished">Copy log ID</translation>
+      <translation>Kopiera logg-ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation type="unfinished">Force Crash</translation>
+      <translation>Tvinga krasch</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Loggnivå</translation>
     </message>
   </context>
   <context>
@@ -395,15 +395,15 @@
     <name>EventSearchMenu</name>
     <message>
       <source>Looking for</source>
-      <translation type="unfinished">Looking for</translation>
+      <translation>Letar efter</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Bokmärken</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objekt</translation>
     </message>
   </context>
   <context>
@@ -434,11 +434,11 @@
     </message>
     <message>
       <source>Clear All</source>
-      <translation type="unfinished">Clear All</translation>
+      <translation>Rensa allt</translation>
     </message>
     <message>
       <source>Filters</source>
-      <translation type="unfinished">Filters</translation>
+      <translation>Filter</translation>
     </message>
   </context>
   <context>
@@ -508,11 +508,11 @@
     <name>FiltersItem</name>
     <message>
       <source>Search Filters</source>
-      <translation type="unfinished">Search Filters</translation>
+      <translation>Sökfilter</translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Endast delad</translation>
     </message>
   </context>
   <context>
@@ -578,23 +578,23 @@
     <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Gränssnitt</translation>
     </message>
     <message>
       <source>Live Previews</source>
-      <translation type="unfinished">Live Previews</translation>
+      <translation>Liveförhandsvisningar</translation>
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation type="unfinished">Show previews in the cameras list</translation>
+      <translation>Visa förhandsvisningar i listan över kameror</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Servertid</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
-      <translation type="unfinished">Show server time on cameras</translation>
+      <translation>Visa servertid på kameror</translation>
     </message>
   </context>
   <context>
@@ -740,23 +740,23 @@
     <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Prestanda</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation type="unfinished">Hardware Acceleration</translation>
+      <translation>Hårdvaruacceleration</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation type="unfinished">Can improve performance and battery life</translation>
+      <translation>Kan förbättra prestanda och batteritid</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation type="unfinished">Software Decoder Fallback</translation>
+      <translation>Programvaruavkodare reserv</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation type="unfinished">Can decode rare video formats using software</translation>
+      <translation>Kan avkoda sällsynta videoformat med hjälp av programvara</translation>
     </message>
   </context>
   <context>
@@ -784,51 +784,51 @@
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Platser</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Aviseringar</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Klart</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+      <translation>Logga in i molnet för att få aviseringar</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>Aviseringar är avstängda i enhetens inställningar</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Alla webbplatser</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation type="unfinished">Selected Sites</translation>
+      <translation>Valda webplatser</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation type="unfinished">SELECT</translation>
+      <translation>VÄLJ</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation type="unfinished">At least one site has to be selected</translation>
+      <translation>Minst en webplats måste väljas</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ja</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Nej</translation>
     </message>
     <message>
       <source>Save changes?</source>
-      <translation type="unfinished">Save changes?</translation>
+      <translation>Spara ändringarna?</translation>
     </message>
   </context>
   <context>
@@ -888,7 +888,7 @@
     <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Inget hittades</translation>
     </message>
   </context>
   <context>
@@ -919,11 +919,11 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Resurser</translation>
     </message>
     <message>
       <source>Timeline</source>
-      <translation type="unfinished">Timeline</translation>
+      <translation>Tidslinje</translation>
     </message>
   </context>
   <context>
@@ -937,47 +937,47 @@
     <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Säkerhet</translation>
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation type="unfinished">Save Passwords</translation>
+      <translation>Spara lösenord</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation type="unfinished">Automatically log in to servers</translation>
+      <translation>Logga in automatiskt på servrar</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation type="unfinished">How to handle saved passwords?</translation>
+      <translation>Hur hanterar man sparade lösenord?</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Behåll</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Radera</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation type="unfinished">Server Certificate Check</translation>
+      <translation>Kontroll av servercertifikat</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Rekommenderad</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+      <translation>Din bekräftelse kommer att begäras för att fästa självsignerade certifikat</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Strikt</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation type="unfinished">Connect only servers with public certificates</translation>
+      <translation>Anslut endast servrar med offentligt certifikat</translation>
     </message>
   </context>
   <context>
@@ -1075,11 +1075,11 @@
     </message>
     <message>
       <source>Structure</source>
-      <translation type="unfinished">Structure</translation>
+      <translation>Struktur</translation>
     </message>
     <message>
       <source>Welcome, %1!</source>
-      <translation type="unfinished">Welcome, %1!</translation>
+      <translation>Välkommen, %1!</translation>
     </message>
   </context>
   <context>
@@ -1219,7 +1219,7 @@
     </message>
     <message>
       <source>Log In to Cloud</source>
-      <translation type="unfinished">Log In to Cloud</translation>
+      <translation>Logga in i molnet</translation>
     </message>
   </context>
   <context>
@@ -1433,10 +1433,6 @@
     <message>
       <source>Tap and hold to select an area</source>
       <translation>Tryck och håll ned för att välja ett område</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Aktivera rörelsesökning först för att välja ett område</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>

@@ -19,7 +19,7 @@
     <name>AppInfoPage</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>О приложении</translation>
     </message>
   </context>
   <context>
@@ -300,7 +300,7 @@
     <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Настройки для разработчиков</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
@@ -312,11 +312,11 @@
     </message>
     <message>
       <source>Force Crash</source>
-      <translation type="unfinished">Force Crash</translation>
+      <translation>Принудительное завершение</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Уровень журналирования</translation>
     </message>
   </context>
   <context>
@@ -401,11 +401,11 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Закладки</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объекты</translation>
     </message>
   </context>
   <context>
@@ -580,7 +580,7 @@
     <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Оформление</translation>
     </message>
     <message>
       <source>Live Previews</source>
@@ -588,11 +588,11 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation type="unfinished">Show previews in the cameras list</translation>
+      <translation>Предпросмотр в списке камер</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Время сервера</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -742,7 +742,7 @@
     <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Производительность</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -786,15 +786,15 @@
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Сайты</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Уведомления</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Готово</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
@@ -814,7 +814,7 @@
     </message>
     <message>
       <source>SELECT</source>
-      <translation type="unfinished">SELECT</translation>
+      <translation>ВЫБРАТЬ</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
@@ -822,15 +822,15 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Да</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Нет</translation>
     </message>
     <message>
       <source>Save changes?</source>
-      <translation type="unfinished">Save changes?</translation>
+      <translation>Сохранить изменения?</translation>
     </message>
   </context>
   <context>
@@ -890,7 +890,7 @@
     <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Ничего не найдено</translation>
     </message>
   </context>
   <context>
@@ -921,7 +921,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Ресурсы</translation>
     </message>
     <message>
       <source>Timeline</source>
@@ -939,7 +939,7 @@
     <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Безопасность</translation>
     </message>
     <message>
       <source>Save Passwords</source>
@@ -947,7 +947,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation type="unfinished">Automatically log in to servers</translation>
+      <translation>Автоматический вход на серверы</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
@@ -955,11 +955,11 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Оставить</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Удалить</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
@@ -967,19 +967,19 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Рекомендованные</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+      <translation>Ваше подтверждение будет запрошено для закрепления самоподписанных сертификатов</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Строгий</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation type="unfinished">Connect only servers with public certificates</translation>
+      <translation>Подключайте только серверы с публичными сертификатами</translation>
     </message>
   </context>
   <context>
@@ -1435,10 +1435,6 @@
     <message>
       <source>Tap and hold to select an area</source>
       <translation>Нажмите и удерживайте, чтобы выбрать область</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Для выбора области сначала включите поиск движения</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>

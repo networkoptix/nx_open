@@ -300,7 +300,7 @@
     <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Fejlesztői beállítások</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Rendszernapló szintje</translation>
     </message>
   </context>
   <context>
@@ -399,11 +399,11 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Könyjelzők</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektumok</translation>
     </message>
   </context>
   <context>
@@ -586,11 +586,11 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation type="unfinished">Show previews in the cameras list</translation>
+      <translation>Az előnézetek megjelenítése a kamerák listájában</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Szerveridő</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -740,7 +740,7 @@
     <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Teljesítmény</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -788,11 +788,11 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Figylemeztetések</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Kész</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
@@ -812,7 +812,7 @@
     </message>
     <message>
       <source>SELECT</source>
-      <translation type="unfinished">SELECT</translation>
+      <translation>KIVÁLASZTÁS</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
@@ -820,15 +820,15 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Igen</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Nem</translation>
     </message>
     <message>
       <source>Save changes?</source>
-      <translation type="unfinished">Save changes?</translation>
+      <translation>Menti a módosításokat?</translation>
     </message>
   </context>
   <context>
@@ -888,7 +888,7 @@
     <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Nincs találat</translation>
     </message>
   </context>
   <context>
@@ -919,7 +919,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Források</translation>
     </message>
     <message>
       <source>Timeline</source>
@@ -937,7 +937,7 @@
     <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Biztonság</translation>
     </message>
     <message>
       <source>Save Passwords</source>
@@ -945,7 +945,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation type="unfinished">Automatically log in to servers</translation>
+      <translation>Automatikus bejelentkezés a kiszolgálókra</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
@@ -953,11 +953,11 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Megtart</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Törlés</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
@@ -965,7 +965,7 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Ajánlott</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -1433,10 +1433,6 @@
     <message>
       <source>Tap and hold to select an area</source>
       <translation>Kattintson és tartsa nyomva egy terület kiválasztásához</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>A terület kiválasztásához először engedélyezze a mozgáskeresést</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>

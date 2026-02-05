@@ -1435,10 +1435,6 @@
       <translation type="unfinished">Tap and hold to select an area</translation>
     </message>
     <message>
-      <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
-    </message>
-    <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
