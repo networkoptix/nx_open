@@ -36,7 +36,10 @@ Item
     property string splashTitle
 
     property alias leftPanel: leftPanel
+    property alias leftPanelButtonIndicator: leftPanelButtonIndicator
+
     property alias rightPanel: rightPanel
+    property alias rightPanelButtonIndicator: rightPanelButtonIndicator
 
     property string leftControlIconSource
     property alias leftControlEnabled: defaultLeftControl.enabled
@@ -252,6 +255,16 @@ Item
             && root.leftPanel.interactive
             && leftPanel.isHidden
         onClicked: leftPanel.visible = true
+
+        Indicator
+        {
+            id: leftPanelButtonIndicator
+
+            anchors.topMargin: (parent.height - parent.icon.height) / 2
+            anchors.rightMargin: (parent.width - parent.icon.width) / 2
+            z: 1
+            visible: false
+        }
     }
 
     NxControls.Button
@@ -277,6 +290,16 @@ Item
             && root.rightPanel.interactive
             && rightPanel.isHidden
         onClicked: rightPanel.visible = true
+
+        Indicator
+        {
+            id: rightPanelButtonIndicator
+
+            anchors.topMargin: (parent.height - parent.icon.height) / 2
+            anchors.rightMargin: (parent.width - parent.icon.width) / 2
+            z: 1
+            visible: false
+        }
     }
 
     Popup

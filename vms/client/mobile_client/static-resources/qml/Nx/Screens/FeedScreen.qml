@@ -29,6 +29,11 @@ Page
     readonly property bool filtered: filterModel.filter !== PushNotificationFilterModel.All
     readonly property bool empty: notifications.count === 0
 
+    function openFilterMenu()
+    {
+        filterMenu.open()
+    }
+
     objectName: "feedScreen"
     title: qsTr("Feed")
 
@@ -56,7 +61,7 @@ Page
             visible: feedScreen.filtered
         }
 
-        onClicked: filterMenu.open()
+        onClicked: feedScreen.openFilterMenu()
     }
 
     states:
@@ -369,7 +374,7 @@ Page
         id: filterMenu
 
         parent: filterButton
-        y: filterButton.height
+        y: filterButton.visible ? filterButton.height : 0
         width: 240
 
         MenuItem

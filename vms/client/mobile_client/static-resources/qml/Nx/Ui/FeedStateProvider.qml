@@ -19,9 +19,10 @@ NxObject
     property alias user: notifications.user
     property int updateIntervalMs: 4000
 
-    readonly property string buttonIconSource: active
-        ? "image://skin/24x24/Outline/notification.svg?primary=light4"
-        : "image://skin/24x24/Outline/notification_off.svg?primary=light4"
+    property string iconColor: "light4"
+    readonly property string buttonIconSource: "image://skin/24x24/Outline/%1.svg?primary=%2"
+       .arg(active ? "notification" : "notification_off")
+       .arg(iconColor)
 
     readonly property string buttonIconIndicatorText: active && unviewedCount > 0
         ? (unviewedCount > 9 ? "9+" : unviewedCount)
@@ -47,7 +48,7 @@ NxObject
         PushNotificationProvider
         {
             id: notifications
-            
+
             readonly property bool activeSession: windowContext.sessionManager.hasActiveSession
                 || windowContext.sessionManager.hasReconnectingSession
 
