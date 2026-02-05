@@ -1268,7 +1268,7 @@ RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
 
             if (!ignoreCachedData)
             {
-                if (auto context = contextPtr.lock(); !context->logonData.authCacheData.empty())
+                if (auto context = contextPtr.lock(); context && !context->logonData.authCacheData.empty())
                     useFastConnect = RemoteConnectionFactoryCache::fillContext(context);
             }
             else
