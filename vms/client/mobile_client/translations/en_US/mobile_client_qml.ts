@@ -1435,10 +1435,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Enable motion search first to select an area</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Invalid custom area. Please draw a correct one.</source>
         <translation></translation>
     </message>
