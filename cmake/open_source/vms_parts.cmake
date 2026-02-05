@@ -6,20 +6,17 @@ set(_withDistributions ON)
 set(_withDocumentation ON)
 set(_withMiniLauncher ON)
 set(_withSdk ON)
-set(_withUnitTestsArchive ON)
 
 if(developerBuild)
     set(_withDistributions OFF)
     set(_withDocumentation OFF)
     set(_withMiniLauncher OFF)
     set(_withSdk OFF)
-    set(_withUnitTestsArchive OFF)
 endif()
 
 # Windows distributions cannot be built without release libraries.
 if(WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(_withDistributions OFF)
-    set(_withUnitTestsArchive OFF)
 endif()
 
 option(withDesktopClient "Enable Desktop Client" ON)
@@ -27,7 +24,7 @@ option(withMobileClient "Enable Mobile Client" ON)
 option(withDistributions "Enable distributions" ${_withDistributions})
 option(withDocumentation "Generate documentation" ${_withDocumentation})
 option(withTests "Enable unit tests" ON)
-option(withUnitTestsArchive "Enable unit tests archive" ${_withUnitTestsArchive})
+option(withUnitTestsArchive "Enable unit tests archive" OFF)
 set(withRootTool "false") #< Required in the build_info.json.
 set(withPluginHost "true") #< Required in the build_info.json.
 
@@ -44,7 +41,6 @@ unset(_withMiniLauncher)
 unset(_withDistributions)
 unset(_withDocumentation)
 unset(_withSdk)
-unset(_withUnitTestsArchive)
 
 if(withUnitTestsArchive AND NOT withTests)
     message(WARNING "-DwithTests is OFF. Accordingly, switching OFF -DwithUnitTestsArchive option.")
