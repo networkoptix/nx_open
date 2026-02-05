@@ -234,11 +234,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Налаштування для розробників</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Рівень журналювання</translation>
     </message>
     <message>
       <source>Copy log ID</source>
@@ -458,7 +458,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation type="unfinished">Show previews in the cameras list</translation>
+      <translation>Показувати попередній перегляд у списку камер</translation>
     </message>
     <message>
       <source>Use server time</source>
@@ -547,7 +547,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Характеристики</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -595,11 +595,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Виконано</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation type="unfinished">SELECT</translation>
+      <translation>ОБРАТИ</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -611,7 +611,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation type="unfinished">Save changes?</translation>
+      <translation>Зберегти зміни?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -721,11 +721,11 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Безпека</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Рекомендовані</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -745,7 +745,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation type="unfinished">Automatically log in to servers</translation>
+      <translation>Автоматично заходити на сервери</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
@@ -753,7 +753,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Залишити</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -874,7 +874,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Безпека</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -894,7 +894,7 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Характеристики</translation>
     </message>
     <message>
       <source>App Info</source>

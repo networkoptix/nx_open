@@ -234,15 +234,15 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>การตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>ระดับล็อก</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation type="unfinished">Copy log ID</translation>
+      <translation>คัดลอก log ID</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
@@ -455,7 +455,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation type="unfinished">Show previews in the cameras list</translation>
+      <translation>แสดงตัวอย่างในรายการกล้อง</translation>
     </message>
     <message>
       <source>Use server time</source>
@@ -544,7 +544,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>ประสิทธิภาพ</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -592,11 +592,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>เสร็จ</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation type="unfinished">SELECT</translation>
+      <translation>เลือก</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -608,7 +608,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation type="unfinished">Save changes?</translation>
+      <translation>ต้องการบันทึกการเปลี่ยนแปลง?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -718,23 +718,23 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>ความปลอดภัย</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>แนะนำ</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+      <translation>การยืนยันของคุณจะถูกขอให้ปักหมุดใบรับรองที่ลงนามด้วยตนเอง</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>เข้มงวด</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation type="unfinished">Connect only servers with public certificates</translation>
+      <translation>เชื่อมต่อเฉพาะเซิร์ฟเวอร์ที่มี public certificates</translation>
     </message>
     <message>
       <source>Save passwords</source>
@@ -742,7 +742,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation type="unfinished">Automatically log in to servers</translation>
+      <translation>เข้าสู่โดยอัตโนมัติไปยังเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
@@ -750,7 +750,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>เก็บไว้</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -871,7 +871,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>ความปลอดภัย</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -891,7 +891,7 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>ประสิทธิภาพ</translation>
     </message>
     <message>
       <source>App Info</source>
