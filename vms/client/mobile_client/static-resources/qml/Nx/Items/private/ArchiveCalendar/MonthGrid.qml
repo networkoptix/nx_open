@@ -74,7 +74,7 @@ Item
                     width: 40
                     height: 40
                     radius: width / 2
-                    visible: calendarDay.current
+                    visible: calendarDay.current && model.display
                     color: ColorTheme.colors.light1
                 }
 
