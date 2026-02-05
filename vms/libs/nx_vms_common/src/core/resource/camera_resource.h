@@ -18,6 +18,7 @@
 #include <nx/core/resource/using_media2_type.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/socket_common.h>
+#include <nx/streaming/rtp/camera_time_helper.h>
 #include <nx/utils/lockable.h>
 #include <nx/utils/mac_address.h>
 #include <nx/utils/safe_direct_connection.h>
@@ -883,6 +884,8 @@ public:
 
     QSize maxVideoResolution() const;
 
+    nx::streaming::rtp::TimeOffsetPtr getTimeOffset() const { return m_timeOffset; }
+
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
     void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
@@ -993,6 +996,7 @@ private:
     nx::utils::CachedValue<int> m_cachedBackupMegapixels;
     nx::utils::CachedValue<QnLiveStreamParams> m_primaryStreamConfiguration;
     nx::utils::CachedValue<QnLiveStreamParams> m_secondaryStreamConfiguration;
+    nx::streaming::rtp::TimeOffsetPtr m_timeOffset;
 
     mutable nx::Mutex m_cachedValueMutex;
 };

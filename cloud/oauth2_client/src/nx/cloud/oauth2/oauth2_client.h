@@ -84,9 +84,9 @@ public:
 
 class NX_OAUTH2_CLIENT_API Oauth2Client:
     public AbstractOauth2Client,
-    public nx::network::http::GenericApiClient<db::client::ResultCodeDescriptor>
+    public nx::cloud::db::client::ApiRequestsExecutor
 {
-    using base_type = nx::network::http::GenericApiClient<db::client::ResultCodeDescriptor>;
+    using base_type = nx::cloud::db::client::ApiRequestsExecutor;
 
 public:
     Oauth2Client(

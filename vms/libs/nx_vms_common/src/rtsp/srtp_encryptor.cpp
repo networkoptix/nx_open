@@ -9,8 +9,7 @@
 
 using namespace nx::rtp;
 
-namespace nx::vms::server::rtsp
-{
+namespace nx::rtsp {
 
 class SrtpInit
 {
@@ -139,4 +138,4 @@ bool SrtpEncryptor::decryptPacket(uint8_t* data, int* inOutSize)
     return error == 0;
 }
 
-} // namespace nx::vms::server::rtsp
+} // namespace nx::rtsp

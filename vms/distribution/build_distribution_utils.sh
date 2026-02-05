@@ -445,6 +445,7 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         libonvif
         libnx_onvif
         libnx_ldap
+        libnx_webrtc
         libnx_json_rpc
         libnx_cloud_storage_client
         libnx_mediaserver_deployment_service_client

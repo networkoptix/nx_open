@@ -18,7 +18,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
-using namespace nx::vms::server::rtsp;
+using namespace nx::rtsp;
 
 static const int kVideoPayloadType = 96;
 static const int kAudioPayloadType = 97;
@@ -551,7 +551,7 @@ FfmpegMuxer::PacketTimestamp QnUniversalRtpEncoder::getLastTimestamps() const
     return m_transcoder.muxer().getLastPacketTimestamp();
 }
 
-nx::vms::server::rtsp::SrtpEncryptor* QnUniversalRtpEncoder::encryptor() const
+nx::rtsp::SrtpEncryptor* QnUniversalRtpEncoder::encryptor() const
 {
     return m_encryptor.get();
 }

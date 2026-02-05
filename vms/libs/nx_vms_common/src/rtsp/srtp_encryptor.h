@@ -7,8 +7,7 @@
 #include <nx/utils/byte_array.h>
 #include <srtp2/srtp.h>
 
-namespace nx::vms::server::rtsp
-{
+namespace nx::rtsp {
 
 constexpr int kSrtpAes128KeyLen = 16;
 constexpr int kSrtpSaltLen = 14;
@@ -40,4 +39,4 @@ private:
     bool m_isClient = false;
 };
 
-} // namespace nx::vms::server::rtsp
+} // namespace nx::rtsp

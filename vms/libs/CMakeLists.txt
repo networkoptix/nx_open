@@ -29,3 +29,7 @@ endif()
 if (withMediaServer OR withDesktopClient OR withMobileClient)
     add_subdirectory(nx_vms_rules)
 endif()
+
+if (withMediaServer)
+    add_subdirectory(nx_webrtc)
+endif()

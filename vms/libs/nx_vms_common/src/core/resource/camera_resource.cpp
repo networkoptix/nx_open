@@ -466,7 +466,8 @@ QnVirtualCameraResource::QnVirtualCameraResource():
         {
             return QJson::deserialized<QnLiveStreamParams>(
                 getProperty(nx::vms::api::device_properties::kSecondaryStreamConfiguration).toUtf8());
-        })
+        }),
+    m_timeOffset(std::make_shared<nx::streaming::rtp::TimeOffset>())
 {
     NX_VERBOSE(this, "Creating");
     addFlags(Qn::network);
