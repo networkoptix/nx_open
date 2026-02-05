@@ -37,11 +37,11 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Beta Özellikleri</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation type="unfinished">Video Download</translation>
+      <translation>Video İndirme</translation>
     </message>
     <message>
       <source>Download video to this device</source>
@@ -234,15 +234,15 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Geliştirici Ayarları</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Kayıt düzeyi</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation type="unfinished">Copy log ID</translation>
+      <translation>Günlük ID kopyala</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
@@ -441,7 +441,7 @@
     <name>FiltersScreen</name>
     <message>
       <source>Search Filters</source>
-      <translation type="unfinished">Search Filters</translation>
+      <translation>Arama Filtreleri</translation>
     </message>
     <message>
       <source>Shared Only</source>
@@ -511,11 +511,11 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Arayüz</translation>
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation type="unfinished">Show previews in the cameras list</translation>
+      <translation>Kamera listesinde canlı önizlemeyi göster</translation>
     </message>
     <message>
       <source>Live Previews</source>
@@ -523,7 +523,7 @@
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Sunucu Saati</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
@@ -634,7 +634,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Performans</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -682,11 +682,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Tamamlandı</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation type="unfinished">SELECT</translation>
+      <translation>SEÇ</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -698,7 +698,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation type="unfinished">Save changes?</translation>
+      <translation>Değişiklikler kaydedilsin mi?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -774,7 +774,7 @@
     <name>ResourceTreeSheet</name>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Kaynaklar</translation>
     </message>
     <message>
       <source>Nothing Found</source>
@@ -819,31 +819,31 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Güvenlik</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Önerilen</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+      <translation>Kendinden imzalı sertifikaları sabitlemek için onayınız istenecek</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Sıkı</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation type="unfinished">Connect only servers with public certificates</translation>
+      <translation>Yalnızca genel sertifikalara sahip sunucuları bağlayın</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation type="unfinished">Automatically log in to servers</translation>
+      <translation>Sunuculara otomatik olarak oturum aç</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Tut</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -968,7 +968,7 @@
     </message>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Güvenlik</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -976,15 +976,15 @@
     </message>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Beta Özellikleri</translation>
     </message>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Arayüz</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Performans</translation>
     </message>
     <message>
       <source>Notifications</source>
