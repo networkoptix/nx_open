@@ -104,9 +104,7 @@ TreeViewDelegate
 
             Label
             {
-                textFormat: highlightRegExp
-                    ? Text.RichText
-                    : Text.PlainText
+                textFormat: Text.StyledText
                 anchors.verticalCenter: parent.verticalCenter
                 text: highlightRegExp
                     ? NxGlobals.highlightMatch(model.display, highlightRegExp, ColorTheme.colors.yellow_l)
