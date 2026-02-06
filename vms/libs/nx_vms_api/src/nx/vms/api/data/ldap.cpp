@@ -7,6 +7,17 @@
 
 namespace nx::vms::api {
 
+namespace {
+
+QString syncIdPart(const QString& field, std::string_view fieldName)
+{
+    if (field.isEmpty())
+        return {};
+    return NX_FMT("%1=%2", fieldName, field);
+}
+
+} // namespace
+
 bool LdapSettings::isValid(bool checkPassword) const
 {
     return uri.isValid()
@@ -36,7 +47,8 @@ QString LdapSettings::syncId() const
     if (!isValid(/*checkPassword*/ false))
         return {};
 
-    QString data = uri.toString() + adminDn + loginAttribute + groupObjectClass + memberAttribute;
+    QString data = uri.toString() + adminDn + loginAttribute + groupObjectClass + memberAttribute
+        + syncIdPart(userIdAttribute, "uidattr") + syncIdPart(groupIdAttribute, "gidattr");
     for (const auto& filter: nx::utils::unique_sorted(filters, cmpFilters))
         data += filter.base + filter.filter;
     return nx::Uuid::fromArbitraryData(data.toUtf8()).toSimpleString();
