@@ -59,6 +59,10 @@ public:
 
     std::size_t count() const;
 
+    // Function is returned after handler is called for each connection. Handler is called from
+    // each connection AIO thread.
+    void forEachConnection(nx::MoveOnlyFunc<void(WebSocketConnection*)> handler);
+
 private:
     struct Connection
     {

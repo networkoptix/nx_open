@@ -699,7 +699,8 @@ static void registerServerRestHandlers(
     QnMediaServerModule* serverModule,
     nx::vms::network::AbstractServerConnector* serverConnector,
     CloudManagerGroup* cloudManagerGroup,
-    MediaServerProcess* process)
+    nx::vms::server::json_rpc::Connections* jsonRpcConnections,
+    std::function<void()> restartServerFunc)
 {
     const auto reg = processorPool->createRegisterHandlerFunctor();
 
@@ -1299,7 +1300,7 @@ static void registerServerRestHandlers(
      * %permissions Administrator with a fresh session.
      */
     reg("rest/v{1-}/servers/:id/reset", GlobalPermission::administratorWithFreshSession,
-        std::make_unique<ServerResetHandler>(serverModule, serverConnector, process));
+        std::make_unique<ServerResetHandler>(serverModule, serverConnector, restartServerFunc));
 
     /**%apidoc POST /rest/v{1-}/servers/{id}/restart
      * Restarts the Server specified by {id}.
@@ -1312,7 +1313,7 @@ static void registerServerRestHandlers(
      * %permissions Power User with a fresh session.
      */
     reg("rest/v{1-}/servers/:id/restart", GlobalPermission::powerUserWithFreshSession,
-        std::make_unique<ServerRestartHandler>(serverModule, serverConnector, process));
+        std::make_unique<ServerRestartHandler>(serverModule, serverConnector, restartServerFunc));
 
     /**%apidoc[proprietary] GET /rest/v{2-}/servers/{id}/p2pStats
      * %caption Get Server P2P stats
@@ -1336,6 +1337,26 @@ static void registerServerRestHandlers(
      */
     reg("rest/v{2-}/servers/:id/p2pStats", GlobalPermission::powerUser,
         std::make_unique<P2pStatsHandler>(serverConnector));
+
+    /**%apidoc[proprietary] GET /rest/v{4-}/servers/{id}/jsonRpcStats
+     * %caption Server JSON-RPC stats
+     * %ingroup Servers
+     * %param:string id Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`,
+     *     or be `this` to refer to the current Server.
+     *     %example this
+     * %param[ref] _format,_language,_local,_pretty,_strict,_stripDefault,_ticket,_with
+     * %permissions Power User.
+     * %return:{JsonRpcStats} Server JSON-RPC statistics.
+     *
+     **%apidoc[proprietary] GET /rest/v{4-}/servers/%2A/jsonRpcStats
+     * %caption All Servers' JSON-RPC stats
+     * %ingroup Servers
+     * %param[ref] _filter,_format,_language,_local,_pretty,_strict,_stripDefault,_ticket,_with
+     * %permissions Power User.
+     * %return:{JsonRpcStatsList} List of Server JSON-RPC statistics.
+     */
+    reg("rest/v{4-}/servers/:id/jsonRpcStats", GlobalPermission::powerUser,
+        std::make_unique<JsonRpcStatsHandler>(serverConnector, jsonRpcConnections));
 
     /**%apidoc[proprietary] GET /rest/v{2-}/servers/{id}/iniConfig
      * Intended for debugging and experimenting. Retrieves the current state of the IniConfig

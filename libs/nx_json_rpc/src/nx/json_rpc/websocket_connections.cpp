@@ -5,6 +5,7 @@
 #include <nx/network/websocket/websocket.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/json/qt_core_types.h>
+#include <nx/utils/thread/barrier_handler.h>
 
 #include "websocket_connection.h"
 
@@ -142,6 +143,23 @@ void WebSocketConnections::clear()
     }
     for (auto& [_, connection]: connections)
         connection.stop();
+}
+
+void WebSocketConnections::forEachConnection(nx::MoveOnlyFunc<void(WebSocketConnection*)> handler)
+{
+    nx::utils::BarrierWaiter barrier{};
+    auto sharedHandler =
+        std::make_shared<nx::MoveOnlyFunc<void(WebSocketConnection*)>>(std::move(handler));
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    for (auto& [_, c]: m_connections)
+    {
+        c.connection->dispatch(
+            [c = c.connection.get(), sharedHandler, f = barrier.fork()]()
+            {
+                (*sharedHandler)(c);
+                f();
+            });
+    }
 }
 
 void WebSocketConnections::Connection::stop()
