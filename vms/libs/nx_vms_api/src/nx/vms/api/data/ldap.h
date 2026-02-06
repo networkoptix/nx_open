@@ -97,6 +97,20 @@ struct NX_VMS_API LdapSettings
      */
     QString memberAttribute;
 
+    /**%apidoc[opt]
+     * LDAP User attribute to calculate VMS id.
+     * Changing the value leads to the creation of new Users.
+     * %example objectGUID
+     */
+    QString userIdAttribute;
+
+    /**%apidoc[opt]
+     * LDAP Group attribute to calculate VMS id.
+     * Changing the value leads to the creation of new Groups.
+     * %example objectGUID
+     */
+    QString groupIdAttribute;
+
     /**%apidoc[opt] */
     std::chrono::milliseconds passwordExpirationPeriodMs = 5min;
 
@@ -171,6 +185,8 @@ struct NX_VMS_API LdapSettings
     (loginAttribute) \
     (groupObjectClass) \
     (memberAttribute) \
+    (userIdAttribute) \
+    (groupIdAttribute) \
     (passwordExpirationPeriodMs) \
     (searchTimeoutS) \
     (responseTimeoutS) \
