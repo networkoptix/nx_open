@@ -1150,10 +1150,6 @@ CameraDiagnostics::Result RtspResourceStreamProvider::openStream()
 {
     setUrl(m_resource->getUrl());
 
-    // Set credentials from resource only if not already forced.
-    if (!m_credentials)
-        setCredentials(nx::network::http::Credentials(m_resource->getAuth()));
-
     m_RtpSession.setMediaTypeEnabled(
         nx::rtp::Sdp::MediaType::Audio,
         m_resource->isAudioRequired());
@@ -1434,6 +1430,12 @@ void RtspResourceStreamProvider::processCameraTimeHelperEvent(
     default:
         return;
     }
+}
+
+std::optional<nx::network::http::Credentials> RtspResourceStreamProvider::credentials() const
+{
+    return base_type::credentials().value_or(
+        nx::network::http::Credentials(resource()->getAuth()));
 }
 
 } // namespace nx::streaming
