@@ -15,13 +15,13 @@
       <source>%n Object Attributes</source>
       <comment>%n is number of attributes</comment>
       <translation type="unfinished">
-        <numerusform>%n Object Attributes</numerusform>
+        <numerusform>%n Atributos del objeto</numerusform>
         <numerusform>%n Object Attributes</numerusform>
       </translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Solo compartido</translation>
     </message>
   </context>
   <context>
@@ -35,18 +35,18 @@
     <name>nx::vms::client::mobile::MediaDownloadBackend</name>
     <message>
       <source>Can&apos;t download video</source>
-      <translation type="unfinished">Can&apos;t download video</translation>
+      <translation>El viedo no se puede descargar</translation>
     </message>
     <message>
       <source>Please check a network connection.</source>
-      <translation type="unfinished">Please check a network connection.</translation>
+      <translation>Por favor, comprueba la conexión a Internet.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::PtzCameraButtonController</name>
     <message>
       <source>Control PTZ</source>
-      <translation type="unfinished">Control PTZ</translation>
+      <translation>Controlar PTZ</translation>
     </message>
   </context>
   <context>
@@ -73,7 +73,7 @@
     <message>
       <source>Expires in %1</source>
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>Caduca el %1</translation>
     </message>
     <message>
       <source>Error</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>No se puede compartir el marcador.</translation>
     </message>
   </context>
   <context>
@@ -93,7 +93,7 @@
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>No se puede conectar al sistema &quot;%1&quot;</translation>
     </message>
   </context>
 </TS>
