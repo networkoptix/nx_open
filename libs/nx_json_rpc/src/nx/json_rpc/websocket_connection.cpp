@@ -3,6 +3,7 @@
 #include "websocket_connection.h"
 
 #include <nx/network/websocket/websocket.h>
+#include <nx/ranges/std_compat.h>
 
 #include "detail/outgoing_processor.h"
 #include "incoming_processor.h"
@@ -14,9 +15,12 @@ using namespace detail;
 namespace {
 
 void logMessage(
-    const char* action, const nx::network::SocketAddress& address, const nx::Buffer& buffer)
+    const char* action,
+    const nx::network::SocketAddress& address,
+    const size_t id,
+    const nx::Buffer& buffer)
 {
-    NX_DEBUG(nx::log::kHttpTag, "JSON-RPC %1 %2\n%3", action, address,
+    NX_DEBUG(nx::log::kHttpTag, "JSON-RPC %1 %2 %%3\n%4", action, address, id,
         nx::log::isToBeLogged(nx::log::Level::verbose, nx::log::kHttpTag)
             ? buffer
             : buffer.substr(0, 1024 * 5)); //< Should be enough for 5 devices.
@@ -135,6 +139,7 @@ void WebSocketConnection::send(
             handler = std::move(handler),
             serializedRequest = std::move(serializedRequest)]() mutable
         {
+            ++m_outRequests;
             m_outgoingProcessor->processRequest(
                 std::move(request), std::move(handler), std::move(serializedRequest));
         });
@@ -146,6 +151,7 @@ void WebSocketConnection::send(
     dispatch(
         [this, jsonRpcRequests = std::move(jsonRpcRequests), handler = std::move(handler)]() mutable
         {
+            m_outRequests += jsonRpcRequests.size();
             m_outgoingProcessor->processBatchRequest(std::move(jsonRpcRequests), std::move(handler));
         });
 }
@@ -175,7 +181,7 @@ void WebSocketConnection::readNextMessage()
 
 void WebSocketConnection::readHandler(const nx::Buffer& buffer)
 {
-    logMessage("receive from", m_address, buffer);
+    logMessage("receive from", m_address, id, buffer);
     rapidjson::Document data;
     data.Parse(buffer.data(), buffer.size());
     if (data.HasParseError())
@@ -204,6 +210,10 @@ void WebSocketConnection::readHandler(const nx::Buffer& buffer)
 
 void WebSocketConnection::processRequest(rapidjson::Document data)
 {
+    if (data.IsArray())
+        m_inRequests += data.Size();
+    else
+        ++m_inRequests;
     m_queuedRequests.push(std::move(data));
     if (m_queuedRequests.size() == 1)
         processQueuedRequest();
@@ -226,7 +236,7 @@ void WebSocketConnection::send(std::string data)
 {
     auto buffer = std::make_unique<nx::Buffer>(std::move(data));
     auto bufferPtr = buffer.get();
-    logMessage("send to", m_address, *bufferPtr);
+    logMessage("send to", m_address, id, *bufferPtr);
     m_socket->sendAsync(bufferPtr,
         [buffer = std::move(buffer), this](auto errorCode, auto /*bytesTransferred*/)
         {
@@ -261,6 +271,18 @@ void WebSocketConnection::removeGuard(const QString& id)
             NX_VERBOSE(this, "Removing guard for %1", id);
             m_guards.erase(id);
         });
+}
+
+WebSocketConnectionStats WebSocketConnection::stats() const
+{
+    auto output = m_socket->outputStatistics();
+    return {
+        .guards = m_guards | std::views::keys | nx::ranges::to<std::vector>(),
+        .inRequests = m_inRequests,
+        .outRequests = m_outRequests,
+        .totalInB = output.totalIn,
+        .totalOutB = output.totalOut,
+    };
 }
 
 } // namespace nx::json_rpc
