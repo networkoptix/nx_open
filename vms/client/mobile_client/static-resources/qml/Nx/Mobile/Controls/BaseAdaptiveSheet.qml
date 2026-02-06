@@ -137,6 +137,7 @@ Drawer
 
             anchors.fill: parent
             anchors.bottomMargin: content.footer ? control.spacing : 0
+            interactive: control.interactive
             clip: true
             contentHeight: contentColumn.height
 

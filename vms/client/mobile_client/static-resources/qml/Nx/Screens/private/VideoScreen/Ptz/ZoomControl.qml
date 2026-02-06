@@ -11,7 +11,6 @@ GenericValueControl
     readonly property bool zoomInPressed: upButton.down
     readonly property bool zoomOutPressed: downButton.down
 
-    centralAreaText: "ZOOM"
-    upButton.icon.source: lp("/images/ptz/ptz_zoom_plus.png")
-    downButton.icon.source: lp("/images/ptz/ptz_zoom_minus.png")
+    upButton.icon.source: "image://skin/ptz/ptz_zoom_plus.svg"
+    downButton.icon.source: "image://skin/ptz/ptz_zoom_minus.svg"
 }

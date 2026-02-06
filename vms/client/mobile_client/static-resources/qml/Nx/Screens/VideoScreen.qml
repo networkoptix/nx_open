@@ -87,7 +87,7 @@ Page
             if (offline)
             {
                 offlineStatusDelay.restart()
-                ptzPanel.moveOnTapMode = false
+                ptzSheet.ptz.moveOnTapMode = false
             }
             else
             {
@@ -236,6 +236,18 @@ Page
                     controller.mediaPlayer,
                     controller.resourceHelper.audioSupported,
                     controller.audioController)
+            }
+        }
+
+        MenuItem
+        {
+            text: qsTr("PTZ Mode")
+            visible: ptzSheet.available
+            height: visible ? implicitHeight : 0
+            onClicked:
+            {
+                d.mode = VideoScreenUtils.VideoScreenMode.Ptz
+                video.to1xScale()
             }
         }
 
@@ -641,6 +653,8 @@ Page
             objectsType: videoScreen.selectedObjectsType
 
             interactive: !objectsTypeSheet.opened && !timelineObjectSheet.opened
+                && !ptzSheet.opened
+
             timeZone: video.resourceHelper.timeZone
 
             onObjectTileTapped: (data) =>
@@ -1001,17 +1015,14 @@ Page
             }
         }
 
-        PtzPanel
+        PtzSheet
         {
-            id: ptzPanel
+            id: ptzSheet
 
             preloaders.parent: video
             preloaders.height: video.fitSize ? video.fitSize.height : 0
             preloaders.x: (video.width - preloaders.width) / 2
             preloaders.y: (video.height - preloaders.height) / 3
-
-            width: parent.width
-            anchors.bottom: parent.bottom
 
             controller.resource: controller.resource
             customRotation: controller.resourceHelper.customRotation
@@ -1019,11 +1030,11 @@ Page
             opacity: d.controlsOpacity
             visible: opacity > 0 && d.ptzMode
 
-            onCloseButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Navigation
+            onClosed: d.mode = VideoScreenUtils.VideoScreenMode.Navigation
 
-            onMoveOnTapModeChanged:
+            ptz.onMoveOnTapModeChanged:
             {
-                if (ptzPanel.moveOnTapMode)
+                if (ptz.moveOnTapMode)
                 {
                     moveOnTapOverlay.open()
                     video.fitToBounds()
@@ -1062,7 +1073,7 @@ Page
                 if (!data)
                     return
 
-                ptzPanel.moveViewport(data.viewport, data.aspect)
+                ptzSheet.ptz.moveViewport(data.viewport, data.aspect)
                 preloader.pos = contentItem.mapToItem(preloader.parent, pos.x, pos.y)
                 preloader.visible = true
             }
@@ -1072,7 +1083,7 @@ Page
                 if (moveOnTapOverlay.visible)
                     return
 
-                ptzPanel.moveOnTapMode = false
+                ptzSheet.ptz.moveOnTapMode = false
             }
         }
     }

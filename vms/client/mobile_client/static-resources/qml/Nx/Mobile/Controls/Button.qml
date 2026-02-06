@@ -30,6 +30,7 @@ T.AbstractButton
 
     property color backgroundColor: parameters.colors[state]
     property color foregroundColor: parameters.textColors[state]
+    property real radius: 6
 
     property color borderColor: parameters.borderColors
         ? (parameters.borderColors[state] ?? "transparent")
@@ -52,8 +53,8 @@ T.AbstractButton
 
     background: Rectangle
     {
-        radius: 6
         color: control.backgroundColor
+        radius: control.radius
         border.color: control.borderColor
     }
 

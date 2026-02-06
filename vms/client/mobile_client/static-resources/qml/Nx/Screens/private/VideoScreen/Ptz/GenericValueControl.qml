@@ -1,74 +1,78 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
+import QtQuick
+import QtQuick.Controls
 
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx.Core
+import Nx.Mobile.Controls
 
-Rectangle
+import Qt5Compat.GraphicalEffects
+
+Control
 {
     id: control
 
     property bool enableValueControls: true
     property bool showCentralArea: false
-    property alias centralAreaText: centralText.text
-    property Item centralArea: null
+    property alias centralArea: centralArea.contentItem
 
     property alias upButton: upButtonControl
     property alias downButton: downButtonControl
 
-    color: ColorTheme.transparent(ColorTheme.colors.dark8, 0.8)
-
-    implicitWidth: 56
-    implicitHeight: 136
-
-    radius: 28
-
-    MouseArea
+    component ValueButton: Button
     {
-        id: clickEventsOmitter
-
-        anchors.fill: parent
-    }
-
-    IconButton
-    {
-        id: upButtonControl
-
-        width: control.width
-        height: width
+        type: Button.Type.LightInterface
+        radius: 0
         padding: 0
         enabled: control.enableValueControls
         opacity: enabled ? 1 : 0.3
+        icon.width: 24
+        icon.height: 24
     }
 
-    Text
+    contentItem: Column
     {
-        id: centralText
+        spacing: 2
 
-        anchors.centerIn: parent
-        visible: !control.showCentralArea
-        opacity: 0.5
-        font: Qt.font({pixelSize: 12, weight: Font.Bold})
-        color: ColorTheme.colors.light16
+        ValueButton
+        {
+            id: upButtonControl
+
+            width: 52
+            height: 56
+            topPadding: 2
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        Control
+        {
+            id: centralArea
+
+            width: 52
+            height: 48
+            visible: control.showCentralArea
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        ValueButton
+        {
+            id: downButtonControl
+
+            width: 52
+            height: 56
+            bottomPadding: 2
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
     }
 
-    IconButton
+    layer.enabled: true
+    layer.effect: OpacityMask
     {
-        id: downButtonControl
-
-        width: control.width
-        height: width
-        anchors.bottom: parent.bottom
-        padding: 0
-        enabled: control.enableValueControls
-        opacity: enabled ? 1 : 0.3
-    }
-
-    onCentralAreaChanged:
-    {
-        centralArea.parent = control
-        centralArea.anchors.centerIn = control
-        centralArea.visible = Qt.binding(function() { return control.showCentralArea })
+        maskSource: Rectangle
+        {
+            width: control.width
+            height: control.height
+            radius: 24
+        }
     }
 }

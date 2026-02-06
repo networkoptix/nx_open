@@ -81,7 +81,7 @@ void ResourcePtzController::setRawResource(QnResource* value)
 
 bool ResourcePtzController::available() const
 {
-    return m_availabilityWatcher->available();
+    return m_availabilityWatcher && m_availabilityWatcher->available();
 }
 
 Ptz::Traits ResourcePtzController::auxTraits() const

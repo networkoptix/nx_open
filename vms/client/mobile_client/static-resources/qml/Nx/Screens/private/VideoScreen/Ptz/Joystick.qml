@@ -3,7 +3,7 @@
 import QtQuick 2.6
 import QtQuick.Window 2.0
 
-import Nx.Core 1.0
+import Nx.Core
 
 import "joystick_utils.js" as JoystickUtils
 
@@ -22,11 +22,12 @@ Rectangle
     }
     property int joystickType: JoystickUtils.Type.Any
     property real customRotation: 0
+    readonly property bool active: mouseArea.pressed
 
-    implicitWidth: 136
+    implicitWidth: 112
     implicitHeight: implicitWidth
     radius: width / 2
-    color: ColorTheme.transparent(ColorTheme.colors.dark8, 0.8)
+    color: ColorTheme.colors.dark12
 
     Canvas
     {
@@ -64,10 +65,7 @@ Rectangle
                 ? d.centerPoint
                 : d.centerPoint.minus(d.radialVector)
 
-            var startColor = ColorTheme.transparent(ColorTheme.colors.light1, 0.0)
-            var finishColor = ColorTheme.transparent(ColorTheme.colors.light1, 0.2)
-            context.fillStyle = createGradient(context, gradientStartPoint, d.radialPosition,
-                startColor, finishColor)
+            context.fillStyle = ColorTheme.colors.dark14
 
             var angle = JoystickUtils.getAngle(d.radialVector)
             var angleOffset = customCanvas.drawButtonBorders
@@ -78,15 +76,6 @@ Rectangle
             var startAngle = angle - angleOffset
             var finishAngle = angle + angleOffset
             drawSegment(context, d.centerPoint, control.radius, startAngle, finishAngle)
-        }
-
-        function createGradient(context, startPoint, finishPoint, startColor, endColor)
-        {
-            var gradient = context.createLinearGradient(
-                startPoint.x, startPoint.y, finishPoint.x, finishPoint.y)
-            gradient.addColorStop(0, startColor)
-            gradient.addColorStop(1, endColor)
-            return gradient
         }
 
         function drawSegment(context, center, radius, startAngle, finishAngle)
@@ -181,12 +170,18 @@ Rectangle
             color: ColorTheme.transparent(ColorTheme.colors.light1, 0.2)
         }
 
-        Image
+        Rectangle
         {
             id: circleMarker
 
             anchors.centerIn: parent
-            source: lp("/images/ptz/ptz_circle.png")
+
+            width: 16
+            height: width
+            radius: width / 2
+            color: "transparent"
+            border.color: ColorTheme.colors.dark9
+            border.width: 2
         }
     }
 
@@ -197,7 +192,8 @@ Rectangle
         property vector2d position: d.radialVector.times(
             1 + 0.15 * (d.dragging ? d.movementVector.length() : 1)).plus(d.centerPoint)
 
-        source: lp("/images/ptz/ptz_arrow.png")
+        source: "image://skin/ptz/ptz_arrow.svg?primary=light1"
+        sourceSize: Qt.size(24, 24)
 
         x: position.x - width / 2
         y: position.y - height / 2
@@ -224,7 +220,7 @@ Rectangle
 
         anchors.fill: parent
 
-        onPressed:
+        onPressed: (mouse) =>
         {
             var mousePos = Qt.vector2d(mouseX, mouseY) //< Use explicit value to avoid dependencies
             if (JoystickUtils.pointInCircle(mousePos, d.centerPoint, d.markerRadius))
@@ -259,7 +255,7 @@ Rectangle
 
         delegate: Image
         {
-            property real offset: marker.height / 2 + 16 + 16
+            property real offset: control.height / 2 - height / 2 - 8
 
             property int buttonDirection:
                 d.currentSectionData
@@ -275,7 +271,8 @@ Rectangle
                 ? Qt.vector2d(buttonDirection == JoystickUtils.Direction.Left ? -offset : offset, 0)
                 : Qt.vector2d(0, buttonDirection == JoystickUtils.Direction.Top ? -offset : offset))
 
-            source: lp("/images/ptz/ptz_arrow_dimmed.png")
+            source: "image://skin/ptz/ptz_arrow.svg?primary=light1"
+            sourceSize: Qt.size(24, 24)
 
             x: position.x - width / 2
             y: position.y - height / 2

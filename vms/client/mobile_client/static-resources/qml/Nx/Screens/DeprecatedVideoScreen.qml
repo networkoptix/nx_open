@@ -468,13 +468,14 @@ Page
             width: parent.width
             anchors.bottom: parent.bottom
 
+            leftPadding: 20
+            rightPadding: 20
+
             controller.resource: controller.resource
             customRotation: controller.resourceHelper.customRotation
 
             opacity: Math.min(d.uiOpacity, d.controlsOpacity)
             visible: opacity > 0 && d.ptzMode
-
-            onCloseButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Navigation
 
             onMoveOnTapModeChanged:
             {
@@ -489,6 +490,23 @@ Page
                     showUi()
                     moveOnTapOverlay.close()
                 }
+            }
+
+            IconButton
+            {
+                id: hidePtzButton
+
+                anchors.bottom: parent.top
+                anchors.right: parent.right
+
+                width: 64
+                height: 64
+
+                icon.source: "image://skin/32x32/Outline/close.svg?primary=light10"
+                icon.width: 32
+                icon.height: 32
+
+                onClicked: d.mode = VideoScreenUtils.VideoScreenMode.Navigation
             }
         }
 

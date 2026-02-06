@@ -1,9 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx.Mobile.Controls
 
 GenericValueControl
 {
@@ -14,20 +11,19 @@ GenericValueControl
     readonly property bool focusInPressed: control.upButton.down
     readonly property bool focusOutPressed: control.downButton.down
 
-    centralAreaText: "FOCUS"
-
     signal autoFocusClicked()
 
-    upButton.icon.source: lp("/images/ptz/ptz_plus.png")
-    downButton.icon.source: lp("/images/ptz/ptz_minus.png")
+    upButton.icon.source: "image://skin/24x24/Outline/plus.svg"
+    downButton.icon.source: "image://skin/24x24/Outline/minus.svg"
 
-    centralArea: IconButton
+    centralArea: Button
     {
-        width: control.width
-        height: width
-        padding: 0
-        icon.source: lp("/images/ptz/af_off.png")
-
-        onClicked: { control.autoFocusClicked() }
+        text: qsTr("AF") //< Autofocus.
+        type: Button.Type.LightInterface
+        radius: 0
+        leftPadding: 0
+        rightPadding: 0
+        font.pixelSize: 16
+        onClicked: control.autoFocusClicked()
     }
 }
