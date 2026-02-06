@@ -88,14 +88,12 @@ PushSystemsSelectionModel::PushSystemsSelectionModel(QObject* parent):
     base_type(parent),
     d(new Private{this})
 {
-
     d->systems = sortedByName(appContext()->cloudStatusWatcher()->recentCloudSystems());
 
     for (int row = 0; row != d->systems.size(); ++row)
         d->systemRowHash.insert(d->systems[row].cloudId, row);
 
-
-    setSelectedSystems(appContext()->pushManager()->selectedSystems());
+    reset();
 }
 
 PushSystemsSelectionModel::~PushSystemsSelectionModel()
@@ -134,6 +132,12 @@ void PushSystemsSelectionModel::setSelectedSystems(const QStringList& value)
 bool PushSystemsSelectionModel::hasChanges() const
 {
     return d->hasChanges;
+}
+
+void PushSystemsSelectionModel::reset()
+{
+    setSelectedSystems(appContext()->pushManager()->selectedSystems());
+    resetChangesFlag();
 }
 
 void PushSystemsSelectionModel::resetChangesFlag()

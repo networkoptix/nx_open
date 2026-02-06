@@ -34,6 +34,7 @@ public:
 
     bool hasChanges() const;
 
+    Q_INVOKABLE void reset();
     Q_INVOKABLE void resetChangesFlag();
     Q_INVOKABLE void setCheckedState(int row, Qt::CheckState state);
 

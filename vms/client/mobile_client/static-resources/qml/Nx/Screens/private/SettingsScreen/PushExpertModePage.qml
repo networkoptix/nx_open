@@ -202,11 +202,7 @@ BaseSettingsPage
         }
     }
 
-    Component.onCompleted:
-    {
-        expertModeRadioButton.checked = appContext.pushManager.expertMode
-        simpleModeRadioButton.checked = !appContext.pushManager.expertMode
-    }
+    Component.onCompleted: d.reset()
 
     Connections
     {
@@ -314,10 +310,17 @@ BaseSettingsPage
                             d.tryApplyAndReturn()
                             break
                         case "goBackButton":
-                            // TODO: Reset ui state.
+                            reset()
                             pushExpertModePage.settingsSaved()
                     }
                 });
+        }
+
+        function reset()
+        {
+            expertModeRadioButton.checked = appContext.pushManager.expertMode
+            simpleModeRadioButton.checked = !appContext.pushManager.expertMode
+            d.selectionModel.reset()
         }
     }
 }
