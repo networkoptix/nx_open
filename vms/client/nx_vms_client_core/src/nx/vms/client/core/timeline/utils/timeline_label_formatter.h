@@ -42,6 +42,9 @@ public:
     /** Format timestamp for external uses (e.g. in object details sheet). */
     Q_INVOKABLE QString formatTimestamp(qint64 timestampMs, const QTimeZone& timeZone) const;
 
+    /** Format timestamp to display at the bottom of the video. */
+    Q_INVOKABLE QString formatCameraTimestamp(qint64 timestampMs, const QTimeZone& timeZone) const;
+
     QLocale locale() const;
     void setLocale(QLocale value);
 

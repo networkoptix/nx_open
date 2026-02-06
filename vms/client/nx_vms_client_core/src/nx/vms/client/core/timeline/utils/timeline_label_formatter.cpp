@@ -220,6 +220,12 @@ QString LabelFormatter::formatTimestamp(qint64 timestampMs, const QTimeZone& tim
         : d->locale.toString(dt, "d MMM yyyy, H:mm");
 }
 
+QString LabelFormatter::formatCameraTimestamp(qint64 timestampMs, const QTimeZone& timeZone) const
+{
+    const auto dt = QDateTime::fromMSecsSinceEpoch(timestampMs, timeZone);
+    return d->locale.toString(dt, QLocale::ShortFormat);
+}
+
 QLocale LabelFormatter::locale() const
 {
     return d->locale;

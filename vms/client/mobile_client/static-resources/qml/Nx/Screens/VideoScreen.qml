@@ -264,10 +264,12 @@ Page
     {
         id: video
 
+        readonly property bool shown: dummyLoader.status != Loader.Ready && !screenshot.visible
+
         width: parent.width
         height: width / (16.0 / 9.0)
 
-        visible: dummyLoader.status != Loader.Ready && !screenshot.visible
+        visible: video.shown
         opacity: d.cameraUiOpacity
 
         resourceHelper: controller.resourceHelper
@@ -904,11 +906,51 @@ Page
     {
         id: content
 
-        visible: false
-        anchors.fill: parent
         anchors.top: video.top
         anchors.bottom: video.bottom
         width: parent.width
+
+        Rectangle
+        {
+            id: bottomOverlayControls
+
+            height: 56
+            visible: video.shown
+
+            x: -windowParams.leftMargin
+            width: videoScreen.width
+            anchors.bottom: content.bottom
+
+            gradient: Gradient
+            {
+                GradientStop { position: 0.0; color: "transparent" }
+                GradientStop { position: 1.0; color: ColorTheme.colors.dark1 }
+            }
+
+            Text
+            {
+                id: timestampLabel
+
+                anchors.left: bottomOverlayControls.left
+                anchors.leftMargin: 14
+                anchors.bottom: bottomOverlayControls.bottom
+                anchors.bottomMargin: 9
+
+                font.pixelSize: 16
+                font.weight: Font.Medium
+
+                color: ColorTheme.colors.light4
+
+                text:
+                {
+                    if (controller.mediaPlayer.liveMode)
+                        return qsTr("LIVE")
+
+                    return timeline.labelFormatter.formatCameraTimestamp(
+                        controller.mediaPlayer.position, timeline.timeZone)
+                }
+            }
+        }
 
         Loader
         {
