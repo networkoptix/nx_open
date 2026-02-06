@@ -101,8 +101,9 @@ public:
 
     void setRequest(const QString& request);
     void setRole(Qn::ConnectionRole role);
+    // Force credentials. If credentials were not explicitly set, derived classes may use other
+    // sources to automatically obtain them.
     void setCredentials(const nx::network::http::Credentials& credentials);
-    std::optional<nx::network::http::Credentials> credentials() const;
     void setPreferredAuthScheme(const nx::network::http::header::AuthScheme::Value scheme);
 
     static void setDefaultTransport(nx::vms::api::RtpTransportType defaultTransportToUse);
@@ -168,6 +169,8 @@ protected:
     virtual void updateStreamUrlIfNeeded() {};
     virtual nx::streaming::rtp::TimePolicy getTimePolicy() const;
     virtual CameraDiagnostics::Result registerMulticastAddressesIfNeeded();
+
+    virtual std::optional<nx::network::http::Credentials> credentials() const;
 
 private:
     struct TrackInfo
@@ -285,6 +288,8 @@ protected:
     virtual CameraDiagnostics::Result registerMulticastAddressesIfNeeded() override;
     virtual void processCameraTimeHelperEvent(
         nx::streaming::rtp::CameraTimeHelper::EventType event) override;
+
+    virtual std::optional<nx::network::http::Credentials> credentials() const override;
 
 private:
     CameraDiagnostics::Result registerAddressIfNeeded(
