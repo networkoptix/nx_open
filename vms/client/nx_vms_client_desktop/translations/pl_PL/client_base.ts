@@ -1072,7 +1072,7 @@
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation>Zarządzanie witryną...</translation>
+      <translation>Zarządzanie systemem...</translation>
     </message>
     <message>
       <source>Site Update...</source>
@@ -8255,7 +8255,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site Administration</source>
-      <translation>Zarządzanie witryną</translation>
+      <translation>Zarządzanie systemem</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>

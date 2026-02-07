@@ -1924,7 +1924,7 @@
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation>Zarządzanie witryną</translation>
+      <translation>Zarządzanie systemem</translation>
     </message>
   </context>
   <context>
