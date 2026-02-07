@@ -515,6 +515,13 @@
     </message>
   </context>
   <context>
+    <name>FocusControl</name>
+    <message>
+      <source>AF</source>
+      <translation type="unfinished">AF</translation>
+    </message>
+  </context>
+  <context>
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
@@ -766,17 +773,28 @@
     </message>
   </context>
   <context>
-    <name>PresetsButton</name>
+    <name>PresetSheet</name>
     <message>
-      <source>PRESETS</source>
-      <translation>프리셋</translation>
+      <source>PTZ Presets</source>
+      <translation type="unfinished">PTZ Presets</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>
-    <name>PresetsDialog</name>
+    <name>Presets</name>
     <message>
       <source>PTZ Presets</source>
-      <translation>PTZ 프리셋</translation>
+      <translation type="unfinished">PTZ Presets</translation>
+    </message>
+  </context>
+  <context>
+    <name>PtzSheet</name>
+    <message>
+      <source>PTZ</source>
+      <translation type="unfinished">PTZ</translation>
     </message>
   </context>
   <context>
@@ -1465,6 +1483,10 @@
       <source>You do not have permission&lt;br&gt;to view the archive</source>
       <comment>&lt;br&gt; is a line break</comment>
       <translation>보관함을 볼 수 있는 권한이 없습니다</translation>
+    </message>
+    <message>
+      <source>PTZ Mode</source>
+      <translation type="unfinished">PTZ Mode</translation>
     </message>
   </context>
   <context>
