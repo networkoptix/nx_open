@@ -671,7 +671,7 @@
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation>Preaxustes PTZ</translation>
+      <translation type="unfinished">PTZ Presets</translation>
     </message>
   </context>
   <context>

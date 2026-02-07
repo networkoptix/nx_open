@@ -671,7 +671,7 @@
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation>PTZ-forudindstillinger</translation>
+      <translation type="unfinished">PTZ Presets</translation>
     </message>
   </context>
   <context>

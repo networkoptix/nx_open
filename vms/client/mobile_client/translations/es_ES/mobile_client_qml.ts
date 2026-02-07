@@ -445,7 +445,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Solo compartido</translation>
     </message>
   </context>
   <context>
@@ -671,7 +671,7 @@
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation>Pre-programados de PTZ</translation>
+      <translation type="unfinished">PTZ Presets</translation>
     </message>
   </context>
   <context>

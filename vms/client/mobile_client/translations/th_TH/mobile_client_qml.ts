@@ -670,7 +670,7 @@
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation>ตั้งไว้ล่วงหน้า PTZ</translation>
+      <translation type="unfinished">PTZ Presets</translation>
     </message>
   </context>
   <context>
