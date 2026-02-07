@@ -291,21 +291,18 @@ struct OrganizationsModel::Private
         parent->remove(row);
     }
 
-    // Remove all nodes under 'parent'. Report model changes.
-    void clear(TreeNode* parent)
+    // Remove only Folder nodes under 'parent', keeping System nodes. Report model changes.
+    void clearStructure(TreeNode* parent)
     {
         if (!parent)
-            parent = root.get();
-
-        auto parentIndex = parent == root.get()
-            ? QModelIndex()
-            : q->createIndex(parent->row(), 0, parent);
-
-        if (parent->allChildren().size() == 0)
             return;
 
-        const ScopedRemoveRows removeRows(q, parentIndex, 0, parent->allChildren().size() - 1);
-        parent->clear();
+        for (int i = (int) parent->allChildren().size() - 1; i >= 0; --i)
+        {
+            const auto& child = parent->allChildren()[i];
+            if (child->type == OrganizationsModel::Folder)
+                remove(i, parent);
+        }
     }
 
     void setChannelPartners(const ChannelPartnerList& data)
@@ -481,7 +478,7 @@ struct OrganizationsModel::Private
 
         if (data.empty())
         {
-            clear(orgNode);
+            clearStructure(orgNode);
             if (cachedIt != orgStructureCache.end())
                 orgStructureCache.erase(cachedIt);
             return;
@@ -1077,6 +1074,9 @@ void OrganizationsModel::Private::clearCloudData()
     // Remove all except 'Sites' node.
     while (root->allChildren().size() > 1)
         remove(root->allChildren().size() - 1, root.get());
+
+    orgStructureCache.clear();
+    orgSystemsCache.clear();
 }
 
 coro::Task<bool> OrganizationsModel::Private::loadOrgAsync(struct Organization org)
