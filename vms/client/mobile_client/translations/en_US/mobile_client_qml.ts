@@ -516,6 +516,13 @@
     </message>
 </context>
 <context>
+    <name>FocusControl</name>
+    <message>
+        <source>AF</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>HorizontalCalendar</name>
     <message>
         <source>Close</source>
@@ -767,17 +774,28 @@
     </message>
 </context>
 <context>
-    <name>PresetsButton</name>
+    <name>PresetSheet</name>
     <message>
-        <source>PRESETS</source>
-        <translation></translation>
+        <source>PTZ Presets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>PresetsDialog</name>
+    <name>Presets</name>
     <message>
         <source>PTZ Presets</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PtzSheet</name>
+    <message>
+        <source>PTZ</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1465,6 +1483,10 @@
     <message>
         <source>You do not have permission&lt;br&gt;to view the archive</source>
         <comment>&lt;br&gt; is a line break</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PTZ Mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
