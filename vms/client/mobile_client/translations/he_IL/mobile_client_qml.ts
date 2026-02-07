@@ -584,7 +584,7 @@
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation>פריסטים ל PTZ</translation>
+      <translation type="unfinished">PTZ Presets</translation>
     </message>
   </context>
   <context>
