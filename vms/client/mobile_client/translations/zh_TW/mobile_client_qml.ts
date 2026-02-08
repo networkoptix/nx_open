@@ -581,7 +581,7 @@
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ預設點</translation>
     </message>
   </context>
   <context>
