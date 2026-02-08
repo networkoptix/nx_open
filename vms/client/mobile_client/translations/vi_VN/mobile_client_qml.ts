@@ -776,25 +776,25 @@
     <name>PresetSheet</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>Cài đặt trước PTZ</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>gần</translation>
     </message>
   </context>
   <context>
     <name>Presets</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>Cài đặt trước PTZ</translation>
     </message>
   </context>
   <context>
     <name>PtzSheet</name>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
   </context>
   <context>
