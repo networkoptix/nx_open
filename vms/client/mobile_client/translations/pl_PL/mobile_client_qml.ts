@@ -673,7 +673,7 @@
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>Presety PTZ</translation>
     </message>
   </context>
   <context>
