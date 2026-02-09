@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "track_permissions_crud_handler.h"
+#include "track_permission.h"
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -38,6 +38,7 @@ struct TrackPermission::Private
     TrackPermission* q;
     nx::vms::common::SystemContext* systemContext;
     nx::Uuid allAccessibleGroupId;
+    nx::vms::api::AccessRight requiredAccess;
     nx::MoveOnlyFunc<void(const QString& id,
         nx::network::rest::Handler::NotifyType notifyType,
         std::optional<nx::Uuid> user,
@@ -49,6 +50,7 @@ struct TrackPermission::Private
         TrackPermission* q,
         nx::vms::common::SystemContext* systemContext,
         nx::Uuid allAccessibleGroupId,
+        nx::vms::api::AccessRight requiredAccess,
         nx::MoveOnlyFunc<void(const QString& id,
             nx::network::rest::Handler::NotifyType notifyType,
             std::optional<nx::Uuid> user,
@@ -57,6 +59,7 @@ struct TrackPermission::Private
         q(q),
         systemContext(systemContext),
         allAccessibleGroupId(std::move(allAccessibleGroupId)),
+        requiredAccess(requiredAccess),
         notifyFunc(std::move(notify))
     {
     }
@@ -208,7 +211,7 @@ struct TrackPermission::Private
 
         return !allAccessibleGroupId.isNull()
             && systemContext->resourceAccessManager()->hasAccessRights(
-                userResource, allAccessibleGroupId, nx::vms::api::AccessRight::view);
+                userResource, allAccessibleGroupId, requiredAccess);
     }
 
     template<typename T>
@@ -227,9 +230,10 @@ struct TrackPermission::Private
             return result;
 
         systemContext->resourcePool()->forEach<T>(
-            [&result, userResource, m = systemContext->resourceAccessManager()](auto r)
+            [&result, userResource, m = systemContext->resourceAccessManager(), a = requiredAccess](
+                auto r)
             {
-                if (m->hasAccessRights(userResource, r, nx::vms::api::AccessRight::view))
+                if (m->hasAccessRights(userResource, r, a))
                     result.insert(r->getId().toSimpleString());
             });
         return result;
@@ -239,13 +243,14 @@ struct TrackPermission::Private
 TrackPermission::TrackPermission(
     nx::vms::common::SystemContext* systemContext,
     nx::Uuid allAccessibleGroupId,
+    nx::vms::api::AccessRight requiredAccess,
     nx::MoveOnlyFunc<void(const QString& id,
         nx::network::rest::Handler::NotifyType notifyType,
         std::optional<nx::Uuid> user,
         bool noEtag)> notify)
     :
     d(std::make_unique<Private>(
-        this, systemContext, std::move(allAccessibleGroupId), std::move(notify)))
+        this, systemContext, std::move(allAccessibleGroupId), requiredAccess, std::move(notify)))
 {
 }
 
