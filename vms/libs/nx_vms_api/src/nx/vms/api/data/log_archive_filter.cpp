@@ -3,7 +3,7 @@
 #include "log_archive_filter.h"
 
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/std/ranges.h>
+#include <nx/ranges/actions/sort.h>
 
 namespace nx::vms::api {
 
@@ -12,7 +12,7 @@ const std::vector<api::LogName> LogArchiveFilter::kAllNames =
         []<typename ...T>(T&&... items)
         {
             return std::vector{items.value...}
-                | nx::ranges::sort();
+                | nx::actions::sort();
         });
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LogArchiveFilter, (json), LogArchiveFilter_Fields)

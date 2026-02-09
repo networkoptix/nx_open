@@ -3,5 +3,5 @@
 #include <nx/utils/system_network_headers.h>
 
 #ifdef __cplusplus
-    #include <nx/utils/std/ranges.h> //< Drastically increases compilation time.
+    #include <nx/ranges.h> //< Drastically increases compilation time.
 #endif

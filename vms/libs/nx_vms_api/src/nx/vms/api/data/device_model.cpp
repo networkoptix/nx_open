@@ -7,6 +7,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/ranges.h>
 #include <nx/utils/compound_visitor.h>
 #include <nx/utils/crud_model.h>
 #include <nx/utils/std/algorithm.h>
@@ -399,17 +400,16 @@ struct LessById
 template<typename Model>
 std::vector<Model> fromCameras(std::vector<CameraData> cameras)
 {
-    std::vector<Model> result;
-    result.reserve(cameras.size());
-    std::transform(std::make_move_iterator(cameras.begin()),
-        std::make_move_iterator(cameras.end()),
-        std::back_inserter(result),
-        [](CameraData data) -> Model
-        {
-            return {DeviceModelGeneral::fromCameraData(std::move(data))};
-        });
-
-    return result;
+    return std::move(cameras)
+        | std::views::transform(
+            [](CameraData c) -> Model
+            {
+                Model m;
+                static_cast<DeviceModelGeneral&>(m) =
+                    DeviceModelGeneral::fromCameraData(std::move(c));
+                return m;
+            })
+        | nx::ranges::to<std::vector>();
 }
 
 template <typename Model>

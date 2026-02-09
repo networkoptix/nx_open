@@ -42,6 +42,22 @@ auto make_vector(Elements&&... e)
 }
 
 /**
+ * std::vector of non-copyable types cannot be initialized by the initializer list (it
+ * requires a copy constructor), but can be initialized by the following method:
+ * ```
+ *     auto vector = make_vector<std::unique_ptr<Data>>(1, 2, 2);
+ * ```
+ */
+template<typename T, template<typename> typename Allocator = std::allocator, typename... Args>
+auto make_vector(Args&&... args)
+{
+    std::vector<T, Allocator<T>> result;
+    result.reserve(sizeof...(Args));
+    (result.emplace_back(std::forward<Args>(args)), ...);
+    return result;
+}
+
+/**
  * Converts unique_ptr of one type to another using static_cast.
  * Consumes original unique_ptr. Actually moves memory to a new unique_ptr.
  */

@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include <nx/concepts.h>
 #include <nx/network/http/http_status.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/buffer.h>
@@ -974,7 +975,7 @@ struct NX_NETWORK_API ContentType
      * NOTE: This constructor works with any type that has "const char* data()" and "size()".
      * E.g., QByteArray.
      */
-    template<traits::ToStringViewConvertible String>
+    template<nx::ToStringViewConvertible String>
     ContentType(const String& str)
         :
         ContentType(std::string_view(str.data(), (std::size_t) str.size()))
