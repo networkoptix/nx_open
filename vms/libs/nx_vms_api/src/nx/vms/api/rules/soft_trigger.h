@@ -12,6 +12,15 @@
 
 namespace nx::vms::api::rules {
 
+struct SoftTriggerId
+{
+    /**%apidoc ID of the software trigger. */
+    nx::Uuid triggerId;
+};
+#define SoftTriggerId_Fields (triggerId)
+QN_FUSION_DECLARE_FUNCTIONS(SoftTriggerId, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(SoftTriggerId, SoftTriggerId_Fields)
+
 struct NX_VMS_API SoftTriggerData
 {
     /**%apidoc ID of the soft trigger to execute. */

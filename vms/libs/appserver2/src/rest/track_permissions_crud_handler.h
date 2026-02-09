@@ -3,36 +3,7 @@
 #pragma once
 
 #include "ec2_crud_handler.h"
-
-class TrackPermission
-{
-public:
-    TrackPermission(
-        nx::vms::common::SystemContext* systemContext,
-        nx::Uuid allAccessibleGroupId,
-        nx::MoveOnlyFunc<void(const QString& id,
-            nx::network::rest::Handler::NotifyType notifyType,
-            std::optional<nx::Uuid> user,
-            bool noEtag)> notify);
-
-    virtual ~TrackPermission();
-    nx::utils::Guard trackPermissions(const nx::Uuid& user);
-    void addAccessible(const QString& id);
-    void removeAccessible(const QString& id);
-
-    template<typename T>
-    std::set<QString> accessibleIds(const nx::Uuid& user, bool all) const;
-
-protected:
-    virtual std::set<QString> accessibleIds(const nx::Uuid& user, bool all) const = 0;
-
-private:
-    struct Private;
-    friend struct Private;
-
-private:
-    std::unique_ptr<Private> d;
-};
+#include "track_permission.h"
 
 template<
     typename Derived,
@@ -52,7 +23,10 @@ public:
         QueryProcessor* queryProcessor,
         Args&&... args)
         :
-        TrackPermission(queryProcessor->systemContext(), allAccessibleGroupId,
+        TrackPermission(
+            queryProcessor->systemContext(),
+            allAccessibleGroupId,
+            nx::vms::api::AccessRight::view,
             [this](auto&&... args)
             {
                 TrackPermissionCrudHandler::CrudHandler::notify(std::forward<decltype(args)>(args)...);
