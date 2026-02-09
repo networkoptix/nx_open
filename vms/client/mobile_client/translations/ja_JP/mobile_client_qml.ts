@@ -518,7 +518,7 @@
     <name>FocusControl</name>
     <message>
       <source>AF</source>
-      <translation type="unfinished">AF</translation>
+      <translation>AF</translation>
     </message>
   </context>
   <context>
@@ -1486,7 +1486,7 @@
     </message>
     <message>
       <source>PTZ Mode</source>
-      <translation type="unfinished">PTZ Mode</translation>
+      <translation>PTZ モード</translation>
     </message>
   </context>
   <context>
