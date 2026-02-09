@@ -47,16 +47,6 @@ NxObject
 
         function calculateCellY(cellIndex)
         {
-            let calculateRowsHeight =
-                function (rowCount, cellHeight)
-                {
-                    if (rowCount === 0)
-                        return 0
-
-                    return rowCount * (cellHeight + sizesCalculator.spacing)
-                        - sizesCalculator.spacing
-                }
-
             const enlargedRowHeight =
                 sizesCalculator.cellHeightFromWidth(sizesCalculator.enlargedCellWidth)
 
@@ -67,30 +57,29 @@ NxObject
 
                 return cellIndex < sizesCalculator.enlargedCellsCountInFirstRow
                     ? 0
-                    : calculateRowsHeight(1, enlargedRowHeight) + sizesCalculator.spacing
+                    : enlargedRowHeight + sizesCalculator.spacing
             }
 
             const normalCellHeight =
                 sizesCalculator.cellHeightFromWidth(sizesCalculator.normalCellWidth)
 
-            const enlargedRowsHeight =
-                calculateRowsHeight(sizesCalculator.enlargedRowsCount, enlargedRowHeight)
+            // Y position of the first normal row (right after enlarged rows).
+            const firstNormalRowY = sizesCalculator.enlargedRowsCount > 0
+                ? sizesCalculator.enlargedRowsCount * (enlargedRowHeight + sizesCalculator.spacing)
+                : 0
 
             const repositionedTailCellIndex = paddingsCalculator.toRepositionedCellIndex(cellIndex)
 
             if (repositionedTailCellIndex < 0)
             {
+                // Normal (non-repositioned) cell.
                 const normalRowIndex = Math.floor((cellIndex - sizesCalculator.enlargedCellsCount)
                     / sizesCalculator.columnsCount)
 
-                const spacingBetweenEnlargedAndNormal =
-                    sizesCalculator.enlargedRowsCount > 0 ? sizesCalculator.spacing : 0
-
-                return enlargedRowsHeight + spacingBetweenEnlargedAndNormal
-                    + calculateRowsHeight(normalRowIndex, normalCellHeight)
-                    + (normalRowIndex > 0 ? sizesCalculator.spacing : 0)
+                return firstNormalRowY + normalRowIndex * (normalCellHeight + sizesCalculator.spacing)
             }
 
+            // Repositioned tail cell.
             const repositionedRowIndex = Math.floor(repositionedTailCellIndex
                 / paddingsCalculator.repositionedCellsInFirstRow)
 
@@ -99,15 +88,11 @@ NxObject
                     - paddingsCalculator.repositionedTailCellsCount)
                 / sizesCalculator.columnsCount)
 
-            const normalRowsHeight =
-                calculateRowsHeight(normalRowsCount, normalCellHeight)
+            // Y position of the first repositioned row (right after normal rows).
+            const firstRepositionedRowY = firstNormalRowY
+                + normalRowsCount * (normalCellHeight + sizesCalculator.spacing)
 
-            const repositionedRowsHeight =
-                calculateRowsHeight(repositionedRowIndex, normalCellHeight)
-
-            // There could only be enlarged or repositioned rows.
-            return normalRowsHeight + sizesCalculator.spacing + repositionedRowsHeight
-                + (repositionedRowIndex > 0 ? sizesCalculator.spacing : 0)
+            return firstRepositionedRowY + repositionedRowIndex * (normalCellHeight + sizesCalculator.spacing)
         }
 
         function calculateCellIndexInRow(cellIndex)
