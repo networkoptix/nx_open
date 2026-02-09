@@ -87,7 +87,7 @@ Control
             id: thumbnailContainer
 
             width: parent.width
-            height: width * cameraItem.aspectRatio
+            height: Math.floor(width * cameraItem.aspectRatio)
 
 
             color: d.showThumbnailDummy ? ColorTheme.colors.dark8 : ColorTheme.colors.dark4
