@@ -101,6 +101,7 @@ void Tracker::sendOffer()
         rapidjson::Value mimeValue(mime, d.GetAllocator());
         d.AddMember("mime", mimeValue, d.GetAllocator());
     }
+
     rapidjson::Value transcodingValue(rapidjson::kObjectType);
     transcodingValue.AddMember("video", m_session->tracks()->hasVideoTranscoding(), d.GetAllocator());
     transcodingValue.AddMember("audio", m_session->tracks()->hasAudioTranscoding(), d.GetAllocator());
@@ -140,12 +141,10 @@ void Tracker::sendIce(const IceCandidate& candidate)
     rapidjson::Value ice(rapidjson::kObjectType);
     rapidjson::Value candidateValue(candidateStr, d.GetAllocator());
     ice.AddMember("candidate", candidateValue, d.GetAllocator());
-    rapidjson::Value sdpMid("2"); //< Data Channel mid.
-    if (m_session->tracks()->hasVideo())
-        sdpMid = "0";
-    else if (m_session->tracks()->hasAudio())
-        sdpMid = "1";
-    ice.AddMember("sdpMid", sdpMid, d.GetAllocator());
+
+    const auto tracks = m_session->tracks()->allTracks();
+    int mid = tracks.empty() ? kDataChannelMid : tracks[0].mid;
+    ice.AddMember("sdpMid", mid, d.GetAllocator());
     ice.AddMember("sdpMLineIndex", 0, d.GetAllocator());
     std::string ufrag = m_session->getLocalUfrag();
     rapidjson::Value ufragValue(ufrag, d.GetAllocator());

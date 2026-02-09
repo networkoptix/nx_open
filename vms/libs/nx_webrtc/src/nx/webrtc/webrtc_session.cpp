@@ -2,6 +2,7 @@
 
 #include "webrtc_session.h"
 
+#include <core/resource/camera_resource.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/vms/common/system_context.h>
@@ -76,26 +77,64 @@ Session::Session(
     m_iceCandidates(iceCandidates),
     m_sessionPool(sessionPool)
 {
-    using namespace nx::sdk::UuidHelper;
-    m_localMsid = toStdString(randomUuid(), FormatOptions::hyphens);
     m_localUfrag = localUfrag;
     m_localPwd = generatePwd(24);
     m_dtls = std::make_shared<Dtls>(m_localUfrag, m_pem);
 
+    const auto deviceId = m_provider->resource()->getId();
+
     if (m_purpose == Purpose::send)
     {
         m_tracks = std::make_unique<TracksForSend>(this);
+
+        if (m_provider->getVideoCodecParameters())
+        {
+            auto video = std::make_unique<Track>(Track{
+                .mid = 0,
+                .deviceId = deviceId,
+                .trackType = TrackType::video,
+                });
+            m_tracks->addTrack(std::move(video));
+        }
+
+        if (m_provider->getAudioCodecParameters())
+        {
+            auto audio = std::make_unique<Track>(Track{
+                .mid = 1,
+                .deviceId = deviceId,
+                .trackType = TrackType::audio,
+                });
+            m_tracks->addTrack(std::move(audio));
+        }
+
         m_transceiver = std::make_unique<Streamer>(this);
         m_consumer = std::make_unique<Consumer>(this);
         m_provider->subscribe(
-            [this](const QnConstAbstractMediaDataPtr& data, const AbstractCameraDataProvider::OnDataReady& handler)
+            [this, deviceId]
+            (const QnConstAbstractMediaDataPtr& data, const AbstractCameraDataProvider::OnDataReady& handler)
             {
-                m_consumer->putData(data, handler);
+                m_consumer->putData(deviceId, data, handler);
             });
     }
     else if (m_purpose == Purpose::recv)
     {
         m_tracks = std::make_unique<TracksForRecv>(this);
+        auto video = std::make_unique<Track>(Track{
+            .mid = 0,
+            .payloadType = 96,
+            .deviceId = deviceId,
+            .trackType = TrackType::video,
+            });
+        m_tracks->addTrack(std::move(video));
+        auto audio = std::make_unique<Track>(Track{
+            .mid = 1,
+            .payloadType = 0,
+            .deviceId = deviceId,
+            .trackType = TrackType::audio,
+        });
+        m_tracks->addTrack(std::move(audio));
+
+
         m_transceiver = std::make_unique<Receiver>(this);
         m_demuxer = std::make_unique<Demuxer>(m_tracks.get());
     }
@@ -200,6 +239,7 @@ bool Session::initializeMuxersInternal(bool useFallbackVideo, bool useFallbackAu
     }
 
     return m_muxer->createEncoders(
+        m_provider->resource()->getId(),
         m_provider->getVideoCodecParameters(),
         m_provider->getAudioCodecParameters());
 }
@@ -231,48 +271,12 @@ SessionDescription Session::describe() const
     };
 }
 
-void Session::addTrackAttributes(const Track& track, const std::string& localAddress, std::string& sdp)
+std::string Session::dataChannelSdp() const
 {
 #define ENDL "\r\n";
-    sdp += "c=IN " + localAddress + ENDL;
-    sdp += "a=rtcp:9 IN " + localAddress + ENDL;
-    // Used with STUN handshake
-    sdp += "a=ice-ufrag:" + m_localUfrag + ENDL;
-    sdp += "a=ice-pwd:" + m_localPwd + ENDL;
-    // Media ID.
-    sdp += "a=mid:" + track.mid + ENDL;
-    /* https://datatracker.ietf.org/doc/html/rfc3264#section-5.1
-     * If the offerer wishes to only send media on a stream to its peer, it
-     * MUST mark the stream as sendonly with the "a=sendonly" attribute.
-     * */
-    sdp += toSdpAttribute(track.purpose) + ENDL;
-    // Probably unused fields.
-    sdp += "a=msid:" + m_localMsid + " " + track.msid + ENDL;
-    // Mux rtcp and rtp stream.
-    sdp += "a=rtcp-mux" ENDL;
-    /* 'actpass' due to bug in old Chromium. Actually, for incoming connection, should be 'passive':
-     * https://datatracker.ietf.org/doc/html/rfc4145#section-4 */
-    sdp += "a=setup:actpass" ENDL;
-    // Probably ignored by all implementations.
-    sdp += "a=connection:new" ENDL;
-    // 'ssrc' of track used by Chromium's demuxer. Not sure about 'cname'.
-    sdp += "a=ssrc:" + std::to_string(track.ssrc) + " cname:" + track.cname + ENDL;
-    // Generic RTCP feedbacks supported: https://www.rfc-editor.org/rfc/rfc4585.html#section-3.6.2
-    sdp += "a=rtcp-fb:" + std::to_string(track.payloadType) + " nack" ENDL;
-    // TODO Move all method into Tracks.
-    tracks()->addTrackAttributes(track, sdp);
-}
-
-void Session::addDataChannelAttributes(const std::string& localAddress, std::string& sdp)
-{
-#define ENDL "\r\n";
+    std::string sdp;
     sdp += "m=application 0 UDP/DTLS/SCTP webrtc-datachannel" ENDL;
-    sdp += "c=IN " + localAddress + ENDL;
-    // Used with STUN handshake
-    sdp += "a=ice-ufrag:" + m_localUfrag + ENDL;
-    sdp += "a=ice-pwd:" + m_localPwd + ENDL;
-    // Media ID always 2 for data channel.
-    sdp += "a=mid:2" ENDL;
+    sdp += "a=mid:" + std::to_string(kDataChannelMid) + ENDL;
     // Port in SCTP level.
     sdp += "a=sctp-port:" + std::to_string(kDefaultSctpPort) + ENDL;
     // SCTP max message size.
@@ -287,8 +291,7 @@ void Session::addDataChannelAttributes(const std::string& localAddress, std::str
     /* 'actpass' due to bug in old Chromium. Actually, for incoming connection, should be 'passive':
      * https://datatracker.ietf.org/doc/html/rfc4145#section-4 */
     sdp += "a=setup:actpass" ENDL;
-    // Probably ignored by all implementations.
-    sdp += "a=connection:new" ENDL;
+    return sdp;
 }
 
 std::string Session::constructFingerprint() const
@@ -309,6 +312,8 @@ std::string Session::constructFingerprint() const
 
 std::string Session::constructSdp()
 {
+    const auto tracks = m_tracks->allTracks();
+
     std::string sdp;
     std::string localAddress =
         (m_localAddress.address.isPureIpV6() ? "IP6 " : "IP4 ")
@@ -317,33 +322,31 @@ std::string Session::constructSdp()
     sdp += "v=0" ENDL;
     sdp += "o=- 4833640938783375127 2 IN " + localAddress + ENDL;
     sdp += "s=-" ENDL;
+    sdp += "c=IN " + localAddress + ENDL;
     sdp += "t=0 0" ENDL;
-    sdp += toSdpAttribute(purpose()) + ENDL;
     // Lite agent implementation.
     sdp += "a=ice-lite" ENDL;
     // Fingerprint of certificate which will be used for DTLS.
     sdp += constructFingerprint() + ENDL;
     // Group MediaID==0 (video), mediaID==1 (audio if exists) and MediaID==2 (data).
-    sdp += "a=group:BUNDLE"
-       + std::string(m_tracks->hasVideo() ? " 0" : "")
-       + std::string(m_tracks->hasAudio() ? " 1" : "")
-       + " 2" ENDL;
+    sdp += "a=group:BUNDLE";
+    for (const auto& track: tracks)
+        sdp += " " + std::to_string(track.mid);
+    sdp += " " + std::to_string(kDataChannelMid) + ENDL;
     // Inform that ice candidates will be sent later.
     sdp += "a=ice-options:trickle" ENDL;
     // Probably unused.
     sdp += "a=msid-semantic: WMS *" ENDL;
+
+    sdp += "a=ice-ufrag:" + m_localUfrag + ENDL;
+    sdp += "a=ice-pwd:" + m_localPwd + ENDL;
+
+
     auto port = m_localAddress.port;
-    if (m_tracks->hasVideo())
-    {
-        sdp += m_tracks->getVideoMedia(port);
-        addTrackAttributes(m_tracks->videoTrack(), localAddress, sdp);
-    }
-    if (m_tracks->hasAudio())
-    {
-        sdp += m_tracks->getAudioMedia(port);
-        addTrackAttributes(m_tracks->audioTrack(), localAddress, sdp);
-    }
-    addDataChannelAttributes(localAddress, sdp);
+    for (const auto& track: tracks)
+        sdp += m_tracks->getSdpForTrack(&track, port);
+
+    sdp += dataChannelSdp();
     return sdp;
 }
 
@@ -359,6 +362,7 @@ AnswerResult Session::examineSdp(const std::string& sdp)
     }
     m_dtls->setFingerprint(m_sdpParseResult.fingerprint);
 
+#if 0
     if ((m_sdpParseResult.video != SdpParseResult::TrackState::absent) ^ (m_tracks->hasVideo() ? 1 : 0))
     {
         NX_DEBUG(
@@ -376,6 +380,7 @@ AnswerResult Session::examineSdp(const std::string& sdp)
             id());
         return AnswerResult::failed;
     }
+#endif
 
     if (m_sdpParseResult.application != SdpParseResult::TrackState::active)
     {
@@ -411,10 +416,12 @@ AnswerResult Session::setFallbackCodecs()
     if (m_tracks->fallbackCodecs())
         return AnswerResult::failed;
     m_tracks->setFallbackCodecs();
+#if 0
     if (m_tracks->hasVideo())
         m_sdpParseResult.video = SdpParseResult::TrackState::inactive;
     if (m_tracks->hasAudio())
         m_sdpParseResult.audio = SdpParseResult::TrackState::inactive;
+#endif
 
     bool status = initializeMuxersInternal(/*useFallbackVideo*/ true, /*useFallbackAudio*/ true);
     return status ? AnswerResult::again : AnswerResult::failed;

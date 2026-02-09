@@ -27,6 +27,9 @@ Receiver::Receiver(Session* session): m_session(session)
     m_ice = ice;
 
     m_session->demuxer()->setSrtpEncryptionData(dtls->encryptionData());
+
+    // TODO: I suppose FIR packets are not needed. Lets check in browser and remove it.
+#if 0
     m_session->reader()->onKeyframeNeeded(
         [this]()
         {
@@ -36,6 +39,7 @@ Receiver::Receiver(Session* session): m_session(session)
             if (output.size() != 0)
                 m_ice->writePacket(output.data(), output.size(), /*foreground*/ false);
         });
+#endif
     m_session->reader()->start();
 
     return true;

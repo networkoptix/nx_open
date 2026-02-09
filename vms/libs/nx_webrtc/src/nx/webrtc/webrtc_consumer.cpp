@@ -243,7 +243,9 @@ void Consumer::sendMetadata(const QnConstCompressedMetadataPtr& metadata)
     m_streamer->ice()->writeDataChannelString(ctx.composer.take());
 }
 
-void Consumer::putMediaDataToSendBuffers(const QnConstAbstractMediaDataPtr& media)
+void Consumer::putMediaDataToSendBuffers(
+    nx::Uuid deviceId,
+    const QnConstAbstractMediaDataPtr& media)
 {
     // This code should be called only from Streamer's AIO thread.
     NX_VERBOSE(this, "Process data: %1", media);
@@ -265,10 +267,10 @@ void Consumer::putMediaDataToSendBuffers(const QnConstAbstractMediaDataPtr& medi
         return;
     }
 
-    m_session->muxer()->setDataPacket(media);
+    auto rtpEncoder = m_session->muxer()->setDataPacket(deviceId, media);
 
     nx::utils::ByteArray buffer;
-    while (!m_needStop && m_session->muxer()->getNextPacket(media->dataType, buffer))
+    while (!m_needStop && m_session->muxer()->getNextPacket(rtpEncoder, buffer))
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         m_mediaBuffers.emplace_back(buffer.data(), buffer.size());
@@ -278,7 +280,7 @@ void Consumer::putMediaDataToSendBuffers(const QnConstAbstractMediaDataPtr& medi
     // In case with changed codec, encoder will report with EOF.
     // Maybe need to make additional check for extradata: for example, some high h.264 profiles
     // can be unsupported by browser.
-    if (m_session->muxer()->isEof(media->dataType))
+    if (m_session->muxer()->isEof(rtpEncoder))
     {
         m_pollable.dispatch(
             [this]()
@@ -337,16 +339,18 @@ void Consumer::runInMuxingThread(std::function<void()>&& func)
 }
 
 void Consumer::putData(
-    const QnConstAbstractMediaDataPtr& data, const AbstractCameraDataProvider::OnDataReady& handler)
+    nx::Uuid deviceId,
+    const QnConstAbstractMediaDataPtr& data,
+    const AbstractCameraDataProvider::OnDataReady& handler)
 {
     m_dataConsumedHandler = handler;
     m_pollable.dispatch(
-        [this, data]()
+        [this, deviceId, data]()
         {
             if (m_needStop)
                 return;
 
-            putMediaDataToSendBuffers(data);
+            putMediaDataToSendBuffers(deviceId, data);
         });
 }
 

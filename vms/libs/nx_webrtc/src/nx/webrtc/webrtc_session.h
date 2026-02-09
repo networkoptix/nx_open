@@ -15,6 +15,8 @@
 
 namespace nx::webrtc {
 
+static const int kDataChannelMid = 128;
+
 enum AnswerResult
 {
     success = 0,
@@ -82,8 +84,7 @@ public:
     AbstractIceDelegate* transceiver() { return m_transceiver.get(); }
 
 private:
-    void addTrackAttributes(const Track& track, const std::string& localAddress, std::string& sdp);
-    void addDataChannelAttributes(const std::string& localAddress, std::string& sdp);
+    std::string dataChannelSdp() const;
     std::string constructFingerprint() const;
     bool initializeMuxersInternal(bool useFallbackVideo, bool useFallbackAudio);
 
@@ -97,7 +98,6 @@ private:
     std::unique_ptr<Consumer> m_consumer; //< Streaming side. Can be null.
     std::unique_ptr<Demuxer> m_demuxer; //< Receiving side. Can be null.
     std::shared_ptr<Reader> m_reader; //< Receiving side. Can be null.
-    std::string m_localMsid;
     std::string m_localUfrag;
     std::string m_localPwd;
     SdpParseResult m_sdpParseResult;

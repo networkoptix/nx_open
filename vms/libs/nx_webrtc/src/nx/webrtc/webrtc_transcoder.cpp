@@ -64,35 +64,47 @@ Transcoder::Transcoder(
 }
 
 bool Transcoder::createEncoders(
-    AVCodecParameters* videoParameters, AVCodecParameters* audioParameters)
+    nx::Uuid deviceId,
+    AVCodecParameters* videoParameters,
+    AVCodecParameters* audioParameters)
 {
     if (m_method == nx::vms::api::WebRtcMethod::srtp)
-        return createRtpEncoders(videoParameters, audioParameters);
+        return createRtpEncoders(deviceId, videoParameters, audioParameters);
     else
         return createMseEncoder(videoParameters, audioParameters);
 }
 
 bool Transcoder::createRtpEncoders(
-    AVCodecParameters* videoParameters, AVCodecParameters* audioParameters)
+    nx::Uuid deviceId,
+    AVCodecParameters* videoParameters,
+    AVCodecParameters* audioParameters)
 {
+    bool success = false;
     if (videoParameters)
     {
-        const auto& track = m_session->tracks()->videoTrack();
-        m_videoEncoder = createRtpEncoder(
-            videoParameters, track.ssrc, track.cname);
+        if (const auto track = m_session->tracks()->videoTrack(deviceId))
+        {
+            if (auto encoder = createRtpEncoder(videoParameters, track->ssrc, track->cname))
+            {
+                success = true;
+                m_videoEncoders[deviceId] = std::move(encoder);
+            }
+        }
     }
 
     if (audioParameters)
     {
-        const auto& track = m_session->tracks()->audioTrack();
-        m_audioEncoder = createRtpEncoder(
-            audioParameters, track.ssrc, track.cname);
+        if (const auto track = m_session->tracks()->audioTrack(deviceId))
+        {
+            if (auto encoder = createRtpEncoder(audioParameters, track->ssrc, track->cname))
+            {
+                success = true;
+                m_audioEncoders[deviceId] = std::move(encoder);
+            }
+        }
     }
 
-    if (!m_videoEncoder && !m_audioEncoder)
-        return false;
-
-    return true;
+    return success;
 }
 
 bool Transcoder::isVideoCodecSupported(AVCodecID codecId)
@@ -185,39 +197,41 @@ QnUniversalRtpEncoderPtr Transcoder::createRtpEncoder(
         return nullptr;
     }
 
-    if (codecParameters->codec_type == AVMEDIA_TYPE_VIDEO)
-        m_session->tracks()->setVideoPayloadType(universalEncoder->payloadType());
-    else if (codecParameters->codec_type == AVMEDIA_TYPE_AUDIO)
-        m_session->tracks()->setAudioPayloadType(universalEncoder->payloadType());
+    if (Track* track = m_session->tracks()->track(ssrc))
+        track->payloadType = universalEncoder->payloadType();
+    else
+        NX_WARNING(this, "Track %1 not found", ssrc);
 
     return universalEncoder;
 }
 
 void Transcoder::setSrtpEncryptionData(const rtsp::EncryptionData& data)
 {
-    if (m_videoEncoder)
-        m_videoEncoder->setSrtpEncryptionData(data);
-    if (m_audioEncoder)
-        m_audioEncoder->setSrtpEncryptionData(data);
+    for (auto& [_, encoder]: m_videoEncoders)
+        encoder->setSrtpEncryptionData(data);
+    for (auto& [_, encoder]:  m_audioEncoders)
+        encoder->setSrtpEncryptionData(data);
 }
 
 rtsp::SrtpEncryptor* Transcoder::getEncryptor() const
 {
-    if (m_videoEncoder)
-        return m_videoEncoder->encryptor();
-    else if (m_audioEncoder)
-        return m_audioEncoder->encryptor();
+    if (!m_videoEncoders.empty())
+        return m_videoEncoders.begin()->second->encryptor();
+    if (!m_audioEncoders.empty())
+        return m_audioEncoders.begin()->second->encryptor();
     return nullptr;
 }
 
-QnUniversalRtpEncoder* Transcoder::videoEncoder() const
+QnUniversalRtpEncoder* Transcoder::videoEncoder(nx::Uuid deviceId) const
 {
-    return m_videoEncoder.get();
+    auto it = m_videoEncoders.find(deviceId);
+    return it != m_videoEncoders.end() ? it->second.get() : nullptr;
 }
 
-QnUniversalRtpEncoder* Transcoder::audioEncoder() const
+QnUniversalRtpEncoder* Transcoder::audioEncoder(nx::Uuid deviceId) const
 {
-    return m_audioEncoder.get();
+    auto it = m_audioEncoders.find(deviceId);
+    return it != m_videoEncoders.end() ? it->second.get() : nullptr;
 }
 
 bool Transcoder::constructMimeType()
@@ -256,20 +270,23 @@ bool Transcoder::constructMimeType()
 
 QnUniversalRtpEncoder* Transcoder::encoderBySsrc(uint32_t ssrc) const
 {
-    if (m_session->tracks()->videoTrack().ssrc == ssrc)
-        return videoEncoder();
-    else if (m_session->tracks()->audioTrack().ssrc == ssrc)
-        return audioEncoder();
+    if (auto track = m_session->tracks()->track(ssrc))
+    {
+        if (track->trackType == TrackType::video)
+            return videoEncoder(track->deviceId);
+        else if (track->trackType == TrackType::audio)
+            return audioEncoder(track->deviceId);
+    }
     return nullptr;
 }
 
-QnUniversalRtpEncoder* Transcoder::getRtpEncoder(QnAbstractMediaData::DataType type) const
+QnUniversalRtpEncoder* Transcoder::getRtpEncoder(
+    nx::Uuid deviceId,
+    QnAbstractMediaData::DataType type) const
 {
-    if (type == QnAbstractMediaData::VIDEO)
-        return m_videoEncoder.get();
-    else if (type == QnAbstractMediaData::AUDIO)
-        return m_audioEncoder.get();
-    return nullptr;
+    auto& encoders = type == QnAbstractMediaData::VIDEO ? m_videoEncoders : m_audioEncoders;
+    auto it = encoders.find(deviceId);
+    return it != encoders.end() ? it->second.get() : nullptr;
 }
 
 bool Transcoder::checkForMseEof(QnConstAbstractMediaDataPtr media)
@@ -336,15 +353,16 @@ bool Transcoder::checkForMseEof(QnConstAbstractMediaDataPtr media)
     return false;
 }
 
-void Transcoder::setDataPacket(QnConstAbstractMediaDataPtr media)
+QnUniversalRtpEncoder* Transcoder::setDataPacket(nx::Uuid deviceId, QnConstAbstractMediaDataPtr media)
 {
     m_lastTimestampMs = media->timestamp / 1000;
     if (m_method == nx::vms::api::WebRtcMethod::srtp)
     {
-        QnUniversalRtpEncoder* rtpEncoder = getRtpEncoder(media->dataType);
+        QnUniversalRtpEncoder* rtpEncoder = getRtpEncoder(deviceId, media->dataType);
         if (!rtpEncoder)
-            return; //< Skip not supported data.
+            return nullptr; //< Skip not supported data.
         rtpEncoder->setDataPacket(media);
+        return rtpEncoder;
     }
     else
     {
@@ -353,33 +371,33 @@ void Transcoder::setDataPacket(QnConstAbstractMediaDataPtr media)
         if (media->dataType != QnAbstractMediaData::VIDEO
             && media->dataType != QnAbstractMediaData::AUDIO)
         {
-            return; //< Skip not supported data.
+            return nullptr; //< Skip not supported data.
         }
         m_eof = checkForMseEof(media);
         if (m_eof)
-            return;
+            return nullptr;
 
         if (!m_mseMuxer->process(media))
         {
             NX_DEBUG(this, "MSE muxer: failed to process data");
             m_eof = true;
-            return;
+            return nullptr;
         }
 
         nx::utils::ByteArray buffer;
         m_mseMuxer->getResult(&buffer);
         if (buffer.size() != 0)
             m_mseBuffers.emplace(std::move(buffer));
+        return nullptr;
     }
 }
 
-bool Transcoder::getNextPacket(QnAbstractMediaData::DataType type, nx::utils::ByteArray& buffer)
+bool Transcoder::getNextPacket(
+    QnUniversalRtpEncoder* rtpEncoder,
+    nx::utils::ByteArray& buffer)
 {
     if (m_method == nx::vms::api::WebRtcMethod::srtp)
     {
-        QnUniversalRtpEncoder* rtpEncoder = getRtpEncoder(type);
-        if (!rtpEncoder)
-            return false; //< Skip not supported data.
         return rtpEncoder->getNextPacket(buffer);
     }
     else
@@ -394,16 +412,13 @@ bool Transcoder::getNextPacket(QnAbstractMediaData::DataType type, nx::utils::By
     }
 }
 
-bool Transcoder::isEof(QnAbstractMediaData::DataType type) const
+bool Transcoder::isEof(QnUniversalRtpEncoder* rtpEncoder) const
 {
     if (m_eof)
         return true;
 
     if (m_method == nx::vms::api::WebRtcMethod::srtp)
     {
-        QnUniversalRtpEncoder* rtpEncoder = getRtpEncoder(type);
-        if (!rtpEncoder)
-            return false; //< Skip not supported data.
         return rtpEncoder->isEof();
     }
     else
@@ -414,13 +429,14 @@ bool Transcoder::isEof(QnAbstractMediaData::DataType type) const
 
 FfmpegMuxer::PacketTimestamp Transcoder::getLastTimestamps() const
 {
+    // TODO: this function doesn't support multi camera streaming properly. It is needed to refactor it.
     if (m_method == nx::vms::api::WebRtcMethod::srtp)
     {
         QnUniversalRtpEncoder* rtpEncoder = nullptr;
-        if (m_videoEncoder)
-            rtpEncoder = m_videoEncoder.get();
-        else if (m_audioEncoder)
-            rtpEncoder = m_audioEncoder.get();
+        if (!m_videoEncoders.empty())
+            rtpEncoder = m_videoEncoders.begin()->second.get();
+        else if (!m_audioEncoders.empty())
+            rtpEncoder = m_videoEncoders.begin()->second.get();
 
         if (!rtpEncoder)
             return FfmpegMuxer::PacketTimestamp(); //< Skip not supported data.

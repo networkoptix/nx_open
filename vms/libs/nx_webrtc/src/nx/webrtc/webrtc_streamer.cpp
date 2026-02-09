@@ -130,6 +130,7 @@ Ice* Streamer::ice()
 
 void Streamer::sendTimestamp(int64_t timestampUs, uint32_t rtpTimestamp)
 {
+    // TODO: this function doesn't support multi camera streaming properly. It is needed to refactor it.
     rapidjson::Document message(rapidjson::kObjectType);
     message.AddMember("timestampMs", (int64_t) timestampUs / 1000, message.GetAllocator());
     message.AddMember("rtpTimestamp", rtpTimestamp, message.GetAllocator());

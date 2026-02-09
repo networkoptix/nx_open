@@ -24,7 +24,10 @@ public:
         nx::vms::api::WebRtcMethod method,
         nx::vms::api::WebRtcTrackerSettings::MseFormat mseFormat);
 
-    bool createEncoders(AVCodecParameters* videoParameters, AVCodecParameters* audioParameters);
+    bool createEncoders(
+        nx::Uuid deviceId,
+        AVCodecParameters* videoParameters,
+        AVCodecParameters* audioParameters);
     void setSrtpEncryptionData(const rtsp::EncryptionData& data);
     rtsp::SrtpEncryptor* getEncryptor() const;
     nx::vms::api::WebRtcMethod method() const { return m_method; }
@@ -32,14 +35,18 @@ public:
     bool isAudioCodecSupported(AVCodecID codecId);
     const std::string& mimeType() const { return m_mimeType; }
 
-    QnUniversalRtpEncoder* videoEncoder() const;
-    QnUniversalRtpEncoder* audioEncoder() const;
+    QnUniversalRtpEncoder* videoEncoder(nx::Uuid deviceId) const;
+    QnUniversalRtpEncoder* audioEncoder(nx::Uuid deviceId) const;
     QnUniversalRtpEncoder* encoderBySsrc(uint32_t ssrc) const;
 
     // API for Consumer.
-    void setDataPacket(QnConstAbstractMediaDataPtr media);
-    bool getNextPacket(QnAbstractMediaData::DataType type, nx::utils::ByteArray& buffer);
-    bool isEof(QnAbstractMediaData::DataType type) const;
+    QnUniversalRtpEncoder* setDataPacket(
+        nx::Uuid deviceId,
+        QnConstAbstractMediaDataPtr media);
+    bool getNextPacket(
+        QnUniversalRtpEncoder* rtpEncoder,
+        nx::utils::ByteArray& buffer);
+    bool isEof(QnUniversalRtpEncoder* rtpEncoder) const;
     FfmpegMuxer::PacketTimestamp getLastTimestamps() const;
     int64_t getLastTimestampMs() const { return m_lastTimestampMs; } //< Required for reconnection.
 
@@ -49,18 +56,23 @@ private:
         uint32_t ssrc,
         const std::string& cname);
 
-    bool createRtpEncoders(AVCodecParameters* videoParameters, AVCodecParameters* audioParameters);
+    bool createRtpEncoders(
+        nx::Uuid deviceId,
+        AVCodecParameters* videoParameters,
+        AVCodecParameters* audioParameters);
     bool createMseEncoder(AVCodecParameters* videoParameters, AVCodecParameters* audioParameters);
     bool checkForMseEof(QnConstAbstractMediaDataPtr media);
     bool constructMimeType();
-    QnUniversalRtpEncoder* getRtpEncoder(QnAbstractMediaData::DataType type) const;
+    QnUniversalRtpEncoder* getRtpEncoder(
+        nx::Uuid deviceId,
+        QnAbstractMediaData::DataType type) const;
 
 private:
     Session* m_session;
 
     // SRTP transcoding.
-    QnUniversalRtpEncoderPtr m_videoEncoder;
-    QnUniversalRtpEncoderPtr m_audioEncoder;
+    std::map<nx::Uuid, QnUniversalRtpEncoderPtr> m_videoEncoders;
+    std::map<nx::Uuid, QnUniversalRtpEncoderPtr> m_audioEncoders;
 
     // MSE transcoding.
     std::unique_ptr<FfmpegMuxer> m_mseMuxer;

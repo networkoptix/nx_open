@@ -12,16 +12,6 @@ namespace nx::webrtc {
 
 namespace {
 
-void fillTrack(Track& track, const std::string& mid, Purpose purpose)
-{
-    using namespace nx::sdk::UuidHelper;
-    track.ssrc = nx::utils::random::number<uint32_t>();
-    track.cname = toStdString(randomUuid(), FormatOptions::hyphens);
-    track.msid = toStdString(randomUuid(), FormatOptions::hyphens);
-    track.mid = mid;
-    track.purpose = purpose;
-}
-
 static const std::string kSendOnlyAttr = "a=sendonly";
 static const std::string kRecvOnlyAttr = "a=recvonly";
 static const std::string kSendRecvAttr = "a=sendrecv";
@@ -42,50 +32,77 @@ const std::string& toSdpAttribute(Purpose purpose)
     }
 }
 
-Tracks::Tracks(Session* session): m_session(session)
+Track* Tracks::videoTrack(nx::Uuid deviceId) const
 {
-    fillTrack(m_localVideoTrack, "0", session->purpose());
-    fillTrack(m_localAudioTrack, "1", session->purpose());
+    for (const auto& [_,track]: m_tracks)
+    {
+        if (track->deviceId == deviceId && track->trackType == TrackType::video)
+            return track.get();
+    }
+    return nullptr;
+}
+Track* Tracks::audioTrack(nx::Uuid deviceId) const
+{
+    for (const auto& [_, track]: m_tracks)
+    {
+        if (track->deviceId == deviceId && track->trackType == TrackType::audio)
+            return track.get();
+    }
+    return nullptr;
 }
 
-void Tracks::setVideoPayloadType(int payloadType)
+std::vector<Track> Tracks::allTracks() const
 {
-    m_localVideoTrack.payloadType = payloadType;
+    std::vector<Track> result;
+    for (const auto& [_, track]: m_tracks)
+        result.emplace_back(*track.get());
+
+    std::sort(result.begin(), result.end(),
+        [](const auto& t1, const auto& t2)
+        {
+            return t1.mid < t2.mid;
+        });
+
+    return result;
 }
 
-void Tracks::setAudioPayloadType(int payloadType)
+Track* Tracks::track(uint32_t ssrc) const
 {
-    m_localAudioTrack.payloadType = payloadType;
+    const auto it = m_tracks.find(ssrc);
+    return it != m_tracks.end() ? it->second.get() : nullptr;
 }
 
-TracksForSend::TracksForSend(Session* session): Tracks(session)
+Tracks::Tracks(Session* session)
+    : m_session(session)
 {
 }
 
-bool TracksForSend::hasVideo() const
+void Tracks::addTrack(std::unique_ptr<Track> track)
 {
-    return m_session->muxer()->videoEncoder() != nullptr;
-}
+    track->ssrc = nx::utils::random::number<uint32_t>();
+    track->purpose = m_session->purpose();
 
-bool TracksForSend::hasAudio() const
-{
-    return m_session->muxer()->audioEncoder() != nullptr;
-}
+    // Find existing track with same deviceId
+    bool found = false;
+    for (const auto& [_, t]: m_tracks)
+    {
+        if (t->deviceId == track->deviceId)
+        {
+            track->cname = t->cname;
+            track->streamId = t->streamId;
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+    {
+        track->cname = nx::Uuid::createUuid().toSimpleStdString();
+        const nx::Uuid guid = track->deviceId.isNull() ? nx::Uuid::createUuid() : track->deviceId;
+        track->streamId = guid.toSimpleStdString();
+    }
+    track->trackId = nx::Uuid::createUuid().toSimpleStdString();
 
-std::string TracksForSend::getVideoMedia(uint16_t port) const
-{
-    if (!NX_ASSERT(hasVideo()))
-        return "";
-    return m_session->muxer()->videoEncoder()->getSdpMedia(
-        true, 0, port, /*ssl*/ true).toStdString();
-}
-
-std::string TracksForSend::getAudioMedia(uint16_t port) const
-{
-    if (!NX_ASSERT(hasAudio()))
-        return "";
-    return m_session->muxer()->audioEncoder()->getSdpMedia(
-        false, 1, port, /*ssl*/ true).toStdString();
+    m_tracks.emplace(track->ssrc, std::move(track));
 }
 
 void TracksForSend::setFallbackCodecs()
@@ -98,67 +115,6 @@ bool TracksForSend::fallbackCodecs()
     return m_fallbackCodecs;
 }
 
-std::string TracksForSend::mimeType() const
-{
-    return m_session->muxer()->mimeType();
-}
-
-bool TracksForSend::hasVideoTranscoding() const
-{
-    return m_session->provider()->isTranscodingEnabled(QnAbstractMediaData::VIDEO);
-}
-
-bool TracksForSend::hasAudioTranscoding() const
-{
-    return m_session->provider()->isTranscodingEnabled(QnAbstractMediaData::AUDIO);
-}
-
-bool TracksForSend::examineSdp(const std::string& /*sdp*/)
-{
-    return true;
-}
-
-void TracksForSend::addTrackAttributes(const Track& /*track*/, std::string& /*sdp*/) const
-{
-}
-
-TracksForRecv::TracksForRecv(Session* session): Tracks(session)
-{
-    setVideoPayloadType(96);
-    setAudioPayloadType(0);
-}
-
-bool TracksForRecv::hasVideo() const
-{
-    return true;
-}
-
-bool TracksForRecv::hasAudio() const
-{
-    return m_session->demuxer()->resource()->isAudioEnabled();
-}
-
-std::string TracksForRecv::getVideoMedia(uint16_t port) const
-{
-    return NX_FMT(
-        "m=video %1 RTP/AVP %2\r\n"
-        "a=rtpmap:%2 H264/90000\r\n"
-        "a=fmtp:%2 packetization-mode=1\r\n",
-        port,
-        videoTrack().payloadType)
-        .toStdString();
-}
-
-std::string TracksForRecv::getAudioMedia(uint16_t port) const
-{
-    return NX_FMT(
-        "m=audio %1 RTP/AVP %2\r\n"
-        "a=rtpmap:%2 PCMU/8000\r\n",
-        port,
-        audioTrack().payloadType)
-        .toStdString();
-}
-
 void TracksForRecv::setFallbackCodecs()
 {
 }
@@ -168,9 +124,104 @@ bool TracksForRecv::fallbackCodecs()
     return true;
 }
 
+std::string TracksForSend::mimeType() const
+{
+    return m_session->muxer()->mimeType();
+}
+
 std::string TracksForRecv::mimeType() const
 {
     return "";
+}
+
+bool TracksForSend::examineSdp(const std::string& /*sdp*/)
+{
+    return true;
+}
+
+bool TracksForRecv::examineSdp(const std::string& sdp)
+{
+    m_session->demuxer()->setSdp(sdp);
+
+#if 0
+    if (hasVideo() != m_session->demuxer()->hasVideo()
+        || hasAudio() != m_session->demuxer()->hasAudio())
+    {
+        return false;
+    }
+
+    if (hasAudio())
+    {
+        auto audioCodecParameters = m_session->demuxer()->audioCodecParameters();
+        NX_ASSERT(audioCodecParameters);
+        auto layout = std::make_shared<AudioLayout>(audioCodecParameters);
+        m_session->reader()->setAudioLayout(layout);
+    }
+#endif
+
+    return true;
+}
+
+std::string Tracks::getSdpForTrack(const Track* track, uint16_t /*port*/) const
+{
+    std::string sdp;
+#define ENDL "\r\n";
+    // Used with STUN handshake
+    // Media ID.
+    sdp += "a=mid:" + std::to_string(track->mid) + ENDL;
+    /* https://datatracker.ietf.org/doc/html/rfc3264#section-5.1
+     * If the offerer wishes to only send media on a stream to its peer, it
+     * MUST mark the stream as sendonly with the "a=sendonly" attribute.
+     * */
+    sdp += toSdpAttribute(track->purpose) + ENDL;
+    // Probably unused fields.
+    sdp += "a=msid:" + track->streamId + " " + track->trackId + ENDL;
+    // Mux rtcp and rtp stream.
+    sdp += "a=rtcp-mux" ENDL;
+    /* 'actpass' due to bug in old Chromium. Actually, for incoming connection, should be 'passive':
+     * https://datatracker.ietf.org/doc/html/rfc4145#section-4 */
+    sdp += "a=setup:actpass" ENDL;
+    // 'ssrc' of track used by Chromium's demuxer. Not sure about 'cname'.
+    sdp += "a=ssrc:" + std::to_string(track->ssrc) + " cname:" + track->cname + ENDL;
+    // Generic RTCP feedbacks supported: https://www.rfc-editor.org/rfc/rfc4585.html#section-3.6.2
+    sdp += "a=rtcp-fb:" + std::to_string(track->payloadType) + " nack" ENDL;
+    return sdp;
+}
+
+std::string TracksForSend::getSdpForTrack(const Track* track, uint16_t port) const
+{
+    bool isVideo = track->trackType == TrackType::video;
+    return m_session->muxer()->videoEncoder(track->deviceId)->getSdpMedia(
+        isVideo, 0, port, /*ssl*/ true).toStdString()
+        + base_type::getSdpForTrack(track, port);
+}
+
+std::string TracksForRecv::getSdpForTrack(const Track* track, uint16_t port) const
+{
+    std::string result;
+    if (track->trackType == TrackType::video)
+    {
+        result = NX_FMT(
+            "m=video %1 RTP/AVP %2\r\n"
+            "a=rtpmap:%2 H264/90000\r\n"
+            "a=fmtp:%2 packetization-mode=1\r\n",
+            port,
+            track->payloadType)
+            .toStdString();
+    }
+    else
+    {
+        result = NX_FMT(
+            "m=audio %1 RTP/AVP %2\r\n"
+            "a=rtpmap:%2 PCMU/8000\r\n",
+            port,
+            track->payloadType)
+            .toStdString();
+    }
+    // Full intra request: https://datatracker.ietf.org/doc/html/rfc5104#section-4.3.1
+    // `ccm` mean `Codec Control Message`.
+    result += "a=rtcp-fb:" + std::to_string(track->payloadType) + " ccm fir\r\n";
+    return result + base_type::getSdpForTrack(track, port);
 }
 
 bool TracksForRecv::hasVideoTranscoding() const
@@ -183,29 +234,22 @@ bool TracksForRecv::hasAudioTranscoding() const
     return false;
 }
 
-bool TracksForRecv::examineSdp(const std::string& sdp)
+bool TracksForSend::hasVideoTranscoding() const
 {
-    m_session->demuxer()->setSdp(sdp);
-    if (hasVideo() != m_session->demuxer()->hasVideo()
-        || hasAudio() != m_session->demuxer()->hasAudio())
-    {
-        return false;
-    }
-    if (hasAudio())
-    {
-        auto audioCodecParameters = m_session->demuxer()->audioCodecParameters();
-        NX_ASSERT(audioCodecParameters);
-        auto layout = std::make_shared<AudioLayout>(audioCodecParameters);
-        m_session->reader()->setAudioLayout(layout);
-    }
-    return true;
+    return m_session->provider()->isTranscodingEnabled(QnAbstractMediaData::VIDEO);
 }
 
-void TracksForRecv::addTrackAttributes(const Track& track, std::string& sdp) const
+bool TracksForSend::hasAudioTranscoding() const
 {
-    // Full intra request: https://datatracker.ietf.org/doc/html/rfc5104#section-4.3.1
-    // `ccm` mean `Codec Control Message`.
-    sdp += "a=rtcp-fb:" + std::to_string(track.payloadType) + " ccm fir\r\n";
+    return m_session->provider()->isTranscodingEnabled(QnAbstractMediaData::AUDIO);
+}
+
+TracksForSend::TracksForSend(Session* session) : Tracks(session)
+{
+}
+
+TracksForRecv::TracksForRecv(Session* session) : Tracks(session)
+{
 }
 
 } // namespace nx::webrtc
