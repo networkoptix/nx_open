@@ -28,6 +28,7 @@ AdaptiveScreen
     property QnCameraListModel camerasModel: null
     property alias analyticsSearchMode: screenController.analyticsSearchMode
 
+    fullscreenToolBar: detailsLoader.item?.showControls ?? false
     title: contentItem.title
 
     customLeftControl: ToolBarButton
@@ -43,11 +44,19 @@ AdaptiveScreen
             State
             {
                 name: "returnToSearchContent"
-                when: screen.contentItem === filtersItem
+                when: screen.contentItem === filtersItem || screen.contentItem === detailsLoader.item
 
                 PropertyChanges
                 {
-                    backButton.onClicked: screen.contentItem = searchContent
+                    backButton.onClicked:
+                    {
+                        screen.contentItem = searchContent
+
+                        if (!LayoutController.isTabletLayout)
+                            detailsLoader.setSource("")
+
+                        screen.fullscreen = false
+                    }
                 }
             },
             State
@@ -79,7 +88,11 @@ AdaptiveScreen
 
                 PropertyChanges
                 {
-                    backButton.onClicked: { screen.leftPanel.item = null; screen.contentItem = eventSearchMenu }
+                    backButton.onClicked:
+                    {
+                        detailsLoader.setSource("")
+                        screen.contentItem = eventSearchMenu
+                    }
                 }
             }
         ]
@@ -93,6 +106,13 @@ AdaptiveScreen
         {
             screen.contentItem = filtersItem
         }
+    }
+
+    menuButton
+    {
+        visible: screen.contentItem === detailsLoader.item && detailsLoader.hasMenu
+        icon.source: detailsLoader.icon
+        onClicked: detailsLoader.item.share()
     }
 
     TextButton // TODO: Should be right control, but tool bar does not work well with wide buttons. Need to refactor tool bar.
@@ -120,6 +140,73 @@ AdaptiveScreen
         item: contentItem === searchContent ? leftPanelContainer : null
     }
 
+    rightPanel
+    {
+        title: qsTr("Details")
+        interactive: true
+        color: ColorTheme.colors.dark4
+        item: detailsLoader.item
+
+        menuButton.visible: detailsLoader.hasMenu
+        menuButton.icon.source: detailsLoader.icon
+        menuButton.onClicked: detailsLoader.item.share()
+
+        onItemChanged: rightPanel.visible = !!rightPanel.item
+        onCloseButtonClicked: detailsLoader.setSource("")
+    }
+
+    Loader
+    {
+        id: detailsLoader
+
+        readonly property var backend: item?.backend
+        readonly property string icon:
+        {
+            if (!backend)
+                return ""
+
+            return backend.isShared && !screen.analyticsSearchMode
+                ? "image://skin/20x20/Solid/shared.svg?primary=light4&secondary=green"
+                : "image://skin/20x20/Solid/share.svg?primary=light4"
+        }
+        readonly property bool hasMenu: backend?.isAvailable || false
+
+        Connections
+        {
+            target: detailsLoader.item ?? null
+
+            function onFullscreenButtonClicked()
+            {
+                screen.fullscreen = !screen.fullscreen
+
+                if (LayoutController.isTabletLayout)
+                {
+                    if (screen.contentItem === detailsLoader.item) //< Exit fullscreen.
+                    {
+                        screen.contentItem = searchContent
+                        screen.rightPanel.visible = true
+                    }
+                    else //< Enter fullscreen.
+                    {
+                        screen.contentItem = detailsLoader.item
+                    }
+                }
+                else
+                {
+                    if (CoreUtils.isMobilePlatform())
+                    {
+                        windowContext.ui.windowHelpers.setScreenOrientation(
+                            LayoutController.isPortrait ? Qt.LandscapeOrientation : Qt.PortraitOrientation)
+                    }
+                    else
+                    {
+                        [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
+                    }
+                }
+            }
+        }
+    }
+
     EventSearchMenu
     {
         id: eventSearchMenu
@@ -135,7 +222,6 @@ AdaptiveScreen
             screen.camerasModel = cameraListModel
             screen.analyticsSearchMode = isAnalyticsSearchMode
             screen.contentItem = searchContent
-            screen.leftPanel.item = LayoutController.isTabletLayout ? leftPanelContainer : null
 
             screenController.requestUpdate()
         }
@@ -391,8 +477,26 @@ AdaptiveScreen
                 extraText: model.description
                 timestampMs: model.timestampMs
                 shared: !!model.isSharedBookmark
+                selected: LayoutController.isTabletLayout
+                    && detailsLoader.item?.currentEventIndex === currentEventIndex
 
                 onVisibleChanged: model.visible = visible
+
+                onClicked:
+                {
+                    detailsLoader.setSource(
+                        Qt.resolvedUrl("private/DetailsScreen.qml"),
+                        {
+                            "isAnalyticsDetails": isAnalyticsItem,
+                            "camerasModel": camerasModel,
+                            "eventSearchModel": eventsModel,
+                            "currentEventIndex": currentEventIndex
+                        })
+
+                    if (!LayoutController.isTabletLayout)
+                        screen.contentItem = detailsLoader.item
+                }
+
                 Component.onCompleted: model.visible = visible
                 Component.onDestruction: model.visible = false
             }
@@ -467,15 +571,32 @@ AdaptiveScreen
 
     Connections
     {
+        id: layoutControllerConnections
+
         target: LayoutController
 
         function onIsPortraitChanged()
         {
-            if (LayoutController.isMobile)
-                return
-
             if (screen.contentItem === eventSearchMenu)
                 return
+
+            if (LayoutController.isMobile)
+            {
+                if (screen.contentItem !== detailsLoader.item)
+                    return
+
+                screen.fullscreen = !LayoutController.isPortrait
+                return
+            }
+
+            if (LayoutController.isTabletLayout && screen.fullscreen)
+                return
+
+            if (LayoutController.isPortrait && screen.fullscreen)
+            {
+                screen.fullscreen = false
+                return
+            }
 
             leftPanelPopup.close()
 
@@ -486,7 +607,6 @@ AdaptiveScreen
             }
 
             screen.contentItem = searchContent
-            screen.leftPanel.item = LayoutController.isTabletLayout ? leftPanelContainer : null
         }
     }
 

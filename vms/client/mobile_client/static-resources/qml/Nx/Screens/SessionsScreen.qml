@@ -85,31 +85,19 @@ AdaptiveScreen
             return feedScreen
         }
 
+        menuButton
+        {
+            icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
+            visible: !feedScreen.empty
+            indicator.visible: feedScreen.filtered
+
+            onClicked: feedScreen.openFilterMenu()
+        }
+
         onItemChanged:
         {
             if (!rightPanel.item)
                 rightPanel.visible = false
-        }
-    }
-
-    ToolBarButton
-    {
-        id: rightPanelFeedFiltersButton
-
-        parent: rightPanel.availableHeaderArea
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-
-        icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
-        visible: !feedScreen.empty
-
-        onClicked: feedScreen.openFilterMenu()
-
-        Indicator
-        {
-            anchors.topMargin: (rightButton.height - rightButton.icon.height) / 2
-            anchors.rightMargin: (rightButton.width - rightButton.icon.width) / 2
-            visible: feedScreen.filtered
         }
     }
 
@@ -990,7 +978,7 @@ AdaptiveScreen
             if (isCurrentRootInvalid)
             {
                 sessionsScreen.rootType = undefined
-                
+
                 // IMPORTANT:
                 // This property is used by many bindings and state conditions.
                 // Re-assigning it, even with the same value, forces synchronous

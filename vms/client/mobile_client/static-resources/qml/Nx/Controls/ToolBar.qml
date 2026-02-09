@@ -57,7 +57,7 @@ ToolBarBase
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: leftControlContainer.right
         anchors.leftMargin: 20
-        anchors.right: rightControlContainer.left
+        anchors.right: rightControlContainer.implicitWidth ? rightControlContainer.left : parent.right
         anchors.rightMargin: 20
         height: parent.height
 

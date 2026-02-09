@@ -198,17 +198,6 @@ function openEventSearchScreen(push, selectedResourceId, camerasModel, analytics
         stackView.replace(null, Qt.resolvedUrl("../Screens/EventSearch/EventSearchScreen.qml"), properties)
 }
 
-function openEventDetailsScreen(camerasModel, bookmarksModel, currentIndex, isAnalyticsDetails)
-{
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/EventSearch/private/DetailsScreen.qml"),
-        {
-            "isAnalyticsDetails": isAnalyticsDetails,
-            "camerasModel": camerasModel,
-            "eventSearchModel": bookmarksModel,
-            "currentEventIndex": currentIndex
-        })
-}
-
 function openFeedScreen(push, feedState)
 {
     if (push)

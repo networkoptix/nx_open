@@ -19,6 +19,8 @@ Item
 
     // Whether only the contentItem is visible.
     property bool fullscreen
+    // Whether tool bar visible in the fullscreen mode.
+    property bool fullscreenToolBar
 
     property alias toolBar: toolBar //< TODO: the given alias must be removed.
     property alias title: toolBar.title
@@ -49,6 +51,8 @@ Item
     property Item customLeftControl
     property Item customRightControl
 
+    property alias menuButton: menuButton
+
     property var customToolBarClickHandler
     property var customBackHandler
 
@@ -76,6 +80,17 @@ Item
         leftControl: root.customLeftControl ?? defaultLeftControl
         rightControl: root.customRightControl
         useGradientBackground: root.fullscreen
+
+        centerControl: ToolBarButton
+        {
+            id: menuButton
+
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+
+            icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
+            visible: false
+        }
 
         onToolBarClicked:
         {
@@ -226,10 +241,12 @@ Item
 
     ProxyItem
     {
+        id: fullscreenToolbarProxy
+
         width: parent.width
         target: toolBar
         background.color: "transparent"
-        visible: root.fullscreen
+        visible: root.fullscreen && root.fullscreenToolBar
     }
 
     NxControls.Button

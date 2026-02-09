@@ -27,12 +27,20 @@ MouseArea
     property alias extraText: extraTextItem.text
     property alias eventTimestampText: eventTimeItem.text
     property bool shared: false
+    property bool selected: false
 
     height: d.kRowHeight
     width: (parent && parent.width) ?? 0
 
-    onClicked: Workflow.openEventDetailsScreen(
-        camerasModel, eventsModel, currentEventIndex, isAnalyticsItem)
+    Rectangle
+    {
+        anchors.fill: parent
+        visible: control.selected
+        color: "transparent"
+        border.width: 1
+        border.color: ColorTheme.colors.dark10
+        radius: 6
+    }
 
     Preview
     {

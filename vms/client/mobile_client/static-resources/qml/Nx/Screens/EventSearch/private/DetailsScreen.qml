@@ -34,71 +34,55 @@ Page
     property QnCameraListModel camerasModel: null
     property alias eventSearchModel: d.accessor.model
     property int currentEventIndex: -1
+    property alias backend: backend
+    readonly property alias showControls: d.showControls
 
-    onLeftButtonClicked: Workflow.popCurrentScreen()
+    signal fullscreenButtonClicked
+
+    function share()
+    {
+        if (!backend.isAvailable)
+            return
+
+        if (appContext.settings.showHowShareWorksNotification && isAnalyticsDetails)
+            howItWorksSheet.open()
+        else
+            shareBookmarkSheet.showSheet()
+    }
 
     title: qsTr("Preview")
-
-    toolBar.visible: opacity > 0
-    toolBar.opacity: d.hasControls ? 1 : 0
+    toolBar.visible: false
 
     clip: false
 
-    rightControl: IconButton
+    ShareBookmarkSheet
     {
-        id: shareButton
+        id: shareBookmarkSheet
 
-        padding: 0
-        icon.source: backend.isShared && !eventDetailsScreen.isAnalyticsDetails
-            ? "image://skin/20x20/Solid/shared.svg?primary=light10&secondary=green"
-            : "image://skin/20x20/Solid/share.svg?primary=light10"
-        icon.width: 24
-        icon.height: icon.width
-
-        visible: backend.isAvailable
-
-        ShareBookmarkSheet
+        isAnalyticsItemMode: eventDetailsScreen.isAnalyticsDetails
+        backend: ShareBookmarkBackend
         {
-            id: shareBookmarkSheet
+            id: backend
 
-            isAnalyticsItemMode: eventDetailsScreen.isAnalyticsDetails
-            backend: ShareBookmarkBackend
-            {
-                id: backend
-
-                modelIndex: eventSearchModel.index(currentEventIndex, 0)
-            }
-
-            onShowHowItWorks: howItWorksSheet.open()
+            modelIndex: eventSearchModel.index(currentEventIndex, 0)
         }
 
-        HowItWorksSheet
-        {
-            id: howItWorksSheet
-
-            description: qsTr("Sharing opens the new bookmark dialog to generate a playback link" +
-                " after setting the sharing options")
-            doNotShowAgain: !appContext.settings.showHowShareWorksNotification
-            onContinued:
-            {
-                appContext.settings.showHowShareWorksNotification = !doNotShowAgain
-                shareBookmarkSheet.showSheet()
-            }
-        }
-
-        onClicked:
-        {
-            if (appContext.settings.showHowShareWorksNotification && isAnalyticsDetails)
-                howItWorksSheet.open()
-            else
-                shareBookmarkSheet.showSheet()
-        }
+        onShowHowItWorks: howItWorksSheet.open()
     }
 
-    toolBar.contentItem.clip: false
-    gradientToolbarBackground: true
+    HowItWorksSheet
+    {
+        id: howItWorksSheet
 
-    toolBar.background.opacity: LayoutController.isPortrait ? 0 : 1
+        description: qsTr("Sharing opens the new bookmark dialog to generate a playback link" +
+            " after setting the sharing options")
+        doNotShowAgain: !appContext.settings.showHowShareWorksNotification
+        onContinued:
+        {
+            appContext.settings.showHowShareWorksNotification = !doNotShowAgain
+            shareBookmarkSheet.showSheet()
+        }
+    }
 
     Rectangle
     {
@@ -124,23 +108,12 @@ Page
     {
         id: preview
 
-        audioEnabled: audioController.audioEnabled && eventDetailsScreen.activePage
+        audioEnabled: audioController.audioEnabled
 
-        y: !LayoutController.isPortrait && header.visible
-           ? -header.height
-           : 0
-        x: -windowParams.leftMargin
-
-        width:
-        {
-            return LayoutController.isPortrait
-                ? parent.width
-                : mainWindow.width
-        }
-
+        width: parent.width
         height:
         {
-            if (!LayoutController.isPortrait)
+            if (!d.portraitOrientation)
                 return eventDetailsScreen.height
 
             const realWidth =
@@ -154,7 +127,7 @@ Page
                         : width * videoAspectRatio
                 }()
 
-            const maxHeight = (eventDetailsScreen.height - header.height - playbackPanel.height) / 2
+            const maxHeight = (eventDetailsScreen.height - playbackPanel.height) / 2
             return Math.min(realWidth, maxHeight)
         }
 
@@ -177,21 +150,21 @@ Page
 
             source: lp("/images/timeline_gradient.png")
             opacity: d.hasControls ? 1 : 0
-            visible: LayoutController.isPortrait && opacity > 0
+            visible: d.portraitOrientation && opacity > 0
         }
 
         DownloadMediaButton
         {
             id: downloadButton
 
-            parent: LayoutController.isPortrait
+            parent: d.portraitOrientation
                 ? preview
                 : playbackPanel
 
-            x: LayoutController.isPortrait
+            x: d.portraitOrientation
                 ? parent.width - width - orientationModeButton.width - goToCameraButton.width
                 : orientationModeButton.x - width
-            y: LayoutController.isPortrait
+            y: d.portraitOrientation
                 ? parent.height - height
                 : (parent.height - height) / 2
 
@@ -206,7 +179,7 @@ Page
         {
             id: goToCameraButton
 
-            visible: LayoutController.isPortrait && !preview.cannotDecryptMedia
+            visible: d.portraitOrientation && !preview.cannotDecryptMedia
 
             x: parent.width - width - orientationModeButton.width
             y: parent.height - height
@@ -222,14 +195,14 @@ Page
         {
             id: orientationModeButton
 
-            parent: LayoutController.isPortrait
+            parent: d.portraitOrientation
                 ? preview
                 : playbackPanel
 
-            x: LayoutController.isPortrait
+            x: d.portraitOrientation
                 ? parent.width - width
                 : parent.width - width - 16;
-            y: LayoutController.isPortrait
+            y: d.portraitOrientation
                 ? parent.height - height
                 : (parent.height - height) / 2
 
@@ -237,32 +210,14 @@ Page
             height: 48
             visible: !preview.cannotDecryptMedia
 
-            icon.source: LayoutController.isPortrait
+            icon.source: d.portraitOrientation
                 ? lp("/images/fullscreen_view_mode.svg")
                 : lp("/images/exit_fullscreen_mode.svg")
             icon.width: 24
             icon.height: icon.width
             padding: 0
 
-            onClicked:
-            {
-                if (LayoutController.isPortrait)
-                {
-                    // Go to landscape mode.
-                    if (CoreUtils.isMobilePlatform())
-                        windowContext.ui.windowHelpers.setScreenOrientation(Qt.LandscapeOrientation)
-                    else
-                        [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
-                }
-                else
-                {
-                    // Go to portrait mode.
-                    if (CoreUtils.isMobilePlatform())
-                        windowContext.ui.windowHelpers.setScreenOrientation(Qt.PortraitOrientation)
-                    else
-                        [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
-                }
-            }
+            onClicked: eventDetailsScreen.fullscreenButtonClicked()
         }
     }
 
@@ -379,9 +334,8 @@ Page
             return d.portrait ? 1 : 0.8
         }
 
-        x: mainWindow.hasNavigationBar ? 0 : -windowParams.leftMargin
         y: parent.height - height
-        width: mainWindow.hasNavigationBar ? parent.width : mainWindow.width
+        width: parent.width
         height: 76
 
         color: ColorTheme.colors.dark1
@@ -390,7 +344,7 @@ Page
         {
             labelPadding: 12
             anchors.verticalCenter: parent.verticalCenter
-            visible: !LayoutController.isPortrait
+            visible: !d.portraitOrientation
 
             icon.source: lp("/images/go_to_camera.svg")
             text: qsTr("Show on Camera")
@@ -467,15 +421,15 @@ Page
     {
         id: timestampText
 
-        parent: LayoutController.isPortrait
+        parent: d.portraitOrientation
             ? preview
             : playbackPanel
 
         visible: !preview.cannotDecryptMedia
-        x: LayoutController.isPortrait
+        x: d.portraitOrientation
             ? 16
             : (downloadButton.visible ? downloadButton.x : orientationModeButton.x) - width - 16
-        y: LayoutController.isPortrait
+        y: d.portraitOrientation
             ? parent.height - height - 14
             : (parent.height - height) / 2
 
@@ -495,20 +449,6 @@ Page
         height: windowParams.bottomMargin
         width: parent.width + windowParams.leftMargin + windowParams.rightMargin
         color: ColorTheme.colors.dark1
-    }
-
-    Rectangle
-    {
-        id: navigationBarTint
-
-        visible: mainWindow.hasNavigationBar
-
-        x: windowParams.leftMargin ? -windowParams.leftMargin : parent.width
-        y: -toolBar.height
-        width: mainWindow.width - parent.width
-        height: eventDetailsScreen.height
-
-        color: ColorTheme.colors.dark3
     }
 
     Slider
@@ -604,12 +544,15 @@ Page
     {
         target: d
         property: "hasControls"
-        value: LayoutController.isPortrait || d.showControls
+        value: d.portraitOrientation || d.showControls
     }
 
     QtObject
     {
         id: d
+
+        readonly property bool portraitOrientation: eventDetailsScreen.width < eventDetailsScreen.height
+        onPortraitOrientationChanged: d.hasControls = true
 
         property bool hasControls: true
 
@@ -676,16 +619,6 @@ Page
         onHasControlsChanged: updateStatusBarVisibility()
 
         onExclusionAreaYChanged: updateGestureExclusionArea()
-    }
-
-    Connections
-    {
-        target: LayoutController
-
-        function onIsPortraitChanged()
-        {
-            d.hasControls = true
-        }
     }
 
     Component.onCompleted:

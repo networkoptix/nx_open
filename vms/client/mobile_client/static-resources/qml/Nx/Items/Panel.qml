@@ -19,6 +19,7 @@ Page
     property color color: ColorTheme.colors.dark4
     property string iconSource
     property alias availableHeaderArea: availableHeaderArea
+    property alias menuButton: menuButton
 
     signal closeButtonClicked
 
@@ -58,6 +59,20 @@ Page
 
             NxControls.IconButton
             {
+                id: menuButton
+
+                icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
+                icon.width: 24
+                icon.height: 24
+
+                padding: 0
+                visible: false
+            }
+
+            NxControls.IconButton
+            {
+                id: closePanelButton
+
                 padding: 0
                 icon.source: "image://skin/24x24/Outline/close.svg?primary=light4"
                 icon.width: 24
