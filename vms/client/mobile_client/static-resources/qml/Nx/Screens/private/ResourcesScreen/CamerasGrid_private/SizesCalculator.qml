@@ -97,12 +97,14 @@ NxObject
 
     readonly property int totalLayoutHeight:
     {
-        const enlargedRowsTotalHeight =
-            enlargedRowsCount * (cellHeightFromWidth(enlargedCellWidth) + spacing) - spacing
+        const enlargedRowsTotalHeight = enlargedRowsCount > 0
+            ? enlargedRowsCount * (cellHeightFromWidth(enlargedCellWidth) + spacing) - spacing
+            : 0
 
         const normalRowsCount = Math.ceil((cellsCount - enlargedCellsCount) / columnsCount)
-        const normalRowsTotalHeight =
-            normalRowsCount * (cellHeightFromWidth(normalCellWidth) + spacing) - spacing
+        const normalRowsTotalHeight = normalRowsCount > 0
+            ? normalRowsCount * (cellHeightFromWidth(normalCellWidth) + spacing) - spacing
+            : 0
 
         return enlargedRowsTotalHeight + normalRowsTotalHeight
             + ((enlargedRowsCount > 0 && normalRowsCount > 0) ? spacing : 0)
@@ -276,12 +278,14 @@ NxObject
                 return normalCellWidth
 
             const normalCellHeight = cellHeightFromWidth(normalCellWidth)
+            const spacingBetweenNormalAndEnlargedRows = spacing
 
             if (enlargedCellsCount < columnsCount) //< A single row is enlarged.
             {
                 const normalRowsCount = Math.ceil(cellsCount / columnsCount) - 1
                 const availableHeightForTheEnlargedRow =
                     (availableHeight + spacing) - normalRowsCount * (normalCellHeight + spacing)
+                    - spacingBetweenNormalAndEnlargedRows
 
                 const cellWidthCorrespondingToAvailableWidth =
                     roundDimension((availableWidth + spacing) / enlargedCellsCount - spacing)
@@ -302,6 +306,7 @@ NxObject
             const normalRowsCount = Math.ceil(cellsCount / columnsCount) - 2
             const availableHeightForTwoEnlargedRows =
                 (availableHeight + spacing) - normalRowsCount * (normalCellHeight + spacing)
+                - spacingBetweenNormalAndEnlargedRows
 
             const enlargedRowWithMoreCellsLength = Math.ceil(enlargedCellsCount / 2)
 
