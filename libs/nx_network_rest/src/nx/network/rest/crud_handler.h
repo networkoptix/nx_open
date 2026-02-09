@@ -8,12 +8,12 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/ranges.h>
 #include <nx/reflect/array_orderer.h>
 #include <nx/reflect/field_enumerator.h>
 #include <nx/reflect/json/filter.h>
 #include <nx/reflect/merge.h>
 #include <nx/utils/crud_model.h>
-#include <nx/utils/std/ranges.h>
 #include <nx/utils/type_traits.h>
 #include <nx/utils/void.h>
 

@@ -4,6 +4,7 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/utils.h>
+#include <nx/ranges.h>
 #include <nx/utils/random.h>
 
 namespace nx::network::http::header::test {

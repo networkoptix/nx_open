@@ -3,7 +3,8 @@
 #pragma once
 
 #include <string_view>
-#include <nx/utils/std/ranges.h>
+
+#include <nx/ranges.h>
 #include <nx/utils/exception.h>
 
 #include "http/abstract_msg_body_source.h"
@@ -22,11 +23,18 @@ concept CookieViewFilterPredicate =
     };
 
 constexpr nx::Closure cookiesView =
-    []<CookieViewFilterPredicate Predicate = nx::AlwaysTrue>(
+    []<CookieViewFilterPredicate Predicate = nx::traits::AlwaysTrue>(
         const HttpHeaders& headers, Predicate&& filter = {})
             -> nx::ranges::ViewOf<std::pair<std::string_view, std::string_view>> auto
     {
+        using namespace std::string_view_literals;
         using namespace nx::ranges;
+
+        static constexpr auto toStringView =
+            [](const nx::ToStringViewConvertible auto& s)
+            {
+                return std::string_view(s);
+            };
 
         const auto cookieHeaders = std::apply(
             [](auto... i)
@@ -41,7 +49,8 @@ constexpr nx::Closure cookiesView =
                 [filterPredicate = std::forward<Predicate>(filter)](std::string_view v) mutable
                 {
                     return v
-                        | nx::views::split(";")
+                        | std::views::split(";"sv)
+                        | std::views::transform(toStringView)
                         | std::views::transform(trim)
                         | std::views::filter(
                             [](std::string_view v)
@@ -55,7 +64,8 @@ constexpr nx::Closure cookiesView =
                             [](std::string_view s) -> std::pair<std::string_view, std::string_view>
                             {
                                 return s
-                                    | nx::views::split("=")
+                                    | std::views::split("="sv)
+                                    | std::views::transform(toStringView)
                                     | std::views::transform(trim)
                                     | to_pair;
                             })

@@ -13,6 +13,7 @@
 
 #include <QtCore/QByteArray>
 
+#include <nx/concepts.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/type_traits.h>
@@ -1302,7 +1303,7 @@ public:
      * NOTE: This constructor works with any type that has "const char* data()" and "size()".
      * E.g., QByteArray.
      */
-    template<traits::ToStringViewConvertible T>
+    template<nx::ToStringViewConvertible T>
     ConstBufferRefType(const T& str)
         :
         base_type(str.data(), (std::size_t) str.size())

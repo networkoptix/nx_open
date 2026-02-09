@@ -7,6 +7,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/ranges.h>
 #include <nx/utils/compound_visitor.h>
 #include <nx/utils/crud_model.h>
 #include <nx/utils/std/algorithm.h>
@@ -401,14 +402,15 @@ template<typename Model>
 std::vector<Model> fromCameras(std::vector<CameraData> cameras)
 {
     return std::move(cameras)
-        | nx::ranges::transform(
+        | std::views::transform(
             [](CameraData c) -> Model
             {
                 Model m;
                 static_cast<DeviceModelGeneral&>(m) =
                     DeviceModelGeneral::fromCameraData(std::move(c));
                 return m;
-            });
+            })
+        | nx::ranges::to<std::vector>();
 }
 
 template <typename Model>

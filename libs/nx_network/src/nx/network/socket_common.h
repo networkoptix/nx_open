@@ -9,10 +9,10 @@
 #include <string>
 #include <string_view>
 
+#include <nx/concepts.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/tags.h>
 #include <nx/utils/system_error.h>
-#include <nx/utils/type_traits.h>
 
 // TODO: #skolesnik Move all related conversion functions to separate header.
 // very error prone
@@ -100,7 +100,7 @@ public:
      * NOTE: This constructor works with any type that has "const char* data()" and "size()".
      * E.g., QByteArray.
      */
-    template<nx::traits::ToStringViewConvertible String>
+    template<nx::ToStringViewConvertible String>
     HostAddress(const String& str)
         :
         HostAddress(std::string_view(str.data(), (std::size_t) str.size()))
@@ -245,7 +245,7 @@ public:
      * NOTE: This constructor works with any type that has "const char* data()" and "size()".
      * E.g., QByteArray.
      */
-    template<nx::traits::ToStringViewConvertible String>
+    template<nx::ToStringViewConvertible String>
     SocketAddress(const String& endpointStr)
         :
         SocketAddress(std::string_view(endpointStr.data(), (std::size_t) endpointStr.size()))
@@ -334,15 +334,12 @@ NX_REFLECTION_TAG_TYPE(KeepAliveOptions, useStringConversionForSerialization)
 
 } // namespace nx::network
 
-namespace std {
-
-template <> struct hash<nx::network::SocketAddress>
+template<>
+struct std::hash<nx::network::SocketAddress>
 {
-    size_t operator()(const nx::network::SocketAddress& socketAddress) const
+    std::size_t operator()(const nx::network::SocketAddress& socketAddress) const noexcept
     {
         const auto stdString = socketAddress.toString();
-        return hash<std::string>{}(stdString);
+        return std::hash<std::string>{}(stdString);
     }
 };
-
-} // namespace std

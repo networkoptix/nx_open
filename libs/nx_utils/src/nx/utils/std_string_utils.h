@@ -10,9 +10,9 @@
 #include <string_view>
 #include <tuple>
 
+#include <nx/concepts.h>
 #include <nx/utils/buffer.h>
 #include <nx/utils/std/charconv.h>
-#include <nx/utils/type_traits.h>
 
 namespace nx::utils {
 
@@ -641,7 +641,7 @@ void append(String* str, T val)
         str->append(buf, result.ptr - buf);
 }
 
-template<typename String, traits::ToStringViewConvertible T>
+template<typename String, nx::ToStringViewConvertible T>
     requires (!requires(String& s, const T& t) { s += t.toString(); })
 void append(String * str, const T& val)
 {
@@ -1518,7 +1518,7 @@ inline BasicBuffer<char> toHex(const BasicBuffer<char>& str)
     return BasicBuffer<char>(toHex(std::string_view(str.data(), str.size())));
 }
 
-template <traits::ToStringViewConvertible String>
+template <nx::ToStringViewConvertible String>
 std::decay_t<String> toHex(const String& str)
 {
     return detail::toHex<String>(std::string_view(str.data(), (std::size_t) str.size()));

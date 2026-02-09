@@ -94,3 +94,17 @@
 
 #define NX_SUPPRESS_DEPRECATED_END() \
     NX_DIAG_POP()
+
+// Microsoft's way to "support" the standard's [[no_unique_address]] attribute is
+// "It won't create an error, but it won't have any effect":
+// https://devblogs.microsoft.com/cppblog/msvc-cpp20-and-the-std-cpp20-switch/
+//
+// To ensure ABI compatibility with MSVC code, clang doesn't support that attribute either
+// when compiling for Windows target, reporting a warning/error for the "unknown" attribute.
+//
+// Meanwhile, both compilers support an extension attribute with the same functionality.
+#ifdef _MSC_VER
+    #define NX_NO_UNIQUE_ADDRESS [[msvc::no_unique_address]]
+#else
+    #define NX_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#endif
