@@ -4,92 +4,102 @@
 
 #include "webrtc_utils.h"
 
+#include <nx/utils/uuid.h>
+
 namespace nx::webrtc {
+
+enum class TrackType {
+    unknown,
+    video,
+    audio
+};
 
 struct NX_WEBRTC_API Track
 {
     uint32_t ssrc = 0;
     std::string cname;
-    std::string msid;
-    std::string mid;
+    std::string streamId;
+    std::string trackId;
+    int mid = 0;
     int payloadType = 0;
     Purpose purpose = Purpose::sendrecv;
+    nx::Uuid deviceId;
+    TrackType trackType = TrackType::unknown;
 };
 
 const std::string& toSdpAttribute(Purpose purpose);
 
 class NX_WEBRTC_API Tracks
 {
+    Tracks(const Tracks&) = delete;
+    Tracks& operator=(const Tracks&) = delete;
+
 public:
+
+    void addTrack(std::unique_ptr<Track> track);
+
     Tracks(Session* session);
     virtual ~Tracks() = default;
 
-    const Track& videoTrack() const { return m_localVideoTrack; }
-    const Track& audioTrack() const { return m_localAudioTrack; }
-    void setVideoPayloadType(int payloadType);
-    void setAudioPayloadType(int payloadType);
+    Track* videoTrack(nx::Uuid deviceId) const;
+    Track* audioTrack(nx::Uuid deviceId) const;
+    Track* track(uint32_t ssrc) const;
+    std::vector<Track> allTracks() const;
 
-    virtual bool hasVideo() const = 0;
-    virtual bool hasAudio() const = 0;
-    virtual std::string getVideoMedia(uint16_t port) const = 0;
-    virtual std::string getAudioMedia(uint16_t port) const = 0;
     virtual void setFallbackCodecs() = 0;
     virtual bool fallbackCodecs() = 0;
+
     virtual std::string mimeType() const = 0;
+    virtual bool examineSdp(const std::string& sdp) = 0;
+
+    virtual std::string getSdpForTrack(const Track* track, uint16_t port) const;
+
     virtual bool hasVideoTranscoding() const = 0;
     virtual bool hasAudioTranscoding() const = 0;
-    virtual bool examineSdp(const std::string& sdp) = 0;
-    virtual void addTrackAttributes(const Track& track, std::string& sdp) const = 0;
 
 protected:
     Session* m_session = nullptr;
 
 private:
-    Track m_localVideoTrack;
-    Track m_localAudioTrack;
+    std::map<uint32_t, std::unique_ptr<Track>> m_tracks;
 };
 
 class NX_WEBRTC_API TracksForSend: public Tracks
 {
+    using base_type = Tracks;
 public:
     TracksForSend(Session* session);
     virtual ~TracksForSend() override = default;
 
-    virtual bool hasVideo() const override;
-    virtual bool hasAudio() const override;
-    virtual std::string getVideoMedia(uint16_t port) const override;
-    virtual std::string getAudioMedia(uint16_t port) const override;
     virtual void setFallbackCodecs() override;
     virtual bool fallbackCodecs() override;
+
     virtual std::string mimeType() const override;
+    virtual bool examineSdp(const std::string& sdp) override;
+    virtual std::string getSdpForTrack(const Track* track, uint16_t port) const override;
+
     virtual bool hasVideoTranscoding() const override;
     virtual bool hasAudioTranscoding() const override;
-    virtual bool examineSdp(const std::string& sdp) override;
-    virtual void addTrackAttributes(const Track& track, std::string& sdp) const override;
-
 private:
     bool m_fallbackCodecs = false;
 };
 
 class NX_WEBRTC_API TracksForRecv: public Tracks
 {
+    using base_type = Tracks;
 public:
     TracksForRecv(Session* session);
     virtual ~TracksForRecv() override = default;
 
-    virtual bool hasVideo() const override;
-    virtual bool hasAudio() const override;
-    virtual std::string getVideoMedia(uint16_t port) const override;
-    virtual std::string getAudioMedia(uint16_t port) const override;
     virtual void setFallbackCodecs() override;
     virtual bool fallbackCodecs() override;
 
     virtual std::string mimeType() const override;
+    virtual bool examineSdp(const std::string& sdp) override;
+    virtual std::string getSdpForTrack(const Track* track, uint16_t port) const override;
+
     virtual bool hasVideoTranscoding() const override;
     virtual bool hasAudioTranscoding() const override;
-
-    virtual bool examineSdp(const std::string& sdp) override;
-    virtual void addTrackAttributes(const Track& track, std::string& sdp) const override;
 };
 
 } // namespace nx::webrtc

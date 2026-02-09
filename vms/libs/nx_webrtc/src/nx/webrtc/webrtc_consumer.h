@@ -39,7 +39,9 @@ public:
     virtual ~Consumer();
 
     void putData(
-        const QnConstAbstractMediaDataPtr& data, const AbstractCameraDataProvider::OnDataReady& handler);
+        nx::Uuid deviceId,
+        const QnConstAbstractMediaDataPtr& data,
+        const AbstractCameraDataProvider::OnDataReady& handler);
 
     // API for Streamer.
     bool startStream(Streamer* streamer);
@@ -58,7 +60,9 @@ private:
     friend class Ice;
 
     // Streaming related.
-    void putMediaDataToSendBuffers(const QnConstAbstractMediaDataPtr& media);
+    void putMediaDataToSendBuffers(
+        nx::Uuid deviceId,
+        const QnConstAbstractMediaDataPtr& media);
     void sendMetadata(const QnConstCompressedMetadataPtr& metadata);
     void handleRtcp(uint8_t* data, int size);
     void runInMuxingThread(std::function<void()>&& func);
