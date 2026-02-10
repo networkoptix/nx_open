@@ -7,10 +7,15 @@
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/vms/common/system_context.h>
 
+#include "webrtc_ice_relay.h"
+#include "webrtc_ice_tcp.h"
+#include "webrtc_ice_udp.h"
 #include "webrtc_receiver.h"
 #include "webrtc_streamer.h"
 #include "webrtc_tracker.h"
 #include "webrtc_session_pool.h"
+#include "webrtc_srflx.h"
+#include "webrtc_tracker.h"
 
 /* RFC list:
  * https://webrtcforthecurious.com/docs/03-connecting/ - Overview of connecting process
@@ -65,7 +70,9 @@ Session::Session(
     std::unique_ptr<AbstractCameraDataProvider> provider,
     const std::string& localUfrag,
     const nx::network::SocketAddress& address,
-    const std::vector<IceCandidate>& iceCandidates,
+    const QList<nx::network::SocketAddress>& allAddresses,
+    const SessionConfig& config,
+    const std::vector<nx::network::SocketAddress>& stunServers,
     Purpose purpose)
     :
     m_SystemContext(context),
@@ -73,10 +80,12 @@ Session::Session(
     m_provider(std::move(provider)),
     m_localAddress(address),
     m_pem(ssl::Context::instance()->getDefaultCertificate()),
-    m_tracker(std::make_shared<Tracker>(m_SystemContext, sessionPool, this)),
-    m_iceCandidates(iceCandidates),
-    m_sessionPool(sessionPool)
+    m_tracker(std::make_shared<Tracker>(this)),
+    m_stunServers(stunServers),
+    m_sessionPool(sessionPool),
+    m_config(config)
 {
+    createIces(allAddresses);
     m_localUfrag = localUfrag;
     m_localPwd = generatePwd(24);
     m_dtls = std::make_shared<Dtls>(m_localUfrag, m_pem);
@@ -142,8 +151,95 @@ Session::Session(
 
 Session::~Session()
 {
+    m_sessionPool->turnInfoFetcher().removeOauthInfoHandler(id());
     m_reader.reset();
     releaseTracker(); //< Should be guarded.
+}
+
+void Session::createIces(const QList<nx::network::SocketAddress>& addresses)
+{
+    int priority = IceCandidate::kIceMaxPriority;
+    int index = 0;
+    // TCP host candidates.
+    for (const auto& address: addresses)
+    {
+        m_iceCandidates.push_back(
+            IceCandidate::constructTcpHost(index++, priority--, address));
+    }
+
+    // UDP host candidates.
+    for (const auto& address: addresses)
+    {
+        auto udpIce = std::make_unique<IceUdp>(m_sessionPool, m_config);
+        auto iceLocalAddress = udpIce->bind(address.address);
+        if (iceLocalAddress)
+        {
+            m_iceCandidates.push_back(
+                IceCandidate::constructUdpHost(
+                    index++,
+                    priority--,
+                    *iceLocalAddress));
+            m_udpIces.push_back(std::move(udpIce));
+        }
+    }
+
+    // Srflx candidate.
+    // Use first 2 accessible STUN servers from list.
+    m_srflx = std::make_unique<Srflx>(m_localUfrag, m_stunServers,
+        [this](const nx::network::SocketAddress& mappedAddress,
+            std::unique_ptr<nx::network::AbstractDatagramSocket>&& socket)
+        {
+            NX_DEBUG(this, "%1: Got Srflx remote addres: %2, local address: %3",
+                id(),
+                mappedAddress.toString(),
+                socket ? socket->getLocalAddress().toString() : "null");
+            // 1. Create IceUdp with given socket.
+            nx::network::SocketAddress iceLocalAddress;
+            if (socket && !mappedAddress.isNull())
+            {
+                iceLocalAddress = socket->getLocalAddress();
+
+                NX_MUTEX_LOCKER lk(&m_mutex);
+                m_punchedUdpIce = std::make_unique<IceUdp>(m_sessionPool, m_config);
+                m_punchedUdpIce->resetSocket(std::move(socket));
+                if (m_remoteSrflx)
+                    m_punchedUdpIce->sendBinding(*m_remoteSrflx.get(), describeUnsafe());
+            }
+
+            // 2. Add candidate to list.
+            if (!mappedAddress.isNull())
+            {
+                IceCandidate srflxCandidate = IceCandidate::constructUdpSrflx(
+                    IceCandidate::kIceMinIndex,
+                    IceCandidate::kIceMaxPriority,
+                    mappedAddress,
+                    iceLocalAddress);
+                addIceCandidate(std::move(srflxCandidate));
+            }
+        });
+
+    m_relayIce = std::make_unique<IceRelay>(m_sessionPool, m_config, id(),
+        [this](const IceCandidate& candidate)
+        {
+            addIceCandidate(candidate);
+        });
+
+    m_sessionPool->turnInfoFetcher().fetchTurnInfo(
+        id(),
+        [this](const TurnServerInfo& info) {
+            m_relayIce->startRelay(info);
+        });
+}
+
+void Session::gotIceFromTracker(const IceCandidate& iceCandidate)
+{
+    NX_DEBUG(this, "Got ice srflx from peer: %1 -> %2", id(), iceCandidate.serialize());
+
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    if (m_punchedUdpIce)
+        m_punchedUdpIce->sendBinding(iceCandidate, describeUnsafe());
+    m_remoteSrflx = std::make_unique<IceCandidate>(iceCandidate);
+    m_relayIce->setRemoteSrflx(iceCandidate);
 }
 
 bool Session::initializeMuxers(
@@ -259,14 +355,22 @@ std::shared_ptr<nx::metric::Storage> Session::metrics() const
     return m_SystemContext->metrics();
 }
 
-SessionDescription Session::describe() const
+std::optional<SessionDescription> Session::describe() const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
+    if (isLocked())
+        return std::nullopt;
+
+    return describeUnsafe();
+}
+
+SessionDescription Session::describeUnsafe() const
+{
     return SessionDescription
     {
-        .id = id(),
-        .remoteUfrag = getRemoteUfrag(),
-        .localPwd = getLocalPwd(),
+        .id = m_localUfrag,
+        .remoteUfrag = m_sdpParseResult.iceUfrag,
+        .localPwd = m_localPwd,
         .dtls = m_dtls
     };
 }
@@ -353,7 +457,7 @@ std::string Session::constructSdp()
 AnswerResult Session::examineSdp(const std::string& sdp)
 {
     m_sdpParseResult = SdpParseResult::parse(sdp);
-    NX_DEBUG(this, "%1: Sdp parsed, got remote: %2/%3", id(), getRemoteUfrag(), getRemotePwd());
+    NX_DEBUG(this, "%1: Sdp parsed, got remote: %2/%3", id(), m_sdpParseResult.iceUfrag, m_sdpParseResult.icePwd);
 
     if (m_sdpParseResult.fingerprint.type == Fingerprint::Type::none)
     {
@@ -433,7 +537,32 @@ const std::vector<IceCandidate> Session::getIceCandidates() const
     return m_iceCandidates;
 }
 
-void Session::gotIceFromManager(const IceCandidate& iceCandidate)
+
+bool Session::lock()
+{
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    if (isLocked())
+        return false;
+
+    NX_DEBUG(this, "Locked session %1", id());
+    m_timer.invalidate();
+    return true;
+}
+
+void Session::unlock()
+{
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    NX_DEBUG(this, "Unlocked session %1", id());
+    m_timer.restart();
+}
+
+bool Session::hasExpired(std::chrono::milliseconds timeout) const
+{
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    return m_timer.isValid() && m_timer.hasExpired(timeout);
+}
+
+void Session::addIceCandidate(const IceCandidate& iceCandidate)
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     int index = IceCandidate::kIceMinIndex;

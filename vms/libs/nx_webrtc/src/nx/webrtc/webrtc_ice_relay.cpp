@@ -19,11 +19,12 @@ constexpr std::chrono::seconds kPermissionsLifetime{295};
 IceRelay::IceRelay(
     SessionPool* sessionPool,
     const SessionConfig& config,
-    const std::string& sessionId
-    )
+    const std::string& sessionId,
+    const CandidateHandler& handler)
     :
     Ice(sessionPool, config),
-    m_sessionId(sessionId)
+    m_sessionId(sessionId),
+    m_onCandidateReadyHandler(handler)
 {
     m_readBuffer.reserve(kRawReadBufferSize);
 
@@ -36,8 +37,10 @@ IceRelay::IceRelay(
     m_socket.setNonBlockingMode(true);
 }
 
-/*virtual*/ IceRelay::~IceRelay()
+IceRelay::~IceRelay()
 {
+    m_sessionPool->turnInfoFetcher().removeOauthInfoHandler(m_sessionId);
+
     std::promise<void> stoppedPromise;
     m_pollable.dispatch(
         [this, &stoppedPromise]()
@@ -48,7 +51,7 @@ IceRelay::IceRelay(
     stoppedPromise.get_future().wait();
 }
 
-/*virtual*/ void IceRelay::stopUnsafe()
+void IceRelay::stopUnsafe()
 {
     if (!m_needStop)
     {
@@ -61,7 +64,7 @@ IceRelay::IceRelay(
     }
 }
 
-/*virtual*/ IceCandidate::Filter IceRelay::type() const
+IceCandidate::Filter IceRelay::type() const
 {
     return IceCandidate::Filter::UdpRelay;
 }
@@ -128,7 +131,7 @@ void IceRelay::bindToRelay()
         });
 }
 
-/*virtual*/ nx::Buffer IceRelay::toSendBuffer(const char* data, int dataSize) const
+nx::Buffer IceRelay::toSendBuffer(const char* data, int dataSize) const
 {
     if (dataSize > std::numeric_limits<uint16_t>::max())
     {
@@ -318,9 +321,12 @@ bool IceRelay::handleThirdPartyAuthorization(const stun::Message& message)
         auto thirdPartyAuthorization = message.getAttribute<stun::attrs::ThirdPartyAuthorization>();
         NX_CRITICAL(thirdPartyAuthorization);
 
-        m_sessionPool->iceManager().getThirdPartyAuthorization(
+        m_sessionPool->turnInfoFetcher().fetchThirdPartyAuthorization(
             m_sessionId,
-            thirdPartyAuthorization->getString());
+            thirdPartyAuthorization->getString(),
+            [this](const OauthInfo& info) {
+                setOauthInfo(info);
+            });
         return false;
     }
     return true;
@@ -431,9 +437,8 @@ bool IceRelay::handleCreatePermission(const stun::Message& message)
     }
     if (m_relayStage != RelayStage::Indication)
     {
-        m_sessionPool->gotIceFromManager(
-            m_sessionId,
-            *m_localRelay);
+        NX_DEBUG(this, "Got ice candidate from manager: %1 -> %2", m_sessionId, m_localRelay->serialize());
+        m_onCandidateReadyHandler(*m_localRelay);
         m_relayStage = RelayStage::Indication; //< Ready to send and receive packets to/from remote peer.
     }
 
@@ -594,7 +599,7 @@ void IceRelay::onBytesRead(SystemError::ErrorCode errorCode, std::size_t bytesTr
     }
 }
 
-/*virtual*/ void IceRelay::asyncSendPacketUnsafe()
+void IceRelay::asyncSendPacketUnsafe()
 {
     m_socket.post(
         [this]()
@@ -611,12 +616,12 @@ void IceRelay::onBytesRead(SystemError::ErrorCode errorCode, std::size_t bytesTr
         });
 }
 
-/*virtual*/ nx::network::SocketAddress IceRelay::iceRemoteAddress() const
+nx::network::SocketAddress IceRelay::iceRemoteAddress() const
 {
     return m_socket.getForeignAddress();
 }
 
-/*virtual*/ nx::network::SocketAddress IceRelay::iceLocalAddress() const
+nx::network::SocketAddress IceRelay::iceLocalAddress() const
 {
     return m_socket.getLocalAddress();
 }

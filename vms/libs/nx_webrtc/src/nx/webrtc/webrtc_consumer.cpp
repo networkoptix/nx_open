@@ -248,7 +248,7 @@ void Consumer::putMediaDataToSendBuffers(
     const QnConstAbstractMediaDataPtr& media)
 {
     // This code should be called only from Streamer's AIO thread.
-    NX_VERBOSE(this, "Process data: %1", media);
+    NX_VERBOSE(this, "Process data: %1, buffer size: %2", media, m_mediaBuffers.size());
 
     if (!media) //< EOF.
     {
@@ -268,6 +268,12 @@ void Consumer::putMediaDataToSendBuffers(
     }
 
     auto rtpEncoder = m_session->muxer()->setDataPacket(deviceId, media);
+    if (!rtpEncoder)
+    {
+        NX_VERBOSE(this, "Skip unsupported data: %1, deviceId: %2", media, deviceId);
+        onDataConsumed();
+        return;
+    }
 
     nx::utils::ByteArray buffer;
     while (!m_needStop && m_session->muxer()->getNextPacket(rtpEncoder, buffer))

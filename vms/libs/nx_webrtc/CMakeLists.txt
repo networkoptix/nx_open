@@ -15,4 +15,6 @@ target_compile_definitions(nx_webrtc
     PRIVATE NX_WEBRTC_API=${API_EXPORT_MACRO}
     INTERFACE NX_WEBRTC_API=${API_IMPORT_MACRO})
 
-add_subdirectory(unit_tests)
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()

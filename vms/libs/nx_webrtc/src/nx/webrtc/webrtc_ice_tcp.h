@@ -43,6 +43,7 @@ public:
     virtual ~IceTcp();
     void start();
     virtual IceCandidate::Filter type() const override;
+    bool isStopped();
 
 protected:
     // From Ice.
@@ -58,6 +59,7 @@ private:
 private:
     nx::network::BufferedStreamSocket m_socket;
     nx::Buffer m_readBuffer;
+    std::atomic<bool> m_stopped = false;
 };
 
 } // namespace nx::webrtc

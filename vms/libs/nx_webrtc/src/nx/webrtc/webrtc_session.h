@@ -28,6 +28,11 @@ enum AnswerResult
 class SessionPool;
 class Tracker;
 class AbstractIceDelegate;
+class IceUdp;
+class IceRelay;
+class Srflx;
+class Session;
+class ConnectionProcessor;
 
 class NX_WEBRTC_API Session
 {
@@ -40,27 +45,22 @@ public:
         std::unique_ptr<AbstractCameraDataProvider> provider,
         const std::string& localUfrag,
         const nx::network::SocketAddress& address,
-        const std::vector<IceCandidate>& iceCandidates,
+        const QList<nx::network::SocketAddress>& allAddresses,
+        const SessionConfig& config,
+        const std::vector<nx::network::SocketAddress>& m_stunServers,
         Purpose purpose);
     ~Session();
     void setAddress(const nx::network::SocketAddress& address);
     std::string constructSdp();
     AnswerResult examineSdp(const std::string& sdp);
-
     AnswerResult setFallbackCodecs();
-
     Purpose purpose() const { return m_purpose; }
-    std::string id() const { return getLocalUfrag(); }
-    std::string getLocalUfrag() const { return m_localUfrag; }
-    std::string getLocalPwd() const { return m_localPwd; }
-    std::string getRemoteUfrag() const { return m_sdpParseResult.iceUfrag; }
-    std::string getRemotePwd() const { return m_sdpParseResult.icePwd; }
-    const SdpParseResult& sdpParseResult() const { return m_sdpParseResult; }
-    SessionDescription describe() const;
+    std::string id() const { return m_localUfrag; }
+    std::optional<SessionDescription> describe() const;
     const std::vector<IceCandidate> getIceCandidates() const;
 
     const nx::network::ssl::Pem& getPem() const { return m_pem; }
-    void gotIceFromManager(const IceCandidate& iceCandidate);
+    void addIceCandidate(const IceCandidate& iceCandidate);
     std::shared_ptr<Tracker> tracker() { return m_tracker; }
     void releaseTracker();
 
@@ -82,11 +82,26 @@ public:
     AbstractCameraDataProvider* provider() { return m_provider.get(); }
     Consumer* consumer() { return m_consumer.get(); }
     AbstractIceDelegate* transceiver() { return m_transceiver.get(); }
+    void gotIceFromTracker(const IceCandidate& iceCandidate);
+
+    /**
+     * @return false, if session already locked.
+     * NOTE: Cancel session deletion timer for keepAliveTimeoutSec and lock the session for other
+     * ices.
+     */
+    bool lock();
+    /**
+     * NOTE: Starts session deletion timer for keepAliveTimeoutSec if no refs found.
+     */
+    void unlock();
+    bool hasExpired(std::chrono::milliseconds timeout) const;
 
 private:
     std::string dataChannelSdp() const;
     std::string constructFingerprint() const;
     bool initializeMuxersInternal(bool useFallbackVideo, bool useFallbackAudio);
+    void createIces(const QList<nx::network::SocketAddress>& addresses);
+    SessionDescription describeUnsafe() const;
 
 private:
     nx::vms::common::SystemContext* m_SystemContext = nullptr;
@@ -124,7 +139,20 @@ private:
     std::optional<nx::vms::api::ResolutionData> m_resolution;
     std::optional<nx::vms::api::ResolutionData> m_resolutionWhenTranscoding;
     nx::vms::api::WebRtcTrackerSettings::MseFormat m_mseFormat;
+
+    std::vector<std::unique_ptr<IceUdp>> m_udpIces;
+    std::unique_ptr<IceUdp> m_punchedUdpIce;
+    std::unique_ptr<IceRelay> m_relayIce;
+    std::unique_ptr<Srflx> m_srflx;
+    std::unique_ptr<IceCandidate> m_remoteSrflx;
+    std::vector<nx::network::SocketAddress> m_stunServers;
     SessionPool* m_sessionPool;
+    SessionConfig m_config;
+
+
+    // Timer for carbage collector in SessionPool.
+    nx::utils::ElapsedTimer m_timer{ nx::utils::ElapsedTimerState::started};
+    bool isLocked() const { return !m_timer.isValid(); }
 };
 
 } // namespace nx::webrtc

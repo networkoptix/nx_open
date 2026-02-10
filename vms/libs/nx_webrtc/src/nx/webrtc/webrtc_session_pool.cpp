@@ -2,8 +2,14 @@
 
 #include "webrtc_session_pool.h"
 
+#include "webrtc_ice_tcp.h"
 #include "webrtc_session.h"
 
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/mediator_connector.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 
 namespace nx::webrtc {
@@ -11,13 +17,14 @@ namespace nx::webrtc {
 SessionPool::SessionPool(
     nx::vms::common::SystemContext* context,
     nx::utils::TimerManager* timerManager,
-    QnFfmpegVideoTranscoder::TranscodePolicy transcodePolicy)
+    QnFfmpegVideoTranscoder::TranscodePolicy transcodePolicy,
+    const std::vector<nx::network::SocketAddress>& defaultStunServers)
     :
     nx::vms::common::SystemContextAware(context),
     m_timerManager(timerManager),
-    m_iceManager(context, this),
-    m_threadPool(std::make_unique<QThreadPool>()),
-    m_transcodePolicy(transcodePolicy)
+    m_turnInfoFetcher(context->globalSettings()),
+    m_transcodePolicy(transcodePolicy),
+    m_defaultStunServers(defaultStunServers)
 {
     static const std::chrono::milliseconds kMinTimeout(100);
     using namespace std::chrono;
@@ -31,7 +38,7 @@ SessionPool::SessionPool(
         timeout, timeout);
 }
 
-/*virtual*/ SessionPool::~SessionPool()
+SessionPool::~SessionPool()
 {
     stop();
 }
@@ -39,20 +46,35 @@ SessionPool::SessionPool(
 void SessionPool::stop()
 {
     m_timerManager->joinAndDeleteTimer(m_timerId);
-    m_iceManager.stop();
+    m_turnInfoFetcher.stop();
+
+    // TODO move working ice to session and use simple crear() without swap and deletion order.
+    // Now it should be deleted before sessions, since ices have pointer to session.
+    decltype(m_tcpIces) icesTcp;
+    {
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        std::swap(icesTcp, m_tcpIces);
+    }
+    icesTcp.clear();
 
     NX_MUTEX_LOCKER lk(&m_mutex);
     m_sessionById.clear();
 }
 
-IceManager& SessionPool::iceManager()
+std::vector<nx::network::SocketAddress> SessionPool::getStunServers()
 {
-  return m_iceManager;
+    auto connectionMediatorAddress = SocketGlobals::cloud().mediatorConnector().address();
+
+    std::vector<nx::network::SocketAddress> result;
+    if (connectionMediatorAddress)
+        result.push_back(connectionMediatorAddress->stunUdpEndpoint);
+    result.insert(result.end(), m_defaultStunServers.begin(), m_defaultStunServers.end());
+    return result;
 }
 
-QThreadPool* SessionPool::threadPool()
+TurnInfoFetcher& SessionPool::turnInfoFetcher()
 {
-    return m_threadPool.get();
+  return m_turnInfoFetcher;
 }
 
 std::string SessionPool::emitUfrag()
@@ -66,7 +88,7 @@ std::string SessionPool::emitUfrag()
     }
     while (m_sessionById.count(localUfrag) > 0);
 
-    m_sessionById[localUfrag] = std::nullopt;
+    m_sessionById[localUfrag] = nullptr;
     return localUfrag;
 }
 
@@ -76,7 +98,8 @@ bool SessionPool::takeUfrag(const std::string& ufrag)
 
     if (m_sessionById.count(ufrag) > 0)
         return false;
-    m_sessionById[ufrag] = std::nullopt;
+
+    m_sessionById[ufrag] = nullptr;
     return true;
 }
 
@@ -85,25 +108,6 @@ std::shared_ptr<Session> SessionPool::createInternal(
     Purpose purpose,
     const nx::network::SocketAddress& address,
     const std::string& localUfrag,
-    const SessionConfig& config)
-{
-    auto iceCandidates = m_iceManager.allocateIce(localUfrag, config); //< Should be unguarded.
-
-    auto session = createSessionInternal(
-        std::move(cameraProvider), purpose, address, localUfrag, iceCandidates, config);
-
-    // Note that async ices should be created after session creation.
-    m_iceManager.allocateIceAsync(localUfrag, config); //< Should be unguarded.
-
-    return session;
-}
-
-std::shared_ptr<Session> SessionPool::createSessionInternal(
-    std::unique_ptr<AbstractCameraDataProvider> cameraProvider,
-    Purpose purpose,
-    const nx::network::SocketAddress& address,
-    const std::string& localUfrag,
-    const std::vector<IceCandidate>& iceCandidates,
     const SessionConfig& config)
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
@@ -115,18 +119,26 @@ std::shared_ptr<Session> SessionPool::createSessionInternal(
         return nullptr;
     }
 
+    auto server = systemContext()->resourcePool()->getResourceById<QnMediaServerResource>(
+        systemContext()->peerId());
+
+    if (!server)
+        return nullptr;
+
+    auto allAddresses = server->getAllAvailableAddresses();
+
     std::shared_ptr<Session> session = std::make_shared<Session>(
         systemContext(),
         this,
         std::move(cameraProvider),
         localUfrag,
         address,
-        iceCandidates,
+        allAddresses,
+        config,
+        getStunServers(),
         purpose);
 
-    m_sessionById[session->id()] = SessionContext{
-        .session = session,
-        .config = config};
+    m_sessionById[session->id()] = session;
 
     NX_DEBUG(this, "Started session %1", localUfrag);
 
@@ -158,46 +170,19 @@ std::shared_ptr<Session> SessionPool::create(
         std::move(cameraProvider), purpose, address, localUfrag, config);
 }
 
-std::optional<SessionDescription> SessionPool::describe(const std::string& id)
-{
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    auto session = m_sessionById.find(id);
-    if (session == m_sessionById.end() || !session->second || session->second->isLocked())
-        return std::nullopt;
-
-    return session->second->session->describe();
-}
-
-std::shared_ptr<Session> SessionPool::lock(const std::string& id)
+std::weak_ptr<Session> SessionPool::getSession(const std::string& id)
 {
     // TODO: Maybe it is better to cleanup now unused Ices here...
     NX_MUTEX_LOCKER lk(&m_mutex);
     auto session = m_sessionById.find(id);
-    if (session == m_sessionById.end() || !session->second || session->second->isLocked())
-        return nullptr;
+    if (session == m_sessionById.end() || !session->second)
+        return std::weak_ptr<Session>();
 
-    session->second->lock();
-    NX_DEBUG(this, "Locked session %1", id);
-    return session->second->session;
+    return session->second;
 }
 
-void SessionPool::unlock(const std::string& id)
+void SessionPool::onTimer(const quint64& /*timerId*/)
 {
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    auto session = m_sessionById.find(id);
-    NX_CRITICAL(session != m_sessionById.end());
-    NX_CRITICAL(session->second);
-    if (!session->second->isLocked())
-        return; //< unlock() called twice
-
-
-    session->second->unlock();
-    NX_DEBUG(this, "Unlocked session %1", id);
-}
-
-/*virtual*/ void SessionPool::onTimer(const quint64& /*timerId*/)
-{
-    std::vector<SessionPtr> toRemove;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         for (auto it = m_sessionById.begin(); it != m_sessionById.end();)
@@ -205,8 +190,7 @@ void SessionPool::unlock(const std::string& id)
             auto& ctx = it->second;
             if (ctx && ctx->hasExpired(m_keepAliveTimeout))
             {
-                NX_DEBUG(this, "Remove session on timer: %1", ctx->session);
-                toRemove.emplace_back(std::move(ctx->session));
+                NX_DEBUG(this, "Remove session on timer: %1", ctx);
                 it = m_sessionById.erase(it);
             }
             else
@@ -214,49 +198,33 @@ void SessionPool::unlock(const std::string& id)
                 ++it;
             }
         }
+
+        // Clean finished TCP Ices.
+        m_tcpIces.remove_if([](std::unique_ptr<IceTcp>& ice) {
+            return ice->isStopped();
+        });
     }
-    for (const auto& session: toRemove)
-        m_iceManager.freeIce(session->id()); //< Should be unguarded.
 }
 
 void SessionPool::drop(const std::string& id)
 {
-    SessionPtr session;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         auto sessionIter = m_sessionById.find(id);
         if (sessionIter == m_sessionById.end())
             return; //< Already dropped by some way.
         NX_CRITICAL(sessionIter->second);
-        std::swap(session, sessionIter->second->session); //< Should be destroyed outside of guard.
         m_sessionById.erase(sessionIter);
         NX_DEBUG(this, "Dropped session %1", id);
     }
-    m_iceManager.freeIce(id); //< Should be unguarded.
 }
 
-void SessionPool::gotIceFromManager(const std::string& sessionId, const IceCandidate& iceCandidate)
+void SessionPool::gotIceTcp(std::unique_ptr<IceTcp>&& iceTcp)
 {
-    NX_ASSERT(iceCandidate.type == IceCandidate::Type::Relay ||
-        iceCandidate.type == IceCandidate::Type::Srflx);
-
-    NX_DEBUG(this, "Got ice candidate from manager: %1 -> %2", sessionId, iceCandidate.serialize());
+    iceTcp->start();
 
     NX_MUTEX_LOCKER lk(&m_mutex);
-    auto session = m_sessionById.find(sessionId);
-    if (session == m_sessionById.end())
-    {
-        NX_DEBUG(this, "Session with id %1 for ice candidate %2 has already been deleted",
-            sessionId, iceCandidate.serialize());
-        return;
-    }
-    if (!session->second)
-    {
-        NX_ASSERT(false, "No session with id %1 stored for ice candidate %2",
-            sessionId, iceCandidate.serialize());
-        return;
-    }
-    session->second->session->gotIceFromManager(iceCandidate);
+    m_tcpIces.push_back(std::move(iceTcp));
 }
 
 QnFfmpegVideoTranscoder::TranscodePolicy SessionPool::transcodePolicy() const

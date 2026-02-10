@@ -35,7 +35,7 @@ AbstractDataChannelDelegate::AbstractDataChannelDelegate(const SessionConfig& co
 {
 }
 
-/*virtual*/ AbstractDataChannelDelegate::~AbstractDataChannelDelegate()
+AbstractDataChannelDelegate::~AbstractDataChannelDelegate()
 {
 }
 

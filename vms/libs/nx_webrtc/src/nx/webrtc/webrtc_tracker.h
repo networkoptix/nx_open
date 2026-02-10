@@ -5,22 +5,17 @@
 #include <rapidjson/document.h>
 
 #include <nx/network/websocket/websocket.h>
-#include <nx/vms/common/system_context_aware.h>
 
 #include "webrtc_session.h"
 
 class QnMediaServerModule;
-class SessionPool;
 
 namespace nx::webrtc {
 
-class NX_WEBRTC_API Tracker: public nx::vms::common::SystemContextAware
+class NX_WEBRTC_API Tracker
 {
 public:
-    Tracker(
-        nx::vms::common::SystemContext* context,
-        SessionPool* sessionPool,
-        Session* session);
+    Tracker(Session* session);
     ~Tracker();
     void start(
         std::unique_ptr<AbstractStreamSocket>&& socket,
@@ -47,7 +42,6 @@ private:
     };
 
 private:
-    SessionPool* m_sessionPool;
     std::optional<IceCandidate> m_srflxCandidate;
     WebSocketPtr m_webSocket;
     Session* m_session = nullptr;

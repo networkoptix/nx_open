@@ -85,9 +85,6 @@ protected:
     bool processIncomingPacket(const uint8_t* data, int size);
 
 private:
-    // Streaming related.
-    bool startStream();
-
     // Protocol related.
     Stage demuxMessageStage(const uint8_t* data, size_t size);
     bool handleStun(const uint8_t* data, int size);
@@ -110,7 +107,7 @@ protected:
     Stage m_stage = binding;
 
 private:
-    SessionPtr m_session;
+    std::weak_ptr<Session> m_session;
 };
 
 } // namespace nx::webrtc

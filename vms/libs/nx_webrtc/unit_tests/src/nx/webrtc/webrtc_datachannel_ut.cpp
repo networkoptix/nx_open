@@ -75,7 +75,7 @@ private:
     std::queue<std::vector<uint8_t>> m_serverClientQueue;
 };
 
-/*virtual*/ void TestDataChannelStreamer::writeDataChannelPacket(const uint8_t* data, int size)
+void TestDataChannelStreamer::writeDataChannelPacket(const uint8_t* data, int size)
 {
     m_testDataChannel->writePacket(data, size, m_type);
 }
