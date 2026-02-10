@@ -1945,7 +1945,7 @@
     </message>
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
-      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+      <translation>Tempo de espera de envío de sockets cando o servidor transmite datos multimedia (segundos).</translation>
     </message>
   </context>
 </TS>
