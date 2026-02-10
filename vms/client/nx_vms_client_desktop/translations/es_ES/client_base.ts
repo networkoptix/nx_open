@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>Reemplazar cámara...</translation>
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
@@ -974,11 +974,11 @@
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>Guardar diseño de nube</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>Guardar diseño de nube como...</translation>
     </message>
     <message>
       <source>Add</source>
@@ -986,7 +986,7 @@
     </message>
     <message>
       <source>Device...</source>
-      <translation type="unfinished">Device...</translation>
+      <translation>Dispositivo...</translation>
     </message>
     <message>
       <source>Add User...</source>
@@ -998,7 +998,7 @@
     </message>
     <message>
       <source>New Integration...</source>
-      <translation type="unfinished">New Integration...</translation>
+      <translation>Nueva Integración...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
@@ -1006,11 +1006,11 @@
     </message>
     <message>
       <source>Add Showreel...</source>
-      <translation type="unfinished">Add Showreel...</translation>
+      <translation>Añadir Showreel...</translation>
     </message>
     <message>
       <source>Add Virtual Camera...</source>
-      <translation type="unfinished">Add Virtual Camera...</translation>
+      <translation>Añadir cámara virtual...</translation>
     </message>
     <message>
       <source>Integration Settings...</source>
@@ -2114,7 +2114,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>This user is removed from Site</source>
       <translation type="unfinished">
-        <numerusform>This user is removed from Site</numerusform>
+        <numerusform>Este usuario ha sido eliminado del sitio.</numerusform>
         <numerusform>This user is removed from Site</numerusform>
       </translation>
     </message>
