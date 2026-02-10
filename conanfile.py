@@ -189,7 +189,7 @@ class NxOpenConan(ConanFile):
         self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#cf9c0c761f39805e5a258dc39daff2bd")
-        self.requires("qt/6.9.1" "#3fc3e653f3c94a5b2de4223f4a7f8e80")
+        self.requires("qt/6.9.1" "#18a7fb0db802ee37066ece7bb5066f77")
         self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
         self.requires("boost/1.83.0" "#d150c9edc8081c98965b05ea9c2df318")
         self.requires("rapidjson/cci.20230929" "#751fc0dfc70af706c708706450fc2ab7")
