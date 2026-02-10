@@ -75,6 +75,9 @@ NxObject
 
     function setUserDefinedColumnsCount(newColumnsCount)
     {
+        if (newColumnsCount === kInvalidColumnsCount)
+            newColumnsCount = defaultColumnsCount
+
         d.userDefinedColumnsCount =
             MathUtils.bound(minColumnsCount, newColumnsCount, defaultColumnsCount)
     }

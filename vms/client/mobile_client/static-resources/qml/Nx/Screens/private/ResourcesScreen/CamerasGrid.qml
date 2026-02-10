@@ -122,8 +122,6 @@ Item
             }
 
             d.saveTargetColumnsCount()
-
-            resizeOverlay.visible = false
         }
 
         // Required for contentY update during screen resize. Must use statically calculated
@@ -178,6 +176,7 @@ Item
                 flickable.updateSizesCalculatorAvailableGeometry()
                 flickable.updatePlayersStates()
                 d.saveLayoutPosition()
+                resizeOverlay.visible = false
             }
         }
 
