@@ -434,7 +434,7 @@
     </message>
     <message>
       <source>Clear All</source>
-      <translation type="unfinished">Clear All</translation>
+      <translation>Borrar todo</translation>
     </message>
     <message>
       <source>Filters</source>
@@ -519,7 +519,7 @@
     <name>FocusControl</name>
     <message>
       <source>AF</source>
-      <translation type="unfinished">AF</translation>
+      <translation>AF</translation>
     </message>
   </context>
   <context>
@@ -710,7 +710,7 @@
     </message>
     <message>
       <source>Motions</source>
-      <translation type="unfinished">Motions</translation>
+      <translation>Movementos</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -941,7 +941,7 @@
     </message>
     <message>
       <source>Timeline</source>
-      <translation type="unfinished">Timeline</translation>
+      <translation>Liña de tempo</translation>
     </message>
   </context>
   <context>
@@ -1093,11 +1093,11 @@
     </message>
     <message>
       <source>Structure</source>
-      <translation type="unfinished">Structure</translation>
+      <translation>Estrutura</translation>
     </message>
     <message>
       <source>Welcome, %1!</source>
-      <translation type="unfinished">Welcome, %1!</translation>
+      <translation>Benvida/o, %1!</translation>
     </message>
   </context>
   <context>
@@ -1237,7 +1237,7 @@
     </message>
     <message>
       <source>Log In to Cloud</source>
-      <translation type="unfinished">Log In to Cloud</translation>
+      <translation>Iniciar sesión na nube</translation>
     </message>
   </context>
   <context>
@@ -1474,20 +1474,20 @@
     </message>
     <message>
       <source>No results</source>
-      <translation type="unfinished">No results</translation>
+      <translation>Sen resultados</translation>
     </message>
     <message>
       <source>Not available</source>
-      <translation type="unfinished">Not available</translation>
+      <translation>Non dipoñible</translation>
     </message>
     <message>
       <source>You do not have permission&lt;br&gt;to view the archive</source>
       <comment>&lt;br&gt; is a line break</comment>
-      <translation type="unfinished">You do not have permission&lt;br&gt;to view the archive</translation>
+      <translation>Non tes permiso&lt;br&gt;para ver o arquivo</translation>
     </message>
     <message>
       <source>PTZ Mode</source>
-      <translation type="unfinished">PTZ Mode</translation>
+      <translation>Modo PTZ</translation>
     </message>
   </context>
   <context>

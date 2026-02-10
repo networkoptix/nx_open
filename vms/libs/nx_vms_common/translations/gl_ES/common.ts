@@ -2009,11 +2009,11 @@
     </message>
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
-      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+      <translation>Tempo de espera de envío de sockets cando o servidor transmite datos multimedia (segundos).</translation>
     </message>
     <message>
       <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
-      <translation type="unfinished">Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</translation>
+      <translation>Controla como se cargan as integracións. Os valores posibles son: &quot;ManifestoControlado&quot;&quot;, &quot;ForzarCarganunProcesoSeparado&quot;,&quot;ForzarCargaenProcesoActual&quot;</translation>
     </message>
   </context>
 </TS>

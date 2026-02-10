@@ -115,15 +115,15 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsLoaderDelegate</name>
     <message>
       <source>Unknown Object</source>
-      <translation type="unfinished">Unknown Object</translation>
+      <translation>Obxecto descoñecido</translation>
     </message>
     <message>
       <source>Objects (&gt;%1)</source>
-      <translation type="unfinished">Objects (&gt;%1)</translation>
+      <translation>Obxectos (&gt;%1)</translation>
     </message>
     <message>
       <source>Objects (%1)</source>
-      <translation type="unfinished">Objects (%1)</translation>
+      <translation>Obxectos (%1)</translation>
     </message>
   </context>
   <context>
@@ -134,26 +134,26 @@
     </message>
     <message>
       <source>Bookmarks (&gt;%1)</source>
-      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
+      <translation>Marcadores (&gt;%1)</translation>
     </message>
     <message>
       <source>Bookmarks (%1)</source>
-      <translation type="unfinished">Bookmarks (%1)</translation>
+      <translation>Marcadores (%1)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::MotionLoaderDelegate</name>
     <message>
       <source>Motion detected</source>
-      <translation type="unfinished">Motion detected</translation>
+      <translation>Movemento detectado</translation>
     </message>
     <message>
       <source>Motion (&gt;%1)</source>
-      <translation type="unfinished">Motion (&gt;%1)</translation>
+      <translation>Movemento (&gt;%1)</translation>
     </message>
     <message>
       <source>Motion (%1)</source>
-      <translation type="unfinished">Motion (%1)</translation>
+      <translation>Movemento (%1)</translation>
     </message>
   </context>
 </TS>
