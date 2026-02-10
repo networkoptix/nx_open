@@ -142,33 +142,50 @@ AdaptiveScreen
             width: settingsNavigation.width
             spacing: 4
 
-            component SettingsNavigationItem: LabeledSwitch //< TODO: Use button component here.
+            component SettingsNavigationItem: Button
             {
                 property Item page
                 property int margin: LayoutController.isTabletLayout ? 20 : 0
 
-                horizontalPadding: LayoutController.isTabletLayout ? 8 : 16
-                verticalPadding: LayoutController.isTabletLayout ? 8 : 12
-
                 Layout.fillWidth: true
                 Layout.leftMargin: margin
                 Layout.rightMargin: margin
+                Layout.preferredHeight: LayoutController.isTabletLayout ? 40 : 56
+
+                leftPadding: LayoutController.isTabletLayout ? 8 : 16
+                spacing: LayoutController.isTabletLayout ? 4 : 8
+                textHorizontalAlignment: Text.AlignLeft
 
                 text: page?.title ?? ""
-                topPadding: verticalPadding
-                bottomPadding: verticalPadding
-                leftPadding: horizontalPadding
-                rightPadding: horizontalPadding
-                showIndicator: false
-                backgroundColor: !LayoutController.isTabletLayout || settingsScreen.contentItem === page
-                    ? ColorTheme.colors.dark6
-                    : "transparent"
-                backgroundRadius: settingsScreen.contentItem === page ? 4 : 0
+                font.weight: Font.Normal
+                font.pixelSize: LayoutController.isTabletLayout ? 14 : 18
+
+                checked: settingsScreen.contentItem === page
+
+                backgroundColor: LayoutController.isTabletLayout
+                    ? (checked ? ColorTheme.colors.dark8 : "transparent")
+                    : ColorTheme.colors.dark6
+
+                foregroundColor: LayoutController.isTabletLayout
+                    ? (checked ? ColorTheme.colors.light4 : ColorTheme.colors.light10)
+                    : ColorTheme.colors.light1
+
+                borderColor: backgroundColor
+
+                radius: LayoutController.isTabletLayout ? 4 : 0
+
+                icon.width: 24
+                icon.height: 24
+
                 onClicked: settingsScreen.setContentItem(page)
-                showCustomArea: !LayoutController.isTabletLayout
-                customArea: ColoredImage
+
+                ColoredImage
                 {
+                    anchors.right: parent.right
+                    anchors.rightMargin: 16
                     anchors.verticalCenter: parent.verticalCenter
+
+                    visible: !LayoutController.isTabletLayout
                     sourcePath: "image://skin/20x20/Outline/arrow_right.svg"
                     sourceSize: Qt.size(24, 24)
                     primaryColor: ColorTheme.colors.light16
@@ -181,32 +198,32 @@ AdaptiveScreen
 
                 Layout.topMargin: margin
                 page: interfaceSettingsPage
-                icon: "image://skin/24x24/Solid/interface.svg?primary=light1"
+                icon.source: "image://skin/24x24/Solid/interface.svg?primary=light1"
             }
 
             SettingsNavigationItem
             {
                 page: securitySettingsPage
-                icon: "image://skin/24x24/Solid/security.svg?primary=light1"
+                icon.source: "image://skin/24x24/Solid/security.svg?primary=light1"
             }
 
             SettingsNavigationItem
             {
                 page: performanceSettingsPage
-                icon: "image://skin/24x24/Solid/speed.svg?primary=light1"
+                icon.source: "image://skin/24x24/Solid/speed.svg?primary=light1"
             }
 
             SettingsNavigationItem
             {
                 page: betaFeaturesPage
-                icon: "image://skin/24x24/Solid/beta_features.svg?primary=light1"
+                icon.source: "image://skin/24x24/Solid/beta_features.svg?primary=light1"
             }
 
             SettingsNavigationItem
             {
                 id: notificationsSwitch
 
-                icon: "image://skin/24x24/Solid/notifications.svg?primary=light1"
+                icon.source: "image://skin/24x24/Solid/notifications.svg?primary=light1"
                 text: qsTr("Notifications")
                 page: pushExpertModePage
             }
@@ -217,7 +234,7 @@ AdaptiveScreen
 
                 Layout.bottomMargin: margin
                 page: appInfoPage
-                icon: "image://skin/24x24/Solid/info.svg?primary=light1"
+                icon.source: "image://skin/24x24/Solid/info.svg?primary=light1"
             }
 
             SettingsNavigationItem
@@ -226,7 +243,7 @@ AdaptiveScreen
 
                 Layout.bottomMargin: margin
                 page: developerSettingsPage
-                icon: "image://skin/24x24/Solid/developer_settings.svg?primary=light1"
+                icon.source: "image://skin/24x24/Solid/developer_settings.svg?primary=light1"
                 visible: settingsScreen.contentItem === page
             }
         }

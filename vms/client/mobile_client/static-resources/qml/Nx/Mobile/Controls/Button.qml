@@ -25,6 +25,7 @@ T.AbstractButton
     property int type: Button.Type.Interface
 
     property real textIndent: 0 //< Additional text indent from the left.
+    property alias textHorizontalAlignment: textItem.horizontalAlignment
 
     readonly property var parameters: d.parameters[control.type]
 
