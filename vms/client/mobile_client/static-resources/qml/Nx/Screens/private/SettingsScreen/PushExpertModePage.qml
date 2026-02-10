@@ -51,8 +51,8 @@ BaseSettingsPage
         id: content
         enabled: !appContext.pushManager.userUpdateInProgress
 
-        width: parent.width
-        height: parent.height
+        width: pushExpertModePage.width
+        height: pushExpertModePage.height
 
         Column
         {

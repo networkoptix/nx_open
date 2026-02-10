@@ -17,8 +17,9 @@ Popup
     closePolicy: Popup.NoAutoClose
     focus: true
 
-    width: mainWindow.width
-    height: mainWindow.height
+    anchors.centerIn: parent
+    width: parent.width
+    height: parent.height
 
     background: GaussianBlur
     {
@@ -26,7 +27,6 @@ Popup
 
         deviation: 2
     }
-
 
     contentItem: Item
     {
