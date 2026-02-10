@@ -1438,8 +1438,13 @@ void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QStrin
 
 void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QString& error)
 {
-    if (!NX_ASSERT(m_widgetState == WidgetUpdateState::finishingInstall))
+    // WidgetUpdateState::initial state may occur if the system was disconnected before
+    // receiving the result of an operation: VMS-61453.
+    if (!NX_ASSERT(m_widgetState == WidgetUpdateState::finishingInstall
+        || m_widgetState == WidgetUpdateState::initial))
+    {
         return;
+    }
 
     if (success)
     {
