@@ -672,7 +672,7 @@ Page
         {
             id: timelineObjectSheet
 
-            dateFormatter: ((timestampMs) => timeline.labelFormatter.formatTimestamp(
+            dateFormatter: ((timestampMs) => timeline.labelFormatter.objectTimestamp(
                 timestampMs, timeline.timeZone))
         }
 
@@ -955,14 +955,8 @@ Page
 
                 color: ColorTheme.colors.light4
 
-                text:
-                {
-                    if (controller.mediaPlayer.liveMode)
-                        return qsTr("LIVE")
-
-                    return timeline.labelFormatter.formatCameraTimestamp(
-                        controller.mediaPlayer.position, timeline.timeZone)
-                }
+                text: timeline.labelFormatter.cameraTimestamp(
+                    controller.mediaPlayer.position, timeline.timeZone)
             }
         }
 

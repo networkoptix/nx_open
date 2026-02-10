@@ -86,8 +86,8 @@
 #include <nx/vms/client/core/time/duration_formatter.h>
 #include <nx/vms/client/core/time/month_list_model.h>
 #include <nx/vms/client/core/timeline/items/chunk_bar.h>
-#include <nx/vms/client/core/timeline/utils/timeline_label_formatter.h>
-#include <nx/vms/client/core/timeline/utils/timeline_zoom_calculator.h>
+#include <nx/vms/client/core/timeline/utils/label_formatter.h>
+#include <nx/vms/client/core/timeline/utils/zoom_calculator.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/client/core/ui/frame_section.h>
 #include <nx/vms/client/core/ui/translation_list_model.h>

@@ -24,26 +24,29 @@ public:
     virtual ~LabelFormatter() override;
 
     /** Format time scale tick label. */
-    Q_INVOKABLE QString formatLabel(qint64 timeMs, const QTimeZone& timeZone,
+    Q_INVOKABLE QString tickLabel(qint64 timeMs, const QTimeZone& timeZone,
         TimelineZoomLevel::LevelType level) const;
 
     /** Format time marker inside current time window. */
-    Q_INVOKABLE QString formatMarker(
+    Q_INVOKABLE QString timeMarker(qint64 timeMs, const QTimeZone& timeZone,
+        TimelineZoomLevel::LevelType level) const;
+
+    /** Format time marker pressed for repositioning. */
+    Q_INVOKABLE QString pressedTimeMarker(
         qint64 timeMs, const QTimeZone& timeZone, qreal millisecondsPerPixel) const;
 
     /** Format time marker outside current time window. */
-    Q_INVOKABLE QString formatOutsideMarker(
-        qint64 timeMs, const QTimeZone& timeZone, TimelineZoomLevel::LevelType level) const;
+    Q_INVOKABLE QString externalTimeMarker(qint64 timeMs, const QTimeZone& timeZone) const;
 
     /** Format time marker outside current time window. */
-    Q_INVOKABLE QString formatHeader(qint64 startTimeMs, qint64 endTimeMs,
+    Q_INVOKABLE QString windowHeader(qint64 startTimeMs, qint64 endTimeMs,
         const QTimeZone& timeZone) const;
 
-    /** Format timestamp for external uses (e.g. in object details sheet). */
-    Q_INVOKABLE QString formatTimestamp(qint64 timestampMs, const QTimeZone& timeZone) const;
+    /** Format timestamp to display in the object details sheet. */
+    Q_INVOKABLE QString objectTimestamp(qint64 timestampMs, const QTimeZone& timeZone) const;
 
     /** Format timestamp to display at the bottom of the video. */
-    Q_INVOKABLE QString formatCameraTimestamp(qint64 timestampMs, const QTimeZone& timeZone) const;
+    Q_INVOKABLE QString cameraTimestamp(qint64 timestampMs, const QTimeZone& timeZone) const;
 
     QLocale locale() const;
     void setLocale(QLocale value);

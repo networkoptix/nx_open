@@ -53,7 +53,7 @@ Item
 
             font: item.font
             color: item.textColor
-            text: item.labelFormatter.formatLabel(modelData.timestampMs, d.timeZone, item.zoomLevel)
+            text: item.labelFormatter.tickLabel(modelData.timestampMs, d.timeZone, item.zoomLevel)
             horizontalAlignment: Qt.AlignRight
         }
     }

@@ -144,7 +144,7 @@ Rectangle
         {
             id: currentDateLabel
 
-            text: timeScale.labelFormatter.formatHeader(
+            text: timeScale.labelFormatter.windowHeader(
                 timeline.startTimeMs, timeline.endTimeMs, timeline.timeZone)
 
             color: ColorTheme.colors.mobileTimeline.header.text
@@ -583,8 +583,11 @@ Rectangle
 
             readonly property real markerWidth:
             {
-                return isOutside && !timeline.positionAtLive
-                    ? timeMarkerText.width
+                if (isOutside && !timeline.positionAtLive)
+                    return timeMarkerText.width
+
+                return dragHandler.draggingTimeMarker
+                    ? Math.max(timeMarkerText.width, timeScale.width)
                     : timeScale.width
             }
 
@@ -672,12 +675,18 @@ Rectangle
 
                     if (timeMarker.isOutside)
                     {
-                        return timeScale.labelFormatter.formatOutsideMarker(timeline.positionMs,
-                            timeScale.timeZone, timeScale.zoomLevel)
+                        return timeScale.labelFormatter.externalTimeMarker(timeline.positionMs,
+                            timeScale.timeZone)
                     }
 
-                    return timeScale.labelFormatter.formatMarker(timeline.positionMs,
-                        timeScale.timeZone, timeScale.millisecondsPerPixel)
+                    if (dragHandler.draggingTimeMarker)
+                    {
+                        return timeScale.labelFormatter.pressedTimeMarker(timeline.positionMs,
+                            timeScale.timeZone, timeScale.millisecondsPerPixel)
+                    }
+
+                    return timeScale.labelFormatter.timeMarker(timeline.positionMs,
+                        timeScale.timeZone, timeScale.zoomLevel)
                 }
 
                 color: ColorTheme.colors.mobileTimeline.timeMarker.text
