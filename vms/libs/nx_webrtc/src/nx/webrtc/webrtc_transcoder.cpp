@@ -182,7 +182,7 @@ QnUniversalRtpEncoderPtr Transcoder::createRtpEncoder(
     AVCodecParameters* codecParameters,
     uint32_t ssrc,
     const std::string& cname,
-    int mid)
+    int /*mid*/)
 {
     QnUniversalRtpEncoder::Config config;
     config.absoluteRtcpTimestamps = true;
@@ -194,7 +194,6 @@ QnUniversalRtpEncoderPtr Transcoder::createRtpEncoder(
     QnUniversalRtpEncoderPtr universalEncoder(new QnUniversalRtpEncoder(config, nullptr));
     universalEncoder->setSsrc(ssrc);
     universalEncoder->setCName(cname);
-    universalEncoder->setMid(std::to_string(mid));
     universalEncoder->setMtu(kWebrtcMtu);
 
     if (!universalEncoder->open(codecParameters))

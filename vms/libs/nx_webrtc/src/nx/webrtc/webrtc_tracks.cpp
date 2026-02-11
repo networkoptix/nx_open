@@ -188,7 +188,9 @@ std::string Tracks::getSdpForTrack(const Track* track, uint16_t /*port*/) const
     sdp += "a=ssrc:" + std::to_string(track->ssrc) + " cname:" + track->cname + ENDL;
     // Generic RTCP feedbacks supported: https://www.rfc-editor.org/rfc/rfc4585.html#section-3.6.2
     sdp += "a=rtcp-fb:" + std::to_string(track->payloadType) + " nack" ENDL;
-    sdp += "a=extmap:1 urn:ietf:params:rtp-hdrext:sdes:mid" ENDL;
+
+    // Mid in RTP extension is not used now.
+    //sdp += "a=extmap:1 urn:ietf:params:rtp-hdrext:sdes:mid" ENDL;
     return sdp;
 }
 
