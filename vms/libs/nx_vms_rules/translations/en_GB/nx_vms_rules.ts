@@ -22,7 +22,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n time: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
@@ -30,7 +30,7 @@
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation type="unfinished">
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+        <numerusform>First occurrence: %1 on %2 (%n time total)</numerusform>
         <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
       </translation>
     </message>
@@ -207,28 +207,28 @@
     <message numerus="yes">
       <source>Selected devices were removed</source>
       <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
+        <numerusform>Selected device was removed</numerusform>
         <numerusform>Selected devices were removed</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
       <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
+        <numerusform>Selected camera was removed</numerusform>
         <numerusform>Selected cameras were removed</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
       <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
+        <numerusform>Selected server was removed</numerusform>
         <numerusform>Selected servers were removed</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
       <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
+        <numerusform>Selected layout was removed</numerusform>
         <numerusform>Selected layouts were removed</numerusform>
       </translation>
     </message>
@@ -645,7 +645,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>Custom header</translation>
     </message>
   </context>
   <context>
@@ -664,14 +664,14 @@
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
       <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
+        <numerusform>One of the headers is not valid</numerusform>
         <numerusform>Some of the headers are not valid</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
       <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
+        <numerusform>The header is not valid</numerusform>
         <numerusform>All the headers are not valid</numerusform>
       </translation>
     </message>
@@ -796,7 +796,7 @@
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
+        <numerusform>No data received during last %n second.</numerusform>
         <numerusform>No data received during last %n seconds.</numerusform>
       </translation>
     </message>
@@ -1014,21 +1014,21 @@
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Recording on %n channel was stopped due to service overuse.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Cloud storage backup on %n channel was stopped due to service overuse.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Paid integration service usage on %n channel was stopped due to service overuse.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>

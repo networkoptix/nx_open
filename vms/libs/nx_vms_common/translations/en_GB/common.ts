@@ -702,88 +702,88 @@
     <message numerus="yes">
       <source>%n Time Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Time License</numerusform>
         <numerusform>%n Time Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Analog License</numerusform>
         <numerusform>%n Analog Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Professional License</numerusform>
         <numerusform>%n Professional Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge License</numerusform>
         <numerusform>%n Edge Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax License</numerusform>
         <numerusform>%n Vmax Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Analog Encoder License</numerusform>
         <numerusform>%n Analog Encoder Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Video Wall License</numerusform>
         <numerusform>%n Video Wall Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n I/O Module License</numerusform>
         <numerusform>%n I/O Module Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Start License</numerusform>
         <numerusform>%n Start Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Bridge License</numerusform>
         <numerusform>%n Bridge Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>%n Invalid License</numerusform>
         <numerusform>%n Invalid Licenses</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Free License</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free License</numerusform>
         <numerusform>%n Free Licenses</numerusform>
       </translation>
     </message>
@@ -791,7 +791,7 @@
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Time License</numerusform>
         <numerusform>%n/%1 Time Licenses</numerusform>
       </translation>
     </message>
@@ -799,7 +799,7 @@
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n/%1 Analog License</numerusform>
         <numerusform>%n/%1 Analog Licenses</numerusform>
       </translation>
     </message>
@@ -807,7 +807,7 @@
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n/%1 Professional License</numerusform>
         <numerusform>%n/%1 Professional Licenses</numerusform>
       </translation>
     </message>
@@ -815,7 +815,7 @@
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+        <numerusform>%n/%1 Edge License</numerusform>
         <numerusform>%n/%1 Edge Licenses</numerusform>
       </translation>
     </message>
@@ -823,7 +823,7 @@
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n/%1 Vmax License</numerusform>
         <numerusform>%n/%1 Vmax Licenses</numerusform>
       </translation>
     </message>
@@ -831,7 +831,7 @@
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform>%n/%1 Analog Encoder License</numerusform>
         <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
       </translation>
     </message>
@@ -839,7 +839,7 @@
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+        <numerusform>%n/%1 Video Wall License</numerusform>
         <numerusform>%n/%1 Video Wall Licenses</numerusform>
       </translation>
     </message>
@@ -847,7 +847,7 @@
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n/%1 I/O Module License</numerusform>
         <numerusform>%n/%1 I/O Module Licenses</numerusform>
       </translation>
     </message>
@@ -855,7 +855,7 @@
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Start Licenses</numerusform>
+        <numerusform>%n/%1 Start License</numerusform>
         <numerusform>%n/%1 Start Licenses</numerusform>
       </translation>
     </message>
@@ -863,7 +863,7 @@
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Free License</numerusform>
         <numerusform>%n/%1 Free Licenses</numerusform>
       </translation>
     </message>
@@ -871,7 +871,7 @@
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n/%1 Bridge License</numerusform>
         <numerusform>%n/%1 Bridge Licenses</numerusform>
       </translation>
     </message>
@@ -879,7 +879,7 @@
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n/%1 Invalid License</numerusform>
         <numerusform>%n/%1 Invalid Licenses</numerusform>
       </translation>
     </message>
@@ -889,12 +889,12 @@
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>NVR License</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n NVR Licenses</numerusform>
+        <numerusform>%n NVR License</numerusform>
         <numerusform>%n NVR Licenses</numerusform>
       </translation>
     </message>
@@ -902,7 +902,7 @@
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+        <numerusform>%n/%1 NVR License</numerusform>
         <numerusform>%n/%1 NVR Licenses</numerusform>
       </translation>
     </message>
@@ -913,7 +913,7 @@
     <message numerus="yes">
       <source>%n Local recording services</source>
       <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
+        <numerusform>%n Local recording service</numerusform>
         <numerusform>%n Local recording services</numerusform>
       </translation>
     </message>
@@ -921,13 +921,13 @@
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
+        <numerusform>%n/%1 Local recording service</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
       </translation>
     </message>
     <message>
       <source>Local recording services</source>
-      <translation type="unfinished">Local recording services</translation>
+      <translation>Local recording service</translation>
     </message>
   </context>
   <context>
@@ -942,7 +942,7 @@
     <message numerus="yes">
       <source>%n groups</source>
       <translation type="unfinished">
-        <numerusform>%n groups</numerusform>
+        <numerusform>%n group</numerusform>
         <numerusform>%n groups</numerusform>
       </translation>
     </message>
@@ -962,7 +962,7 @@
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n group does not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
       </translation>
     </message>
@@ -975,7 +975,7 @@
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n user does not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
       </translation>
     </message>
@@ -990,42 +990,42 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Camera</numerusform>
         <numerusform>%n Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
       <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+        <numerusform>%n camera</numerusform>
         <numerusform>%n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
       <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Module</numerusform>
         <numerusform>%n I/O Modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
       <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O module</numerusform>
         <numerusform>%n I/O modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
       <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Device</numerusform>
         <numerusform>%n Devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
       <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
+        <numerusform>%n device</numerusform>
         <numerusform>%n devices</numerusform>
       </translation>
     </message>
@@ -1391,21 +1391,21 @@
     <message numerus="yes">
       <source>%n minutes ago</source>
       <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
+        <numerusform>%n minute ago</numerusform>
         <numerusform>%n minutes ago</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours ago</source>
       <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
+        <numerusform>%n hour ago</numerusform>
         <numerusform>%n hours ago</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days ago</source>
       <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
+        <numerusform>%n day ago</numerusform>
         <numerusform>%n days ago</numerusform>
       </translation>
     </message>
