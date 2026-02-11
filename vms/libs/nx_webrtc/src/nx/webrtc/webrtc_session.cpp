@@ -262,7 +262,7 @@ void Session::addProvider(std::shared_ptr<AbstractCameraDataProvider> provider)
 
     m_providers.emplace(deviceId, provider);
     provider->subscribe(
-        [this, deviceId]
+        [this]
         (const QnConstAbstractMediaDataPtr& data)
         {
             m_consumer->putData(data);
