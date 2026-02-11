@@ -582,7 +582,7 @@
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation>Pre-programados de PTZ</translation>
+      <translation>Presets PTZ</translation>
     </message>
   </context>
   <context>

@@ -129,7 +129,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 への接続はまだ準備ができていません。サーバーのインターネット接続を確認するか、後でもう一度お試しください。</translation>
+      <translation>%1 への接続はまだ準備ができていません。サーバーのインターネット接続を確認するか、時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
