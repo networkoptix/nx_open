@@ -370,7 +370,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
       <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
+        <numerusform>Batch Edit - %n User</numerusform>
         <numerusform>Batch Edit - %n Users</numerusform>
       </translation>
     </message>
@@ -487,14 +487,14 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>%n chosen devices</source>
       <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n chosen device</numerusform>
         <numerusform>%n chosen devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
       <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n chosen camera</numerusform>
         <numerusform>%n chosen cameras</numerusform>
       </translation>
     </message>
@@ -761,7 +761,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
       <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+        <numerusform>This list is associated with %n Event Rule. Are you sure you want to delete it?</numerusform>
         <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
       </translation>
     </message>
@@ -1244,7 +1244,7 @@ Select an Integration to begin configuring its parameters.</translation>
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
       <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+        <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
         <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
       </translation>
     </message>
@@ -1510,7 +1510,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
       <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>This line requires at least %n point.</numerusform>
         <numerusform>This line requires at least %n points.</numerusform>
       </translation>
     </message>
@@ -1521,7 +1521,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
       <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>The maximum number of points has been reached (%n point).</numerusform>
         <numerusform>The maximum number of points has been reached (%n points).</numerusform>
       </translation>
     </message>
@@ -1792,7 +1792,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>with %n attributes</source>
       <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
+        <numerusform>with %n attribute</numerusform>
         <numerusform>with %n attributes</numerusform>
       </translation>
     </message>
@@ -2035,7 +2035,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
       <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>This polygon requires at least %n point.</numerusform>
         <numerusform>This polygon requires at least %n points.</numerusform>
       </translation>
     </message>
@@ -2046,7 +2046,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
       <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>The maximum number of points has been reached (%n point).</numerusform>
         <numerusform>The maximum number of points has been reached (%n points).</numerusform>
       </translation>
     </message>
@@ -2617,7 +2617,7 @@ Press Alt + Click to follow object</translation>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
       <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Set for the Camera</numerusform>
         <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>

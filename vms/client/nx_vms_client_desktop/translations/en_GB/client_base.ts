@@ -57,7 +57,7 @@
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 with %n attribute</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
       </translation>
     </message>
@@ -1125,7 +1125,7 @@
       <source>Show on Items</source>
       <comment>Numerus form depends on the amount of items</comment>
       <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Item</numerusform>
         <numerusform>Show on Items</numerusform>
       </translation>
     </message>
@@ -1133,7 +1133,7 @@
       <source>Mute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
       <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Item</numerusform>
         <numerusform>Mute Items</numerusform>
       </translation>
     </message>
@@ -1141,7 +1141,7 @@
       <source>Unmute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
       <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Item</numerusform>
         <numerusform>Unmute Items</numerusform>
       </translation>
     </message>
@@ -1294,7 +1294,7 @@
     <message numerus="yes">
       <source>Delete %n groups?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n groups?</numerusform>
+        <numerusform>Delete %n group?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
       </translation>
     </message>
@@ -1538,7 +1538,7 @@ License Key: %2</translation>
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
       <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved character:</numerusform>
         <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
@@ -1709,14 +1709,14 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
       <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
+        <numerusform>Password must be at least %n character long</numerusform>
         <numerusform>Password must be at least %n characters long</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
       <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters</numerusform>
+        <numerusform>Password must be no longer than %n character</numerusform>
         <numerusform>Password must be no longer than %n characters</numerusform>
       </translation>
     </message>
@@ -2107,7 +2107,7 @@ License Key: %2</translation>
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
+        <numerusform>Details for %n session of %1</numerusform>
         <numerusform>Details for %n sessions of %1</numerusform>
       </translation>
     </message>
@@ -2115,7 +2115,7 @@ License Key: %2</translation>
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
+        <numerusform>Details for %n camera of %1</numerusform>
         <numerusform>Details for %n cameras of %1</numerusform>
       </translation>
     </message>
@@ -2131,7 +2131,7 @@ License Key: %2</translation>
       <source>These devices are removed from Site</source>
       <comment>Numerus form depends on the number of devices</comment>
       <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
+        <numerusform>This device is removed from Site</numerusform>
         <numerusform>These devices are removed from Site</numerusform>
       </translation>
     </message>
@@ -2139,7 +2139,7 @@ License Key: %2</translation>
       <source>These cameras are removed from Site</source>
       <comment>Numerus form depends on the number of cameras</comment>
       <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
+        <numerusform>This camera is removed from Site</numerusform>
         <numerusform>These cameras are removed from Site</numerusform>
       </translation>
     </message>
@@ -2147,7 +2147,7 @@ License Key: %2</translation>
       <source>These resources are removed from Site</source>
       <comment>Numerus form depends on the number of resources</comment>
       <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
+        <numerusform>This resource is removed from Site</numerusform>
         <numerusform>These resources are removed from Site</numerusform>
       </translation>
     </message>
@@ -2277,7 +2277,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>%n actions</source>
       <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
+        <numerusform>%n action</numerusform>
         <numerusform>%n actions</numerusform>
       </translation>
     </message>
@@ -3515,7 +3515,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Set for %n devices</source>
       <translation type="unfinished">
-        <numerusform>Set for %n devices</numerusform>
+        <numerusform>Set for %n device</numerusform>
         <numerusform>Set for %n devices</numerusform>
       </translation>
     </message>
@@ -3717,7 +3717,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>about %n minutes</source>
       <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
+        <numerusform>about %n minute</numerusform>
         <numerusform>about %n minutes</numerusform>
       </translation>
     </message>
@@ -4035,7 +4035,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>%n Layouts</source>
       <translation type="unfinished">
-        <numerusform>%n Layouts</numerusform>
+        <numerusform>%n Layout</numerusform>
         <numerusform>%n Layouts</numerusform>
       </translation>
     </message>
@@ -4162,7 +4162,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+        <numerusform>Server utilizes this SSL certificate to authenticate its identity</numerusform>
         <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
       </translation>
     </message>
@@ -4190,7 +4190,7 @@ License Key: %2</translation>
       <source>Certificates</source>
       <comment>Numerus form depends on the certificates count</comment>
       <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
+        <numerusform>Certificate</numerusform>
         <numerusform>Certificates</numerusform>
       </translation>
     </message>
@@ -4955,14 +4955,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Storage is not configured on %n servers</source>
       <translation type="unfinished">
-        <numerusform>Storage is not configured on %n servers</numerusform>
+        <numerusform>Storage is not configured on %n server</numerusform>
         <numerusform>Storage is not configured on %n servers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
       <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
+        <numerusform>Backup storage is not configured on %n server</numerusform>
         <numerusform>Backup storage is not configured on %n servers</numerusform>
       </translation>
     </message>
@@ -4973,14 +4973,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+        <numerusform>Recording schedule is invalid on %n camera</numerusform>
         <numerusform>Recording schedule is invalid on %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
       <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
+        <numerusform>Email address is not set for %n user</numerusform>
         <numerusform>Email address is not set for %n users</numerusform>
       </translation>
     </message>
@@ -4996,14 +4996,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+        <numerusform>Storage for analytics data is not set on %n Server</numerusform>
         <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
       <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+        <numerusform>System storage is used for analytics data on %n server</numerusform>
         <numerusform>System storage is used for analytics data on %n servers</numerusform>
       </translation>
     </message>
@@ -5053,7 +5053,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
       <translation type="unfinished">
-        <numerusform>Site will stop functioning in %n days</numerusform>
+        <numerusform>Site will stop functioning in %n day</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
       </translation>
     </message>
@@ -5430,14 +5430,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
       <translation type="unfinished">
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+        <numerusform>Failed to open %n device on the video wall:</numerusform>
         <numerusform>Failed to open %n devices on the video wall:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n cameras on the video wall:</source>
       <translation type="unfinished">
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+        <numerusform>Failed to open %n camera on the video wall:</numerusform>
         <numerusform>Failed to open %n cameras on the video wall:</numerusform>
       </translation>
     </message>
@@ -5461,7 +5461,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
       <comment>Numerus form depends on the number of devices</comment>
       <translation type="unfinished">
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall device for which you do not have View Live permission.</numerusform>
         <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
       </translation>
     </message>
@@ -5469,7 +5469,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
       <comment>Numerus form depends on the number of cameras</comment>
       <translation type="unfinished">
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall camera for which you do not have View Live permission.</numerusform>
         <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
       </translation>
     </message>
@@ -5598,7 +5598,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
       <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+        <numerusform>Some video files are still being uploaded to %n virtual camera:</numerusform>
         <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
       </translation>
     </message>
@@ -5665,14 +5665,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Delete %n layouts?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>Delete %n layout?</numerusform>
         <numerusform>Delete %n layouts?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n items were not deleted.</source>
       <translation type="unfinished">
-        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n items was not deleted.</numerusform>
         <numerusform>%n items were not deleted.</numerusform>
       </translation>
     </message>
@@ -5704,7 +5704,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n layout is shared with other users, so it will be deleted for their accounts as well.</numerusform>
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
     </message>
@@ -5727,7 +5727,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerus form depends on the amount of layouts</comment>
       <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>This layout is shared with other users, so it will be deleted for their accounts as well.</numerusform>
         <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
     </message>
@@ -5831,14 +5831,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Camera</numerusform>
         <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Layouts</source>
       <translation type="unfinished">
-        <numerusform>%n Layouts</numerusform>
+        <numerusform>%n Layout</numerusform>
         <numerusform>%n Layouts</numerusform>
       </translation>
     </message>
@@ -5849,7 +5849,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Source Server and %n Server</numerusform>
         <numerusform>Source Server and %n Servers</numerusform>
       </translation>
     </message>
@@ -5917,7 +5917,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n Groups</source>
       <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Group</numerusform>
         <numerusform>%n Groups</numerusform>
       </translation>
     </message>
@@ -5944,63 +5944,63 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed devices</source>
       <translation type="unfinished">
-        <numerusform>%n removed devices</numerusform>
+        <numerusform>%n removed device</numerusform>
         <numerusform>%n removed devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed cameras</source>
       <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
+        <numerusform>%n removed camera</numerusform>
         <numerusform>%n removed cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed servers</source>
       <translation type="unfinished">
-        <numerusform>%n removed servers</numerusform>
+        <numerusform>%n removed server</numerusform>
         <numerusform>%n removed servers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed layouts</source>
       <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
+        <numerusform>%n removed layout</numerusform>
         <numerusform>%n removed layouts</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
       <translation type="unfinished">
-        <numerusform>%n subjects more</numerusform>
+        <numerusform>%n subject more</numerusform>
         <numerusform>%n subjects more</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices more</source>
       <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
+        <numerusform>%n device more</numerusform>
         <numerusform>%n devices more</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras more</source>
       <translation type="unfinished">
-        <numerusform>%n cameras more</numerusform>
+        <numerusform>%n camera more</numerusform>
         <numerusform>%n cameras more</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers more</source>
       <translation type="unfinished">
-        <numerusform>%n servers more</numerusform>
+        <numerusform>%n server more</numerusform>
         <numerusform>%n servers more</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts more</source>
       <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
+        <numerusform>%n layout more</numerusform>
         <numerusform>%n layouts more</numerusform>
       </translation>
     </message>
@@ -6086,14 +6086,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
       <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>%n existing LDAP group is not found in the LDAP database.</numerusform>
         <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups</source>
       <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
+        <numerusform>Delete group</numerusform>
         <numerusform>Delete %n groups</numerusform>
       </translation>
     </message>
@@ -6108,7 +6108,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
       <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Failed to delete %n group.</numerusform>
         <numerusform>Failed to delete %n groups.</numerusform>
       </translation>
     </message>
@@ -6157,7 +6157,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
       <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>LDAP server is offline. %n user is not able to log in.</numerusform>
         <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
       </translation>
     </message>
@@ -6168,14 +6168,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
       <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
+        <numerusform>Failed to delete %n user.</numerusform>
         <numerusform>Failed to delete %n users.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database</source>
       <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>%n existing LDAP user is not found in the LDAP database</numerusform>
         <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
       </translation>
     </message>
@@ -6220,7 +6220,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Delete %n rules?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
+        <numerusform>Delete rule?</numerusform>
         <numerusform>Delete %n rules?</numerusform>
       </translation>
     </message>
@@ -6371,14 +6371,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n chosen devices</source>
       <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n chosen device</numerusform>
         <numerusform>%n chosen devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
       <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n chosen camera</numerusform>
         <numerusform>%n chosen cameras</numerusform>
       </translation>
     </message>
@@ -6487,7 +6487,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n objects</source>
       <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
+        <numerusform>%n object</numerusform>
         <numerusform>%n objects</numerusform>
       </translation>
     </message>
@@ -6670,7 +6670,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
       <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+        <numerusform>%n suitable cloud storage service is required</numerusform>
         <numerusform>%n suitable cloud storage services are required</numerusform>
       </translation>
     </message>
@@ -6684,7 +6684,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n Megapixels</source>
       <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
+        <numerusform>%n Megapixel</numerusform>
         <numerusform>%n Megapixels</numerusform>
       </translation>
     </message>
@@ -6699,7 +6699,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
       <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
+        <numerusform>%n suitable cloud storage service available</numerusform>
         <numerusform>%n suitable cloud storage services available</numerusform>
       </translation>
     </message>
@@ -6737,7 +6737,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Set for %n selected devices</source>
       <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
+        <numerusform>Set for the selected device</numerusform>
         <numerusform>Set for %n selected devices</numerusform>
       </translation>
     </message>
@@ -6854,14 +6854,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
+        <numerusform>Backup is enabled for the device</numerusform>
         <numerusform>Backup is enabled for %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+        <numerusform>Backup is enabled for the camera</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
       </translation>
     </message>
@@ -6884,7 +6884,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n bookmarks</source>
       <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
+        <numerusform>%n bookmark</numerusform>
         <numerusform>%n bookmarks</numerusform>
       </translation>
     </message>
@@ -6971,7 +6971,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
       <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+        <numerusform>This ID is already used on the following camera:</numerusform>
         <numerusform>This ID is already used on the following %n cameras:</numerusform>
       </translation>
     </message>
@@ -7481,14 +7481,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>Failed to enable audio on %n device</numerusform>
         <numerusform>Failed to enable audio on %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+        <numerusform>Failed to enable 2-way audio on %n device</numerusform>
         <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
       </translation>
     </message>
@@ -7512,7 +7512,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>These devices do not have audio outputs or are not configured correctly.</source>
       <comment>Numerus form depends on the total number of devices</comment>
       <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>This device do not have an audio output or is not configured correctly.</numerusform>
         <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
       </translation>
     </message>
@@ -7520,7 +7520,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>These devices do not have audio inputs or are not configured correctly.</source>
       <comment>Numerus form depends on the total number of devices</comment>
       <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>This device does not have an audio input or is not configured correctly.</numerusform>
         <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
       </translation>
     </message>
@@ -8004,7 +8004,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
       <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+        <numerusform>%n devices is being added. You can close this dialog or start a new search</numerusform>
         <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
       </translation>
     </message>
@@ -8015,7 +8015,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Add %n Devices</source>
       <translation type="unfinished">
-        <numerusform>Add %n Devices</numerusform>
+        <numerusform>Add Device</numerusform>
         <numerusform>Add %n Devices</numerusform>
       </translation>
     </message>
@@ -8092,7 +8092,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
       <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+        <numerusform>Event log for period from %1 to %2 - %n event found</numerusform>
         <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
       </translation>
     </message>
@@ -8100,7 +8100,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
+        <numerusform>Event log for %1 - %n event found</numerusform>
         <numerusform>Event log for %1 - %n events found</numerusform>
       </translation>
     </message>
@@ -8120,7 +8120,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
       <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+        <numerusform>Event log for period from %1 to %2 - Showing first %n event. To find specific events, please adjust the date range or apply additional filters</numerusform>
         <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
       </translation>
     </message>
@@ -8128,7 +8128,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Date is substituted</comment>
       <translation type="unfinished">
-        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+        <numerusform>Event log for %1 - Showing first %n event. To find specific events, please adjust the date range or apply additional filters</numerusform>
         <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
       </translation>
     </message>
@@ -8507,7 +8507,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n devices total</source>
       <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
+        <numerusform>%n device total</numerusform>
         <numerusform>%n devices total</numerusform>
       </translation>
     </message>
@@ -8531,7 +8531,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more group</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
@@ -8887,7 +8887,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
+        <numerusform>%n deactivation remaining.</numerusform>
         <numerusform>%n deactivations remaining.</numerusform>
       </translation>
     </message>
@@ -8945,7 +8945,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n minutes left</source>
       <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
+        <numerusform>%n minute left</numerusform>
         <numerusform>%n minutes left</numerusform>
       </translation>
     </message>
@@ -9056,7 +9056,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+        <numerusform>Debug logging is enabled on %n Server</numerusform>
         <numerusform>Debug logging is enabled on %n Servers</numerusform>
       </translation>
     </message>
@@ -9549,7 +9549,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
       <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+        <numerusform>Missing update package for the client and %n server</numerusform>
         <numerusform>Missing update package for the client and %n servers</numerusform>
       </translation>
     </message>
@@ -9846,7 +9846,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
       <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+        <numerusform>%n device is being added. You can close this dialog or start a new search</numerusform>
         <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
       </translation>
     </message>
@@ -9857,7 +9857,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>Add %n Devices</source>
       <translation type="unfinished">
-        <numerusform>Add %n Devices</numerusform>
+        <numerusform>Add Device</numerusform>
         <numerusform>Add %n Devices</numerusform>
       </translation>
     </message>
@@ -9923,7 +9923,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%n notifications</source>
       <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
+        <numerusform>%n notification</numerusform>
         <numerusform>%n notifications</numerusform>
       </translation>
     </message>
@@ -9954,7 +9954,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%n notification types</source>
       <translation type="unfinished">
-        <numerusform>%n notification types</numerusform>
+        <numerusform>%n notification type</numerusform>
         <numerusform>%n notification types</numerusform>
       </translation>
     </message>
@@ -10335,7 +10335,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 and %n more layout</numerusform>
         <numerusform>%1 and %n more layouts</numerusform>
       </translation>
     </message>
@@ -10348,7 +10348,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 and %n more video wall</numerusform>
         <numerusform>%1 and %n more video walls</numerusform>
       </translation>
     </message>
@@ -10361,7 +10361,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more group</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
@@ -10408,35 +10408,35 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%n motion events</source>
       <translation type="unfinished">
-        <numerusform>%n motion events</numerusform>
+        <numerusform>%n motion event</numerusform>
         <numerusform>%n motion events</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
       <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
+        <numerusform>%n bookmark</numerusform>
         <numerusform>%n bookmarks</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation type="unfinished">
-        <numerusform>%n events</numerusform>
+        <numerusform>%n event</numerusform>
         <numerusform>%n events</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
       <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
+        <numerusform>%n object</numerusform>
         <numerusform>%n objects</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n notifications</source>
       <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
+        <numerusform>%n notification</numerusform>
         <numerusform>%n notifications</numerusform>
       </translation>
     </message>
@@ -10689,7 +10689,7 @@ You can still change quality and FPS directly on the camera.</translation>
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
       <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+        <numerusform>%n out of %1 users is allowed to use digest authentication (not secure).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
       </translation>
     </message>
@@ -10742,7 +10742,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message numerus="yes">
       <source>%n objects selected</source>
       <translation type="unfinished">
-        <numerusform>%n objects selected</numerusform>
+        <numerusform>%n object selected</numerusform>
         <numerusform>%n objects selected</numerusform>
       </translation>
     </message>
@@ -10853,7 +10853,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>I trust these servers</source>
       <comment>Numerus form depends on the number of certificates</comment>
       <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+        <numerusform>I trust this server</numerusform>
         <numerusform>I trust these servers</numerusform>
       </translation>
     </message>
@@ -10870,7 +10870,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>%n cameras</source>
       <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+        <numerusform>%n camera</numerusform>
         <numerusform>%n cameras</numerusform>
       </translation>
     </message>
@@ -11113,7 +11113,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>%n motion events</source>
       <translation type="unfinished">
-        <numerusform>%n motion events</numerusform>
+        <numerusform>%n motion event</numerusform>
         <numerusform>%n motion events</numerusform>
       </translation>
     </message>
@@ -11179,21 +11179,21 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Recording on %n channel was stopped due to service overuse.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Cloud storage backup on %n channel was stopped due to service overuse.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Paid integration service usage on %n channel was stopped due to service overuse.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
@@ -11292,7 +11292,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <comment>Numerus form depends on the number of cameras</comment>
       <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add camera to the current layout or ctrl+click to open in a new tab</numerusform>
         <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
       </translation>
     </message>
@@ -11864,7 +11864,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Selected file formats are not supported</source>
       <comment>Numerus form depends on the number of files</comment>
       <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file format is not supported</numerusform>
         <numerusform>Selected file formats are not supported</numerusform>
       </translation>
     </message>
@@ -11872,7 +11872,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Selected files do not have timestamps</source>
       <comment>Numerus form depends on the number of files</comment>
       <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected file does not have timestamp</numerusform>
         <numerusform>Selected files do not have timestamps</numerusform>
       </translation>
     </message>
@@ -11880,7 +11880,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Selected files are too old</source>
       <comment>Numerus form depends on the number of files</comment>
       <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected file is too old</numerusform>
         <numerusform>Selected files are too old</numerusform>
       </translation>
     </message>
@@ -11888,7 +11888,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
       <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected file covers period for which video is already being uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
       </translation>
     </message>
@@ -11896,7 +11896,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <comment>Numerus form depends on the number of files</comment>
       <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload this file to a different instance of a Virtual Camera.</numerusform>
         <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
       </translation>
     </message>
@@ -11904,7 +11904,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
       <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected file covers period for which video has already been uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>
     </message>
@@ -11912,7 +11912,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Some footage may be deleted after uploading these files</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
       <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading this file</numerusform>
         <numerusform>Some footage may be deleted after uploading these files</numerusform>
       </translation>
     </message>
@@ -11920,7 +11920,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
       <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected file happens to be the oldest on the server, it will be deleted right after being uploaded.</numerusform>
         <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
       </translation>
     </message>
@@ -11982,7 +11982,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>%n events</source>
       <translation type="unfinished">
-        <numerusform>%n events</numerusform>
+        <numerusform>%n event</numerusform>
         <numerusform>%n events</numerusform>
       </translation>
     </message>
@@ -12126,7 +12126,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n bookmarks</source>
       <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
+        <numerusform>%n bookmark</numerusform>
         <numerusform>%n bookmarks</numerusform>
       </translation>
     </message>
@@ -12658,7 +12658,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>%n custom headers</source>
       <comment>%n is a number of custom headers</comment>
       <translation type="unfinished">
-        <numerusform>%n custom headers</numerusform>
+        <numerusform>%n custom header</numerusform>
         <numerusform>%n custom headers</numerusform>
       </translation>
     </message>
@@ -12755,7 +12755,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Camera</numerusform>
         <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
@@ -12766,7 +12766,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n layouts</source>
       <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layout</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
     </message>
@@ -12888,7 +12888,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Some of the rules were not enabled</source>
       <comment>Numerus form depends on the invalid rule count</comment>
       <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
+        <numerusform>One of the rules was not enabled</numerusform>
         <numerusform>Some of the rules were not enabled</numerusform>
       </translation>
     </message>
@@ -12896,7 +12896,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Numerus form depends on the invalid rule count</comment>
       <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+        <numerusform>One of the selected rules can not be enabled as it has wrong parameters. Fix them and enable the rule again.</numerusform>
         <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
       </translation>
     </message>
@@ -13027,7 +13027,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+        <numerusform>Note that each license key may be deactivated a maximum of %n time.</numerusform>
         <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
       </translation>
     </message>
@@ -13169,7 +13169,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
       <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+        <numerusform>Failed to change password on %n camera of %1</numerusform>
         <numerusform>Failed to change password on %n cameras of %1</numerusform>
       </translation>
     </message>
