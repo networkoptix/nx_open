@@ -10212,7 +10212,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>Nueva Integración</translation>
     </message>
     <message>
       <source>Edit Integration</source>

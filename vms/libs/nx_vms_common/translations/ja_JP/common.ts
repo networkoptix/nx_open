@@ -1392,7 +1392,7 @@
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation>アーカイブは現在利用できません。後でもう一度お試しください。</translation>
+      <translation>アーカイブは現在利用できません。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>File write error.</source>

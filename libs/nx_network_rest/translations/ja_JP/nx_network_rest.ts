@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation>LDAP サーバーにアクセスできません。後ほどお試しください。</translation>
+      <translation>LDAP サーバーにアクセスできません。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation>複数回の試行に失敗したため、ユーザーがロックされました。後ほどお試しください。</translation>
+      <translation>複数回の試行に失敗したため、ユーザーがロックされました。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
