@@ -11,24 +11,18 @@ constexpr std::chrono::seconds kPunchTimeout{2};
 
 using namespace nx::network;
 
-Srflx::Srflx(
-    SessionPool* sessionPool,
+Srflx::Srflx(const std::string& sessionId,
     const std::vector<nx::network::SocketAddress>& stunServers,
-    const std::string& sessionId,
-    const SessionConfig& config)
+    const Handler& handler)
     :
     m_sessionId(sessionId),
-    m_config(config),
     m_socket(nx::network::SocketFactory::createDatagramSocket()),
-    m_sessionPool(sessionPool)
+    m_handler(handler)
 {
     m_pollable.bindToAioThread(m_socket->getAioThread());
     for (const auto& stunServer: stunServers)
         m_addrQueue.push_back(stunServer);
-}
 
-void Srflx::start()
-{
     m_socket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, 0));
     m_socket->setRecvTimeout(kPunchTimeout);
     m_socket->setSendTimeout(kPunchTimeout);
@@ -41,7 +35,16 @@ void Srflx::start()
 
     // Do sync Punch
     for (const auto& addr: m_addrQueue)
+    {
+        NX_DEBUG(
+            this,
+            "%1: Punching srflx: binded to %2, STUN server: %3",
+            m_sessionId,
+            m_socket->getLocalAddress().toString(),
+            addr.toString());
+
         m_socket->sendTo(m_sendBuffer.data(), m_sendBuffer.size(), addr);
+    }
 
     m_readBuffer.reserve(kRawReadBufferSize);
     m_timeout.restart();
@@ -52,7 +55,6 @@ void Srflx::start()
         {
             onBytesRead(std::move(args)...);
         });
-    // This object can be asynchronously deleted in the m_timer handler, so don't add any code here.
 }
 
 Srflx::~Srflx()
@@ -148,14 +150,7 @@ void Srflx::onBytesRead(SystemError::ErrorCode errorCode, std::size_t bytesTrans
 
 void Srflx::putResult(const nx::network::SocketAddress& socketAddress)
 {
-    // Dangerous: object does not exists after this call.
-    NX_DEBUG(this, "%1: Got Srflx result %2", m_sessionId, socketAddress.toString());
-    m_sessionPool->iceManager().gotSrflxResult(
-        this,
-        m_sessionId,
-        m_config,
-        socketAddress,
-        std::move(m_socket));
+    m_handler(socketAddress, std::move(m_socket));
 }
 
 } // namespace nx::webrtc

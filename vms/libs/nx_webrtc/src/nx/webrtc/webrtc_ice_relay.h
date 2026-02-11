@@ -11,13 +11,15 @@ namespace nx::webrtc {
 class NX_WEBRTC_API IceRelay: public Ice
 {
 public:
+    using CandidateHandler = std::function<void(const IceCandidate&)>;
+public:
     IceRelay(
         SessionPool* sessionPool,
         const SessionConfig& config,
-        const std::string& sessionId);
+        const std::string& sessionId,
+        const CandidateHandler& handler);
     virtual ~IceRelay();
     void setRemoteSrflx(const IceCandidate& candidate);
-    void setOauthInfo(const OauthInfo& oauth);
     void startRelay(const TurnServerInfo& turnServer);
     virtual IceCandidate::Filter type() const override;
 
@@ -30,6 +32,7 @@ protected:
     virtual nx::Buffer toSendBuffer(const char* data, int dataSize) const override final;
 
 private:
+    void setOauthInfo(const OauthInfo& oauth);
     void writeRelayPacket(const char* data, int size);
     void onBytesRead(SystemError::ErrorCode errorCode, std::size_t bytesTransferred);
     bool processRelayPackets();
@@ -84,6 +87,7 @@ private:
     nx::network::aio::Timer m_createPermissionTimer;
     nx::network::aio::Timer m_refreshTimer;
     int m_refreshLifetimeSeconds = 600;
+    CandidateHandler m_onCandidateReadyHandler;
 };
 
 } // namespace nx::webrtc

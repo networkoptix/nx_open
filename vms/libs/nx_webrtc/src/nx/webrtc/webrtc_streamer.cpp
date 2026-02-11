@@ -17,11 +17,11 @@ Streamer::Streamer(Session* session): m_session(session)
 {
 }
 
-/*virtual*/ Streamer::~Streamer()
+Streamer::~Streamer()
 {
 }
 
-/*virtual*/ bool Streamer::start(Ice* ice, Dtls* dtls)
+bool Streamer::start(Ice* ice, Dtls* dtls)
 {
     NX_ASSERT(ice);
     m_ice = ice;
@@ -42,19 +42,19 @@ Streamer::Streamer(Session* session): m_session(session)
     return true;
 }
 
-/*virtual*/ void Streamer::stop()
+void Streamer::stop()
 {
     updateMetrics(-1);
     m_session->provider()->stop();
     m_iceType = IceCandidate::Filter::None;
 }
 
-/*virtual*/ bool Streamer::onSrtp(std::vector<uint8_t> buffer)
+bool Streamer::onSrtp(std::vector<uint8_t> buffer)
 {
     return m_session->consumer()->handleSrtp(std::move(buffer));
 }
 
-/*virtual*/ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
+void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
 {
     rapidjson::Document d;
     d.Parse(data.data());
@@ -117,7 +117,7 @@ Streamer::Streamer(Session* session): m_session(session)
     }
 }
 
-/*virtual*/ void Streamer::onDataChannelBinary(const std::string& data, int streamId)
+void Streamer::onDataChannelBinary(const std::string& data, int streamId)
 {
     onDataChannelString(data, streamId);
 }

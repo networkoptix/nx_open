@@ -362,6 +362,7 @@ QnUniversalRtpEncoder* Transcoder::setDataPacket(nx::Uuid deviceId, QnConstAbstr
         QnUniversalRtpEncoder* rtpEncoder = getRtpEncoder(deviceId, media->dataType);
         if (!rtpEncoder)
             return nullptr; //< Skip not supported data.
+
         rtpEncoder->setDataPacket(media);
         return rtpEncoder;
     }

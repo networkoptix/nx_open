@@ -6,8 +6,6 @@
 #include <rapidjson/writer.h>
 
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
-#include <nx/vms/common/system_context.h>
 #include <network/tcp_connection_priv.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/websocket/websocket_handshake.h>
@@ -21,13 +19,7 @@ using namespace nx::vms::api;
 using namespace nx::network;
 using namespace nx;
 
-Tracker::Tracker(
-    nx::vms::common::SystemContext* context,
-    SessionPool* sessionPool,
-    Session* session)
-    :
-    nx::vms::common::SystemContextAware(context),
-    m_sessionPool(sessionPool),
+Tracker::Tracker(Session* session):
     m_session(session)
 {
     const std::string iceCandidatesIni = ::ini().webrtcIceCandidates;
@@ -147,7 +139,7 @@ void Tracker::sendIce(const IceCandidate& candidate)
     int mid = tracks.empty() ? kDataChannelMid : tracks[0].mid;
     ice.AddMember("sdpMid", mid, d.GetAllocator());
     ice.AddMember("sdpMLineIndex", 0, d.GetAllocator());
-    std::string ufrag = m_session->getLocalUfrag();
+    std::string ufrag = m_session->id();
     rapidjson::Value ufragValue(ufrag, d.GetAllocator());
     ice.AddMember("usernameFragment", ufragValue, d.GetAllocator());
     d.AddMember("ice", ice, d.GetAllocator());
@@ -170,9 +162,10 @@ AnswerResult Tracker::examineAnswer()
             if (candidate.IsString())
             {
                 auto iceCandidate = IceCandidate::parse(candidate.GetString());
-                m_sessionPool->iceManager().gotIceFromTracker(
-                    m_session,
-                    iceCandidate);
+
+                if (iceCandidate.type == IceCandidate::Type::Srflx)
+                    m_session->gotIceFromTracker(iceCandidate);
+
                 if (iceCandidate.type == IceCandidate::Type::Srflx)
                 {
                     m_stage = Stage::srflxReceived;

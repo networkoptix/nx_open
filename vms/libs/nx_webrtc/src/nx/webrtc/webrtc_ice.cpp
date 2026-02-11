@@ -17,11 +17,11 @@ Ice::Ice(SessionPool* sessionPool, const SessionConfig& config):
 {
 }
 
-/*virtual*/ Ice::~Ice()
+Ice::~Ice()
 {
 }
 
-/*virtual*/ nx::Buffer Ice::toSendBuffer(const char* data, int dataSize) const
+nx::Buffer Ice::toSendBuffer(const char* data, int dataSize) const
 {
     return nx::Buffer(data, dataSize);
 }
@@ -110,7 +110,15 @@ bool Ice::handleStun(const uint8_t* data, int size)
 
     if (!m_sessionDescription)
     {
-        m_sessionDescription = m_sessionPool->describe(leftUsername);
+        auto sessionPtr = m_sessionPool->getSession(leftUsername);
+        auto session = sessionPtr.lock();
+        if (!session)
+        {
+            NX_DEBUG(this, "STUN session %1 was not found", leftUsername);
+            sendStunError(message);
+            return false;
+        }
+        m_sessionDescription = session->describe();
         if (!m_sessionDescription)
         {
             NX_DEBUG(this, "STUN session %1 is locked or expired", leftUsername);
@@ -179,7 +187,7 @@ bool Ice::handleStun(const uint8_t* data, int size)
     return true;
 }
 
-/*virtual*/ void Ice::writeDataChannelPacket(const uint8_t* data, int size)
+void Ice::writeDataChannelPacket(const uint8_t* data, int size)
 {
     nx::Buffer buffer((const char*) data, size);
 
@@ -200,12 +208,12 @@ bool Ice::handleStun(const uint8_t* data, int size)
         });
 }
 
-/*virtual*/ void Ice::writeDtlsPacket(const char* data, int size)
+void Ice::writeDtlsPacket(const char* data, int size)
 {
     writePacket(data, size, /*foreground*/ true);
 }
 
-/*virtual*/ bool Ice::onDtlsData(const uint8_t* data, int size)
+bool Ice::onDtlsData(const uint8_t* data, int size)
 {
     return m_dataChannel.handlePacket(data, size);
 }
@@ -218,6 +226,9 @@ bool Ice::handleDtls(const uint8_t* data, int size)
         return false;
     if (status == Dtls::Status::streaming && m_stage == Stage::dtls)
     {
+        if (m_needStop)
+            return false;
+
         m_stage = Stage::streaming;
 
         /* Some peers (at least Firefox) make successfully STUN handshake into several ICE candidates
@@ -226,16 +237,29 @@ bool Ice::handleDtls(const uint8_t* data, int size)
          * on the server side.
          * So, lock session afterward, on successful DTLS handshake.
          * */
-        NX_CRITICAL(!m_session);
-        m_session = m_sessionPool->lock(m_sessionDescription->id);
-
-        if (!m_session)
+        NX_CRITICAL(!m_session.lock());
+        auto sessionPtr = m_sessionPool->getSession(m_sessionDescription->id);
+        auto session = sessionPtr.lock();
+        if (!session)
+        {
+            NX_DEBUG(this, "Init DTLS: session %1 was not found", m_sessionDescription->id);
+            return false;
+        }
+        if (!session->lock())
         {
             NX_DEBUG(this, "Init DTLS: can't lock session %1", m_sessionDescription->id);
             return false;
         }
+        else
+        {
+            NX_DEBUG(this, "Session %1 is locked", m_sessionDescription->id);
+        }
+        m_session = sessionPtr;
 
-        if (!startStream())
+        m_dataChannel.openDataChannel("nx-channel", "");
+
+        // Start streaming.
+        if (!session->transceiver()->start(this, m_sessionDescription->dtls.get()))
             return false;
     }
     return true;
@@ -243,13 +267,14 @@ bool Ice::handleDtls(const uint8_t* data, int size)
 
 bool Ice::handleSrtp(const uint8_t* data, int size)
 {
-    if (!m_session)
+    auto session = m_session.lock();
+    if (!session)
         return true; //< Not a fatal error.
 
     std::vector<uint8_t> buffer;
     buffer.assign(data, data + size);
 
-    return m_session->transceiver()->onSrtp(std::move(buffer));
+    return session->transceiver()->onSrtp(std::move(buffer));
 }
 
 Ice::Stage Ice::demuxMessageStage(const uint8_t* data, size_t size)
@@ -337,19 +362,6 @@ aio::AbstractAioThread* Ice::getAioThread()
     return m_pollable.getAioThread();
 }
 
-bool Ice::startStream()
-{
-    if (m_needStop)
-        return false;
-
-    m_dataChannel.openDataChannel("nx-channel", "");
-
-    if (!m_session->transceiver()->start(this, m_sessionDescription->dtls.get()))
-        return false;
-
-    return true;
-}
-
 void Ice::onBytesWritten(SystemError::ErrorCode errorCode, std::size_t /*bytesTransferred*/)
 {
     if (m_needStop)
@@ -367,7 +379,6 @@ void Ice::onBytesWritten(SystemError::ErrorCode errorCode, std::size_t /*bytesTr
     }
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-
     m_sendBuffers.pop_front();
     if (m_foregroundOffset != 0)
         --m_foregroundOffset;
@@ -386,9 +397,11 @@ void Ice::sendNextBufferUnsafe()
 
     if (m_sendBuffers.empty())
     {
-        if (m_session && m_session->consumer() && m_dataChannel.outputQueueSize() == 0)
-            m_session->consumer()->onDataSent(/*success*/ true);
-
+        if (auto session = m_session.lock())
+        {
+            if (session->consumer() && m_dataChannel.outputQueueSize() == 0)
+               session->consumer()->onDataSent(/*success*/ true);
+        }
         return;
     }
 
@@ -401,25 +414,27 @@ void Ice::stopUnsafe()
     m_needStop = true;
     m_dataChannel.reset();
     m_pollable.pleaseStopSync();
-    if (m_session)
+    if (auto session = m_session.lock())
     {
-        if (m_session->consumer())
-            m_session->consumer()->stopUnsafe();
-        m_session->sessionPool()->unlock(m_session->getLocalUfrag());
+        if (session->consumer())
+            session->consumer()->stopUnsafe();
+        session->unlock();
         m_session.reset();
     }
 }
 
-/*virtual*/ void Ice::onDataChannelString(const std::string& data, int streamId)
+void Ice::onDataChannelString(const std::string& data, int streamId)
 {
     NX_DEBUG(this, "Got string from Data Channel: %1", data);
-    m_session->transceiver()->onDataChannelString(data, streamId);
+    if (auto session = m_session.lock())
+        session->transceiver()->onDataChannelString(data, streamId);
 }
 
-/*virtual*/ void Ice::onDataChannelBinary(const std::string& data, int streamId)
+void Ice::onDataChannelBinary(const std::string& data, int streamId)
 {
     NX_DEBUG(this, "Got binary from Data Channel: %1", data);
-    m_session->transceiver()->onDataChannelBinary(data, streamId);
+    if (auto session = m_session.lock())
+        session->transceiver()->onDataChannelBinary(data, streamId);
 }
 
 void Ice::writeDataChannelString(const std::string& data)

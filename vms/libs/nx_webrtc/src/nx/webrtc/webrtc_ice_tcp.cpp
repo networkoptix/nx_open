@@ -26,7 +26,7 @@ ListenerTcp::ListenerTcp(
     setObjectName(nx::toString(this));
 }
 
-/*virtual*/ void ListenerTcp::run()
+void ListenerTcp::run()
 {
     Q_D(QnTCPConnectionProcessor);
     initSystemThreadId();
@@ -38,7 +38,7 @@ ListenerTcp::ListenerTcp(
         SessionConfig(),
         d->clientRequest);
 
-    m_sessionPool->iceManager().gotIceTcp(std::move(ice));
+    m_sessionPool->gotIceTcp(std::move(ice));
 }
 
 IceTcp::IceTcp(
@@ -68,12 +68,12 @@ void IceTcp::start()
         });
 }
 
-/*virtual*/ IceCandidate::Filter IceTcp::type() const
+IceCandidate::Filter IceTcp::type() const
 {
     return IceCandidate::Filter::TcpHost;
 }
 
-/*virtual*/ IceTcp::~IceTcp()
+IceTcp::~IceTcp()
 {
     std::promise<void> stoppedPromise;
     m_pollable.dispatch(
@@ -86,20 +86,23 @@ void IceTcp::start()
     NX_VERBOSE(this, "Destroyed.");
 }
 
-/*virtual*/ void IceTcp::stopUnsafe()
+void IceTcp::stopUnsafe()
 {
     if (!m_needStop)
     {
         Ice::stopUnsafe();
 
         m_socket.cancelIOSync(aio::EventType::etAll);
-
-        // Dangerous: object does not exists after this call.
-        m_sessionPool->iceManager().removeIceTcp(this);
     }
+    m_stopped = true;
 }
 
-/*virtual*/ nx::Buffer IceTcp::toSendBuffer(const char* data, int dataSize) const
+bool IceTcp::isStopped()
+{
+    return m_stopped;
+}
+
+nx::Buffer IceTcp::toSendBuffer(const char* data, int dataSize) const
 {
     if (dataSize > std::numeric_limits<uint16_t>::max())
     {
@@ -158,7 +161,7 @@ void IceTcp::onBytesRead(SystemError::ErrorCode errorCode, std::size_t bytesTran
     }
 };
 
-/*virtual*/ void IceTcp::asyncSendPacketUnsafe()
+void IceTcp::asyncSendPacketUnsafe()
 {
     m_socket.post(
         [this]()
@@ -175,12 +178,12 @@ void IceTcp::onBytesRead(SystemError::ErrorCode errorCode, std::size_t bytesTran
         });
 }
 
-/*virtual*/ nx::network::SocketAddress IceTcp::iceRemoteAddress() const
+nx::network::SocketAddress IceTcp::iceRemoteAddress() const
 {
     return m_socket.getForeignAddress();
 }
 
-/*virtual*/ nx::network::SocketAddress IceTcp::iceLocalAddress() const
+nx::network::SocketAddress IceTcp::iceLocalAddress() const
 {
     return m_socket.getLocalAddress();
 }

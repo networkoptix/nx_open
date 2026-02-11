@@ -27,14 +27,13 @@ namespace nx::webrtc {
 class NX_WEBRTC_API Srflx
 {
 public:
-    Srflx(
-        SessionPool* sessionPool,
-        const std::vector<nx::network::SocketAddress>& stunAddress,
-        const std::string& sessionId,
-        const SessionConfig& config);
+    using Handler = std::function<void(const nx::network::SocketAddress& mappedAddress,
+        std::unique_ptr<nx::network::AbstractDatagramSocket>&& socket)>;
+public:
+    Srflx(const std::string& sessionId,
+        const std::vector<nx::network::SocketAddress>& stunServers,
+        const Handler& handler);
     ~Srflx();
-
-    void start();
 
 private:
     void onBytesRead(SystemError::ErrorCode errorCode, std::size_t bytesTransferred);
@@ -42,7 +41,6 @@ private:
 
 private:
     std::string m_sessionId;
-    const SessionConfig m_config;
     std::deque<nx::network::SocketAddress> m_addrQueue;
     nx::utils::ElapsedTimer m_timeout;
     nx::network::aio::BasicPollable m_pollable;
@@ -51,7 +49,7 @@ private:
 
     std::unique_ptr<nx::network::AbstractDatagramSocket> m_socket;
     nx::network::SocketAddress m_mappedAddress;
-    nx::webrtc::SessionPool* m_sessionPool = nullptr;
+    Handler m_handler;
 };
 
 } // namespace nx::webrtc

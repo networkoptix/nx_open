@@ -23,7 +23,7 @@ IceUdp::IceUdp(SessionPool* sessionPool, const SessionConfig& config)
     m_bindingTimer.bindToAioThread(m_pollable.getAioThread());
 }
 
-/*virtual*/ IceUdp::~IceUdp()
+IceUdp::~IceUdp()
 {
     std::promise<void> stoppedPromise;
     m_pollable.dispatch(
@@ -35,7 +35,7 @@ IceUdp::IceUdp(SessionPool* sessionPool, const SessionConfig& config)
     stoppedPromise.get_future().wait();
 }
 
-/*virtual*/ void IceUdp::stopUnsafe()
+void IceUdp::stopUnsafe()
 {
     if (!m_needStop)
     {
@@ -47,7 +47,7 @@ IceUdp::IceUdp(SessionPool* sessionPool, const SessionConfig& config)
     }
 }
 
-/*virtual*/ IceCandidate::Filter IceUdp::type() const
+IceCandidate::Filter IceUdp::type() const
 {
     return m_bindingCount == 0 ? IceCandidate::Filter::UdpHost : IceCandidate::Filter::UdpSrflx;
 }
@@ -146,37 +146,40 @@ void IceUdp::onBytesRead(SystemError::ErrorCode errorCode, std::size_t bytesTran
     }
     else
     {
-        if (m_firstPacket)
+        if (m_readBuffer.size())
         {
-            // NOTE: for host candidate, we can receive packet only from remote host candidate.
-            // For srflx candidate, we can receive packet from remote srflx or from STUN server.
-            // We set right address for srflx in sendBinding().
-            m_socket->setDestAddr(m_socket->lastDatagramSourceAddress());
-        }
+            if (m_firstPacket)
+            {
+                // NOTE: for host candidate, we can receive packet only from remote host candidate.
+                // For srflx candidate, we can receive packet from remote srflx or from STUN server.
+                // We set right address for srflx in sendBinding().
+                m_socket->setDestAddr(m_socket->lastDatagramSourceAddress());
+            }
 
-        bool result = processIncomingPacket((uint8_t*) m_readBuffer.data(), m_readBuffer.size());
-        if (m_needStop) // processIncomingPacket can call stopUnsafe on write data.
-            return;
-        m_readBuffer.resize(0);
-        if (!result && m_stage != Stage::binding)
-        {
-            stopUnsafe();
-            return;
-        }
+            bool result = processIncomingPacket((uint8_t*) m_readBuffer.data(), m_readBuffer.size());
+            if (m_needStop) // processIncomingPacket can call stopUnsafe on write data.
+                return;
+            m_readBuffer.resize(0);
+            if (!result && m_stage != Stage::binding)
+            {
+                stopUnsafe();
+                return;
+            }
 
-        if (result)
-        {
-            m_firstPacket = false;
-            m_keepAliveTimer.start(
-                kKeepAliveTimeout,
-                [this]()
-                {
-                    NX_DEBUG(
-                        this,
-                        "Keep alive timeout reached, stopping UDP ice for %1",
-                        (m_sessionDescription ? m_sessionDescription->id : "(null)"));
-                    stopUnsafe(); //< Ice restart is better.
-                });
+            if (result)
+            {
+                m_firstPacket = false;
+                m_keepAliveTimer.start(
+                    kKeepAliveTimeout,
+                    [this]()
+                    {
+                        NX_DEBUG(
+                            this,
+                            "Keep alive timeout reached, stopping UDP ice for %1",
+                            (m_sessionDescription ? m_sessionDescription->id : "(null)"));
+                        stopUnsafe(); //< Ice restart is better.
+                    });
+            }
         }
 
         m_socket->readSomeAsync(
@@ -188,7 +191,7 @@ void IceUdp::onBytesRead(SystemError::ErrorCode errorCode, std::size_t bytesTran
     }
 };
 
-/*virtual*/ void IceUdp::asyncSendPacketUnsafe()
+void IceUdp::asyncSendPacketUnsafe()
 {
     m_socket->post(
         [this]()
@@ -205,12 +208,12 @@ void IceUdp::onBytesRead(SystemError::ErrorCode errorCode, std::size_t bytesTran
         });
 }
 
-/*virtual*/ nx::network::SocketAddress IceUdp::iceRemoteAddress() const
+nx::network::SocketAddress IceUdp::iceRemoteAddress() const
 {
     return m_socket->lastDatagramSourceAddress();
 }
 
-/*virtual*/ nx::network::SocketAddress IceUdp::iceLocalAddress() const
+nx::network::SocketAddress IceUdp::iceLocalAddress() const
 {
     return m_socket->getLocalAddress();
 }

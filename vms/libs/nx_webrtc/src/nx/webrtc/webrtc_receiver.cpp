@@ -16,12 +16,12 @@ Receiver::Receiver(Session* session): m_session(session)
 {
 }
 
-/*virtual*/ Receiver::~Receiver()
+Receiver::~Receiver()
 {
     NX_ASSERT(!m_session->reader() || !m_session->reader()->isStarted());
 }
 
-/*virtual*/ bool Receiver::start(Ice* ice, Dtls* dtls)
+bool Receiver::start(Ice* ice, Dtls* dtls)
 {
     NX_ASSERT(ice);
     m_ice = ice;
@@ -45,15 +45,15 @@ Receiver::Receiver(Session* session): m_session(session)
     return true;
 }
 
-/*virtual*/ void Receiver::stop()
+void Receiver::stop()
 {
     m_session->reader()->stop();
 
     // Dangerous, object can be destroyed after this call.
-    m_session->sessionPool()->drop(m_session->getLocalUfrag());
+    m_session->sessionPool()->drop(m_session->id());
 }
 
-/*virtual*/ bool Receiver::onSrtp(std::vector<uint8_t> buffer)
+bool Receiver::onSrtp(std::vector<uint8_t> buffer)
 {
     if (!m_session->demuxer()->processData((const char*) buffer.data(), buffer.size()))
     {
@@ -77,12 +77,12 @@ Receiver::Receiver(Session* session): m_session(session)
     return true;
 }
 
-/*virtual*/ void Receiver::onDataChannelString(const std::string& /*data*/, int /*streamId*/)
+void Receiver::onDataChannelString(const std::string& /*data*/, int /*streamId*/)
 {
     // Nop.
 }
 
-/*virtual*/ void Receiver::onDataChannelBinary(const std::string& /*data*/, int /*streamId*/)
+void Receiver::onDataChannelBinary(const std::string& /*data*/, int /*streamId*/)
 {
     // Nop.
 }
