@@ -100,7 +100,10 @@ Page
                     "image://skin/64x64/Outline/notification_off.svg?primary=light10"
 
                 placeholder.buttonText: qsTr("Settings")
-                placeholder.onButtonClicked: Workflow.openSettingsScreen(/*push*/ true) //< TODO: required to open the exact page.
+                placeholder.onButtonClicked:
+                {
+                    Workflow.openSettingsScreen(/*push*/ true, /*initialPage*/ "pushExpertModePage")
+                }
             }
         },
         State

@@ -21,15 +21,18 @@ AdaptiveScreen
 
     objectName: "settingsScreen"
 
-    // TODO: Add initialPage property.
+    property string initialPage
 
-    function checkTabletLayoutContentNotEmpty()
+    function ensureContentNotEmpty()
     {
         if (LayoutController.isTabletLayout)
         {
             if (!contentItem || contentItem === settingsNavigation)
                 contentItem = interfaceSettingsPage
         }
+
+        if (!contentItem)
+            contentItem = settingsNavigation
     }
 
     function setContentItem(newItem)
@@ -78,6 +81,19 @@ AdaptiveScreen
         [
             State
             {
+                name: "returnToPreviousScreen"
+                when: stackView.depth > 1
+                    && (settingsScreen.initialPage
+                        || LayoutController.isTabletLayout
+                        || settingsScreen.contentItem === settingsNavigation)
+
+                PropertyChanges
+                {
+                    backButton.onClicked: Workflow.popCurrentScreen()
+                }
+            },
+            State
+            {
                 name: "returnToSettingsNavigation"
                 when: !LayoutController.isTabletLayout
                     && settingsScreen.contentItem !== settingsNavigation
@@ -85,18 +101,6 @@ AdaptiveScreen
                 PropertyChanges
                 {
                     backButton.onClicked: settingsScreen.setContentItem(settingsNavigation)
-                }
-            },
-            State
-            {
-                name: "returnToPreviousScreen"
-                when: stackView.depth > 1 &&
-                    (LayoutController.isTablet
-                        || (!LayoutController.isTabletLayout && settingsScreen.contentItem === settingsNavigation))
-
-                PropertyChanges
-                {
-                    backButton.onClicked: Workflow.popCurrentScreen()
                 }
             },
             State
@@ -252,31 +256,38 @@ AdaptiveScreen
     InterfaceSettingsPage
     {
         id: interfaceSettingsPage
+        objectName: "interfaceSettingsPage"
     }
 
     SecuritySettingsPage
     {
         id: securitySettingsPage
+        objectName: "securitySettingsPage"
     }
 
     PerformanceSettingsPage
     {
         id: performanceSettingsPage
+        objectName: "performanceSettingsPage"
     }
 
     BetaFeaturesPage
     {
         id: betaFeaturesPage
+        objectName: "betaFeaturesPage"
     }
 
     PushExpertModePage
     {
         id: pushExpertModePage
+        objectName: "pushExpertModePage"
     }
 
     AppInfoPage
     {
         id: appInfoPage
+
+        objectName: "appInfoPage"
 
         onDeveloperSettingsRequested: settingsScreen.contentItem = developerSettingsPage
     }
@@ -284,6 +295,7 @@ AdaptiveScreen
     DeveloperSettingsPage
     {
         id: developerSettingsPage
+        objectName: "developerSettingsPage"
     }
 
     Connections
@@ -292,12 +304,14 @@ AdaptiveScreen
 
         function onIsTabletLayoutChanged()
         {
-            settingsScreen.checkTabletLayoutContentNotEmpty()
+            settingsScreen.ensureContentNotEmpty()
         }
     }
 
     Component.onCompleted:
     {
-        checkTabletLayoutContentNotEmpty()
+        contentItem = data.find((i) => i.objectName && i.objectName === initialPage) ?? null
+
+        ensureContentNotEmpty()
     }
 }

@@ -138,13 +138,14 @@ function openVideoScreen(resource, screenshotUrl, timestamp, camerasModel, selec
 // Pushes or replaces Settings screen based on 'push' parameter. Pushing is required to be able
 // to go back to the previous screen.
 // At the moment `push` is used only by the FeedScreen to open the push notifications settings.
-// TODO: Add initial page parameter.
-function openSettingsScreen(push)
+function openSettingsScreen(push, initialPage = "")
 {
+    const properties = {"initialPage": initialPage}
+
     if (push)
-        stackView.pushScreen(Qt.resolvedUrl("../Screens/SettingsScreen.qml"))
+        stackView.pushScreen(Qt.resolvedUrl("../Screens/SettingsScreen.qml"), properties)
     else
-        stackView.replace(null, Qt.resolvedUrl("../Screens/SettingsScreen.qml"))
+        stackView.replace(null, Qt.resolvedUrl("../Screens/SettingsScreen.qml"), properties)
 }
 
 function openCloudSummaryScreen()
