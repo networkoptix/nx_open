@@ -6,6 +6,18 @@
 
 namespace nx::json_rpc {
 
+static bool isNotification(const ResponseId& responseId, const rapidjson::Value& request)
+{
+    if (!std::holds_alternative<std::nullptr_t>(responseId))
+        return false;
+
+    if (!request.IsObject())
+        return false;
+
+    auto id = request.FindMember("id");
+    return id == request.MemberEnd() || id->value.IsNull();
+}
+
 static std::variant<Request, Response> deserialize(
     rapidjson::Document::AllocatorType allocator, rapidjson::Value& value)
 {
@@ -35,11 +47,10 @@ void IncomingProcessor::processRequest(
     {
         if (data.Empty())
         {
-            NX_DEBUG(this, "Empty batch request received");
-            return sendResponse(
-                Response::makeError(
-                    std::nullptr_t{}, Error::invalidRequest, "Empty batch request"),
-                handler);
+            auto response = nx::reflect::json::serialize(Response::makeError(
+                std::nullptr_t{}, Error::invalidRequest, "Empty batch request"));
+            NX_DEBUG(this, "Send error response " + response);
+            return handler(std::move(response));
         }
 
         return processBatchRequest(std::move(data), std::move(handler));
@@ -47,9 +58,25 @@ void IncomingProcessor::processRequest(
 
     auto requestOrError = deserialize(data.GetAllocator(), data);
     if (std::holds_alternative<Response>(requestOrError))
-        return sendResponse(std::get<Response>(std::move(requestOrError)), handler);
+    {
+        auto error = std::get<Response>(std::move(requestOrError));
+        auto serialized = nx::reflect::json::serialize(error);
+        NX_DEBUG(this, "Send error response " + serialized);
+        if (isNotification(error.id, data))
+        {
+            ++m_messages.notifications;
+        }
+        else
+        {
+            ++m_messages.requests;
+            ++m_messages.responses;
+            handler(std::move(serialized));
+        }
+        return;
+    }
 
     auto jsonRpcRequest = std::get<Request>(std::move(requestOrError));
+    ++(jsonRpcRequest.id ? m_messages.requests : m_messages.notifications);
     if (!m_handler)
     {
         NX_DEBUG(this, "Ignore %1", idWithMethod(jsonRpcRequest));
@@ -81,29 +108,43 @@ void IncomingProcessor::processBatchRequest(
         auto requestOrError = deserialize(list.GetAllocator(), item);
         if (std::holds_alternative<Response>(requestOrError))
         {
-            responses.emplace_back(std::get<Response>(std::move(requestOrError)));
+            auto error = std::get<Response>(std::move(requestOrError));
+            if (isNotification(error.id, item))
+            {
+                ++m_messages.notifications;
+            }
+            else
+            {
+                ++m_messages.requests;
+                responses.emplace_back(std::move(error));
+            }
             continue;
         }
 
         auto jsonRpcRequest = std::get<Request>(std::move(requestOrError));
+        ++(jsonRpcRequest.id ? m_messages.requests : m_messages.notifications);
         if (m_handler)
         {
             requests.push_back(std::move(jsonRpcRequest));
         }
         else
         {
-            NX_DEBUG(this, "Ignore %1", idWithMethod(jsonRpcRequest));
-            responses.emplace_back(Response::makeError(jsonRpcRequest.responseId(),
-                Error::methodNotFound, "Method handler is not found"));
+            NX_DEBUG(this, "No handler for %1", idWithMethod(jsonRpcRequest));
+            if (jsonRpcRequest.id)
+            {
+                responses.emplace_back(Response::makeError(jsonRpcRequest.responseId(),
+                    Error::methodNotFound, "Method handler is not found"));
+            }
         }
     }
 
     if (requests.empty())
     {
-        auto serialized{nx::reflect::json::serialize(responses)};
+        auto serialized{
+            responses.empty() ? std::string{} : nx::reflect::json::serialize(responses)};
         NX_DEBUG(this, "No valid request in batch, responses %1", serialized);
-        handler(std::move(serialized));
-        return;
+        m_messages.responses += responses.size();
+        return handler(std::move(serialized));
     }
 
     auto batchRequest = std::make_unique<BatchRequest>(
@@ -137,11 +178,8 @@ void IncomingProcessor::onBatchResponse(BatchRequest* batchRequest, int request,
     if (!NX_ASSERT(it != m_batchRequests.end(), "Failed to find %1 for %2", batchRequest, request))
         return;
 
-    if (!std::holds_alternative<std::nullptr_t>(response.id)
-        || (response.error && response.error->code == Error::invalidRequest))
-    {
+    if (!std::holds_alternative<std::nullptr_t>(response.id))
         it->second->responses.push_back(std::move(response));
-    }
 
     if (NX_ASSERT(it->second->requests[request],
         "Response for %1 in %2 is already processed", request, batchRequest))
@@ -155,6 +193,7 @@ void IncomingProcessor::onBatchResponse(BatchRequest* batchRequest, int request,
         m_batchRequests.erase(it);
 
         NX_DEBUG(this, "End of %1", batchRequest);
+        m_messages.responses += responses.size();
         handler(responses.empty() ? std::string{} : nx::reflect::json::serialize(responses));
     }
 }
@@ -163,13 +202,13 @@ void IncomingProcessor::sendResponse(
     Response response, const nx::MoveOnlyFunc<void(std::string)>& handler)
 {
     std::string value;
-    if (!std::holds_alternative<std::nullptr_t>(response.id)
-        || (response.error && response.error->code == Error::invalidRequest))
+    if (!std::holds_alternative<std::nullptr_t>(response.id))
     {
         value = nx::reflect::json::serialize(response);
         NX_DEBUG(this, response.error
             ? "Send error response " + value
             : "Send response " + nx::reflect::json::serialize(response.id));
+        ++m_messages.responses;
     }
     else
     {

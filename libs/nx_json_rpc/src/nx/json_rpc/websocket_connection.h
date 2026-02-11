@@ -9,6 +9,7 @@
 #include <nx/utils/scope_guard.h>
 
 #include "messages.h"
+#include "websocket_connection_stats.h"
 
 namespace nx::network::websocket { class WebSocket; }
 
@@ -16,15 +17,6 @@ namespace nx::json_rpc {
 
 class IncomingProcessor;
 namespace detail { class OutgoingProcessor; }
-
-struct NX_JSON_RPC_API WebSocketConnectionStats
-{
-    std::vector<QString> guards;
-    size_t inRequests = 0;
-    size_t outRequests = 0;
-    size_t totalInB = 0;
-    size_t totalOutB = 0;
-};
 
 class NX_JSON_RPC_API WebSocketConnection: public nx::network::aio::BasicPollable
 {
@@ -75,8 +67,7 @@ private:
     std::unique_ptr<detail::OutgoingProcessor> m_outgoingProcessor;
     std::queue<rapidjson::Document> m_queuedRequests;
     std::unique_ptr<nx::network::websocket::WebSocket> m_socket;
-    size_t m_inRequests = 0;
-    size_t m_outRequests = 0;
+    WebSocketConnectionMessages m_outMessages;
 };
 
 } // namespace nx::json_rpc

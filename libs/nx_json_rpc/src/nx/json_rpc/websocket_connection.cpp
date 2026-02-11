@@ -52,7 +52,14 @@ std::pair<bool, std::optional<Response>> isResponse(const rapidjson::Value& valu
     if (value.IsArray())
         return isArrayResponse(value);
 
-    return {value.IsObject() && isObjectResponse(value), std::optional<Response>{}};
+    if (!value.IsObject())
+    {
+        return {false,
+            Response::makeError(
+                std::nullptr_t{}, Error::invalidRequest, "Must be array or object")};
+    }
+
+    return {isObjectResponse(value), std::optional<Response>{}};
 }
 
 static std::atomic<size_t> s_id{0};
@@ -139,7 +146,7 @@ void WebSocketConnection::send(
             handler = std::move(handler),
             serializedRequest = std::move(serializedRequest)]() mutable
         {
-            ++m_outRequests;
+            ++(request.id ? m_outMessages.requests : m_outMessages.notifications);
             m_outgoingProcessor->processRequest(
                 std::move(request), std::move(handler), std::move(serializedRequest));
         });
@@ -151,7 +158,8 @@ void WebSocketConnection::send(
     dispatch(
         [this, jsonRpcRequests = std::move(jsonRpcRequests), handler = std::move(handler)]() mutable
         {
-            m_outRequests += jsonRpcRequests.size();
+            for (const auto& r: jsonRpcRequests)
+                ++(r.id ? m_outMessages.requests : m_outMessages.notifications);
             m_outgoingProcessor->processBatchRequest(std::move(jsonRpcRequests), std::move(handler));
         });
 }
@@ -202,18 +210,22 @@ void WebSocketConnection::readHandler(const nx::Buffer& buffer)
     else
     {
         if (isResponse_)
+        {
+            if (data.IsArray())
+                m_outMessages.responses += data.Size();
+            else
+                ++m_outMessages.responses;
             m_outgoingProcessor->onResponse(std::move(data));
+        }
         else
+        {
             processRequest(std::move(data));
+        }
     }
 }
 
 void WebSocketConnection::processRequest(rapidjson::Document data)
 {
-    if (data.IsArray())
-        m_inRequests += data.Size();
-    else
-        ++m_inRequests;
     m_queuedRequests.push(std::move(data));
     if (m_queuedRequests.size() == 1)
         processQueuedRequest();
@@ -277,11 +289,11 @@ WebSocketConnectionStats WebSocketConnection::stats() const
 {
     auto output = m_socket->outputStatistics();
     return {
-        .guards = m_guards | std::views::keys | nx::ranges::to<std::vector>(),
-        .inRequests = m_inRequests,
-        .outRequests = m_outRequests,
+        .in = m_incomingProcessor->messages(),
+        .out = m_outMessages,
         .totalInB = output.totalIn,
         .totalOutB = output.totalOut,
+        .guards = m_guards | std::views::keys | nx::ranges::to<std::vector>(),
     };
 }
 

@@ -10,81 +10,14 @@
 
 #include <nx/reflect/instrument.h>
 #include <nx/utils/json/exceptions.h>
+#include <nx/utils/json/int64_as_number.h>
 #include <nx/utils/json/json.h>
 
 // JSON RPC 2.0 Specification: https://www.jsonrpc.org/specification
 
 namespace nx::json_rpc {
 
-struct NumericId
-{
-    /**%apidoc[unused] */
-    int64_t value;
-
-    NumericId(const NumericId&) = default;
-    NumericId(NumericId&&) = default;
-    NumericId& operator=(const NumericId&) = default;
-    NumericId& operator=(NumericId&&) = default;
-
-    NumericId(int64_t other = 0): value(other) {}
-    NumericId& operator=(int64_t other)
-    {
-        value = other;
-        return *this;
-    }
-
-    operator int64_t() const { return value; }
-
-    NumericId& operator++()
-    {
-        ++value;
-        return *this;
-    }
-
-    NumericId operator++(int)
-    {
-        NumericId r = *this;
-        ++value;
-        return r;
-    }
-
-    QString toString() const { return QString::number(value); }
-};
-
-inline nx::reflect::DeserializationResult deserialize(
-    const nx::reflect::json::DeserializationContext& context, NumericId* data)
-{
-    if (context.value.IsInt64())
-    {
-        *data = context.value.GetInt64();
-        return {};
-    }
-
-    if (context.value.IsInt())
-    {
-        *data = context.value.GetInt();
-        return {};
-    }
-
-    if constexpr (sizeof(std::decay_t<decltype(context.value.GetUint())>) < 8u)
-    {
-        if (context.value.IsUint())
-        {
-            *data = context.value.GetUint();
-            return {};
-        }
-    }
-
-    return {false, "Signed 64 bit integer expected",
-        nx::reflect::json_detail::getStringRepresentation(context.value)};
-}
-
-template<typename SerializationContext>
-inline void serialize(SerializationContext* context, const NumericId& value)
-{
-    context->composer.writeInt(value.value);
-}
-
+using NumericId = nx::json::Int64AsNumber;
 using StringId = QString;
 using RequestId = std::optional<std::variant<StringId, NumericId>>;
 using ResponseId = std::variant<StringId, NumericId, std::nullptr_t>;
@@ -356,16 +289,3 @@ inline nx::reflect::DeserializationResult deserialize(
 }
 
 } // namespace nx::json_rpc
-
-namespace std {
-
-template<>
-struct hash<nx::json_rpc::NumericId>
-{
-    size_t operator()(const nx::json_rpc::NumericId& id) const
-    {
-        return hash<int64_t>()(id.value);
-    }
-};
-
-} // namespace std
