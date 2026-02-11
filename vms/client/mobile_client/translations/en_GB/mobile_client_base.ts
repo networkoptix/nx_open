@@ -7,7 +7,7 @@
       <source>%n Object Attributes</source>
       <comment>%n is number of attributes</comment>
       <translation type="unfinished">
-        <numerusform>%n Object Attributes</numerusform>
+        <numerusform>%n Object Attribute</numerusform>
         <numerusform>%n Object Attributes</numerusform>
       </translation>
     </message>
