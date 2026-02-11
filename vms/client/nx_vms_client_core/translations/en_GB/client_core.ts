@@ -224,7 +224,7 @@
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
       <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n server</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
       </translation>
     </message>
@@ -334,7 +334,7 @@
       <source>%n Cameras</source>
       <comment>%n is a number of cameras</comment>
       <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Camera</numerusform>
         <numerusform>%n Cameras</numerusform>
       </translation>
     </message>

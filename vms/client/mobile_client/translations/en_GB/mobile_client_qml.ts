@@ -313,7 +313,7 @@
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
       <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minute</numerusform>
         <numerusform>%n minutes</numerusform>
       </translation>
     </message>
