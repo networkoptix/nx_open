@@ -3,6 +3,7 @@
 #include "webrtc_consumer.h"
 
 #include <analytics/common/object_metadata.h>
+#include <core/resource/camera_resource.h>
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/reflect/json.h>
 #include <nx/reflect/json/serializer.h>
@@ -65,53 +66,82 @@ void Consumer::startProvidersIfNeeded()
         });
 }
 
-void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler&& handler)
+void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handler)
 {
     NX_CRITICAL(m_session);
 
     // Should be called in muxing thread!
     runInMuxingThread(
-        [this, handler = std::move(handler), deviceId, timestampUs]()
+        [this, handler, deviceId, timestampUs]()
         {
             bool useAudioLastGop = //< TODO is it needed?
                 m_session->muxer()->method() == nx::vms::api::WebRtcMethod::mse;
-            auto provider = m_session->provider(deviceId);
-            auto status = provider && provider->play(timestampUs, useAudioLastGop)
-                ? StreamStatus::success
-                : StreamStatus::nodata;
-
-            m_pollable.dispatch(
-                [deviceId, status, handler = std::move(handler)]()
+            auto doSeek =
+                [this, useAudioLastGop]
+                (int64_t timestampUs, auto provider, StatusHandler handler)
                 {
-                    handler(deviceId, status);
-                });
-            });
+                    auto status = provider && provider->play(timestampUs, useAudioLastGop)
+                        ? StreamStatus::success
+                        : StreamStatus::nodata;
+
+                    m_pollable.dispatch(
+                        [deviceId = provider->resource()->getId(), status, handler]()
+                        {
+                            handler(deviceId, status);
+                        });
+                };
+
+            if (!deviceId.isNull())
+            {
+                auto provider = m_session->provider(deviceId);
+                doSeek(timestampUs, provider, handler);
+            }
+            else
+            {
+                for (const auto& provider: m_session->allProviders())
+                    doSeek(timestampUs, provider, handler);
+            }
+        });
 }
 
 void Consumer::changeQuality(
     nx::Uuid deviceId,
     nx::vms::api::StreamIndex stream,
-    StatusHandler&& handler)
+    StatusHandler handler)
 {
     NX_CRITICAL(m_session);
 
     // Should be called in muxing thread!
     runInMuxingThread(
-        [this, handler = std::move(handler), deviceId, stream]()
+        [this, handler, deviceId, stream]()
         {
-            auto provider = m_session->provider(deviceId);
-            auto status = provider && provider->changeQuality(stream)
-                ? StreamStatus::success
-                : StreamStatus::nodata;
-            m_pollable.dispatch(
-                [deviceId, status, handler = std::move(handler)]()
+            auto doChangeQuality =
+                [this](auto provider, auto stream, auto handler)
                 {
-                    handler(deviceId, status);
-                });
+                    auto status = provider && provider->changeQuality(stream)
+                        ? StreamStatus::success
+                        : StreamStatus::nodata;
+                    m_pollable.dispatch(
+                        [deviceId = provider->resource()->getId(), status, handler]()
+                        {
+                            handler(deviceId, status);
+                        });
+                };
+
+            if (!deviceId.isNull())
+            {
+                auto provider = m_session->provider(deviceId);
+                doChangeQuality(provider, stream, handler);
+            }
+            else
+            {
+                for (const auto& provider: m_session->allProviders())
+                    doChangeQuality(provider, stream, handler);
+            }
         });
 }
 
-void Consumer::pause(nx::Uuid deviceId, StatusHandler&& handler)
+void Consumer::pause(nx::Uuid deviceId, StatusHandler handler)
 {
     NX_CRITICAL(m_session);
 
@@ -119,37 +149,63 @@ void Consumer::pause(nx::Uuid deviceId, StatusHandler&& handler)
     runInMuxingThread(
         [this, handler = std::move(handler), deviceId]()
         {
-            auto provider = m_session->provider(deviceId);
-            auto status = provider && provider->pause()
-                ? StreamStatus::success
-                : StreamStatus::nodata;
-            handler(deviceId, status);
+            auto doPause =
+                [](auto provider, auto handler)
+                {
+                    auto status = provider && provider->pause()
+                        ? StreamStatus::success
+                        : StreamStatus::nodata;
+                    handler(provider->resource()->getId(), status);
+                };
+
+            if (!deviceId.isNull())
+            {
+                auto provider = m_session->provider(deviceId);
+                doPause(provider, handler);
+            }
+            else
+            {
+                for (const auto& provider: m_session->allProviders())
+                    doPause(provider, handler);
+            }
         });
 }
 
-void Consumer::resume(nx::Uuid deviceId, StatusHandler&& handler)
+void Consumer::resume(nx::Uuid deviceId, StatusHandler handler)
 {
-    NX_CRITICAL(m_session);
-
     // Should be called in muxing thread!
     runInMuxingThread(
         [this, handler = std::move(handler), deviceId]()
         {
-            auto provider = m_session->provider(deviceId);
-            auto status = provider && provider->resume()
-                ? StreamStatus::success
-                : StreamStatus::nodata;
-            handler(deviceId, status);
+            auto doResume =
+                [](auto provider, auto handler)
+                {
+                    auto status = provider && provider->resume()
+                        ? StreamStatus::success
+                        : StreamStatus::nodata;
+                    handler(provider->resource()->getId(), status);
+                };
+
+            if (!deviceId.isNull())
+            {
+                auto provider = m_session->provider(deviceId);
+                doResume(provider, handler);
+            }
+            else
+            {
+                for (const auto& provider: m_session->allProviders())
+                    doResume(provider, handler);
+            }
         });
 }
 
-void Consumer::nextFrame(nx::Uuid deviceId, StatusHandler&& handler)
+void Consumer::nextFrame(nx::Uuid deviceId, StatusHandler handler)
 {
     NX_CRITICAL(m_session);
 
     // Should be called in muxing thread!
     runInMuxingThread(
-        [this, handler = std::move(handler), deviceId]()
+        [this, handler, deviceId]()
         {
             if (m_session->muxer()->method() == nx::vms::api::WebRtcMethod::mse)
             {

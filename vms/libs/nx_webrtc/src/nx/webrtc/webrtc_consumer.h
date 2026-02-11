@@ -43,15 +43,15 @@ public:
     // API for Streamer.
     bool startStream(Streamer* streamer);
     bool handleSrtp(std::vector<uint8_t> buffer);
-    void seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler&& handler);
+    void seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handler);
     void startProvidersIfNeeded();
     void changeQuality(
         nx::Uuid deviceId,
         nx::vms::api::StreamIndex stream,
-        StatusHandler&& handler);
-    void pause(nx::Uuid deviceId, StatusHandler&& handler);
-    void resume(nx::Uuid deviceId, StatusHandler&& handler);
-    void nextFrame(nx::Uuid deviceId, StatusHandler&& handler);
+        StatusHandler handler);
+    void pause(nx::Uuid deviceId, StatusHandler handler);
+    void resume(nx::Uuid deviceId, StatusHandler handler);
+    void nextFrame(nx::Uuid deviceId, StatusHandler handler);
     void onDataSent(bool success);
     int64_t lastReportedTimestampUs() { return m_lastReportedTimestampUs; }
     void setSendTimestampInterval(std::chrono::milliseconds interval);
