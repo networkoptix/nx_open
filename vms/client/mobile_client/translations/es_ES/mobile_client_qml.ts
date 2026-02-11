@@ -519,7 +519,7 @@
     <name>FocusControl</name>
     <message>
       <source>AF</source>
-      <translation type="unfinished">AF</translation>
+      <translation>AF</translation>
     </message>
   </context>
   <context>
@@ -777,7 +777,7 @@
     <name>PresetSheet</name>
     <message>
       <source>PTZ Presets</source>
-      <translation>Pre-programados de PTZ</translation>
+      <translation>Presets PTZ</translation>
     </message>
     <message>
       <source>Close</source>
@@ -1487,7 +1487,7 @@
     </message>
     <message>
       <source>PTZ Mode</source>
-      <translation type="unfinished">PTZ Mode</translation>
+      <translation>Modo PTZ</translation>
     </message>
   </context>
   <context>
