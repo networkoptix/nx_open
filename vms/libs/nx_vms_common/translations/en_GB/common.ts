@@ -781,7 +781,7 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation>Free License</translation>
+      <translation type="unfinished">Free Licenses</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
@@ -892,7 +892,7 @@
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation>NVR License</translation>
+      <translation type="unfinished">NVR Licenses</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
@@ -930,7 +930,7 @@
     </message>
     <message>
       <source>Local recording services</source>
-      <translation>Local recording service</translation>
+      <translation type="unfinished">Local recording services</translation>
     </message>
   </context>
   <context>
@@ -1319,7 +1319,7 @@
     </message>
     <message>
       <source>milliseconds</source>
-      <translation>millisecond</translation>
+      <translation type="unfinished">milliseconds</translation>
     </message>
     <message>
       <source>seconds</source>
