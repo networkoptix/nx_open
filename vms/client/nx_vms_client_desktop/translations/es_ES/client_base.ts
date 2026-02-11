@@ -2125,7 +2125,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>Este usuario ha sido eliminado del sitio.</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -10241,7 +10241,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>Nueva Integración</translation>
     </message>
     <message>
       <source>Edit Integration</source>
