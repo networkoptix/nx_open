@@ -342,12 +342,12 @@ void Ice::writePacket(const char* data, int size, bool foreground)
     sendNextBufferUnsafe();
 }
 
-void Ice::writeBatch(const std::deque<nx::Buffer>& mediaBuffers)
+void Ice::writeBatch(std::deque<nx::Buffer> mediaBuffers)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     // Always non-foreground.
-    for (const auto& packet: mediaBuffers)
-        m_sendBuffers.push_back(toSendBuffer(packet.data(), packet.size()));
+    for (auto& packet: mediaBuffers)
+        m_sendBuffers.push_back(std::move(packet));
     sendNextBufferUnsafe();
 }
 

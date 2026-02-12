@@ -57,7 +57,7 @@ public:
     virtual void onDataChannelBinary(const std::string& data, int streamId) override final;
 
     // API for Transceiver.
-    void writeBatch(const std::deque<nx::Buffer>& mediaBuffers);
+    void writeBatch(std::deque<nx::Buffer> mediaBuffers);
     void writeDataChannelBatch(const std::deque<nx::Buffer>& mediaBuffers);
     aio::AbstractAioThread* getAioThread();
     void writeDataChannelString(const std::string& data);
