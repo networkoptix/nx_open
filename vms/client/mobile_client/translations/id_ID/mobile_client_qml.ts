@@ -518,7 +518,7 @@
     <name>FocusControl</name>
     <message>
       <source>AF</source>
-      <translation type="unfinished">AF</translation>
+      <translation>AF</translation>
     </message>
   </context>
   <context>
@@ -940,7 +940,7 @@
     </message>
     <message>
       <source>Timeline</source>
-      <translation type="unfinished">Timeline</translation>
+      <translation>Timeline</translation>
     </message>
   </context>
   <context>
@@ -1092,11 +1092,11 @@
     </message>
     <message>
       <source>Structure</source>
-      <translation type="unfinished">Structure</translation>
+      <translation>Struktur</translation>
     </message>
     <message>
       <source>Welcome, %1!</source>
-      <translation type="unfinished">Welcome, %1!</translation>
+      <translation>Selamat datang, %1!</translation>
     </message>
   </context>
   <context>
@@ -1236,7 +1236,7 @@
     </message>
     <message>
       <source>Log In to Cloud</source>
-      <translation type="unfinished">Log In to Cloud</translation>
+      <translation>Masuk ke Cloud</translation>
     </message>
   </context>
   <context>
@@ -1486,7 +1486,7 @@
     </message>
     <message>
       <source>PTZ Mode</source>
-      <translation type="unfinished">PTZ Mode</translation>
+      <translation>Mode PTZ</translation>
     </message>
   </context>
   <context>
