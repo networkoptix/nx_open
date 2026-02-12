@@ -330,11 +330,7 @@ void Consumer::processNextData()
             continue;
         }
 
-        auto mediaProvider = dynamic_cast<const QnAbstractMediaStreamDataProvider*>(media->dataProvider);
-        if (!NX_ASSERT(mediaProvider))
-            continue;
-        const auto deviceId = mediaProvider->resource()->getId();
-
+        const auto deviceId = media->deviceId;
         auto rtpEncoder = m_session->muxer()->setDataPacket(deviceId, media);
         if (!NX_ASSERT(rtpEncoder))
             return;

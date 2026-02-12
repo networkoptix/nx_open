@@ -207,6 +207,12 @@ bool Tracker::processMessages()
      * is complete. This process can be repeated for additional offer/answer exchanges.
      * */
     AnswerResult result = examineAnswer();
+    if (result == AnswerResult::again)
+    {
+        sendOffer();
+        return true;
+    }
+
     NX_VERBOSE(this, "Answer examination result: %1 in stage: %2", (int)result, (int)m_stage);
 
     m_session->consumer()->startProvidersIfNeeded();
@@ -226,10 +232,6 @@ bool Tracker::processMessages()
                 for (const auto& candidate: iceCandidates)
                     if (candidate.type != IceCandidate::Type::Srflx)
                         sendIce(candidate); //< Send Srflx only after get one from remote peer.
-            }
-            else if (result == AnswerResult::again)
-            {
-                sendOffer();
             }
             return true;
         case Stage::answerSuccess:
