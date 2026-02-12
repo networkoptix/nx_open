@@ -159,9 +159,7 @@ SdpParseResult SdpParseResult::parse(const std::string& sdp)
     static const std::string_view kFingerprint("a=fingerprint:");
 
     SdpParseResult result;
-    SdpParseResult::TrackState* currentTrackState = nullptr;
-    bool hasGroup = false;
-    std::set<std::string> groupedMids;
+    std::set<std::string> supportedMids;
 
     getTokens(
         sdp,
@@ -176,29 +174,8 @@ SdpParseResult SdpParseResult::parse(const std::string& sdp)
             {
                 result.iceUfrag = sv.substr(kIceUfragPrefix.size());
             }
-            else if (sv.find(kAttributeInactive) == 0)
-            {
-                if (currentTrackState != nullptr)
-                    *currentTrackState = SdpParseResult::TrackState::inactive;
-            }
-            else if (sv.find(kVideo) == 0)
-            {
-                currentTrackState = &result.video;
-                *currentTrackState = SdpParseResult::TrackState::active;
-            }
-            else if (sv.find(kAudio) == 0)
-            {
-                currentTrackState = &result.audio;
-                *currentTrackState = SdpParseResult::TrackState::active;
-            }
-            else if (sv.find(kApplication) == 0)
-            {
-                currentTrackState = &result.application;
-                *currentTrackState = SdpParseResult::TrackState::active;
-            }
             else if (sv.find(kGroup) == 0)
             {
-                hasGroup = true;
                 int i = 0;
                 getTokens(
                     sv,
@@ -206,17 +183,20 @@ SdpParseResult SdpParseResult::parse(const std::string& sdp)
                     [&](std::string_view mid)
                     {
                         if (i++)
-                            groupedMids.emplace(mid);
+                            supportedMids.emplace(mid);
                     });
             }
             else if (sv.find(kMid) == 0)
             {
-                if (hasGroup
-                    && groupedMids.count(std::string(sv, kMid.size(), std::string::npos)) == 0
-                    && currentTrackState != nullptr)
+                std::string midStr = std::string(sv, kMid.size(), std::string::npos);
+                try {
+                    int mid = std::stoi(midStr);
+                    result.tracksState[mid] = supportedMids.count(midStr)
+                        ? TrackState::active : TrackState::inactive;
+                }
+                catch (...)
                 {
-                    // Assume that non-grouped mid's are inactive.
-                    *currentTrackState = SdpParseResult::inactive;
+                    // Ignore invalid mid
                 }
             }
             else if (sv.find(kFingerprint) == 0)

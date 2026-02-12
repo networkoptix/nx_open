@@ -187,7 +187,7 @@ AnswerResult Tracker::examineAnswer()
     const auto& sdp = sdpRoot["sdp"];
     if (!sdp.IsString())
         return AnswerResult::noop;
-    return m_session->examineSdp(sdp.GetString());
+    return m_session->processSdpAnswer(sdp.GetString());
 }
 
 bool Tracker::processMessages()

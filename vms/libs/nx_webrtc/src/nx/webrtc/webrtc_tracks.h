@@ -25,6 +25,8 @@ struct NX_WEBRTC_API Track
     Purpose purpose = Purpose::sendrecv;
     nx::Uuid deviceId;
     TrackType trackType = TrackType::unknown;
+
+    std::optional<TrackState> state;
 };
 
 const std::string& toSdpAttribute(Purpose purpose);
@@ -45,9 +47,7 @@ public:
     Track* audioTrack(nx::Uuid deviceId) const;
     Track* track(uint32_t ssrc) const;
     std::vector<Track> allTracks() const;
-
-    virtual void setFallbackCodecs() = 0;
-    virtual bool fallbackCodecs() = 0;
+    std::map<uint32_t, std::unique_ptr<Track>>& tracks() { return m_tracks; }
 
     virtual std::string mimeType() const = 0;
     virtual bool examineSdp(const std::string& sdp) = 0;
@@ -69,15 +69,9 @@ public:
     TracksForSend(Session* session);
     virtual ~TracksForSend() override = default;
 
-    virtual void setFallbackCodecs() override;
-    virtual bool fallbackCodecs() override;
-
     virtual std::string mimeType() const override;
     virtual bool examineSdp(const std::string& sdp) override;
     virtual std::string getSdpForTrack(const Track* track, uint16_t port) const override;
-
-private:
-    bool m_fallbackCodecs = false;
 };
 
 class NX_WEBRTC_API TracksForRecv: public Tracks
@@ -86,9 +80,6 @@ class NX_WEBRTC_API TracksForRecv: public Tracks
 public:
     TracksForRecv(Session* session);
     virtual ~TracksForRecv() override = default;
-
-    virtual void setFallbackCodecs() override;
-    virtual bool fallbackCodecs() override;
 
     virtual std::string mimeType() const override;
     virtual bool examineSdp(const std::string& sdp) override;

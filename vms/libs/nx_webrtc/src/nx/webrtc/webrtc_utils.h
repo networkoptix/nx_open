@@ -54,24 +54,20 @@ struct Fingerprint
     static Fingerprint parse(std::string_view sv);
 };
 
+enum TrackState
+{
+    absent,
+    inactive,
+    active,
+};
+
 struct SdpParseResult
 {
     Fingerprint fingerprint;
     std::string iceUfrag;
     std::string icePwd;
-    enum TrackState
-    {
-        active,
-        inactive,
-        absent
-    };
-    TrackState audio = absent;
-    TrackState video = absent;
-    TrackState application = absent;
-    bool hasInactive() const
-    {
-        return video == inactive || audio == inactive || application == inactive;
-    }
+    std::map<int, TrackState> tracksState;
+
     static SdpParseResult parse(const std::string& sdp);
 };
 
