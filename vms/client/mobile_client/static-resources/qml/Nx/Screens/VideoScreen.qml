@@ -15,6 +15,7 @@ import Nx.Models
 import Nx.Ui
 
 import nx.vms.client.core
+import nx.vms.client.mobile
 import nx.vms.client.mobile.timeline as Timeline
 import nx.vms.common
 
@@ -269,6 +270,15 @@ Page
                 && !(controller.resource?.flags & ResourceFlag.cross_system)) ?? false
             height: visible ? implicitHeight : 0
             onTriggered: Workflow.openEventSearchScreen(/*push*/ true, controller.resource.id, camerasModel, true)
+        }
+
+        MenuItem
+        {
+            id: exportMenuItem
+            text: qsTr("Export...")
+            visible: mediaDownloadBackend.isDownloadAvailable
+            height: visible ? implicitHeight : 0
+            onTriggered: downloadMediaSheet.open()
         }
     }
 
@@ -914,6 +924,22 @@ Page
     Timeline.ObjectsTypeSheet
     {
         id: objectsTypeSheet
+    }
+
+    MediaDownloadBackend
+    {
+        id: mediaDownloadBackend
+        resource: controller.resource
+        onErrorOccured: windowContext.ui.showMessage(title, description)
+    }
+
+    DownloadMediaDurationSheet
+    {
+        id: downloadMediaSheet
+        onDurationPicked: function(duration)
+        {
+            mediaDownloadBackend.downloadVideo(timeline.positionMs, duration)
+        }
     }
 
     Item
