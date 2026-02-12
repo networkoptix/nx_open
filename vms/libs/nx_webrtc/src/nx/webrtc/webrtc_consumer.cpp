@@ -14,6 +14,7 @@
 namespace nx::webrtc {
 
 Consumer::Consumer(Session* session):
+    m_mediaQueue(512, std::chrono::seconds(2)),
     m_session(session)
 {}
 
@@ -42,101 +43,125 @@ void Consumer::stopUnsafe()
 
     if (m_streamer)
         m_streamer->stop();
-    m_dataConsumedHandler = nullptr;
 
     m_needStop = true;
     m_pollable.pleaseStopSync();
 }
 
-void Consumer::seek(int64_t timestampUs, StatusHandler&& handler)
+void Consumer::startProvidersIfNeeded()
+{
+    NX_CRITICAL(m_session);
+    if (!m_streamer)
+        return; //< It is not started yet.
+    // Should be called in muxing thread!
+    runInMuxingThread(
+        [this]()
+        {
+            for (auto& provider: m_session->allProviders())
+            {
+                if (!provider->isStarted())
+                    provider->play(provider->getPosition(), false);
+            }
+        });
+}
+
+void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler&& handler)
 {
     NX_CRITICAL(m_session);
 
     // Should be called in muxing thread!
     runInMuxingThread(
-        [this, handler = std::move(handler), timestampUs]()
+        [this, handler = std::move(handler), deviceId, timestampUs]()
         {
             bool useAudioLastGop = //< TODO is it needed?
                 m_session->muxer()->method() == nx::vms::api::WebRtcMethod::mse;
-            auto status = m_session->provider()->play(timestampUs, useAudioLastGop)
+            auto provider = m_session->provider(deviceId);
+            auto status = provider && provider->play(timestampUs, useAudioLastGop)
                 ? StreamStatus::success
                 : StreamStatus::nodata;
 
             m_pollable.dispatch(
-                [status, handler = std::move(handler)]()
+                [deviceId, status, handler = std::move(handler)]()
                 {
-                    handler(status);
+                    handler(deviceId, status);
                 });
             });
 }
 
-void Consumer::changeQuality(nx::vms::api::StreamIndex stream, StatusHandler&& handler)
+void Consumer::changeQuality(
+    nx::Uuid deviceId,
+    nx::vms::api::StreamIndex stream,
+    StatusHandler&& handler)
 {
     NX_CRITICAL(m_session);
 
     // Should be called in muxing thread!
     runInMuxingThread(
-        [this, handler = std::move(handler), stream]()
+        [this, handler = std::move(handler), deviceId, stream]()
         {
-            auto status = m_session->provider()->changeQuality(stream)
+            auto provider = m_session->provider(deviceId);
+            auto status = provider && provider->changeQuality(stream)
                 ? StreamStatus::success
                 : StreamStatus::nodata;
             m_pollable.dispatch(
-                [status, handler = std::move(handler)]()
+                [deviceId, status, handler = std::move(handler)]()
                 {
-                    handler(status);
+                    handler(deviceId, status);
                 });
         });
 }
 
-void Consumer::pause(StatusHandler&& handler)
+void Consumer::pause(nx::Uuid deviceId, StatusHandler&& handler)
 {
     NX_CRITICAL(m_session);
 
     // Should be called in muxing thread!
     runInMuxingThread(
-        [this, handler = std::move(handler)]()
+        [this, handler = std::move(handler), deviceId]()
         {
-            auto status = m_session->provider()->pause()
+            auto provider = m_session->provider(deviceId);
+            auto status = provider && provider->pause()
                 ? StreamStatus::success
                 : StreamStatus::nodata;
-            handler(status);
+            handler(deviceId, status);
         });
 }
 
-void Consumer::resume(StatusHandler&& handler)
+void Consumer::resume(nx::Uuid deviceId, StatusHandler&& handler)
 {
     NX_CRITICAL(m_session);
 
     // Should be called in muxing thread!
     runInMuxingThread(
-        [this, handler = std::move(handler)]()
+        [this, handler = std::move(handler), deviceId]()
         {
-            auto status = m_session->provider()->resume()
+            auto provider = m_session->provider(deviceId);
+            auto status = provider && provider->resume()
                 ? StreamStatus::success
                 : StreamStatus::nodata;
-            handler(status);
+            handler(deviceId, status);
         });
 }
 
-void Consumer::nextFrame(StatusHandler&& handler)
+void Consumer::nextFrame(nx::Uuid deviceId, StatusHandler&& handler)
 {
     NX_CRITICAL(m_session);
 
     // Should be called in muxing thread!
     runInMuxingThread(
-        [this, handler = std::move(handler)]()
+        [this, handler = std::move(handler), deviceId]()
         {
             if (m_session->muxer()->method() == nx::vms::api::WebRtcMethod::mse)
             {
                 // Pause/Resume/NextFrame not supported for MSE.
-                handler(StreamStatus::nodata);
+                handler(deviceId, StreamStatus::nodata);
                 return;
             }
-            auto status = m_session->provider()->nextFrame()
+            auto provider = m_session->provider(deviceId);
+            auto status = provider && provider->nextFrame()
                 ? StreamStatus::success
                 : StreamStatus::nodata;
-            handler(status);
+            handler(deviceId, status);
         });
 }
 
@@ -206,29 +231,15 @@ void Consumer::handleRtcp(uint8_t* data, int size)
 
 void Consumer::onDataSent(bool success)
 {
-    if (!success)
-    {
-        m_streamer->ice()->stopUnsafe();
-        return;
-    }
-
-    if (success && !m_mediaBuffers.empty())
-    {
-        m_pollable.post(  //< Should be posted to avoid deadlock due to recursion.
-            [this]() { sendMediaBuffer(); });
-
-        onDataConsumed();
-    }
-}
-
-void Consumer::onDataConsumed()
-{
-    m_pollable.post(  //< Should be posted to avoid deadlock due to recursion.
-        [this]()
+    // Should be posted to avoid deadlock due to recursion.
+    if (success)
+        m_pollable.post([this]()
         {
-            if (m_dataConsumedHandler)
-                m_dataConsumedHandler();
+            m_sendInProgress = false;
+            processNextData();
         });
+    else
+        m_streamer->ice()->stopUnsafe();
 }
 
 void Consumer::sendMetadata(const QnConstCompressedMetadataPtr& metadata)
@@ -243,96 +254,84 @@ void Consumer::sendMetadata(const QnConstCompressedMetadataPtr& metadata)
     m_streamer->ice()->writeDataChannelString(ctx.composer.take());
 }
 
-void Consumer::putMediaDataToSendBuffers(
-    nx::Uuid deviceId,
-    const QnConstAbstractMediaDataPtr& media)
+void Consumer::processNextData()
 {
     // This code should be called only from Streamer's AIO thread.
-    NX_VERBOSE(this, "Process data: %1, buffer size: %2", media, m_mediaBuffers.size());
 
-    if (!media) //< EOF.
+    while (!m_needStop)
     {
-        NX_DEBUG(this, "Switch to live, since no data in archive");
-        m_session->provider()->play(DATETIME_NOW, /*useAudioLastGop*/ false);
-        onDataConsumed();
-        return;
-    }
+        auto media = m_mediaQueue.popData(false /*blocked*/);
+        if (!media)
+            break;
 
-    // Send metadata via datachannel.
-    const auto metadata = std::dynamic_pointer_cast<const QnCompressedMetadata>(media);
-    if (metadata && metadata->metadataType == MetadataType::ObjectDetection && m_enableMetadata)
-    {
-        sendMetadata(metadata);
-        onDataConsumed();
-        return;
-    }
+        NX_VERBOSE(this, "Process data: %1", media);
 
-    auto rtpEncoder = m_session->muxer()->setDataPacket(deviceId, media);
-    if (!rtpEncoder)
-    {
-        NX_VERBOSE(this, "Skip unsupported data: %1, deviceId: %2", media, deviceId);
-        onDataConsumed();
-        return;
-    }
-
-    nx::utils::ByteArray buffer;
-    while (!m_needStop && m_session->muxer()->getNextPacket(rtpEncoder, buffer))
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        m_mediaBuffers.emplace_back(buffer.data(), buffer.size());
-        buffer.clear();
-    }
-
-    // In case with changed codec, encoder will report with EOF.
-    // Maybe need to make additional check for extradata: for example, some high h.264 profiles
-    // can be unsupported by browser.
-    if (m_session->muxer()->isEof(rtpEncoder))
-    {
-        m_pollable.dispatch(
-            [this]()
-            {
-                m_streamer->handleStreamStatus(StreamStatus::reconnect);
-            });
-        return;
-    }
-
-    if (media->dataType == QnAbstractMediaData::VIDEO ||
-        media->dataType == QnAbstractMediaData::AUDIO)
-    {
-        auto timestamps = m_session->muxer()->getLastTimestamps();
-        if (m_lastReportedTimestampUs == AV_NOPTS_VALUE ||
-            std::abs(timestamps.ntpTimestamp - m_lastReportedTimestampUs) > m_sendTimestampInterval.count() * 1000)
+        // Send metadata via datachannel.
+        const auto metadata = std::dynamic_pointer_cast<const QnCompressedMetadata>(media);
+        if (metadata && metadata->metadataType == MetadataType::ObjectDetection && m_enableMetadata)
         {
+            sendMetadata(metadata);
+            continue;
+        }
 
-            m_lastReportedTimestampUs = timestamps.ntpTimestamp;
-            m_streamer->sendTimestamp(timestamps.ntpTimestamp, timestamps.rtpTimestamp);
+        auto mediaProvider = dynamic_cast<const QnAbstractMediaStreamDataProvider*>(media->dataProvider);
+        if (!NX_ASSERT(mediaProvider))
+            continue;
+        const auto deviceId = mediaProvider->resource()->getId();
+
+        auto rtpEncoder = m_session->muxer()->setDataPacket(deviceId, media);
+        if (!NX_ASSERT(rtpEncoder))
+            return;
+
+        nx::utils::ByteArray buffer;
+        std::deque<nx::Buffer> mediaBuffers;
+        while (!m_needStop && m_session->muxer()->getNextPacket(rtpEncoder, buffer))
+        {
+            mediaBuffers.emplace_back(buffer.data(), buffer.size());
+            buffer.clear();
+        }
+
+        // In case with changed codec, encoder will report with EOF.
+        // Maybe need to make additional check for extradata: for example, some high h.264 profiles
+        // can be unsupported by browser.
+        if (m_session->muxer()->isEof(deviceId, rtpEncoder))
+        {
+            m_pollable.dispatch(
+                [this, deviceId]()
+                {
+                    m_streamer->handleStreamStatus(deviceId, StreamStatus::reconnect);
+                });
+            return;
+        }
+
+        if (media->dataType == QnAbstractMediaData::VIDEO ||
+            media->dataType == QnAbstractMediaData::AUDIO)
+        {
+            auto timestamps = m_session->muxer()->getLastTimestamps();
+            if (m_lastReportedTimestampUs == AV_NOPTS_VALUE ||
+                std::abs(timestamps.ntpTimestamp - m_lastReportedTimestampUs) > m_sendTimestampInterval.count() * 1000)
+            {
+
+                m_lastReportedTimestampUs = timestamps.ntpTimestamp;
+                m_streamer->sendTimestamp(timestamps.ntpTimestamp, timestamps.rtpTimestamp);
+            }
+        }
+
+        if (!mediaBuffers.empty())
+        {
+            // If the ice send buffer is empty, we send the data and start collecting the second chunk.
+            // If the ice send buffer is busy, we stop collecting the data and wait for the send with
+            // the ready chunk, it will be sent later in the callback onDataSent, so sending is not
+            // wait for chunk collection.
+
+            if (m_session->muxer()->method() == nx::vms::api::WebRtcMethod::srtp)
+                m_streamer->ice()->writeBatch(mediaBuffers);
+            else
+                m_streamer->ice()->writeDataChannelBatch(mediaBuffers);
+            m_sendInProgress = true;
+            break;
         }
     }
-
-    if (m_mediaBuffers.empty())
-    {
-        onDataConsumed();
-        return;
-    }
-
-    if (!m_needStop && m_streamer->ice()->bufferEmpty())
-    {
-        // If the ice send buffer is empty, we send the data and start collecting the second chunk.
-        // If the ice send buffer is busy, we stop collecting the data and wait for the send with
-        // the ready chunk, it will be sent later in the callback onDataSent, so sending is not
-        // wait for chunk collection.
-        sendMediaBuffer();
-        onDataConsumed();
-    }
-}
-
-void Consumer::sendMediaBuffer()
-{
-    if (m_session->muxer()->method() == nx::vms::api::WebRtcMethod::srtp)
-        m_streamer->ice()->writeBatch(m_mediaBuffers);
-    else
-        m_streamer->ice()->writeDataChannelBatch(m_mediaBuffers);
-    m_mediaBuffers.clear();
 }
 
 void Consumer::runInMuxingThread(std::function<void()>&& func)
@@ -344,19 +343,13 @@ void Consumer::runInMuxingThread(std::function<void()>&& func)
         });
 }
 
-void Consumer::putData(
-    nx::Uuid deviceId,
-    const QnConstAbstractMediaDataPtr& data,
-    const AbstractCameraDataProvider::OnDataReady& handler)
+void Consumer::putData(const QnConstAbstractMediaDataPtr& data)
 {
-    m_dataConsumedHandler = handler;
-    m_pollable.dispatch(
-        [this, deviceId, data]()
+    m_pollable.dispatch([this, data]()
         {
-            if (m_needStop)
-                return;
-
-            putMediaDataToSendBuffers(deviceId, data);
+            m_mediaQueue.putData(data);
+            if (!m_sendInProgress)
+                processNextData();
         });
 }
 

@@ -85,9 +85,11 @@ bool Transcoder::createRtpEncoders(
     {
         if (const auto track = m_session->tracks()->videoTrack(deviceId))
         {
-            if (auto encoder = createRtpEncoder(videoParameters, track->ssrc, track->cname))
+            if (auto encoder = createRtpEncoder(videoParameters, track->ssrc, track->cname, track->mid))
             {
                 success = true;
+                if (m_encryptionData.has_value())
+                    encoder->setSrtpEncryptionData(*m_encryptionData);
                 m_videoEncoders[deviceId] = std::move(encoder);
             }
         }
@@ -97,9 +99,11 @@ bool Transcoder::createRtpEncoders(
     {
         if (const auto track = m_session->tracks()->audioTrack(deviceId))
         {
-            if (auto encoder = createRtpEncoder(audioParameters, track->ssrc, track->cname))
+            if (auto encoder = createRtpEncoder(audioParameters, track->ssrc, track->cname, track->mid))
             {
                 success = true;
+                if (m_encryptionData.has_value())
+                    encoder->setSrtpEncryptionData(*m_encryptionData);
                 m_audioEncoders[deviceId] = std::move(encoder);
             }
         }
@@ -177,7 +181,8 @@ bool Transcoder::createMseEncoder(
 QnUniversalRtpEncoderPtr Transcoder::createRtpEncoder(
     AVCodecParameters* codecParameters,
     uint32_t ssrc,
-    const std::string& cname)
+    const std::string& cname,
+    int mid)
 {
     QnUniversalRtpEncoder::Config config;
     config.absoluteRtcpTimestamps = true;
@@ -189,6 +194,7 @@ QnUniversalRtpEncoderPtr Transcoder::createRtpEncoder(
     QnUniversalRtpEncoderPtr universalEncoder(new QnUniversalRtpEncoder(config, nullptr));
     universalEncoder->setSsrc(ssrc);
     universalEncoder->setCName(cname);
+    universalEncoder->setMid(std::to_string(mid));
     universalEncoder->setMtu(kWebrtcMtu);
 
     if (!universalEncoder->open(codecParameters))
@@ -208,6 +214,7 @@ QnUniversalRtpEncoderPtr Transcoder::createRtpEncoder(
 
 void Transcoder::setSrtpEncryptionData(const rtsp::EncryptionData& data)
 {
+    m_encryptionData = data;
     for (auto& [_, encoder]: m_videoEncoders)
         encoder->setSrtpEncryptionData(data);
     for (auto& [_, encoder]:  m_audioEncoders)
@@ -296,7 +303,7 @@ bool Transcoder::checkForMseEof(QnConstAbstractMediaDataPtr media)
 
     // Checks for EOF.
     // 1. If EOF is already set, you can only re-create Transcoder.
-    if (m_eof)
+    if (!m_eof.empty())
         return true;
 
     // 2. Check for codec changed on-fly.
@@ -375,14 +382,16 @@ QnUniversalRtpEncoder* Transcoder::setDataPacket(nx::Uuid deviceId, QnConstAbstr
         {
             return nullptr; //< Skip not supported data.
         }
-        m_eof = checkForMseEof(media);
-        if (m_eof)
+        if (checkForMseEof(media))
+        {
+            m_eof.insert(deviceId);
             return nullptr;
+        }
 
         if (!m_mseMuxer->process(media))
         {
             NX_DEBUG(this, "MSE muxer: failed to process data");
-            m_eof = true;
+            m_eof.insert(deviceId);
             return nullptr;
         }
 
@@ -414,9 +423,11 @@ bool Transcoder::getNextPacket(
     }
 }
 
-bool Transcoder::isEof(QnUniversalRtpEncoder* rtpEncoder) const
+bool Transcoder::isEof(
+    nx::Uuid deviceId,
+    QnUniversalRtpEncoder* rtpEncoder) const
 {
-    if (m_eof)
+    if (m_eof.contains(deviceId))
         return true;
 
     if (m_method == nx::vms::api::WebRtcMethod::srtp)

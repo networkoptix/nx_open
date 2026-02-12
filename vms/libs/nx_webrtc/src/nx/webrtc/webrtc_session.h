@@ -42,7 +42,7 @@ public:
     Session(
         nx::vms::common::SystemContext* context,
         SessionPool* sessionPool,
-        std::unique_ptr<AbstractCameraDataProvider> provider,
+        createDataProviderFactory providerFactory,
         const std::string& localUfrag,
         const nx::network::SocketAddress& address,
         const QList<nx::network::SocketAddress>& allAddresses,
@@ -68,7 +68,7 @@ public:
     void setReader(std::shared_ptr<Reader> reader);
 
     SessionPool* sessionPool() const { return m_sessionPool; }
-    bool initializeMuxers(
+    void setTranscodingParams(
         nx::vms::api::WebRtcMethod method,
         QnLegacyTranscodingSettings transcodingParams,
         std::optional<nx::vms::api::ResolutionData> resolution,
@@ -79,10 +79,18 @@ public:
     Demuxer* demuxer() { return m_demuxer.get(); }
     Tracks* tracks() { return m_tracks.get(); }
     Transcoder* muxer() { return m_muxer.get(); }
-    AbstractCameraDataProvider* provider() { return m_provider.get(); }
+    std::shared_ptr<AbstractCameraDataProvider> provider(nx::Uuid deviceId) const;
+    std::vector<std::shared_ptr<AbstractCameraDataProvider>> allProviders() const;
     Consumer* consumer() { return m_consumer.get(); }
     AbstractIceDelegate* transceiver() { return m_transceiver.get(); }
-    void gotIceFromTracker(const IceCandidate& iceCandidate);
+	void gotIceFromTracker(const IceCandidate& iceCandidate);
+    void stopAllProviders();
+
+    AbstractCameraDataProviderPtr createProvider(
+        nx::Uuid deviceId,
+        std::optional<std::chrono::milliseconds> positionMs,
+        nx::vms::api::StreamIndex stream,
+        std::optional<float> speedOpt);
 
     /**
      * @return false, if session already locked.
@@ -100,15 +108,18 @@ private:
     std::string dataChannelSdp() const;
     std::string constructFingerprint() const;
     bool initializeMuxersInternal(bool useFallbackVideo, bool useFallbackAudio);
+    void addProvider(std::shared_ptr<AbstractCameraDataProvider> provider);
     void createIces(const QList<nx::network::SocketAddress>& addresses);
     SessionDescription describeUnsafe() const;
 
 private:
+    mutable nx::Mutex m_mutex;
+
     nx::vms::common::SystemContext* m_SystemContext = nullptr;
     Purpose m_purpose = Purpose::send;
     std::unique_ptr<Tracks> m_tracks;
     std::unique_ptr<AbstractIceDelegate> m_transceiver;
-    std::unique_ptr<AbstractCameraDataProvider> m_provider; //< Streaming side. Can be null.
+    std::map<nx::Uuid, std::shared_ptr<AbstractCameraDataProvider>> m_providers; //< Streaming side. Can be null.
     std::unique_ptr<Transcoder> m_muxer; //< Streaming side. Can be null.
     std::unique_ptr<Consumer> m_consumer; //< Streaming side. Can be null.
     std::unique_ptr<Demuxer> m_demuxer; //< Receiving side. Can be null.
@@ -128,7 +139,6 @@ private:
      * But, the fields 'm_tracker', 'm_iceCandidates' and 'm_dtls' can be used in any state.
      * So, access to these fields should be guarded by this mutex.
      * */
-    mutable nx::Mutex m_mutex;
     std::shared_ptr<Tracker> m_tracker;
     std::shared_ptr<Dtls> m_dtls;
     std::vector<IceCandidate> m_iceCandidates;
@@ -139,6 +149,10 @@ private:
     std::optional<nx::vms::api::ResolutionData> m_resolution;
     std::optional<nx::vms::api::ResolutionData> m_resolutionWhenTranscoding;
     nx::vms::api::WebRtcTrackerSettings::MseFormat m_mseFormat;
+
+    bool m_stopped = false;
+    createDataProviderFactory m_providerFactory;
+    int m_version = 1;
 
     std::vector<std::unique_ptr<IceUdp>> m_udpIces;
     std::unique_ptr<IceUdp> m_punchedUdpIce;

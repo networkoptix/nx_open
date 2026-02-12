@@ -104,7 +104,7 @@ bool SessionPool::takeUfrag(const std::string& ufrag)
 }
 
 std::shared_ptr<Session> SessionPool::createInternal(
-    std::unique_ptr<AbstractCameraDataProvider> cameraProvider,
+    createDataProviderFactory providerFactory,
     Purpose purpose,
     const nx::network::SocketAddress& address,
     const std::string& localUfrag,
@@ -130,7 +130,7 @@ std::shared_ptr<Session> SessionPool::createInternal(
     std::shared_ptr<Session> session = std::make_shared<Session>(
         systemContext(),
         this,
-        std::move(cameraProvider),
+        std::move(providerFactory),
         localUfrag,
         address,
         allAddresses,
@@ -146,7 +146,7 @@ std::shared_ptr<Session> SessionPool::createInternal(
 }
 
 std::shared_ptr<Session> SessionPool::create(
-    std::unique_ptr<AbstractCameraDataProvider> cameraProvider,
+    createDataProviderFactory providerFactory,
     Purpose purpose,
     const nx::network::SocketAddress& address,
     const std::string& localUfrag,
@@ -156,18 +156,18 @@ std::shared_ptr<Session> SessionPool::create(
         return nullptr;
 
     return createInternal(
-        std::move(cameraProvider), purpose, address, localUfrag, config);
+        std::move(providerFactory), purpose, address, localUfrag, config);
 }
 
 std::shared_ptr<Session> SessionPool::create(
-    std::unique_ptr<AbstractCameraDataProvider> cameraProvider,
+    createDataProviderFactory providerFactory,
     Purpose purpose,
     const nx::network::SocketAddress& address,
     const SessionConfig& config)
 {
     const auto localUfrag = emitUfrag();
     return createInternal(
-        std::move(cameraProvider), purpose, address, localUfrag, config);
+        std::move(providerFactory), purpose, address, localUfrag, config);
 }
 
 std::weak_ptr<Session> SessionPool::getSession(const std::string& id)

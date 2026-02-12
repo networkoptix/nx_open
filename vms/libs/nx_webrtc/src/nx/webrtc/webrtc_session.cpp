@@ -67,7 +67,7 @@ std::string Session::generateLocalUfrag()
 Session::Session(
     nx::vms::common::SystemContext* context,
     SessionPool* sessionPool,
-    std::unique_ptr<AbstractCameraDataProvider> provider,
+    createDataProviderFactory providerFactory,
     const std::string& localUfrag,
     const nx::network::SocketAddress& address,
     const QList<nx::network::SocketAddress>& allAddresses,
@@ -77,7 +77,6 @@ Session::Session(
     :
     m_SystemContext(context),
     m_purpose(purpose),
-    m_provider(std::move(provider)),
     m_localAddress(address),
     m_pem(ssl::Context::instance()->getDefaultCertificate()),
     m_tracker(std::make_shared<Tracker>(this)),
@@ -90,61 +89,29 @@ Session::Session(
     m_localPwd = generatePwd(24);
     m_dtls = std::make_shared<Dtls>(m_localUfrag, m_pem);
 
-    const auto deviceId = m_provider->resource()->getId();
+    m_tracks = std::make_unique<TracksForSend>(this);
+    m_transceiver = std::make_unique<Streamer>(this);
 
     if (m_purpose == Purpose::send)
     {
-        m_tracks = std::make_unique<TracksForSend>(this);
-
-        if (m_provider->getVideoCodecParameters())
-        {
-            auto video = std::make_unique<Track>(Track{
-                .mid = 0,
-                .deviceId = deviceId,
-                .trackType = TrackType::video,
-                });
-            m_tracks->addTrack(std::move(video));
-        }
-
-        if (m_provider->getAudioCodecParameters())
-        {
-            auto audio = std::make_unique<Track>(Track{
-                .mid = 1,
-                .deviceId = deviceId,
-                .trackType = TrackType::audio,
-                });
-            m_tracks->addTrack(std::move(audio));
-        }
-
-        m_transceiver = std::make_unique<Streamer>(this);
         m_consumer = std::make_unique<Consumer>(this);
-        m_provider->subscribe(
-            [this, deviceId]
-            (const QnConstAbstractMediaDataPtr& data, const AbstractCameraDataProvider::OnDataReady& handler)
-            {
-                m_consumer->putData(deviceId, data, handler);
-            });
+        m_providerFactory = std::move(providerFactory);
     }
     else if (m_purpose == Purpose::recv)
     {
-        m_tracks = std::make_unique<TracksForRecv>(this);
         auto video = std::make_unique<Track>(Track{
             .mid = 0,
             .payloadType = 96,
-            .deviceId = deviceId,
             .trackType = TrackType::video,
             });
         m_tracks->addTrack(std::move(video));
         auto audio = std::make_unique<Track>(Track{
             .mid = 1,
             .payloadType = 0,
-            .deviceId = deviceId,
             .trackType = TrackType::audio,
         });
         m_tracks->addTrack(std::move(audio));
 
-
-        m_transceiver = std::make_unique<Receiver>(this);
         m_demuxer = std::make_unique<Demuxer>(m_tracks.get());
     }
 }
@@ -242,9 +209,69 @@ void Session::gotIceFromTracker(const IceCandidate& iceCandidate)
     m_relayIce->setRemoteSrflx(iceCandidate);
 }
 
-bool Session::initializeMuxers(
+AbstractCameraDataProviderPtr Session::createProvider(
+    nx::Uuid deviceId,
+    std::optional<std::chrono::milliseconds> positionMs,
+    nx::vms::api::StreamIndex stream,
+    std::optional<float> speedOpt)
+{
+    auto provider = m_providerFactory(deviceId, positionMs, stream, speedOpt);
+    addProvider(provider);
+
+    if (!initializeMuxersInternal(
+        /*useFallbackVideo*/ false,
+        /*useFallbackAudio*/ false))
+    {
+        return AbstractCameraDataProviderPtr();
+    }
+
+
+    if (m_tracker->isStarted())
+        m_tracker->sendOffer();
+
+    return provider;
+}
+
+void Session::addProvider(std::shared_ptr<AbstractCameraDataProvider> provider)
+{
+    const auto deviceId = provider->resource()->getId();
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_stopped)
+        return;
+
+    if (provider->getVideoCodecParameters())
+    {
+        auto video = std::make_unique<Track>(Track{
+            .mid = 0,
+            .deviceId = deviceId,
+            .trackType = TrackType::video,
+            });
+        m_tracks->addTrack(std::move(video));
+    }
+
+    if (provider->getAudioCodecParameters())
+    {
+        auto audio = std::make_unique<Track>(Track{
+            .mid = 1,
+            .deviceId = deviceId,
+            .trackType = TrackType::audio,
+            });
+        m_tracks->addTrack(std::move(audio));
+    }
+
+    m_providers.emplace(deviceId, provider);
+    provider->subscribe(
+        [this, deviceId]
+        (const QnConstAbstractMediaDataPtr& data)
+        {
+            m_consumer->putData(data);
+        });
+}
+
+void Session::setTranscodingParams(
     nx::vms::api::WebRtcMethod method,
-    QnLegacyTranscodingSettings transcodingSettings,
+    const nx::core::transcoding::Settings& transcodingSettings,
     std::optional<nx::vms::api::ResolutionData> resolution,
     std::optional<nx::vms::api::ResolutionData> resolutionWhenTranscoding,
     nx::vms::api::WebRtcTrackerSettings::MseFormat mseFormat)
@@ -254,84 +281,99 @@ bool Session::initializeMuxers(
     m_resolution = resolution;
     m_resolutionWhenTranscoding = resolutionWhenTranscoding;
     m_mseFormat = mseFormat;
-    return initializeMuxersInternal(/*useFallbackVideo*/ false, /*useFallbackAudio*/ false);
+    m_muxer = std::make_unique<Transcoder>(this, m_method, m_mseFormat);
 }
 
 bool Session::initializeMuxersInternal(bool useFallbackVideo, bool useFallbackAudio)
 {
     // Ignore aspect ratio if user specifies the full resolution.
     if (m_resolution && m_resolution->size.width() > 0)
-        m_transcodingSettings.forcedAspectRatio = QnAspectRatio();
+        m_transcodingSettings.aspectRatio = QnAspectRatio();
 
-    m_muxer = std::make_unique<Transcoder>(this, m_method, m_mseFormat);
-
-    auto videoCodecParamaters = m_provider->getVideoCodecParameters();
-    if (videoCodecParamaters)
+    for (const auto& [_, provider]: m_providers)
     {
-        bool videoTranscodingRequired = !m_transcodingSettings.isEmpty()
-            || m_resolution
-            || useFallbackVideo
-            || !m_muxer->isVideoCodecSupported(videoCodecParamaters->codec_id);
+        if (provider->isInitialized())
+            continue;
 
-        const auto transcodePolicy = m_sessionPool->transcodePolicy();
-        if (transcodePolicy.disableTranscoding && videoTranscodingRequired)
+        auto videoCodecParamaters = provider->getVideoCodecParameters();
+        if (videoCodecParamaters)
         {
-            NX_DEBUG(this,
-                "%1: Video transcoding is disabled(source codec: %2) in the server settings. "
-                "Feature unavailable. RTP",
-                id(),
-                videoCodecParamaters->codec_id);
+            bool videoTranscodingRequired = m_transcodingSettings.isTranscodingRequired()
+                || m_resolution
+                || useFallbackVideo
+                || !m_muxer->isVideoCodecSupported(videoCodecParamaters->codec_id);
+
+            const auto transcodePolicy = m_sessionPool->transcodePolicy();
+            if (transcodePolicy.disableTranscoding && videoTranscodingRequired)
+            {
+                NX_DEBUG(this,
+                    "%1: Video transcoding is disabled(source codec: %2) in the server settings. "
+                    "Feature unavailable. RTP",
+                    id(),
+                    videoCodecParamaters->codec_id);
+                return false;
+            }
+
+            if (videoTranscodingRequired)
+            {
+                QnFfmpegVideoTranscoder::Config config(transcodePolicy);
+                config.targetCodecId = m_method == nx::vms::api::WebRtcMethod::srtp ?
+                    kFallbackSrtpVideoCodec : kFallbackMseVideoCodec;
+                config.quality = Qn::StreamQuality::normal;
+                if (m_method == nx::vms::api::WebRtcMethod::srtp)
+                    config.rtpContatiner = true;
+
+                if (m_resolution)
+                    config.outputResolutionLimit = m_resolution->size;
+                else if (m_resolutionWhenTranscoding)
+                    config.outputResolutionLimit = m_resolutionWhenTranscoding->size;
+                config.useMultiThreadEncode = nx::transcoding::useMultiThreadEncode(
+                    config.targetCodecId, config.outputResolutionLimit);
+
+                config.params =
+                    suggestMediaStreamParams(config.targetCodecId, config.quality);
+                if (m_method == nx::vms::api::WebRtcMethod::mse)
+                {
+                    // Gop size should be less then MAX_FRAME_DURATION (5s) for correct delay
+                    // calculation in Consumer::calculateDelay(). You can only specify gop_size in
+                    // number of frames, so 20/ is enough for fps >= 5.
+                    config.params.insert(QnCodecParams::gop_size, 20);
+                }
+                if (!provider->addVideoTranscoder(config, m_transcodingSettings))
+                    return false;
+
+                NX_DEBUG(this, "%1: Video transcoding started, target codec: %2",
+                    id(), config.targetCodecId);
+            }
+        }
+
+        auto audioCodecParamaters = provider->getAudioCodecParameters();
+        if (audioCodecParamaters)
+        {
+            bool audioTranscodingRequired = useFallbackAudio
+                || !m_muxer->isAudioCodecSupported(audioCodecParamaters->codec_id);
+            if (audioTranscodingRequired)
+            {
+                auto audioCodecId = m_method == nx::vms::api::WebRtcMethod::srtp
+                    ? kFallbackSrtpAudioCodec : kFallbackMseAudioCodec;
+                if (!provider->addAudioTranscoder(audioCodecId))
+                    return false;
+
+                NX_DEBUG(this, "%1: Audio transcoding started, target codec: %2",
+                    id(), audioCodecId);
+            }
+        }
+
+        if (!m_muxer->createEncoders(
+            provider->resource()->getId(),
+            provider->getVideoCodecParameters(),
+            provider->getAudioCodecParameters()))
+        {
             return false;
         }
-
-        if (videoTranscodingRequired)
-        {
-            QnFfmpegVideoTranscoder::Config config(transcodePolicy);
-            config.targetCodecId = m_method == nx::vms::api::WebRtcMethod::srtp ?
-                kFallbackSrtpVideoCodec : kFallbackMseVideoCodec;
-            config.quality = Qn::StreamQuality::normal;
-            if (m_method == nx::vms::api::WebRtcMethod::srtp)
-                config.rtpContatiner = true;
-
-            if (m_resolution)
-                config.outputResolutionLimit = m_resolution->size;
-            else if (m_resolutionWhenTranscoding)
-                config.outputResolutionLimit = m_resolutionWhenTranscoding->size;
-            config.useMultiThreadEncode = nx::transcoding::useMultiThreadEncode(
-                config.targetCodecId, config.outputResolutionLimit);
-
-            config.params =
-                suggestMediaStreamParams(config.targetCodecId, config.quality);
-            if (m_method == nx::vms::api::WebRtcMethod::mse)
-            {
-                // Gop size should be less then MAX_FRAME_DURATION (5s) for correct delay
-                // calculation in Consumer::calculateDelay(). You can only specify gop_size in
-                // number of frames, so 20/ is enough for fps >= 5.
-                config.params.insert(QnCodecParams::gop_size, 20);
-            }
-            if (!m_provider->addVideoTranscoder(config, m_transcodingSettings))
-                return false;
-        }
+        provider->setInitialized(true);
     }
-
-    auto audioCodecParamaters = m_provider->getAudioCodecParameters();
-    if (audioCodecParamaters)
-    {
-        bool audioTranscodingRequired = useFallbackAudio
-            || !m_muxer->isAudioCodecSupported(audioCodecParamaters->codec_id);
-        if (audioTranscodingRequired)
-        {
-            auto audioCodecId = m_method == nx::vms::api::WebRtcMethod::srtp
-                ? kFallbackSrtpAudioCodec : kFallbackMseAudioCodec;
-            if (!m_provider->addAudioTranscoder(audioCodecId))
-                return false;
-        }
-    }
-
-    return m_muxer->createEncoders(
-        m_provider->resource()->getId(),
-        m_provider->getVideoCodecParameters(),
-        m_provider->getAudioCodecParameters());
+    return true;
 }
 
 void Session::setReader(std::shared_ptr<Reader> reader)
@@ -418,7 +460,7 @@ std::string Session::constructSdp()
         + m_localAddress.address.toString();
 #define ENDL "\r\n";
     sdp += "v=0" ENDL;
-    sdp += "o=- 4833640938783375127 2 IN " + localAddress + ENDL;
+    sdp += "o=- 4833640938783375127 " + std::to_string(m_version++) + " IN " + localAddress + ENDL;
     sdp += "s=-" ENDL;
     sdp += "c=IN " + localAddress + ENDL;
     sdp += "t=0 0" ENDL;
@@ -439,12 +481,16 @@ std::string Session::constructSdp()
     sdp += "a=ice-ufrag:" + m_localUfrag + ENDL;
     sdp += "a=ice-pwd:" + m_localPwd + ENDL;
 
-
     auto port = m_localAddress.port;
-    for (const auto& track: tracks)
-        sdp += m_tracks->getSdpForTrack(&track, port);
 
-    sdp += dataChannelSdp();
+    for (size_t i = 0; i < tracks.size(); ++i)
+    {
+        sdp += m_tracks->getSdpForTrack(&tracks[i], i == 0 ? port : 9);
+        if (i == 0)
+            sdp += dataChannelSdp();
+        else
+            sdp += std::string("a=bundle-only") + ENDL;
+    }
     return sdp;
 }
 
@@ -581,6 +627,34 @@ void Session::releaseTracker()
         NX_MUTEX_LOCKER lk(&m_mutex);
         m_tracker.reset();
     }
+}
+
+std::shared_ptr<AbstractCameraDataProvider> Session::provider(nx::Uuid deviceId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    auto it = m_providers.find(deviceId);
+    return it != m_providers.end() ? it->second : nullptr;
+}
+
+std::vector<std::shared_ptr<AbstractCameraDataProvider>> Session::allProviders() const
+{
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    std::vector<std::shared_ptr<AbstractCameraDataProvider>> result;
+    for (const auto& [_, p]: m_providers)
+        result.push_back(p);
+    return result;
+}
+
+void Session::stopAllProviders()
+{
+    decltype(m_providers) providers;
+    {
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        std::swap(providers, m_providers);
+        m_stopped = true;
+    }
+    for (const auto& [_, provider]: providers)
+        provider->stop();
 }
 
 } // namespace nx::webrtc

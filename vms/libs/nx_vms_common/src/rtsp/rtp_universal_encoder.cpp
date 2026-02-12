@@ -455,6 +455,56 @@ void QnUniversalRtpEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
     m_transcoder.transcodePacket(media, &m_outputBuffer);
 }
 
+// RFC8285 one-byte header extension block:
+//  16-bit profile: 0xBEDE
+//  16-bit length: number of 32-bit words following
+//  extensions: [ (id<<4 | (len-1)) + data... ] + padding to 32-bit
+static int writeMidExtensionBlock(uint8_t* out, int outCap, uint8_t midExtId, const std::string& mid)
+{
+    // MID in RFC8285 is the ASCII string (e.g. "0", "1", "128" etc).
+    // One-byte header len field supports 1..16 bytes.
+    const int midLen = (int)mid.size();
+    if (midLen <= 0 || midLen > 16)
+        return 0;
+
+    // Header is 4 bytes + 1 byte ext header + data + padding
+    const int maxNeeded = 4 + 1 + midLen + 3;
+    if (outCap < maxNeeded)
+        return 0;
+
+    int pos = 0;
+
+    // 0xBEDE
+    out[pos++] = 0xBE;
+    out[pos++] = 0xDE;
+
+    // We'll fill length later
+    out[pos++] = 0x00;
+    out[pos++] = 0x00;
+
+    // One-byte extension element header:
+    //  4 bits id (1..14), 4 bits lenMinus1 (0..15 -> 1..16 bytes)
+    if (midExtId == 0 || midExtId > 14)
+        return 0;
+
+    out[pos++] = uint8_t((midExtId << 4) | uint8_t(midLen - 1));
+
+    // MID data
+    memcpy(out + pos, mid.data(), midLen);
+    pos += midLen;
+
+    // Pad to 32-bit boundary with 0x00 bytes
+    while (pos % 4 != 0)
+        out[pos++] = 0x00;
+
+    // Set length in 32-bit words after the 4-byte header
+    const int words = (pos - 4) / 4;
+    out[2] = uint8_t((words >> 8) & 0xFF);
+    out[3] = uint8_t(words & 0xFF);
+
+    return pos; // total bytes written
+}
+
 bool QnUniversalRtpEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
 {
     const int dataStartIndex = sendBuffer.size();
@@ -502,19 +552,36 @@ bool QnUniversalRtpEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
 
     const char* packetOffset = m_outputBuffer.data() + m_outputPos;
     uint32_t packetSize = packets[m_packetIndex];
-    if (m_config.addOnvifHeaderExtension)
+    bool hasExtraHeaders = m_config.addOnvifHeaderExtension || !m_mid.empty();
+
+    if (hasExtraHeaders)
     {
         rtpHeader->extension = 1;
         sendBuffer.write(packetOffset, nx::rtp::RtpHeader::kSize);
         packetOffset += nx::rtp::RtpHeader::kSize;
         packetSize -= nx::rtp::RtpHeader::kSize;
+    }
+
+    if (m_config.addOnvifHeaderExtension)
+    {
         uint8_t buffer[nx::rtp::OnvifHeaderExtension::kSize];
         nx::rtp::OnvifHeaderExtension onvifExtension;
         onvifExtension.ntp = std::chrono::microseconds(timestamps.ntpTimestamp);
         uint32_t size = onvifExtension.write(buffer, sizeof(buffer));
         sendBuffer.write((char*)buffer, size);
     }
+
+    if (!m_mid.empty())
+    {
+        // Write MID extension block (example: ID=1, mid="0"/"1")
+        uint8_t extBuf[64];
+        const int extSize = writeMidExtensionBlock( extBuf, (int)sizeof(extBuf), /*midExtId*/ 1, m_mid);
+        if (extSize > 0)
+            sendBuffer.write((char*)extBuf, extSize);
+    }
+
     sendBuffer.write(packetOffset, packetSize);
+
     m_outputPos += packets[m_packetIndex];
     m_packetIndex++;
 
@@ -559,4 +626,9 @@ nx::rtsp::SrtpEncryptor* QnUniversalRtpEncoder::encryptor() const
 int QnUniversalRtpEncoder::payloadType() const
 {
     return m_payloadType;
+}
+
+QStringList QnUniversalRtpEncoder::sdpAttributes() const
+{
+    return m_sdpAttributes;
 }
