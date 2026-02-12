@@ -52,7 +52,7 @@ public:
     ~Session();
     void setAddress(const nx::network::SocketAddress& address);
     std::string constructSdp();
-    AnswerResult examineSdp(const std::string& sdp);
+    AnswerResult processSdpAnswer(const std::string& sdp);
     AnswerResult setFallbackCodecs();
     Purpose purpose() const { return m_purpose; }
     std::string id() const { return m_localUfrag; }
@@ -107,7 +107,7 @@ public:
 private:
     std::string dataChannelSdp() const;
     std::string constructFingerprint() const;
-    bool initializeMuxersInternal(bool useFallbackVideo, bool useFallbackAudio);
+    bool initializeMuxersInternal();
     void addProvider(std::shared_ptr<AbstractCameraDataProvider> provider);
     void createIces(const QList<nx::network::SocketAddress>& addresses);
     SessionDescription describeUnsafe() const;

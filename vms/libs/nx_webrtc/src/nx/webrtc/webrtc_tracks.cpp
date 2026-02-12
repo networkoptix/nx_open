@@ -108,25 +108,6 @@ void Tracks::addTrack(std::unique_ptr<Track> track)
     m_tracks.emplace(track->ssrc, std::move(track));
 }
 
-void TracksForSend::setFallbackCodecs()
-{
-    m_fallbackCodecs = true;
-}
-
-bool TracksForSend::fallbackCodecs()
-{
-    return m_fallbackCodecs;
-}
-
-void TracksForRecv::setFallbackCodecs()
-{
-}
-
-bool TracksForRecv::fallbackCodecs()
-{
-    return true;
-}
-
 std::string TracksForSend::mimeType() const
 {
     return m_session->muxer()->mimeType();

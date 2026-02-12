@@ -218,13 +218,8 @@ AbstractCameraDataProviderPtr Session::createProvider(
     auto provider = m_providerFactory(deviceId, positionMs, stream, speedOpt);
     addProvider(provider);
 
-    if (!initializeMuxersInternal(
-        /*useFallbackVideo*/ false,
-        /*useFallbackAudio*/ false))
-    {
+    if (!initializeMuxersInternal())
         return AbstractCameraDataProviderPtr();
-    }
-
 
     if (m_tracker->isStarted())
         m_tracker->sendOffer();
@@ -284,7 +279,7 @@ void Session::setTranscodingParams(
     m_muxer = std::make_unique<Transcoder>(this, m_method, m_mseFormat);
 }
 
-bool Session::initializeMuxersInternal(bool useFallbackVideo, bool useFallbackAudio)
+bool Session::initializeMuxersInternal()
 {
     // Ignore aspect ratio if user specifies the full resolution.
     if (m_resolution && m_resolution->size.width() > 0)
@@ -294,6 +289,12 @@ bool Session::initializeMuxersInternal(bool useFallbackVideo, bool useFallbackAu
     {
         if (provider->isInitialized())
             continue;
+
+        const auto videoTrack = m_tracks->videoTrack(provider->resource()->getId());
+        const auto audioTrack = m_tracks->audioTrack(provider->resource()->getId());
+
+        const bool useFallbackVideo = videoTrack && videoTrack->state && videoTrack->state == TrackState::inactive;
+        const bool useFallbackAudio = audioTrack && audioTrack->state && audioTrack->state == TrackState::inactive;
 
         auto videoCodecParamaters = provider->getVideoCodecParameters();
         if (videoCodecParamaters)
@@ -494,7 +495,7 @@ std::string Session::constructSdp()
     return sdp;
 }
 
-AnswerResult Session::examineSdp(const std::string& sdp)
+AnswerResult Session::processSdpAnswer(const std::string& sdp)
 {
     m_sdpParseResult = SdpParseResult::parse(sdp);
     NX_DEBUG(this, "%1: Sdp parsed, got remote: %2/%3", id(), m_sdpParseResult.iceUfrag, m_sdpParseResult.icePwd);
@@ -506,27 +507,7 @@ AnswerResult Session::examineSdp(const std::string& sdp)
     }
     m_dtls->setFingerprint(m_sdpParseResult.fingerprint);
 
-#if 0
-    if ((m_sdpParseResult.video != SdpParseResult::TrackState::absent) ^ (m_tracks->hasVideo() ? 1 : 0))
-    {
-        NX_DEBUG(
-            this,
-            "%1: Tracks in offer and answer does not match (video track doesn't exists)",
-            id());
-        return AnswerResult::failed;
-    }
-
-    if ((m_sdpParseResult.audio != SdpParseResult::TrackState::absent) ^ (m_tracks->hasAudio() ? 1 : 0))
-    {
-        NX_DEBUG(
-            this,
-            "%1: Tracks in offer and answer does not match (audio track doesn't exists)",
-            id());
-        return AnswerResult::failed;
-    }
-#endif
-
-    if (m_sdpParseResult.application != SdpParseResult::TrackState::active)
+    if (m_sdpParseResult.tracksState[kDataChannelMid] != TrackState::active)
     {
         NX_DEBUG(
             this,
@@ -535,39 +516,39 @@ AnswerResult Session::examineSdp(const std::string& sdp)
         return AnswerResult::failed;
     }
 
-    if (!m_tracks->examineSdp(sdp))
+    bool needToUpdate = false;
+    for (auto& [_, track]: m_tracks->tracks())
     {
-        NX_DEBUG(this, "%1: SDP examination failed", id());
-        return AnswerResult::failed;
+        const auto state = m_sdpParseResult.tracksState[track->mid];
+        if (state != TrackState::active)
+        {
+            needToUpdate = true;
+            if (track->state.has_value())
+                return AnswerResult::failed; //< Still failed after traying fallback codec
+            if (auto it = m_providers.find(nx::Uuid(track->deviceId)); it != m_providers.end())
+                it->second->setInitialized(false); //< Allow to reinit provider.
+        }
+        track->state = state;
     }
 
-    if (!m_sdpParseResult.hasInactive())
+    if (!needToUpdate)
         return AnswerResult::success;
 
-    if (m_tracks->fallbackCodecs())
-        return AnswerResult::failed;
-
-    m_tracks->setFallbackCodecs();
-
-    bool status = initializeMuxersInternal(
-        m_sdpParseResult.video == SdpParseResult::TrackState::inactive,
-        m_sdpParseResult.audio == SdpParseResult::TrackState::inactive);
+    // Reinitialize some tracks again with fallback codec.
+    bool status = initializeMuxersInternal();
     return status ? AnswerResult::again : AnswerResult::failed;
 }
 
 AnswerResult Session::setFallbackCodecs()
 {
-    if (m_tracks->fallbackCodecs())
-        return AnswerResult::failed;
-    m_tracks->setFallbackCodecs();
-#if 0
-    if (m_tracks->hasVideo())
-        m_sdpParseResult.video = SdpParseResult::TrackState::inactive;
-    if (m_tracks->hasAudio())
-        m_sdpParseResult.audio = SdpParseResult::TrackState::inactive;
-#endif
+    for (auto& [_, track]: m_tracks->tracks())
+    {
+        if (track->state && track->state == TrackState::inactive)
+            return AnswerResult::failed; //< Still failed after traying fallback codec
+        track->state = TrackState::inactive;
+    }
 
-    bool status = initializeMuxersInternal(/*useFallbackVideo*/ true, /*useFallbackAudio*/ true);
+    bool status = initializeMuxersInternal();
     return status ? AnswerResult::again : AnswerResult::failed;
 }
 
