@@ -15,7 +15,7 @@
 namespace nx::webrtc {
 
 Consumer::Consumer(Session* session):
-    m_mediaQueue(512, std::chrono::seconds(2)),
+    m_mediaQueue(512),
     m_session(session)
 {}
 

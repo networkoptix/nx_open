@@ -13,10 +13,11 @@ namespace nx::vms::server {
 class NX_WEBRTC_API MediaQueue
 {
 public:
-    MediaQueue(int maxSize, std::chrono::microseconds maxDuration);
+    MediaQueue(int maxSize);
     void putData(const QnConstAbstractMediaDataPtr& data);
     QnConstAbstractMediaDataPtr popData(bool blocked = false);
     void stop();
+    void setMaxSize(int maxSize);
     void clearUnprocessedData();
 
 private:
@@ -24,8 +25,7 @@ private:
     void clearTillLastGopUnsafe();
 
 private:
-    const int m_maxSize;
-    const std::chrono::microseconds m_maxDuration;
+    int m_maxSize;
     std::deque<QnConstAbstractMediaDataPtr> m_mediaQueue;
     std::vector<bool> m_keyDataFound;
 
