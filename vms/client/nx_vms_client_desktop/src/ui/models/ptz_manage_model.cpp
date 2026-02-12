@@ -16,6 +16,26 @@ using namespace nx::vms::client::core;
 using namespace nx::vms::client::core::ptz;
 using namespace nx::vms::client::desktop;
 
+namespace {
+
+QString makeTourId()
+{
+    auto id = nx::Uuid::createUuid()
+        .toRfc4122()
+        .toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+
+    return "Tour_" + QString::fromLatin1(id);
+}
+
+} // namespace
+
+QnPtzTourItemModel::QnPtzTourItemModel(const QString& name):
+    tour(makeTourId(), name, QnPtzTourSpotList()),
+    modified(true),
+    local(true)
+{
+}
+
 QnPtzManageModel::QnPtzManageModel(QObject *parent) :
     base_type(parent),
     m_homePositionChanged(false)

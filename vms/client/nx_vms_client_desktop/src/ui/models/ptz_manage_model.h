@@ -19,11 +19,7 @@ struct QnPtzTourItemModel {
         local(false)
     {}
 
-    QnPtzTourItemModel(const QString &name):
-        tour(nx::Uuid::createUuid().toString(QUuid::WithBraces), name, QnPtzTourSpotList()),
-        modified(true),
-        local(true)
-    {}
+    QnPtzTourItemModel(const QString& name);
 
     QnPtzTour tour;
 
