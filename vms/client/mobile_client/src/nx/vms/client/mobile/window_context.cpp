@@ -22,6 +22,7 @@
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
+#include <settings/qml_settings_adaptor.h>
 #include <ui/texture_size_helper.h>
 #include <ui/window_utils.h>
 
@@ -122,6 +123,9 @@ WindowContext::WindowContext(QObject* parent):
 
     connect(appContext()->pushManager(), &PushNotificationManager::showPushActivateErrorMessage,
         d->uiController.get(), &UiController::showMessage);
+
+    connect(d->sessionManager.get(), &SessionManager::hasSessionChanged, this,
+        []() { appContext()->settings()->clear("selectedObjectsType"); });
 }
 
 WindowContext::~WindowContext()

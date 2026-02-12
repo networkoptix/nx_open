@@ -16,6 +16,7 @@ import Nx.Ui
 
 import nx.vms.client.core
 import nx.vms.client.mobile
+import nx.vms.client.mobile.timeline as Timeline
 
 import "private/ResourcesScreen"
 
@@ -200,14 +201,20 @@ AdaptiveScreen
         id: videoItem
 
         toolBar.visible: false
-        padding:
-        {
-            if (resourcesScreen.fullscreen)
-                return 0
-
-            return LayoutController.isTabletLayout ? 20 : 0
-        }
         backgroundColor: ColorTheme.colors.dark4
+
+        padding: resourcesScreen.fullscreen
+            ? 0
+            : (LayoutController.isTabletLayout ? 20 : 0)
+
+        onSelectedObjectsTypeChanged:
+            appContext.settings.selectedObjectsType = selectedObjectsType
+
+        Component.onCompleted:
+        {
+            selectedObjectsType = appContext.settings.selectedObjectsType
+                ?? Timeline.ObjectsLoader.ObjectsType.motion
+        }
     }
 
     ResourceHelper
