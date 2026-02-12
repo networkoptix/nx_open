@@ -67,7 +67,7 @@
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>your Regional / Licence support</translation>
     </message>
   </context>
   <context>
@@ -644,35 +644,35 @@
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation>Analog Licenses</translation>
+      <translation>Analog Licences</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation>Professional Licenses</translation>
+      <translation>Professional Licences</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation>Edge Licenses</translation>
+      <translation>Edge Licences</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
-      <translation>Vmax Licenses</translation>
+      <translation>Vmax Licences</translation>
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation>Analog Encoder Licenses</translation>
+      <translation>Analog Encoder Licences</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation>Video Wall Licenses</translation>
+      <translation>Video Wall Licences</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation>I/O Module Licenses</translation>
+      <translation>I/O Module Licences</translation>
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation>Start Licenses</translation>
+      <translation>Start Licences</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -680,7 +680,7 @@
     </message>
     <message>
       <source>Invalid Licenses</source>
-      <translation>Invalid Licenses</translation>
+      <translation>Invalid Licences</translation>
     </message>
     <message>
       <source>Free</source>
@@ -692,7 +692,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation>Time Licenses</translation>
+      <translation>Time Licences</translation>
     </message>
     <message>
       <source>Bridge</source>
@@ -700,190 +700,190 @@
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation>Bridge Licenses</translation>
+      <translation>Bridge Licences</translation>
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Time License</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
+      <translation>
+        <numerusform>%n Time Licence</numerusform>
+        <numerusform>%n Time Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog License</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n Analog Licence</numerusform>
+        <numerusform>%n Analog Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Professional License</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n Professional Licence</numerusform>
+        <numerusform>%n Professional Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Edge License</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n Edge Licence</numerusform>
+        <numerusform>%n Edge Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Vmax License</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n Vmax Licence</numerusform>
+        <numerusform>%n Vmax Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Encoder License</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n Analog Encoder Licence</numerusform>
+        <numerusform>%n Analog Encoder Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Video Wall License</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n Video Wall Licence</numerusform>
+        <numerusform>%n Video Wall Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Module License</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n I/O Module Licence</numerusform>
+        <numerusform>%n I/O Module Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Start License</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n Start Licence</numerusform>
+        <numerusform>%n Start Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Bridge License</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n Bridge Licence</numerusform>
+        <numerusform>%n Bridge Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Invalid License</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n Invalid Licence</numerusform>
+        <numerusform>%n Invalid Licences</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation>Free License</translation>
+      <translation>Free Licences</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free License</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n Free Licence</numerusform>
+        <numerusform>%n Free Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Time License</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Time Licence</numerusform>
+        <numerusform>%n/%1 Time Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog License</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Analog Licence</numerusform>
+        <numerusform>%n/%1 Analog Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Professional License</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Professional Licence</numerusform>
+        <numerusform>%n/%1 Professional Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Edge License</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Edge Licence</numerusform>
+        <numerusform>%n/%1 Edge Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Vmax License</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Vmax Licence</numerusform>
+        <numerusform>%n/%1 Vmax Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Encoder License</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Analog Encoder Licence</numerusform>
+        <numerusform>%n/%1 Analog Encoder Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Video Wall License</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Video Wall Licence</numerusform>
+        <numerusform>%n/%1 Video Wall Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 I/O Module License</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 I/O Module Licence</numerusform>
+        <numerusform>%n/%1 I/O Module Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Start License</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Start Licence</numerusform>
+        <numerusform>%n/%1 Start Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free License</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Free Licence</numerusform>
+        <numerusform>%n/%1 Free Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Bridge License</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Bridge Licence</numerusform>
+        <numerusform>%n/%1 Bridge Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Invalid License</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Invalid Licence</numerusform>
+        <numerusform>%n/%1 Invalid Licences</numerusform>
       </translation>
     </message>
     <message>
@@ -892,21 +892,21 @@
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation>NVR License</translation>
+      <translation>NVR Licences</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n NVR License</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n NVR Licence</numerusform>
+        <numerusform>%n NVR Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 NVR License</numerusform>
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 NVR Licence</numerusform>
+        <numerusform>%n/%1 NVR Licences</numerusform>
       </translation>
     </message>
     <message>
@@ -915,7 +915,7 @@
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Local recording service</numerusform>
         <numerusform>%n Local recording services</numerusform>
       </translation>
@@ -923,14 +923,14 @@
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 Local recording service</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
       </translation>
     </message>
     <message>
       <source>Local recording services</source>
-      <translation>Local recording service</translation>
+      <translation>Local recording services</translation>
     </message>
   </context>
   <context>
@@ -1041,7 +1041,7 @@
     </message>
     <message>
       <source>FREE License</source>
-      <translation>FREE License</translation>
+      <translation>FREE Licence</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
@@ -1072,7 +1072,7 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation type="unfinished">ms</translation>
+      <translation>ms</translation>
     </message>
     <message>
       <source>s</source>
@@ -1082,52 +1082,52 @@
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation type="unfinished">m</translation>
+      <translation>m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation type="unfinished">h</translation>
+      <translation>h</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation type="unfinished">d</translation>
+      <translation>d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation type="unfinished">w</translation>
+      <translation>w</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation type="unfinished">M</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation type="unfinished">y</translation>
+      <translation>y</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">msec</translation>
+      <translation>msec</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation type="unfinished">sec</translation>
+      <translation>sec</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation type="unfinished">min</translation>
+      <translation>min</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation type="unfinished">hrs</translation>
+      <translation>hrs</translation>
     </message>
     <message>
       <source>days</source>
@@ -1137,31 +1137,31 @@
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation type="unfinished">wks</translation>
+      <translation>wks</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation type="unfinished">mos</translation>
+      <translation>mos</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation type="unfinished">yrs</translation>
+      <translation>yrs</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Numerus: Full suffix for displaying milliseconds</comment>
       <translation>
         <numerusform>millisecond</numerusform>
-        <numerusform>millisecond</numerusform>
+        <numerusform>milliseconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Numerus: Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>seconds</numerusform>
+        <numerusform>second</numerusform>
         <numerusform>seconds</numerusform>
       </translation>
     </message>
@@ -1169,7 +1169,7 @@
       <source>minutes</source>
       <comment>Numerus: Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>minutes</numerusform>
+        <numerusform>minute</numerusform>
         <numerusform>minutes</numerusform>
       </translation>
     </message>
@@ -1177,7 +1177,7 @@
       <source>hours</source>
       <comment>Numerus: Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>hours</numerusform>
+        <numerusform>hour</numerusform>
         <numerusform>hours</numerusform>
       </translation>
     </message>
@@ -1185,7 +1185,7 @@
       <source>days</source>
       <comment>Numerus: Full suffix for displaying days</comment>
       <translation>
-        <numerusform>days</numerusform>
+        <numerusform>day</numerusform>
         <numerusform>days</numerusform>
       </translation>
     </message>
@@ -1193,7 +1193,7 @@
       <source>weeks</source>
       <comment>Numerus: Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>weeks</numerusform>
+        <numerusform>week</numerusform>
         <numerusform>weeks</numerusform>
       </translation>
     </message>
@@ -1201,7 +1201,7 @@
       <source>months</source>
       <comment>Numerus: Full suffix for displaying months</comment>
       <translation>
-        <numerusform>months</numerusform>
+        <numerusform>month</numerusform>
         <numerusform>months</numerusform>
       </translation>
     </message>
@@ -1209,63 +1209,63 @@
       <source>years</source>
       <comment>Numerus: Full suffix for displaying years</comment>
       <translation>
-        <numerusform>years</numerusform>
+        <numerusform>year</numerusform>
         <numerusform>years</numerusform>
       </translation>
     </message>
     <message>
       <source>Msec</source>
       <comment>Numerus: Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>Msec</translation>
     </message>
     <message>
       <source>Sec</source>
       <comment>Numerus: Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>Sec</translation>
     </message>
     <message>
       <source>Min</source>
       <comment>Numerus: Capitalized long suffix for displaying minutes</comment>
-      <translation type="unfinished">Min</translation>
+      <translation>Min</translation>
     </message>
     <message>
       <source>Hrs</source>
       <comment>Numerus: Capitalized long suffix for displaying hours</comment>
-      <translation type="unfinished">Hrs</translation>
+      <translation>Hrs</translation>
     </message>
     <message>
       <source>Days</source>
       <comment>Numerus: Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Days</translation>
     </message>
     <message>
       <source>Wks</source>
       <comment>Numerus: Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>Wks</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Numerus: Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>Mos</translation>
     </message>
     <message>
       <source>Yrs</source>
       <comment>Numerus: Capitalized long suffix for displaying years</comment>
-      <translation type="unfinished">Yrs</translation>
+      <translation>Yrs</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Numerus: Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>Milliseconds</numerusform>
+      <translation>
+        <numerusform>Millisecond</numerusform>
         <numerusform>Milliseconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Numerus: Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
+      <translation>
+        <numerusform>Second</numerusform>
         <numerusform>Seconds</numerusform>
       </translation>
     </message>
@@ -1273,53 +1273,53 @@
       <source>Minutes</source>
       <comment>Numerus: Capitalized full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>Minutes</numerusform>
+        <numerusform>Minute</numerusform>
         <numerusform>Minutes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Hours</source>
       <comment>Numerus: Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>Hours</numerusform>
+      <translation>
+        <numerusform>Hour</numerusform>
         <numerusform>Hours</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Days</source>
       <comment>Numerus: Capitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>Day</numerusform>
         <numerusform>Days</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Numerus: Capitalized full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
+      <translation>
+        <numerusform>Week</numerusform>
         <numerusform>Weeks</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Months</source>
       <comment>Numerus: Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>Months</numerusform>
+      <translation>
+        <numerusform>Month</numerusform>
         <numerusform>Months</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Numerus: Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>Years</numerusform>
+      <translation>
+        <numerusform>Year</numerusform>
         <numerusform>Years</numerusform>
       </translation>
     </message>
     <message>
       <source>milliseconds</source>
-      <translation>millisecond</translation>
+      <translation>milliseconds</translation>
     </message>
     <message>
       <source>seconds</source>
@@ -1351,11 +1351,11 @@
     </message>
     <message>
       <source>Milliseconds</source>
-      <translation type="unfinished">Milliseconds</translation>
+      <translation>Milliseconds</translation>
     </message>
     <message>
       <source>Seconds</source>
-      <translation type="unfinished">Seconds</translation>
+      <translation>Seconds</translation>
     </message>
     <message>
       <source>Minutes</source>
@@ -1363,23 +1363,23 @@
     </message>
     <message>
       <source>Hours</source>
-      <translation type="unfinished">Hours</translation>
+      <translation>Hours</translation>
     </message>
     <message>
       <source>Days</source>
-      <translation type="unfinished">Days</translation>
+      <translation>Days</translation>
     </message>
     <message>
       <source>Weeks</source>
-      <translation type="unfinished">Weeks</translation>
+      <translation>Weeks</translation>
     </message>
     <message>
       <source>Months</source>
-      <translation type="unfinished">Months</translation>
+      <translation>Months</translation>
     </message>
     <message>
       <source>Years</source>
-      <translation type="unfinished">Years</translation>
+      <translation>Years</translation>
     </message>
   </context>
   <context>
@@ -1427,7 +1427,7 @@
     <name>StringsHelper</name>
     <message>
       <source>Check internet connection between VMS and license server.</source>
-      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
+      <translation>Check internet connection between VMS and licence server.</translation>
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
@@ -1889,7 +1889,7 @@
     </message>
     <message>
       <source>License server.</source>
-      <translation type="unfinished">License server.</translation>
+      <translation>Licence server.</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update.</source>

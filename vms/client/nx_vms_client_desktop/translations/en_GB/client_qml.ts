@@ -2600,7 +2600,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Activate License</translation>
+      <translation>Activate Licence</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -2643,7 +2643,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Not enough licences</translation>
     </message>
     <message>
       <source>Server unavailable</source>
