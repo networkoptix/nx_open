@@ -377,7 +377,7 @@ void Consumer::processNextData()
             // wait for chunk collection.
 
             if (m_session->muxer()->method() == nx::vms::api::WebRtcMethod::srtp)
-                m_streamer->ice()->writeBatch(mediaBuffers);
+                m_streamer->ice()->writeBatch(std::move(mediaBuffers));
             else
                 m_streamer->ice()->writeDataChannelBatch(mediaBuffers);
             m_sendInProgress = true;
