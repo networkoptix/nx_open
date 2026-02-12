@@ -22,8 +22,8 @@
   <String Id="InstallOptionsButton">Options</String>
   <String Id="InstallInstallButton">Install</String>
   <String Id="InstallCloseButton">Close</String>
-  <String Id="InstallAcceptCheckbox">I agree to the license terms and conditions</String>
-  <String Id="InstallLicenseLinkText">End User License Agreement</String>
+  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallLicenseLinkText">End User Licence Agreement</String>
   <String Id="OptionsHeader">Setup Options</String>
   <String Id="OptionsLocationLabel">Install location:</String>
   <String Id="OptionsBrowseButton">Browse</String>

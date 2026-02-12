@@ -173,7 +173,7 @@
     </message>
     <message>
       <source>Not enough integration licenses for camera %1.</source>
-      <translation type="unfinished">Not enough integration licenses for camera %1.</translation>
+      <translation>Not enough integration licences for camera %1.</translation>
     </message>
     <message>
       <source>Server %1 does not exist.</source>
@@ -209,7 +209,7 @@
     </message>
     <message>
       <source>Set %1 `scheduleEnabled` to true is forbidden: no license to enable recording.</source>
-      <translation type="unfinished">Set %1 `scheduleEnabled` to true is forbidden: no license to enable recording.</translation>
+      <translation>Set %1 `scheduleEnabled` to true is forbidden: no licence to enable recording.</translation>
     </message>
     <message>
       <source>It is forbidden to enable cloud backup for %1 since SaaS service is not active.</source>
@@ -217,7 +217,7 @@
     </message>
     <message>
       <source>It is forbidden to enable cloud backup for %1 because there is no appropriate SaaS service license.</source>
-      <translation type="unfinished">It is forbidden to enable cloud backup for %1 because there is no appropriate SaaS service license.</translation>
+      <translation>It is forbidden to enable cloud backup for %1 because there is no appropriate SaaS service licence.</translation>
     </message>
     <message>
       <source>There is not enough save permissions</source>
@@ -229,7 +229,7 @@
     </message>
     <message>
       <source>There is no license for camera %1</source>
-      <translation type="unfinished">There is no license for camera %1</translation>
+      <translation>There is no licence for camera %1</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s attributes.</source>

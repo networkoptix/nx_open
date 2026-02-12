@@ -613,7 +613,7 @@
     <name>CameraLicensePanelWidget</name>
     <message>
       <source>Activate License...</source>
-      <translation>Activate License...</translation>
+      <translation>Activate Licence...</translation>
     </message>
   </context>
   <context>
@@ -678,7 +678,7 @@
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>Activate License...</translation>
+      <translation>Activate Licence...</translation>
     </message>
     <message>
       <source>Copying Schedule</source>
@@ -1327,7 +1327,7 @@
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
-      <translation>License Details</translation>
+      <translation>Licence Details</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -1346,7 +1346,7 @@
     </message>
     <message>
       <source>License issues:</source>
-      <translation>License issues:</translation>
+      <translation>Licence issues:</translation>
     </message>
   </context>
   <context>
@@ -1357,7 +1357,7 @@
     </message>
     <message>
       <source>Select License File...</source>
-      <translation>Select License File...</translation>
+      <translation>Select Licence File...</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1365,15 +1365,15 @@
     </message>
     <message>
       <source>License will be bound to the current server</source>
-      <translation>License will be bound to the current server</translation>
+      <translation>Licence will be bound to the current server</translation>
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation>Activate Free License</translation>
+      <translation>Activate Free Licence</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Activate License</translation>
+      <translation>Activate Licence</translation>
     </message>
     <message>
       <source>Internet Activation</source>
@@ -1381,11 +1381,11 @@
     </message>
     <message>
       <source>License Key</source>
-      <translation>License Key</translation>
+      <translation>Licence Key</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Invalid License Key</translation>
+      <translation>Invalid Licence Key</translation>
     </message>
     <message>
       <source>Activation Key File</source>
@@ -2628,7 +2628,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>nx::vms::client::desktop::LicenseManagerWidget</name>
     <message>
       <source>Active Licenses</source>
-      <translation>Active Licenses</translation>
+      <translation>Active Licences</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -2644,7 +2644,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>New License</source>
-      <translation>New License</translation>
+      <translation>New Licence</translation>
     </message>
   </context>
   <context>

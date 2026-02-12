@@ -649,7 +649,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>Custom headers</translation>
     </message>
   </context>
   <context>
@@ -766,12 +766,12 @@
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>Licence Issue</translation>
     </message>
     <message>
       <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">Not enough licenses on %1</translation>
+      <translation>Not enough licences on %1</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following devices:</source>
@@ -1044,11 +1044,11 @@
     </message>
     <message>
       <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <translation>Failed to migrate licences.</translation>
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <translation>Skipped import of licences. Another migration attempt will be automatically scheduled for later.</translation>
     </message>
     <message>
       <source>Services Issue on %1</source>
