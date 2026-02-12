@@ -150,7 +150,7 @@ AnswerResult Tracker::examineAnswer()
     d.Parse(s.data());
     if (!d.IsObject())
         return AnswerResult::noop;
-    if (d.HasMember("ice") && m_stage != Stage::offer)
+    if (d.HasMember("ice"))
     {
         const auto& ice = d["ice"];
         if (ice.IsObject() && ice.HasMember("candidate"))
@@ -165,12 +165,10 @@ AnswerResult Tracker::examineAnswer()
 
                 if (iceCandidate.type == IceCandidate::Type::Srflx)
                 {
-                    m_stage = Stage::srflxReceived;
+                    m_srflxReceived = true;
                     if (m_srflxCandidate)
-                    {
                         sendIce(*m_srflxCandidate);
-                        m_stage = Stage::srflxSent;
-                    }
+                    m_srflxCandidate.reset();
                 }
             }
         }
@@ -205,43 +203,37 @@ bool Tracker::processMessages()
      * and sends the answer back to the initiator over the signaling channel. When the initiator
      * gets that answer, it installs it using the setRemoteDescription() API, and initial setup
      * is complete. This process can be repeated for additional offer/answer exchanges.
-     * */
+     */
+
     AnswerResult result = examineAnswer();
     if (result == AnswerResult::again)
     {
         sendOffer();
         return true;
     }
+    else if (result == AnswerResult::failed)
+    {
+        return false;
+    }
 
-    NX_VERBOSE(this, "Answer examination result: %1 in stage: %2", (int)result, (int)m_stage);
+    NX_VERBOSE(this, "Answer examination result: %1 in stage: %2", (int)result);
 
     m_session->consumer()->startProvidersIfNeeded();
 
-    switch (m_stage)
+    if (!m_iceSent)
     {
-        case Stage::offer:
-            if (result == AnswerResult::failed)
-            {
-                return false;
-            }
-            else if (result == AnswerResult::success)
-            {
-                m_stage = Stage::answerSuccess;
-                NX_VERBOSE(this, "Answer succeeded, send ice candidates");
-                const auto iceCandidates = m_session->getIceCandidates();
-                for (const auto& candidate: iceCandidates)
-                    if (candidate.type != IceCandidate::Type::Srflx)
-                        sendIce(candidate); //< Send Srflx only after get one from remote peer.
-            }
-            return true;
-        case Stage::answerSuccess:
-        case Stage::srflxReceived:
-        case Stage::srflxSent:
-            return result != AnswerResult::failed;
-        default:
-            NX_ASSERT(false);
-            return false;
+        NX_VERBOSE(this, "Answer succeeded, send ice candidates");
+        const auto iceCandidates = m_session->getIceCandidates();
+        for (const auto& candidate: iceCandidates)
+        {
+            if (m_srflxReceived || candidate.type != IceCandidate::Type::Srflx)
+                sendIce(candidate); //< Send Srflx only after get one from remote peer.
+            else
+                m_srflxCandidate = candidate;
+        }
+        m_iceSent = true;
     }
+    return true;
 }
 
 void Tracker::onIceCandidate(const IceCandidate& candidate)
@@ -250,17 +242,12 @@ void Tracker::onIceCandidate(const IceCandidate& candidate)
     m_pollable.dispatch(
         [this, candidate]()
         {
-            if (m_stage == Stage::srflxReceived || m_stage == Stage::srflxSent)
-            {
-                sendIce(candidate);
-                if (m_stage == Stage::srflxReceived)
-                    m_stage = Stage::srflxSent;
-            }
+            if (!m_iceSent)
+                return; //< All ice will be send later.
+            if (m_srflxReceived || candidate.type != IceCandidate::Type::Srflx)
+                sendIce(candidate); //< Send Srflx only after get one from remote peer.
             else
-            {
-                NX_ASSERT(candidate.type == IceCandidate::Type::Srflx);
-                m_srflxCandidate = candidate; //< Can't be relay candidate in this stage.
-            }
+                m_srflxCandidate = candidate;
         });
 }
 

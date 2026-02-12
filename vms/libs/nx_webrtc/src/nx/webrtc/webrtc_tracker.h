@@ -35,23 +35,15 @@ private:
     void stopUnsafe();
 
 private:
-    enum class Stage
-    {
-        offer,
-        answerSuccess,
-        srflxReceived,
-        srflxSent,
-    };
-
-private:
     std::optional<IceCandidate> m_srflxCandidate;
     WebSocketPtr m_webSocket;
     Session* m_session = nullptr;
     nx::Buffer m_buffer;
-    Stage m_stage = Stage::offer;
     nx::network::aio::BasicPollable m_pollable;
     IceCandidate::Filter m_candidateFilter = IceCandidate::Filter::All;
     std::atomic<bool> m_started{};
+    bool m_iceSent = false;
+    bool m_srflxReceived = false;
 };
 
 } // namespace nx::webrtc
