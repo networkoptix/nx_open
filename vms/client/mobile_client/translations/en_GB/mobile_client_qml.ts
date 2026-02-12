@@ -1263,7 +1263,7 @@
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Not enough licences</translation>
     </message>
     <message>
       <source>Password required</source>
