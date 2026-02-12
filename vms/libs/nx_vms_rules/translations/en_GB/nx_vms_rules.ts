@@ -649,7 +649,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>Custom header</translation>
     </message>
   </context>
   <context>
