@@ -20,12 +20,15 @@ class NX_WEBRTC_API AbstractCameraDataProvider:
 public:
 
     // Data handler, will put nullptr on EOF.
-    using OnDataReady = std::function<void()>;
     using OnDataHandler =
-        std::function<void (const QnConstAbstractMediaDataPtr& packet, const OnDataReady& handler)>;
+        std::function<void (const QnConstAbstractMediaDataPtr& packet)>;
 
     int64_t getPosition() const { return m_positionUs; }
     void setPosition(int64_t positionUs) { m_positionUs = (positionUs >= 0 ? positionUs : DATETIME_NOW); }
+
+    bool isInitialized() const { return m_initialized;}
+    void setInitialized(bool value) { m_initialized = value; }
+    virtual bool isStarted() const = 0;
 
 public: // Initialize.
     virtual void subscribe(const OnDataHandler& handler) = 0;
@@ -56,6 +59,14 @@ public: // Playback.
 protected:
     int64_t m_positionUs = DATETIME_NOW;
     AuditHandle m_auditHandle;
+    bool m_initialized = false;
 };
+
+using AbstractCameraDataProviderPtr = std::shared_ptr<AbstractCameraDataProvider>;
+using createDataProviderFactory = nx::MoveOnlyFunc<AbstractCameraDataProviderPtr(
+    nx::Uuid /*deviceId*/,
+    std::optional<std::chrono::milliseconds> /*positionMs*/,
+    nx::vms::api::StreamIndex /*stream*/,
+    std::optional<float> /*speedOpt*/)>;
 
 } // namespace nx::webrtc

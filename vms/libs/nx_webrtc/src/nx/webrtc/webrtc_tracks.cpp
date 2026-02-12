@@ -79,8 +79,11 @@ Tracks::Tracks(Session* session)
 
 void Tracks::addTrack(std::unique_ptr<Track> track)
 {
-    track->ssrc = nx::utils::random::number<uint32_t>();
+    do {
+        track->ssrc = nx::utils::random::number<uint32_t>();
+    } while (m_tracks.find(track->ssrc) != m_tracks.end());
     track->purpose = m_session->purpose();
+    track->mid = m_lastMid++;
 
     // Find existing track with same deviceId
     bool found = false;
@@ -185,14 +188,18 @@ std::string Tracks::getSdpForTrack(const Track* track, uint16_t /*port*/) const
     sdp += "a=ssrc:" + std::to_string(track->ssrc) + " cname:" + track->cname + ENDL;
     // Generic RTCP feedbacks supported: https://www.rfc-editor.org/rfc/rfc4585.html#section-3.6.2
     sdp += "a=rtcp-fb:" + std::to_string(track->payloadType) + " nack" ENDL;
+    sdp += "a=extmap:1 urn:ietf:params:rtp-hdrext:sdes:mid" ENDL;
     return sdp;
 }
 
 std::string TracksForSend::getSdpForTrack(const Track* track, uint16_t port) const
 {
+    auto encoder = m_session->muxer()->videoEncoder(track->deviceId);
+    if (!NX_ASSERT(encoder))
+        return {};
     bool isVideo = track->trackType == TrackType::video;
-    return m_session->muxer()->videoEncoder(track->deviceId)->getSdpMedia(
-        isVideo, 0, port, /*ssl*/ true).toStdString()
+    return encoder->getSdpMedia(
+        isVideo, track->mid, port, /*ssl*/ true).toStdString()
         + base_type::getSdpForTrack(track, port);
 }
 
@@ -222,26 +229,6 @@ std::string TracksForRecv::getSdpForTrack(const Track* track, uint16_t port) con
     // `ccm` mean `Codec Control Message`.
     result += "a=rtcp-fb:" + std::to_string(track->payloadType) + " ccm fir\r\n";
     return result + base_type::getSdpForTrack(track, port);
-}
-
-bool TracksForRecv::hasVideoTranscoding() const
-{
-    return false;
-}
-
-bool TracksForRecv::hasAudioTranscoding() const
-{
-    return false;
-}
-
-bool TracksForSend::hasVideoTranscoding() const
-{
-    return m_session->provider()->isTranscodingEnabled(QnAbstractMediaData::VIDEO);
-}
-
-bool TracksForSend::hasAudioTranscoding() const
-{
-    return m_session->provider()->isTranscodingEnabled(QnAbstractMediaData::AUDIO);
 }
 
 TracksForSend::TracksForSend(Session* session) : Tracks(session)

@@ -22,11 +22,13 @@ public:
         const nx::network::http::HttpHeaders& headers);
     void onIceCandidate(const IceCandidate& candidate);
 
+    void sendOffer();
+    bool isStarted() const { return m_started; }
+
 private:
     void readMessage();
     bool processMessages();
     AnswerResult examineAnswer();
-    void sendOffer();
     void sendIce(const IceCandidate& candidate);
     void sendJson(const rapidjson::Document& doc);
     void onBytesRead(SystemError::ErrorCode errorCode, std::size_t /*bytesTransferred*/);
@@ -49,6 +51,7 @@ private:
     Stage m_stage = Stage::offer;
     nx::network::aio::BasicPollable m_pollable;
     IceCandidate::Filter m_candidateFilter = IceCandidate::Filter::All;
+    std::atomic<bool> m_started{};
 };
 
 } // namespace nx::webrtc

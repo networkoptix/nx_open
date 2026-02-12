@@ -46,7 +46,7 @@ public:
     bool getNextPacket(
         QnUniversalRtpEncoder* rtpEncoder,
         nx::utils::ByteArray& buffer);
-    bool isEof(QnUniversalRtpEncoder* rtpEncoder) const;
+    bool isEof(nx::Uuid deviceId, QnUniversalRtpEncoder* rtpEncoder) const;
     FfmpegMuxer::PacketTimestamp getLastTimestamps() const;
     int64_t getLastTimestampMs() const { return m_lastTimestampMs; } //< Required for reconnection.
 
@@ -54,7 +54,8 @@ private:
     QnUniversalRtpEncoderPtr createRtpEncoder(
         AVCodecParameters* codecParameters,
         uint32_t ssrc,
-        const std::string& cname);
+        const std::string& cname,
+        int mid);
 
     bool createRtpEncoders(
         nx::Uuid deviceId,
@@ -77,7 +78,7 @@ private:
     // MSE transcoding.
     std::unique_ptr<FfmpegMuxer> m_mseMuxer;
     std::queue<nx::utils::ByteArray> m_mseBuffers;
-    bool m_eof = false;
+    std::set<nx::Uuid> m_eof;
     // Count of video and audio frames received for last gop.
     int m_videoPacketsCount = 0;
     int m_audioPacketsCount = 0;
@@ -85,6 +86,7 @@ private:
     nx::vms::api::WebRtcMethod m_method = nx::vms::api::WebRtcMethod::srtp;
     nx::vms::api::WebRtcTrackerSettings::MseFormat m_mseFormat;
     int64_t m_lastTimestampMs = 0;
+    std::optional<rtsp::EncryptionData> m_encryptionData;
 };
 
 } // namespace nx::webrtc

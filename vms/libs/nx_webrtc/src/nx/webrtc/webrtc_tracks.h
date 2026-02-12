@@ -54,14 +54,12 @@ public:
 
     virtual std::string getSdpForTrack(const Track* track, uint16_t port) const;
 
-    virtual bool hasVideoTranscoding() const = 0;
-    virtual bool hasAudioTranscoding() const = 0;
-
 protected:
     Session* m_session = nullptr;
 
 private:
     std::map<uint32_t, std::unique_ptr<Track>> m_tracks;
+    int m_lastMid = 0;
 };
 
 class NX_WEBRTC_API TracksForSend: public Tracks
@@ -78,8 +76,6 @@ public:
     virtual bool examineSdp(const std::string& sdp) override;
     virtual std::string getSdpForTrack(const Track* track, uint16_t port) const override;
 
-    virtual bool hasVideoTranscoding() const override;
-    virtual bool hasAudioTranscoding() const override;
 private:
     bool m_fallbackCodecs = false;
 };
@@ -97,9 +93,6 @@ public:
     virtual std::string mimeType() const override;
     virtual bool examineSdp(const std::string& sdp) override;
     virtual std::string getSdpForTrack(const Track* track, uint16_t port) const override;
-
-    virtual bool hasVideoTranscoding() const override;
-    virtual bool hasAudioTranscoding() const override;
 };
 
 } // namespace nx::webrtc

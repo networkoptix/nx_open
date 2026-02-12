@@ -10,6 +10,7 @@
 #include <nx/network/socket.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/move_only_func.h>
 #include <nx/vms/common/system_context_aware.h>
 
 #include "webrtc_ice_manager.h"
@@ -49,7 +50,7 @@ public:
      * @return False, if session with id session->id() already exists. true, otherwise.
      */
     std::shared_ptr<Session> create(
-        std::unique_ptr<AbstractCameraDataProvider> cameraProvider,
+        createDataProviderFactory providerFactory,
         Purpose purpose,
         const nx::network::SocketAddress& address,
         const SessionConfig& config);
@@ -63,7 +64,7 @@ public:
      * @return False, if session with id session->id() already exists. true, otherwise.
      */
     std::shared_ptr<Session> create(
-        std::unique_ptr<AbstractCameraDataProvider> cameraProvider,
+        createDataProviderFactory providerFactory,
         Purpose purpose,
         const nx::network::SocketAddress& address,
         const std::string& localUfrag,
@@ -96,7 +97,7 @@ private:
     std::string emitUfrag();
     bool takeUfrag(const std::string& ufrag);
     std::shared_ptr<Session> createInternal(
-        std::unique_ptr<AbstractCameraDataProvider> cameraProvider,
+        createDataProviderFactory providerFactory,
         Purpose purpose,
         const nx::network::SocketAddress& address,
         const std::string& localUfrag,

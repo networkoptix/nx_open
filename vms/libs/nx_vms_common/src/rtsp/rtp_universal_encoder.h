@@ -52,6 +52,11 @@ public:
     nx::rtsp::SrtpEncryptor* encryptor() const;
     FfmpegMuxer::PacketTimestamp getLastTimestamps() const;
     int payloadType() const;
+
+    QStringList sdpAttributes() const;
+
+    void setMid(const std::string& value) { m_mid = value; }
+    std::string mid() const { return m_mid; }
 private:
     QSize getTargetSize(QnConstAbstractMediaDataPtr media, QSize targetSize);
     void buildSdp(
@@ -78,6 +83,7 @@ private:
     nx::rtp::RtcpSenderReporter m_rtcpReporter;
     std::unique_ptr<nx::rtsp::SrtpEncryptor> m_encryptor;
     std::unique_ptr<nx::rtp::RtcpNackResponder> m_rtcpNackResponder;
+    std::string m_mid;
 };
 
 using QnUniversalRtpEncoderPtr = std::unique_ptr<QnUniversalRtpEncoder>;

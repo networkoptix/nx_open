@@ -67,6 +67,7 @@ void Tracker::start(
             m_webSocket->start();
             sendOffer();
             readMessage();
+            m_started = true;
         });
 }
 
@@ -94,10 +95,6 @@ void Tracker::sendOffer()
         d.AddMember("mime", mimeValue, d.GetAllocator());
     }
 
-    rapidjson::Value transcodingValue(rapidjson::kObjectType);
-    transcodingValue.AddMember("video", m_session->tracks()->hasVideoTranscoding(), d.GetAllocator());
-    transcodingValue.AddMember("audio", m_session->tracks()->hasAudioTranscoding(), d.GetAllocator());
-    d.AddMember("transcoding", transcodingValue, d.GetAllocator());
     d.AddMember("sdp", sdpRoot, d.GetAllocator());
     sendJson(d);
 }
@@ -210,6 +207,8 @@ bool Tracker::processMessages()
      * */
     AnswerResult result = examineAnswer();
     NX_VERBOSE(this, "Answer examination result: %1 in stage: %2", (int)result, (int)m_stage);
+
+    m_session->consumer()->startProvidersIfNeeded();
 
     switch (m_stage)
     {
