@@ -1825,7 +1825,7 @@
     </message>
     <message>
       <source>License server.</source>
-      <translation type="unfinished">License server.</translation>
+      <translation>Licence server.</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update.</source>
