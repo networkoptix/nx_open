@@ -645,7 +645,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation>Custom header</translation>
+      <translation type="unfinished">Custom headers</translation>
     </message>
   </context>
   <context>
