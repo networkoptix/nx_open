@@ -778,7 +778,7 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Free License</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
@@ -889,7 +889,7 @@
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>NVR License</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
@@ -927,7 +927,7 @@
     </message>
     <message>
       <source>Local recording services</source>
-      <translation type="unfinished">Local recording services</translation>
+      <translation>Local recording service</translation>
     </message>
   </context>
   <context>
