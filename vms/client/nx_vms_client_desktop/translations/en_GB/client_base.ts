@@ -1151,35 +1151,35 @@
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation>License does not exist.</translation>
+      <translation>Licence does not exist.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation>License is disabled.</translation>
+      <translation>Licence is disabled.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation>License is inactive.</translation>
+      <translation>Licence is inactive.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation>Invalid license.</translation>
+      <translation>Invalid licence.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation>License is trial.</translation>
+      <translation>Licence is trial.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation>License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation>Licence is in pending deactivation state, but has not been deactivated yet.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation>Number of deactivations exceeded limit for this license.</translation>
+      <translation>Number of deactivations exceeded limit for this licence.</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
+      <translation>Hardware ID of Server with this licence does not match Hardware ID on which licence was activated.</translation>
     </message>
   </context>
   <context>
@@ -1275,11 +1275,11 @@
     <name>LicenseActivationDialogs</name>
     <message>
       <source>Incompatible license</source>
-      <translation>Incompatible license</translation>
+      <translation>Incompatible licence</translation>
     </message>
     <message>
       <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>License you are trying to activate is incompatible with your software.</translation>
+      <translation>Licence you are trying to activate is incompatible with your software.</translation>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
@@ -1287,7 +1287,7 @@
     </message>
     <message>
       <source>Failed to activate license</source>
-      <translation>Failed to activate license</translation>
+      <translation>Failed to activate licence</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
@@ -1299,7 +1299,7 @@
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Invalid License Key</translation>
+      <translation>Invalid Licence Key</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
@@ -1315,19 +1315,19 @@
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1</translation>
+      <translation>This licence is already activated and linked to Hardware ID %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1 on %2</translation>
+      <translation>This licence is already activated and linked to Hardware ID %1 on %2</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
-      <translation>License already activated on another server</translation>
+      <translation>Licence already activated on another server</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>To activate Licence Key manually please contact %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1335,15 +1335,15 @@
     </message>
     <message>
       <source>License activated</source>
-      <translation>License activated</translation>
+      <translation>Licence activated</translation>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>To report the issue please contact your Regional / Licence support:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>To activate Licence Key manually please contact your Regional / License support:</translation>
     </message>
     <message>
       <source>Hardware ID</source>
@@ -1351,11 +1351,11 @@
     </message>
     <message>
       <source>License Key</source>
-      <translation>License Key</translation>
+      <translation>Licence Key</translation>
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>Failed to activate free licence</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1364,8 +1364,8 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>Hardware ID: %1
+Licence Key: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
@@ -1373,15 +1373,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>License has already been activated</source>
-      <translation type="unfinished">License has already been activated</translation>
+      <translation>Licence has already been activated</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>If your Site does not have access to the Internet, please send the provided Licence Key and Hardware ID to %1 to receive the activation file.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / Licence support team to receive the activation file:</translation>
     </message>
   </context>
   <context>
@@ -1389,15 +1389,15 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
       <translation>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Failed to deactivate %n licence</numerusform>
+        <numerusform>Failed to deactivate %n licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
       <translation>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 of %n licence cannot be deactivated</numerusform>
+        <numerusform>%1 of %n licences cannot be deactivated</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1410,8 +1410,8 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <translation>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licence</numerusform>
+        <numerusform>Cannot deactivate licences</numerusform>
       </translation>
     </message>
     <message>
@@ -1420,7 +1420,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
-      <translation>Cannot connect to the License Server</translation>
+      <translation>Cannot connect to the Licence Server</translation>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
@@ -1428,17 +1428,17 @@ License Key: %2</translation>
     </message>
     <message>
       <source>License Server error</source>
-      <translation>License Server error</translation>
+      <translation>Licence Server error</translation>
     </message>
     <message>
       <source>Failed to remove license from Server</source>
-      <translation>Failed to remove license from Server</translation>
+      <translation>Failed to remove licence from Server</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
       <translation>
-        <numerusform>%n licenses deactivated</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licence deactivated</numerusform>
+        <numerusform>%n licences deactivated</numerusform>
       </translation>
     </message>
   </context>
@@ -1453,7 +1453,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>To get a valid Licence Key please contact %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
@@ -1465,15 +1465,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>To get a valid Licence Key please contact your Regional / Licence support:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>If the problem persists, please contact your Regional / Licence support:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Please contact your Regional / Licence support:</translation>
     </message>
   </context>
   <context>
@@ -1835,7 +1835,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Regional / Licence support</translation>
     </message>
     <message>
       <source>Partner information</source>
@@ -3182,11 +3182,11 @@ License Key: %2</translation>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>License Type</source>
-      <translation>License Type</translation>
+      <translation>Licence Type</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>License Key</translation>
+      <translation>Licence Key</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
@@ -3225,7 +3225,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>License Key</translation>
+      <translation>Licence Key</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3261,11 +3261,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>License is active</source>
-      <translation>License is active</translation>
+      <translation>Licence is active</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>License is expired</translation>
+      <translation>Licence is expired</translation>
     </message>
     <message>
       <source>Expires soon</source>
@@ -3273,17 +3273,17 @@ License Key: %2</translation>
     </message>
     <message>
       <source>License expires today</source>
-      <translation>License expires today</translation>
+      <translation>Licence expires today</translation>
     </message>
     <message>
       <source>License expires tomorrow</source>
-      <translation>License expires tomorrow</translation>
+      <translation>Licence expires tomorrow</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
       <translation>
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
+        <numerusform>Licence expires in %n day</numerusform>
+        <numerusform>Licence expires in %n days</numerusform>
       </translation>
     </message>
     <message>
@@ -3299,11 +3299,11 @@ License Key: %2</translation>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation>Activate Trial License</translation>
+      <translation>Activate Trial Licence</translation>
     </message>
     <message>
       <source>Open License File</source>
-      <translation>Open License File</translation>
+      <translation>Open Licence File</translation>
     </message>
     <message>
       <source>Failed to open file</source>
@@ -3311,16 +3311,16 @@ License Key: %2</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>To obtain an Activation Key file please send the provided Licence Key and Hardware ID to %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Please send the provided Licence Key and Hardware ID to your Regional / Licence support to obtain an Activation Key file.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Please send the provided Licence Key and Hardware ID to your Regional / Licence support (%1) to obtain an Activation Key file.</translation>
     </message>
     <message>
       <source>Text Files</source>
@@ -4200,7 +4200,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Activate License</translation>
+      <translation>Activate Licence</translation>
     </message>
     <message>
       <source>Unlock</source>
@@ -4227,7 +4227,7 @@ License Key: %2</translation>
     <name>QnStatusOverlayWidget</name>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation>NOT ENOUGH LICENSES</translation>
+      <translation>NOT ENOUGH LICENCES</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -4725,7 +4725,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Licenses</source>
-      <translation>Licenses</translation>
+      <translation>Licences</translation>
     </message>
     <message>
       <source>Email</source>
@@ -4780,7 +4780,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No licenses</source>
-      <translation>No licenses</translation>
+      <translation>No licences</translation>
     </message>
     <message>
       <source>Email server is not set</source>
@@ -4808,7 +4808,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You have no licenses.</source>
-      <translation>You have no licenses.</translation>
+      <translation>You have no licences.</translation>
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
@@ -5355,7 +5355,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
-      <translation>To enable this feature, please activate a Video Wall license.</translation>
+      <translation>To enable this feature, please activate a Video Wall licence.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -5375,7 +5375,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>More Video Wall licenses required</source>
-      <translation>More Video Wall licenses required</translation>
+      <translation>More Video Wall licences required</translation>
     </message>
     <message>
       <source>Control session cannot be started.</source>
@@ -5395,7 +5395,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>Activate License...</translation>
+      <translation>Activate Licence...</translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
@@ -7137,9 +7137,9 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
       <source>Use License</source>
-      <translation type="unfinished">
-        <numerusform>Use License</numerusform>
-        <numerusform>Use License</numerusform>
+      <translation>
+        <numerusform>Use Licence</numerusform>
+        <numerusform>Use Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7772,7 +7772,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
-      <translation>Total amount of licenses will decrease</translation>
+      <translation>Total amount of licences will decrease</translation>
     </message>
     <message>
       <source>Enter password...</source>
@@ -8028,7 +8028,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>To use the software you must agree with the end user licence agreement</translation>
     </message>
   </context>
   <context>
@@ -8858,7 +8858,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+      <translation>You do not have a valid licence installed. Please activate your commercial or trial licence.</translation>
     </message>
     <message>
       <source>Export</source>
@@ -8874,8 +8874,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licence?</numerusform>
+        <numerusform>Deactivate licences?</numerusform>
       </translation>
     </message>
     <message>
@@ -8884,7 +8884,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Export licenses to a file</source>
-      <translation>Export licenses to a file</translation>
+      <translation>Export licences to a file</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -9377,19 +9377,19 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+      <translation>You are about to merge Sites with Starter licences.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Only one Starter licence is allowed per Site, so the second licence will be deactivated.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+      <translation>You are about to merge Sites with NVR licences.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Only one NVR licence is allowed per Site, so the second licence will be deactivated.</translation>
     </message>
     <message>
       <source>Could not configure the remote Site %1.</source>
@@ -12975,7 +12975,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation>I accidentally assigned the license to a wrong machine</translation>
+      <translation>I accidentally assigned the licence to a wrong machine</translation>
     </message>
     <message>
       <source>Other Reason</source>
@@ -12983,13 +12983,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Please complete the following for licence deactivation</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n time.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Note that each licence key may be deactivated a maximum of %n time.</numerusform>
+        <numerusform>Note that each licence key may be deactivated a maximum of %n times.</numerusform>
       </translation>
     </message>
   </context>

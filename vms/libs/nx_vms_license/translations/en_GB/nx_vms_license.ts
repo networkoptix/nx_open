@@ -48,12 +48,12 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation>License is expired</translation>
+      <translation>Licence is expired</translation>
     </message>
     <message>
       <source>License is not validated by %1</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
+      <translation>Licence is not validated by %1</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -61,19 +61,19 @@
     </message>
     <message>
       <source>You already have one active Starter license.</source>
-      <translation type="unfinished">You already have one active Starter license.</translation>
+      <translation>You already have one active Starter licence.</translation>
     </message>
     <message>
       <source>You already have one active NVR license.</source>
-      <translation type="unfinished">You already have one active NVR license.</translation>
+      <translation>You already have one active NVR licence.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
-      <translation type="unfinished">You already have one active license of the same type.</translation>
+      <translation>You already have one active licence of the same type.</translation>
     </message>
     <message>
       <source>This license type requires higher software version</source>
-      <translation type="unfinished">This license type requires higher software version</translation>
+      <translation>This licence type requires higher software version</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -81,15 +81,15 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per Site.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+      <translation>Only one Starter licence is allowed per Site.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+      <translation>Only one NVR licence is allowed per Site.</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per Site.</source>
-      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
+      <translation>Only one licence of this type is allowed per Site.</translation>
     </message>
   </context>
 </TS>
