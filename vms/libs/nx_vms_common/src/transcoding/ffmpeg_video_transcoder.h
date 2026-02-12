@@ -97,6 +97,7 @@ private:
     nx::metric::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;
     std::optional<int64_t> m_lastEncodedPts;
+    nx::Uuid m_deviceId;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

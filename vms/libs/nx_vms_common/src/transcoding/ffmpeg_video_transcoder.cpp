@@ -308,6 +308,9 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     if (!decoder)
         return 0;
 
+    if (video)
+        m_deviceId = video->deviceId;
+
     if (result)
         *result = QnCompressedVideoDataPtr();
 
@@ -420,6 +423,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     resultVideoData->context = m_codecParamaters;
     resultVideoData->width = m_encoderCtx->width;
     resultVideoData->height = m_encoderCtx->height;
+    resultVideoData->deviceId = m_deviceId;
     *result = QnCompressedVideoDataPtr(resultVideoData);
 
     m_droppedFrames = 0;

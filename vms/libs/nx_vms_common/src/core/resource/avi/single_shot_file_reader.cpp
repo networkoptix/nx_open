@@ -57,6 +57,7 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
     outData->flags |= QnAbstractMediaData::MediaFlags_AVKey | QnAbstractMediaData::MediaFlags_StillImage;
     outData->timestamp = qnSyncTime->currentUSecsSinceEpoch();
     outData->dataProvider = this;
+    outData->deviceId = resource()->getId();
     outData->channelNumber = 0;
 
     delete file;

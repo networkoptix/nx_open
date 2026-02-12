@@ -113,6 +113,7 @@ void QnThumbnailsStreamReader::run()
 
         if(data) {
             data->dataProvider = this;
+            data->deviceId = resource()->getId();
             data->opaque = m_cseq;
         }
 

@@ -93,6 +93,7 @@ private:
 
     bool m_isOpened = false;
     int m_channelNumber = 0;
+    nx::Uuid m_deviceId;
 };
 
 using QnFfmpegAudioTranscoderPtr = std::unique_ptr<QnFfmpegAudioTranscoder>;
