@@ -5,6 +5,7 @@
 #include <QtCore/QCoreApplication> //< For Q_DECLARE_TR_FUNCTIONS.
 
 #include <nx/branding.h>
+#include <nx/build_info.h>
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/html/html.h>
@@ -167,7 +168,10 @@ public:
 
                 const QString message = tr("Log in to %1 to log in to this site with %2 user",
                     "%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)")
-                        .arg(html::localLink(nx::branding::cloudName(), "#cloud"), nx::branding::shortCloudName());
+                        .arg(nx::build_info::isMobilePlatform()
+                            ? nx::branding::cloudName()
+                            : html::localLink(nx::branding::cloudName(), "#cloud"))
+                        .arg(nx::branding::shortCloudName());
 
                 return {message, message};
             }
