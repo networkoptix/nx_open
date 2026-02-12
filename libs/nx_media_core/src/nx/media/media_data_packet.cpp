@@ -36,6 +36,7 @@ QnAbstractMediaData::~QnAbstractMediaData()
 void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
 {
     dataProvider = other->dataProvider;
+    deviceId = other->deviceId;
     timestamp = other->timestamp;
     dataType = other->dataType;
     compressionType = other->compressionType;
@@ -84,8 +85,8 @@ AVMediaType toAvMediaType(QnAbstractMediaData::DataType dataType)
 
 QString QnAbstractMediaData::idForToStringFromPtr() const
 {
-    return NX_FMT("%1, codec: %2, timestamp: %3ms, channel: %4, %5",
-        dataType, compressionType, timestamp / 1000, channelNumber, flags);
+    return NX_FMT("%1, codec: %2, timestamp: %3ms, channel: %4, %5, deviceId: %6",
+        dataType, compressionType, timestamp / 1000, channelNumber, flags, deviceId);
 }
 
 //------------------------------------- QnEmptyMediaData -----------------------------------------

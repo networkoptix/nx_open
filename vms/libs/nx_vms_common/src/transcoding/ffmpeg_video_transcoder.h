@@ -105,6 +105,7 @@ private:
         m_metadataObjectsCache;
     nx::analytics::CachingMetadataConsumer<QnConstAbstractCompressedMetadataPtr>
         m_metadataMotionCache;
+    nx::Uuid m_deviceId;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

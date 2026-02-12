@@ -10,6 +10,7 @@
 #include <nx/media/codec_parameters.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/byte_array.h>
+#include <nx/utils/uuid.h>
 
 // TODO: #dmishin move all classes to separate source files.
 // TODO: #dmishin place this code into proper namespace.
@@ -145,6 +146,7 @@ public:
 public:
     QnAbstractStreamDataProvider* dataProvider;
     DataType dataType;
+    nx::Uuid deviceId;
     AVCodecID compressionType;
     mutable MediaFlags flags;
     // Video or audio channel number. Some devices might have more than one sensor.

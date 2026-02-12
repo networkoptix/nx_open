@@ -196,6 +196,7 @@ void QnAbstractArchiveStreamReader::run()
         if(data)
         {
             data->dataProvider = this;
+            data->deviceId = resource()->getId();
             if (data->flags &
                 (QnAbstractMediaData::MediaFlags_AfterEOF | QnAbstractMediaData::MediaFlags_BOF))
             {

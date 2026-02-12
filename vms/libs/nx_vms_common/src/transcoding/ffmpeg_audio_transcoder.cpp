@@ -125,6 +125,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(
 bool QnFfmpegAudioTranscoder::sendPacket(const QnConstAbstractMediaDataPtr& media)
 {
     m_channelNumber = media->channelNumber;
+    m_deviceId = media->deviceId;
 
     // 1. push media to decoder
     auto avPacket = av_packet_alloc();
@@ -179,6 +180,7 @@ bool QnFfmpegAudioTranscoder::receivePacket(QnAbstractMediaDataPtr* const result
     if (resultAudio)
     {
         resultAudio->channelNumber = m_channelNumber;
+        resultAudio->deviceId = m_deviceId;
         *result = resultAudio;
     }
 
