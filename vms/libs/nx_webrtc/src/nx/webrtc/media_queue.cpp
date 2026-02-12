@@ -7,28 +7,16 @@
 
 namespace nx::vms::server {
 
-MediaQueue::MediaQueue(int maxSize, std::chrono::microseconds maxDuration):
-    m_maxSize(maxSize),
-    m_maxDuration(maxDuration)
+MediaQueue::MediaQueue(int maxSize):
+    m_maxSize(maxSize)
 {
-}
-
-std::chrono::microseconds MediaQueue::getDurationUnsafe()
-{
-    if (!m_mediaQueue.empty() && m_mediaQueue.back()->timestamp > m_mediaQueue.front()->timestamp)
-    {
-        return std::chrono::microseconds(
-            m_mediaQueue.back()->timestamp - m_mediaQueue.front()->timestamp);
-    }
-    return std::chrono::microseconds::zero();
 }
 
 // Normally should drop only first gop for the first appeared channel in media queue, and all audio
 // before. If there is no keyframes in queue clear queue().
 void MediaQueue::clearTillLastGopUnsafe()
 {
-    NX_DEBUG(this, "Clear media queue due to overflow, size: %1, duration: %2",
-        m_mediaQueue.size(), getDurationUnsafe());
+    NX_DEBUG(this, "Clear media queue due to overflow, size: %1", m_mediaQueue.size());
 
     for (auto media = m_mediaQueue.begin(); media != m_mediaQueue.end(); ++media)
     {
@@ -38,17 +26,20 @@ void MediaQueue::clearTillLastGopUnsafe()
 
         if (isKeyFrame)
         {
+            auto deviceId = (*media)->deviceId;
+            auto channelNumber = (*media)->channelNumber;
+            NX_DEBUG(this, "Clear GOP for device: %1, channel: %2", deviceId, channelNumber);
             media->get()->flags |= QnAbstractMediaData::MediaFlags_Discontinuity;
             bool removed = false;
             auto erasedVideoStart = std::remove_if(
                 m_mediaQueue.begin(),
                 media,
-                [&media, &removed](const auto& value)
+                [&channelNumber, deviceId, &removed](const auto& value)
                 {
                     if (const auto* video =
                         dynamic_cast<const QnCompressedVideoData*>(value.get()))
                     {
-                        if (video->channelNumber == (*media)->channelNumber)
+                        if (video->channelNumber == channelNumber && video->deviceId == deviceId)
                         {
                             removed = true;
                             return true;
@@ -58,13 +49,15 @@ void MediaQueue::clearTillLastGopUnsafe()
                 });
             if (removed)
             {
+                // Clean not video packets until the same key frame,
                 media = m_mediaQueue.erase(erasedVideoStart, media);
                 auto erasedAudioStart = std::remove_if(
                     m_mediaQueue.begin(),
                     media,
-                    [](const auto& value)
+                    [deviceId](const auto& value)
                     {
-                        return value->dataType != QnAbstractMediaData::VIDEO;
+                        return value->deviceId == deviceId
+                            && value->dataType != QnAbstractMediaData::VIDEO;
                     });
                 m_mediaQueue.erase(erasedAudioStart, media);
                 // `media` is invalidated at this moment.
@@ -78,10 +71,15 @@ void MediaQueue::clearTillLastGopUnsafe()
     m_keyDataFound.clear();
 }
 
+void MediaQueue::setMaxSize(int maxSize)
+{
+    m_maxSize = maxSize;
+}
+
 void MediaQueue::putData(const QnConstAbstractMediaDataPtr& media)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    if ((int)m_mediaQueue.size() > m_maxSize || getDurationUnsafe() > m_maxDuration)
+    if ((int)m_mediaQueue.size() >= m_maxSize)
         clearTillLastGopUnsafe();
 
     if (const auto& video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media))

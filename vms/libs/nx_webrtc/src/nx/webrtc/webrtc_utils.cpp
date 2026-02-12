@@ -150,10 +150,6 @@ SdpParseResult SdpParseResult::parse(const std::string& sdp)
      */
     static const std::string_view kIcePwdPrefix("a=ice-pwd:");
     static const std::string_view kIceUfragPrefix("a=ice-ufrag:");
-    static const std::string_view kAttributeInactive("a=inactive");
-    static const std::string_view kVideo("m=video");
-    static const std::string_view kAudio("m=audio");
-    static const std::string_view kApplication("m=application");
     static const std::string_view kGroup("a=group");
     static const std::string_view kMid("a=mid:");
     static const std::string_view kFingerprint("a=fingerprint:");
