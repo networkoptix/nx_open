@@ -123,8 +123,8 @@ void FilterChain::reset()
 }
 
 void FilterChain::setMetadata(
-    const std::list<QnConstAbstractCompressedMetadataPtr>& objectsData,
-    const std::list<QnConstAbstractCompressedMetadataPtr>& motionData)
+    const std::vector<common::metadata::ObjectMetadataPacketPtr>& objectsData,
+    const std::vector<QnConstMetaDataV1Ptr>& motionData)
 {
     for (auto filter: m_filters)
     {

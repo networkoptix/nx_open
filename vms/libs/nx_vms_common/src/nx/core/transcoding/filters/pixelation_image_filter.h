@@ -4,7 +4,6 @@
 
 #include <analytics/common/object_metadata.h>
 #include <nx/vms/api/data/pixelation_settings.h>
-
 #include <transcoding/filters/abstract_image_filter.h>
 
 namespace nx::core::transcoding {
@@ -22,11 +21,11 @@ public:
 
     virtual QSize updatedResolution(const QSize& sourceSize) { return sourceSize; };
 
-    void setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata);
+    void setMetadata(const std::vector<nx::common::metadata::ObjectMetadataPacketPtr>& metadata);
 
 private:
     nx::vms::api::PixelationSettings m_settings;
-    std::list<QnConstAbstractCompressedMetadataPtr> m_metadata;
+    std::vector<nx::common::metadata::ObjectMetadataPacketPtr> m_metadata;
 };
 
 } // nx::core::transcoding

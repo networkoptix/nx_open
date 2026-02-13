@@ -8,8 +8,10 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
 
+#include <analytics/common/object_metadata.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
-#include <nx/analytics/caching_metadata_consumer.h>
+#include <nx/analytics/export_caching_metadata_consumer.h>
+#include <nx/analytics/metadata_cache.h>
 #include <nx/core/transcoding/filters/filter_chain.h>
 #include <nx/media/ffmpeg/frame_info.h>
 #include <nx/media/video_data_packet.h>
@@ -101,10 +103,9 @@ private:
     nx::metric::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;
     std::optional<int64_t> m_lastEncodedPts;
-    nx::analytics::CachingMetadataConsumer<QnConstAbstractCompressedMetadataPtr>
+    nx::analytics::ExportCachingMetadataConsumer<nx::common::metadata::ObjectMetadataPacketPtr>
         m_metadataObjectsCache;
-    nx::analytics::CachingMetadataConsumer<QnConstAbstractCompressedMetadataPtr>
-        m_metadataMotionCache;
+    nx::analytics::ExportCachingMetadataConsumer<QnConstMetaDataV1Ptr> m_metadataMotionCache;
     nx::Uuid m_deviceId;
 };
 

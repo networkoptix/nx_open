@@ -27,10 +27,6 @@ namespace {
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
 const static qint64 OPTIMIZATION_MOVING_AVERAGE_RATE = 90;
 static const int kMaxDroppedFrames = 5;
-
-using namespace std::chrono;
-constexpr seconds kMetadataPersistence = 3s;
-
 }
 
 static const nx::log::Tag kLogTag(QString("Transcoding"));
@@ -73,8 +69,8 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     :
     m_config(config),
     m_metrics(metrics),
-    m_metadataObjectsCache(MetadataType::ObjectDetection, nx::analytics::kMetadataCashSize),
-    m_metadataMotionCache(MetadataType::Motion, nx::analytics::kMetadataCashSize)
+    m_metadataObjectsCache(MetadataType::ObjectDetection, nx::analytics::kMetadataCacheDuration),
+    m_metadataMotionCache(MetadataType::Motion, nx::analytics::kMetadataCacheDuration)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -357,14 +353,10 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         microseconds timestamp(decodedFrame->pkt_dts);
 
         m_filters->setMetadata(
-            m_metadataObjectsCache.metadataRange(
-                timestamp - kMetadataPersistence,
-                timestamp + 1ms,
-                decodedFrame->channel),
-            m_metadataMotionCache.metadataRange(
-                timestamp - kMetadataPersistence,
-                timestamp + 1ms,
-                decodedFrame->channel));
+            m_metadataObjectsCache.metadata(
+                duration_cast<milliseconds>(timestamp), decodedFrame->channel),
+            m_metadataMotionCache.metadata(
+                duration_cast<milliseconds>(timestamp), decodedFrame->channel));
 
         decodedFrame = m_filters->apply(decodedFrame);
     }

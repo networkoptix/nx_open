@@ -8,6 +8,9 @@
 
 namespace nx::analytics {
 
+constexpr std::chrono::milliseconds kMetadataCacheDuration(10000);
+constexpr size_t kMetadataCacheSize = 1000;
+
 class NX_VMS_COMMON_API AbstractMetadataConsumer
 {
 public:

@@ -167,7 +167,8 @@ ObjectInfoFilter::~ObjectInfoFilter()
 {
 }
 
-void ObjectInfoFilter::setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata)
+void ObjectInfoFilter::setMetadata(
+    const std::vector<nx::common::metadata::ObjectMetadataPacketPtr>& metadata)
 {
     m_metadata = metadata;
 }
@@ -289,6 +290,7 @@ void ObjectInfoFilter::updateImage(QImage& image)
         return;
 
     std::set<Uuid> oldFramesObjectsSet;
+    std::unordered_set<nx::Uuid> usedTrackIds;
     std::transform(
         m_descriptions.begin(),
         m_descriptions.end(),
@@ -303,14 +305,15 @@ void ObjectInfoFilter::updateImage(QImage& image)
     const int lineWidth = std::max(std::min(width, height) / kAreaLineDivider, kAreaLineMinWidth);
 
     QPainter painter(&image);
-    for (auto iter = m_metadata.rbegin(); iter != m_metadata.rend(); ++iter)
-    {
-        const auto objectDataPacket = objectDataPacketFromMetadata(*iter);
-        if (!objectDataPacket)
-            continue;
 
-        for (const auto& objectMetadata: objectDataPacket->objectMetadataList)
+    for (const auto& objectMetadataPacket: m_metadata)
+    {
+        for (const auto& objectMetadata: objectMetadataPacket->objectMetadataList)
         {
+            auto [_, newTrackId] = usedTrackIds.insert(objectMetadata.trackId);
+            if (!newTrackId)
+                continue;
+
             oldFramesObjectsSet.erase(objectMetadata.trackId);
 
             if (!objectRectIsValid(objectMetadata.boundingBox)
@@ -333,8 +336,6 @@ void ObjectInfoFilter::updateImage(QImage& image)
             if (m_settings.showAttributes)
                 drawDescription(box, frameColor, painter, objectMetadata, width, height);
         }
-
-        break;
     }
 
     for (const auto id: oldFramesObjectsSet)

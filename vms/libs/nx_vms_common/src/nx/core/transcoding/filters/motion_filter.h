@@ -20,7 +20,7 @@ public:
 
     QSize updatedResolution(const QSize& sourceSize) override;
 
-    void setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata) override;
+    void setMetadata(const std::vector<QnConstMetaDataV1Ptr>& metadata);
 
 private:
     void paintMotionGrid(
@@ -29,7 +29,7 @@ private:
         const QnConstMetaDataV1Ptr& motion);
 
     MotionExportSettings m_settings;
-    std::list<QnConstAbstractCompressedMetadataPtr> m_metadata;
+    std::vector<QnConstMetaDataV1Ptr> m_metadata;
 };
 
 } // namespace nx::core::transcoding

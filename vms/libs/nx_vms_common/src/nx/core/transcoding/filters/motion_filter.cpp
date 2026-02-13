@@ -39,7 +39,7 @@ MotionFilter::~MotionFilter()
 {
 }
 
-void MotionFilter::setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata)
+void MotionFilter::setMetadata(const std::vector<QnConstMetaDataV1Ptr>& metadata)
 {
     m_metadata = metadata;
 }

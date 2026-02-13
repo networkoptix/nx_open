@@ -23,7 +23,7 @@ public:
 
     QSize updatedResolution(const QSize& sourceSize) override;
 
-    void setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata) override;
+    void setMetadata(const std::vector<nx::common::metadata::ObjectMetadataPacketPtr>& metadata);
 
 private:
     QColor getFrameColor(const common::metadata::ObjectMetadata& objectMetadata) const;
@@ -39,7 +39,7 @@ private:
         int width,
         int height);
     ObjectExportSettings m_settings;
-    std::list<QnConstAbstractCompressedMetadataPtr> m_metadata;
+    std::vector<nx::common::metadata::ObjectMetadataPacketPtr> m_metadata;
     std::map<Uuid, std::shared_ptr<QTextDocument>> m_descriptions;
 };
 

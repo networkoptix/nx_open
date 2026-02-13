@@ -4,6 +4,7 @@
 
 #include <list>
 
+#include <analytics/common/object_metadata.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 #include <nx/core/transcoding/filters/transcoding_settings.h>
@@ -47,8 +48,8 @@ public:
     bool empty();
 
     void setMetadata(
-        const std::list<QnConstAbstractCompressedMetadataPtr>& objectsData,
-        const std::list<QnConstAbstractCompressedMetadataPtr>& motionData);
+        const std::vector<common::metadata::ObjectMetadataPacketPtr>& objectsData,
+        const std::vector<QnConstMetaDataV1Ptr>& motionData);
     QSize apply(const QSize& resolution) const;
     CLVideoDecoderOutputPtr apply(const CLVideoDecoderOutputPtr& source) const;
 

@@ -60,18 +60,6 @@ protected:
     }
     virtual void SetUp() override {}
 
-    std::list<QnConstAbstractCompressedMetadataPtr> generateMetadataList(
-        const nx::common::metadata::ObjectMetadataPacket& packet)
-    {
-        QnCompressedMetadata metadata(MetadataType::ObjectDetection);
-        metadata.setData(QnUbjson::serialized<nx::common::metadata::ObjectMetadataPacket>(packet));
-
-        std::list<QnConstAbstractCompressedMetadataPtr> objectMetadataList;
-        objectMetadataList.push_back(std::make_shared<const QnCompressedMetadata>(metadata));
-
-        return objectMetadataList;
-    }
-
     nx::core::transcoding::ObjectExportSettings makeSettings(
         bool isAll,
         QStringList&& typeIds = {})
@@ -130,8 +118,7 @@ TEST_F(ObjectInfoFilterTest, IncorrectMetadata)
     packet.objectMetadataList.push_back(emptyBoundingBoxMetadata);
     packet.objectMetadataList.push_back(nonNormalizedMetadata);
     packet.objectMetadataList.push_back(negativeBoundingBoxMetadata);
-    auto metadata = generateMetadataList(packet);
-    filter.setMetadata(metadata);
+    filter.setMetadata({std::make_shared<nx::common::metadata::ObjectMetadataPacket>(packet)});
 
     CLVideoDecoderOutputPtr frame(new CLVideoDecoderOutput(prepareImage()));
     auto resImage = filter.updateImage(frame)->toImage();
@@ -144,8 +131,7 @@ TEST_F(ObjectInfoFilterTest, TypeMismatch)
 
     nx::common::metadata::ObjectMetadataPacket packet;
     packet.objectMetadataList.push_back(correctAnimalMetadata);
-    auto metadata = generateMetadataList(packet);
-    filter.setMetadata(metadata);
+    filter.setMetadata({std::make_shared<nx::common::metadata::ObjectMetadataPacket>(packet)});
 
     auto image = prepareImage();
     auto referenceImage = prepareImage();
@@ -159,8 +145,7 @@ TEST_F(ObjectInfoFilterTest, TypeMatch)
 
     nx::common::metadata::ObjectMetadataPacket packet;
     packet.objectMetadataList.push_back(correctAnimalMetadata);
-    auto metadata = generateMetadataList(packet);
-    filter.setMetadata(metadata);
+    filter.setMetadata({std::make_shared<nx::common::metadata::ObjectMetadataPacket>(packet)});
 
     auto image = prepareImage();
     auto referenceImage = prepareImage();
@@ -175,8 +160,7 @@ TEST_F(ObjectInfoFilterTest, AllTypes)
 
     nx::common::metadata::ObjectMetadataPacket packet;
     packet.objectMetadataList.push_back(correctAnimalMetadata);
-    auto metadata = generateMetadataList(packet);
-    filter.setMetadata(metadata);
+    filter.setMetadata({std::make_shared<nx::common::metadata::ObjectMetadataPacket>(packet)});
 
     auto image = prepareImage();
     auto referenceImage = prepareImage();
@@ -192,8 +176,7 @@ TEST_F(ObjectInfoFilterTest, ColorSpecified)
 
     nx::common::metadata::ObjectMetadataPacket packet;
     packet.objectMetadataList.push_back(coloredCarMetadata);
-    auto metadata = generateMetadataList(packet);
-    filter.setMetadata(metadata);
+    filter.setMetadata({std::make_shared<nx::common::metadata::ObjectMetadataPacket>(packet)});
 
     auto image = prepareImage();
     auto referenceImage = prepareImage();

@@ -30,13 +30,6 @@ public:
      * @param image input image to be used as span for metadata adding.
      */
     virtual void updateImage(QImage& image) = 0;
-
-    /**
-     * Store relevant metadata inside filter and use it to draw found objects, motions, etc.
-     *
-     * @param metadata list of metadata that is applicable for the current frame.
-     */
-    virtual void setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata) = 0;
 };
 
 using AbstractMetadataFilterPtr = QSharedPointer<AbstractMetadataFilter>;

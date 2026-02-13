@@ -140,7 +140,8 @@ PixelationImageFilter::~PixelationImageFilter()
 {
 }
 
-void PixelationImageFilter::setMetadata(const std::list<QnConstAbstractCompressedMetadataPtr>& metadata)
+void PixelationImageFilter::setMetadata(
+    const std::vector<nx::common::metadata::ObjectMetadataPacketPtr>& metadata)
 {
     m_metadata = metadata;
 }
@@ -155,24 +156,25 @@ CLVideoDecoderOutputPtr PixelationImageFilter::updateImage(
     int h = frame->height;
     CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput());
     result->copyFrom(frame.get());
+    std::unordered_set<nx::Uuid> usedTrackIds;
     for (const auto& metadata: m_metadata)
     {
-        if (const auto objectDataPacket = objectDataPacketFromMetadata(metadata))
+        for (const auto& objectMetadata: metadata->objectMetadataList)
         {
-            for (const auto& objectMetadata: objectDataPacket->objectMetadataList)
+            auto [_, newTrackId] = usedTrackIds.insert(objectMetadata.trackId);
+            if (newTrackId && m_settings.contains(objectMetadata.typeId))
             {
-                if (m_settings.contains(objectMetadata.typeId))
-                {
-                    QRect box = { (int)(objectMetadata.boundingBox.x() * w),
-                        (int)(objectMetadata.boundingBox.y() * h),
-                        (int)(objectMetadata.boundingBox.width() * w),
-                        (int)(objectMetadata.boundingBox.height() * h) };
+                QRect box = {
+                    (int)(objectMetadata.boundingBox.x() * w),
+                    (int)(objectMetadata.boundingBox.y() * h),
+                    (int)(objectMetadata.boundingBox.width() * w),
+                    (int)(objectMetadata.boundingBox.height() * h) };
 
-                    pixelate(result, box, (int)(m_settings.intensity * kIntensityToInt));
-                }
+                pixelate(result, box, (int)(m_settings.intensity * kIntensityToInt));
             }
         }
     }
+
     return result;
 }
 

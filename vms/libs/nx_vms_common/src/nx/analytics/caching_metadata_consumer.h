@@ -11,8 +11,6 @@
 
 namespace nx::analytics {
 
-static constexpr int kMetadataCashSize = 1000;
-
 template<typename T>
 class NX_VMS_COMMON_API CachingMetadataConsumer: public AbstractMetadataConsumer
 {
