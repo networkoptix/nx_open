@@ -26,7 +26,7 @@ struct NX_WEBRTC_API Track
     nx::Uuid deviceId;
     TrackType trackType = TrackType::unknown;
 
-    std::optional<TrackState> state;
+    TrackState state;
 };
 
 const std::string& toSdpAttribute(Purpose purpose);
