@@ -762,7 +762,7 @@ QPixmap TileInteractionHandler::createDragPixmap(const QnResourceList& resources
 
         painter.drawText(rect.adjusted(kTextIndent, 0, 0, 0),
             kTextFlags,
-            tr("... and %n more", "", overflow));
+            tr("... and %n more", "Numerus: placeholder for more items", overflow));
     }
 
     return target;

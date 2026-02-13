@@ -603,7 +603,7 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
     {
         descriptions << (linePrefix + makeDescription(
             tr("%1 layout", "%1 will be substituted with a layout name"),
-            tr("%1 and %n more layouts", "%1 will be substituted with a layout name",
+            tr("%1 and %n more layouts", "Numerus: %1 will be substituted with a layout name",
                 layouts.size() - 1),
             layouts));
     }
@@ -612,7 +612,7 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
     {
         descriptions << (linePrefix + makeDescription(
             tr("%1 video wall", "%1 will be substituted with a video wall name"),
-            tr("%1 and %n more video walls", "%1 will be substituted with a video wall name",
+            tr("%1 and %n more video walls", "Numerus: %1 will be substituted with a video wall name",
                 videoWalls.size() - 1),
             videoWalls));
     }
@@ -621,7 +621,7 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
     {
         descriptions << (linePrefix + makeDescription(
             tr("%1 group", "%1 will be substituted with a user group name"),
-            tr("%1 and %n more groups", "%1 will be substituted with a user group name",
+            tr("%1 and %n more groups", "Numerus: %1 will be substituted with a user group name",
                 groups.size() - 1),
             groups));
     }

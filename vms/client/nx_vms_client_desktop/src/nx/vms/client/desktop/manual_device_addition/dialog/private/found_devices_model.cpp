@@ -329,7 +329,9 @@ QVariant FoundDevicesModel::headerData(
             return tr("Address");
         case Columns::presentedStateColumn:
             return QString("%1, %2").arg(tr("%n devices total", "", rowCount()))
-                .arg(tr("%n new", "", rowCount() - deviceCount(alreadyAddedState)));
+                .arg(
+                    tr("%n new", "Numerus: %n is the count of new devices",
+                    rowCount() - deviceCount(alreadyAddedState)));
         default:
             return QVariant();
     }

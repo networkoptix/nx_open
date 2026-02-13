@@ -544,7 +544,7 @@ QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) 
     {
         case Qt::DisplayRole:
             if (column == ResolutionColumn && cameraResolution > 0)
-                return tr("%n MP", "", cameraResolution);
+                return tr("%n MP", "Numerus: MP for Megapixels", cameraResolution);
             break;
 
         case Qt::ToolTipRole:

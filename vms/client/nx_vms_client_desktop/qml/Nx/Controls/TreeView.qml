@@ -916,7 +916,8 @@ FocusScope
                 {
                     id: remainderText
 
-                    text: qsTr("... and %n more", "", indexListModel.remainder)
+                    text: qsTr("... and %n more", "Numerus: placeholder for more items",
+                        indexListModel.remainder)
                     color: ColorTheme.colors.light10
                     leftPadding: 16
                     topPadding: 4

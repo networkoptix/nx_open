@@ -64,7 +64,8 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetDevi
         if (resources.empty())
             return sourceCameraString();
 
-        return tr("Source and %n more Cameras", "", static_cast<int>(resources.size()));
+        return tr("Source and %n more Cameras", "Numerus: placeholder for more items",
+            static_cast<int>(resources.size()));
     }
 
     return getName(context, resources);
@@ -225,7 +226,9 @@ QString Strings::getName(
     if (users.empty() && groups.empty() && additionalCount == 0)
         return selectString();
 
-    QString additionalName = tr("%n additional", "", additionalCount);
+    QString additionalName = tr("%n additional",
+        "Numerus: placeholder for explicitly added items",
+        additionalCount);
     if (users.empty() && groups.empty())
         return additionalName;
 
