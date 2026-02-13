@@ -154,8 +154,7 @@ nx::Uuid Validator::serverId(const QnLicensePtr& license) const
             continue;
 
         bool hwKeyOK = info.data.hardwareIds.contains(license->hardwareId());
-        bool brandOK = license->brand().isEmpty() || (license->brand() == info.data.brand);
-        if (hwKeyOK && brandOK)
+        if (hwKeyOK)
             return info.uuid;
     }
     return nx::Uuid();
