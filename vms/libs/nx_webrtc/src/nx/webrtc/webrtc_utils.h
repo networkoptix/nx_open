@@ -56,7 +56,7 @@ struct Fingerprint
 
 enum TrackState
 {
-    absent,
+    offer, //< Offer sent but state is not confirmed yet
     inactive,
     active,
 };

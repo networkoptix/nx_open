@@ -293,8 +293,8 @@ bool Session::initializeMuxersInternal()
         const auto videoTrack = m_tracks->videoTrack(provider->resource()->getId());
         const auto audioTrack = m_tracks->audioTrack(provider->resource()->getId());
 
-        const bool useFallbackVideo = videoTrack && videoTrack->state && videoTrack->state == TrackState::inactive;
-        const bool useFallbackAudio = audioTrack && audioTrack->state && audioTrack->state == TrackState::inactive;
+        const bool useFallbackVideo = videoTrack && videoTrack->state == TrackState::inactive;
+        const bool useFallbackAudio = audioTrack && audioTrack->state == TrackState::inactive;
 
         auto videoCodecParamaters = provider->getVideoCodecParameters();
         if (videoCodecParamaters)
@@ -516,14 +516,14 @@ AnswerResult Session::processSdpAnswer(const std::string& sdp)
         return AnswerResult::failed;
     }
 
-    bool needToUpdate = false;
+    bool hasInactiveTracks = false;
     for (auto& [_, track]: m_tracks->tracks())
     {
         const auto state = m_sdpParseResult.tracksState[track->mid];
-        if (state != TrackState::active)
+        if (state == TrackState::inactive)
         {
-            needToUpdate = true;
-            if (track->state.has_value())
+            hasInactiveTracks = true;
+            if (track->state != TrackState::offer)
                 return AnswerResult::failed; //< Still failed after traying fallback codec
             if (auto it = m_providers.find(nx::Uuid(track->deviceId)); it != m_providers.end())
                 it->second->setInitialized(false); //< Allow to reinit provider.
@@ -531,21 +531,24 @@ AnswerResult Session::processSdpAnswer(const std::string& sdp)
         track->state = state;
     }
 
-    if (!needToUpdate)
-        return AnswerResult::success;
-
     // Reinitialize some tracks again with fallback codec.
-    bool status = initializeMuxersInternal();
-    return status ? AnswerResult::again : AnswerResult::failed;
+    if (!initializeMuxersInternal())
+        return AnswerResult::failed;
+
+    return hasInactiveTracks ? AnswerResult::again : AnswerResult::success;
 }
 
 AnswerResult Session::setFallbackCodecs()
 {
     for (auto& [_, track]: m_tracks->tracks())
     {
-        if (track->state && track->state == TrackState::inactive)
+        if (track->state == TrackState::inactive)
             return AnswerResult::failed; //< Still failed after traying fallback codec
+        if (track->state == TrackState::active)
+            continue;
         track->state = TrackState::inactive;
+        if (auto it = m_providers.find(nx::Uuid(track->deviceId)); it != m_providers.end())
+            it->second->setInitialized(false); //< Allow to reinit provider.
     }
 
     bool status = initializeMuxersInternal();

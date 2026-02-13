@@ -150,12 +150,15 @@ SdpParseResult SdpParseResult::parse(const std::string& sdp)
      */
     static const std::string_view kIcePwdPrefix("a=ice-pwd:");
     static const std::string_view kIceUfragPrefix("a=ice-ufrag:");
+    static const std::string_view kAttributeInactive("a=inactive");
     static const std::string_view kGroup("a=group");
     static const std::string_view kMid("a=mid:");
     static const std::string_view kFingerprint("a=fingerprint:");
 
     SdpParseResult result;
     std::set<std::string> supportedMids;
+    int lastMid = -1;
+    bool inactiveTrack = false;
 
     getTokens(
         sdp,
@@ -182,13 +185,26 @@ SdpParseResult SdpParseResult::parse(const std::string& sdp)
                             supportedMids.emplace(mid);
                     });
             }
+            else if (sv.find("m=") == 0)
+            {
+                // new track started
+                lastMid = -1;
+                inactiveTrack = false;
+            }
+            else if (sv.find(kAttributeInactive) == 0)
+            {
+                if (lastMid != -1)
+                    result.tracksState[lastMid] = TrackState::inactive;
+                inactiveTrack = true;
+            }
             else if (sv.find(kMid) == 0)
             {
                 std::string midStr = std::string(sv, kMid.size(), std::string::npos);
                 try {
                     int mid = std::stoi(midStr);
-                    result.tracksState[mid] = supportedMids.count(midStr)
+                    result.tracksState[mid] = supportedMids.count(midStr) && !inactiveTrack
                         ? TrackState::active : TrackState::inactive;
+                    lastMid = mid;
                 }
                 catch (...)
                 {
