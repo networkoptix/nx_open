@@ -1437,9 +1437,9 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>Deaktivoi %n Muu</numerusform>
+        <numerusform>Deaktivoi %n Muu</numerusform>
       </translation>
     </message>
     <message>
@@ -1722,16 +1722,16 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>Salasanassa ei saa olla %n tai useampia peräkkäisiä merkkejä</numerusform>
+        <numerusform>Salasanassa ei saa olla %n tai useampia peräkkäisiä merkkejä</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>Salasanassa ei saa olla %n tai useampia toistuvia merkkejä</numerusform>
+        <numerusform>Salasanassa ei saa olla %n tai useampia toistuvia merkkejä</numerusform>
       </translation>
     </message>
     <message>
@@ -4361,7 +4361,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -4369,7 +4369,7 @@ License Key: %2</translation>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -5902,9 +5902,9 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
+      <translation>
+        <numerusform>%n lisää</numerusform>
+        <numerusform>%n lisää</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8499,9 +8499,9 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n uusi</numerusform>
+        <numerusform>%n uusi</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11231,9 +11231,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... ja %n lisää</numerusform>
+        <numerusform>... ja %n lisää</numerusform>
       </translation>
     </message>
     <message>

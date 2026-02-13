@@ -2389,11 +2389,11 @@ Press Alt + Click to follow object</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>... ועוד %n</numerusform>
+        <numerusform>... ועוד %n</numerusform>
+        <numerusform>... ועוד %n</numerusform>
+        <numerusform>... ועוד %n</numerusform>
       </translation>
     </message>
   </context>
@@ -2849,11 +2849,11 @@ Press Alt + Click to follow object</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... ו %n נוספים</numerusform>
+        <numerusform>... ו %n נוספים</numerusform>
+        <numerusform>... ו %n נוספים</numerusform>
+        <numerusform>... ו %n נוספים</numerusform>
       </translation>
     </message>
   </context>

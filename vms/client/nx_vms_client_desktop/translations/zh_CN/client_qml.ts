@@ -2353,8 +2353,8 @@ Press Alt + Click to follow object</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>还有 %n项...</numerusform>
       </translation>
     </message>
   </context>
@@ -2807,8 +2807,8 @@ Press Alt + Click to follow object</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... 和 %n 更多</numerusform>
       </translation>
     </message>
   </context>
