@@ -12,23 +12,26 @@
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
-      <translation>
-        <numerusform>%n %2 vil blive brugt ud af %1.</numerusform>
-        <numerusform>%n %2 vil blive brugt ud af %1.</numerusform>
+      <comment>Numerus: %2 is substituted with the required license type</comment>
+      <translation type="unfinished">
+        <numerusform>%n %2 will be used out of %1.</numerusform>
+        <numerusform>%n %2 will be used out of %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation>
-        <numerusform>Aktiver %n mere %1.</numerusform>
-        <numerusform>Aktiver %n mere %1.</numerusform>
+      <comment>Numerus: %1 is substituted with the required license type</comment>
+      <translation type="unfinished">
+        <numerusform>Activate %n more %1.</numerusform>
+        <numerusform>Activate %n more %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
-      <translation>
-        <numerusform>%n mere %1 vil blive brugt.</numerusform>
-        <numerusform>%n mere %1 vil blive brugt.</numerusform>
+      <comment>Numerus: %1 is substituted with the required license type</comment>
+      <translation type="unfinished">
+        <numerusform>%n more %1 will be used.</numerusform>
+        <numerusform>%n more %1 will be used.</numerusform>
       </translation>
     </message>
   </context>

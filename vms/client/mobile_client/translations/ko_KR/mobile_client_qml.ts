@@ -388,17 +388,17 @@
     <message numerus="yes">
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n 분</numerusform>
       </translation>
     </message>
     <message>
       <source>Download next</source>
-      <translation type="unfinished">Download next</translation>
+      <translation>다음 다운로드</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>닫기</translation>
     </message>
   </context>
   <context>
@@ -459,7 +459,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>상세</translation>
     </message>
   </context>
   <context>

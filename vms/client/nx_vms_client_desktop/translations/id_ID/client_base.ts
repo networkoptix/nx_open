@@ -1426,12 +1426,6 @@ Kunci Lisensi: %2</translation>
         <numerusform>%1 dari %n lisensi tidak dapat dinonaktifkan</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Nonaktifkan %n Lainnya</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Please try again later.</source>
       <translation>Silakan coba lagi nanti.</translation>
@@ -1463,6 +1457,13 @@ Kunci Lisensi: %2</translation>
       <comment>Numerus form depends on the amount of licenses</comment>
       <translation>
         <numerusform>Tidak dapat menonaktifkan lisensi</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <comment>Numerus: %n is the count of licenses which can be deactivated</comment>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
   </context>
@@ -1703,18 +1704,6 @@ Kunci Lisensi: %2</translation>
         <numerusform>Kata sandi tidak boleh lebih panjang dari %n karakter</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more consecutive characters together</source>
-      <translation>
-        <numerusform>Kata sandi tidak boleh mengandung %n atau lebih karakter yang berurutan secara bersamaan</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more repeating characters</source>
-      <translation>
-        <numerusform>Kata sandi tidak boleh berisi %n atau lebih karakter berulang</numerusform>
-      </translation>
-    </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
       <translation>This password is in list of the most popular passwords</translation>
@@ -1726,6 +1715,20 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed</source>
       <translation>Only latin letters, numbers and keyboard symbols are allowed</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together</source>
+      <comment>Numerus: %n is a hardcoded 4</comment>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters</source>
+      <comment>Numerus: %n is a hardcoded 4</comment>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4316,18 +4319,6 @@ Kunci Lisensi: %2</translation>
       <source>Export selected events to file</source>
       <translation>Ekspor event yang dipilih ke file</translation>
     </message>
-    <message numerus="yes">
-      <source>%n TB</source>
-      <comment>TB - terabytes</comment>
-      <translation>
-        <numerusform>%n TB</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>TB</source>
-      <comment>TB - terabytes</comment>
-      <translation>TB</translation>
-    </message>
     <message>
       <source>Last 5 minutes</source>
       <translation>5 menit terakhir</translation>
@@ -4347,6 +4338,18 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
       <translation>Prakiraan hanya tersedia untuk kamera dengan perekaman yang diaktifkan.</translation>
+    </message>
+    <message>
+      <source>TB</source>
+      <comment>TB for terabytes</comment>
+      <translation type="unfinished">TB</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n TB</source>
+      <comment>Numerus: TB for terabytes</comment>
+      <translation type="unfinished">
+        <numerusform>%n TB</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4978,12 +4981,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>Some cameras are set to record in a mode they do not support.</source>
       <translation>Beberapa kamera diatur untuk merekam dalam mode yang tidak didukung.</translation>
     </message>
-    <message numerus="yes">
-      <source>+ %n more</source>
-      <translation>
-        <numerusform>+ %n selengkapnya</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Site will stop functioning soon</source>
       <translation>Site akan segera berhenti berfungsi</translation>
@@ -5037,6 +5034,13 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Cloud Storage is enabled</source>
       <translation>Penyimpanan Cloud diaktifkan</translation>
+    </message>
+    <message numerus="yes">
+      <source>+ %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>+ %n more</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5753,12 +5757,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
   <context>
     <name>Strings</name>
     <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Sumber dan %n Kamera lainnya</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n Layouts</source>
       <translation>
         <numerusform>%n Layout</numerusform>
@@ -5818,12 +5816,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>%n Servers</source>
       <translation>
         <numerusform>%n Server</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n additional</source>
-      <translation>
-        <numerusform>%n tambahan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5917,6 +5909,20 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <comment>The subject is user or group</comment>
       <translation>
         <numerusform>%n subjek dihapus</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <comment>Numerus: placeholder for explicitly added items</comment>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
   </context>
@@ -6570,12 +6576,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       </translation>
     </message>
     <message numerus="yes">
-      <source>%n MP</source>
-      <translation>
-        <numerusform>%n MP</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n Megapixels</source>
       <translation>
         <numerusform>%n Megapiksel</numerusform>
@@ -6610,6 +6610,13 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Site is currently suspended</source>
       <translation>Site saat ini ditangguhkan</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n MP</source>
+      <comment>Numerus: MP for Megapixels</comment>
+      <translation type="unfinished">
+        <numerusform>%n MP</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8379,15 +8386,16 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>Alamat</translation>
     </message>
     <message numerus="yes">
-      <source>%n new</source>
-      <translation>
-        <numerusform>%n baru</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n devices total</source>
       <translation>
         <numerusform>%n total perangkat</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new</source>
+      <comment>Numerus: %n is the count of new devices</comment>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
       </translation>
     </message>
   </context>
@@ -8406,13 +8414,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <comment>%1 will be substituted with a user group name</comment>
       <translation>%1 grup</translation>
     </message>
-    <message numerus="yes">
-      <source>%1 and %n more groups</source>
-      <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 dan %n grup lainnya</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
@@ -8421,6 +8422,13 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>View video without redaction</source>
       <translation>Lihat video tanpa penyuntingan</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>Numerus: %1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8994,13 +9002,6 @@ Performa Site menurun.</translation>
       <source>Download success</source>
       <translation>Download sukses</translation>
     </message>
-    <message numerus="yes">
-      <source>%n selected:</source>
-      <comment>number of selected rows</comment>
-      <translation>
-        <numerusform>%n dipilih:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Retry (%1)</source>
       <translation>Coba lagi (%1)</translation>
@@ -9008,6 +9009,13 @@ Performa Site menurun.</translation>
     <message>
       <source>Retry</source>
       <translation>Coba lagi</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n selected:</source>
+      <comment>Numerus: %n is a number of selected rows</comment>
+      <translation type="unfinished">
+        <numerusform>%n selected:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -10194,24 +10202,10 @@ Anda dapat memaksakan deteksi gerakan, tetapi hal itu dapat menyebabkan peningka
       <comment>%1 will be substituted with a layout name</comment>
       <translation>%1 layout</translation>
     </message>
-    <message numerus="yes">
-      <source>%1 and %n more layouts</source>
-      <comment>%1 will be substituted with a layout name</comment>
-      <translation>
-        <numerusform>%1 dan %n layout lainnya</numerusform>
-      </translation>
-    </message>
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
       <translation>%1 video wall</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 and %n more video walls</source>
-      <comment>%1 will be substituted with a video wall name</comment>
-      <translation>
-        <numerusform>%1 dan %n video wall lainnya</numerusform>
-      </translation>
     </message>
     <message>
       <source>%1 group</source>
@@ -10219,10 +10213,24 @@ Anda dapat memaksakan deteksi gerakan, tetapi hal itu dapat menyebabkan peningka
       <translation>%1 grup</translation>
     </message>
     <message numerus="yes">
+      <source>%1 and %n more layouts</source>
+      <comment>Numerus: %1 will be substituted with a layout name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more layouts</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more video walls</source>
+      <comment>Numerus: %1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more video walls</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
       <source>%1 and %n more groups</source>
-      <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 dan %n grup lainnya</numerusform>
+      <comment>Numerus: %1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
   </context>
@@ -11076,12 +11084,6 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
   </context>
   <context>
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
-    <message numerus="yes">
-      <source>... and %n more</source>
-      <translation>
-        <numerusform>... and %n more</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No available archive</source>
       <translation>Tidak ada archive yang tersedia</translation>
@@ -11139,6 +11141,13 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
       <comment>Numerus form depends on the number of cameras</comment>
       <translation>
         <numerusform>Klik dua kali untuk menambahkan kamera ke layout saat ini atau ctrl+klik untuk membuka di tab baru</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -12541,12 +12550,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       <source>Source camera</source>
       <translation>Kamera source</translation>
     </message>
-    <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Sumber dan %n Kamera lainnya</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No target</source>
       <translation>Tidak ada target</translation>
@@ -12588,6 +12591,13 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>Site</source>
       <translation>Site</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
     </message>
   </context>
   <context>

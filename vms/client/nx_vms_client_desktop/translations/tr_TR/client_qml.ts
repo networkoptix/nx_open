@@ -1721,9 +1721,9 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>%n more</source>
-      <comment>%n is the number of remaining groups</comment>
+      <comment>Numerus: %n is the number of remaining groups</comment>
       <translation type="unfinished">
-        <numerusform>%n daha fazla</numerusform>
+        <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
       </translation>
     </message>
@@ -2366,9 +2366,10 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>..ve %n fazlası</numerusform>
-        <numerusform>..ve %n fazlası</numerusform>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2822,9 +2823,10 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... ve %n den fazlası</numerusform>
-        <numerusform>... ve %n den fazlası</numerusform>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>

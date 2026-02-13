@@ -391,20 +391,20 @@
     <message numerus="yes">
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n minut</numerusform>
+        <numerusform>%n minut</numerusform>
+        <numerusform>%n minut</numerusform>
+        <numerusform>%n minut</numerusform>
       </translation>
     </message>
     <message>
       <source>Download next</source>
-      <translation type="unfinished">Download next</translation>
+      <translation>Pobierz następny</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Zamknij</translation>
     </message>
   </context>
   <context>
@@ -465,7 +465,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Szczegóły</translation>
     </message>
   </context>
   <context>
@@ -1514,11 +1514,11 @@
     </message>
     <message>
       <source>PTZ Mode</source>
-      <translation type="unfinished">PTZ Mode</translation>
+      <translation>Tryb PTZ</translation>
     </message>
     <message>
       <source>Export...</source>
-      <translation type="unfinished">Export...</translation>
+      <translation>Eksport...</translation>
     </message>
   </context>
   <context>

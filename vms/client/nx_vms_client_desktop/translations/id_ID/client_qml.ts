@@ -1713,9 +1713,9 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
     <message numerus="yes">
       <source>%n more</source>
-      <comment>%n is the number of remaining groups</comment>
-      <translation>
-        <numerusform>%n selengkapnya</numerusform>
+      <comment>Numerus: %n is the number of remaining groups</comment>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2357,7 +2357,8 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
         <numerusform>...and %n more</numerusform>
       </translation>
     </message>
@@ -2811,7 +2812,8 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
         <numerusform>... and %n more</numerusform>
       </translation>
     </message>

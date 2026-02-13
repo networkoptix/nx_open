@@ -12,6 +12,7 @@
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
+      <comment>Numerus: %2 is substituted with the required license type</comment>
       <translation>
         <numerusform>%1 Arasından %2 %n Kullanılacak.</numerusform>
         <numerusform>%1 Arasından %2 %n Kullanılacak.</numerusform>
@@ -19,6 +20,7 @@
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
+      <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation>
         <numerusform>%n lisans etkinleşti %1 daha gerekli.</numerusform>
         <numerusform>%n lisans etkinleşti %1 daha gerekli.</numerusform>
@@ -26,6 +28,7 @@
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
+      <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation>
         <numerusform>%n lisansın %1 tanesi kullanılacak.</numerusform>
         <numerusform>%n lisansın %1 tanesi kullanılacak.</numerusform>

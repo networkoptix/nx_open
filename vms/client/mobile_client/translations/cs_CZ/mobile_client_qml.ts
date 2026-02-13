@@ -404,7 +404,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Zavřít</translation>
     </message>
   </context>
   <context>
@@ -465,7 +465,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaily</translation>
     </message>
   </context>
   <context>

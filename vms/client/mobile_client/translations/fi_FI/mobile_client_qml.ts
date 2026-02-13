@@ -400,7 +400,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Sulje</translation>
     </message>
   </context>
   <context>
@@ -461,7 +461,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Tarkemmat tiedot</translation>
     </message>
   </context>
   <context>

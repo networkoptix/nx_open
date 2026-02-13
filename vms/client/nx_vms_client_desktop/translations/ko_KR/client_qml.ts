@@ -1713,9 +1713,9 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message numerus="yes">
       <source>%n more</source>
-      <comment>%n is the number of remaining groups</comment>
-      <translation>
-        <numerusform>%n 더 보기</numerusform>
+      <comment>Numerus: %n is the number of remaining groups</comment>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2352,8 +2352,9 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>... 이외 %n 건 더 있음</numerusform>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2806,8 +2807,9 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... 그리고 %n 더</numerusform>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>

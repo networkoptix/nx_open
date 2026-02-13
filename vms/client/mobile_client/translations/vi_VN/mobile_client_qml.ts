@@ -388,17 +388,17 @@
     <message numerus="yes">
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n phút</numerusform>
       </translation>
     </message>
     <message>
       <source>Download next</source>
-      <translation type="unfinished">Download next</translation>
+      <translation>Tải xuống tiếp</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>gần</translation>
     </message>
   </context>
   <context>
@@ -459,7 +459,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Chi tiết</translation>
     </message>
   </context>
   <context>

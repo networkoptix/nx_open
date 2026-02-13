@@ -1737,9 +1737,9 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message numerus="yes">
       <source>%n more</source>
-      <comment>%n is the number of remaining groups</comment>
+      <comment>Numerus: %n is the number of remaining groups</comment>
       <translation type="unfinished">
-        <numerusform>%n więcej</numerusform>
+        <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
@@ -2393,11 +2393,12 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2853,11 +2854,12 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>

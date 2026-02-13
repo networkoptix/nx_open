@@ -389,9 +389,9 @@
     <message numerus="yes">
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n Minute</numerusform>
+        <numerusform>%n Minuten</numerusform>
       </translation>
     </message>
     <message>
@@ -400,7 +400,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Schließen</translation>
     </message>
   </context>
   <context>
@@ -461,7 +461,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Details</translation>
     </message>
   </context>
   <context>

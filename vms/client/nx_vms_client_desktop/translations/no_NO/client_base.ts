@@ -1435,13 +1435,6 @@ Lisensnøkkel: %2</translation>
         <numerusform>%1 av %n lisenser kan ikke deaktiveres</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Deaktiver %n Annet</numerusform>
-        <numerusform>Deaktiver %n Annet</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Please try again later.</source>
       <translation>Vennligst prøv igjen senere.</translation>
@@ -1475,6 +1468,14 @@ Lisensnøkkel: %2</translation>
       <translation>
         <numerusform>Kan ikke deaktivere lisenser</numerusform>
         <numerusform>Kan ikke deaktivere lisenser</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <comment>Numerus: %n is the count of licenses which can be deactivated</comment>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
   </context>
@@ -1720,20 +1721,6 @@ Lisensnøkkel: %2</translation>
         <numerusform>Passordet må ikke være lengre enn %n tegn</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more consecutive characters together</source>
-      <translation>
-        <numerusform>Passordet skal ikke inneholde %n eller flere påfølgende tegn sammen</numerusform>
-        <numerusform>Passordet skal ikke inneholde %n eller flere påfølgende tegn sammen</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more repeating characters</source>
-      <translation>
-        <numerusform>Passordet skal ikke inneholde %n eller flere repeterende tegn</numerusform>
-        <numerusform>Passordet skal ikke inneholde %n eller flere repeterende tegn</numerusform>
-      </translation>
-    </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
       <translation>Dette passordet er på listen over de mest populære passordene</translation>
@@ -1745,6 +1732,22 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed</source>
       <translation>Bare latinske bokstaver, tall og tastatur symboler er tillatt</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together</source>
+      <comment>Numerus: %n is a hardcoded 4</comment>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters</source>
+      <comment>Numerus: %n is a hardcoded 4</comment>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4358,19 +4361,6 @@ Lisensnøkkel: %2</translation>
       <source>Export selected events to file</source>
       <translation>Eksporter valgte hendelser til fil</translation>
     </message>
-    <message numerus="yes">
-      <source>%n TB</source>
-      <comment>TB - terabytes</comment>
-      <translation>
-        <numerusform>%n TB</numerusform>
-        <numerusform>%n TB</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>TB</source>
-      <comment>TB - terabytes</comment>
-      <translation>TB</translation>
-    </message>
     <message>
       <source>Last 5 minutes</source>
       <translation>Siste 5 minutter</translation>
@@ -4390,6 +4380,19 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
       <translation>Prognose bare tilgjengelig for kameraer med aktivert opptak.</translation>
+    </message>
+    <message>
+      <source>TB</source>
+      <comment>TB for terabytes</comment>
+      <translation type="unfinished">TB</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n TB</source>
+      <comment>Numerus: TB for terabytes</comment>
+      <translation type="unfinished">
+        <numerusform>%n TB</numerusform>
+        <numerusform>%n TB</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5027,13 +5030,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>Some cameras are set to record in a mode they do not support.</source>
       <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
     </message>
-    <message numerus="yes">
-      <source>+ %n more</source>
-      <translation>
-        <numerusform>+ %n mer</numerusform>
-        <numerusform>+ %n mer</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Site will stop functioning soon</source>
       <translation type="unfinished">Site will stop functioning soon</translation>
@@ -5088,6 +5084,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Cloud Storage is enabled</source>
       <translation>Skylagring aktivert</translation>
+    </message>
+    <message numerus="yes">
+      <source>+ %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>+ %n more</numerusform>
+        <numerusform>+ %n more</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5829,13 +5833,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
   <context>
     <name>Strings</name>
     <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Kilde og %n flere kameraer</numerusform>
-        <numerusform>Kilde og %n kameraer til</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n Layouts</source>
       <translation>
         <numerusform>%n Visninger</numerusform>
@@ -5898,13 +5895,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>
         <numerusform>%n server</numerusform>
         <numerusform>%n servere</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n additional</source>
-      <translation>
-        <numerusform>%n tillegg</numerusform>
-        <numerusform>%n tillegg</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6010,6 +6000,22 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>
         <numerusform>%n fjernede emner</numerusform>
         <numerusform>%n fjernede emner</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <comment>Numerus: placeholder for explicitly added items</comment>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
   </context>
@@ -6675,13 +6681,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       </translation>
     </message>
     <message numerus="yes">
-      <source>%n MP</source>
-      <translation>
-        <numerusform>%n MP</numerusform>
-        <numerusform>%n MP</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n Megapixels</source>
       <translation>
         <numerusform>%n Megapixler</numerusform>
@@ -6718,6 +6717,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Site is currently suspended</source>
       <translation type="unfinished">Site is currently suspended</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n MP</source>
+      <comment>Numerus: MP for Megapixels</comment>
+      <translation type="unfinished">
+        <numerusform>%n MP</numerusform>
+        <numerusform>%n MP</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8510,17 +8517,18 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Adresse</translation>
     </message>
     <message numerus="yes">
-      <source>%n new</source>
-      <translation>
-        <numerusform>%n nye</numerusform>
-        <numerusform>%n nye</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n devices total</source>
       <translation>
         <numerusform>%n enhet totalt</numerusform>
         <numerusform>%n enheter totalt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new</source>
+      <comment>Numerus: %n is the count of new devices</comment>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
+        <numerusform>%n new</numerusform>
       </translation>
     </message>
   </context>
@@ -8539,14 +8547,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <comment>%1 will be substituted with a user group name</comment>
       <translation>%1 gruppe</translation>
     </message>
-    <message numerus="yes">
-      <source>%1 and %n more groups</source>
-      <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 og %n grupper til</numerusform>
-        <numerusform>%1 og %n grupper til</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
@@ -8555,6 +8555,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>View video without redaction</source>
       <translation type="unfinished">View video without redaction</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>Numerus: %1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -9135,14 +9143,6 @@ Site performance is degraded.</translation>
       <source>Download success</source>
       <translation type="unfinished">Download success</translation>
     </message>
-    <message numerus="yes">
-      <source>%n selected:</source>
-      <comment>number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
-        <numerusform>%n selected:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Retry (%1)</source>
       <translation type="unfinished">Retry (%1)</translation>
@@ -9150,6 +9150,14 @@ Site performance is degraded.</translation>
     <message>
       <source>Retry</source>
       <translation>Prøv på nytt</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n selected:</source>
+      <comment>Numerus: %n is a number of selected rows</comment>
+      <translation type="unfinished">
+        <numerusform>%n selected:</numerusform>
+        <numerusform>%n selected:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -10343,26 +10351,10 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <comment>%1 will be substituted with a layout name</comment>
       <translation>%1 planløsning</translation>
     </message>
-    <message numerus="yes">
-      <source>%1 and %n more layouts</source>
-      <comment>%1 will be substituted with a layout name</comment>
-      <translation>
-        <numerusform>%1 og %n oppsett til</numerusform>
-        <numerusform>%1 og %n oppsett til</numerusform>
-      </translation>
-    </message>
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
       <translation>%1 videovegg</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 and %n more video walls</source>
-      <comment>%1 will be substituted with a video wall name</comment>
-      <translation>
-        <numerusform>%1 og %n videovegger til</numerusform>
-        <numerusform>%1 og %n videovegger til</numerusform>
-      </translation>
     </message>
     <message>
       <source>%1 group</source>
@@ -10370,10 +10362,26 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <translation>%1 gruppe</translation>
     </message>
     <message numerus="yes">
-      <source>%1 and %n more groups</source>
-      <comment>%1 will be substituted with a user group name</comment>
+      <source>%1 and %n more layouts</source>
+      <comment>Numerus: %1 will be substituted with a layout name</comment>
       <translation type="unfinished">
-        <numerusform>%1 og %n grupper til</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more video walls</source>
+      <comment>Numerus: %1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 and %n more video walls</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>Numerus: %1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
@@ -11238,13 +11246,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
   </context>
   <context>
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
-    <message numerus="yes">
-      <source>... and %n more</source>
-      <translation>
-        <numerusform>... og %n mer</numerusform>
-        <numerusform>... og %n mer</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No available archive</source>
       <translation>Ingen tilgjengelige opptak</translation>
@@ -11303,6 +11304,14 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>
         <numerusform>Dobbeltklikk for å legge til kameraer i gjeldende oppsett, eller ctrl + klikk for å åpne i en ny fane</numerusform>
         <numerusform>Dobbeltklikk for å legge til kameraer i gjeldende oppsett, eller ctrl + klikk for å åpne i en ny fane</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -12718,13 +12727,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <source>Source camera</source>
       <translation>Kildekamera</translation>
     </message>
-    <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Kilde og %n flere kameraer</numerusform>
-        <numerusform>Kilde og %n kameraer til</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No target</source>
       <translation>Ingen mål</translation>
@@ -12767,6 +12769,14 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Site</source>
       <translation>Nettsted</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
     </message>
   </context>
   <context>

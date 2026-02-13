@@ -389,18 +389,18 @@
     <message numerus="yes">
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n dakika</numerusform>
+        <numerusform>%n dakika</numerusform>
       </translation>
     </message>
     <message>
       <source>Download next</source>
-      <translation type="unfinished">Download next</translation>
+      <translation>Sonrakini indir</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Kapat</translation>
     </message>
   </context>
   <context>
@@ -461,7 +461,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaylar</translation>
     </message>
   </context>
   <context>

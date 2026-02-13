@@ -388,8 +388,8 @@
     <message numerus="yes">
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n 分钟</numerusform>
       </translation>
     </message>
     <message>
@@ -398,7 +398,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>关闭</translation>
     </message>
   </context>
   <context>
@@ -459,7 +459,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>配置信息</translation>
     </message>
   </context>
   <context>

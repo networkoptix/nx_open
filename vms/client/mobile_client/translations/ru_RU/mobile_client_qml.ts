@@ -391,20 +391,20 @@
     <message numerus="yes">
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n минут(ы)</numerusform>
+        <numerusform>%n минут(ы)</numerusform>
+        <numerusform>%n минут(ы)</numerusform>
+        <numerusform>%n минут(ы)</numerusform>
       </translation>
     </message>
     <message>
       <source>Download next</source>
-      <translation type="unfinished">Download next</translation>
+      <translation>Загрузить следующие</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Закрыть</translation>
     </message>
   </context>
   <context>
@@ -465,7 +465,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Детали</translation>
     </message>
   </context>
   <context>

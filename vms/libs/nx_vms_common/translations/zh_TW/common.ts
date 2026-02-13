@@ -1943,7 +1943,7 @@
     </message>
     <message>
       <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
-      <translation type="unfinished">Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</translation>
+      <translation>控制整合載入的方式，可選值如下：&quot;manifestControlled&quot;、&quot;forceLoadingInSeparateProcess&quot;、&quot;forceLoadingInCurrentProcess&quot;</translation>
     </message>
   </context>
 </TS>

@@ -1426,12 +1426,6 @@ Khóa giấy phép: %2</translation>
         <numerusform>%1 trong số %n giấy phép không kích hoạt</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Hủy kích hoạt %n Khác</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Please try again later.</source>
       <translation>Vui lòng thử lại sau.</translation>
@@ -1463,6 +1457,13 @@ Khóa giấy phép: %2</translation>
       <comment>Numerus form depends on the amount of licenses</comment>
       <translation>
         <numerusform>Không thể hủy kích hoạt giấy phép</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <comment>Numerus: %n is the count of licenses which can be deactivated</comment>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
   </context>
@@ -1703,18 +1704,6 @@ Khóa giấy phép: %2</translation>
         <numerusform>Mật khẩu của bạn có thể không dài quá %n ký tự</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more consecutive characters together</source>
-      <translation>
-        <numerusform>Mật khẩu không được chứa %n hoặc nhiều ký tự liên tiếp lại với nhau</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more repeating characters</source>
-      <translation>
-        <numerusform>Mật khẩu không được chứa %n hoặc nhiều ký tự lặp lại</numerusform>
-      </translation>
-    </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
       <translation>Mật khẩu này nằm trong danh sách các mật khẩu phổ biến nhất</translation>
@@ -1726,6 +1715,20 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed</source>
       <translation>Chỉ cho phép chữ cái, số và ký tự bàn phím</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together</source>
+      <comment>Numerus: %n is a hardcoded 4</comment>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters</source>
+      <comment>Numerus: %n is a hardcoded 4</comment>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4316,18 +4319,6 @@ Khóa giấy phép: %2</translation>
       <source>Export selected events to file</source>
       <translation>Xuất khẩu chọn lọc sự kiện để nộp</translation>
     </message>
-    <message numerus="yes">
-      <source>%n TB</source>
-      <comment>TB - terabytes</comment>
-      <translation>
-        <numerusform>%n TB</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>TB</source>
-      <comment>TB - terabytes</comment>
-      <translation>TB</translation>
-    </message>
     <message>
       <source>Last 5 minutes</source>
       <translation>5 phút qua</translation>
@@ -4347,6 +4338,18 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
       <translation>Dự báo chỉ khả dụng cho các camera có bật ghi hình.</translation>
+    </message>
+    <message>
+      <source>TB</source>
+      <comment>TB for terabytes</comment>
+      <translation type="unfinished">TB</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n TB</source>
+      <comment>Numerus: TB for terabytes</comment>
+      <translation type="unfinished">
+        <numerusform>%n TB</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4978,12 +4981,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Some cameras are set to record in a mode they do not support.</source>
       <translation>Một số camera được thiết lập để ghi hình ở chế độ mà chúng không hỗ trợ.</translation>
     </message>
-    <message numerus="yes">
-      <source>+ %n more</source>
-      <translation>
-        <numerusform>+ %n thêm</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Site will stop functioning soon</source>
       <translation>Chi nhánh sẽ sớm ngừng hoạt động</translation>
@@ -5037,6 +5034,13 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Cloud Storage is enabled</source>
       <translation>Lưu trữ đám mây đã được bật</translation>
+    </message>
+    <message numerus="yes">
+      <source>+ %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>+ %n more</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5753,12 +5757,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
   <context>
     <name>Strings</name>
     <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Nguồn và %n camera khác</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n Layouts</source>
       <translation>
         <numerusform>Bố cục %n</numerusform>
@@ -5818,12 +5816,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>%n Servers</source>
       <translation>
         <numerusform>%n Máy chủ</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n additional</source>
-      <translation>
-        <numerusform>%n bổ sung</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5917,6 +5909,20 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <comment>The subject is user or group</comment>
       <translation>
         <numerusform>%n chủ đề đã bị xóa</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <comment>Numerus: placeholder for explicitly added items</comment>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
   </context>
@@ -6570,12 +6576,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       </translation>
     </message>
     <message numerus="yes">
-      <source>%n MP</source>
-      <translation>
-        <numerusform>%n MP</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n Megapixels</source>
       <translation>
         <numerusform>%n Megapixel</numerusform>
@@ -6610,6 +6610,13 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Site is currently suspended</source>
       <translation>Chi nhánh hiện đang bị đình chỉ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n MP</source>
+      <comment>Numerus: MP for Megapixels</comment>
+      <translation type="unfinished">
+        <numerusform>%n MP</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8379,15 +8386,16 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Địa chỉ</translation>
     </message>
     <message numerus="yes">
-      <source>%n new</source>
-      <translation>
-        <numerusform>%n mới</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n devices total</source>
       <translation>
         <numerusform>Tổng số %n thiết bị</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new</source>
+      <comment>Numerus: %n is the count of new devices</comment>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
       </translation>
     </message>
   </context>
@@ -8406,13 +8414,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <comment>%1 will be substituted with a user group name</comment>
       <translation>%1 nhóm</translation>
     </message>
-    <message numerus="yes">
-      <source>%1 and %n more groups</source>
-      <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 và %n nhóm nữa</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
@@ -8421,6 +8422,13 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>View video without redaction</source>
       <translation>Xem video không bị biên tập</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>Numerus: %1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8994,13 +9002,6 @@ Hiệu suất Chi nhánh bị giảm.</translation>
       <source>Download success</source>
       <translation>Tải xuống thành công</translation>
     </message>
-    <message numerus="yes">
-      <source>%n selected:</source>
-      <comment>number of selected rows</comment>
-      <translation>
-        <numerusform>%n đã chọn:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Retry (%1)</source>
       <translation>Thử lại (%1)</translation>
@@ -9008,6 +9009,13 @@ Hiệu suất Chi nhánh bị giảm.</translation>
     <message>
       <source>Retry</source>
       <translation>Thử lại</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n selected:</source>
+      <comment>Numerus: %n is a number of selected rows</comment>
+      <translation type="unfinished">
+        <numerusform>%n selected:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -10194,24 +10202,10 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
       <comment>%1 will be substituted with a layout name</comment>
       <translation>bố cục %1</translation>
     </message>
-    <message numerus="yes">
-      <source>%1 and %n more layouts</source>
-      <comment>%1 will be substituted with a layout name</comment>
-      <translation>
-        <numerusform>%1 và %n bố cục khác</numerusform>
-      </translation>
-    </message>
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
       <translation>%1 tường video</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 and %n more video walls</source>
-      <comment>%1 will be substituted with a video wall name</comment>
-      <translation>
-        <numerusform>%1 và %n tường video nữa</numerusform>
-      </translation>
     </message>
     <message>
       <source>%1 group</source>
@@ -10219,10 +10213,24 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
       <translation>%1 nhóm</translation>
     </message>
     <message numerus="yes">
+      <source>%1 and %n more layouts</source>
+      <comment>Numerus: %1 will be substituted with a layout name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more layouts</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more video walls</source>
+      <comment>Numerus: %1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more video walls</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
       <source>%1 and %n more groups</source>
-      <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 và %n nhóm nữa</numerusform>
+      <comment>Numerus: %1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
   </context>
@@ -11076,12 +11084,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
   </context>
   <context>
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
-    <message numerus="yes">
-      <source>... and %n more</source>
-      <translation>
-        <numerusform>... và %n nhiều hơn nữa</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No available archive</source>
       <translation>Không có lưu trữ có sẵn</translation>
@@ -11139,6 +11141,13 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <comment>Numerus form depends on the number of cameras</comment>
       <translation>
         <numerusform>Nhấp đúp để thêm camera vào bố cục hiện tại hoặc nhấp ctrl + để mở trong tab mới</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -12541,12 +12550,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Source camera</source>
       <translation>Máy ảnh nguồn</translation>
     </message>
-    <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Nguồn và %n camera khác</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No target</source>
       <translation>Không có đích đến</translation>
@@ -12588,6 +12591,13 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Site</source>
       <translation>Chi nhánh</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
     </message>
   </context>
   <context>

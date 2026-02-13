@@ -148,11 +148,11 @@
     </message>
     <message>
       <source>Motion (&gt;%1)</source>
-      <translation type="unfinished">Motion (&gt;%1)</translation>
+      <translation>位移偵測 (&gt;%1)</translation>
     </message>
     <message>
       <source>Motion (%1)</source>
-      <translation type="unfinished">Motion (%1)</translation>
+      <translation>位移偵測 (%1)</translation>
     </message>
   </context>
 </TS>

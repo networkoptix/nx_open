@@ -388,17 +388,17 @@
     <message numerus="yes">
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n 分鐘</numerusform>
       </translation>
     </message>
     <message>
       <source>Download next</source>
-      <translation type="unfinished">Download next</translation>
+      <translation>Download 下一個</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>關閉​​​</translation>
     </message>
   </context>
   <context>
@@ -459,7 +459,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>細節</translation>
     </message>
   </context>
   <context>
@@ -540,7 +540,7 @@
     <name>FocusControl</name>
     <message>
       <source>AF</source>
-      <translation type="unfinished">AF</translation>
+      <translation>AF</translation>
     </message>
   </context>
   <context>
@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>Timeline</source>
-      <translation type="unfinished">Timeline</translation>
+      <translation>時間軸</translation>
     </message>
   </context>
   <context>
@@ -1114,11 +1114,11 @@
     </message>
     <message>
       <source>Structure</source>
-      <translation type="unfinished">Structure</translation>
+      <translation>結構</translation>
     </message>
     <message>
       <source>Welcome, %1!</source>
-      <translation type="unfinished">Welcome, %1!</translation>
+      <translation>歡迎，%1!</translation>
     </message>
   </context>
   <context>
@@ -1258,7 +1258,7 @@
     </message>
     <message>
       <source>Log In to Cloud</source>
-      <translation type="unfinished">Log In to Cloud</translation>
+      <translation>登入Cloud</translation>
     </message>
   </context>
   <context>
@@ -1508,11 +1508,11 @@
     </message>
     <message>
       <source>PTZ Mode</source>
-      <translation type="unfinished">PTZ Mode</translation>
+      <translation>PTZ模式</translation>
     </message>
     <message>
       <source>Export...</source>
-      <translation type="unfinished">Export...</translation>
+      <translation>匯出...</translation>
     </message>
   </context>
   <context>

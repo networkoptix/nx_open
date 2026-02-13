@@ -1721,10 +1721,10 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message numerus="yes">
       <source>%n more</source>
-      <comment>%n is the number of remaining groups</comment>
-      <translation>
-        <numerusform>%n máis</numerusform>
-        <numerusform>%n máis</numerusform>
+      <comment>Numerus: %n is the number of remaining groups</comment>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
+        <numerusform>%n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2369,9 +2369,10 @@ prema Alt + Clic para seguir o obxecto</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>...e %n máis</numerusform>
-        <numerusform>...e %n máis</numerusform>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2825,9 +2826,10 @@ prema Alt + Clic para seguir o obxecto</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... e %n máis</numerusform>
-        <numerusform>... e %n máis</numerusform>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
