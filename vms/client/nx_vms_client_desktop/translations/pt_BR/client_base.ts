@@ -1437,9 +1437,9 @@ Chave de licença: %2</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Desativar %n outro</numerusform>
-        <numerusform>Desativar %n outro</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
     <message>
@@ -1722,16 +1722,16 @@ Chave de licença: %2</translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation>
-        <numerusform>A senha não deve conter %n ou mais caracteres consecutivos juntos</numerusform>
-        <numerusform>A senha não deve conter %n ou mais caracteres consecutivos juntos</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation>
-        <numerusform>A senha não deve conter %n ou mais caracteres repetidos</numerusform>
-        <numerusform>A senha não deve conter %n ou mais caracteres repetidos</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
       </translation>
     </message>
     <message>
@@ -4361,15 +4361,15 @@ Chave de licença: %2</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
-        <numerusform>%n Tb</numerusform>
-        <numerusform>%n Tb</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n TB</numerusform>
+        <numerusform>%n TB</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>Tb</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -5830,9 +5830,9 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <name>Strings</name>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Fonte e mais %n câmeras</numerusform>
-        <numerusform>Fonte e mais %n câmeras</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5902,9 +5902,9 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
-        <numerusform>%n adicional</numerusform>
-        <numerusform>%n adicional</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8499,9 +8499,9 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation>
-        <numerusform>%n novo</numerusform>
-        <numerusform>%n novo</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
+        <numerusform>%n new</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11231,9 +11231,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... e mais %n</numerusform>
-        <numerusform>... e mais %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
     <message>
@@ -12753,9 +12753,9 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Fonte e mais %n câmeras</numerusform>
-        <numerusform>Fonte e mais %n câmeras</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message>

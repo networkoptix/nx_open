@@ -1428,8 +1428,8 @@ Khóa giấy phép: %2</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Hủy kích hoạt %n Khác</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
     <message>
@@ -1705,14 +1705,14 @@ Khóa giấy phép: %2</translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation>
-        <numerusform>Mật khẩu không được chứa %n hoặc nhiều ký tự liên tiếp lại với nhau</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation>
-        <numerusform>Mật khẩu không được chứa %n hoặc nhiều ký tự lặp lại</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
       </translation>
     </message>
     <message>
@@ -4319,14 +4319,14 @@ Khóa giấy phép: %2</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n TB</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>TB</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -4980,8 +4980,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
-      <translation>
-        <numerusform>+ %n thêm</numerusform>
+      <translation type="unfinished">
+        <numerusform>+ %n more</numerusform>
       </translation>
     </message>
     <message>
@@ -5754,8 +5754,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>Strings</name>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Nguồn và %n camera khác</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5822,8 +5822,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
-        <numerusform>%n bổ sung</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6571,7 +6571,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>%n MP</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n MP</numerusform>
       </translation>
     </message>
@@ -8368,8 +8368,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation>
-        <numerusform>%n mới</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8397,8 +8397,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 và %n nhóm nữa</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
     <message>
@@ -8985,8 +8985,8 @@ Hiệu suất Chi nhánh bị giảm.</translation>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
-      <translation>
-        <numerusform>%n đã chọn:</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n selected:</numerusform>
       </translation>
     </message>
     <message>
@@ -10185,8 +10185,8 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation>
-        <numerusform>%1 và %n bố cục khác</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more layouts</numerusform>
       </translation>
     </message>
     <message>
@@ -10197,8 +10197,8 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation>
-        <numerusform>%1 và %n tường video nữa</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more video walls</numerusform>
       </translation>
     </message>
     <message>
@@ -10209,8 +10209,8 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 và %n nhóm nữa</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
   </context>
@@ -11066,8 +11066,8 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... và %n nhiều hơn nữa</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
     <message>
@@ -12573,8 +12573,8 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Nguồn và %n camera khác</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message>

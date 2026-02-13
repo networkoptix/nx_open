@@ -1455,11 +1455,11 @@ Klucz licencyjny: %2</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Dezaktywuj %n inny</numerusform>
-        <numerusform>Dezaktywuj %n inne</numerusform>
-        <numerusform>Dezaktywuj %n innych</numerusform>
-        <numerusform>Dezaktywuj %n innych</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
     <message>
@@ -1756,20 +1756,20 @@ Klucz licencyjny: %2</translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation>
-        <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków</numerusform>
-        <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków</numerusform>
-        <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków</numerusform>
-        <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation>
-        <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków</numerusform>
-        <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków</numerusform>
-        <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków</numerusform>
-        <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
       </translation>
     </message>
     <message>
@@ -4445,7 +4445,7 @@ Klucz licencyjny: %2</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
@@ -4455,7 +4455,7 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>TB</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -5126,11 +5126,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
-      <translation>
-        <numerusform>+ %n więcej</numerusform>
-        <numerusform>+ %n więcej</numerusform>
-        <numerusform>+ %n więcej</numerusform>
-        <numerusform>+ %n więcej</numerusform>
+      <translation type="unfinished">
+        <numerusform>+ %n more</numerusform>
+        <numerusform>+ %n more</numerusform>
+        <numerusform>+ %n more</numerusform>
+        <numerusform>+ %n more</numerusform>
       </translation>
     </message>
     <message>
@@ -5981,11 +5981,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>Strings</name>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Źródłowa i jeszcze %n inna kamera</numerusform>
-        <numerusform>Źródłowa i jeszcze %n inne kamery</numerusform>
-        <numerusform>Źródłowa i jeszcze %n innych kamer</numerusform>
-        <numerusform>Źródłowa i jeszcze %n innych kamer</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6061,11 +6061,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
-        <numerusform>%n dodatkowy</numerusform>
-        <numerusform>%n dodatkowe</numerusform>
-        <numerusform>%n dodatkowych</numerusform>
-        <numerusform>%n dodatkowy</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
+        <numerusform>%n additional</numerusform>
+        <numerusform>%n additional</numerusform>
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8760,11 +8760,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation>
-        <numerusform>%n nowy</numerusform>
-        <numerusform>%n nowe</numerusform>
-        <numerusform>%n nowych</numerusform>
-        <numerusform>%n nowych</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
+        <numerusform>%n new</numerusform>
+        <numerusform>%n new</numerusform>
+        <numerusform>%n new</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8796,7 +8796,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 i %n więcej grup</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
@@ -9408,7 +9408,7 @@ Wydajność witryny jest obniżona.</translation>
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
       <translation type="unfinished">
-        <numerusform>%n wybrano:</numerusform>
+        <numerusform>%n selected:</numerusform>
         <numerusform>%n selected:</numerusform>
         <numerusform>%n selected:</numerusform>
         <numerusform>%n selected:</numerusform>
@@ -10632,8 +10632,8 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
       <translation type="unfinished">
-        <numerusform>%1 i %n więcej układów</numerusform>
-        <numerusform>%1 i %n więcej układów</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
         <numerusform>%1 and %n more layouts</numerusform>
         <numerusform>%1 and %n more layouts</numerusform>
       </translation>
@@ -10647,7 +10647,7 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
       <translation type="unfinished">
-        <numerusform>%1 i %n więcej ścian wideo</numerusform>
+        <numerusform>%1 and %n more video walls</numerusform>
         <numerusform>%1 and %n more video walls</numerusform>
         <numerusform>%1 and %n more video walls</numerusform>
         <numerusform>%1 and %n more video walls</numerusform>
@@ -10661,11 +10661,11 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 i %n więcej grup</numerusform>
-        <numerusform>%1 i %n więcej grup</numerusform>
-        <numerusform>%1 i %n więcej grup</numerusform>
-        <numerusform>%1 i %n więcej grup</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
   </context>
@@ -11559,11 +11559,11 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
     <message>
@@ -13112,11 +13112,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Źródłowa i jeszcze %n inna kamera</numerusform>
-        <numerusform>Źródłowa i jeszcze %n inne kamery</numerusform>
-        <numerusform>Źródłowa i jeszcze %n innych kamer</numerusform>
-        <numerusform>Źródłowa i jeszcze %n innych kamer</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message>
