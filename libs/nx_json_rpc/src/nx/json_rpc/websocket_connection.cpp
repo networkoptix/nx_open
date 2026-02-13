@@ -20,7 +20,7 @@ void logMessage(
     const size_t id,
     const nx::Buffer& buffer)
 {
-    NX_DEBUG(nx::log::kHttpTag, "JSON-RPC %1 %2 %%3\n%4", action, address, id,
+    NX_DEBUG(nx::log::kHttpTag, "JSON-RPC %1 %2 %3\n%4", action, address, id,
         nx::log::isToBeLogged(nx::log::Level::verbose, nx::log::kHttpTag)
             ? buffer
             : buffer.substr(0, 1024 * 5)); //< Should be enough for 5 devices.
