@@ -758,7 +758,7 @@ Page
             if (isCurrentRootInvalid)
             {
                 sessionsScreen.rootType = undefined
-                
+
                 // IMPORTANT:
                 // This property is used by many bindings and state conditions.
                 // Re-assigning it, even with the same value, forces synchronous
@@ -934,9 +934,14 @@ Page
                 && !accessor.getData(current, "isSaasShutDown")
 
             if (isAccessible)
+            {
                 windowContext.sessionManager.startCloudSession(systemId, systemName)
+            }
             else
+            {
+                appGlobalState.lastOpenedNodeId = NxGlobals.uuid("")
                 Workflow.openSitePlaceholderScreen(systemName)
+            }
         }
     }
 }
