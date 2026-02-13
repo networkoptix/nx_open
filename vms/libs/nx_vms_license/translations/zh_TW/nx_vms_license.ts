@@ -11,18 +11,21 @@
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
+      <comment>Numerus: %2 is substituted with the required license type</comment>
       <translation>
         <numerusform>%n %2 將使用 %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
+      <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation>
         <numerusform>再啟用 %n 個 %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
+      <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation>
         <numerusform>需要再 %n 個 %1.</numerusform>
       </translation>

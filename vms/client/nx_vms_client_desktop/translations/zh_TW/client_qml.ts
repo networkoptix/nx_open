@@ -1713,7 +1713,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message numerus="yes">
       <source>%n more</source>
-      <comment>%n is the number of remaining groups</comment>
+      <comment>Numerus: %n is the number of remaining groups</comment>
       <translation>
         <numerusform>還有%n 個</numerusform>
       </translation>
@@ -2350,6 +2350,7 @@ Press Alt + Click to follow object</source>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
       <translation>
         <numerusform>...與另外 %n 個</numerusform>
       </translation>
@@ -2804,6 +2805,7 @@ Press Alt + Click to follow object</source>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
       <translation>
         <numerusform>... 與另外 %n 個</numerusform>
       </translation>

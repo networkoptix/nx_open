@@ -11,18 +11,21 @@
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
+      <comment>Numerus: %2 is substituted with the required license type</comment>
       <translation>
         <numerusform>%n %2 akan digunakan di luar %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
+      <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation>
         <numerusform>Aktifkan %n selengkapnya %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
+      <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation>
         <numerusform>%n lebih banyak %1 akan digunakan.</numerusform>
       </translation>

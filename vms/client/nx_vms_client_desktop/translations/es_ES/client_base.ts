@@ -1023,7 +1023,7 @@
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>Importar desde dispositivos...</translation>
     </message>
     <message>
       <source>User Manual...</source>
@@ -1035,7 +1035,7 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Conectarse al sitio</translation>
     </message>
     <message>
       <source>Site Administration...</source>
@@ -1043,7 +1043,7 @@
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>Actualización del sitio...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
@@ -1404,19 +1404,19 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>Copiar parámetros</translation>
     </message>
     <message>
       <source>License has already been activated</source>
-      <translation type="unfinished">License has already been activated</translation>
+      <translation>La licencia ya ha sido activada</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Si su sitio no tiene acceso a Internet, por favor envíe la clave de licencia y el ID de hardware proporcionados a %1 para recibir el archivo de activación.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Si su sitio no tiene acceso a Internet, envíe la clave de licencia y el ID de hardware proporcionados a su equipo de soporte regional/de licencias para recibir el archivo de activación:</translation>
     </message>
   </context>
   <context>
@@ -1433,13 +1433,6 @@ License Key: %2</translation>
       <translation>
         <numerusform>%1 de %n licencias no se pueden desactivar</numerusform>
         <numerusform>%1 de %n licencias no se pueden desactivar</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Desactivar %n Otros</numerusform>
-        <numerusform>Desactivar %n Otros</numerusform>
       </translation>
     </message>
     <message>
@@ -1475,6 +1468,14 @@ License Key: %2</translation>
       <translation>
         <numerusform>No se pueden desactivar las licencias</numerusform>
         <numerusform>No se pueden desactivar las licencias</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <comment>Numerus: %n is the count of licenses which can be deactivated</comment>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
   </context>
@@ -1547,7 +1548,7 @@ License Key: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Conectarse al sitio</translation>
     </message>
   </context>
   <context>
@@ -1720,20 +1721,6 @@ License Key: %2</translation>
         <numerusform>La contraseña no debe tener más de %n caracteres</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more consecutive characters together</source>
-      <translation>
-        <numerusform>La contraseña no debe contener %n o más caracteres consecutivos juntos</numerusform>
-        <numerusform>La contraseña no debe contener %n o más caracteres consecutivos juntos</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more repeating characters</source>
-      <translation>
-        <numerusform>La contraseña no debe contener %n o más caracteres repetitivos</numerusform>
-        <numerusform>La contraseña no debe contener %n o más caracteres repetitivos</numerusform>
-      </translation>
-    </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
       <translation>Esta contraseña está en la lista de las contraseñas más populares</translation>
@@ -1745,6 +1732,22 @@ License Key: %2</translation>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed</source>
       <translation>Se permiten sólo letras, números y símbolos de teclado</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together</source>
+      <comment>Numerus: %n is a hardcoded 4</comment>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters</source>
+      <comment>Numerus: %n is a hardcoded 4</comment>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2121,7 +2124,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>Este servidor se ha eliminado del sitio</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
@@ -2683,36 +2686,36 @@ License Key: %2</translation>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+      <translation>Actualmente no hay conexión entre su sitio y %1.</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+      <translation>Ingrese la contraseña de su cuenta para desconectar el sitio de %1</translation>
     </message>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+      <translation>No se puede desconectar el sitio de %1</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site disconnected from %1</translation>
+      <translation>Sitio desconectado de %1</translation>
     </message>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">Disconnect site from %1?</translation>
+      <translation>¿Desconectar el sitio de %1?</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
-      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+      <translation>La grabación se detendrá y se eliminarán todas las suscripciones al servicio</translation>
     </message>
     <message>
       <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be removed from the site</translation>
+      <translation>Todos los usuarios %1 serán eliminados del sitio</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
@@ -2919,11 +2922,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
-      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+      <translation>El sitio no es compatible con el factor de doble autenticación</translation>
     </message>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
+      <translation>No se pudo iniciar sesión en el sitio &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -2990,15 +2993,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>La base de datos se ha restaurado correctamente. La aplicación del servidor se reiniciará en breve.</translation>
     </message>
     <message>
       <source>Site configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>La configuración del sitio se restaurará desde la copia de seguridad y se reiniciará la aplicación del servidor.</translation>
     </message>
     <message>
       <source>Enter your account password to restore Site from backup</source>
-      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
+      <translation>Ingrese la contraseña de su cuenta para restaurar el sitio desde la copia de seguridad</translation>
     </message>
   </context>
   <context>
@@ -3102,7 +3105,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>Integraciones abiertas</translation>
     </message>
   </context>
   <context>
@@ -3325,7 +3328,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Not verified</source>
-      <translation type="unfinished">Not verified</translation>
+      <translation>No verificado</translation>
     </message>
   </context>
   <context>
@@ -4358,19 +4361,6 @@ License Key: %2</translation>
       <source>Export selected events to file</source>
       <translation>Exportar eventos seleccionados en un archivo</translation>
     </message>
-    <message numerus="yes">
-      <source>%n TB</source>
-      <comment>TB - terabytes</comment>
-      <translation>
-        <numerusform>%n TB</numerusform>
-        <numerusform>%n TB</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>TB</source>
-      <comment>TB - terabytes</comment>
-      <translation>TB</translation>
-    </message>
     <message>
       <source>Last 5 minutes</source>
       <translation>Últimos 5 minutos</translation>
@@ -4390,6 +4380,19 @@ License Key: %2</translation>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
       <translation>Pronóstico disponible solo para cámaras con grabación habilitada.</translation>
+    </message>
+    <message>
+      <source>TB</source>
+      <comment>TB for terabytes</comment>
+      <translation type="unfinished">TB</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n TB</source>
+      <comment>Numerus: TB for terabytes</comment>
+      <translation type="unfinished">
+        <numerusform>%n TB</numerusform>
+        <numerusform>%n TB</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5027,13 +5030,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <source>Some cameras are set to record in a mode they do not support.</source>
       <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
     </message>
-    <message numerus="yes">
-      <source>+ %n more</source>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Site will stop functioning soon</source>
       <translation type="unfinished">Site will stop functioning soon</translation>
@@ -5088,6 +5084,14 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Cloud Storage is enabled</source>
       <translation type="unfinished">Cloud Storage is enabled</translation>
+    </message>
+    <message numerus="yes">
+      <source>+ %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>+ %n more</numerusform>
+        <numerusform>+ %n more</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5829,13 +5833,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
   <context>
     <name>Strings</name>
     <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Fuente y %n más cámaras</numerusform>
-        <numerusform>Fuente y %n más cámaras</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n Layouts</source>
       <translation>
         <numerusform>%n Diseños</numerusform>
@@ -5898,13 +5895,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>
         <numerusform>%n Servidores</numerusform>
         <numerusform>%n Servidores</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n additional</source>
-      <translation>
-        <numerusform>%n adicionales</numerusform>
-        <numerusform>%n adicionales</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6010,6 +6000,22 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>
         <numerusform>%n sujetos eliminados</numerusform>
         <numerusform>%n sujetos eliminados</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <comment>Numerus: placeholder for explicitly added items</comment>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
   </context>
@@ -6675,13 +6681,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       </translation>
     </message>
     <message numerus="yes">
-      <source>%n MP</source>
-      <translation type="unfinished">
-        <numerusform>%n MP</numerusform>
-        <numerusform>%n MP</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n Megapixels</source>
       <translation type="unfinished">
         <numerusform>%n Megapixels</numerusform>
@@ -6718,6 +6717,14 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Site is currently suspended</source>
       <translation type="unfinished">Site is currently suspended</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n MP</source>
+      <comment>Numerus: MP for Megapixels</comment>
+      <translation type="unfinished">
+        <numerusform>%n MP</numerusform>
+        <numerusform>%n MP</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8498,17 +8505,18 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>Dirección</translation>
     </message>
     <message numerus="yes">
-      <source>%n new</source>
-      <translation>
-        <numerusform>%n nuevo</numerusform>
-        <numerusform>%n nuevo</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n devices total</source>
       <translation>
         <numerusform>%n dispositivos en total</numerusform>
         <numerusform>%n dispositivos en total</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new</source>
+      <comment>Numerus: %n is the count of new devices</comment>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
+        <numerusform>%n new</numerusform>
       </translation>
     </message>
   </context>
@@ -8527,14 +8535,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <comment>%1 will be substituted with a user group name</comment>
       <translation>Grupo %1</translation>
     </message>
-    <message numerus="yes">
-      <source>%1 and %n more groups</source>
-      <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>Grupos %1 y %n más</numerusform>
-        <numerusform>Grupos %1 y %n más</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
@@ -8543,6 +8543,14 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>View video without redaction</source>
       <translation type="unfinished">View video without redaction</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>Numerus: %1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -9123,14 +9131,6 @@ Site performance is degraded.</translation>
       <source>Download success</source>
       <translation type="unfinished">Download success</translation>
     </message>
-    <message numerus="yes">
-      <source>%n selected:</source>
-      <comment>number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
-        <numerusform>%n selected:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Retry (%1)</source>
       <translation type="unfinished">Retry (%1)</translation>
@@ -9138,6 +9138,14 @@ Site performance is degraded.</translation>
     <message>
       <source>Retry</source>
       <translation>Volver a intentar</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n selected:</source>
+      <comment>Numerus: %n is a number of selected rows</comment>
+      <translation type="unfinished">
+        <numerusform>%n selected:</numerusform>
+        <numerusform>%n selected:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -10331,26 +10339,10 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <comment>%1 will be substituted with a layout name</comment>
       <translation>%1 diseños</translation>
     </message>
-    <message numerus="yes">
-      <source>%1 and %n more layouts</source>
-      <comment>%1 will be substituted with a layout name</comment>
-      <translation>
-        <numerusform>%1 y %n diseños más</numerusform>
-        <numerusform>%1 y %n diseños más</numerusform>
-      </translation>
-    </message>
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
       <translation>Pared de vídeo %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 and %n more video walls</source>
-      <comment>%1 will be substituted with a video wall name</comment>
-      <translation>
-        <numerusform>%1 y %n videowalls más</numerusform>
-        <numerusform>%1 y %n videowalls más</numerusform>
-      </translation>
     </message>
     <message>
       <source>%1 group</source>
@@ -10358,11 +10350,27 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <translation>Grupo %1</translation>
     </message>
     <message numerus="yes">
+      <source>%1 and %n more layouts</source>
+      <comment>Numerus: %1 will be substituted with a layout name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more video walls</source>
+      <comment>Numerus: %1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 and %n more video walls</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
       <source>%1 and %n more groups</source>
-      <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>Grupos %1 y %n más</numerusform>
-        <numerusform>Grupos %1 y %n más</numerusform>
+      <comment>Numerus: %1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
   </context>
@@ -11228,13 +11236,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
   </context>
   <context>
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
-    <message numerus="yes">
-      <source>... and %n more</source>
-      <translation>
-        <numerusform>... y %n más</numerusform>
-        <numerusform>... y %n más</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No available archive</source>
       <translation>No hay archivo disponible</translation>
@@ -11293,6 +11294,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>
         <numerusform>Haga doble clic para agregar cámaras al diseño actual o presione ctrl + clic para abrir en una nueva pestaña</numerusform>
         <numerusform>Haga doble clic para agregar cámaras al diseño actual o presione ctrl + clic para abrir en una nueva pestaña</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -12751,13 +12760,6 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       <source>Source camera</source>
       <translation>Cámara de origen</translation>
     </message>
-    <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Fuente y %n más cámaras</numerusform>
-        <numerusform>Fuente y %n más cámaras</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No target</source>
       <translation type="unfinished">No target</translation>
@@ -12800,6 +12802,14 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message>
       <source>Site</source>
       <translation>Sitio</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
     </message>
   </context>
   <context>

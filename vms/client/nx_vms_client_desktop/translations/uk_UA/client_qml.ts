@@ -1737,7 +1737,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>%n more</source>
-      <comment>%n is the number of remaining groups</comment>
+      <comment>Numerus: %n is the number of remaining groups</comment>
       <translation type="unfinished">
         <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
@@ -2389,11 +2389,12 @@ Press Alt + Click to follow object</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
       <translation>
-        <numerusform>... і %n ще</numerusform>
-        <numerusform>... і %n ще</numerusform>
-        <numerusform>... і %n ще</numerusform>
-        <numerusform>... і %n ще</numerusform>
+        <numerusform>... і ще %n бiльше</numerusform>
+        <numerusform>... і ще %n бiльше</numerusform>
+        <numerusform>... і ще %n бiльше</numerusform>
+        <numerusform>... і ще %n бiльше</numerusform>
       </translation>
     </message>
   </context>
@@ -2849,6 +2850,7 @@ Press Alt + Click to follow object</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
       <translation>
         <numerusform>... і %n бiльше</numerusform>
         <numerusform>... і %n бiльше</numerusform>

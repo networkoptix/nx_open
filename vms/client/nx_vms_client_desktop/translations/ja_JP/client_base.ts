@@ -1426,12 +1426,6 @@ License Key: %2</source>
         <numerusform>%1 / %n ライセンスを無効化できません</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>その他 %n を解除</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Please try again later.</source>
       <translation>後でもう一度お試しください。</translation>
@@ -1463,6 +1457,13 @@ License Key: %2</source>
       <comment>Numerus form depends on the amount of licenses</comment>
       <translation>
         <numerusform>ライセンスを無効化できません</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <comment>Numerus: %n is the count of licenses which can be deactivated</comment>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
   </context>
@@ -1703,18 +1704,6 @@ License Key: %2</source>
         <numerusform>パスワードは %n 文字以内にする必要があります</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more consecutive characters together</source>
-      <translation>
-        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more repeating characters</source>
-      <translation>
-        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません</numerusform>
-      </translation>
-    </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
       <translation>このパスワードは、最も一般的なパスワードのひとつです</translation>
@@ -1726,6 +1715,20 @@ License Key: %2</source>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed</source>
       <translation>英数字およびキーボードの記号のみ使用可能です</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together</source>
+      <comment>Numerus: %n is a hardcoded 4</comment>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters</source>
+      <comment>Numerus: %n is a hardcoded 4</comment>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4316,18 +4319,6 @@ License Key: %2</source>
       <source>Export selected events to file</source>
       <translation>選択したイベントをファイルにエクスポート</translation>
     </message>
-    <message numerus="yes">
-      <source>%n TB</source>
-      <comment>TB - terabytes</comment>
-      <translation>
-        <numerusform>%n TB</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>TB</source>
-      <comment>TB - terabytes</comment>
-      <translation>TB</translation>
-    </message>
     <message>
       <source>Last 5 minutes</source>
       <translation>直近5分間</translation>
@@ -4347,6 +4338,18 @@ License Key: %2</source>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
       <translation>録画が有効になっているカメラのみ予測可能です。</translation>
+    </message>
+    <message>
+      <source>TB</source>
+      <comment>TB for terabytes</comment>
+      <translation type="unfinished">TB</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n TB</source>
+      <comment>Numerus: TB for terabytes</comment>
+      <translation type="unfinished">
+        <numerusform>%n TB</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4978,12 +4981,6 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some cameras are set to record in a mode they do not support.</source>
       <translation>一部のカメラは、サポートされていないモードで録画するように設定されています。</translation>
     </message>
-    <message numerus="yes">
-      <source>+ %n more</source>
-      <translation>
-        <numerusform>+ ほか %n</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Site will stop functioning soon</source>
       <translation>サイトはまもなく機能しなくなります。</translation>
@@ -5037,6 +5034,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cloud Storage is enabled</source>
       <translation>クラウドストレージが有効です</translation>
+    </message>
+    <message numerus="yes">
+      <source>+ %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>+ %n more</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5753,12 +5757,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>Strings</name>
     <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>ソースおよびその他 %n 台のカメラ</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n Layouts</source>
       <translation>
         <numerusform>%n レイアウト</numerusform>
@@ -5818,12 +5816,6 @@ If you intended to move analytics data to another storage location, please conta
       <source>%n Servers</source>
       <translation>
         <numerusform>%n サーバー</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n additional</source>
-      <translation>
-        <numerusform>追加 %n 名</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5917,6 +5909,20 @@ If you intended to move analytics data to another storage location, please conta
       <comment>The subject is user or group</comment>
       <translation>
         <numerusform>削除された %n サブジェクト</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <comment>Numerus: placeholder for explicitly added items</comment>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
   </context>
@@ -6571,12 +6577,6 @@ If you intended to move analytics data to another storage location, please conta
       </translation>
     </message>
     <message numerus="yes">
-      <source>%n MP</source>
-      <translation>
-        <numerusform>%n MP</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n Megapixels</source>
       <translation>
         <numerusform>%n メガピクセル</numerusform>
@@ -6611,6 +6611,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Site is currently suspended</source>
       <translation>サイトは現在サスペンドされています。</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n MP</source>
+      <comment>Numerus: MP for Megapixels</comment>
+      <translation type="unfinished">
+        <numerusform>%n MP</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8368,15 +8375,16 @@ If you intended to move analytics data to another storage location, please conta
       <translation>アドレス</translation>
     </message>
     <message numerus="yes">
-      <source>%n new</source>
-      <translation>
-        <numerusform>%n 新規</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n devices total</source>
       <translation>
         <numerusform>合計 %n デバイス</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new</source>
+      <comment>Numerus: %n is the count of new devices</comment>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
       </translation>
     </message>
   </context>
@@ -8395,13 +8403,6 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 will be substituted with a user group name</comment>
       <translation>%1 グループ</translation>
     </message>
-    <message numerus="yes">
-      <source>%1 and %n more groups</source>
-      <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 ほか %n グループ</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
@@ -8410,6 +8411,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>View video without redaction</source>
       <translation>編集なしの映像を表示</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>Numerus: %1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8983,13 +8991,6 @@ Site performance is degraded.</source>
       <source>Download success</source>
       <translation>ダウンロード成功</translation>
     </message>
-    <message numerus="yes">
-      <source>%n selected:</source>
-      <comment>number of selected rows</comment>
-      <translation>
-        <numerusform>%n 選択中:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Retry (%1)</source>
       <translation>リトライ (%1)</translation>
@@ -8997,6 +8998,13 @@ Site performance is degraded.</source>
     <message>
       <source>Retry</source>
       <translation>リトライ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n selected:</source>
+      <comment>Numerus: %n is a number of selected rows</comment>
+      <translation type="unfinished">
+        <numerusform>%n selected:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -10183,24 +10191,10 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <comment>%1 will be substituted with a layout name</comment>
       <translation>%1 レイアウト</translation>
     </message>
-    <message numerus="yes">
-      <source>%1 and %n more layouts</source>
-      <comment>%1 will be substituted with a layout name</comment>
-      <translation>
-        <numerusform>%1 ほか %n レイアウト</numerusform>
-      </translation>
-    </message>
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
       <translation>%1 ビデオウォール</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 and %n more video walls</source>
-      <comment>%1 will be substituted with a video wall name</comment>
-      <translation>
-        <numerusform>%1 ほか %n ビデオウォール</numerusform>
-      </translation>
     </message>
     <message>
       <source>%1 group</source>
@@ -10208,10 +10202,24 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <translation>%1 グループ</translation>
     </message>
     <message numerus="yes">
+      <source>%1 and %n more layouts</source>
+      <comment>Numerus: %1 will be substituted with a layout name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more layouts</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more video walls</source>
+      <comment>Numerus: %1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more video walls</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
       <source>%1 and %n more groups</source>
-      <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 ほか %n グループ</numerusform>
+      <comment>Numerus: %1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
   </context>
@@ -11065,12 +11073,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
   </context>
   <context>
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
-    <message numerus="yes">
-      <source>... and %n more</source>
-      <translation>
-        <numerusform>... ほか %n 件</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No available archive</source>
       <translation>利用可能なアーカイブがありません</translation>
@@ -11128,6 +11130,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <comment>Numerus form depends on the number of cameras</comment>
       <translation>
         <numerusform>現在のレイアウトにカメラを追加するにはダブルクリック、新規タブで開くには Ctrl + クリックしてください</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -12570,12 +12579,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Source camera</source>
       <translation>ソースカメラ</translation>
     </message>
-    <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>ソースおよびその他 %n 台のカメラ</numerusform>
-      </translation>
-    </message>
     <message>
       <source>No target</source>
       <translation>対象がありません</translation>
@@ -12617,6 +12620,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Site</source>
       <translation>サイト</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <comment>Numerus: placeholder for more items</comment>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
     </message>
   </context>
   <context>

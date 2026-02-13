@@ -1721,7 +1721,7 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     </message>
     <message numerus="yes">
       <source>%n more</source>
-      <comment>%n is the number of remaining groups</comment>
+      <comment>Numerus: %n is the number of remaining groups</comment>
       <translation>
         <numerusform>%n plus</numerusform>
         <numerusform>%n plus</numerusform>
@@ -2365,6 +2365,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
       <translation>
         <numerusform>...et %n de plus</numerusform>
         <numerusform>...et %n de plus</numerusform>
@@ -2821,6 +2822,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
       <translation>
         <numerusform>... et %n de plus</numerusform>
         <numerusform>... et %n de plus</numerusform>

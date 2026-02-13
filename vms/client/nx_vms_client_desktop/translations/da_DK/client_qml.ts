@@ -1721,7 +1721,7 @@ Vælg en Integration for at begynde at konfigurere dens parametre.</translation>
     </message>
     <message numerus="yes">
       <source>%n more</source>
-      <comment>%n is the number of remaining groups</comment>
+      <comment>Numerus: %n is the number of remaining groups</comment>
       <translation>
         <numerusform>%n mere</numerusform>
         <numerusform>%n mere</numerusform>
@@ -2364,6 +2364,7 @@ Tryk på Alt + klik for at følge objektet</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
       <translation>
         <numerusform>...og %n mere</numerusform>
         <numerusform>...og %n mere</numerusform>
@@ -2820,6 +2821,7 @@ Tryk på Alt + klik for at følge objektet</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
       <translation>
         <numerusform>... og %n mere</numerusform>
         <numerusform>... og %n mere</numerusform>

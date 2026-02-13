@@ -11,18 +11,21 @@
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
+      <comment>Numerus: %2 is substituted with the required license type</comment>
       <translation>
         <numerusform>%n %2 은 %1에서 사용될 것입니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
+      <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation>
         <numerusform>더 많은 %1 %n을 활성화 합니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
+      <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation>
         <numerusform>%n 더 많은 %1 사용 됩니다.</numerusform>
       </translation>

@@ -1713,7 +1713,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message numerus="yes">
       <source>%n more</source>
-      <comment>%n is the number of remaining groups</comment>
+      <comment>Numerus: %n is the number of remaining groups</comment>
       <translation>
         <numerusform>%n thêm</numerusform>
       </translation>
@@ -2353,6 +2353,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
       <translation>
         <numerusform>... và %n hơn nữa</numerusform>
       </translation>
@@ -2807,6 +2808,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
+      <comment>Numerus: placeholder for more items</comment>
       <translation>
         <numerusform>... và %n hơn nữa</numerusform>
       </translation>
