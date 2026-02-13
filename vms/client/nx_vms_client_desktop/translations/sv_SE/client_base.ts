@@ -1402,9 +1402,9 @@ Licensnyckel: %2</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Inaktivera %n Annan</numerusform>
-        <numerusform>Inaktivera %n Annan</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1686,16 +1686,16 @@ Licensnyckel: %2</translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation>
-        <numerusform>Lösenordet ska inte innehålla %n eller flera på varandra följande tecken tillsammans</numerusform>
-        <numerusform>Lösenordet ska inte innehålla %n eller flera på varandra följande tecken tillsammans</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation>
-        <numerusform>Lösenordet får inte innehålla %n eller flera upprepade tecken</numerusform>
-        <numerusform>Lösenordet får inte innehålla %n eller flera upprepade tecken</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
       </translation>
     </message>
     <message>
@@ -4327,7 +4327,7 @@ Licensnyckel: %2</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -4335,7 +4335,7 @@ Licensnyckel: %2</translation>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>TB</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -4995,9 +4995,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
-      <translation>
-        <numerusform>+ %n mer</numerusform>
-        <numerusform>+ %n mer</numerusform>
+      <translation type="unfinished">
+        <numerusform>+ %n more</numerusform>
+        <numerusform>+ %n more</numerusform>
       </translation>
     </message>
     <message>
@@ -5789,9 +5789,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <name>Strings</name>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Källa och %n fler kameror</numerusform>
-        <numerusform>Källa och %n fler kameror</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5861,9 +5861,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
-        <numerusform>%n ytterligare</numerusform>
-        <numerusform>%n ytterligare</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6663,7 +6663,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>%n MP</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n MP</numerusform>
         <numerusform>%n MP</numerusform>
       </translation>
@@ -8479,9 +8479,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation>
-        <numerusform>%n ny</numerusform>
-        <numerusform>%n ny</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
+        <numerusform>%n new</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8510,9 +8510,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 och %n fler grupper</numerusform>
-        <numerusform>%1 och %n fler grupper</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
     <message>
@@ -9105,9 +9105,9 @@ Platsens prestanda är försämrad.</translation>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
-      <translation>
-        <numerusform>%n valt:</numerusform>
-        <numerusform>%n valt:</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n selected:</numerusform>
+        <numerusform>%n selected:</numerusform>
       </translation>
     </message>
     <message>
@@ -10305,9 +10305,9 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation>
-        <numerusform>%1 och %n fler layouter</numerusform>
-        <numerusform>%1 och %n fler layouter</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
       </translation>
     </message>
     <message>
@@ -10318,9 +10318,9 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation>
-        <numerusform>%1 och %n fler videoväggar</numerusform>
-        <numerusform>%1 och %n fler videoväggar</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 and %n more video walls</numerusform>
       </translation>
     </message>
     <message>
@@ -10331,9 +10331,9 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation>
-        <numerusform>%1 och %n fler grupper</numerusform>
-        <numerusform>%1 och %n fler grupper</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
   </context>
@@ -11200,9 +11200,9 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... och %n mer</numerusform>
-        <numerusform>... och %n mer</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -12714,9 +12714,9 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Källa och %n fler kameror</numerusform>
-        <numerusform>Källa och %n fler kameror</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message>

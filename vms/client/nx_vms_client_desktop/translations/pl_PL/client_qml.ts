@@ -1731,7 +1731,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
       <translation type="unfinished">
-        <numerusform>%n więcej</numerusform>
+        <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
@@ -2381,11 +2381,11 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2841,11 +2841,11 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>

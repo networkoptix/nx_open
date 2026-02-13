@@ -1393,8 +1393,8 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>重置 %n 个其他授权</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4283,14 +4283,14 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n TB</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>TB</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -5711,8 +5711,8 @@ If you intended to move analytics data to another storage location, please conta
     <name>Strings</name>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>来源与 %n 个以上的摄像机</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5779,8 +5779,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
-        <numerusform>%n 增加</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8347,8 +8347,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation>
-        <numerusform>%n 新</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11032,8 +11032,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... 和 %n 更多</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -12528,8 +12528,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>来源与 %n 个以上的摄像机</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message>

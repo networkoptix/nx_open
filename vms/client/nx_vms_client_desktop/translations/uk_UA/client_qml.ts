@@ -2381,11 +2381,11 @@ Press Alt + Click to follow object</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>... і %n ще</numerusform>
-        <numerusform>... і %n ще</numerusform>
-        <numerusform>... і %n ще</numerusform>
-        <numerusform>... і %n ще</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2841,11 +2841,11 @@ Press Alt + Click to follow object</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... і %n бiльше</numerusform>
-        <numerusform>... і %n бiльше</numerusform>
-        <numerusform>... і %n бiльше</numerusform>
-        <numerusform>... і %n бiльше</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>

@@ -1706,8 +1706,8 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation>
-        <numerusform>%n thêm</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2345,8 +2345,8 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>... và %n hơn nữa</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2799,8 +2799,8 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... và %n hơn nữa</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>

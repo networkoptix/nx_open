@@ -2357,9 +2357,9 @@ Presione Alt + Clic para seguir el objeto</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>...y %n más</numerusform>
-        <numerusform>...y %n más</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2813,9 +2813,9 @@ Presione Alt + Clic para seguir el objeto</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... y %n más</numerusform>
-        <numerusform>... y %n más</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>

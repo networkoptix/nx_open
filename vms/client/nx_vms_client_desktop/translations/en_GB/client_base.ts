@@ -1402,7 +1402,7 @@ Licence Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Deactivate %n Other</numerusform>
         <numerusform>Deactivate %n Other</numerusform>
       </translation>
@@ -4327,7 +4327,7 @@ Licence Key: %2</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -4335,7 +4335,7 @@ Licence Key: %2</translation>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>TB</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -5790,7 +5790,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <translation type="unfinished">
-        <numerusform>Source and %n more Camera</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
         <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
@@ -5861,7 +5861,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n additional</numerusform>
         <numerusform>%n additional</numerusform>
       </translation>
@@ -8511,7 +8511,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more group</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
@@ -10306,7 +10306,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more layout</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
         <numerusform>%1 and %n more layouts</numerusform>
       </translation>
     </message>
@@ -10319,7 +10319,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more video wall</numerusform>
+        <numerusform>%1 and %n more video walls</numerusform>
         <numerusform>%1 and %n more video walls</numerusform>
       </translation>
     </message>
@@ -10332,7 +10332,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more group</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
@@ -11201,7 +11201,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>... and %n more</numerusform>
         <numerusform>... and %n more</numerusform>
       </translation>
@@ -12716,7 +12716,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <translation type="unfinished">
-        <numerusform>Source and %n more Camera</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
         <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
