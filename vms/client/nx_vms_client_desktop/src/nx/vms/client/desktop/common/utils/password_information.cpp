@@ -62,13 +62,15 @@ PasswordInformation::PasswordInformation(PasswordStrength strength)
         case PasswordStrength::Conseq:
             m_text = tr("Weak");
             m_hint = tr("Password should not contain %n or more consecutive characters together",
-                "", PasswordLimitations::kConsecutiveCharactersLimit);
+                "Numerus: %n is a hardcoded 4",
+                PasswordLimitations::kConsecutiveCharactersLimit);
             break;
 
         case PasswordStrength::Repeat:
             m_text = tr("Weak");
             m_hint = tr("Password should not contain %n or more repeating characters",
-                "", PasswordLimitations::kRepeatingCharactersLimit);
+                "Numerus: %n is a hardcoded 4",
+                PasswordLimitations::kRepeatingCharactersLimit);
             break;
 
         case PasswordStrength::Common:

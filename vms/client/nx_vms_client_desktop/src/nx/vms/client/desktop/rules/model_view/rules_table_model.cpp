@@ -711,7 +711,8 @@ QVariant RulesTableModel::targetCameraData(const ConstRulePtr& rule, int role) c
         {
             return resources.empty()
                 ? tr("Source camera")
-                : tr("Source and %n more Cameras", "", static_cast<int>(resources.size()));
+                : tr("Source and %n more Cameras", "Numerus: placeholder for more items",
+                    static_cast<int>(resources.size()));
         }
 
         if (resources.isEmpty())

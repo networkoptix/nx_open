@@ -325,7 +325,8 @@ QString QnSystemHealthStringsHelper::resourceText(
     {
         const auto numberOfHiddenResources = list.size() - maxResourcesLines;
         const auto coloredLine = nx::vms::common::html::colored(
-            tr("+ %n more", "", numberOfHiddenResources), core::colorTheme()->color("light16"));
+            tr("+ %n more", "Numerus: placeholder for more items", numberOfHiddenResources),
+            core::colorTheme()->color("light16"));
         formattedResources.append(coloredLine);
     }
     return QString("<html><body>%1</body></html>").arg(formattedResources.join("<br>"));

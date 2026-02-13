@@ -446,7 +446,9 @@ bool LicenseDeactivationDialogs::partialDeactivationError(
     messageBox.setEscapeButton(QDialogButtonBox::Cancel);
 
     QPushButton* deactivateButton = messageBox.addButton(
-        tr("Deactivate %n Other", "", licenses.size() - errors.size()),
+        tr("Deactivate %n Other",
+            "Numerus: %n is the count of licenses which can be deactivated",
+            licenses.size() - errors.size()),
         QDialogButtonBox::YesRole,
         Qn::ButtonAccent::Warning);
     messageBox.setDefaultButton(deactivateButton);

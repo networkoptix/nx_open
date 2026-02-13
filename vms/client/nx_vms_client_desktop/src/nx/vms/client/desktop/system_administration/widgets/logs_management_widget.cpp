@@ -442,7 +442,9 @@ void LogsManagementWidget::updateWidgets(LogsManagementWatcher::State state)
     ui->settingsButton->setVisible(selectionCount);
     ui->resetButton->setVisible(!selectionCount);
     ui->selectedButton->setVisible(selectionCount);
-    ui->selectedButton->setText(tr("%n selected:", "number of selected rows", selectionCount));
+    ui->selectedButton->setText(tr("%n selected:",
+        "Numerus: %n is a number of selected rows",
+        selectionCount));
 
     ui->cancelButton->setVisible(!downloadFinished);
     ui->downloadingLabel->setVisible(!downloadFinished);

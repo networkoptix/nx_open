@@ -61,7 +61,7 @@ Item
             readonly property int remainder: count - displayedCount
 
             color: resourceList.remainderColor
-            text: qsTr("...and %n more", "", remainder)
+            text: qsTr("...and %n more", "Numerus: placeholder for more items", remainder)
             visible: remainder > 0
             topPadding: 4
             font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }

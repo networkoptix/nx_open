@@ -161,8 +161,8 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     setHelpTopic(this, HelpTopic::Id::ServerSettings_StorageAnalitycs);
 
     // TODO: #sivanov Use HumanReadable texts instead.
-    ui->extraSizeSpinBox->setSuffix(' ' + tr("TB", "TB - terabytes"));
-    ui->maxSizeLabel->setText(tr("%n TB", "TB - terabytes",
+    ui->extraSizeSpinBox->setSuffix(' ' + tr("TB", "TB for terabytes"));
+    ui->maxSizeLabel->setText(tr("%n TB", "Numerus: TB for terabytes",
         qRound(ui->extraSizeSpinBox->maximum())));
 
     m_statsTableScrollbar = new SnappedScrollBar(this);

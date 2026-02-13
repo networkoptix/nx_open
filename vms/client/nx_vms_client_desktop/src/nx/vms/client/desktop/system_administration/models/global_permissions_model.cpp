@@ -140,7 +140,7 @@ QVariant GlobalPermissionsModel::data(const QModelIndex& index, int role) const
 
             const QString groupsInfoTemplate = groupsData.size() == 1
                 ? tr("%1 group", "%1 will be substituted with a user group name")
-                : tr("%1 and %n more groups", "%1 will be substituted with a user group name",
+                : tr("%1 and %n more groups", "Numerus: %1 will be substituted with a user group name",
                     groupsData.size() - 1);
 
             const QString permisionName = permissions.at(index.row()).second;

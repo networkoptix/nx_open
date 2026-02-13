@@ -219,7 +219,10 @@ QString UsageHelper::getProposedUsageText(Qn::LicenseType licenseType) const
 {
     if (usedLicenses(licenseType) == 0)
         return QString();
-    return tr("%n %2 will be used out of %1.", "", usedLicenses(licenseType)).arg(totalLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
+    return tr("%n %2 will be used out of %1.",
+        "Numerus: %2 is substituted with the required license type",
+        usedLicenses(licenseType)
+    ).arg(totalLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 }
 
 QString UsageHelper::getProposedUsageMsg() const
@@ -230,10 +233,18 @@ QString UsageHelper::getProposedUsageMsg() const
 QString UsageHelper::getRequiredText(Qn::LicenseType licenseType) const
 {
     if (requiredLicenses(licenseType) > 0)
-        return tr("Activate %n more %1.", "", requiredLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
+    {
+        return tr("Activate %n more %1.",
+            "Numerus: %1 is substituted with the required license type",
+            requiredLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
+    }
 
     if (isValid() && proposedLicenses(licenseType) > 0)
-        return tr("%n more %1 will be used.", "", proposedLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
+    {
+        return tr("%n more %1 will be used.",
+            "Numerus: %1 is substituted with the required license type",
+            proposedLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
+    }
 
     return QString();
 }
