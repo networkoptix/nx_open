@@ -4327,15 +4327,15 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>%n TB</numerusform>
-        <numerusform>%n TB</numerusform>
+      <translation>
+        <numerusform>%n ТБ</numerusform>
+        <numerusform>%n ТБ</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>ТБ</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -11201,9 +11201,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... болон %n дэлгэрэнгүй</numerusform>
+        <numerusform>... болон %n дэлгэрэнгүй</numerusform>
       </translation>
     </message>
     <message numerus="yes">

@@ -1420,11 +1420,11 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>Deaktivovat %n ostatní</numerusform>
+        <numerusform>Deaktivovat %n ostatní</numerusform>
+        <numerusform>Deaktivovat %n ostatní</numerusform>
+        <numerusform>Deaktivovat %n ostatní</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1720,20 +1720,20 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků</numerusform>
       </translation>
     </message>
     <message>
@@ -4415,7 +4415,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
@@ -4425,7 +4425,7 @@ License Key: %2</translation>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -5945,11 +5945,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>Strings</name>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6025,11 +6025,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
+      <translation>
+        <numerusform>%n dodatečný</numerusform>
+        <numerusform>%n dodatečný</numerusform>
+        <numerusform>%n dodatečný</numerusform>
+        <numerusform>%n dodatečný</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8743,11 +8743,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n nový</numerusform>
+        <numerusform>%n nový</numerusform>
+        <numerusform>%n nový</numerusform>
+        <numerusform>%n nový</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11533,11 +11533,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... a %n dalších</numerusform>
+        <numerusform>... a %n dalších</numerusform>
+        <numerusform>... a %n dalších</numerusform>
+        <numerusform>... a %n dalších</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -13079,11 +13079,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
       </translation>
     </message>
     <message>

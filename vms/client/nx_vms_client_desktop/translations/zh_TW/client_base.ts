@@ -1393,8 +1393,8 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>重置另外 %n 個</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1669,14 +1669,14 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>密碼不得包含 %n 個或更多連續的字符</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>密碼不得包含 %n 個或更多重覆的字元</numerusform>
       </translation>
     </message>
     <message>
@@ -4283,14 +4283,14 @@ License Key: %2</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -4944,8 +4944,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ 還有%n 個</numerusform>
       </translation>
     </message>
     <message>
@@ -5711,8 +5711,8 @@ If you intended to move analytics data to another storage location, please conta
     <name>Strings</name>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>來源與 %n 個以上的攝影機</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5779,8 +5779,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
+      <translation>
+        <numerusform>%n 附加</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6556,7 +6556,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n MP</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n MP</numerusform>
       </translation>
     </message>
@@ -8347,8 +8347,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n 新</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8376,8 +8376,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 和其他 %n 個群組</numerusform>
       </translation>
     </message>
     <message>
@@ -8963,8 +8963,8 @@ Site performance is degraded.</source>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
+      <translation>
+        <numerusform>%n 個已選：</numerusform>
       </translation>
     </message>
     <message>
@@ -10155,8 +10155,8 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more layouts</numerusform>
+      <translation>
+        <numerusform>%1 和其他 %n 個佈局</numerusform>
       </translation>
     </message>
     <message>
@@ -10167,8 +10167,8 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more video walls</numerusform>
+      <translation>
+        <numerusform>%1 和其他 %n 個電視牆</numerusform>
       </translation>
     </message>
     <message>
@@ -10179,8 +10179,8 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 和其他 %n 個群組</numerusform>
       </translation>
     </message>
   </context>
@@ -11032,8 +11032,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... 與另外 %n 個</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -12528,8 +12528,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>來源與 %n 個以上的攝影機</numerusform>
       </translation>
     </message>
     <message>

@@ -1708,8 +1708,8 @@ Select an Integration to begin configuring its parameters.</source>
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>ほか %n</numerusform>
       </translation>
     </message>
   </context>
@@ -2349,8 +2349,8 @@ Alt + クリックを使用してください。</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...さらに %n 件</numerusform>
       </translation>
     </message>
   </context>
@@ -2803,8 +2803,8 @@ Alt + クリックを使用してください。</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... ほか %n 件</numerusform>
       </translation>
     </message>
   </context>
