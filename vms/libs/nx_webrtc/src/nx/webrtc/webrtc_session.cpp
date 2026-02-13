@@ -266,7 +266,7 @@ void Session::addProvider(std::shared_ptr<AbstractCameraDataProvider> provider)
 
 void Session::setTranscodingParams(
     nx::vms::api::WebRtcMethod method,
-    const nx::core::transcoding::Settings& transcodingSettings,
+    QnLegacyTranscodingSettings transcodingSettings,
     std::optional<nx::vms::api::ResolutionData> resolution,
     std::optional<nx::vms::api::ResolutionData> resolutionWhenTranscoding,
     nx::vms::api::WebRtcTrackerSettings::MseFormat mseFormat)
@@ -283,7 +283,7 @@ bool Session::initializeMuxersInternal()
 {
     // Ignore aspect ratio if user specifies the full resolution.
     if (m_resolution && m_resolution->size.width() > 0)
-        m_transcodingSettings.aspectRatio = QnAspectRatio();
+        m_transcodingSettings.forcedAspectRatio = QnAspectRatio();
 
     for (const auto& [_, provider]: m_providers)
     {
@@ -299,7 +299,7 @@ bool Session::initializeMuxersInternal()
         auto videoCodecParamaters = provider->getVideoCodecParameters();
         if (videoCodecParamaters)
         {
-            bool videoTranscodingRequired = m_transcodingSettings.isTranscodingRequired()
+            bool videoTranscodingRequired = !m_transcodingSettings.isEmpty()
                 || m_resolution
                 || useFallbackVideo
                 || !m_muxer->isVideoCodecSupported(videoCodecParamaters->codec_id);
