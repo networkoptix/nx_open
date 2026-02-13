@@ -136,11 +136,18 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
 
         const nx::vms::api::StreamIndex newStream = parseStreamIndex(addObj);
 
-        m_session->createProvider(
-            newDeviceId,
-            positionMs,
-            newStream,
-            std::nullopt /*speedOpt*/);
+        try
+        {
+            m_session->createProvider(
+                newDeviceId,
+                positionMs,
+                newStream,
+                std::nullopt /*speedOpt*/);
+        }
+        catch (const std::exception& e)
+        {
+            NX_WARNING(this, "Can't create provider: %1", e.what());
+        }
         return;
     }
 
