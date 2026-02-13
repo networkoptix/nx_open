@@ -46,4 +46,4 @@ struct QnCamRecordingStatsData: public QnRecordingStatsData
 QN_FUSION_DECLARE_FUNCTIONS(QnRecordingStatsData, (json))
 QN_FUSION_DECLARE_FUNCTIONS(QnCamRecordingStatsData, (json), NX_VMS_COMMON_API)
 
-typedef QVector<QnCamRecordingStatsData> QnRecordingStatsReply;
+typedef QList<QnCamRecordingStatsData> QnRecordingStatsReply;

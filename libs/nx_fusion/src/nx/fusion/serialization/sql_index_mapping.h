@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <nx/utils/log/assert.h>
 
@@ -13,7 +13,6 @@ namespace QnSqlDetail {
     class MappingVisitor;
     class FetchVisitor;
 }
-
 
 class QnSqlIndexMapping {
 public:
@@ -44,7 +43,7 @@ private:
     friend class QnSqlDetail::MappingVisitor;
     friend class QnSqlDetail::FetchVisitor;
 
-    QVector<int> indices;
+    QList<int> indices;
 };
 
 #endif // QN_SQL_INDEX_MAPPING_H

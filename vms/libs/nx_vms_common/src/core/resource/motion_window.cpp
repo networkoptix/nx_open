@@ -23,7 +23,7 @@ QnRegion::QnRegion(const QnRegion& right)
     QRegion()
 {
     //making deep copy of right
-    const QVector<QRect>& _rects = right.rects();
+    const QList<QRect>& _rects = right.rects();
     setRects( _rects.constData(), _rects.size() );
 }
 
@@ -56,13 +56,13 @@ QnRegion& QnRegion::operator=( const QnRegion& r )
     if( this != &r )
     {
         //making deep copy of right
-        const QVector<QRect>& _rects = r.rects();
+        const QList<QRect>& _rects = r.rects();
         setRects( _rects.constData(), _rects.size() );
     }
     return *this;
 }
 
-QVector<QRect> QnRegion::rects() const
+QList<QRect> QnRegion::rects() const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     return {begin(), end()};
@@ -124,7 +124,7 @@ QMultiMap<int, QRect> QnMotionRegion::getAllMotionRects() const
     QMultiMap<int, QRect> result;
     for (int sens = 1; sens < kSensitivityLevelCount; ++sens)
     {
-        QVector<QRect> rects = getRectsBySens(sens);
+        QList<QRect> rects = getRectsBySens(sens);
         for (int i = 0; i < rects.size(); ++i)
             result.insert(sens, rects[i]);
     }
@@ -143,10 +143,10 @@ QPainterPath QnMotionRegion::getRegionBySensPath(int value) const {
     return m_pathCache[value];
 }
 
-QVector<QRect> QnMotionRegion::getRectsBySens(int value) const
+QList<QRect> QnMotionRegion::getRectsBySens(int value) const
 {
-    QVector<QRect> rects = m_data[value].rects();
-    QVector<int> ignoreList;
+    QList<QRect> rects = m_data[value].rects();
+    QList<int> ignoreList;
     ignoreList.resize(rects.size());
     // simplify rects
     for (int i = 0; i < rects.size(); ++i)
@@ -160,7 +160,7 @@ QVector<QRect> QnMotionRegion::getRectsBySens(int value) const
             }
         }
     }
-    QVector<QRect> result;
+    QList<QRect> result;
     for (int i = 0; i < rects.size(); ++i)
     {
         if (!ignoreList[i])
@@ -217,7 +217,7 @@ bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
         {
             if (sens == newSens)
                 return false;
-            QVector<QRect> rects = m_data[sens].rects();
+            QList<QRect> rects = m_data[sens].rects();
             QnRegion linkedRects;
             for (int i = 0; i < rects.size(); ++i)
             {

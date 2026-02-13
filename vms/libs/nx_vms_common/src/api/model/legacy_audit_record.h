@@ -49,5 +49,5 @@ QN_FUSION_DECLARE_FUNCTIONS(
     QnLegacyAuditRecord, (ubjson)(json)(sql_record), NX_VMS_COMMON_API)
 NX_REFLECTION_INSTRUMENT(QnLegacyAuditRecord, QnLegacyAuditRecord_Fields)
 
-using QnLegacyAuditRecordList = QVector<QnLegacyAuditRecord>;
-using QnLegacyAuditRecordRefList = QVector<QnLegacyAuditRecord*>;
+using QnLegacyAuditRecordList = QList<QnLegacyAuditRecord>;
+using QnLegacyAuditRecordRefList = QList<QnLegacyAuditRecord*>;

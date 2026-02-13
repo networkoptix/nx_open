@@ -3,7 +3,7 @@
 #ifndef QN_PROTO_MESSAGE_H
 #define QN_PROTO_MESSAGE_H
 
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include "proto_parse_error.h"
 #include "proto_record.h"
@@ -12,8 +12,8 @@
 class NX_FUSION_API QnProtoMessage
 {
 public:
-    typedef QVector<QnProtoRecord>::const_iterator const_iterator;
-    typedef QVector<QnProtoRecord>::iterator iterator;
+    typedef QList<QnProtoRecord>::const_iterator const_iterator;
+    typedef QList<QnProtoRecord>::iterator iterator;
 
     QnProtoMessage() {}
 
@@ -46,10 +46,7 @@ public:
     void pop_back() { m_records.pop_back(); }
 
 private:
-    QVector<QnProtoRecord> m_records;
+    QList<QnProtoRecord> m_records;
 };
-
-
-
 
 #endif // QN_PROTO_MESSAGE_H

@@ -43,14 +43,14 @@ public:
     // to local part
     QByteArray localPeersMessage; //< last sent peers message
     QElapsedTimer localPeersTimer; //< last sent peers time
-    QVector<vms::api::PersistentIdData> localSubscription; //< local -> remote subscription
+    QList<vms::api::PersistentIdData> localSubscription; //< local -> remote subscription
     bool isLocalStarted = false; //< we opened connection to remote peer
-    QVector<PeerNumberType> awaitingNumbersToResolve;
+    QList<PeerNumberType> awaitingNumbersToResolve;
     bool sendDataInProgress = false; //< Select from transaction log in progress
 
     // to remote part
     QByteArray remotePeersMessage; //< last received peers message
-    QVector<PeerDistanceRecord> remotePeers;
+    QList<PeerDistanceRecord> remotePeers;
     vms::api::TranState remoteSubscription; //< remote -> local subscription
     bool isRemoteSubscribedToAll = false; //< remote -> local subscription. Add implicit data to subscription (subscribeAll).
     bool recvDataInProgress = false;

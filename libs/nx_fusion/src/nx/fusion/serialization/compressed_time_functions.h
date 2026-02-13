@@ -98,7 +98,6 @@ namespace QnCompressedTimeDetail {
     }
 } // QnCompressedTimeDetail
 
-
 #ifndef Q_MOC_RUN
 #define QN_DEFINE_DIRECT_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(TYPE, READ_METHOD, WRITE_METHOD) \
 template<class Output>                                                          \
@@ -116,7 +115,6 @@ QN_DEFINE_DIRECT_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(QnTimePeriod,  readQnTi
 QN_DEFINE_DIRECT_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(nx::Uuid,        readUuid,       writeUuid)
 #undef QN_DEFINE_DIRECT_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS
 
-
 #define QN_DEFINE_COLLECTION_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG, IMPL) \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Output>                            \
 void serialize(const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> &value, QnCompressedTimeWriter<Output> *stream) { \
@@ -129,10 +127,9 @@ bool deserialize(QnCompressedTimeReader<Input> *stream, TYPE<BOOST_PP_TUPLE_ENUM
 }
 
 QN_DEFINE_COLLECTION_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator), collection);
-QN_DEFINE_COLLECTION_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(QVector, (class T), (T), collection);
+QN_DEFINE_COLLECTION_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(QList, (class T), (T), collection);
 
 #undef QN_DEFINE_COLLECTION_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS
 #endif // Q_MOC_RUN
-
 
 #endif // QN_COMPRESSED_TIME_FUNCTIONS_H

@@ -31,7 +31,7 @@ public:
 
     QnRegion& operator=( const QnRegion& r );
 
-    QVector<QRect> rects() const;
+    QList<QRect> rects() const;
 
 private:
     mutable nx::Mutex m_mutex;
@@ -91,7 +91,7 @@ public:
     /**
      * Returns simplified version of region's rects
      */
-    QVector<QRect> getRectsBySens(int value) const;
+    QList<QRect> getRectsBySens(int value) const;
 
     bool updateSensitivityAt(const QPoint& pos, int sens);
 
@@ -118,6 +118,5 @@ NX_VMS_COMMON_API std::optional<QList<QnMotionRegion>> parseMotionRegionList(
     const QByteArray& regionsString);
 
 QString serializeMotionRegionList(const QList<QnMotionRegion>& regions);
-
 
 #endif // __MOTION_WINDOW_H__

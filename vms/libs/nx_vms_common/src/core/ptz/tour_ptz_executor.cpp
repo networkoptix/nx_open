@@ -39,7 +39,7 @@ struct QnPtzTourSpotData {
     qint64 moveTime;
 };
 
-using QnPtzTourSpotDataList = QVector<QnPtzTourSpotData>;
+using QnPtzTourSpotDataList = QList<QnPtzTourSpotData>;
 
 struct QnPtzTourData {
     QnPtzTour tour;

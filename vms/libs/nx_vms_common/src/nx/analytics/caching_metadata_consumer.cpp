@@ -6,7 +6,7 @@
 
 #include <boost/container/flat_map.hpp>
 
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtCore/QMultiMap>
 #include <QtCore/QSharedPointer>
 
@@ -211,7 +211,6 @@ bool MetadataCache<ObjectMetadataPacketPtr>::containsTime(
     return (t->timestampUs <= timestampUs) && (timestampUs < (t->timestampUs + t->durationUs));
 }
 
-
 template<>
 QnConstAbstractCompressedMetadataPtr MetadataCache<QnConstAbstractCompressedMetadataPtr>::uncompress(
     const QnConstAbstractCompressedMetadataPtr& metadata)
@@ -246,7 +245,7 @@ template<typename T>
 class CachingMetadataConsumer<T>::Private
 {
 public:
-    QVector<QSharedPointer<MetadataCache<T>>> cachePerChannel;
+    QList<QSharedPointer<MetadataCache<T>>> cachePerChannel;
     size_t cacheSize = 1;
 };
 

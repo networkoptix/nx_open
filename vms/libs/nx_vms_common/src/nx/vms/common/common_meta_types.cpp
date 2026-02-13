@@ -147,7 +147,7 @@ void initializeMetatypesInternal()
     qRegisterMetaType<QnCameraAdvancedParamValue>();
     qRegisterMetaType<QnCameraAdvancedParamValueList>();
 
-    qRegisterMetaType<QVector<int>>(); /* This one is used by QAbstractItemModel. */
+    qRegisterMetaType<QList<int>>(); /* This one is used by QAbstractItemModel. */
 
     qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<std::optional<nx::recording::Error>>();

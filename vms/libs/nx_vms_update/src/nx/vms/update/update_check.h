@@ -36,12 +36,12 @@ using FetchPublicationInfoResult = std::variant<PublicationInfo, FetchError>;
 NX_VMS_UPDATE_API FetchPublicationInfoResult fetchPublicationInfo(
     const nx::utils::SoftwareVersion& version, const nx::Url& urlPrefix);
 NX_VMS_UPDATE_API FetchPublicationInfoResult fetchPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const QVector<nx::Url>& urlPrefixes);
+    const nx::utils::SoftwareVersion& version, const QList<nx::Url>& urlPrefixes);
 
 NX_VMS_UPDATE_API FetchPublicationInfoResult fetchLegacyPublicationInfo(
     const nx::utils::SoftwareVersion& version, const nx::Url& urlPrefix);
 NX_VMS_UPDATE_API FetchPublicationInfoResult fetchLegacyPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const QVector<nx::Url>& urlPrefixes);
+    const nx::utils::SoftwareVersion& version, const QList<nx::Url>& urlPrefixes);
 
 using PublicationInfoResult = std::variant<PublicationInfo, FetchError, std::nullptr_t>;
 

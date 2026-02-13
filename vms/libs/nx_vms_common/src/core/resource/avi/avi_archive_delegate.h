@@ -137,7 +137,7 @@ private:
 
     bool m_eofReached = false;
     nx::Mutex m_openMutex;
-    QVector<qint64> m_lastPacketTimes;
+    QList<qint64> m_lastPacketTimes;
     bool m_fastStreamFind = false;
     bool m_hasVideo = true;
     qint64 m_lastSeekTime = AV_NOPTS_VALUE;

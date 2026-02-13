@@ -8,7 +8,7 @@
 #include <set>
 
 #include <QtCore/QRect>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/media/meta_data_packet.h>
@@ -96,7 +96,7 @@ struct AttributeGroup
 
 NX_VMS_COMMON_API bool operator==(const AttributeGroup& left, const AttributeGroup& right);
 
-using GroupedAttributes = QVector<AttributeGroup>; //< QVector for implicit sharing in the UI.
+using GroupedAttributes = QList<AttributeGroup>; //< QList for implicit sharing in the UI.
 
 NX_VMS_COMMON_API GroupedAttributes groupAttributes(
     const Attributes& attributes,
@@ -209,7 +209,6 @@ struct NX_VMS_COMMON_API ObjectMetadataPacket
 
     /**%apidoc[opt] Video stream from which analytics data was received. */
     nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::undefined;
-
 
     nx::Uuid analyticsEngineId;
 

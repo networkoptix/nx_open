@@ -20,14 +20,14 @@ quint32 deserializeCompressedSize(nx::utils::BitStreamReader& reader);
 QByteArray serializePeersMessage(const std::vector<PeerDistanceRecord>& records, int reservedSpaceAtFront = 1);
 std::vector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success);
 
-QByteArray serializeCompressedPeers(const QVector<PeerNumberType>& peers, int reservedSpaceAtFront = 1);
-QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
+QByteArray serializeCompressedPeers(const QList<PeerNumberType>& peers, int reservedSpaceAtFront = 1);
+QList<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
 
-QByteArray serializeSubscribeRequest(const QVector<SubscribeRecord>& request, int reservedSpaceAtFront = 1);
-QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, bool* success);
+QByteArray serializeSubscribeRequest(const QList<SubscribeRecord>& request, int reservedSpaceAtFront = 1);
+QList<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, bool* success);
 
-QByteArray serializeResolvePeerNumberResponse(const QVector<PeerNumberResponseRecord>& peers, int reservedSpaceAtFront = 1);
-const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(const QByteArray& data, bool* success);
+QByteArray serializeResolvePeerNumberResponse(const QList<PeerNumberResponseRecord>& peers, int reservedSpaceAtFront = 1);
+const QList<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(const QByteArray& data, bool* success);
 
 QByteArray serializeTransactionList(const QList<QByteArray>& tranList, int reservedSpaceAtFront = 1);
 QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* success);

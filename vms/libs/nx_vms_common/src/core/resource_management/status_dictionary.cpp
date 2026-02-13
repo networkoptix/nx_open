@@ -24,7 +24,7 @@ void QnResourceStatusDictionary::clear()
     m_items.clear();
 }
 
-void QnResourceStatusDictionary::clear(const QVector<nx::Uuid>& idList)
+void QnResourceStatusDictionary::clear(const QList<nx::Uuid>& idList)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     for(const nx::Uuid& id: idList)

@@ -6,7 +6,8 @@
  * Custom nx_reflect/json functions for Qt containers.
  *
  * Qt associative containers do not satisfy STL concepts like AssociativeContainer. So, separate
- * support functions are added here. Qt sequence containers (QList, QVector) work out of the box.
+ * support functions are added here. Qt sequence container QList work out of the box.
+ * Starting from Qt 6.0 QVector is just a typedef for QList.
  */
 
 #include <QtCore/QMap>

@@ -4,7 +4,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <nx/vms/common/system_context_aware.h>
 
@@ -60,7 +60,7 @@ public:
     ResultCode deleteFile(const QString& fileName, bool deleteData = true);
     ResultCode deleteFilesByType(const QString& type);
 
-    QVector<QByteArray> getChunkChecksums(const QString& fileName);
+    QList<QByteArray> getChunkChecksums(const QString& fileName);
 
     void startDownloads();
     void stopDownloads();

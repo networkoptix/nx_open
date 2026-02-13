@@ -8,7 +8,7 @@
 #ifdef QN_TIME_PERIODS_STD
     #include <vector>
 #else
-    #include <QtCore/QVector>
+    #include <QtCore/QList>
 #endif
 
 #include <nx/utils/log/assert.h>
@@ -24,13 +24,13 @@ class NX_VMS_COMMON_API QnTimePeriodList:
 #ifdef QN_TIME_PERIODS_STD
     public std::vector<QnTimePeriod>
 #else
-    public QVector<QnTimePeriod>
+    public QList<QnTimePeriod>
 #endif
 {
 #ifdef QN_TIME_PERIODS_STD
     typedef std::vector<QnTimePeriod> base_type;
 #else
-    typedef QVector<QnTimePeriod> base_type;
+    typedef QList<QnTimePeriod> base_type;
 #endif
 
 public:

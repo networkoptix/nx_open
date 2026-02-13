@@ -3,7 +3,7 @@
 #pragma once
 
 #include <QtCore/QRect>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <nx/media/aligned_allocator.h>
 #include <nx/media/media_data_packet.h>
@@ -209,4 +209,4 @@ private:
     qint64 m_firstTimestamp = AV_NOPTS_VALUE;
 };
 
-using FrameMetadata = QVector<QnAbstractCompressedMetadataPtr>;
+using FrameMetadata = QList<QnAbstractCompressedMetadataPtr>;

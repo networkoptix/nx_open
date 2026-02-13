@@ -521,7 +521,7 @@ void Worker::requestChecksums()
 
     while (!peers.isEmpty() && !needToStop())
     {
-        using Context = RequestContext<QVector<QByteArray>, Peer>;
+        using Context = RequestContext<QList<QByteArray>, Peer>;
         std::vector<Context> contexts;
 
         while (!peers.isEmpty() && contexts.size() < kMaxPeersToCheckAtOnce && !needToStop())
@@ -542,7 +542,7 @@ void Worker::requestChecksums()
             break;
 
         Context::processRequests(this, contexts,
-            [this](const Worker::Peer& peer, const std::optional<QVector<QByteArray>>& checksums)
+            [this](const Worker::Peer& peer, const std::optional<QList<QByteArray>>& checksums)
             {
                 handleChecksumsReply(peer, checksums);
                 return m_state != State::requestingChecksums;
@@ -570,7 +570,7 @@ void Worker::requestChecksums()
 }
 
 void Worker::handleChecksumsReply(
-    const Peer& peer, const std::optional<QVector<QByteArray>>& checksums)
+    const Peer& peer, const std::optional<QList<QByteArray>>& checksums)
 {
     NX_VERBOSE(m_logTag, "handleChecksumsReply(): Got %1 from %2: %3",
         requestSubjectString(State::requestingChecksums),

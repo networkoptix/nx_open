@@ -99,10 +99,10 @@ Result AacParser::processData(
 {
     gotData = false;
 
-    QVector<int> auSize;
-    QVector<int> auIndex;
-    QVector<int> auCtsDelta;
-    QVector<int> auDtsDelta;
+    QList<int> auSize;
+    QList<int> auIndex;
+    QList<int> auCtsDelta;
+    QList<int> auDtsDelta;
 
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
     const quint8* curPtr = rtpBuffer;

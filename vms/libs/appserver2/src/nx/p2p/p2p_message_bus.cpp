@@ -806,7 +806,7 @@ bool MessageBus::handlePushImpersistentBroadcastTransaction(
 bool MessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
-    QVector<PeerNumberType> request;
+    QList<PeerNumberType> request;
     if (connection->localPeer().dataFormat == Qn::SerializationFormat::ubjson)
         request = deserializeCompressedPeers(data, &success);
     else
@@ -814,7 +814,7 @@ bool MessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connecti
     if (!success)
         return false;
 
-    QVector<PeerNumberResponseRecord> response;
+    QList<PeerNumberResponseRecord> response;
     response.reserve(request.size());
     for (const auto& peer: request)
     {
@@ -840,7 +840,7 @@ bool MessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connecti
 bool MessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
-    QVector<PeerNumberResponseRecord> records;
+    QList<PeerNumberResponseRecord> records;
     if (connection->remotePeer().dataFormat == Qn::SerializationFormat::ubjson)
         records = deserializeResolvePeerNumberResponse(data, &success);
     else
@@ -944,7 +944,7 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
     }
 
     auto connectionContext = context(connection);
-    QVector<PeerNumberType> moreNumbersToResolve;
+    QList<PeerNumberType> moreNumbersToResolve;
 
     std::set_difference(
         numbersToResolve.begin(),
@@ -1151,7 +1151,7 @@ void MessageBus::sendRuntimeData(
 bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
-    QVector<SubscribeRecord> request;
+    QList<SubscribeRecord> request;
     if (connection->remotePeer().dataFormat == Qn::SerializationFormat::ubjson)
         request = deserializeSubscribeRequest(data, &success);
     else
@@ -1349,7 +1349,7 @@ void MessageBus::gotUnicastTransaction(
     QMap<P2pConnectionPtr, TransportHeader> dstByConnection;
     for (const auto& dstPeer: unprocessedPeers)
     {
-        QVector<PersistentIdData> via;
+        QList<PersistentIdData> via;
         int distance = kMaxDistance;
         nx::Uuid dstPeerId = routeToPeerVia(dstPeer, &distance, /*address*/ nullptr);
         if (distance > kMaxOnlineDistance || dstPeerId.isNull())

@@ -219,7 +219,7 @@ private:
     bool m_eof;
     FrameTypeExtractor* m_frameTypeExtractor;
     qint64 m_lastGopSeekTime;
-    QVector<int> m_audioCodecs;
+    QList<int> m_audioCodecs;
     bool m_IFrameAfterJumpFound;
     std::atomic<qint64> m_requiredJumpTime;
     qint64 m_lastSeekPosition = AV_NOPTS_VALUE;

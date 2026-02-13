@@ -472,7 +472,7 @@ struct Pixelation::Private
     QPointer<QThread> rhiThread = nullptr;
 
     void initRhi();
-    QImage pixelate(const QImage& source, const QVector<QRectF>& rectangles, double intensity);
+    QImage pixelate(const QImage& source, const QList<QRectF>& rectangles, double intensity);
 };
 
 Pixelation::Private::Private()
@@ -508,7 +508,7 @@ void Pixelation::Private::initRhi()
 
 QImage Pixelation::Private::pixelate(
     const QImage& source,
-    const QVector<QRectF>& rectangles,
+    const QList<QRectF>& rectangles,
     double intensity)
 {
     if (!NX_ASSERT(QThread::currentThread() == rhiThread))
@@ -557,7 +557,7 @@ Pixelation::~Pixelation()
 
 QImage Pixelation::pixelate(
     const QImage& source,
-    const QVector<QRectF>& rectangles,
+    const QList<QRectF>& rectangles,
     double intensity)
 {
     NX_ASSERT(QThread::currentThread() == d->rhiThread);
@@ -888,7 +888,7 @@ struct BlurBuffer::Private
     QRhi* rhi;
     QSize size;
     std::unique_ptr<MaskRenderingProcess> mask;
-    QVector<QRectF> maskRectangles;
+    QList<QRectF> maskRectangles;
     std::unique_ptr<BlurProcess> blurProcess;
 };
 
@@ -912,7 +912,7 @@ BlurBuffer::~BlurBuffer()
 }
 
 void BlurBuffer::blur(
-    const QVector<QRectF>& rectangles,
+    const QList<QRectF>& rectangles,
     double intensity)
 {
     if (rectangles != d->maskRectangles)

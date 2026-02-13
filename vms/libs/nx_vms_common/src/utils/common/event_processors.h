@@ -6,7 +6,7 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <nx/utils/log/assert.h>
 
@@ -80,7 +80,7 @@ protected:
     }
 
 private:
-    QVector<bool> m_typeMask;
+    QList<bool> m_typeMask;
 };
 
 template<class Base>
@@ -272,7 +272,7 @@ private:
     void grow(QnEventSignalEmitter *emitter);
 
 private:
-    QVector<Signal> m_freeList;
+    QList<Signal> m_freeList;
 };
 
 /* Container version of createEventSignalizer function: */

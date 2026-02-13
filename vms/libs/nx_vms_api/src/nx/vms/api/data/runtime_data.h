@@ -4,7 +4,7 @@
 
 #include <QtCore/QSet>
 #include <QtCore/QString>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtCore/QtGlobal>
 
 #include <nx/reflect/instrument.h>
@@ -39,7 +39,7 @@ struct NX_VMS_API RuntimeData
     /**%apidoc Videowall layout id, governed by the current client instance's control session. */
     nx::Uuid videoWallControlSession;
 
-    QVector<QString> hardwareIds;
+    QList<QString> hardwareIds;
 
     QString nx1mac;
     QString nx1serial;

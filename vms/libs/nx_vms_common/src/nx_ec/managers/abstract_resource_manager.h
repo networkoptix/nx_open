@@ -3,7 +3,7 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
@@ -95,7 +95,7 @@ public:
     ErrorCode removeSync(const nx::Uuid& resourceId);
 
     virtual int remove(
-        const QVector<nx::Uuid>& resourceIds,
+        const QList<nx::Uuid>& resourceIds,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
@@ -109,7 +109,7 @@ public:
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeSync(const QVector<nx::Uuid>& resourceIds);
+    ErrorCode removeSync(const QList<nx::Uuid>& resourceIds);
     ErrorCode removeSync(const nx::vms::api::ResourceParamWithRefData& data);
     ErrorCode removeHardwareIdMappingSync(const nx::Uuid& resourceId);
 };

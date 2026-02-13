@@ -4,7 +4,7 @@
 
 #include <chrono>
 
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <api/model/recording_stats_reply.h>
 
@@ -21,7 +21,7 @@ struct CameraRecordingSettings
     std::chrono::seconds maxPeriod{0}; //< Cached camera 'maxPeriod' value. maxPeriod == 0s => record forever.
 };
 
-using CameraRecordingSettingsSet = QVector<CameraRecordingSettings>;
+using CameraRecordingSettingsSet = QList<CameraRecordingSettings>;
 
 // Creates forecast. Sets `archiveDurationSecs` field in forecast structure based
 // on `cameras` and `totalSpace`.

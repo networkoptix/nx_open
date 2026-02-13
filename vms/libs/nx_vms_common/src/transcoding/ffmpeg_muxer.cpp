@@ -76,7 +76,7 @@ void FfmpegMuxer::setPacketizedMode(bool value)
     m_packetizedMode = value;
 }
 
-const QVector<int>& FfmpegMuxer::getPacketsSize()
+const QList<int>& FfmpegMuxer::getPacketsSize()
 {
     return m_outputPacketSize;
 }

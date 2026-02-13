@@ -275,7 +275,7 @@ QnAviArchiveMetadata QnStreamRecorder::prepareMetaData(
     result.dewarpingParams = m_mediaDevice->getDewarpingParams();
     result.encryptionData = prepareEncryptor((quint64) result.startTimeMs);
     result.videoLayoutSize = videoLayout ? videoLayout->size() : QSize(1, 1);
-    result.videoLayoutChannels = videoLayout ? videoLayout->getChannels() : QVector<int>() << 0;
+    result.videoLayoutChannels = videoLayout ? videoLayout->getChannels() : QList<int>() << 0;
     if (m_mediaDevice->customAspectRatio().isValid())
         result.overridenAr = m_mediaDevice->customAspectRatio().toFloat();
     adjustMetaData(result);

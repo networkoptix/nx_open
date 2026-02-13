@@ -12,7 +12,7 @@ struct QnVirtualCameraPrepareReplyElement
 
 struct QnVirtualCameraPrepareReply
 {
-    QVector<QnVirtualCameraPrepareReplyElement> elements;
+    QList<QnVirtualCameraPrepareReplyElement> elements;
     bool storageCleanupNeeded = false;
     bool storageFull = false;
 };

@@ -112,7 +112,7 @@ public:
     virtual RequestContextPtr<FileInformation> requestFileInfo(
         const nx::Uuid& peer, const QString& fileName, const nx::Url& url) = 0;
 
-    virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
+    virtual RequestContextPtr<QList<QByteArray>> requestChecksums(
         const nx::Uuid& peer, const QString& fileName) = 0;
 
     virtual RequestContextPtr<nx::Buffer> downloadChunk(

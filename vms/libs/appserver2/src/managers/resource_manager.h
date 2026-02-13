@@ -49,7 +49,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int remove(
-        const QVector<nx::Uuid>& resourceIds,
+        const QList<nx::Uuid>& resourceIds,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -210,7 +210,7 @@ int QnResourceManager<T>::remove(
 
 template<class T>
 int QnResourceManager<T>::remove(
-    const QVector<nx::Uuid>& resourceIds,
+    const QList<nx::Uuid>& resourceIds,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {

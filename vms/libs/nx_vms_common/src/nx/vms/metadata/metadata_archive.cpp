@@ -610,8 +610,8 @@ void MetadataArchive::loadDataFromIndex(
     std::function<bool()> interruptionCallback,
     AbstractMetadataBinaryFile& metadataFile,
     const Index& index,
-    const QVector<IndexRecord>::const_iterator startItr,
-    const QVector<IndexRecord>::const_iterator endItr,
+    const QList<IndexRecord>::const_iterator startItr,
+    const QList<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
     nx::utils::ByteArray buffer(kAlignment, 0, 0);
@@ -629,7 +629,7 @@ void MetadataArchive::loadDataFromIndex(
     qint64 dataOffset = index.dataOffset(indexRecordNumber, recordMatcher->isNoGeometryMode());
     metadataFile.seek(dataOffset);
 
-    QVector<IndexRecord>::const_iterator i = startItr;
+    QList<IndexRecord>::const_iterator i = startItr;
     int mediaRecordsPerIndexRecord = i->recordCount();
     while (mediaRecordsLeft > 0)
     {
@@ -679,8 +679,8 @@ void MetadataArchive::loadDataFromIndex(
     const Filter* filter,
     std::function<bool()> interruptionCallback,
     const Index& index,
-    const QVector<IndexRecord>::const_iterator startItr,
-    const QVector<IndexRecord>::const_iterator endItr,
+    const QList<IndexRecord>::const_iterator startItr,
+    const QList<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
     for(auto i = startItr; i < endItr;  ++i)
@@ -701,8 +701,8 @@ void MetadataArchive::loadDataFromIndexDesc(
     std::function<bool()> interruptionCallback,
     AbstractMetadataBinaryFile& metadataFile,
     const Index& index,
-    const QVector<IndexRecord>::const_iterator startItr,
-    const QVector<IndexRecord>::const_iterator endItr,
+    const QList<IndexRecord>::const_iterator startItr,
+    const QList<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
     nx::utils::ByteArray buffer(kAlignment, 0, 0);
@@ -717,8 +717,8 @@ void MetadataArchive::loadDataFromIndexDesc(
         return;
 
     // math file (one month)
-    QVector<IndexRecord>::const_iterator i = endItr - 1;
-    const QVector<IndexRecord>::const_iterator itBegin = index.records.begin();
+    QList<IndexRecord>::const_iterator i = endItr - 1;
+    const QList<IndexRecord>::const_iterator itBegin = index.records.begin();
     int64_t mediaFileOffset = index.dataOffset(endItr - itBegin, recordMatcher->isNoGeometryMode());
     while (mediaRecordsLeft > 0)
     {
@@ -770,8 +770,8 @@ void MetadataArchive::loadDataFromIndexDesc(
     const Filter* filter,
     std::function<bool()> interruptionCallback,
     const Index& index,
-    const QVector<IndexRecord>::const_iterator startItr,
-    const QVector<IndexRecord>::const_iterator endItr,
+    const QList<IndexRecord>::const_iterator startItr,
+    const QList<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
     for (auto i = endItr - 1; i >= startItr; --i)
@@ -849,8 +849,8 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
                 if (metadataFile->isOpen())
                     index.truncateToBytes(metadataFile->size(), noGeometryMode);
 
-                QVector<IndexRecord>::iterator startItr = index.records.begin();
-                QVector<IndexRecord>::iterator endItr = index.records.end();
+                QList<IndexRecord>::iterator startItr = index.records.begin();
+                QList<IndexRecord>::iterator endItr = index.records.end();
 
                 if (!hasDiscontinue)
                 {

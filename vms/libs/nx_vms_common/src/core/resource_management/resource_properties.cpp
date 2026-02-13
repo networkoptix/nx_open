@@ -169,7 +169,7 @@ void QnResourcePropertyDictionary::clear()
     m_modifiedItems.clear();
 }
 
-void QnResourcePropertyDictionary::clear(const QVector<nx::Uuid>& idList)
+void QnResourcePropertyDictionary::clear(const QList<nx::Uuid>& idList)
 {
     NX_WRITE_LOCKER lock(&m_readWriteLock);
     for (const nx::Uuid& id: idList)

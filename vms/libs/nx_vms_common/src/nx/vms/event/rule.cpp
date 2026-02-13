@@ -50,12 +50,12 @@ void Rule::setEventType(EventType eventType)
     m_eventType = eventType;
 }
 
-QVector<nx::Uuid> Rule::eventResources() const
+QList<nx::Uuid> Rule::eventResources() const
 {
     return m_eventResources;
 }
 
-void Rule::setEventResources(const QVector<nx::Uuid>& value)
+void Rule::setEventResources(const QList<nx::Uuid>& value)
 {
     m_eventResources = value;
 }
@@ -91,12 +91,12 @@ void Rule::setActionType(ActionType actionType)
     // TODO: #sivanov Fill action params with default values? Filter action resources?
 }
 
-QVector<nx::Uuid> Rule::actionResources() const
+QList<nx::Uuid> Rule::actionResources() const
 {
     return m_actionResources;
 }
 
-void Rule::setActionResources(const QVector<nx::Uuid>& value)
+void Rule::setActionResources(const QList<nx::Uuid>& value)
 {
     m_actionResources = value;
 }

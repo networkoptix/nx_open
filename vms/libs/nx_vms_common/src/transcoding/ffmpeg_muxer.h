@@ -77,7 +77,7 @@ public:
     void setRtpMtu(int mtu) { m_rtpMtu = mtu; }
 
     void setPacketizedMode(bool value);
-    const QVector<int>& getPacketsSize();
+    const QList<int>& getPacketsSize();
     bool isCodecSupported(AVCodecID id) const;
     void setStartTimeOffset(int64_t value);
     const Config& config() const { return m_config; }
@@ -92,7 +92,7 @@ private:
 private:
     Config m_config;
     nx::utils::ByteArray m_internalBuffer;
-    QVector<int> m_outputPacketSize;
+    QList<int> m_outputPacketSize;
 
     bool m_initialized = false;
     bool m_initializedAudio = false; //< Incoming audio packets will be ignored.

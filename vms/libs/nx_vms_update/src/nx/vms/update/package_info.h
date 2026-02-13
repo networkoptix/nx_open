@@ -25,7 +25,7 @@ struct NX_VMS_UPDATE_API PlatformVariant
 NX_REFLECTION_INSTRUMENT(PlatformVariant, PlatformVariant_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(PlatformVariant, (hash)(json), NX_VMS_UPDATE_API)
 
-using PlatformVariantList = QVector<PlatformVariant>;
+using PlatformVariantList = QList<PlatformVariant>;
 
 NX_REFLECTION_ENUM_CLASS(Component,
     unknown,

@@ -220,7 +220,7 @@ public:
     void reset();
     bool isEmpty() const;
 
-    QVector<QString> hardwareIds(const nx::Uuid& serverId) const;
+    QList<QString> hardwareIds(const nx::Uuid& serverId) const;
     QString currentHardwareId(const nx::Uuid& serverId) const;
 
 signals:

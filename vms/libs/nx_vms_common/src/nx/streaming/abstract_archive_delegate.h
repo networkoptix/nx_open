@@ -6,7 +6,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSize>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtGui/QRegion>
 
 #include <core/resource/avi/avi_archive_metadata.h>

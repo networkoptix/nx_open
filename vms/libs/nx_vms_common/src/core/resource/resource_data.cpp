@@ -1,6 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include <cassert>
 #include <functional>
 
@@ -41,7 +40,7 @@ public:
         registerKey<std::vector<QnCameraAdvancedParameterOverload>>(
             ResourceDataKey::kAdvancedParameterOverloads);
         registerKey<ptz::Override>(ptz::Override::kPtzOverrideKey);
-        registerKey<QVector<bool>>("hasDualStreaming");
+        registerKey<QList<bool>>("hasDualStreaming");
         registerKey<UnauthorizedTimeoutLimits>(ResourceDataKey::kUnauthorizedTimeoutLimitsSec);
     }
 

@@ -115,7 +115,7 @@ private:
         const Peer& peer, const std::optional<FileInformation>& fileInfo);
     void requestChecksums();
     void handleChecksumsReply(
-        const Peer& peer, const std::optional<QVector<QByteArray>>& checksums);
+        const Peer& peer, const std::optional<QList<QByteArray>>& checksums);
     void downloadChunks();
     void handleDownloadChunkReply(
         const Peer& peer,

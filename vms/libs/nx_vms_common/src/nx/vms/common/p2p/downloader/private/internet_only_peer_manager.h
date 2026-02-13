@@ -24,7 +24,7 @@ public:
         const QString& fileName,
         const nx::Url& url) override;
 
-    virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
+    virtual RequestContextPtr<QList<QByteArray>> requestChecksums(
         const nx::Uuid& peerId, const QString& fileName) override;
 
     virtual RequestContextPtr<nx::Buffer> downloadChunk(

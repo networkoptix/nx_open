@@ -6,7 +6,7 @@
 #include <limits>
 #include <vector>
 
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 namespace nx::vms::common {
 
@@ -20,7 +20,7 @@ public:
         int limit = std::numeric_limits<int>::max(),
         Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder)
     {
-        QVector<PeriodList> nonEmptyPeriods;
+        QList<PeriodList> nonEmptyPeriods;
         for (const PeriodList& periodList: periodLists)
         {
             if (!periodList.empty())
@@ -46,7 +46,7 @@ public:
 private:
     template <typename IteratorPeriod>
     static PeriodList mergeTimePeriodsInternal(
-        const QVector<PeriodList>& nonEmptyPeriods,
+        const QList<PeriodList>& nonEmptyPeriods,
         std::vector<IteratorPeriod>&& minIndices,
         std::vector<IteratorPeriod>&& maxIndices,
         int limit)
@@ -150,7 +150,7 @@ private:
         return result;
     }
 
-    static PeriodList mergeTimePeriodsAsc(const QVector<PeriodList>& nonEmptyPeriods, int limit)
+    static PeriodList mergeTimePeriodsAsc(const QList<PeriodList>& nonEmptyPeriods, int limit)
     {
         std::vector<typename PeriodList::const_iterator> minIndices(nonEmptyPeriods.size());
         std::vector<typename PeriodList::const_iterator> endIndices(nonEmptyPeriods.size());
@@ -166,7 +166,7 @@ private:
             limit);
     }
 
-    static PeriodList mergeTimePeriodsDesc(const QVector<PeriodList>& nonEmptyPeriods, int limit)
+    static PeriodList mergeTimePeriodsDesc(const QList<PeriodList>& nonEmptyPeriods, int limit)
     {
         std::vector<typename PeriodList::const_reverse_iterator> minIndexes(nonEmptyPeriods.size());
         std::vector<typename PeriodList::const_reverse_iterator> endIndexes(nonEmptyPeriods.size());

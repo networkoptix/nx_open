@@ -87,7 +87,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<q
     /* Note: source == device space, target == logical space. */
 
     Qn::ExtrapolationMode extrapolationMode;
-    QVector<qreal> device, logical;
+    QList<qreal> device, logical;
     qreal deviceMultiplier = 1.0, logicalMultiplier = 1.0;
     auto space = AngleSpace::DegreesSpace;
     if(
@@ -135,7 +135,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<q
         logical = std::move(degrees);
     }
 
-    QVector<QPair<qreal, qreal> > sourceToTarget;
+    QList<QPair<qreal, qreal> > sourceToTarget;
     for(int i = 0; i < logical.size(); i++)
         sourceToTarget.push_back(qMakePair(device[i], logical[i]));
 

@@ -8,7 +8,7 @@
 #include <QtCore/QRectF>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <nx/fusion/fusion/fusion_adaptors.h>
 

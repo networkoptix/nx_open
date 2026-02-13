@@ -161,7 +161,7 @@ std::vector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, 
     return result;
 }
 
-QByteArray serializeCompressedPeers(const QVector<PeerNumberType>& peers, int reservedSpaceAtFront)
+QByteArray serializeCompressedPeers(const QList<PeerNumberType>& peers, int reservedSpaceAtFront)
 {
     QByteArray result;
     result.resize(qPower2Ceil(unsigned(peers.size() * 2 + reservedSpaceAtFront), kByteArrayAlignFactor));
@@ -175,9 +175,9 @@ QByteArray serializeCompressedPeers(const QVector<PeerNumberType>& peers, int re
     return result;
 }
 
-QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success)
+QList<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success)
 {
-    QVector<PeerNumberType> result;
+    QList<PeerNumberType> result;
     *success = true;
     if (data.isEmpty())
         return result;
@@ -194,7 +194,7 @@ QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool*
     return result;
 }
 
-QByteArray serializeSubscribeRequest(const QVector<SubscribeRecord>& request, int reservedSpaceAtFront)
+QByteArray serializeSubscribeRequest(const QList<SubscribeRecord>& request, int reservedSpaceAtFront)
 {
     QByteArray result;
     result.resize(qPower2Ceil(unsigned(request.size() * PeerDistanceRecord::kMaxRecordSize +
@@ -212,9 +212,9 @@ QByteArray serializeSubscribeRequest(const QVector<SubscribeRecord>& request, in
     return result;
 }
 
-QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, bool* success)
+QList<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, bool* success)
 {
-    QVector<SubscribeRecord> result;
+    QList<SubscribeRecord> result;
     if (data.isEmpty())
         return result;
     nx::utils::BitStreamReader reader((quint8*)data.data(), data.size());
@@ -336,7 +336,7 @@ QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* s
 }
 
 QByteArray serializeResolvePeerNumberResponse(
-    const QVector<PeerNumberResponseRecord>& peers,
+    const QList<PeerNumberResponseRecord>& peers,
     int reservedSpaceAtFront)
 {
     QByteArray result;
@@ -358,10 +358,10 @@ QByteArray serializeResolvePeerNumberResponse(
     return result;
 }
 
-const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(const QByteArray& _response, bool* success)
+const QList<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(const QByteArray& _response, bool* success)
 {
     QByteArray response(_response);
-    QVector<PeerNumberResponseRecord> result;
+    QList<PeerNumberResponseRecord> result;
 
     *success = false;
     if (response.size() % PeerNumberResponseRecord::kRecordSize != 0)
@@ -515,7 +515,6 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
     if (query.hasQueryItem(Qn::EC2_CONNECTION_GUID_HEADER_NAME))
         result.connectionGuid = nx::Uuid(query.queryItemValue(Qn::EC2_CONNECTION_GUID_HEADER_NAME));
 
-
     if (result.peerType == nx::vms::api::PeerType::notDefined)
     {
         result.peerType = nx::reflect::fromString<vms::api::PeerType>(
@@ -533,7 +532,6 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
     const nx::Uuid videoWallInstanceGuid(query.queryItemValue(Qn::VIDEOWALL_INSTANCE_HEADER_NAME));
     if (!videoWallInstanceGuid.isNull())
         result.peerType = nx::vms::api::PeerType::videowallClient;
-
 
     return result;
 }

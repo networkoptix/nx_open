@@ -33,7 +33,7 @@ struct NX_VMS_COMMON_API ObjectPainterHelper
         QRectF objectRect);
 
     static QColor calculateTooltipColor(const QColor& frameColor);
-    static QVector<QVector<QPointF>> calculateMotionGrid(
+    static QList<QList<QPointF>> calculateMotionGrid(
         const QRectF& rect,
         const QnConstMetaDataV1Ptr& motion);
 };

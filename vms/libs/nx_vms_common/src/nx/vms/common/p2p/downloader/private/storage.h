@@ -29,7 +29,7 @@ struct FileMetadata: FileInformation
         const FileInformation& fileInformation,
         const QDir& defaultDownloadsDirectory);
 
-    QVector<QByteArray> chunkChecksums;
+    QList<QByteArray> chunkChecksums;
 };
 
 class NX_VMS_COMMON_API Storage: public QObject
@@ -57,9 +57,9 @@ public:
     ResultCode deleteFile(const QString& fileName, bool deleteData = true);
     ResultCode clearFile(const QString& fileName, bool force = false);
 
-    QVector<QByteArray> getChunkChecksums(const QString& fileName);
+    QList<QByteArray> getChunkChecksums(const QString& fileName);
     ResultCode setChunkChecksums(
-        const QString& fileName, const QVector<QByteArray>& chunkChecksums);
+        const QString& fileName, const QList<QByteArray>& chunkChecksums);
 
     void cleanupExpiredFiles();
 
@@ -70,7 +70,7 @@ public:
     static QByteArray calculateMd5(const QString& filePath);
     static qint64 calculateFileSize(const QString& filePath);
     static int calculateChunkCount(qint64 fileSize, qint64 calculateChunkSize);
-    static QVector<QByteArray> calculateChecksums(const QString& filePath, qint64 chunkSize);
+    static QList<QByteArray> calculateChecksums(const QString& filePath, qint64 chunkSize);
 
 signals:
     void fileAdded(

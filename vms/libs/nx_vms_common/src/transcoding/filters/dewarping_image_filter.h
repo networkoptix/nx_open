@@ -3,7 +3,7 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtGui/QMatrix3x3>
 #include <QtGui/QMatrix4x4>
 #include <QtGui/QVector2D>
@@ -64,6 +64,6 @@ protected: //< For unit tests.
     nx::vms::api::dewarping::MediaData m_mediaParams;
     nx::vms::api::dewarping::ViewData m_itemParams;
 
-    using PointsVector = QVector<QPointF>;
+    using PointsVector = QList<QPointF>;
     PointsVector m_transform[MAX_COLOR_PLANES];
 };

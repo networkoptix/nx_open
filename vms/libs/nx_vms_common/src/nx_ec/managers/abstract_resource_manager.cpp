@@ -89,7 +89,7 @@ ErrorCode AbstractResourceManager::removeSync(const nx::Uuid& resourceId)
         });
 }
 
-ErrorCode AbstractResourceManager::removeSync(const QVector<nx::Uuid>& resourceIds)
+ErrorCode AbstractResourceManager::removeSync(const QList<nx::Uuid>& resourceIds)
 {
     return detail::callSync(
         [&](auto handler)

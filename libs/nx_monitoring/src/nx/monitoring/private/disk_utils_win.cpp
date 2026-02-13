@@ -2,7 +2,7 @@
 
 #include "disk_utils_win.h"
 
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <nx/utils/log/log.h>
 
@@ -10,9 +10,9 @@ namespace nx::monitoring {
 
 namespace {
 
-QVector<WCHAR> prepareDriveNameBuffer()
+QList<WCHAR> prepareDriveNameBuffer()
 {
-    QVector<WCHAR> result;
+    QList<WCHAR> result;
 
     const DWORD bufferSize = GetLogicalDriveStringsW(0, nullptr);
     if (!bufferSize)

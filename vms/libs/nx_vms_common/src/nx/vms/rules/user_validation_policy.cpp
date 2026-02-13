@@ -67,11 +67,11 @@ QnSubjectValidationPolicy::~QnSubjectValidationPolicy()
 void QnSubjectValidationPolicy::analyze(
     bool allUsers,
     const QSet<nx::Uuid>& subjects,
-    QVector<nx::Uuid>& validRoles,
-    QVector<nx::Uuid>& invalidRoles,
-    QVector<nx::Uuid>& intermediateRoles,
-    QVector<QnUserResourcePtr>& validUsers,
-    QVector<QnUserResourcePtr>& invalidUsers) const
+    QList<nx::Uuid>& validRoles,
+    QList<nx::Uuid>& invalidRoles,
+    QList<nx::Uuid>& intermediateRoles,
+    QList<QnUserResourcePtr>& validUsers,
+    QList<QnUserResourcePtr>& invalidUsers) const
 {
     validRoles.clear();
     invalidRoles.clear();
@@ -321,11 +321,11 @@ QString QnRequiredAccessRightPolicy::calculateAlert(bool allUsers,
     if (!alert.isEmpty())
         return alert;
 
-    QVector<nx::Uuid> validRoles;
-    QVector<nx::Uuid> invalidRoles;
-    QVector<nx::Uuid> intermediateRoles;
-    QVector<QnUserResourcePtr> validUsers;
-    QVector<QnUserResourcePtr> invalidUsers;
+    QList<nx::Uuid> validRoles;
+    QList<nx::Uuid> invalidRoles;
+    QList<nx::Uuid> intermediateRoles;
+    QList<QnUserResourcePtr> validUsers;
+    QList<QnUserResourcePtr> invalidUsers;
 
     analyze(allUsers, subjects,
         validRoles, invalidRoles, intermediateRoles,

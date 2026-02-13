@@ -45,10 +45,10 @@ public:
     void handleVideowallLayoutsChanged(const QnVideoWallResourcePtr& videowall);
 
     void handleVideowallLayoutsAdded(const QnVideoWallResourcePtr& videowall,
-        const QVector<nx::Uuid>& layoutIds);
+        const QList<nx::Uuid>& layoutIds);
 
     void handleVideowallLayoutsRemoved(const QnVideoWallResourcePtr& videowall,
-        const QVector<nx::Uuid>& layoutIds);
+        const QList<nx::Uuid>& layoutIds);
 
     void handleLayoutAdded(const QnLayoutResourcePtr& layout);
     void handleLayoutRemoved(const QnLayoutResourcePtr& layout);
@@ -376,7 +376,7 @@ void VideowallItemAccessResolver::Private::handleVideowallRemoved(
 }
 
 void VideowallItemAccessResolver::Private::handleVideowallLayoutsAdded(
-    const QnVideoWallResourcePtr& videowall, const QVector<nx::Uuid>& layoutIds)
+    const QnVideoWallResourcePtr& videowall, const QList<nx::Uuid>& layoutIds)
 {
     bool changed = false;
     for (const auto& layoutId: layoutIds)
@@ -408,7 +408,7 @@ void VideowallItemAccessResolver::Private::handleVideowallLayoutsAdded(
 }
 
 void VideowallItemAccessResolver::Private::handleVideowallLayoutsRemoved(
-    const QnVideoWallResourcePtr& videowall, const QVector<nx::Uuid>& layoutIds)
+    const QnVideoWallResourcePtr& videowall, const QList<nx::Uuid>& layoutIds)
 {
     for (const auto& layoutId: layoutIds)
     {

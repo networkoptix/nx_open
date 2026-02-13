@@ -96,12 +96,12 @@ QPoint QnCustomResourceVideoLayout::position(int channel) const
     return QPoint();
 }
 
-QVector<int> QnCustomResourceVideoLayout::getChannels() const
+QList<int> QnCustomResourceVideoLayout::getChannels() const
 {
     return m_channels;
 }
 
-void QnCustomResourceVideoLayout::setChannels(const QVector<int>& value)
+void QnCustomResourceVideoLayout::setChannels(const QList<int>& value)
 {
     m_channels = value;
 }

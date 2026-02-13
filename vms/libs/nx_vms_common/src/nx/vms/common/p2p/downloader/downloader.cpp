@@ -249,7 +249,7 @@ ResultCode Downloader::deleteFilesByType(const QString& type)
     return ResultCode::ok;
 }
 
-QVector<QByteArray> Downloader::getChunkChecksums(const QString& fileName)
+QList<QByteArray> Downloader::getChunkChecksums(const QString& fileName)
 {
     return d->storage->getChunkChecksums(fileName);
 }

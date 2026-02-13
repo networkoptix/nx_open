@@ -224,21 +224,21 @@ AbstractPeerManager::RequestContextPtr<FileInformation> ResourcePoolPeerManager:
         promise->get_future(), makeCanceller(promise, connection, handle));
 }
 
-AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ResourcePoolPeerManager::requestChecksums(
+AbstractPeerManager::RequestContextPtr<QList<QByteArray>> ResourcePoolPeerManager::requestChecksums(
     const nx::Uuid& peerId, const QString& fileName)
 {
     const auto& connection = getConnection(peerId);
     if (!connection)
         return {};
 
-    auto promise = std::make_shared<std::promise<std::optional<QVector<QByteArray>>>>();
+    auto promise = std::make_shared<std::promise<std::optional<QList<QByteArray>>>>();
 
     const auto handleReply =
         [promise](
             bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& result)
         {
             if (success)
-                setPromiseValueIfEmpty(promise, {result.deserialized<QVector<QByteArray>>()});
+                setPromiseValueIfEmpty(promise, {result.deserialized<QList<QByteArray>>()});
             else
                 setPromiseValueIfEmpty(promise, {});
         };
@@ -247,7 +247,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ResourcePoolPeerMana
     if (handle < 0)
         return {};
 
-    return std::make_unique<BaseRequestContext<QVector<QByteArray>>>(
+    return std::make_unique<BaseRequestContext<QList<QByteArray>>>(
         promise->get_future(), makeCanceller(promise, connection, handle));
 }
 

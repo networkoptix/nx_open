@@ -105,7 +105,6 @@ QJsonValue::Type expected_json_type(const QByteArray& value)
     return QJsonValue::Undefined;
 }
 
-
 bool QJsonDetail::deserialize_json(
     const QByteArray& value, QJsonValue* outTarget, QString* errorMessage)
 {
@@ -254,7 +253,7 @@ public:
         registerSerializer<QStringList>();
         registerSerializer<QList<QString>>();
         registerSerializer<QList<QByteArray>>();
-        registerSerializer<QVector<bool>>();
+        registerSerializer<QList<bool>>();
 
         registerSerializer<QSize>();
         registerSerializer<QSizeF>();

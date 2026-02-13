@@ -552,14 +552,14 @@ ResultCode Storage::clearFile(const QString& fileName, bool force)
     return ResultCode::ok;
 }
 
-QVector<QByteArray> Storage::getChunkChecksums(const QString& fileName)
+QList<QByteArray> Storage::getChunkChecksums(const QString& fileName)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto info = fileMetadata(fileName);
     lock.unlock();
 
     if (!info.isValid())
-        return QVector<QByteArray>();
+        return QList<QByteArray>();
 
     if (info.chunkChecksums.isEmpty())
     {
@@ -574,7 +574,7 @@ QVector<QByteArray> Storage::getChunkChecksums(const QString& fileName)
 }
 
 ResultCode Storage::setChunkChecksums(
-    const QString& fileName, const QVector<QByteArray>& chunkChecksums)
+    const QString& fileName, const QList<QByteArray>& chunkChecksums)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -757,9 +757,9 @@ int Storage::calculateChunkCount(qint64 fileSize, qint64 chunkSize)
     return (int) ((fileSize + chunkSize - 1) / chunkSize);
 }
 
-QVector<QByteArray> Storage::calculateChecksums(const QString& filePath, qint64 chunkSize)
+QList<QByteArray> Storage::calculateChecksums(const QString& filePath, qint64 chunkSize)
 {
-    QVector<QByteArray> result;
+    QList<QByteArray> result;
 
     QFile file(filePath);
 

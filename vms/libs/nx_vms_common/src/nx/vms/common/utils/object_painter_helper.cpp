@@ -147,7 +147,7 @@ QColor ObjectPainterHelper::calculateTooltipColor(const QColor& frameColor)
     return color;
 }
 
-QVector<QVector<QPointF>> ObjectPainterHelper::calculateMotionGrid(
+QList<QList<QPointF>> ObjectPainterHelper::calculateMotionGrid(
     const QRectF& rect,
     const QnConstMetaDataV1Ptr& motion)
 {
@@ -155,7 +155,7 @@ QVector<QVector<QPointF>> ObjectPainterHelper::calculateMotionGrid(
     qreal xStep = rect.width() / kWidth;
     qreal yStep = rect.height() / kHeight;
 
-    QVector<QVector<QPointF>> gridLines(2);
+    QList<QList<QPointF>> gridLines(2);
     if (motion)
     {
         /* Horizontal lines. */

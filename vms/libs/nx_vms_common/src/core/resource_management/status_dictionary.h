@@ -12,7 +12,7 @@ public:
     nx::vms::api::ResourceStatus value(const nx::Uuid& resourceId) const;
     void setValue(const nx::Uuid& resourceId, nx::vms::api::ResourceStatus status);
     void clear();
-    void clear(const QVector<nx::Uuid>& idList);
+    void clear(const QList<nx::Uuid>& idList);
     void remove(const nx::Uuid& id);
     QMap<nx::Uuid, nx::vms::api::ResourceStatus> values() const;
 private:

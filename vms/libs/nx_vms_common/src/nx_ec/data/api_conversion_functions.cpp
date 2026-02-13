@@ -45,7 +45,7 @@ using namespace nx::vms::api;
 namespace {
 
 template<typename T>
-QVector<T> fromStdVector(const std::vector<T>& v)
+QList<T> fromStdVector(const std::vector<T>& v)
 {
     return {v.begin(), v.end()};
 }
@@ -443,7 +443,6 @@ void fromApiToResource(const MediaServerData& src, QnMediaServerResourcePtr& dst
     dst->setOsInfo(nx::utils::OsInfo::fromString(src.osInfo));
     dst->setAuthKey(src.authKey);
 }
-
 
 ////////////////////////////////////////////////////////////
 //// ResourceData

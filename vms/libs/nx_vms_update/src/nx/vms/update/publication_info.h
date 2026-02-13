@@ -6,7 +6,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QString>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/os_info.h>

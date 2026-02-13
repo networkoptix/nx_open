@@ -513,7 +513,7 @@ bool QnUniversalRtpEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
     if (m_eof)
         return false;
 
-    const QVector<int> packets = m_transcoder.muxer().getPacketsSize();
+    const QList<int> packets = m_transcoder.muxer().getPacketsSize();
     if (m_outputPos >= (int) m_outputBuffer.size() - nx::rtp::RtpHeader::kSize ||
         m_packetIndex >= packets.size())
         return false;

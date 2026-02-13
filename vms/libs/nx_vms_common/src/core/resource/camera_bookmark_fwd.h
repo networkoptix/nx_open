@@ -6,7 +6,7 @@
 
 #include <QtCore/QSet>
 #include <QtCore/QString>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 namespace nx::vms::common {
 
@@ -19,7 +19,7 @@ using CameraBookmarkList = std::vector<CameraBookmark>;
 using CameraBookmarkWithRowIdList = std::vector<CameraBookmarkWithRecordId>;
 using MultiServerCameraBookmarkList = std::vector<CameraBookmarkList>;
 using CameraBookmarkTags = QSet<QString>;
-using CameraBookmarkTagList = QVector<CameraBookmarkTag>;
+using CameraBookmarkTagList = QList<CameraBookmarkTag>;
 using MultiServerCameraBookmarkTagList = std::vector<CameraBookmarkTagList>;
 
 } // namespace nx::vms::common

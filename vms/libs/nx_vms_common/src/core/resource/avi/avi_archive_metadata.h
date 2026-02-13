@@ -45,7 +45,7 @@ struct NX_VMS_COMMON_API QnAviArchiveMetadata
     QString timeZoneId;
 
     qint64 startTimeMs = 0; //< Start time in milliseconds since epoch.
-    QVector<int> videoLayoutChannels;
+    QList<int> videoLayoutChannels;
     QSize videoLayoutSize;
     nx::vms::api::dewarping::MediaData dewarpingParams;
     qreal overridenAr = 0.0;

@@ -60,10 +60,10 @@ AbstractPeerManager::RequestContextPtr<FileInformation> InternetOnlyPeerManager:
         nullptr, promise.get_future());
 }
 
-AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> InternetOnlyPeerManager::requestChecksums(
+AbstractPeerManager::RequestContextPtr<QList<QByteArray>> InternetOnlyPeerManager::requestChecksums(
     const nx::Uuid& /*peerId*/, const QString& /*fileName*/)
 {
-    return std::make_unique<InternetRequestContext<QVector<QByteArray>>>();
+    return std::make_unique<InternetRequestContext<QList<QByteArray>>>();
 }
 
 AbstractPeerManager::RequestContextPtr<nx::Buffer> InternetOnlyPeerManager::downloadChunk(

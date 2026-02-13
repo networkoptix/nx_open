@@ -182,7 +182,7 @@ void QnTcpListener::removeDisconnectedConnections()
 {
     Q_D(QnTcpListener);
 
-    QVector<QnLongRunnable*> toDeleteList;
+    QList<QnLongRunnable*> toDeleteList;
 
     {
         NX_MUTEX_LOCKER lock(&d->connectionMtx);

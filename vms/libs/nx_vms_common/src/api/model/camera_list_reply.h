@@ -9,7 +9,7 @@
 class QnCameraListReply
 {
 public:
-    QVector<QString> physicalIdList;
+    QList<QString> physicalIdList;
 };
 
 #define QnCameraListReply_Fields (physicalIdList)

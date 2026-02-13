@@ -60,7 +60,7 @@ public:
     QHash<nx::Uuid, QSet<QString>> allPropertyNamesByResource() const;
 
     void clear();
-    void clear(const QVector<nx::Uuid>& idList);
+    void clear(const QList<nx::Uuid>& idList);
 
 public slots:
     bool on_resourceParamRemoved(const nx::Uuid& resourceId, const QString& key);

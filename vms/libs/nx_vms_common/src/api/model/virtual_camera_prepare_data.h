@@ -14,7 +14,7 @@ struct QnVirtualCameraPrepareDataElement
 
 struct QnVirtualCameraPrepareData
 {
-    QVector<QnVirtualCameraPrepareDataElement> elements;
+    QList<QnVirtualCameraPrepareDataElement> elements;
 };
 #define QnVirtualCameraPrepareData_Fields (elements)
 

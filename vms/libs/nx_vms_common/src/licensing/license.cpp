@@ -764,7 +764,7 @@ bool QnLicensePool::isEmpty() const
     return m_licenseDict.isEmpty();
 }
 
-QVector<QString> QnLicensePool::hardwareIds(const nx::Uuid& serverId) const
+QList<QString> QnLicensePool::hardwareIds(const nx::Uuid& serverId) const
 {
     return remoteInfo(systemContext()->runtimeInfoManager(), serverId).data.hardwareIds;
 }
@@ -776,7 +776,7 @@ QString QnLicensePool::currentHardwareId(const nx::Uuid& serverId) const
     // hardwareIds is a ordered list
     // first come hwid1s, than hwid2s, etc..
     // We need to find first hardware id of last version
-    QVector<QString> hwIds = hardwareIds(serverId);
+    QList<QString> hwIds = hardwareIds(serverId);
     QString lastPrefix;
     for (QString hwid : hwIds) {
         NX_ASSERT(hwid.length() >= 2);

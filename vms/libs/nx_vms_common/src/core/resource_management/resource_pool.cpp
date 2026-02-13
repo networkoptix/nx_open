@@ -161,9 +161,9 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
     if (resources.empty())
         return;
 
-    QVector<QnResourcePtr> removedLayouts;
-    QVector<QnResourcePtr> removedUsers;
-    QVector<QnResourcePtr> removedOtherResources;
+    QList<QnResourcePtr> removedLayouts;
+    QList<QnResourcePtr> removedUsers;
+    QList<QnResourcePtr> removedOtherResources;
     auto appendRemovedResource =
         [&](const QnResourcePtr& resource)
         {

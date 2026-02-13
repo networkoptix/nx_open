@@ -5,7 +5,7 @@
 #include <optional>
 
 #include <QtCore/QString>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <nx/build_info.h>
 #include <nx/fusion/model_functions_fwd.h>
@@ -46,8 +46,8 @@ NX_REFLECTION_INSTRUMENT(ReleaseInfo, ReleaseInfo_Fields)
 
 struct NX_VMS_UPDATE_API ReleasesInfo
 {
-    QVector<nx::Url> packages_urls;
-    QVector<ReleaseInfo> releases;
+    QList<nx::Url> packages_urls;
+    QList<ReleaseInfo> releases;
 
     std::optional<ReleaseInfo> selectVmsRelease(
         const nx::utils::SoftwareVersion& currentVersion) const;

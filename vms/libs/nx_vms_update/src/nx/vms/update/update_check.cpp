@@ -117,7 +117,7 @@ FetchPublicationInfoResult fetchPublicationInfo(
 }
 
 FetchPublicationInfoResult fetchPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const QVector<nx::Url>& urlPrefixes)
+    const nx::utils::SoftwareVersion& version, const QList<nx::Url>& urlPrefixes)
 {
     if (!NX_ASSERT(!urlPrefixes.isEmpty()))
         return FetchError::paramsError;
@@ -287,7 +287,7 @@ FetchPublicationInfoResult fetchLegacyPublicationInfo(
 }
 
 FetchPublicationInfoResult fetchLegacyPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const QVector<nx::Url>& urlPrefixes)
+    const nx::utils::SoftwareVersion& version, const QList<nx::Url>& urlPrefixes)
 {
     if (!NX_ASSERT(!urlPrefixes.isEmpty()))
         return FetchError::paramsError;
@@ -310,7 +310,7 @@ FetchPublicationInfoResult fetchLegacyPublicationInfo(
 
 static PublicationInfoResult getCertainVersionPublicationInfo(
     const nx::utils::SoftwareVersion& version,
-    const QVector<nx::Url>& urlPrexifes)
+    const QList<nx::Url>& urlPrexifes)
 {
     // When we have only publication key, we don't know if it's a legacy package or new package, so
     // try both variants.

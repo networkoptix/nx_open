@@ -5,7 +5,7 @@
 #include <QtCore/QRectF>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QTimeZone>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtGui/QColor>
 #include <QtGui/QImage>
 
@@ -88,7 +88,7 @@ struct Settings
     // The target resolution to which the image will be scaled before other filters.
     std::optional<QSize> resolution;
 
-    QVector<OverlaySettingsPtr> overlays;
+    QList<OverlaySettingsPtr> overlays;
 
     // Video layout for tiled image filter.
     QnConstResourceVideoLayoutPtr layout;
@@ -162,6 +162,5 @@ struct TextOverlaySettings: OverlaySettings
 
     virtual Type type() const override { return Type::text; }
 };
-
 
 } // namespace nx::core::transcoding

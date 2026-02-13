@@ -29,11 +29,11 @@ public:
     virtual QString calculateAlert(bool allUsers, const QSet<nx::Uuid>& subjects) const;
 
     void analyze(bool allUsers, const QSet<nx::Uuid>& subjects,
-        QVector<nx::Uuid>& validRoles,
-        QVector<nx::Uuid>& invalidRoles,
-        QVector<nx::Uuid>& intermediateRoles,
-        QVector<QnUserResourcePtr>& validUsers,
-        QVector<QnUserResourcePtr>& invalidUsers) const;
+        QList<nx::Uuid>& validRoles,
+        QList<nx::Uuid>& invalidRoles,
+        QList<nx::Uuid>& intermediateRoles,
+        QList<QnUserResourcePtr>& validUsers,
+        QList<QnUserResourcePtr>& invalidUsers) const;
 
     bool isEmptySelectionAllowed() const;
 

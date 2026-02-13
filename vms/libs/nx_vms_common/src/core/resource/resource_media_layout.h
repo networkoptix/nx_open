@@ -7,7 +7,7 @@
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
 #include <QtCore/QStringList>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <core/resource/audio_layout.h>
 
@@ -44,7 +44,7 @@ public:
     /**
      * @return Matrix data assumed to be in row-major order.
      */
-    virtual QVector<int> getChannels() const = 0;
+    virtual QList<int> getChannels() const = 0;
 
     virtual QString toString() const { return QString(); }
 };
@@ -68,9 +68,9 @@ public:
         return QPoint(0, 0);
     }
 
-    virtual QVector<int> getChannels() const override
+    virtual QList<int> getChannels() const override
     {
-        return QVector<int>() << 0;
+        return QList<int>() << 0;
     }
 };
 
@@ -103,12 +103,12 @@ public:
 
     virtual QPoint position(int channel) const override;
 
-    virtual QVector<int> getChannels() const override;
+    virtual QList<int> getChannels() const override;
 
-    void setChannels(const QVector<int>& value);
+    void setChannels(const QList<int>& value);
 
 protected:
-    QVector<int> m_channels;
+    QList<int> m_channels;
     QSize m_size;
     mutable std::optional<int> m_cachedChannelCount = std::nullopt;
 };

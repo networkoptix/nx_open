@@ -25,21 +25,21 @@
 namespace nx {
 namespace p2p {
 
-using ResolvePeerNumberMessageType = QVector<PeerNumberType>;
+using ResolvePeerNumberMessageType = QList<PeerNumberType>;
 
 struct AlivePeersRecord
 {
     PeerNumberType peerNumber = 0;
     quint16 distance = 0;
 };
-using AlivePeersMessageType = QVector<AlivePeersRecord>;
+using AlivePeersMessageType = QList<AlivePeersRecord>;
 
 struct SubscribeForDataUpdateRecord
 {
     PeerNumberType peerNumber = 0;
     int sequence = 0;
 };
-using SubscribeForDataUpdatesMessageType = QVector<SubscribeForDataUpdateRecord>;
+using SubscribeForDataUpdatesMessageType = QList<SubscribeForDataUpdateRecord>;
 
 class MessageBus: public ec2::AbstractTransactionMessageBus
 {
@@ -293,7 +293,7 @@ private:
         nx::Url url;
         std::optional<nx::network::http::Credentials> credentials;
         nx::network::ssl::AdapterFunc adapterFunc;
-        QVector<nx::utils::ElapsedTimer> disconnectTimes;
+        QList<nx::utils::ElapsedTimer> disconnectTimes;
         ConnectionBase::State lastConnectionState = ConnectionBase::State::NotDefined;
     };
 

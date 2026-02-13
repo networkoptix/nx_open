@@ -80,7 +80,6 @@ namespace QnUbjsonDetail {
         return qToBigEndian(tmp.i);
     }
 
-
     class ReaderWriterBase {
     protected:
         enum Status {
@@ -109,7 +108,6 @@ namespace QnUbjsonDetail {
             int count;
         };
     };
-
 
     template<class Input>
     class InputStreamWrapper {
@@ -157,7 +155,7 @@ namespace QnUbjsonDetail {
             } else {
                 /* Otherwise there is a high probability that the stream is corrupted,
                  * but we cannot be 100% sure. Read it chunk-by-chunk, then assemble. */
-                QVector<QByteArray> chunks;
+                QList<QByteArray> chunks;
 
                 for(int pos = 0; pos < size; pos += chunkSize) {
                     QByteArray chunk;
@@ -190,7 +188,6 @@ namespace QnUbjsonDetail {
         QnInputBinaryStream<Input> m_stream;
     };
 
-
     template<class Output>
     class OutputStreamWrapper {
     public:
@@ -215,7 +212,6 @@ namespace QnUbjsonDetail {
     private:
         QnOutputBinaryStream<Output> m_stream;
     };
-
 
 } // namespace QnUbjsonDetail
 

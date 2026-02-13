@@ -3,7 +3,7 @@
 #pragma once
 
 #include <QtCore/QRectF>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtGui/QImage>
 
 #include <nx/utils/impl_ptr.h>
@@ -22,7 +22,7 @@ public:
     Pixelation();
     ~Pixelation();
 
-    QImage pixelate(const QImage& source, const QVector<QRectF>& rectangles, double intensity);
+    QImage pixelate(const QImage& source, const QList<QRectF>& rectangles, double intensity);
     QThread* thread() const;
 
 private:
@@ -36,7 +36,7 @@ public:
     BlurBuffer(QRhi* rhi, const QSize& size);
     ~BlurBuffer();
 
-    void blur(const QVector<QRectF>& rectangles, double intensity);
+    void blur(const QList<QRectF>& rectangles, double intensity);
 
     std::shared_ptr<QRhiTexture> texture() const;
 

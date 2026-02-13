@@ -28,8 +28,8 @@ public:
     EventType eventType() const;
     void setEventType(EventType eventType);
 
-    QVector<nx::Uuid> eventResources() const;
-    void setEventResources(const QVector<nx::Uuid> &value);
+    QList<nx::Uuid> eventResources() const;
+    void setEventResources(const QList<nx::Uuid> &value);
 
     EventParameters eventParams() const;
     void setEventParams(const EventParameters& params);
@@ -40,8 +40,8 @@ public:
     ActionType actionType() const;
     void setActionType(ActionType actionType);
 
-    QVector<nx::Uuid> actionResources() const;
-    void setActionResources(const QVector<nx::Uuid> &value);
+    QList<nx::Uuid> actionResources() const;
+    void setActionResources(const QList<nx::Uuid> &value);
 
     ActionParameters actionParams() const;
     void setActionParams(const ActionParameters& params);
@@ -92,12 +92,12 @@ private:
     nx::Uuid m_id;
 
     EventType m_eventType;
-    QVector<nx::Uuid> m_eventResources;
+    QList<nx::Uuid> m_eventResources;
     EventParameters m_eventParams;
     EventState m_eventState;
 
     ActionType m_actionType;
-    QVector<nx::Uuid> m_actionResources;
+    QList<nx::Uuid> m_actionResources;
     ActionParameters m_actionParams;
 
     int m_aggregationPeriod;

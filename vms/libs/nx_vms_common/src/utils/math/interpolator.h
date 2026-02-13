@@ -6,7 +6,7 @@
 #include <cassert>
 #include <functional>
 
-#include <QtCore/QVector>
+#include <QtCore/QList>
 
 #include <common/common_globals.h>
 #include <nx/utils/math/math.h>
@@ -22,7 +22,7 @@ public:
         m_extrapolationMode(extrapolationMode)
     {}
 
-    QnInterpolator(const QVector<point_type> &points, Qn::ExtrapolationMode extrapolationMode = Qn::ConstantExtrapolation):
+    QnInterpolator(const QList<point_type> &points, Qn::ExtrapolationMode extrapolationMode = Qn::ConstantExtrapolation):
         m_extrapolationMode(extrapolationMode)
     {
         setPoints(points);
@@ -32,7 +32,7 @@ public:
         return m_points.isEmpty() && m_extrapolationMode == Qn::ConstantExtrapolation;
     }
 
-    const QVector<point_type> &points() const {
+    const QList<point_type> &points() const {
         return m_points;
     }
 
@@ -40,7 +40,7 @@ public:
         return m_points[index];
     }
 
-    void setPoints(const QVector<point_type> &points) {
+    void setPoints(const QList<point_type> &points) {
         m_points = points;
 
         std::ranges::sort(m_points, PointLess());
@@ -68,7 +68,7 @@ protected:
     };
 
     T valueInternal(const T &x, Qn::ExtrapolationMode extrapolationMode) const {
-        typename QVector<point_type>::const_iterator pos = std::lower_bound(m_points.begin(), m_points.end(), point_type(x, T()), PointLess());
+        typename QList<point_type>::const_iterator pos = std::lower_bound(m_points.begin(), m_points.end(), point_type(x, T()), PointLess());
 
         if(pos == m_points.begin()) {
             return extrapolateStart(x, extrapolationMode);
@@ -137,7 +137,7 @@ protected:
 
 private:
     Qn::ExtrapolationMode m_extrapolationMode;
-    QVector<point_type> m_points;
+    QList<point_type> m_points;
 };
 
 #endif // QN_INTERPOLATOR_H

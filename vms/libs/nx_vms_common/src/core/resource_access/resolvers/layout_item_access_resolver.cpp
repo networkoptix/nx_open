@@ -51,7 +51,7 @@ private:
     void handleDesktopCameraRemoved(const QnVirtualCameraResourcePtr& camera);
 
     void handleVideowallLayoutsAdded(const QnVideoWallResourcePtr& videowall,
-        const QVector<nx::Uuid>& layoutIds);
+        const QList<nx::Uuid>& layoutIds);
 
     void handleLayoutItemAddedOrRemoved(
         const nx::Uuid& resourceId, const QnLayoutResourcePtr& storedLayout);
@@ -476,7 +476,7 @@ void LayoutItemAccessResolver::Private::handleLayoutParentChanged(
 }
 
 void LayoutItemAccessResolver::Private::handleVideowallLayoutsAdded(
-    const QnVideoWallResourcePtr& videowall, const QVector<nx::Uuid>& layoutIds)
+    const QnVideoWallResourcePtr& videowall, const QList<nx::Uuid>& layoutIds)
 {
     for (const auto& layoutId: layoutIds)
     {
