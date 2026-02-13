@@ -386,6 +386,26 @@
     </message>
   </context>
   <context>
+    <name>DownloadMediaDurationSheet</name>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation type="unfinished">
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Download next</source>
+      <translation type="unfinished">Download next</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
+    </message>
+  </context>
+  <context>
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
@@ -440,6 +460,10 @@
     <message>
       <source>Filters</source>
       <translation type="unfinished">Filters</translation>
+    </message>
+    <message>
+      <source>Details</source>
+      <translation type="unfinished">Details</translation>
     </message>
   </context>
   <context>
@@ -1489,6 +1513,10 @@
     <message>
       <source>PTZ Mode</source>
       <translation type="unfinished">PTZ Mode</translation>
+    </message>
+    <message>
+      <source>Export...</source>
+      <translation type="unfinished">Export...</translation>
     </message>
   </context>
   <context>
