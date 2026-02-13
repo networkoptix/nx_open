@@ -531,7 +531,6 @@ AnswerResult Session::processSdpAnswer(const std::string& sdp)
         track->state = state;
     }
 
-    // Reinitialize some tracks again with fallback codec.
     if (!initializeMuxersInternal())
         return AnswerResult::failed;
 
