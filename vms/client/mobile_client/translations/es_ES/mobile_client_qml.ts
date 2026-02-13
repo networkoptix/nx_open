@@ -1070,7 +1070,7 @@
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Conectarse al sitio</translation>
     </message>
     <message>
       <source>Log in as</source>
