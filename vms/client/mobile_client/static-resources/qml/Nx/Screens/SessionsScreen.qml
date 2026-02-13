@@ -1159,9 +1159,14 @@ AdaptiveScreen
                 && !accessor.getData(current, "isSaasShutDown")
 
             if (isAccessible)
+            {
                 windowContext.sessionManager.startCloudSession(systemId, systemName)
+            }
             else
+            {
+                appGlobalState.lastOpenedNodeId = NxGlobals.uuid("")
                 Workflow.openSitePlaceholderScreen(systemName)
+            }
         }
     }
 }
