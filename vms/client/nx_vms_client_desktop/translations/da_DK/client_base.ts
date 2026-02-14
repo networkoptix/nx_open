@@ -1688,14 +1688,14 @@ Licensnøgle: %2</translation>
       <source>Password should not contain %n or more consecutive characters together</source>
       <translation>
         <numerusform>Adgangskoden må ikke indeholde %n eller flere på hinanden følgende tegn samlet</numerusform>
-        <numerusform>Form: Anden</numerusform>
+        <numerusform>Adgangskoden må ikke indeholde %n eller flere på hinanden følgende tegn samlet</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
       <translation>
-        <numerusform>Form: Anden</numerusform>
-        <numerusform>Form: Anden</numerusform>
+        <numerusform>Adgangskoden må ikke indeholde %n eller flere gentagende tegn</numerusform>
+        <numerusform>Adgangskoden må ikke indeholde %n eller flere gentagende tegn</numerusform>
       </translation>
     </message>
     <message>
@@ -5790,8 +5790,8 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <translation>
-        <numerusform>Form: Anden</numerusform>
-        <numerusform>Form: Anden</numerusform>
+        <numerusform>Kilde og %n flere kameraer</numerusform>
+        <numerusform>Kilde og %n flere kameraer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -12713,8 +12713,8 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <translation>
-        <numerusform>Form: Anden</numerusform>
-        <numerusform>Form: Anden</numerusform>
+        <numerusform>Kilde og %n flere kameraer</numerusform>
+        <numerusform>Kilde og %n flere kameraer</numerusform>
       </translation>
     </message>
     <message>
