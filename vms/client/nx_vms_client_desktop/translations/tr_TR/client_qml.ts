@@ -1722,9 +1722,9 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n daha fazla</numerusform>
+        <numerusform>%n daha fazla</numerusform>
       </translation>
     </message>
   </context>
@@ -2367,9 +2367,9 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>..ve %n fazlası</numerusform>
+        <numerusform>..ve %n fazlası</numerusform>
       </translation>
     </message>
   </context>
@@ -2824,9 +2824,9 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... ve %n den fazlası</numerusform>
+        <numerusform>... ve %n den fazlası</numerusform>
       </translation>
     </message>
   </context>

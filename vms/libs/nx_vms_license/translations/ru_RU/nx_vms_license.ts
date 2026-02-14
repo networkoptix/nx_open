@@ -35,11 +35,11 @@
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
       <comment>Numerus: %1 is substituted with the required license type</comment>
-      <translation type="unfinished">
-        <numerusform>%n more %1 will be used.</numerusform>
-        <numerusform>%n more %1 will be used.</numerusform>
-        <numerusform>%n more %1 will be used.</numerusform>
-        <numerusform>%n more %1 will be used.</numerusform>
+      <translation>
+        <numerusform>Будет использована ещё %n %1.</numerusform>
+        <numerusform>Будет использована ещё %n %1.</numerusform>
+        <numerusform>Будет использована ещё %n %1.</numerusform>
+        <numerusform>Будет использована ещё %n %1.</numerusform>
       </translation>
     </message>
   </context>

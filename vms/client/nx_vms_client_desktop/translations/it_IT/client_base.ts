@@ -1473,9 +1473,9 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
       <comment>Numerus: %n is the count of licenses which can be deactivated</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>Disattivare %n Altro</numerusform>
+        <numerusform>Disattivare %n Altro</numerusform>
       </translation>
     </message>
   </context>
@@ -1736,17 +1736,17 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>La password non deve contenere %n o più caratteri consecutivi insieme</numerusform>
+        <numerusform>La password non deve contenere %n o più caratteri consecutivi insieme</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>La password non deve contenere %n o più caratteri ripetuti</numerusform>
+        <numerusform>La password non deve contenere %n o più caratteri ripetuti</numerusform>
       </translation>
     </message>
   </context>
@@ -4384,12 +4384,12 @@ License Key: %2</translation>
     <message>
       <source>TB</source>
       <comment>TB for terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>Numerus: TB for terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -6005,17 +6005,17 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Sorgente e altre %n telecamere</numerusform>
+        <numerusform>Sorgente e altre %n telecamere</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
       <comment>Numerus: placeholder for explicitly added items</comment>
-      <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
+      <translation>
+        <numerusform>%n in aggiunta</numerusform>
+        <numerusform>%n in aggiunta</numerusform>
       </translation>
     </message>
   </context>
@@ -8526,9 +8526,9 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message numerus="yes">
       <source>%n new</source>
       <comment>Numerus: %n is the count of new devices</comment>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n nuovo</numerusform>
+        <numerusform>%n nuovo</numerusform>
       </translation>
     </message>
   </context>
@@ -11312,9 +11312,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... e %n di più</numerusform>
+        <numerusform>... e %n di più</numerusform>
       </translation>
     </message>
   </context>
@@ -12777,9 +12777,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Sorgente e altre %n telecamere</numerusform>
+        <numerusform>Sorgente e altre %n telecamere</numerusform>
       </translation>
     </message>
   </context>

@@ -1202,7 +1202,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Importar desde dispositivos</translation>
     </message>
   </context>
   <context>
@@ -2370,9 +2370,9 @@ Presione Alt + Clic para seguir el objeto</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...y %n más</numerusform>
+        <numerusform>...y %n más</numerusform>
       </translation>
     </message>
   </context>
@@ -2827,9 +2827,9 @@ Presione Alt + Clic para seguir el objeto</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... y %n más</numerusform>
+        <numerusform>... y %n más</numerusform>
       </translation>
     </message>
   </context>

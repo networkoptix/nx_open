@@ -1714,8 +1714,8 @@ Select an Integration to begin configuring its parameters.</source>
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>還有%n 個</numerusform>
       </translation>
     </message>
   </context>
@@ -2355,8 +2355,8 @@ Press Alt + Click to follow object</source>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...與另外 %n 個</numerusform>
       </translation>
     </message>
   </context>
@@ -2810,8 +2810,8 @@ Press Alt + Click to follow object</source>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... 與另外 %n 個</numerusform>
       </translation>
     </message>
   </context>

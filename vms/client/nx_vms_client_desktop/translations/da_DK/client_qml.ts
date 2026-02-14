@@ -1722,9 +1722,9 @@ Vælg en Integration for at begynde at konfigurere dens parametre.</translation>
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n mere</numerusform>
+        <numerusform>%n mere</numerusform>
       </translation>
     </message>
   </context>
@@ -2369,9 +2369,9 @@ Tryk på Alt + klik for at følge objektet</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...og %n mere</numerusform>
+        <numerusform>...og %n mere</numerusform>
       </translation>
     </message>
   </context>
@@ -2826,9 +2826,9 @@ Tryk på Alt + klik for at følge objektet</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... og %n mere</numerusform>
+        <numerusform>... og %n mere</numerusform>
       </translation>
     </message>
   </context>

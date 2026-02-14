@@ -13,25 +13,25 @@
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <comment>Numerus: %2 is substituted with the required license type</comment>
-      <translation type="unfinished">
-        <numerusform>%n %2 will be used out of %1.</numerusform>
-        <numerusform>%n %2 will be used out of %1.</numerusform>
+      <translation>
+        <numerusform>%n %2 usarase fóra de %1.</numerusform>
+        <numerusform>%n %2 usarase fóra de %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <comment>Numerus: %1 is substituted with the required license type</comment>
-      <translation type="unfinished">
-        <numerusform>Activate %n more %1.</numerusform>
-        <numerusform>Activate %n more %1.</numerusform>
+      <translation>
+        <numerusform>Activar %n máis %1.</numerusform>
+        <numerusform>Activar %n máis %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
       <comment>Numerus: %1 is substituted with the required license type</comment>
-      <translation type="unfinished">
-        <numerusform>%n more %1 will be used.</numerusform>
-        <numerusform>%n more %1 will be used.</numerusform>
+      <translation>
+        <numerusform>Usarase %n máis %1.</numerusform>
+        <numerusform>Usarase %n máis %1.</numerusform>
       </translation>
     </message>
   </context>
