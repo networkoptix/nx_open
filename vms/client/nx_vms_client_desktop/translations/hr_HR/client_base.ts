@@ -1484,7 +1484,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
       <comment>Numerus: %n is the count of licenses which can be deactivated</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Deactivate %n Other</numerusform>
         <numerusform>Deactivate %n Other</numerusform>
         <numerusform>Deactivate %n Other</numerusform>
@@ -4426,12 +4426,12 @@ License Key: %2</translation>
     <message>
       <source>TB</source>
       <comment>TB for terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>Numerus: TB for terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
@@ -6105,7 +6105,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n additional</source>
       <comment>Numerus: placeholder for explicitly added items</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n additional</numerusform>
         <numerusform>%n additional</numerusform>
         <numerusform>%n additional</numerusform>
@@ -11466,7 +11466,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>... and %n more</numerusform>
         <numerusform>... and %n more</numerusform>
         <numerusform>... and %n more</numerusform>

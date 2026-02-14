@@ -1473,9 +1473,9 @@ Clé de licence : %2</translation>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
       <comment>Numerus: %n is the count of licenses which can be deactivated</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>Désactiver %n autre</numerusform>
+        <numerusform>Désactiver %n autre</numerusform>
       </translation>
     </message>
   </context>
@@ -1736,17 +1736,17 @@ Clé de licence : %2</translation>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>Mot de passe ne doit pas contenir %n ou plusieurs caractères consécutifs ensemble</numerusform>
+        <numerusform>Mot de passe ne doit pas contenir %n caractères consécutifs ensemble</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>Mot de passe ne doit pas contenir %n ou plusieurs caractères répétitifs</numerusform>
+        <numerusform>Mot de passe ne doit pas contenir %n ou plusieurs caractères répétitifs</numerusform>
       </translation>
     </message>
   </context>
@@ -4384,12 +4384,12 @@ Clé de licence : %2</translation>
     <message>
       <source>TB</source>
       <comment>TB for terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>Numerus: TB for terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -5088,9 +5088,9 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>+ %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ %n plus</numerusform>
+        <numerusform>+ %n plus</numerusform>
       </translation>
     </message>
   </context>
@@ -6005,17 +6005,17 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Source et %n autre caméra</numerusform>
+        <numerusform>Source et %n autre caméra</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
       <comment>Numerus: placeholder for explicitly added items</comment>
-      <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
+      <translation>
+        <numerusform>%n additionnels</numerusform>
+        <numerusform>%n additionnels</numerusform>
       </translation>
     </message>
   </context>
@@ -6721,7 +6721,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>%n MP</source>
       <comment>Numerus: MP for Megapixels</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n MP</numerusform>
         <numerusform>%n MP</numerusform>
       </translation>
@@ -8514,9 +8514,9 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>%n new</source>
       <comment>Numerus: %n is the count of new devices</comment>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n nouveau</numerusform>
+        <numerusform>%n nouveau</numerusform>
       </translation>
     </message>
   </context>
@@ -8547,9 +8547,9 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>Numerus: %1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 et %n groupes supplémentaires</numerusform>
+        <numerusform>%1 et %n groupes supplémentaires</numerusform>
       </translation>
     </message>
   </context>
@@ -9142,9 +9142,9 @@ Les performances du client sont dégradées.</translation>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>Numerus: %n is a number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
-        <numerusform>%n selected:</numerusform>
+      <translation>
+        <numerusform>%n sélectionnés :</numerusform>
+        <numerusform>%n sélectionnés :</numerusform>
       </translation>
     </message>
   </context>
@@ -10352,25 +10352,25 @@ Vous pouvez forcer la détection de mouvement, mais cela peut entraîner une aug
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>Numerus: %1 will be substituted with a layout name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more layouts</numerusform>
-        <numerusform>%1 and %n more layouts</numerusform>
+      <translation>
+        <numerusform>%1 et %n mises en page supplémentaires</numerusform>
+        <numerusform>%1 et %n mises en page supplémentaires</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>Numerus: %1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more video walls</numerusform>
-        <numerusform>%1 and %n more video walls</numerusform>
+      <translation>
+        <numerusform>%1 et %n murs vidéo supplémentaires</numerusform>
+        <numerusform>%1 et %n murs vidéo supplémentaires</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>Numerus: %1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 et %n groupes supplémentaires</numerusform>
+        <numerusform>%1 et %n groupes supplémentaires</numerusform>
       </translation>
     </message>
   </context>
@@ -11300,9 +11300,9 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... et %n de plus</numerusform>
+        <numerusform>... et %n de plus</numerusform>
       </translation>
     </message>
   </context>
@@ -12808,9 +12808,9 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Source et %n autre caméra</numerusform>
+        <numerusform>Source et %n autre caméra</numerusform>
       </translation>
     </message>
   </context>

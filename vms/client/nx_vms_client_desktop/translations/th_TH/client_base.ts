@@ -1462,8 +1462,8 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
       <comment>Numerus: %n is the count of licenses which can be deactivated</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>ปิดใช้งาน %n อื่น ๆ</numerusform>
       </translation>
     </message>
   </context>
@@ -4342,12 +4342,12 @@ License Key: %2</translation>
     <message>
       <source>TB</source>
       <comment>TB for terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>เทราไบต์</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>Numerus: TB for terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
       </translation>
     </message>
@@ -5914,15 +5914,15 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>แหล่งที่มาและ%n เพิ่มกล้องมากขึ้น</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
       <comment>Numerus: placeholder for explicitly added items</comment>
-      <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
+      <translation>
+        <numerusform>%n เพิ่มเติม</numerusform>
       </translation>
     </message>
   </context>
@@ -8382,8 +8382,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n new</source>
       <comment>Numerus: %n is the count of new devices</comment>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n ใหม่</numerusform>
       </translation>
     </message>
   </context>
@@ -8414,8 +8414,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>Numerus: %1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 และอีก %n กลุ่ม</numerusform>
       </translation>
     </message>
   </context>
@@ -10217,8 +10217,8 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>Numerus: %1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 และอีก %n กลุ่ม</numerusform>
       </translation>
     </message>
   </context>
@@ -11134,8 +11134,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... และ %n อื่น ๆ</numerusform>
       </translation>
     </message>
   </context>
@@ -12625,8 +12625,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>แหล่งที่มาและ%n เพิ่มกล้องมากขึ้น</numerusform>
       </translation>
     </message>
   </context>
