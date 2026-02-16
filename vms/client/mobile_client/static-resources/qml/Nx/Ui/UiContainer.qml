@@ -8,6 +8,7 @@ import QtQuick.Controls as Controls
 import Nx.Controls
 import Nx.Core
 import Nx.Items
+import Nx.Mobile
 import Nx.Mobile.Controls
 import Nx.Mobile.Ui
 import Nx.Ui
@@ -44,7 +45,7 @@ Item
 
         anchors.topMargin: topLevelWarning.height
         anchors.fill: parent
-        spacing: 0
+        spacing: 1
         visible: !LayoutController.isTabletLayout
 
         ProxyItem
@@ -61,12 +62,16 @@ Item
             id: mobileNavigationBarProxy
 
             Layout.fillWidth: true
-            Layout.topMargin: 2
 
             target: screenNavigationBar
+
             visible: !stackView.fullscreen
+                && !stackView.longContent
                 && windowContext.sessionManager.hasSession
-                && screenNavigationBar.active
+                && [Controller.ResourcesScreen,
+                    Controller.EventSearchScreen,
+                    Controller.FeedScreen,
+                    Controller.MenuScreen].includes(windowContext.deprecatedUiController.currentScreen)
         }
     }
 
@@ -76,7 +81,7 @@ Item
 
         anchors.topMargin: topLevelWarning.height
         anchors.fill: parent
-        spacing: 2
+        spacing: 1
         visible: LayoutController.isTabletLayout
         clip: true
 
@@ -86,9 +91,13 @@ Item
 
             Layout.fillHeight: true
             target: screenNavigationBar
+
             visible: !stackView.fullscreen
-               && windowContext.sessionManager.hasSession
-               && screenNavigationBar.active
+                && windowContext.sessionManager.hasSession
+                && [Controller.ResourcesScreen,
+                    Controller.EventSearchScreen,
+                    Controller.FeedScreen,
+                    Controller.SettingsScreen].includes(windowContext.deprecatedUiController.currentScreen)
         }
 
         ProxyItem
@@ -108,6 +117,7 @@ Item
         objectName: "mainStackView"
 
         readonly property bool fullscreen: currentItem?.fullscreen || false
+        readonly property bool longContent: currentItem?.longContent || false
 
         function restoreActiveFocus()
         {

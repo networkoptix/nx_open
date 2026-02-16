@@ -31,6 +31,7 @@ AdaptiveScreen
         ? camerasGrid
         : videoItem
     overlayItem: overlayItem
+    longContent: contentItem === videoItem
 
     customLeftControl: ToolBarButton
     {
@@ -43,7 +44,10 @@ AdaptiveScreen
             State
             {
                 name: "returnToLayout"
-                when: resourcesScreen.contentItem === videoItem && (resourceHelper.isLayout || resourceHelper.resource === null)
+                when: resourcesScreen.contentItem === videoItem
+                    && (resourceHelper.isLayout
+                        || resourceHelper.resource === null
+                        || (resourceHelper.isCamera && !LayoutController.isTabletLayout))
 
                 PropertyChanges
                 {
@@ -53,6 +57,9 @@ AdaptiveScreen
                         resourcesScreen.filterIds = []
                         videoItem.controller.stop()
                         resourcesScreen.contentItem = camerasGrid
+
+                        if (resourceHelper.isCamera)
+                            windowContext.deprecatedUiController.resource = null
                     }
                 }
             },

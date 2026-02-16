@@ -30,6 +30,7 @@ AdaptiveScreen
 
     fullscreenToolBar: detailsLoader.item?.showControls ?? false
     title: contentItem.title
+    longContent: contentItem !== eventSearchMenu
 
     customLeftControl: ToolBarButton
     {
@@ -453,7 +454,7 @@ AdaptiveScreen
             readonly property bool portraitMode: height > width
 
             y: portraitSearchProxy.visible ? searchField.height + 16 : 16
-            height: parent.height - y - 16
+            height: parent.height - y
             width: parent.width
 
             clip: true

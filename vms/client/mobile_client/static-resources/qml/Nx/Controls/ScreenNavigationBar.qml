@@ -14,15 +14,6 @@ Rectangle
 {
     id: control
 
-    property bool active: //< TODO: Move to some controller.
-    {
-        return switchToResourcesScreenButton.isSelected
-            || switchToEventSearchMenuScreenButton.isSelected
-            || switchToFeedScreenButton.isSelected
-            || (LayoutController.isTabletLayout ? false : switchToMenuScreenButton.isSelected)
-            || (LayoutController.isTabletLayout ? settingsButton.isSelected : false)
-    }
-
     color: ColorTheme.colors.dark4
     implicitHeight: d.kBarSize
     implicitWidth: d.kBarSize

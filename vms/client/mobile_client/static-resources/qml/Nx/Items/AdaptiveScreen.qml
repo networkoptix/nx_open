@@ -18,9 +18,14 @@ Item
     default property alias data: container.data
 
     // Whether only the contentItem is visible.
-    property bool fullscreen
+    property bool fullscreen: false
+
     // Whether tool bar visible in the fullscreen mode.
-    property bool fullscreenToolBar
+    property bool fullscreenToolBar: false
+
+    // Whether the screen content require a lot of space. The given property is a hint for
+    // the parent container to provide the maximum amount of available space.
+    property bool longContent: false
 
     property alias toolBar: toolBar //< TODO: the given alias must be removed.
     property alias title: toolBar.title
@@ -156,7 +161,7 @@ Item
         id: portraitLayout
 
         anchors.fill: parent
-        spacing: 0
+        spacing: 1
         visible: !LayoutController.isTabletLayout
 
         ProxyItem
@@ -183,7 +188,7 @@ Item
         id: landscapeLayout
 
         anchors.fill: parent
-        spacing: 2
+        spacing: 1
         visible: LayoutController.isTabletLayout
 
         Panel
