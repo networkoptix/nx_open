@@ -1706,13 +1706,13 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
       <translation>
-        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません</numerusform>
+        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
       <translation>
-        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません</numerusform>
+        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません。</numerusform>
       </translation>
     </message>
     <message>
