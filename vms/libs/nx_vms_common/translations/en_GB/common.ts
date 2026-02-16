@@ -224,21 +224,21 @@
     <message numerus="yes">
       <source>%n of %1 devices</source>
       <translation>
-        <numerusform>%n of %1 devices</numerusform>
+        <numerusform>%n of %1 device</numerusform>
         <numerusform>%n of %1 devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 cameras</source>
       <translation>
-        <numerusform>%n of %1 cameras</numerusform>
+        <numerusform>%n of %1 camera</numerusform>
         <numerusform>%n of %1 cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 I/O modules</source>
       <translation>
-        <numerusform>%n of %1 I/O modules</numerusform>
+        <numerusform>%n of %1 I/O module</numerusform>
         <numerusform>%n of %1 I/O modules</numerusform>
       </translation>
     </message>
@@ -555,8 +555,8 @@
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>%n of %1 selected users is not a %2 user and will not get mobile notifications</numerusform>
         <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
       </translation>
     </message>
@@ -941,7 +941,7 @@
     <name>QnRequiredAccessRightPolicy</name>
     <message numerus="yes">
       <source>%n groups</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n group</numerusform>
         <numerusform>%n groups</numerusform>
       </translation>
@@ -949,7 +949,7 @@
     <message numerus="yes">
       <source>%n users</source>
       <translation>
-        <numerusform>%n users</numerusform>
+        <numerusform>%n user</numerusform>
         <numerusform>%n users</numerusform>
       </translation>
     </message>
@@ -961,7 +961,7 @@
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n group does not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
       </translation>
@@ -974,7 +974,7 @@
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n user does not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
       </translation>
@@ -989,42 +989,42 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Camera</numerusform>
         <numerusform>%n Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n camera</numerusform>
         <numerusform>%n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O Module</numerusform>
         <numerusform>%n I/O Modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O module</numerusform>
         <numerusform>%n I/O modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Device</numerusform>
         <numerusform>%n Devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n device</numerusform>
         <numerusform>%n devices</numerusform>
       </translation>
@@ -1390,21 +1390,21 @@
     </message>
     <message numerus="yes">
       <source>%n minutes ago</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n minute ago</numerusform>
         <numerusform>%n minutes ago</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours ago</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n hour ago</numerusform>
         <numerusform>%n hours ago</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days ago</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n day ago</numerusform>
         <numerusform>%n days ago</numerusform>
       </translation>
