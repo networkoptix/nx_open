@@ -312,7 +312,7 @@
     <message numerus="yes">
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n minute</numerusform>
         <numerusform>%n minutes</numerusform>
       </translation>
