@@ -6,7 +6,7 @@
     <message numerus="yes">
       <source>%n Object Attributes</source>
       <comment>%n is number of attributes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Object Attribute</numerusform>
         <numerusform>%n Object Attributes</numerusform>
       </translation>
