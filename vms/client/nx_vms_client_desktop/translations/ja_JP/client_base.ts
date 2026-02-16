@@ -1720,14 +1720,14 @@ License Key: %2</source>
       <source>Password should not contain %n or more consecutive characters together</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
       <translation>
-        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません</numerusform>
+        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
       <translation>
-        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません</numerusform>
+        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません。</numerusform>
       </translation>
     </message>
   </context>
