@@ -559,7 +559,7 @@
         <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
         <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
         <translation>
-            <numerusform>%n of %1 selected user is not %2 user and will not get mobile notifications.</numerusform>
+            <numerusform>%n of %1 selected users is not a %2 user and will not get mobile notifications.</numerusform>
             <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
         </translation>
     </message>
