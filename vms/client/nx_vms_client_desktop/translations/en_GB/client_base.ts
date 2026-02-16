@@ -6746,11 +6746,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup will not be activated for %1 devices: </source>
-      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+      <translation>Backup will not be activated for %1 device: </translation>
     </message>
     <message>
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+      <translation>%1 suitable cloud storage services are required to activate backup for them.</translation>
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
