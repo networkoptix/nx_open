@@ -57,6 +57,8 @@ public:
     void setSendTimestampInterval(std::chrono::milliseconds interval);
     void setEnableMetadata(bool enableMetadata);
 
+    bool canAcceptData() const;
+
 private:
     friend class Ice;
 

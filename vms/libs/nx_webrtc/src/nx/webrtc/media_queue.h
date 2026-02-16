@@ -20,6 +20,8 @@ public:
     void setMaxSize(int maxSize);
     void clearUnprocessedData();
 
+    int size() const;
+
 private:
     std::chrono::microseconds getDurationUnsafe();
     void clearTillLastGopUnsafe();

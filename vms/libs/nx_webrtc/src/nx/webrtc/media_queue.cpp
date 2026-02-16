@@ -76,6 +76,12 @@ void MediaQueue::setMaxSize(int maxSize)
     m_maxSize = maxSize;
 }
 
+int MediaQueue::size() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return (int) m_mediaQueue.size();
+}
+
 void MediaQueue::putData(const QnConstAbstractMediaDataPtr& media)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
