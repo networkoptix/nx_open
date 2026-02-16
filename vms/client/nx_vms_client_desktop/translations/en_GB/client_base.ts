@@ -3719,7 +3719,7 @@ Licence Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>about %n minute</numerusform>
         <numerusform>about %n minutes</numerusform>
       </translation>
@@ -5088,7 +5088,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>+ %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>+ %n more</numerusform>
         <numerusform>+ %n more</numerusform>
       </translation>
@@ -5998,7 +5998,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
       <translation>
-        <numerusform>%n removed subjects</numerusform>
+        <numerusform>%n removed subject</numerusform>
         <numerusform>%n removed subjects</numerusform>
       </translation>
     </message>
@@ -6770,15 +6770,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>Backup will not be activated for %n device:</numerusform>
         <numerusform>Backup will not be activated for %n devices:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>%n suitable cloud storage service is required to activate backup for it.</numerusform>
         <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
       </translation>
     </message>

@@ -391,7 +391,7 @@
       <comment>Number of minutes</comment>
       <translation>
         <numerusform>%n minute</numerusform>
-        <numerusform>%n minute</numerusform>
+        <numerusform>%n minutes</numerusform>
       </translation>
     </message>
     <message>
