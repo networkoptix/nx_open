@@ -2363,7 +2363,7 @@ Alt + クリックを使用してください。</translation>
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
       <translation>
-        <numerusform>...さらに %n 件</numerusform>
+        <numerusform>... ほか %n 件</numerusform>
       </translation>
     </message>
   </context>
