@@ -2197,6 +2197,9 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     const bool layoutIsBeingDropped = targetResources.size() == 1
         && targetResources.front().objectCast<QnLayoutResource>();
 
+    if (layoutIsBeingDropped && targetResources.front()->hasFlags(Qn::cross_system))
+        return;
+
     if (!layoutIsBeingDropped)
         filterAllowedMediaResources(targetResources);
 
