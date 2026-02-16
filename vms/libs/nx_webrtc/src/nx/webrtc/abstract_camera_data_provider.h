@@ -14,6 +14,8 @@ namespace nx::metric { struct Storage; }
 
 namespace nx::webrtc {
 
+class Consumer;
+
 class NX_WEBRTC_API AbstractCameraDataProvider:
     public QnAbstractMediaDataReceptor
 {
@@ -30,8 +32,9 @@ public:
     void setInitialized(bool value) { m_initialized = value; }
     virtual bool isStarted() const = 0;
 
+    void setDataConsumer(Consumer* consumer);
+
 public: // Initialize.
-    virtual void subscribe(const OnDataHandler& handler) = 0;
 
     void setAuditHandle(const AuditHandle& handle) { m_auditHandle = handle; }
 
@@ -60,6 +63,7 @@ protected:
     int64_t m_positionUs = DATETIME_NOW;
     AuditHandle m_auditHandle;
     bool m_initialized = false;
+    Consumer* m_consumer;
 };
 
 using AbstractCameraDataProviderPtr = std::shared_ptr<AbstractCameraDataProvider>;

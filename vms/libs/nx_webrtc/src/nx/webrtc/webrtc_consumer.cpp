@@ -14,8 +14,10 @@
 
 namespace nx::webrtc {
 
+const int kMediaQueueSize = 512;
+
 Consumer::Consumer(Session* session):
-    m_mediaQueue(512),
+    m_mediaQueue(kMediaQueueSize),
     m_session(session)
 {}
 
@@ -29,6 +31,11 @@ Consumer::~Consumer()
             stoppedPromise.set_value();
         });
     stoppedPromise.get_future().wait();
+}
+
+bool Consumer::canAcceptData() const
+{
+    return m_mediaQueue.size() < kMediaQueueSize;
 }
 
 bool Consumer::startStream(Streamer* streamer)

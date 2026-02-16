@@ -122,6 +122,7 @@ void QnAbstractArchiveStreamReader::run()
         // check queue sizes
         if (!dataCanBeAccepted())
         {
+            resetRealtimeDelay();
             emit waitForDataCanBeAccepted();
             QnSleep::msleep(10);
             continue;
