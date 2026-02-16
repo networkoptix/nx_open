@@ -369,7 +369,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Batch Edit - %n User</numerusform>
         <numerusform>Batch Edit - %n Users</numerusform>
       </translation>
@@ -377,7 +377,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n Users</numerusform>
+        <numerusform>%n User</numerusform>
         <numerusform>%n Users</numerusform>
       </translation>
     </message>
@@ -486,14 +486,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n chosen device</numerusform>
         <numerusform>%n chosen devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n chosen camera</numerusform>
         <numerusform>%n chosen cameras</numerusform>
       </translation>
@@ -760,7 +760,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>This list is associated with %n Event Rule. Are you sure you want to delete it?</numerusform>
         <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
       </translation>
@@ -1243,7 +1243,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
         <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
       </translation>
@@ -1509,7 +1509,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>This line requires at least %n point.</numerusform>
         <numerusform>This line requires at least %n points.</numerusform>
       </translation>
@@ -1520,7 +1520,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>The maximum number of points has been reached (%n point).</numerusform>
         <numerusform>The maximum number of points has been reached (%n points).</numerusform>
       </translation>
@@ -1722,7 +1722,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
       </translation>
@@ -1791,7 +1791,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>with %n attribute</numerusform>
         <numerusform>with %n attributes</numerusform>
       </translation>
@@ -2034,7 +2034,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>This polygon requires at least %n point.</numerusform>
         <numerusform>This polygon requires at least %n points.</numerusform>
       </translation>
@@ -2045,7 +2045,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>The maximum number of points has been reached (%n point).</numerusform>
         <numerusform>The maximum number of points has been reached (%n points).</numerusform>
       </translation>
@@ -2617,7 +2617,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Set for the Camera</numerusform>
         <numerusform>Set for all %n Cameras</numerusform>
       </translation>
