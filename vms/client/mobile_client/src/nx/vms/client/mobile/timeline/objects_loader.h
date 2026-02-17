@@ -56,9 +56,10 @@ class ObjectsLoader: public QObject
         NOTIFY chunkProviderChanged)
     Q_PROPERTY(bool synchronous READ isSynchronous NOTIFY objectsTypeChanged)
     Q_PROPERTY(QVariant bottomBoundMs READ bottomBoundMs NOTIFY bottomBoundChanged)
+    Q_PROPERTY(qint64 topBoundMs READ topBoundMs NOTIFY topBoundChanged)
     Q_PROPERTY(qint64 startTimeMs READ startTimeMs WRITE setStartTimeMs NOTIFY startTimeChanged)
     Q_PROPERTY(qint64 durationMs READ durationMs WRITE setDurationMs NOTIFY durationChanged)
-    Q_PROPERTY(bool topLimited READ topLimited WRITE setTopLimited NOTIFY topLimitedChanged)
+    Q_PROPERTY(qint64 liveTimeMs READ liveTimeMs WRITE setLiveTimeMs NOTIFY liveTimeChanged)
     Q_PROPERTY(qint64 bucketSizeMs READ bucketSizeMs WRITE setBucketSizeMs
         NOTIFY bucketSizeChanged)
     Q_PROPERTY(int preloadedBuckets READ preloadedBuckets WRITE setPreloadedBuckets
@@ -108,9 +109,16 @@ public:
 
     /**
      * Archive beginning timestamp, in milliseconds since epoch, obtained from the `chunkProvider`,
-     * if present.
+     * if present. No scrolling below this boundary should be allowed.
      */
     QVariant bottomBoundMs() const;
+
+    /**
+     * The top boundary above which no scrolling should be allowed.
+     * If the topmost bucket has loaded objects and extends past live, the top boundary is
+     * the topmost bucket's end time, otherwise it's the live time.
+     */
+    qint64 topBoundMs() const;
 
     /**
      * Current time window, as start in milliseconds since epoch and duration in milliseconds.
@@ -126,10 +134,11 @@ public:
     void setDurationMs(qint64 value);
 
     /**
-     * Whether the current window end time is at live.
+     * Current live time value.
+     * Set externally to ensure various things are properly synchronized.
      */
-    bool topLimited() const;
-    void setTopLimited(bool value);
+    qint64 liveTimeMs() const;
+    void setLiveTimeMs(qint64 value);
 
     /**
      * Temporal bucket size, in milliseconds. A timeline object list resolution.
@@ -207,9 +216,10 @@ signals:
     void objectsTypeChanged();
     void chunkProviderChanged();
     void bottomBoundChanged();
+    void topBoundChanged();
     void startTimeChanged();
     void durationChanged();
-    void topLimitedChanged();
+    void liveTimeChanged();
     void bucketSizeChanged();
     void preloadedBucketsChanged();
     void cacheSizeChanged();

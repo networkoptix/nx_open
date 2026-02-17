@@ -16,10 +16,11 @@ Item
     property alias chunkProvider: loader.chunkProvider
     property alias objectsType: loader.objectsType
     property alias bottomBoundMs: loader.bottomBoundMs
+    property alias topBoundMs: loader.topBoundMs
 
     property alias startTimeMs: loader.startTimeMs
     property alias durationMs: loader.durationMs
-    property alias windowAtLive: loader.topLimited
+    property alias liveTimeMs: loader.liveTimeMs
     readonly property real millisecondsPerPixel: durationMs / Math.max(height, 1)
     readonly property alias bucketSizeMs: loader.bucketSizeMs
 

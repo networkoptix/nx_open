@@ -219,10 +219,8 @@ Rectangle
                 const nowMs = NxGlobals.syncNowMs()
                 timeline.windowAtLive = value + timeScale.durationMs >= nowMs
 
-                timeScale.startTimeMs = Math.max(timeline.bottomBoundMs,
-                    timeline.windowAtLive
-                        ? (nowMs - timeScale.durationMs)
-                        : value)
+                timeScale.startTimeMs = MathUtils.bound(timeline.bottomBoundMs,
+                    value, objects.topBoundMs - timeScale.durationMs)
             }
 
             // Zoom around specified pivot y-coordinate.
@@ -356,7 +354,7 @@ Rectangle
 
             startTimeMs: timeline.startTimeMs
             durationMs: timeline.durationMs
-            windowAtLive: timeline.windowAtLive
+            liveTimeMs: NxGlobals.syncNowMs()
 
             interactive: timeline.interactive
 
@@ -538,11 +536,11 @@ Rectangle
                     color: ColorTheme.colors.mobileTimeline.chunks.lastSecond
                     width: recordingChunks.width
 
-                    height: kLastSecondsDurationMs / timeScale.millisecondsPerPixel
                     active: !initialLoadingIndicator.active
 
-                    // Update y each animation step when animated parameter t changes.
-                    y: t, timeScale.timeToPosition(NxGlobals.syncNowMs())
+                    // Update height each animation step when animated parameter t changes.
+                    height: t, Math.max(0,
+                        timeScale.timeToPosition(NxGlobals.syncNowMs() - kLastSecondsDurationMs))
                 }
 
                 // This container is further populated by reparenting preloader delegates from
@@ -574,7 +572,7 @@ Rectangle
             id: timeMarker
 
             readonly property bool isAhead: timeline.positionAtLive
-                || (timeline.positionMs > timeScale.startTimeMs + timeScale.durationMs)
+                || (timeline.positionMs >= timeScale.startTimeMs + timeScale.durationMs)
 
             readonly property bool isBehind:
                 timeline.positionMs < timeScale.startTimeMs
@@ -897,6 +895,7 @@ Rectangle
         function onAfterAnimating()
         {
             const nowMs = NxGlobals.syncNowMs()
+            objects.liveTimeMs = nowMs
 
             if (timeline.positionAtLive)
                 timeline.positionMs = nowMs
@@ -905,7 +904,10 @@ Rectangle
 
             if (timeline.windowAtLive)
             {
-                timeScale.startTimeMs = nowMs - timeScale.durationMs
+                timeScale.startTimeMs = MathUtils.bound(
+                    nowMs - timeScale.durationMs,
+                    timeScale.startTimeMs,
+                    objects.topBoundMs - timeScale.durationMs)
 
                 if (dragHandler.draggingTimeMarker)
                     dragHandler.updatePosition(dragHandler.centroid.position.y)

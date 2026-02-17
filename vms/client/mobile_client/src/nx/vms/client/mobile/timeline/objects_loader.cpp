@@ -60,7 +60,6 @@ struct ObjectsLoader::Private
 
     // Visualized time period.
     QnTimePeriod window;
-    bool topLimited = true; //< Whether the window is at live. Affects buckets preloaded ahead.
 
     // Visualized time period rounded to bucket boundaries.
     QnTimePeriod roundedWindow;
@@ -79,6 +78,9 @@ struct ObjectsLoader::Private
     int preloadedBuckets = 2;
     int desiredCacheSize = 100;
 
+    milliseconds liveTime{milliseconds::max()};
+    milliseconds internalTopBound{milliseconds::max()};
+
     seconds expirationTime = 30s;
 
     int maxObjectsPerBucket = 100;
@@ -86,6 +88,10 @@ struct ObjectsLoader::Private
     milliseconds minimumStackDuration = 500ms;
 
     std::optional<milliseconds> bottomBound;
+
+    // The topmost bucket's end time if the bucket has loaded objects and extends past live,
+    // or the live time otherwise.
+    milliseconds topBound{milliseconds::max()};
 
     QPointer<core::ChunkProvider> chunkProvider;
     BackendPtr<ObjectTrackList> analyticsBackend;
@@ -132,6 +138,7 @@ struct ObjectsLoader::Private
         cacheWindow = {};
         roundedWindow = {};
         expandedWindow = {};
+        internalTopBound = liveTime;
         firstLoadedBucket = firstVisibleBucket = 0;
         loadedBucketCount = visibleBucketCount = 0;
 
@@ -143,6 +150,37 @@ struct ObjectsLoader::Private
             objectChunks = {};
             emit q->objectChunksChanged();
         }
+
+        if (topBound != liveTime)
+        {
+            topBound = liveTime;
+            emit q->topBoundChanged();
+        }
+    }
+
+    milliseconds calculateTopBound() const
+    {
+        const auto croppedStartMs = (internalTopBound - bucketSize).count();
+        const auto croppedBucketIt = find(croppedStartMs);
+
+        const bool hasCroppedBucketAtLive = croppedBucketIt != cache.cend()
+            && croppedBucketIt->state == ObjectBucket::State::Ready;
+
+        return hasCroppedBucketAtLive ? internalTopBound : liveTime;
+    }
+
+    void setTopBound(milliseconds value)
+    {
+        if (topBound == value)
+            return;
+
+        topBound = value;
+        emit q->topBoundChanged();
+    }
+
+    void updateTopBound()
+    {
+        setTopBound(calculateTopBound());
     }
 
     void handleWindowChanged()
@@ -175,11 +213,17 @@ struct ObjectsLoader::Private
 
         // Calculate the window encompassing visible buckets and preloaded buckets at each side.
         const auto extraTimeBehind = bucketSize * preloadedBuckets;
-        const auto extraTimeAhead = topLimited ? 0ms : extraTimeBehind;
+        const auto extraTimeAhead = newRoundedWindow.endTime() < liveTime ? extraTimeBehind : 0ms;
 
         const auto newExpandedWindow = QnTimePeriod::fromInterval(
             newRoundedWindow.startTime() - extraTimeBehind,
             newRoundedWindow.endTime() + extraTimeAhead);
+
+        const int totalBucketCount = (int) std::ceil(
+            (double) (liveTime - *bottomBound).count() / bucketSize.count());
+
+        const auto roundedLiveTime = *bottomBound + bucketSize * totalBucketCount;
+        internalTopBound = std::max(newRoundedWindow.endTime(), roundedLiveTime);
 
         if (roundedWindow == newRoundedWindow && expandedWindow == newExpandedWindow)
             return;
@@ -213,6 +257,9 @@ struct ObjectsLoader::Private
         expandedWindow = newExpandedWindow;
         visibleBucketCount = roundedWindow.duration() / bucketSize;
         loadedBucketCount = expandedWindow.duration() / bucketSize;
+
+        NX_ASSERT((roundedWindow.duration() % bucketSize) == 0ms);
+        NX_ASSERT((expandedWindow.duration() % bucketSize) == 0ms);
 
         // Fill the bucket cache with empty buckets where needed, crop the cache if needed.
         const int maxCacheSize = maximumCacheSize();
@@ -307,6 +354,8 @@ struct ObjectsLoader::Private
                 emit q->objectChunksChanged();
         }
 
+        NX_ASSERT(firstVisibleBucket + visibleBucketCount <= (int) cache.size());
+
         if (fullyReset)
         {
             emit q->bucketsReset();
@@ -331,6 +380,7 @@ struct ObjectsLoader::Private
             }
         }
 
+        updateTopBound();
         requestLoad();
     }
 
@@ -407,7 +457,8 @@ struct ObjectsLoader::Private
         }
     }
 
-    void handleBucketLoaded(BucketList::iterator bucketIt, std::optional<MultiObjectData> objectsData)
+    void handleBucketLoaded(
+        BucketList::iterator bucketIt, std::optional<MultiObjectData> objectsData)
     {
         bucketIt->isLoading = false;
         bucketIt->runningLoadingTask.reset();
@@ -424,6 +475,9 @@ struct ObjectsLoader::Private
         const int index = std::distance(cache.begin(), bucketIt) - firstVisibleBucket;
         if (index >= 0 && index < visibleBucketCount)
             emit q->bucketChanged(index);
+
+        if (bucketIt->startTimeMs == (internalTopBound - bucketSize).count())
+            updateTopBound();
     }
 
     void updateObjectChunks(const QnTimePeriod& bucketPeriod, const QnTimePeriodList& chunks)
@@ -447,17 +501,27 @@ struct ObjectsLoader::Private
             emit q->objectChunksChanged();
     }
 
-    BucketList::iterator find(qint64 startTimeMs)
+    static auto findBucket(auto&& sortedBuckets, qint64 startTimeMs)
     {
-        const auto it = std::lower_bound(cache.begin(), cache.end(), startTimeMs,
+        const auto it = std::lower_bound(sortedBuckets.begin(), sortedBuckets.end(), startTimeMs,
             [](const InternalBucket& bucket, qint64 startTimeMs)
             {
                 return bucket.startTimeMs < startTimeMs;
             });
 
-        return (it != cache.end() && it->startTimeMs == startTimeMs)
+        return (it != sortedBuckets.end() && it->startTimeMs == startTimeMs)
             ? it
-            : cache.end();
+            : sortedBuckets.end();
+    }
+
+    BucketList::iterator find(qint64 startTimeMs)
+    {
+        return findBucket(cache, startTimeMs);
+    }
+
+    BucketList::const_iterator find(qint64 startTimeMs) const
+    {
+        return findBucket(cache, startTimeMs);
     }
 
     void initializeLoaderDelegate()
@@ -648,6 +712,11 @@ QVariant ObjectsLoader::bottomBoundMs() const
         : QVariant{};
 }
 
+qint64 ObjectsLoader::topBoundMs() const
+{
+    return d->topBound.count();
+}
+
 milliseconds ObjectsLoader::startTime() const
 {
     return d->window.startTime();
@@ -700,20 +769,22 @@ void ObjectsLoader::setDurationMs(qint64 value)
     setDuration(milliseconds{value});
 }
 
-bool ObjectsLoader::topLimited() const
+qint64 ObjectsLoader::liveTimeMs() const
 {
-    return d->topLimited;
+    return d->liveTime.count();
 }
 
-void ObjectsLoader::setTopLimited(bool value)
+void ObjectsLoader::setLiveTimeMs(qint64 value)
 {
-    if (d->topLimited == value)
+    if (d->liveTime.count() == value)
         return;
 
-    d->topLimited = value;
-    emit topLimitedChanged();
+    d->liveTime = milliseconds(value);
+    emit liveTimeChanged();
 
-    d->handleWindowChanged();
+    // We don't need to update `internalTopBound` etc. until we scroll the window,
+    // and that is handled in `handleWindowChanged`.
+    d->updateTopBound();
 }
 
 milliseconds ObjectsLoader::bucketSize() const
