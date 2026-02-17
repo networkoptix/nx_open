@@ -214,6 +214,8 @@ ListView
     section.criteria: ViewSection.FullString
     section.delegate: ColumnLayout
     {
+        id: sectionItem
+
         readonly property var sectionTextParts: section.split("\n")
 
         readonly property string sectionTitle: sectionTextParts.length > 1
@@ -276,6 +278,8 @@ ListView
 
     delegate: Row
     {
+        id: listItem
+
         spacing: siteList.horizontalSpacing
         property var rowData: model.data
 
