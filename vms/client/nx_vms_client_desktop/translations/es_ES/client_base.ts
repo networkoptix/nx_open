@@ -1018,7 +1018,7 @@
     </message>
     <message>
       <source>Proxied Integration...</source>
-      <translation type="unfinished">Proxied Integration...</translation>
+      <translation>Integración mediante proxy...</translation>
     </message>
     <message>
       <source>Proxied Web Page...</source>
@@ -1043,7 +1043,7 @@
     <message numerus="yes">
       <source>Mute Items</source>
       <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+        <numerusform>Silenciar elementos</numerusform>
         <numerusform>Mute Items</numerusform>
       </translation>
     </message>
@@ -1060,7 +1060,7 @@
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Administración del sitio...</translation>
     </message>
     <message>
       <source>Site Update...</source>
@@ -1096,7 +1096,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>Ventana dedicada</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1220,11 +1220,11 @@
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>Todos los archivos</translation>
     </message>
   </context>
   <context>
@@ -1254,7 +1254,7 @@
     <name>Groups</name>
     <message>
       <source>Delete group?</source>
-      <translation type="unfinished">Delete group?</translation>
+      <translation>¿Borrar grupo?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups?</source>
@@ -1355,7 +1355,7 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>No se pudo activar la licencia gratuita</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1364,8 +1364,8 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>Hardware ID: %1
+Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
@@ -2691,7 +2691,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
-      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
+      <translation>Se conservarán los datos existentes (configuración del sitio y archivo)</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
@@ -2790,7 +2790,7 @@ License Key: %2</translation>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Inició sesión como %1</translation>
     </message>
   </context>
   <context>
@@ -2874,7 +2874,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Log In...</source>
-      <translation type="unfinished">Log In...</translation>
+      <translation>Iniciar sesión...</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -2882,7 +2882,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
-      <translation type="unfinished">Please sign in again with your link to continue</translation>
+      <translation>Por favor, inicia sesión nuevamente con tu enlace para continuar</translation>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
