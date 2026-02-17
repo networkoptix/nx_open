@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick.Window
 
 import Nx.Controls
@@ -54,6 +55,105 @@ Page
     toolBar.visible: false
 
     clip: false
+
+    states:
+    [
+        State
+        {
+            name: "portrait"
+            when: d.portraitOrientation
+
+            AnchorChanges
+            {
+                target: panel
+
+                anchors.left: preview.left
+                anchors.right: preview.right
+                anchors.top: preview.bottom
+            }
+
+            PropertyChanges
+            {
+                panelPlaybackControls.visible: true
+                previewTimestamp.visible: true
+                previewOrientationButton.visible: true
+
+                panel.transparent: false
+
+                playPauseButton.rounded: false
+                playPauseButton.icon.width: 24
+                playPauseButton.icon.height: 24
+                playPauseButton.Layout.preferredWidth: 44
+                playPauseButton.Layout.preferredHeight: 44
+
+                previousButton.rounded: false
+                previousButton.icon.width: 24
+                previousButton.icon.height: 24
+
+                nextButton.rounded: false
+                nextButton.icon.width: 24
+                nextButton.icon.height: 24
+
+                playbackControls.spacing: 8
+            }
+        },
+        State
+        {
+            name: "landscape"
+            when: !d.portraitOrientation
+
+            AnchorChanges
+            {
+                target: panel
+
+                anchors.left: preview.left
+                anchors.right: preview.right
+                anchors.bottom: preview.bottom
+            }
+
+            PropertyChanges
+            {
+                centralPlaybackControls.visible: true
+                panelTimestamp.visible: true
+                panelOrientationButton.visible: true
+
+                panel.transparent: true
+
+                playPauseButton.rounded: true
+                playPauseButton.icon.width: 64
+                playPauseButton.icon.height: 64
+                playPauseButton.Layout.preferredWidth: 64
+                playPauseButton.Layout.preferredHeight: 64
+
+                previousButton.rounded: true
+                previousButton.icon.width: 32
+                previousButton.icon.height: 32
+
+                nextButton.rounded: true
+                nextButton.icon.width: 32
+                nextButton.icon.height: 32
+
+                playbackControls.spacing: 44
+            }
+        }
+    ]
+
+    component ControlButton: MobileControls.Button
+    {
+        property bool rounded: false
+        property bool transparent: rounded
+
+        implicitWidth: 44
+        implicitHeight: 44
+
+        type: MobileControls.Button.Type.Interface
+        icon.width: 24
+        icon.height: 24
+
+        radius: rounded ? width / 2 : 6
+        backgroundColor: ColorTheme.transparent(parameters.colors[state], transparent ? 0.5 : 1.0)
+        foregroundColor: transparent ? ColorTheme.colors.light1 : parameters.textColors[state]
+    }
 
     ShareBookmarkSheet
     {
@@ -127,7 +227,7 @@ Page
                         : width * videoAspectRatio
                 }()
 
-            const maxHeight = (eventDetailsScreen.height - playbackPanel.height) / 2
+            const maxHeight = (eventDetailsScreen.height - panel.height) / 2
             return Math.min(realWidth, maxHeight)
         }
 
@@ -152,73 +252,6 @@ Page
             opacity: d.hasControls ? 1 : 0
             visible: d.portraitOrientation && opacity > 0
         }
-
-        DownloadMediaButton
-        {
-            id: downloadButton
-
-            parent: d.portraitOrientation
-                ? preview
-                : playbackPanel
-
-            x: d.portraitOrientation
-                ? parent.width - width - orientationModeButton.width - goToCameraButton.width
-                : orientationModeButton.x - width
-            y: d.portraitOrientation
-                ? parent.height - height
-                : (parent.height - height) / 2
-
-            visible: isDownloadAvailable && !preview.cannotDecryptMedia
-            enabled: preview.player && !preview.cannotDecryptMedia
-            resource: preview.resource
-            positionMs: preview.startTimeMs
-            durationMs: preview.durationMs
-        }
-
-        IconButton
-        {
-            id: goToCameraButton
-
-            visible: d.portraitOrientation && !preview.cannotDecryptMedia
-
-            x: parent.width - width - orientationModeButton.width
-            y: parent.height - height
-
-            padding: 0
-            icon.source: lp("/images/go_to_camera.svg")
-            icon.width: 24
-            icon.height: icon.width
-            onClicked: d.goToCamera()
-        }
-
-        IconButton
-        {
-            id: orientationModeButton
-
-            parent: d.portraitOrientation
-                ? preview
-                : playbackPanel
-
-            x: d.portraitOrientation
-                ? parent.width - width
-                : parent.width - width - 16;
-            y: d.portraitOrientation
-                ? parent.height - height
-                : (parent.height - height) / 2
-
-            width: 48
-            height: 48
-            visible: !preview.cannotDecryptMedia
-
-            icon.source: d.portraitOrientation
-                ? lp("/images/fullscreen_view_mode.svg")
-                : lp("/images/exit_fullscreen_mode.svg")
-            icon.width: 24
-            icon.height: icon.width
-            padding: 0
-
-            onClicked: eventDetailsScreen.fullscreenButtonClicked()
-        }
     }
 
     VideoDummy
@@ -232,9 +265,9 @@ Page
     {
         width: parent.width
 
-        anchors.top: preview.bottom
+        anchors.top: panel.bottom
         anchors.topMargin: 14
-        anchors.bottom: playbackPanel.top
+        anchors.bottom: parent.bottom
 
         contentWidth: parent.width
         contentHeight: scrollableData.height
@@ -322,120 +355,203 @@ Page
         }
     }
 
+    LayoutItemProxy
+    {
+        id: centralPlaybackControls
+
+        anchors.centerIn: preview
+
+        target: playbackControls
+        opacity: d.hasControls && !preview.cannotDecryptMedia ? 1.0 : 0.0
+        enabled: opacity > 0
+    }
+
+    LayoutItemProxy
+    {
+        id: previewTimestamp
+
+        anchors.left: preview.left
+        anchors.bottom: preview.bottom
+        anchors.margins: 20
+
+        target: timestampText
+    }
+
+    LayoutItemProxy
+    {
+        id: previewOrientationButton
+
+        anchors.right: preview.right
+        anchors.bottom: preview.bottom
+        anchors.rightMargin: 8
+        anchors.bottomMargin: 10
+
+        target: orientationModeButton
+    }
+
     Rectangle
     {
-        id: playbackPanel
+        id: panel
 
-        visible: opacity > 0
-        opacity:
+        property bool transparent: false
+        color: transparent ? "transparent" : ColorTheme.colors.dark6
+
+        visible: d.hasControls
+        height: 68
+
+        RowLayout
         {
-            if (!d.hasControls)
-                return 0
-            return d.portrait ? 1 : 0.8
-        }
+            id: panelLayout
 
-        y: parent.height - height
-        width: parent.width
-        height: 76
+            anchors.fill: parent
+            anchors.margins: 12
 
-        color: ColorTheme.colors.dark1
+            spacing: 8
 
-        Button
-        {
-            labelPadding: 12
-            anchors.verticalCenter: parent.verticalCenter
-            visible: !d.portraitOrientation
-
-            icon.source: lp("/images/go_to_camera.svg")
-            text: qsTr("Show on Camera")
-            color: "transparent"
-            onClicked: d.goToCamera()
-        }
-
-        Row
-        {
-            anchors.centerIn: parent
-
-            IconButton
+            LayoutItemProxy
             {
-                id: previousButton
+                id: panelTimestamp
 
-                width: 48
-                height: width
-                icon.source: lp("images/previous_event.svg")
-                icon.width: 24
-                icon.height: icon.width
-                padding: 0
-
-                enabled: currentEventIndex < d.accessor.count - 1
-                onClicked: ++currentEventIndex
+                target: timestampText
+                Layout.fillWidth: true
+                Layout.preferredWidth: panel.width
             }
 
-            IconButton
+            ControlButton
             {
-                id: playPauseButton
+                id: repeatButton
 
-                width: 48
-                height: width
-                icon.source: preview.playingPlayerState && !preview.cannotDecryptMedia
-                    ? lp("images/pause.svg")
-                    : lp("images/play_event.svg")
+                checkable: true
+                checked: preview.autoRepeat
+                transparent: panel.transparent
+                visible: !preview.cannotDecryptMedia
+                icon.source: "image://skin/24x24/Solid/repeat.svg"
+                Layout.fillWidth: true
+                Layout.minimumWidth: implicitWidth
 
-                icon.width: 24
-                icon.height: icon.width
-                padding: 0
-
-                enabled: !preview.cannotDecryptMedia
                 onClicked:
                 {
-                    if (preview.playingPlayerState)
-                    {
-                        preview.preview()
-                        return
-                    }
-
-                    preview.play(slider.value == slider.to
-                        ? preview.startTimeMs
-                        : preview.position)
+                    preview.autoRepeat = checked
+                    preview.autoplay = checked
                 }
             }
 
-            IconButton
+            LayoutItemProxy
             {
-                id: nextButton
+                id: panelPlaybackControls
 
-                width: 48
-                height: width
-                icon.source: lp("images/next_event.svg")
-                icon.width: 24
-                icon.height: icon.width
-                padding: 0
+                target: playbackControls
+                Layout.fillWidth: true
+                Layout.minimumWidth: implicitWidth
+            }
 
-                enabled: currentEventIndex > 0
-                onClicked: --currentEventIndex
+            ControlButton
+            {
+                id: goToCameraButton
+
+                visible: !preview.cannotDecryptMedia
+                transparent: panel.transparent
+                icon.source: "image://skin/24x24/Outline/show_on_layout.svg"
+                Layout.fillWidth: true
+                Layout.minimumWidth: implicitWidth
+
+                onClicked: d.goToCamera()
+            }
+
+            LayoutItemProxy
+            {
+                id: panelOrientationButton
+
+                target: orientationModeButton
+                Layout.fillWidth: true
+                Layout.minimumWidth: implicitWidth
             }
         }
+    }
+
+    RowLayout
+    {
+        id: playbackControls
+
+        spacing: 8
+
+        ControlButton
+        {
+            id: previousButton
+
+            icon.source: "image://skin/24x24/Outline/chunk_previous.svg"
+            enabled: currentEventIndex < d.accessor.count - 1
+
+            Layout.fillWidth: true
+
+            onClicked: ++currentEventIndex
+        }
+
+        ControlButton
+        {
+            id: playPauseButton
+
+            icon.source: preview.playingPlayerState && !preview.cannotDecryptMedia
+                ? "image://skin/24x24/Outline/pause.svg"
+                : "image://skin/24x24/Outline/play_small.svg"
+            enabled: !preview.cannotDecryptMedia
+
+            Layout.fillWidth: true
+
+            onClicked:
+            {
+                if (preview.playingPlayerState)
+                {
+                    preview.preview()
+                    return
+                }
+
+                preview.play(slider.value == slider.to
+                    ? preview.startTimeMs
+                    : preview.position)
+            }
+        }
+
+        ControlButton
+        {
+            id: nextButton
+
+            icon.source: "image://skin/24x24/Outline/chunk_future.svg"
+            enabled: currentEventIndex > 0
+
+            Layout.fillWidth: true
+
+            onClicked: --currentEventIndex
+        }
+    }
+
+    ControlButton
+    {
+        id: orientationModeButton
+
+        width: 48
+        height: 48
+        opacity: !preview.cannotDecryptMedia ? 1.0 : 0.0
+        enabled: opacity > 0
+        transparent: true
+
+        icon.source: d.portraitOrientation
+            ? "image://skin/24x24/Outline/fullscreen_view_mode.svg"
+            : "image://skin/24x24/Outline/exit_fullscreen_mode.svg"
+        icon.width: 24
+        icon.height: 24
+
+        onClicked: eventDetailsScreen.fullscreenButtonClicked()
     }
 
     Text
     {
         id: timestampText
 
-        parent: d.portraitOrientation
-            ? preview
-            : playbackPanel
-
-        visible: !preview.cannotDecryptMedia
-        x: d.portraitOrientation
-            ? 16
-            : (downloadButton.visible ? downloadButton.x : orientationModeButton.x) - width - 16
-        y: d.portraitOrientation
-            ? parent.height - height - 14
-            : (parent.height - height) / 2
-
         font.pixelSize: 16
         font.weight: Font.Medium
         color: ColorTheme.colors.light4
+        opacity: !preview.cannotDecryptMedia ? 1.0 : 0.0
 
         text: EventSearchUtils.timestampText(slider.value, windowContext.mainSystemContext)
     }
@@ -460,10 +576,9 @@ Page
         visible: opacity > 0 && !preview.cannotDecryptMedia
         opacity: d.hasControls ? 1 : 0
 
-
-        x: playbackPanel.x
-        y: playbackPanel.y - slider.height + (slider.height - sliderBackground.height) / 2
-        width: playbackPanel.width
+        x: panel.x
+        y: panel.y - slider.height + (slider.height - sliderBackground.height) / 2
+        width: panel.width
         height: 36
         leftPadding: 12
         rightPadding: 12
