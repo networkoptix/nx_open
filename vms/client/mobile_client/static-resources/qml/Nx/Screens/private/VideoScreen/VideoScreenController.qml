@@ -66,6 +66,10 @@ NxObject
     readonly property bool is2FaDisabled: !appContext.cloudStatusWatcher.is2FaEnabledForUser
         && resourceHelper.is2FaEnabled
 
+    readonly property alias firstChunkMs: chunkPositionWatcher.firstChunkMs
+    readonly property alias prevChunkMs: chunkPositionWatcher.prevChunkMs
+    readonly property alias nextChunkMs: chunkPositionWatcher.nextChunkMs
+
     readonly property string dummyState:
     {
         if (serverOffline)
@@ -342,22 +346,22 @@ NxObject
 
     function jumpForward()
     {
-        var nextChunkStartTime = chunkPositionWatcher.nextChunkStartTimeMs()
-        forcePosition(nextChunkStartTime)
-        if (nextChunkStartTime == -1)
+        const jumpToLive = nextChunkMs === -1
+        forcePosition(nextChunkMs)
+        if (jumpToLive)
             playLive()
     }
 
     function jumpBackward()
     {
-        const prevChunkStartTimeMs = chunkPositionWatcher.prevChunkStartTimeMs()
-        if (NxGlobals.isValidTime(prevChunkStartTimeMs)) //< FIXME: #vkutin jumpBackward must not be called if there are no chunks.
-            forcePosition(prevChunkStartTimeMs)
+        if (NxGlobals.isValidTime(prevChunkMs))
+            forcePosition(prevChunkMs)
     }
 
     function jumpToFirstChunk()
     {
-        forcePosition(chunkPositionWatcher.firstChunkStartTimeMs())
+        if (NxGlobals.isValidTime(firstChunkMs))
+            forcePosition(firstChunkMs)
     }
 
     function setResource(resource)

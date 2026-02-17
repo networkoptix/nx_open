@@ -35,6 +35,10 @@ class ChunkPositionWatcher: public QObject
         WRITE setChunkProvider
         NOTIFY chunkProviderChanged)
 
+    Q_PROPERTY(qint64 firstChunkMs READ firstChunkStartTimeMs NOTIFY chunksChanged)
+    Q_PROPERTY(qint64 prevChunkMs READ prevChunkStartTimeMs NOTIFY chunksChanged)
+    Q_PROPERTY(qint64 nextChunkMs READ nextChunkStartTimeMs NOTIFY chunksChanged)
+
 public:
     static void registerQmlType();
 
@@ -58,6 +62,7 @@ signals:
     void contentTypeChanged();
     void positionChanged();
     void chunkProviderChanged();
+    void chunksChanged();
 
 private:
     struct Private;

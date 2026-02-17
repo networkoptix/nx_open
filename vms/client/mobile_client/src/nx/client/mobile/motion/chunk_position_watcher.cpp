@@ -59,8 +59,13 @@ qint64 getChunkTime(
     }
 
     // Search backward.
-    if (it->contains(position) && it != periods.cbegin())
+    if (it->contains(position))
+    {
+        if (it == periods.cbegin())
+            return defaultValue(searchForward);
+
         --it;
+    }
 
     return chooseNearestTimeMs(position, it->startTimeMs, periods);
 }
@@ -99,6 +104,7 @@ void ChunkPositionWatcher::Private::updateChunksInformation()
 {
     prevChunkStartTimeMs = getChunkTime(position, periods(), false);
     nextChunkStartTimeMs = getChunkTime(position, periods(), true);
+    emit q->chunksChanged();
 }
 
 void ChunkPositionWatcher::Private::disconnectCurrentProvider()
@@ -131,12 +137,6 @@ ChunkPositionWatcher::ChunkPositionWatcher(QObject* parent):
     base_type(parent),
     d(new Private(this))
 {
-    connect(this, &ChunkPositionWatcher::contentTypeChanged,
-        d.data(), &Private::updateChunksInformation);
-    connect(this, &ChunkPositionWatcher::chunkProviderChanged,
-        d.data(), &Private::updateProviderConnections);
-    connect(this, &ChunkPositionWatcher::positionChanged,
-        d.data(), &Private::updateChunksInformation);
 }
 
 ChunkPositionWatcher::~ChunkPositionWatcher()
@@ -155,6 +155,8 @@ void ChunkPositionWatcher::setContentType(Qn::TimePeriodContent value)
 
     d->contentType = value;
     emit contentTypeChanged();
+
+    d->updateChunksInformation();
 }
 
 qint64 ChunkPositionWatcher::position() const
@@ -169,6 +171,8 @@ void ChunkPositionWatcher::setPosition(qint64 value)
 
     d->position = value == -1 ? DATETIME_NOW : value;
     emit positionChanged();
+
+    d->updateChunksInformation();
 }
 
 nx::vms::client::core::ChunkProvider* ChunkPositionWatcher::chunkProvider() const
@@ -185,6 +189,8 @@ void ChunkPositionWatcher::setChunkProvider(nx::vms::client::core::ChunkProvider
 
     d->provider = value;
     emit chunkProviderChanged();
+
+    d->updateProviderConnections();
 }
 
 qint64 ChunkPositionWatcher::nextChunkStartTimeMs() const

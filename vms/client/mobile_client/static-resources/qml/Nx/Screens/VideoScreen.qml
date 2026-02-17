@@ -481,7 +481,10 @@ Page
                         id: prevChunkButton
 
                         icon.source: "image://skin/24x24/Outline/chunk_previous.svg"
-                        enabled: d.hasArchive && navigationBar.hasChunkNavigation
+
+                        enabled: d.hasArchive
+                            && navigationBar.hasChunkNavigation
+                            && NxGlobals.isValidTime(controller.prevChunkMs)
 
                         onClicked:
                             controller.jumpBackward()
