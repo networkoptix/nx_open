@@ -34,7 +34,7 @@ QString getIconPath(int group, QString iconName)
         iconName = kDefaultIconName;
     return group == static_cast<int>(CameraButtonController::ButtonGroup::ptz)
         ? iconName
-        : QStringLiteral("qrc:///skin/soft_triggers/user_selectable/%1.svg").arg(iconName);
+        : QStringLiteral("image://skin/soft_triggers/user_selectable/%1.svg").arg(iconName);
 }
 
 } // namespace

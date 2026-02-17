@@ -340,6 +340,18 @@ Page
 
     Item
     {
+        id: actionVisualizerContainer
+
+        anchors.top: video.top
+        anchors.horizontalCenter: video.horizontalCenter
+        anchors.margins: 8
+
+        implicitWidth: childrenRect.width
+        implicitHeight: childrenRect.height
+    }
+
+    Item
+    {
         id: screenshotPlaceholder
 
         anchors.fill: video
@@ -625,11 +637,12 @@ Page
                     Layout.fillHeight: true
                 }
 
-                ControlButton
+                Item
                 {
-                    id: actionsButton
+                    id: actionButtonContainer
 
-                    icon.source: "image://skin/24x24/Outline/grid_view.svg"
+                    implicitWidth: childrenRect.width
+                    implicitHeight: childrenRect.height
                     enabled: controller.playingLive
                 }
             }
@@ -663,7 +676,7 @@ Page
             objectsType: videoScreen.selectedObjectsType
 
             interactive: !objectsTypeSheet.opened && !timelineObjectSheet.opened
-                && !ptzSheet.opened
+                && !ptzSheet.opened && !actionSheet.opened
 
             timeZone: video.resourceHelper.timeZone
 
@@ -924,6 +937,15 @@ Page
     Timeline.ObjectsTypeSheet
     {
         id: objectsTypeSheet
+    }
+
+    ActionSheet
+    {
+        id: actionSheet
+
+        resource: controller.resource
+        externalButtonContainer: actionButtonContainer
+        externalVisualizerContainer: actionVisualizerContainer
     }
 
     MediaDownloadBackend

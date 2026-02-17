@@ -4,6 +4,7 @@
 
 #include <QtQml/QtQml>
 
+#include <mobile_client/mobile_client_settings.h>
 #include <nx/vms/client/core/camera/buttons/extended_output_camera_button_controller.h>
 #include <nx/vms/client/core/camera/buttons/soft_trigger_camera_button_controller.h>
 #include <nx/vms/client/core/camera/buttons/two_way_audio_camera_button_controller.h>
@@ -23,7 +24,8 @@ CameraButtonController::CameraButtonController(QObject* parent):
     const auto lazyInitialize =
         [this]()
         {
-            addController<PtzCameraButtonController>(ButtonGroup::ptz);
+            if (!qnSettings->newTimelinePrototype())
+                addController<PtzCameraButtonController>(ButtonGroup::ptz);
 
             addController<core::TwoWayAudioCameraButtonController>(ButtonGroup::twoWayAudio);
 
@@ -33,8 +35,10 @@ CameraButtonController::CameraButtonController(QObject* parent):
 
             const auto commonOutputs =
                 api::ExtendedCameraOutputs(api::ExtendedCameraOutput::heater)
+                | api::ExtendedCameraOutput::fan
                 | api::ExtendedCameraOutput::wiper
                 | api::ExtendedCameraOutput::powerRelay;
+
             addController<core::ExtendedOutputCameraButtonController>(
                 ButtonGroup::extendedOutputs, commonOutputs);
 

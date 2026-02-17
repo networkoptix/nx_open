@@ -46,7 +46,7 @@ OptionalCameraButtonData buttonFromCamera(
         .id = kPtzButtonId,
         .name = PtzCameraButtonController::tr("Control PTZ"),
         .hint = "",
-        .iconName = "qrc:///images/ptz/ptz.png", // Mobile specific, return full path.
+        .iconName = "image://skin/24x24/Outline/ptz.svg", // Mobile specific, return full path.
         .type = CameraButtonData::Type::instant,
         .enabled = true};
 }

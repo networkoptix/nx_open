@@ -18,6 +18,7 @@ class SystemContext;
 /**
  * Abstract camera button controller interface class. Declares the interface of the buttons,
  * related actions and interaction rules.
+ * TODO: Consider renaming, as it seems to contain internal logic.
  */
 class NX_VMS_CLIENT_CORE_API AbstractCameraButtonController: public QObject
 {

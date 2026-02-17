@@ -146,7 +146,7 @@ T.AbstractButton
         if (!control.enabled)
             return "disabled"
 
-        if (control.pressed)
+        if (control.down)
         {
             return control.checked
                 ? "pressed_checked"
