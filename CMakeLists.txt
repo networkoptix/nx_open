@@ -32,9 +32,6 @@ endif()
 set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
-include(cmake/distribution/flavors.cmake)
-nx_init_distribution_flavor_list()
-
 include(cmake/utils.cmake)
 nx_init_known_files_list()
 include(build_utils/ninja/ninja_tool.cmake)
@@ -66,6 +63,11 @@ endif()
 
 nx_fetch_customization_package("artifacts/customization")
 nx_load_customization_package()
+
+# The list of default flavors depends on the target device and the customization package, so we
+# must include flavors.cmake after the target device is set and customization is loaded.
+include(cmake/distribution/flavors.cmake)
+nx_init_distribution_flavor_list()
 
 set(conanNxRemote "${artifactoryUrl}/api/conan/conan"
     CACHE INTERNAL "The URL of Conan remote containing packages needed for the build.")
