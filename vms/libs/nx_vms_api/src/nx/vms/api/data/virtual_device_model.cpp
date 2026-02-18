@@ -23,18 +23,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VirtualDeviceRelease, (json), VirtualDeviceRele
 
 namespace nx::vms::api {
 
-// -- Create Uploads Request --------
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VideoFileMetaInfo, (json), VideoFileMetaInfo_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(StatusForVirtualDeviceUpload, (json), StatusForVirtualDeviceUpload_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VirtualDeviceArchiveUploadItem, (json), VirtualDeviceFileInfo_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VirtualDeviceCreateUploads, (json), VirtualDeviceCreateUploads_Fields)
-
-// -- Create Uploads Response --------
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ResultForVirtualDeviceCreateUpload, (json), ResultForVirtualDeviceCreateUpload_Fields)
-
-// -- Write Upload Request --------
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VirtualDeviceUploadId, (json), VirtualDeviceUploadId_Fields)
-
-// -- Write Upload \ Read Status Response --------
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(StatusForVirtualDeviceUpload, (json), StatusForVirtualDeviceUpload_Fields)
 
 } // namespace nx::vms::api

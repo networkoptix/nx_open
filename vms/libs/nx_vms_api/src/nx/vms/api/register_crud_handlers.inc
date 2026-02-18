@@ -2544,7 +2544,7 @@ static void registerDeviceHandlers(
      * %permissions Depends on Resource access rights.
      * %struct VirtualDeviceCreateUploads
      * %param[ref] _local,_strict,_ticket
-     * %return:{std::vector<std::variant<ResultForVirtualDeviceCreateUpload, Result>>} Upload Ids.
+     * %return:{std::vector<StatusForVirtualDeviceUpload>}
      *
      * %apidoc PUT /rest/v{4-}/devices/{deviceId}/virtual/uploads/{uploadId}
      * Upload a Video file chunk for Virtual Device.
@@ -2585,9 +2585,9 @@ static void registerDeviceHandlers(
      * %struct VirtualDeviceUploadId
      * %param[ref] _local,_strict,_ticket
      */
-    reg("rest/v{3-}/devices/:deviceId/virtual/uploads/:uploadId?",
+    reg("rest/v{4-}/devices/:deviceId/virtual/uploads/:uploadId?",
         GlobalPermission::none,
-        std::make_unique<VirtualDeviceUpload>(serverModule, serverConnector));
+        std::make_unique<VirtualDeviceUpload>(serverModule));
 }
 
 static void registerLdapRestHandlers(

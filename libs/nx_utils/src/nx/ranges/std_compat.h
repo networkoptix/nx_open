@@ -23,6 +23,8 @@ customizations permitted by the standard.
 namespace nx {
 namespace ranges {
 
+// TODO: #skolesnik Implement drop-in outside the ifdef and test. Otherwise it is difficult to
+// debug failed compilation on CI where std::ranges::to is not supported.
 #if defined __cpp_lib_ranges_to_container
     using std::ranges::to;
 #else
@@ -123,7 +125,23 @@ namespace ranges {
             {
         #if defined __cpp_lib_containers_ranges
                 if constexpr (requires { Container(std::from_range, std::forward<R>(r)); })
+                {
                     return Container(std::from_range, std::forward<R>(r));
+                }
+                else
+                {
+                    auto c = std::forward<R>(r) | std::views::common;
+                    if constexpr (requires { Container(std::make_move_iterator(c.begin()),
+                        std::make_move_iterator(c.end())); })
+                    {
+                        return Container(
+                            std::make_move_iterator(c.begin()), std::make_move_iterator(c.end()));
+                    }
+                    else
+                    {
+                        static_assert(false, "Unhandled container type");
+                    }
+                }
         #else
                 auto c = std::forward<R>(r) | std::views::common;
 
