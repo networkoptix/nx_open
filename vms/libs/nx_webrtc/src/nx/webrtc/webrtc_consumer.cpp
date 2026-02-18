@@ -317,8 +317,6 @@ void Consumer::sendMetadata(const QnConstCompressedMetadataPtr& metadata)
 
 void Consumer::processNextData()
 {
-    // This code should be called only from Streamer's AIO thread.
-
     while (!m_needStop)
     {
         auto media = m_mediaQueue.popData(false /*blocked*/);
@@ -337,8 +335,11 @@ void Consumer::processNextData()
 
         const auto deviceId = media->deviceId;
         auto rtpEncoder = m_session->muxer()->setDataPacket(deviceId, media);
-        if (!NX_ASSERT(rtpEncoder))
+        if (!rtpEncoder)
+        {
+            NX_VERBOSE(this, "Skip data: %1", media);
             return;
+        }
 
         nx::utils::ByteArray buffer;
         std::deque<nx::Buffer> mediaBuffers;
