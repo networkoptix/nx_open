@@ -4996,7 +4996,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message numerus="yes">
       <source>+ %n more</source>
       <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
+        <numerusform>+ %n más</numerusform>
         <numerusform>+ %n more</numerusform>
       </translation>
     </message>
@@ -8002,7 +8002,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Administración del sitio</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -9106,7 +9106,7 @@ Site performance is degraded.</translation>
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
       <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
+        <numerusform>%n seleccionado:</numerusform>
         <numerusform>%n selected:</numerusform>
       </translation>
     </message>
