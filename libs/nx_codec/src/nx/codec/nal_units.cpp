@@ -234,13 +234,17 @@ int isStartCode(const void* _data, size_t size)
     return 0;
 }
 
-void convertToStartCodes(uint8_t* const data, const int size)
+void convertToStartCodes(uint8_t* const data, const size_t size)
 {
     uint8_t* offset = data;
     const uint8_t* end = data + size;
     while (end - offset >= 4)
     {
-        int64_t naluSize = (offset[0] << 24) | (offset[1] << 16) | (offset[2] << 8) | offset[3];
+        uint32_t naluSize =
+            (uint32_t(offset[0]) << 24) |
+            (uint32_t(offset[1]) << 16) |
+            (uint32_t(offset[2]) << 8)  |
+            (uint32_t(offset[3]));
         if (end - offset < int64_t(kStartCode.size()) + naluSize)
             break;
 

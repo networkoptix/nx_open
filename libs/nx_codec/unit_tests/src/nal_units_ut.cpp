@@ -281,3 +281,27 @@ TEST(NalUnits, convertStartCodesToSizes)
         ASSERT_EQ(converted[9], 0x05);
     }
 }
+
+TEST(NalUnits, convertToStartCodes)
+{
+    // These tests may not crash the process, so it's best to test them with Address Sanitizer or
+    // Valgrind.
+
+    // Broken data
+    {
+        uint8_t data[] = {0xff, 0xff, 0xff, 0xff, 0xe8};
+        nx::media::nal::convertToStartCodes(data, sizeof(data));
+    }
+
+    // Broken data
+    {
+        uint8_t data[] = {0xff, 0xff, 0xf0, 0x00, 0xe8};
+        nx::media::nal::convertToStartCodes(data, sizeof(data));
+    }
+
+    // Broken data
+    {
+        uint8_t data[] = {0x00, 0x00, 0x00, 0x00, 0xe8};
+        nx::media::nal::convertToStartCodes(data, sizeof(data));
+    }
+}
