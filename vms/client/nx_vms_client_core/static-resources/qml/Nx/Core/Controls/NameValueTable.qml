@@ -51,6 +51,8 @@ Item
     readonly property alias hoveredRow: highlight.rowIndex
     readonly property var hoveredItem: hoveredRow >= 0 ? items[hoveredRow] : undefined
 
+    property bool separatorsVisible: false
+
     property real tableLineHeight: CoreSettings.iniConfigValue("attributeTableLineHeightFactor")
     property real attributeTableSpacing: CoreSettings.iniConfigValue("attributeTableSpacing")
 
@@ -106,6 +108,7 @@ Item
 
             labelsRepeater.model = clippedData
             valuesRepeater.model = clippedData
+            separatorRepeater.model = clippedData
         }
 
         NameValueTableCalculator
@@ -184,8 +187,28 @@ Item
                 values: modelData[control.valuesRole] ?? []
                 colorValues: modelData[control.colorsRole] ?? []
                 maximumLineCount: control.maximumLineCount
+                alignment: valueAlignment
                 colorBoxSize: control.colorBoxSize
             }
+        }
+    }
+
+    Repeater
+    {
+        id: separatorRepeater
+
+        visible: separatorsVisible
+
+        delegate: Rectangle
+        {
+            property Item label: labelsRepeater.count > 0 ? labelsRepeater.itemAt(index) : null
+            property Item value: valuesRepeater.count > 0 ? valuesRepeater.itemAt(index) : null
+
+            y: Math.max(label?.y + label?.height, value?.y + value?.height) + grid.rowSpacing / 2 ?? 0
+
+            height: 1
+            width: parent.width
+            color: ColorTheme.colors.dark8
         }
     }
 

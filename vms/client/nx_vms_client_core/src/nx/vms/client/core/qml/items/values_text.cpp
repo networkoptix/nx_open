@@ -30,6 +30,7 @@ struct ValuesText::Private
     QColor appendixColor;
     QString separator = ", ";
     int maximumLineCount = 1;
+    Qt::Alignment alignment = Qt::AlignLeft;
     QTextDocument document{};
     bool dirty = true;
     int spacing = 4;
@@ -200,6 +201,21 @@ void ValuesText::setMaximumLineCount(int value)
     emit maximumLineCountChanged();
 }
 
+Qt::Alignment ValuesText::alignment() const
+{
+    return d->alignment;
+}
+
+void ValuesText::setAlignment(Qt::Alignment value)
+{
+    if (d->alignment == value)
+        return;
+
+    d->alignment = value;
+    updateItemView();
+    emit alignmentChanged();
+}
+
 qreal ValuesText::effectiveWidth()
 {
     return d->effectiveWidth;
@@ -347,9 +363,14 @@ void ValuesText::updateTextRow()
         table = cursor.insertTable(1, 3, tableFormat);
         cursor = table->cellAt(0, 0).firstCursorPosition();
     }
+
     QTextCharFormat textFormat;
     textFormat.setForeground(d->color);
     cursor.setCharFormat(textFormat);
+
+    QTextBlockFormat textBlockFormat;
+    textBlockFormat.setAlignment(d->alignment);
+    cursor.setBlockFormat(textBlockFormat);
 
     qreal effectiveWidth = 0;
     QFontMetricsF fm(d->document.defaultFont());
@@ -433,6 +454,7 @@ void ValuesText::updateColorRow()
     tableFormat.setBorder(0);
     tableFormat.setWidth(width());
     tableFormat.setHeight(implicitHeight());
+    tableFormat.setAlignment(d->alignment);
     QList<QTextLength> constraints;
     for (int i = 0; i < d->visibleValues.count(); ++i)
     {
@@ -445,7 +467,8 @@ void ValuesText::updateColorRow()
         if (i < d->visibleValues.count() - 1)
             constraints.append(QTextLength(QTextLength::FixedLength, d->spacing));
     }
-    constraints.append(QTextLength());
+    if (d->alignment != Qt::AlignRight)
+        constraints.append(QTextLength());
     if (!appendix.isEmpty())
         constraints.append(QTextLength(QTextLength::FixedLength, ceil(appendixWidth)));
     tableFormat.setColumnWidthConstraints(constraints);

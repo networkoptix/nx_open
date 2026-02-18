@@ -345,12 +345,15 @@ Page
 
                 attributes: d.accessor.getData(currentEventIndex, "analyticsAttributes") ?? []
 
-                nameFont.pixelSize: 16
-                nameColor: ColorTheme.colors.light16
-                valueFont.pixelSize: 16
-                valueColor: ColorTheme.colors.light4
+                nameFont.pixelSize: 14
+                nameColor: ColorTheme.colors.light10
+                valueFont.pixelSize: 14
+                valueColor: ColorTheme.colors.light6
                 valueFont.weight: Font.Medium
+                valueAlignment: Text.AlignRight
                 colorBoxSize: 18
+                rowSpacing: 16
+                separatorsVisible: true
             }
         }
     }

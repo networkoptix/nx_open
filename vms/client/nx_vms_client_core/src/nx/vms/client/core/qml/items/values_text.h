@@ -32,6 +32,7 @@ class ValuesText: public QQuickItem
         READ maximumLineCount
         WRITE setMaximumLineCount
         NOTIFY maximumLineCountChanged)
+    Q_PROPERTY(Qt::Alignment alignment READ alignment WRITE setAlignment NOTIFY alignmentChanged)
     Q_PROPERTY(qreal effectiveWidth READ effectiveWidth NOTIFY effectiveWidthChanged)
     Q_PROPERTY(int spacing READ spacing WRITE setSpacing() NOTIFY spacingChanged)
     Q_PROPERTY(
@@ -65,6 +66,9 @@ public:
     int maximumLineCount() const;
     void setMaximumLineCount(int value);
 
+    Qt::Alignment alignment() const;
+    void setAlignment(Qt::Alignment value);
+
     qreal effectiveWidth();
 
     int spacing() const;
@@ -88,6 +92,7 @@ signals:
     void appendixColorChanged();
     void separatorChanged();
     void maximumLineCountChanged();
+    void alignmentChanged();
     void effectiveWidthChanged();
     void spacingChanged();
     void colorBoxSizeChanged();
