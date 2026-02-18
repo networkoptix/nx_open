@@ -103,12 +103,14 @@ Session::Session(
             .mid = 0,
             .payloadType = 96,
             .trackType = TrackType::video,
+            .offerState = TrackState::active,
             });
         m_tracks->addTrack(std::move(video));
         auto audio = std::make_unique<Track>(Track{
             .mid = 1,
             .payloadType = 0,
             .trackType = TrackType::audio,
+            .offerState = TrackState::active,
         });
         m_tracks->addTrack(std::move(audio));
 
@@ -221,10 +223,39 @@ AbstractCameraDataProviderPtr Session::createProvider(
     if (!initializeMuxersInternal())
         return AbstractCameraDataProviderPtr();
 
-    if (m_tracker->isStarted())
+    if (m_tracker && m_tracker->isStarted())
         m_tracker->sendOffer();
 
     return provider;
+}
+
+bool Session::removeProvider(nx::Uuid deviceId)
+{
+    std::shared_ptr<AbstractCameraDataProvider> p;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        auto it = m_providers.find(deviceId);
+        if (it == m_providers.end())
+            return false;
+        p = it->second;
+        m_providers.erase(it);
+    }
+    p->stop();
+    if (auto track = m_tracks->videoTrack(deviceId))
+    {
+        track->offerState = TrackState::inactive;
+        track->useTranscoding = false;
+    }
+    if (auto track = m_tracks->audioTrack(deviceId))
+    {
+        track->offerState = TrackState::inactive;
+        track->useTranscoding = false;
+    }
+
+    if (m_tracker && m_tracker->isStarted())
+        m_tracker->sendOffer();
+
+    return true;
 }
 
 void Session::addProvider(std::shared_ptr<AbstractCameraDataProvider> provider)
@@ -238,9 +269,9 @@ void Session::addProvider(std::shared_ptr<AbstractCameraDataProvider> provider)
     if (provider->getVideoCodecParameters())
     {
         auto video = std::make_unique<Track>(Track{
-            .mid = 0,
             .deviceId = deviceId,
             .trackType = TrackType::video,
+            .offerState = TrackState::active,
             });
         m_tracks->addTrack(std::move(video));
     }
@@ -248,9 +279,9 @@ void Session::addProvider(std::shared_ptr<AbstractCameraDataProvider> provider)
     if (provider->getAudioCodecParameters())
     {
         auto audio = std::make_unique<Track>(Track{
-            .mid = 1,
             .deviceId = deviceId,
             .trackType = TrackType::audio,
+            .offerState = TrackState::active,
             });
         m_tracks->addTrack(std::move(audio));
     }
@@ -288,8 +319,8 @@ bool Session::initializeMuxersInternal()
         const auto videoTrack = m_tracks->videoTrack(provider->resource()->getId());
         const auto audioTrack = m_tracks->audioTrack(provider->resource()->getId());
 
-        const bool useFallbackVideo = videoTrack && videoTrack->state == TrackState::inactive;
-        const bool useFallbackAudio = audioTrack && audioTrack->state == TrackState::inactive;
+        const bool useFallbackVideo = videoTrack && videoTrack->useTranscoding;
+        const bool useFallbackAudio = audioTrack && audioTrack->useTranscoding;
 
         auto videoCodecParamaters = provider->getVideoCodecParameters();
         if (videoCodecParamaters)
@@ -511,36 +542,38 @@ AnswerResult Session::processSdpAnswer(const std::string& sdp)
         return AnswerResult::failed;
     }
 
-    bool hasInactiveTracks = false;
+    bool doOfferAgain = false;
     for (auto& [_, track]: m_tracks->tracks())
     {
         const auto state = m_sdpParseResult.tracksState[track->mid];
-        if (state == TrackState::inactive)
+        track->answerState = state;
+        if (state == TrackState::inactive && track->offerState == TrackState::active)
         {
-            hasInactiveTracks = true;
-            if (track->state != TrackState::offer)
+            if (track->useTranscoding)
                 return AnswerResult::failed; //< Still failed after traying fallback codec
+            doOfferAgain = true;
+            track->useTranscoding = true;
             if (auto it = m_providers.find(nx::Uuid(track->deviceId)); it != m_providers.end())
                 it->second->setInitialized(false); //< Allow to reinit provider.
         }
-        track->state = state;
     }
 
     if (!initializeMuxersInternal())
         return AnswerResult::failed;
 
-    return hasInactiveTracks ? AnswerResult::again : AnswerResult::success;
+    return doOfferAgain ? AnswerResult::again : AnswerResult::success;
 }
 
 AnswerResult Session::setFallbackCodecs()
 {
     for (auto& [_, track]: m_tracks->tracks())
     {
-        if (track->state == TrackState::inactive)
-            return AnswerResult::failed; //< Still failed after traying fallback codec
-        if (track->state == TrackState::active)
+        if (track->offerState == TrackState::inactive)
             continue;
-        track->state = TrackState::inactive;
+        if (track->useTranscoding)
+            return AnswerResult::failed; //< Still failed after traying fallback codec
+        track->useTranscoding = true;
+        track->answerState = TrackState::inactive;
         if (auto it = m_providers.find(nx::Uuid(track->deviceId)); it != m_providers.end())
             it->second->setInitialized(false); //< Allow to reinit provider.
     }

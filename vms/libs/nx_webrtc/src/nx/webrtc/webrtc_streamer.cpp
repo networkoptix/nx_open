@@ -119,14 +119,17 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
     if (!d.IsObject())
         return;
 
+    nx::Uuid deviceId = parseDeviceId(d);
+
     if (auto it = d.FindMember("add"); it != d.MemberEnd())
     {
         const auto& addObj = it->value;
         if (!addObj.IsObject())
             return;
 
-        const nx::Uuid newDeviceId = parseDeviceId(addObj);
-        if (newDeviceId.isNull())
+        if (deviceId.isNull())
+            deviceId = parseDeviceId(addObj);
+        if (deviceId.isNull())
             return;
 
         const int64_t seekMs = parseSeekMs(addObj);
@@ -139,7 +142,7 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
         try
         {
             m_session->createProvider(
-                newDeviceId,
+                deviceId,
                 positionMs,
                 newStream,
                 std::nullopt /*speedOpt*/);
@@ -151,9 +154,19 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
         return;
     }
 
-    nx::Uuid deviceId = parseDeviceId(d);
-
-    if (d.HasMember("seek"))
+    if (d.HasMember("remove"))
+    {
+        if (deviceId.isNull())
+        {
+            if (const auto& value = d["remove"]; value.IsString())
+                deviceId = nx::Uuid::fromStringSafe(value.GetString());
+        }
+        if (!deviceId.isNull())
+            m_session->removeProvider(deviceId);
+        else
+            NX_WARNING(this, "deviceId should be provided to remove stream");
+    }
+    else if (d.HasMember("seek"))
     {
         int64_t timestamp = 0;
         const auto& seekValue = d["seek"];
@@ -190,6 +203,8 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
     }
     else if (d.HasMember("pause"))
     {
+        if (deviceId.isNull())
+            deviceId = nx::Uuid::fromStringSafe(d["pause"].GetString());
         m_session->consumer()->pause(
             deviceId,
             [this](nx::Uuid deviceId, Consumer::StreamStatus result)
@@ -199,6 +214,8 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
     }
     else if (d.HasMember("resume"))
     {
+        if (deviceId.isNull())
+            deviceId = nx::Uuid::fromStringSafe(d["resume"].GetString());
         m_session->consumer()->resume(
             deviceId,
             [this](nx::Uuid deviceId, Consumer::StreamStatus result)
@@ -208,6 +225,8 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
     }
     else if (d.HasMember("nextFrame"))
     {
+        if (deviceId.isNull())
+            deviceId = nx::Uuid::fromStringSafe(d["nextFrame"].GetString());
         m_session->consumer()->nextFrame(
             deviceId,
             [this](nx::Uuid deviceId, Consumer::StreamStatus result)

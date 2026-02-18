@@ -104,6 +104,8 @@ public:
     void unlock();
     bool hasExpired(std::chrono::milliseconds timeout) const;
 
+    bool removeProvider(nx::Uuid deviceId);
+
 private:
     std::string dataChannelSdp() const;
     std::string constructFingerprint() const;

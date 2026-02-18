@@ -58,10 +58,10 @@ void Consumer::stopUnsafe()
 
 void Consumer::startProvidersIfNeeded()
 {
-    NX_CRITICAL(m_session);
+    if (!NX_ASSERT(m_session))
+        return;
     if (!m_streamer)
         return; //< It is not started yet.
-    // Should be called in muxing thread!
     runInMuxingThread(
         [this]()
         {
@@ -75,9 +75,9 @@ void Consumer::startProvidersIfNeeded()
 
 void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handler)
 {
-    NX_CRITICAL(m_session);
+    if (!NX_ASSERT(m_session))
+        return;
 
-    // Should be called in muxing thread!
     runInMuxingThread(
         [this, handler, deviceId, timestampUs]()
         {
@@ -116,9 +116,9 @@ void Consumer::changeQuality(
     nx::vms::api::StreamIndex stream,
     StatusHandler handler)
 {
-    NX_CRITICAL(m_session);
+    if (!NX_ASSERT(m_session))
+        return;
 
-    // Should be called in muxing thread!
     runInMuxingThread(
         [this, handler, deviceId, stream]()
         {
@@ -150,9 +150,9 @@ void Consumer::changeQuality(
 
 void Consumer::pause(nx::Uuid deviceId, StatusHandler handler)
 {
-    NX_CRITICAL(m_session);
+    if (!NX_ASSERT(m_session))
+        return;
 
-    // Should be called in muxing thread!
     runInMuxingThread(
         [this, handler = std::move(handler), deviceId]()
         {
@@ -180,7 +180,6 @@ void Consumer::pause(nx::Uuid deviceId, StatusHandler handler)
 
 void Consumer::resume(nx::Uuid deviceId, StatusHandler handler)
 {
-    // Should be called in muxing thread!
     runInMuxingThread(
         [this, handler = std::move(handler), deviceId]()
         {
@@ -208,9 +207,9 @@ void Consumer::resume(nx::Uuid deviceId, StatusHandler handler)
 
 void Consumer::nextFrame(nx::Uuid deviceId, StatusHandler handler)
 {
-    NX_CRITICAL(m_session);
+    if (!NX_ASSERT(m_session))
+        return;
 
-    // Should be called in muxing thread!
     runInMuxingThread(
         [this, handler, deviceId]()
         {
@@ -230,7 +229,6 @@ void Consumer::nextFrame(nx::Uuid deviceId, StatusHandler handler)
 
 bool Consumer::handleSrtp(std::vector<uint8_t> buffer)
 {
-    // Should be called in muxing thread!
     runInMuxingThread(
         [this, buffer = std::move(buffer)]() mutable
         {

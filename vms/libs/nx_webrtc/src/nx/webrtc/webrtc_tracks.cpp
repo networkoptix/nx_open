@@ -83,7 +83,7 @@ void Tracks::addTrack(std::unique_ptr<Track> track)
         track->ssrc = nx::utils::random::number<uint32_t>();
     } while (m_tracks.find(track->ssrc) != m_tracks.end());
     track->purpose = m_session->purpose();
-    track->mid = m_lastMid++;
+
 
     // Find existing track with same deviceId
     bool found = false;
@@ -105,6 +105,19 @@ void Tracks::addTrack(std::unique_ptr<Track> track)
     }
     track->trackId = nx::Uuid::createUuid().toSimpleStdString();
 
+    for (auto it = m_tracks.begin(); it != m_tracks.end(); ++it)
+    {
+        const auto& t = it->second;
+        if (t->offerState == TrackState::inactive && t->trackType == track->trackType)
+        {
+            track->mid = t->mid;
+            m_tracks.erase(it);
+            break;
+        }
+    }
+
+    if (track->mid == -1)
+        track->mid = m_lastMid++;
     m_tracks.emplace(track->ssrc, std::move(track));
 }
 
@@ -157,9 +170,16 @@ std::string Tracks::getSdpForTrack(const Track* track, uint16_t /*port*/) const
      * If the offerer wishes to only send media on a stream to its peer, it
      * MUST mark the stream as sendonly with the "a=sendonly" attribute.
      * */
-    sdp += toSdpAttribute(track->purpose) + ENDL;
     // Probably unused fields.
     sdp += "a=msid:" + track->streamId + " " + track->trackId + ENDL;
+    if (track->offerState == TrackState::active)
+    {
+        sdp += toSdpAttribute(track->purpose) + ENDL;
+    }
+    else
+    {
+        sdp += "a=inactive" ENDL;
+    }
     // Mux rtcp and rtp stream.
     sdp += "a=rtcp-mux" ENDL;
     /* 'actpass' due to bug in old Chromium. Actually, for incoming connection, should be 'passive':

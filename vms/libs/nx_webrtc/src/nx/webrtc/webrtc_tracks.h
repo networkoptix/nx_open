@@ -20,13 +20,15 @@ struct NX_WEBRTC_API Track
     std::string cname;
     std::string streamId;
     std::string trackId;
-    int mid = 0;
+    int mid = -1;
     int payloadType = 0;
     Purpose purpose = Purpose::sendrecv;
     nx::Uuid deviceId;
     TrackType trackType = TrackType::unknown;
 
-    TrackState state;
+    TrackState offerState{};
+    TrackState answerState{};
+    bool useTranscoding = false;
 };
 
 const std::string& toSdpAttribute(Purpose purpose);
