@@ -56,9 +56,8 @@ struct Fingerprint
 
 enum TrackState
 {
-    offer, //< Offer sent but state is not confirmed yet
     inactive,
-    active,
+    active
 };
 
 struct SdpParseResult
