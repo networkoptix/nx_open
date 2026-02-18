@@ -14,10 +14,12 @@
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_context_aware.h>
 
 using nx::vms::api::analytics::DeviceAgentManifest;
+using nx::vms::api::analytics::EngineManifest;
 using nx::vms::common::SystemContext;
 using nx::vms::common::SystemContextAware;
 
@@ -31,7 +33,9 @@ struct SupportInfo
     std::map<QString /*objectTypeId*/, std::set<QString /*attributeName*/>> objectTypeSupport;
 };
 
-SupportInfo supportInfoFromDeviceAgentManifest(const DeviceAgentManifest& deviceAgentManifest)
+SupportInfo extractSupportInfo(
+    const DeviceAgentManifest& deviceAgentManifest,
+    const EngineManifest& engineManifest)
 {
     SupportInfo result;
 
@@ -86,6 +90,8 @@ SupportInfo supportInfoFromDeviceAgentManifest(const DeviceAgentManifest& device
         };
     addBaseTypes(&result.eventTypeSupport, deviceAgentManifest.typeLibrary.eventTypes);
     addBaseTypes(&result.objectTypeSupport, deviceAgentManifest.typeLibrary.objectTypes);
+    addBaseTypes(&result.eventTypeSupport, engineManifest.typeLibrary.eventTypes);
+    addBaseTypes(&result.objectTypeSupport, engineManifest.typeLibrary.objectTypes);
 
     return result;
 }
@@ -118,11 +124,17 @@ struct ResourceSupportProxy::Private:
 
     void manifestsMaybeUpdated(const nx::Uuid& resourceId, const QString& key)
     {
+        static const QStringList kRelatedKeys = {
+            api::device_properties::kDeviceAgentManifestsKey,
+            api::device_properties::kCompatibleAnalyticsEnginesProperty,
+            api::device_properties::kUserEnabledAnalyticsEnginesProperty,
+        };
+
+        if (!kRelatedKeys.contains(key))
+            return;
+
         {
             NX_MUTEX_LOCKER lock(&mutex);
-            if (key != api::device_properties::kDeviceAgentManifestsKey)
-                return;
-
             supportInfoCache.erase(resourceId);
         }
         emit q->manifestsMaybeUpdated();
@@ -133,16 +145,23 @@ struct ResourceSupportProxy::Private:
         if (supportInfoCache.contains(deviceId))
             return;
 
+        const auto* resourcePool = systemContext()->resourcePool();
         const QnVirtualCameraResourcePtr device =
-            systemContext()->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
+            resourcePool->getResourceById<QnVirtualCameraResource>(deviceId);
 
         if (!device)
             return;
 
-        for (const auto& [engineId, manifest]: device->deviceAgentManifests())
+        auto& deviceCache = supportInfoCache[deviceId];
+        for (const auto& [engineId, deviceAgentManifest]: device->deviceAgentManifests())
         {
-            SupportInfo supportInfo = supportInfoFromDeviceAgentManifest(manifest);
-            supportInfoCache[deviceId][engineId] = std::move(supportInfo);
+            EngineManifest engineManifest;
+            const auto engine =
+                resourcePool->getResourceById<nx::vms::common::AnalyticsEngineResource>(engineId);
+            if (engine)
+                engineManifest = engine->manifest();
+
+            deviceCache[engineId] = extractSupportInfo(deviceAgentManifest, engineManifest);
         }
     }
 
