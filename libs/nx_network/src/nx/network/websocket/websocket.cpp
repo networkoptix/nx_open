@@ -6,7 +6,7 @@
 
 namespace nx::network::websocket {
 
-static const auto kAliveTimeout = std::chrono::seconds(10);
+static const auto kAliveTimeout = std::chrono::seconds(30);
 static const auto kBufferSize = 4096;
 static const auto kMaxIncomingMessageQueueSize = 1000;
 
