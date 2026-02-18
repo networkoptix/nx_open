@@ -1723,7 +1723,7 @@ Select an Integration to begin configuring its parameters.</translation>
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
       <translation type="unfinished">
-        <numerusform>%n more</numerusform>
+        <numerusform>%n más</numerusform>
         <numerusform>%n more</numerusform>
       </translation>
     </message>

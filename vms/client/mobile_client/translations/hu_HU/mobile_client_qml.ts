@@ -9,6 +9,21 @@
     </message>
   </context>
   <context>
+    <name>ActionSheet</name>
+    <message>
+      <source>Actions</source>
+      <translation type="unfinished">Actions</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation type="unfinished">Disabled by schedule</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticSelectors</name>
     <message>
       <source>ADVANCED SEARCH</source>
@@ -286,10 +301,6 @@
     <message>
       <source>Preview</source>
       <translation>Előnézet</translation>
-    </message>
-    <message>
-      <source>Show on Camera</source>
-      <translation type="unfinished">Show on Camera</translation>
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>

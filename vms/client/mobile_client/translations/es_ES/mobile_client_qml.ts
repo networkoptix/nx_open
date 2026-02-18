@@ -9,6 +9,21 @@
     </message>
   </context>
   <context>
+    <name>ActionSheet</name>
+    <message>
+      <source>Actions</source>
+      <translation type="unfinished">Actions</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation type="unfinished">Disabled by schedule</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticSelectors</name>
     <message>
       <source>ADVANCED SEARCH</source>
@@ -286,10 +301,6 @@
     <message>
       <source>Preview</source>
       <translation>Previsualización</translation>
-    </message>
-    <message>
-      <source>Show on Camera</source>
-      <translation>Mostrar en cámara</translation>
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
@@ -681,7 +692,7 @@
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Inició sesión como %1</translation>
     </message>
     <message>
       <source>Add Server</source>
