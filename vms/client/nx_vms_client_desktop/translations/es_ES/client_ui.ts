@@ -1920,7 +1920,7 @@ y haga clic en el botón &quot;Buscar&amp;quot</translation>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Administración del sitio</translation>
     </message>
   </context>
   <context>
