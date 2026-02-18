@@ -124,7 +124,7 @@ set(translations
 # Mobile platforms should have all languages enabled.
 if(NOT (${platform} MATCHES "android|ios"))
     # Temporary workaround cms issue.
-    if(customization.customLanguages AND NOT customization.customLanguages STREQUAL "[]")
+    if(DEFINED customization.customLanguages AND NOT "${customization.customLanguages}" STREQUAL "[]")
         set(translations ${customization.customLanguages})
     endif()
 endif()

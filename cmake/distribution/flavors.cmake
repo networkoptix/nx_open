@@ -2,13 +2,26 @@
 
 include_guard(GLOBAL)
 
-set(flavors "" CACHE STRING "Comma-separated list of flavors (distribution package formats).")
+set(_flavorsList "default")
+
+# Customization package contains list of linux_arm64 flavors (except the default one). If some
+# flavors are enabled, the corresponding CMake variable will contain a list of strings. Otherwise
+# the variable can be absent or contain "[]" string, depending on the CMS behavior.
+if("${targetDevice}" STREQUAL "linux_arm64")
+    if(DEFINED customization.desktop.flavors AND NOT "${customization.desktop.flavors}" STREQUAL "[]")
+        list(APPEND _flavorsList ${customization.desktop.flavors})
+    endif()
+endif()
+list(JOIN _flavorsList "," _flavors)
+unset(_flavorsList)
+
+set(flavors ${_flavors} CACHE STRING "Comma-separated list of flavors (distribution package formats).")
+
+unset(_flavors)
 
 # Definition of existing flavors - a list for each targetDevice.
 #
 # NOTE: Each targetDevice always has a `default` flavor.
-set(existing_flavors_linux_x64 "default")
-set(existing_flavors_linux_arm32 "default")
 set(existing_flavors_linux_arm64
     "default"
     "axis_acap"
@@ -17,9 +30,6 @@ set(existing_flavors_linux_arm64
     "vivotek_edge1"
     "milesight_edge1"
     "rockchip_nvr1")
-set(existing_flavors_macos_arm64 "default")
-set(existing_flavors_macos_x64 "default")
-set(existing_flavors_windows_x64 "default")
 
 # Validates the value of the configuration variable `flavors`, and initializes the
 # distribution_flavor_list variable accordingly.
@@ -30,12 +40,11 @@ set(existing_flavors_windows_x64 "default")
 #  - distribution_flavor_list: global variable containing the list of flavors to build.
 function(nx_init_distribution_flavor_list)
     set(existing_flavor_list ${existing_flavors_${targetDevice}})
+    if(NOT existing_flavor_list)
+        set(existing_flavor_list "default")
+    endif()
 
     string(REPLACE "," ";" distribution_flavor_list "${flavors}")
-    if(distribution_flavor_list STREQUAL "")
-        set(distribution_flavor_list ${existing_flavor_list} PARENT_SCOPE)
-        return()
-    endif()
 
     list(JOIN existing_flavor_list ", " existing_flavor_string)
 

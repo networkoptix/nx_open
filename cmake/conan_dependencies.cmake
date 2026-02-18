@@ -30,9 +30,9 @@ if(DEFINED withAnalyticsServer AND NOT withAnalyticsServer)
     list(APPEND _additional_conan_parameters "-o withAnalyticsServer=False")
 endif()
 
-string(JOIN "," flavors ${distribution_flavor_list})
+string(JOIN "," _flavors ${distribution_flavor_list})
 if(NOT openSourceBuild)
-    list(APPEND _additional_conan_parameters "-o flavors=${flavors}")
+    list(APPEND _additional_conan_parameters "-o flavors=${_flavors}")
 endif()
 
 if(targetDevice MATCHES "windows")
