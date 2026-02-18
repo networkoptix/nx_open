@@ -3,10 +3,7 @@
 #pragma once
 
 #include <nx/concepts/ranges.h>
-#include <nx/ranges/actions.h>
 #include <nx/ranges/closure.h>
-#include <nx/ranges/ranges.h>
-#include <nx/ranges/views.h>
 
 // -- Operations with Eager evaluation ----------------------------------------------------------
 namespace nx::ranges {

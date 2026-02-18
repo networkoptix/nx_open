@@ -155,41 +155,6 @@ NX_REFLECTION_INSTRUMENT(VirtualDeviceRelease, VirtualDeviceRelease_Fields);
 
 namespace nx::vms::api {
 
-struct NX_VMS_API VideoFileMetaInfo
-{
-    /**%apidoc:integer
-     * UTC time in milliseconds since Unix epoch of the first frame in the file.
-     * %example 0
-     */
-    std::chrono::milliseconds startTimeMs{};
-
-    /**%apidoc:integer
-     * Duration of the video content in milliseconds.
-     * %example 60000
-     */
-    std::chrono::milliseconds durationMs{};
-
-    /**%apidoc:integer
-     * File size in bytes.
-     * %example
-     */
-    double sizeB{};
-
-    /**%apidoc:base64
-     * MD5 checksum of the full file content, base64-encoded.
-     */
-    QByteArray md5{};
-
-    /**%apidoc Container format of the file. */
-    std::string container;
-
-    /**%apidoc Video codec used in the file. */
-    std::string codec;
-};
-#define VideoFileMetaInfo_Fields (startTimeMs)(durationMs)(sizeB) (md5) (container) (codec)
-QN_FUSION_DECLARE_FUNCTIONS(VideoFileMetaInfo, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(VideoFileMetaInfo, VideoFileMetaInfo_Fields);
-
 /**%apidoc
  * Description of a single video file to be uploaded to a Virtual Device archive.
  */
@@ -202,18 +167,38 @@ struct NX_VMS_API VirtualDeviceArchiveUploadItem
      */
     std::string filename;
 
-    /**%apidoc
-     * Video file whose content is to be written into the archive. Files with
-     * the same checksum and size may be treated by the server as the same
-     * underlying content, regardless of filename.
+    /**%apidoc:integer
+     * File size in bytes.
+     * %example 10000
      */
-    VideoFileMetaInfo metaInfo;
+    double sizeB{};
 
-    /**%apidoc[opt]:integer
-     * Archive time offset in milliseconds relative to metaInfo.startTimeMs.
-     * Defaults to 0, meaning the chunk is placed at metaInfo.startTimeMs.
+    /**%apidoc:base64
+     * MD5 checksum of the full file content, base64-encoded.
+     * %example 0
      */
-    std::chrono::milliseconds offsetMs{0};
+    std::string md5{};
+
+    /**%apidoc
+     * UTC time in milliseconds since Unix epoch of the first frame in the file.
+     * Used by Server to lock the corresponding Archive period during the Upload.
+     * %example 0
+     */
+    std::chrono::milliseconds startTimeMs{};
+
+    /**%apidoc
+     * Duration of the video content in milliseconds.
+     * Used by Server to lock the corresponding Archive period during the Upload.
+     * %example 60000
+     */
+    std::chrono::milliseconds durationMs{};
+
+    /**%apidoc[opt]
+     * Archive time offset in milliseconds relative to startTimeMs.
+     * Defaults to 0, meaning the chunk is placed at startTimeMs.
+     * Archive startTimeMs = startTimeMs + archiveOffsetMs.
+     */
+    std::chrono::milliseconds archiveOffsetMs{0};
 
     /**%apidoc[opt]:integer
      * Chunk size in bytes for uploading. Assigned by the server if not provided.
@@ -226,7 +211,8 @@ struct NX_VMS_API VirtualDeviceArchiveUploadItem
      */
     bool forceUpload = false;
 };
-#define VirtualDeviceFileInfo_Fields (filename)(metaInfo)(offsetMs)(chunkSizeB)(forceUpload)
+#define VirtualDeviceFileInfo_Fields \
+    (filename)(sizeB)(md5)(startTimeMs)(durationMs)(archiveOffsetMs)(chunkSizeB)(forceUpload)
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceArchiveUploadItem, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDeviceArchiveUploadItem, VirtualDeviceFileInfo_Fields);
 
@@ -249,7 +235,7 @@ struct NX_VMS_API VirtualDeviceCreateUploads
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceCreateUploads, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDeviceCreateUploads, VirtualDeviceCreateUploads_Fields);
 
-struct NX_VMS_API ResultForVirtualDeviceCreateUpload
+struct NX_VMS_API StatusForVirtualDeviceUpload
 {
     /**%apidoc
      * Filename as provided in the create-uploads request. Returned so the caller can
@@ -257,6 +243,19 @@ struct NX_VMS_API ResultForVirtualDeviceCreateUpload
      * and/or fileId.
      */
     std::string filename;
+
+    /**%apidoc
+     * Archive start time in milliseconds since Unix epoch for the resulting chunk.
+     */
+    std::chrono::milliseconds startTimeMs{};
+
+    /**%apidoc
+     * Duration in milliseconds of the resulting archive chunk.
+     * %example 20000
+     */
+    std::chrono::milliseconds durationMs{};
+
+    std::optional<std::string> _error;
 
     /**%apidoc
      * Identifier of this upload operation. Uniquely identifies both the file content
@@ -271,11 +270,6 @@ struct NX_VMS_API ResultForVirtualDeviceCreateUpload
      */
     double chunkSizeB = {};
 
-    /**%apidoc
-     * True if the server will use an existing cached copy of the file and
-     * the client must not upload data for this uploadId.
-     */
-    bool cached = false;
 
     /**%apidoc
      * Identifier of the file shared between items in the request.
@@ -286,20 +280,28 @@ struct NX_VMS_API ResultForVirtualDeviceCreateUpload
     nx::Uuid fileId;
 
     /**%apidoc
-     * Archive start time in milliseconds since Unix epoch for the resulting chunk.
+     * Percent of file data already stored on the server for this upload, [0-100].
      */
-    std::chrono::milliseconds startTimeMs{};
+    int uploadProgressPercent = 0;
 
     /**%apidoc
-     * Duration in milliseconds of the resulting archive chunk.
-     * %example 20000
+     * Percent of writing this upload into the archive, 0-100.
+     * May be absent when this information is not available (for example,
+     * when status is requested by fileId instead of uploadId).
      */
-    std::chrono::milliseconds durationMs{};
+    std::optional<int> archiveProgressPercent;
+
+    /**%apidoc
+     * Id of the user who created the upload. Visible only for users who have
+     * permissions to modify the Device.
+     */
+    std::optional<nx::Uuid> ownerId;
 };
-#define ResultForVirtualDeviceCreateUpload_Fields \
-    (filename)(uploadId)(chunkSizeB)(cached) (fileId) (startTimeMs) (durationMs)
-QN_FUSION_DECLARE_FUNCTIONS(ResultForVirtualDeviceCreateUpload, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(ResultForVirtualDeviceCreateUpload, ResultForVirtualDeviceCreateUpload_Fields);
+#define StatusForVirtualDeviceUpload_Fields \
+    (filename)(startTimeMs)(durationMs) \
+    (_error)(uploadId)(chunkSizeB)(fileId)(uploadProgressPercent)(archiveProgressPercent)(ownerId)
+QN_FUSION_DECLARE_FUNCTIONS(StatusForVirtualDeviceUpload, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(StatusForVirtualDeviceUpload, StatusForVirtualDeviceUpload_Fields);
 
 struct NX_VMS_API VirtualDeviceUploadId
 {
@@ -324,43 +326,5 @@ struct NX_VMS_API VirtualDeviceUploadId
 #define VirtualDeviceUploadId_Fields (deviceId)(uploadId)(chunk)
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceUploadId, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDeviceUploadId, VirtualDeviceUploadId_Fields);
-
-struct NX_VMS_API StatusForVirtualDeviceUpload
-{
-    /**%apidoc
-     * Percent of file data already stored on the server for this upload, [0-100].
-     */
-    int uploadProgressPercent = 0;
-
-    /**%apidoc
-     * Percent of writing this upload into the archive, 0-100.
-     * May be absent when this information is not available (for example,
-     * when status is requested by fileId instead of uploadId).
-     */
-    std::optional<int> archiveProgressPercent;
-
-    /**%apidoc
-     * Metadata of the video file associated with this upload.
-     */
-    VideoFileMetaInfo metaInfo;
-
-    /**%apidoc
-     * Identifier of the file shared between uploads in this request.
-     * In the common one-file-per-upload case it equals uploadId and can be ignored.
-     * When a single file is reused by multiple uploads, this value can be used
-     * as a stable handle for the shared content.
-     */
-    nx::Uuid fileId;
-
-    /**%apidoc
-     * Id of the user who created the upload. Visible only for users who have
-     * permissions to modify the Device.
-     */
-    std::optional<nx::Uuid> ownerId;
-};
-#define StatusForVirtualDeviceUpload_Fields \
-    (uploadProgressPercent)(archiveProgressPercent)(metaInfo)(fileId)(ownerId)
-QN_FUSION_DECLARE_FUNCTIONS(StatusForVirtualDeviceUpload, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(StatusForVirtualDeviceUpload, StatusForVirtualDeviceUpload_Fields);
 
 } // namespace nx::vms::api
