@@ -389,6 +389,11 @@ void IniConfig::Impl::createDefaultIniFile(std::ostream* output)
         return;
     }
 
+    constexpr auto kHeader = R"(# Warning! Please consult Support before making any adjustments.
+# Note that all settings are subject to future updates, behavior changes, or removal.)";
+
+    file << kHeader << "\n\n";
+
     for (const auto& param: m_params)
     {
         bool isDescriptionMultiline = false;
