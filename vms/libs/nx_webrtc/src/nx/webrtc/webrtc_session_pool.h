@@ -13,7 +13,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/vms/common/system_context_aware.h>
 
-#include "webrtc_ice_manager.h"
+#include "webrtc_turn_info_fetcher.h"
 #include "abstract_camera_data_provider.h"
 
 namespace nx::webrtc {
