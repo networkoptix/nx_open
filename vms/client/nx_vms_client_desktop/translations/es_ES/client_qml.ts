@@ -1640,7 +1640,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 seleccionado:</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -3112,7 +3112,7 @@ Presione Alt + Clic para seguir el objeto</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 seleccionado:</translation>
     </message>
     <message>
       <source>Schedule</source>

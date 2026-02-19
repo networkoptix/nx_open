@@ -7240,15 +7240,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+      <translation>Aby uniknąć nieodwracalnych zmian w archiwum, zaleca się wyłączenie opcji &quot;Zachowaj ustawienia czasu kamery&quot; przed włączeniem opcji &quot;Importuj wideo automatycznie&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+      <translation>Włączenie tego ustawienia może spowodować nieodwracalne zmiany w archiwum. Nie zaleca się włączania go, gdy opcja &quot;Importuj wideo automatycznie&quot; jest aktywna</translation>
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>Tylko okresy offline kamery lub serwera, które wystąpiły po włączeniu tej opcji, zostaną automatycznie zaimportowane. Uwaga: jeśli wyłączysz tę opcję, wszystkie okresy offline, które nie zostały jeszcze zaimportowane, zostaną utracone i nie będzie można ich później odzyskać.</translation>
     </message>
   </context>
   <context>
@@ -9304,7 +9304,7 @@ Pamiętaj, aby przywrócić poziom rejestrowania do ustawienia domyślnego po ze
     </message>
     <message>
       <source>&lt;None&gt;</source>
-      <translation type="unfinished">&lt;None&gt;</translation>
+      <translation>&lt;Brak&gt;</translation>
     </message>
   </context>
   <context>
@@ -12986,15 +12986,15 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>Brak ustawień modelu</translation>
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>Brak parametrów</translation>
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>Ustawienia parametrów</translation>
     </message>
   </context>
   <context>
