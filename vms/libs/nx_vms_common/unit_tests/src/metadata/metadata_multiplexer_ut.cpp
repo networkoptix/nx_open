@@ -94,7 +94,7 @@ protected:
         fetchPacketsGenerated();
 
         auto packetsRead = m_packetsRead;
-        std::sort(packetsRead.begin(), packetsRead.end());
+        std::ranges::sort(packetsRead);
 
         ASSERT_EQ(m_packetsGenerated, packetsRead);
     }
@@ -126,7 +126,7 @@ private:
                 std::back_inserter(m_packetsGenerated));
         }
 
-        std::sort(m_packetsGenerated.begin(), m_packetsGenerated.end());
+        std::ranges::sort(m_packetsGenerated);
     }
 };
 

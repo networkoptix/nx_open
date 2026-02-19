@@ -237,7 +237,7 @@ const QList<nx::Uuid>& PredefinedUserGroups::ids()
         []()
         {
             QList<nx::Uuid> result{kPredefinedGroupIds.cbegin(), kPredefinedGroupIds.cend()};
-            std::sort(result.begin(), result.end());
+            std::ranges::sort(result);
             return result;
         }();
 

@@ -47,9 +47,8 @@ void PluginDiagnosticEventModel::filterByCameras(
         addItem(nx::Uuid(), kAnyPlugin); //< By default should be the first item in the model.
 
     // All the engines should be sorted by the name.
-    std::sort(
-        engines.begin(),
-        engines.end(),
+    std::ranges::sort(
+        engines,
         [](const AnalyticsEngineResourcePtr& l, const AnalyticsEngineResourcePtr& r)
         {
             return l->getName() < r->getName();

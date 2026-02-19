@@ -112,7 +112,8 @@ QVector<Zone> getForbiddenZoned(const QPolygonF& layoutRect, const Lines& edges)
             continue;
 
         // Fixate intersection order to simplify zone calculation.
-        std::sort(intersections.begin(), intersections.end(),
+        std::ranges::sort(
+            intersections,
             [&top, &right, &bottom, &left](
                 const IntersectionWithLine& lhs,
                 const IntersectionWithLine& rhs)
@@ -334,7 +335,8 @@ std::optional<QLineF> calculateVisibleSegment(const QLineF& segment, const QRect
     if (sceneRect.contains(segment.p2()))
         visiblePoints.append(segment.p2());
 
-    std::sort(visiblePoints.begin(), visiblePoints.end(),
+    std::ranges::sort(
+        visiblePoints,
         [segment](const QPointF& p1, const QPointF& p2)
         {
             return distanceSquared(segment.p1(), p1) < distanceSquared(segment.p1(), p2);
@@ -446,7 +448,8 @@ QPolygonF getAllowedRect(const QPolygonF& layoutRect, const Lines& edges, const 
 
     QVector<Zone> forbiddenZones = getForbiddenZoned(fittedLayoutRect, edges);
 
-    std::sort(forbiddenZones.begin(), forbiddenZones.end(),
+    std::ranges::sort(
+        forbiddenZones,
         [](const Zone& lhs, const Zone& rhs)
         {
             return lhs.start < rhs.start;

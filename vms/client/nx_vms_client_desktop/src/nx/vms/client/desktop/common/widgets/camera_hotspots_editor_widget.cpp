@@ -305,7 +305,8 @@ QPoint CameraHotspotsEditorWidget::Private::resolveHotspotsCollision(
         }
     }
 
-    std::sort(possiblePositions.begin(), possiblePositions.end(),
+    std::ranges::sort(
+        possiblePositions,
         [desiredPosition](const QPointF& lhs, const QPointF& rhs)
         {
             return Geometry::length(desiredPosition - lhs)

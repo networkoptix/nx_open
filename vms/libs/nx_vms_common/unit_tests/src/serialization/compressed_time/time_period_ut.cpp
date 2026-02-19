@@ -240,7 +240,7 @@ protected:
             results.emplace_back(elapsed);
         }
 
-        std::sort(results.begin(), results.end());
+        std::ranges::sort(results);
         return {.sizeBytes = sizeBytes,
             .min = results.front(),
             .max = results.back(),

@@ -543,7 +543,8 @@ void AnalyticsSearchWidget::Private::updateTaxonomy()
     addEngineMenuAction(m_engineMenu, m_engineSelectionButton->deactivatedText(), {});
     m_engineMenu->addSeparator();
 
-    std::sort(relevantEngines.begin(), relevantEngines.end(),
+    std::ranges::sort(
+        relevantEngines,
         [this](AbstractEngine* left, AbstractEngine* right)
         {
             return m_collator.compare(left->name(), right->name()) < 0;

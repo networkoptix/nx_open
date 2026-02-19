@@ -91,7 +91,6 @@ bool messageIsSupported(MessageType message)
 //-------------------------------------------------------------------------------------------------
 // SystemHealthListModel::Private::Item definition.
 
-
 QnResourcePtr SystemHealthListModel::Private::Item::getResource() const
 {
     return !resources.empty() ? resources[0] : QnResourcePtr();
@@ -714,7 +713,7 @@ QnResourceList SystemHealthListModel::Private::getSortedResourceList(
 
     const auto resourceSet = getResourceSet(message);
     QnResourceList result(resourceSet.cbegin(), resourceSet.cend());
-    std::sort(result.begin(), result.end(), resourceNameLessThan);
+    std::ranges::sort(result, resourceNameLessThan);
     return result;
 }
 

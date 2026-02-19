@@ -24,7 +24,8 @@ enum Roles
 
 QnCloudSystemList sortedByName(QnCloudSystemList value)
 {
-    std::sort(value.begin(), value.end(),
+    std::ranges::sort(
+        value,
         [](const QnCloudSystem& left, const QnCloudSystem& right)
         {
             return left.name == right.name

@@ -94,7 +94,8 @@ State ServerSettingsDialogStateReducer::setPluginModules(
     }
 
     // Sort plugins by loaded state, then by name.
-    std::sort(state.plugins.modules.begin(), state.plugins.modules.end(),
+    std::ranges::sort(
+        state.plugins.modules,
         [](const PluginInfo& l, const PluginInfo& r)
         {
             if (l.status == PluginInfo::Status::loaded && r.status != PluginInfo::Status::loaded)

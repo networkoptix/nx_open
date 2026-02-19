@@ -448,7 +448,7 @@ int FisheyeCalibrator::Private::calculateLuminanceThreshold(QImage frame) const
     if (borders.isEmpty())
         return -1;
 
-    std::sort(borders.begin(), borders.end());
+    std::ranges::sort(borders);
     const int result = borders[borders.size() / 2];
 
     return qBound(kMinLuminanceThreshold, result, kMaxLuminanceThreshold);

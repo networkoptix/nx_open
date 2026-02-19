@@ -18,7 +18,8 @@ void sortColorsInGroups(ColorTree::ColorGroups* groups)
 {
     for (auto& colors: *groups)
     {
-        std::sort(colors.begin(), colors.end(),
+        std::ranges::sort(
+            colors,
             [](const QColor& c1, const QColor& c2)
             {
                 return c1.toHsl().lightness() < c2.toHsl().lightness();

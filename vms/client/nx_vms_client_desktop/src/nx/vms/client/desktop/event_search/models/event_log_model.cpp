@@ -434,7 +434,8 @@ public:
                 break;
         }
 
-        std::sort(m_records.begin(), m_records.end(),
+        std::ranges::sort(
+            m_records,
             [this, lessThan]
             (Iterator d1, Iterator d2)
             {

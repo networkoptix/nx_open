@@ -286,7 +286,7 @@ void BackupStatusWidget::updateBackupStatus()
                 if (backupPositionRequestHandles->empty())
                 {
                     backupTimePoints->removeAll(milliseconds::zero());
-                    std::sort(backupTimePoints->begin(), backupTimePoints->end());
+                    std::ranges::sort(*backupTimePoints);
                     milliseconds resultBackupTimePoint = backupTimePoints->empty()
                         ? milliseconds::zero()
                         : backupTimePoints->front();

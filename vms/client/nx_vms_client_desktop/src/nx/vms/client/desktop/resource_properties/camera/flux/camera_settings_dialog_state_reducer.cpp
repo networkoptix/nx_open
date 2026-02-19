@@ -73,7 +73,8 @@ static constexpr auto kPreRecordingAlertThreshold = 30s;
 
 QnIOPortDataList sortedPorts(QnIOPortDataList ports)
 {
-    std::sort(ports.begin(), ports.end(),
+    std::ranges::sort(
+        ports,
         [](const QnIOPortData& left, const QnIOPortData& right)
         {
             return nx::utils::naturalStringCompare(left.id, right.id, Qt::CaseInsensitive) < 0;

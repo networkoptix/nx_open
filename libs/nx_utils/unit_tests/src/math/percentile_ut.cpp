@@ -36,7 +36,7 @@ public:
             p->add(i);
 
             sorted.emplace_back(i);
-            std::sort(sorted.begin(), sorted.end());
+            std::ranges::sort(sorted);
 
             ASSERT_EQ(sorted[sorted.size() * percentile], p->get());
         }
@@ -65,7 +65,7 @@ TEST_F(Percentile, p30_contrived_example)
 TEST_F(Percentile, p75_input_increasing)
 {
     auto input = randomNumbers<double>(20);
-    std::sort(input.begin(), input.end());
+    std::ranges::sort(input);
 
     nx::utils::math::Percentile<double> p(0.75);
 
@@ -75,7 +75,7 @@ TEST_F(Percentile, p75_input_increasing)
 TEST_F(Percentile, p75_input_decreasing)
 {
     auto input = randomNumbers<int>(19);
-    std::sort(input.begin(), input.end(), std::greater<int>{});
+    std::ranges::sort(input, std::greater<int>{});
 
     nx::utils::math::Percentile<int> p(0.75);
 

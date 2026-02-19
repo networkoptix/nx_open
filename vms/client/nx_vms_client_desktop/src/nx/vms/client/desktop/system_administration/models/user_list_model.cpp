@@ -674,7 +674,8 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 {
                     auto groups = d->systemContext()->userGroupManager()->getGroupsByIds(
                         utils::unique_sorted(user->allGroupIds()));
-                    std::sort(groups.begin(), groups.end(),
+                    std::ranges::sort(
+                        groups,
                         [](const auto& left, const auto& right)
                         {
                             return ComparableGroup(left) < ComparableGroup(right);

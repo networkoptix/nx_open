@@ -552,7 +552,7 @@ void RequestCounter::printCounters(const QString& header, TestPeerManager* peerM
     printSplit();
 
     auto peers = counters[Total].keys();
-    std::sort(peers.begin(), peers.end());
+    std::ranges::sort(peers);
     for (const auto& peerId: peers)
     {
         for (int type = FirstRequestType; type < RequestTypesCount; ++type)

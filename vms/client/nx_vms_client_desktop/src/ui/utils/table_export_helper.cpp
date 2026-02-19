@@ -126,7 +126,7 @@ QString QnTableExportHelper::getGridCsvData(const QAbstractItemModel* tableModel
     using namespace nx::vms::common;
 
     QModelIndexList sortedIndexes = indexes;
-    std::sort(sortedIndexes.begin(), sortedIndexes.end());
+    std::ranges::sort(sortedIndexes);
 
     /* Creating header. */
     for (int i = 0; i < sortedIndexes.size() && sortedIndexes[i].row() == sortedIndexes[0].row();
@@ -173,7 +173,7 @@ QString QnTableExportHelper::getGridHtmlData(const QAbstractItemModel* tableMode
     using namespace nx::vms::common;
 
     QModelIndexList sortedIndexes = indexes;
-    std::sort(sortedIndexes.begin(), sortedIndexes.end());
+    std::ranges::sort(sortedIndexes);
 
     QString htmlResult;
     {
@@ -234,7 +234,7 @@ void QnTableExportHelper::getGridHtmlCsvData(const QAbstractItemModel* tableMode
     using namespace nx::vms::common;
 
     QModelIndexList sortedIndexes = indexes;
-    std::sort(sortedIndexes.begin(), sortedIndexes.end());
+    std::ranges::sort(sortedIndexes);
 
     QString textResult;
     QString htmlResult;

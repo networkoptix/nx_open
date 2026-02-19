@@ -75,7 +75,8 @@ Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /
             .filtered<core::LayoutResource>());
     }
 
-    std::sort(layouts.begin(), layouts.end(),
+    std::ranges::sort(
+        layouts,
         [](const QnLayoutResourcePtr& l, const QnLayoutResourcePtr& r)
         {
             return nx::utils::naturalStringLess(l->getName(), r->getName());
@@ -145,7 +146,7 @@ Factory::ActionList PtzPresetsToursFactory::newActions(const Parameters& paramet
     widget->ptzController()->getTours(&tours);
     widget->ptzController()->getActiveObject(&activeObject);
 
-    std::sort(tours.begin(), tours.end(),
+    std::ranges::sort(tours,
         [](const QnPtzTour& l, const QnPtzTour& r)
         {
             return nx::utils::naturalStringLess(l.name, r.name);

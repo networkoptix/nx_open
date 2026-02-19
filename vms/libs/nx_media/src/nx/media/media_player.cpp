@@ -98,7 +98,8 @@ QList<int> sortOutEqualQualities(QualityInfoList qualities)
 
     qualities.erase(newEnd, qualities.end());
 
-    std::sort(qualities.begin(), qualities.end(),
+    std::ranges::sort(
+        qualities,
         [](const QualityInfo& left, const QualityInfo& right) -> bool
         {
             return left.quality > right.quality;

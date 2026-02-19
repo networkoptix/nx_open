@@ -94,7 +94,8 @@ QString WidgetProfiler::getWidgetStatistics()
     QVector<QPair<QString, int>> sortedByCount;
     for (auto i = countByClassName.cbegin(); i != countByClassName.cend(); ++i)
         sortedByCount.append({i.key(), i.value()});
-    std::sort(sortedByCount.begin(), sortedByCount.end(),
+    std::ranges::sort(
+        sortedByCount,
         [](const auto& l, const auto& r) { return l.second > r.second; });
 
     return std::accumulate(sortedByCount.cbegin(), sortedByCount.cend(), QString(),

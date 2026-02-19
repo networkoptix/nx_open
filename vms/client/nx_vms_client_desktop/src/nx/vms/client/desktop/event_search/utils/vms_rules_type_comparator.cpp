@@ -62,7 +62,8 @@ int VmsRulesTypeComparator::toLexActionType(const QString& actionType) const
 QStringList VmsRulesTypeComparator::lexSortedEvents(const QStringList& events) const
 {
     auto result = events;
-    std::sort(result.begin(), result.end(),
+    std::ranges::sort(
+        result,
         [this](const QString& l, const QString& r)
         {
             return lexEventLess(l, r);
@@ -73,7 +74,8 @@ QStringList VmsRulesTypeComparator::lexSortedEvents(const QStringList& events) c
 QStringList VmsRulesTypeComparator::lexSortedActions(const QStringList& actions) const
 {
     auto result = actions;
-    std::sort(result.begin(), result.end(),
+    std::ranges::sort(
+        result,
         [this](const QString& l, const QString& r)
         {
             return lexActionLess(l, r);

@@ -23,7 +23,7 @@ static UserGroupDataList operator+(const UserGroupDataList& l, const UserGroupDa
 
 UserGroupDataList sorted(UserGroupDataList list)
 {
-    std::sort(list.begin(), list.end(), [](const auto& l, const auto& r) { return l.id < r.id; });
+    std::ranges::sort(list, [](const auto& l, const auto& r) { return l.id < r.id; });
     return list;
 }
 

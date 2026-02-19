@@ -1071,7 +1071,8 @@ void LinearizationListModel::Private::sourceLayoutAboutToBeChanged(
     if (!NX_ASSERT(!m_layoutChangingNodes.empty()))
         return;
 
-    std::sort(m_layoutChangingNodes.begin(), m_layoutChangingNodes.end(),
+    std::ranges::sort(
+        m_layoutChangingNodes,
         [](const NodePtr& left, const NodePtr& right) { return left->row < right->row; });
 
     if (!NX_ASSERT(m_visibleSourceIndices.empty()))

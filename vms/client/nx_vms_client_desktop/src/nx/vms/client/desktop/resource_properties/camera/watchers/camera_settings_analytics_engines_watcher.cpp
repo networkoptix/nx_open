@@ -90,7 +90,8 @@ QList<core::AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::Private:
         std::remove_if(enginesList.begin(), enginesList.end(), isIncompatibleEngine),
         enginesList.end());
 
-    std::sort(enginesList.begin(), enginesList.end(),
+    std::ranges::sort(
+        enginesList,
         [](const auto& left, const auto& right) { return left.name < right.name; });
 
     return enginesList;

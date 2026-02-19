@@ -163,7 +163,7 @@ void addItemToLayout(const LayoutResourcePtr& layout, const QnVideoWallItemIndex
 
     QList<int> screens =
         screensCoveredByItem(firstIdx.item(), firstIdx.videowall()).values();
-    std::sort(screens.begin(), screens.end());
+    std::ranges::sort(screens);
     if (screens.isEmpty())
         return;
 

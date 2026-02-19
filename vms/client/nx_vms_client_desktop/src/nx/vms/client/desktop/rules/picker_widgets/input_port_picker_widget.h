@@ -57,7 +57,7 @@ private:
             [&inputComparator](const QnVirtualCameraResourcePtr& camera)
             {
                 auto cameraInputs = camera->ioPortDescriptions(Qn::PT_Input);
-                std::sort(cameraInputs.begin(), cameraInputs.end(), inputComparator);
+                std::ranges::sort(cameraInputs, inputComparator);
 
                 return cameraInputs;
             };

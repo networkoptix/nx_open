@@ -536,7 +536,8 @@ void QnWorkbenchItem::setData(int role, const QVariant &value)
 
 void QnWorkbenchItem::sortByGeometryAndName(QList<QnWorkbenchItem*>& items)
 {
-    std::sort(items.begin(), items.end(),
+    std::ranges::sort(
+        items,
         [](const QnWorkbenchItem* l, const QnWorkbenchItem* r)
         {
             const QRect lg = l->geometry();

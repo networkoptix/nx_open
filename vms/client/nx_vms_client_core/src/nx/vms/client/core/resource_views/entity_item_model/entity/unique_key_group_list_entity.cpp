@@ -122,7 +122,8 @@ void UniqueKeyGroupListEntity<Key, KeyHasher, KeyEqual>::setItems(const QVector<
     if (newGroupSequence.empty())
         return;
 
-    std::sort(std::begin(newGroupSequence), std::end(newGroupSequence),
+    std::ranges::sort(
+        newGroupSequence,
         [this](const auto& lhs, const auto& rhs)
         { return m_itemOrder.comp(lhs->headItem(), rhs->headItem()); });
 
@@ -295,7 +296,8 @@ void UniqueKeyGroupListEntity<Key, KeyHasher, KeyEqual>::setItemOrder(const Item
     for (const auto item: m_groupSequence)
         permutationSolver.emplace_back(item, sequentalGenerator());
 
-    std::sort(std::begin(permutationSolver), std::end(permutationSolver),
+    std::ranges::sort(
+        permutationSolver,
         [&itemOrder](const auto& lhs, const auto& rhs)
         { return itemOrder.comp(lhs.first->headItem(), rhs.first->headItem()); });
 

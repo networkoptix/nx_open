@@ -218,7 +218,7 @@ QnVirtualCameraResourceList BackupSettingsDecoratorModel::Private::camerasToAppl
             .filtered(cameraHasDefaultBackupSettings));
     }
 
-    std::sort(cameras.begin(), cameras.end());
+    std::ranges::sort(cameras);
     const auto newEnd = std::unique(cameras.begin(), cameras.end());
     cameras.erase(newEnd, cameras.end());
 

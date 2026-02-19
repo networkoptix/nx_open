@@ -55,7 +55,8 @@ struct AttributeFilter::Private
 
         if (sort)
         {
-            std::sort(result.begin(), result.end(),
+            std::ranges::sort(
+                result,
                 [sortKeys = manager->attributeIndexes()](const Attribute& l, const Attribute& r)
                 {
                     return sortKeys.value(l.id) < sortKeys.value(r.id);

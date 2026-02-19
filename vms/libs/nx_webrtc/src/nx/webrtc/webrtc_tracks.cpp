@@ -57,7 +57,8 @@ std::vector<Track> Tracks::allTracks() const
     for (const auto& [_, track]: m_tracks)
         result.emplace_back(*track.get());
 
-    std::sort(result.begin(), result.end(),
+    std::ranges::sort(
+        result,
         [](const auto& t1, const auto& t2)
         {
             return t1.mid < t2.mid;
@@ -83,7 +84,6 @@ void Tracks::addTrack(std::unique_ptr<Track> track)
         track->ssrc = nx::utils::random::number<uint32_t>();
     } while (m_tracks.find(track->ssrc) != m_tracks.end());
     track->purpose = m_session->purpose();
-
 
     // Find existing track with same deviceId
     bool found = false;

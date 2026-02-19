@@ -84,8 +84,8 @@ protected:
         std::vector<AggregatedRect> left,
         std::vector<AggregatedRect> right)
     {
-        std::sort(left.begin(), left.end(), RectComparator());
-        std::sort(right.begin(), right.end(), RectComparator());
+        std::ranges::sort(left, RectComparator());
+        std::ranges::sort(right, RectComparator());
 
         ASSERT_EQ(left, right);
     }

@@ -139,7 +139,7 @@ void MembersCache::sortSubjects(QList<nx::Uuid>& subjects) const
     if (!m_subjectContext)
         return;
 
-    std::sort(subjects.begin(), subjects.end(), lessFunc());
+    std::ranges::sort(subjects, lessFunc());
 }
 
 MembersCache::Members MembersCache::sortedSubjects(const QSet<nx::Uuid>& subjectSet) const

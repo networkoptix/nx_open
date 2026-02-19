@@ -32,7 +32,7 @@ struct DataChange
         top(top),
         bottom(bottom.isEmpty() ? top : bottom)
     {
-        std::sort(this->roles.begin(), this->roles.end());
+        std::ranges::sort(this->roles);
     }
 
     bool operator==(const DataChange& other) const

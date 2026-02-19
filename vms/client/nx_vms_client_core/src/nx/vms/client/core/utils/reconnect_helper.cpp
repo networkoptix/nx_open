@@ -24,7 +24,8 @@ ReconnectHelper::ReconnectHelper(SystemContext* systemContext, bool stickyReconn
     if (m_servers.empty())
         return;
 
-    std::sort(m_servers.begin(), m_servers.end(),
+    std::ranges::sort(
+        m_servers,
         [](const QnMediaServerResourcePtr& left, const QnMediaServerResourcePtr& right)
         {
             return left->getId() < right->getId();

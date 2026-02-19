@@ -129,7 +129,8 @@ QVariant GlobalPermissionsModel::data(const QModelIndex& index, int role) const
             collator.setCaseSensitivity(Qt::CaseInsensitive);
             collator.setNumericMode(true);
 
-            std::sort(groupsData.begin(), groupsData.end(),
+            std::ranges::sort(
+                groupsData,
                 [](const auto& left, const auto& right)
                 {
                     return ComparableGroup(left) < ComparableGroup(right);

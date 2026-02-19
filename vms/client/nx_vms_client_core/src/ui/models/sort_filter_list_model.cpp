@@ -138,7 +138,7 @@ void QnSortFilterListModelPrivate::refresh()
         return;
 
     auto sortedMapped = m_mapped;
-    std::sort(sortedMapped.begin(), sortedMapped.end(), m_lessPred);
+    std::ranges::sort(sortedMapped, m_lessPred);
 
     RowsList forRemove;
     RowsList forAdd;
@@ -672,7 +672,7 @@ bool QnSortFilterListModel::removeRows(int row, int count, const QModelIndex& /*
     for (int i = row, end = row + count; i < end; ++i)
         rows << d->m_mapped[i];
 
-    std::sort(rows.begin(), rows.end());
+    std::ranges::sort(rows);
 
     int pos = rows.count() - 1;
     while (pos >= 0)

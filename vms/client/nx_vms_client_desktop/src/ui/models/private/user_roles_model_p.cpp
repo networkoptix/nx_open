@@ -42,7 +42,7 @@ QnUserRolesModel::Private::Private(
     {
         m_userRoles = systemContext()->userGroupManager()->groups();
 
-        std::sort(m_userRoles.begin(), m_userRoles.end(), lessRoleByName);
+        std::ranges::sort(m_userRoles, lessRoleByName);
 
         connect(systemContext()->userGroupManager(), &UserGroupManager::addedOrUpdated,
             this, &QnUserRolesModel::Private::updateUserRole);
@@ -53,7 +53,7 @@ QnUserRolesModel::Private::Private(
 
 void QnUserRolesModel::Private::setUserRoles(UserGroupDataList value)
 {
-    std::sort(value.begin(), value.end(), lessRoleByName);
+    std::ranges::sort(value, lessRoleByName);
     if (m_userRoles == value)
         return;
 

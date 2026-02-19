@@ -103,7 +103,7 @@ QString QnVideowallScreenWidget::calculateTitleText() const
     auto pcUuid = m_videowall->pcs()->getItem(m_items.first().pcUuid).uuid;
 
     auto pcUuids = m_videowall->pcs()->getItems().keys();
-    std::sort(pcUuids.begin(), pcUuids.end());
+    std::ranges::sort(pcUuids);
     int idx = pcUuids.indexOf(pcUuid);
     if (idx < 0)
         idx = 0;
@@ -112,7 +112,7 @@ QString QnVideowallScreenWidget::calculateTitleText() const
     QString base = tr("PC %1").arg(pcVisualIdx);
 
     auto screens = screensCoveredByItem(m_items.first(), m_videowall).values();
-    std::sort(screens.begin(), screens.end());
+    std::ranges::sort(screens);
     if (screens.isEmpty())
         return base;
 

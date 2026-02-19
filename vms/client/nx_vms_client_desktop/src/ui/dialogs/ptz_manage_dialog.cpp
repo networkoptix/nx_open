@@ -113,7 +113,6 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     ui->setupUi(this);
     setupTableChangesConfirmation();
 
-
     ui->previewGroupBox->hide(); // TODO: #dklychkov implement preview fetching and remove this line
 
     ui->tableView->setModel(m_model);
@@ -269,7 +268,8 @@ void QnPtzManageDialog::loadData(const QnPtzData &data)
     const auto presets = nx::vms::client::core::ptz::helpers::sortedPresets(
         controller()->resource(), data.presets);
     QnPtzTourList tours = data.tours;
-    std::sort(tours.begin(), tours.end(),
+    std::ranges::sort(
+        tours,
         [](const QnPtzTour& l, const QnPtzTour& r)
         {
             return nx::utils::naturalStringLess(l.name, r.name);
@@ -446,7 +446,7 @@ void QnPtzManageDialog::updateFields(DataFields fields)
         QnPtzTourList tours;
         if (controller()->getTours(&tours))
         {
-            std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r)
+            std::ranges::sort(tours, [](const QnPtzTour &l, const QnPtzTour &r)
             {
                 return nx::utils::naturalStringLess(l.name, r.name);
             });

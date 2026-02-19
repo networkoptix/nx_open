@@ -88,10 +88,12 @@ struct NameValueTableCalculator::Private
 
     void sortWidths()
     {
-        std::sort(rowWidths.begin(), rowWidths.end(), [](RowAsset a, RowAsset b)
-        {
-            return a.valueWidth > b.valueWidth;
-        });
+        std::ranges::sort(
+            rowWidths,
+            [](RowAsset a, RowAsset b)
+            {
+                return a.valueWidth > b.valueWidth;
+            });
     }
 
     void setWidths(qreal labelsWidth, qreal valuesWidth)

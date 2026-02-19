@@ -1150,7 +1150,8 @@ void QnWorkbenchDisplay::bringToFront(const QList<QGraphicsItem *> &items)
     QList<QGraphicsItem *> localItems = items;
 
     /* Sort by z order first, so that relative z order is preserved. */
-    std::sort(localItems.begin(), localItems.end(),
+    std::ranges::sort(
+        localItems,
         [](QGraphicsItem *l, QGraphicsItem *r)
         {
             return l->zValue() < r->zValue();
@@ -2203,7 +2204,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
     // Sort items to guarantee the same item placement for each time the same new layout is opened.
     const auto items = workbenchLayout->items();
     QVector<QnWorkbenchItem*> sortedItems(items.cbegin(), items.cend());
-    std::sort(sortedItems.begin(), sortedItems.end(),
+    std::ranges::sort(
+        sortedItems,
         [](const QnWorkbenchItem* lhs, const QnWorkbenchItem* rhs)
         {
             const auto lhsResourceDescriptor = lhs->data().resource;
@@ -2222,7 +2224,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
     auto resourceWidgets = widgets();
     if (isPreviewSearchLayout)
     {
-        std::sort(resourceWidgets.begin(), resourceWidgets.end(),
+        std::ranges::sort(
+            resourceWidgets,
             [](QnResourceWidget* lhs, QnResourceWidget* rhs)
             {
                 const auto lhsGeometry = lhs->item()->geometry();

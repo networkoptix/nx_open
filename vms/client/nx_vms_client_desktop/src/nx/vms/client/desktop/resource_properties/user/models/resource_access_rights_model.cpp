@@ -434,7 +434,7 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
                 item.target.id(), accessRight);
 
             // Keep arrays sorted for easy comparison.
-            std::sort(newInfo.providerUserGroups.begin(), newInfo.providerUserGroups.end());
+            std::ranges::sort(newInfo.providerUserGroups);
 
             if (!newInfo.providerUserGroups.empty())
                 newInfo.inheritedFrom = ResourceAccessInfo::ProvidedVia::parentUserGroup;
@@ -519,7 +519,7 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
             }
 
             // Keep arrays sorted for easy comparison.
-            std::sort(newInfo.providerUserGroups.begin(), newInfo.providerUserGroups.end());
+            std::ranges::sort(newInfo.providerUserGroups);
         }
     }
 
@@ -568,7 +568,8 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
     collator.setCaseSensitivity(Qt::CaseInsensitive);
     collator.setNumericMode(true);
 
-    std::sort(groupsData.begin(), groupsData.end(),
+    std::ranges::sort(
+        groupsData,
         [](const auto& left, const auto& right)
         {
             return ComparableGroup(left) < ComparableGroup(right);
@@ -585,8 +586,8 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
             videoWalls << videoWall->getName();
     }
 
-    std::sort(layouts.begin(), layouts.end(), collator);
-    std::sort(videoWalls.begin(), videoWalls.end(), collator);
+    std::ranges::sort(layouts, collator);
+    std::ranges::sort(videoWalls, collator);
 
     const auto makeDescription =
         [](const QString& single, const QString& plural, QStringList list) -> QString

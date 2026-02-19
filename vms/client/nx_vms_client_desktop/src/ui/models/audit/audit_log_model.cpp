@@ -239,7 +239,7 @@ public:
                 break;
         }
 
-        std::sort(m_data.begin(), m_data.end(), lessThan);
+        std::ranges::sort(m_data, lessThan);
     }
 
 private:

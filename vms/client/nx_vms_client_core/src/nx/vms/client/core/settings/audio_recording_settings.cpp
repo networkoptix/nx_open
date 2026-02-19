@@ -46,7 +46,8 @@ QList<AudioDeviceInfo> fetchDevicesList()
             nameOrder.append(deviceInfo.description());
         nameOrder.removeDuplicates();
 
-        std::sort(availableDevices.begin(), availableDevices.end(),
+        std::ranges::sort(
+            availableDevices,
             [&nameOrder](const QAudioDevice& l, const QAudioDevice& r)
             {
                 // First WASAPI one (1-2 channels usually), then winMM one (18 channels usually).

@@ -107,7 +107,7 @@ void UniqueKeyListEntity<Key>::setItems(const QVector<Key>& keys)
     if (newItemSequence.empty())
         return;
 
-    std::sort(std::begin(newItemSequence), std::end(newItemSequence), m_itemOrder.comp);
+    std::ranges::sort(newItemSequence, m_itemOrder.comp);
 
     auto guard = insertRowsGuard(modelMapping(), 0, newItemSequence.size());
 
@@ -258,7 +258,8 @@ void UniqueKeyListEntity<Key>::setItemOrder(const ItemOrder& itemOrder)
     for (const auto item: m_itemSequence)
         permutationSolver.emplace_back(item, sequentalGenerator());
 
-    std::sort(std::begin(permutationSolver), std::end(permutationSolver),
+    std::ranges::sort(
+        permutationSolver,
         [&itemOrder](const auto& lhs, const auto& rhs)
         {
             return itemOrder.comp(lhs.first, rhs.first);

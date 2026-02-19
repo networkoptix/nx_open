@@ -55,7 +55,8 @@ QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList pre
             return it == presetIdHotkeyHash.end() ? kNoPresetNumberValue : it.value();
         };
 
-    std::sort(presets.begin(), presets.end(),
+    std::ranges::sort(
+        presets,
         [getPtzPresetHotkeyNumber](const QnPtzPreset& left, const QnPtzPreset& right)
         {
             const int leftPresetNumber = getPtzPresetHotkeyNumber(left.id);

@@ -616,7 +616,7 @@ protected:
         base_type::SetUp();
 
         m_initialData = givenRandomData();
-        std::sort(m_initialData.begin(), m_initialData.end(), std::less<Company>());
+        std::ranges::sort(m_initialData, std::less<Company>());
     }
 
     void givenCursor()
@@ -670,9 +670,8 @@ protected:
 
         for (auto& cursorContext: m_cursors)
         {
-            std::sort(
-                cursorContext.recordsRead.begin(),
-                cursorContext.recordsRead.end(),
+            std::ranges::sort(
+                cursorContext.recordsRead,
                 std::less<Company>());
             ASSERT_EQ(m_initialData, cursorContext.recordsRead);
         }

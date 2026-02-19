@@ -466,7 +466,6 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered()
         menu()->trigger(menu::PtzActivatePresetAction, parameters);
 }
 
-
 void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
@@ -638,9 +637,8 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
 
     QnPtzPresetList presetList;
     controller->getPresets(&presetList);
-    std::sort(
-        presetList.begin(),
-        presetList.end(),
+    std::ranges::sort(
+        presetList,
         [](QnPtzPreset f, QnPtzPreset s){ return f.name < s.name; });
 
     if (presetIndex < presetList.size() && presetIndex >= 0)

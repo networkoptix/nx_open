@@ -36,7 +36,7 @@ QnNewVirtualCameraDialog::QnNewVirtualCameraDialog(
     QnResourceList servers = systemContext()->resourcePool()->servers();
     auto nameLess =
         [](const QnResourcePtr& l, const QnResourcePtr& r) { return l->getName() < r->getName(); };
-    std::sort(servers.begin(), servers.end(), nameLess);
+    std::ranges::sort(servers, nameLess);
     auto selectedServerIndex = servers.indexOf(selectedServer);
     if (selectedServerIndex == -1)
         selectedServerIndex = servers.indexOf(systemContext()->currentServer());

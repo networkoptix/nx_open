@@ -56,7 +56,8 @@ bool ResourceTreeModelSortingGroupingTest::sortingIsAlphanumericCaseInsensitive(
     QCollator collator;
     collator.setCaseSensitivity(Qt::CaseInsensitive);
     collator.setNumericMode(true);
-    std::sort(properlySortedSequence.begin(), properlySortedSequence.end(),
+    std::ranges::sort(
+        properlySortedSequence,
         [collator](const QString& l, const QString& r) { return collator.compare(l, r) < 0; });
 
     return displayedSequence == properlySortedSequence;

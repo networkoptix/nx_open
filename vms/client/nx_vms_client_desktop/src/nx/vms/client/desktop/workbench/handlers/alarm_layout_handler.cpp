@@ -56,7 +56,8 @@ constexpr auto kProcessingActionTimeout = 5s;
 
 QnVirtualCameraResourceList sortedCameras(QnVirtualCameraResourceList cameraList)
 {
-    std::sort(cameraList.begin(), cameraList.end(),
+    std::ranges::sort(
+        cameraList,
         [](const QnVirtualCameraResourcePtr& camera1, const QnVirtualCameraResourcePtr& camera2)
         {
             return camera1->getId() < camera2->getId();
@@ -385,7 +386,7 @@ bool AlarmLayoutHandler::currentInstanceIsMain() const
         return true;
 
     auto connectedFromThisPc = runningInstances.values();
-    std::sort(connectedFromThisPc.begin(), connectedFromThisPc.end());
+    std::ranges::sort(connectedFromThisPc);
     return connectedFromThisPc.first() == currentInstanceGuid;
 }
 

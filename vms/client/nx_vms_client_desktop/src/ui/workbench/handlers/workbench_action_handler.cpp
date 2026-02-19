@@ -3170,7 +3170,8 @@ void ActionHandler::confirmAnalyticsStorageLocation()
             if (storages.empty())
                 continue;
 
-            std::sort(storages.begin(), storages.end(),
+            std::ranges::sort(
+                storages,
                 [](const QnStorageResourcePtr& a, const QnStorageResourcePtr& b)
                 {
                     // TODO: #spanasenko use proper enums

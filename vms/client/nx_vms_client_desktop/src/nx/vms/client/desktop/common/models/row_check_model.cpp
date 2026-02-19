@@ -31,7 +31,7 @@ QList<int> RowCheckModel::checkedRows() const
             result.push_back(i.row());
     }
 
-    std::sort(result.begin(), result.end());
+    std::ranges::sort(result);
     return result;
 }
 

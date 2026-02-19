@@ -687,7 +687,8 @@ void UserGroupListModel::reset(const UserGroupDataList& groups)
     d->notFoundGroups.clear();
     d->orderedGroups = groups;
 
-    std::sort(d->orderedGroups.begin(), d->orderedGroups.end(),
+    std::ranges::sort(
+        d->orderedGroups,
         [](const UserGroupData& left, const UserGroupData& right) { return left.id < right.id; });
 
     const auto newEnd = std::unique(d->orderedGroups.begin(), d->orderedGroups.end(),

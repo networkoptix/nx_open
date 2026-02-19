@@ -104,7 +104,7 @@ protected:
                 std::vector<int> result;
                 for (const auto& list: sourceMultipleLists())
                     result.insert(result.end(), list.begin(), list.end());
-                std::sort(result.begin(), result.end());
+                std::ranges::sort(result);
                 return result;
             }();
 

@@ -112,27 +112,27 @@ TEST(String, serialized_as_a_string_not_buffer)
 TEST(String, naturalStringLessCorrectOrder)
 {
     QStringList list = {"test", "test1"};
-    std::sort(list.begin(), list.end(), utils::naturalStringLess);
+    std::ranges::sort(list, utils::naturalStringLess);
     ASSERT_EQ("test, test1", list.join(", "));
 
     list = {"test", "test_1"};
-    std::sort(list.begin(), list.end(), utils::naturalStringLess);
+    std::ranges::sort(list, utils::naturalStringLess);
     ASSERT_EQ("test, test_1", list.join(", "));
 
     list = {"test_a", "test_1"};
-    std::sort(list.begin(), list.end(), utils::naturalStringLess);
+    std::ranges::sort(list, utils::naturalStringLess);
     ASSERT_EQ("test_1, test_a", list.join(", "));
 
     list = {"test!", "test!2"};
-    std::sort(list.begin(), list.end(), utils::naturalStringLess);
+    std::ranges::sort(list, utils::naturalStringLess);
     ASSERT_EQ("test!, test!2", list.join(", "));
 
     list = {"test+1", "test-1"};
-    std::sort(list.begin(), list.end(), utils::naturalStringLess);
+    std::ranges::sort(list, utils::naturalStringLess);
     ASSERT_EQ("test+1, test-1", list.join(", "));
 
     list = {"test", "test2", "test1", "test10", "test_1", "test_a", "test_b", "test+a", "test!1"};
-    std::sort(list.begin(), list.end(), utils::naturalStringLess);
+    std::ranges::sort(list, utils::naturalStringLess);
     ASSERT_EQ("test, test1, test2, test10, test!1, test+a, test_1, test_a, test_b", list.join(", "));
 }
 

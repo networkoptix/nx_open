@@ -656,7 +656,8 @@ void RhiPaintDeviceRenderer::prepareAtlas(const RhiPaintEngineSyncData::Entries&
         }
     }
 
-    std::sort(smallPixmaps.begin(), smallPixmaps.end(),
+    std::ranges::sort(
+        smallPixmaps,
         [](const auto& p1, const auto& p2)
         {
             return p1.width() * p1.height() < p2.width() * p2.height();
