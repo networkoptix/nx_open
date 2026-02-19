@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "webrtc_ice_manager.h"
+#include "webrtc_turn_info_fetcher.h"
 
 #include "nx_webrtc_ini.h"
 
@@ -238,3 +238,20 @@ void TurnInfoFetcher::fetchThirdPartyAuthorization(
 }
 
 } // namespace nx::webrtc
+
+// turnutils_oauth -e --server-name blackdow.carleon.gov --auth-key-id oldempire
+//    --auth-key MTIzNDU2Nzg5MDEyMzQ1Njc4OTA= --auth-key-timestamp 1664203748 --auth-key-lifetime 21600
+//    --token-mac-key MTIzNDU2Nzg5MDEyMzQ1Njc4OTA=  --token-timestamp `expr $(date +%s) \* 65536`
+//    --token-lifetime=3600 --auth-key-as-rs-alg A256GCM
+// , where:
+// server-name - authorization server name.
+// auth-key-id - key id, stored in redis db as part of key path: 'turn/oauth/kid/oldempire'.
+// auth-key - key which also should be stored in redis db:
+//     hmset turn/oauth/kid/oldempire ikm_key MTIzNDU2Nzg5MDEyMzQ1Njc4OTAx
+//  auth-key-timestamp - unix time of key emitted.
+//  auth-key-lifetime - key lifetime. Probably doesn't checked in authorization process.
+//  token-mac-key - temporary token key. Should be 20 bytes length sha1 of some secret key.
+//  token-timestamp - timestamp of token emit.
+//  token-lifetime - lifetime. Checked in authorization process.
+//  auth-key-as-rs-alg - some algorithm, should be same in redis db:
+//      hmset turn/oauth/kid/oldempire as_rs_alg A256GCM

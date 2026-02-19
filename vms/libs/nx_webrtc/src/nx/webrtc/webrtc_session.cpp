@@ -589,7 +589,6 @@ const std::vector<IceCandidate> Session::getIceCandidates() const
     return m_iceCandidates;
 }
 
-
 bool Session::lock()
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
