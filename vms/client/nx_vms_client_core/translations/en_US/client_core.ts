@@ -118,11 +118,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>You can enable two-factor authentication in your %1.</source>
-        <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connection failed</source>
         <translation></translation>
     </message>
@@ -167,11 +162,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
-        <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>This user has been disabled by a site administrator.</source>
         <translation></translation>
     </message>
@@ -185,6 +175,16 @@
     </message>
     <message>
         <source>Server or network unavailable. Check the address and connection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+        <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can enable two-factor authentication in your %1.</source>
+        <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -481,11 +481,11 @@
     <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
     <message>
         <source>Press and hold to</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>press and hold</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

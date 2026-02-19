@@ -138,8 +138,13 @@ QString QnCameraInputPolicy::getText(
 {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraInputPolicy>(context, cameras);
-    return genericCameraText<QnCameraInputPolicy>(
-        context, cameras, detailed, tr("%1 have no input ports", "", invalid), invalid);
+    return genericCameraText<QnCameraInputPolicy>(context,
+        cameras,
+        detailed,
+        tr("%1 have no input ports",
+            "Numerus: %1 will be replaced by either camera name or string like '1 of 2 devices'",
+            invalid),
+        invalid);
 }
 
 bool QnCameraOutputPolicy::isResourceValid(
@@ -155,8 +160,13 @@ QString QnCameraOutputPolicy::getText(
 {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraOutputPolicy>(context, cameras);
-    return genericCameraText<QnCameraOutputPolicy>(
-        context, cameras, detailed, tr("%1 have no output relays", "", invalid), invalid);
+    return genericCameraText<QnCameraOutputPolicy>(context,
+        cameras,
+        detailed,
+        tr("%1 have no output relays",
+            "Numerus: %1 will be replaced by either camera name or string like '1 of 2 devices'",
+            invalid),
+        invalid);
 }
 
 bool QnExecPtzPresetPolicy::isResourceValid(
@@ -220,8 +230,13 @@ QString QnCameraAudioTransmitPolicy::getText(
             tr("Select camera"));
     }
 
-    return genericCameraText<QnCameraAudioTransmitPolicy>(
-        context, cameras, detailed, tr("%1 does not support two-way audio", "", invalid), invalid);
+    return genericCameraText<QnCameraAudioTransmitPolicy>(context,
+        cameras,
+        detailed,
+        tr("%1 does not support two-way audio",
+            "Numerus: %1 will be replaced by either camera name or string like '1 of 2 devices'",
+            invalid),
+        invalid);
 }
 
 bool QnCameraRecordingPolicy::isResourceValid(

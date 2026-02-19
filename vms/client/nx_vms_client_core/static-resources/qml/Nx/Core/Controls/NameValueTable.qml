@@ -157,7 +157,7 @@ Item
                     grid.sourceData.length - grid.clippedData.length
 
                 objectName: "footer"
-                text: qsTr("+ %n more", "", remainder)
+                text: qsTr("+ %n more", "Numerus: placeholder for more items", remainder)
                 width: grid.width
                 color: nameColor
                 lineHeight: tableLineHeight
