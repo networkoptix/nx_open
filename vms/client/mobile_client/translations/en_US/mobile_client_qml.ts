@@ -476,25 +476,29 @@
     </message>
 </context>
 <context>
-    <name>FeedScreen</name>
+    <name>Feed</name>
     <message>
-        <source>Feed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No Notifications</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No push notifications were found.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unviewed</source>
+        <source>Notifications Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Viewed</source>
+        <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No push notifications were found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -518,23 +522,34 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Unviewed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Viewed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FeedScreen</name>
+    <message>
+        <source>Feed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Unviewed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Notifications Off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings</source>
+        <source>Period</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1131,6 +1146,10 @@
     </message>
     <message>
         <source>Welcome, %1!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
