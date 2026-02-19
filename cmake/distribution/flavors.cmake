@@ -2,13 +2,28 @@
 
 include_guard(GLOBAL)
 
+# Definition of existing flavors - a list for each targetDevice. Variable should be named as
+# `existing_flavors_${targetDevice}`. If it does not exist, only "default" flavor is allowed.
+set(existing_flavors_linux_arm64
+    "default"
+    "axis_acap"
+    "hanwha_edge1"
+    "vca_edge1"
+    "vivotek_edge1"
+    "milesight_edge1"
+    "rockchip_nvr1")
+
 set(_flavorsList "default")
 
 # Customization package contains list of linux_arm64 flavors (except the default one). If some
 # flavors are enabled, the corresponding CMake variable will contain a list of strings. Otherwise
 # the variable can be absent or contain "[]" string, depending on the CMS behavior.
 if("${targetDevice}" STREQUAL "linux_arm64")
-    if(DEFINED customization.desktop.flavors AND NOT "${customization.desktop.flavors}" STREQUAL "[]")
+    # Build all flavors on CI pipelines to ensure their consistency and integrity.
+    if("${publicationType}" STREQUAL "local")
+        set(_flavorsList ${existing_flavors_linux_arm64})
+    # For the release builds flavors should be loaded from the customization package.
+    elseif(DEFINED customization.desktop.flavors AND NOT "${customization.desktop.flavors}" STREQUAL "[]")
         list(APPEND _flavorsList ${customization.desktop.flavors})
     endif()
 endif()
@@ -18,18 +33,6 @@ unset(_flavorsList)
 set(flavors ${_flavors} CACHE STRING "Comma-separated list of flavors (distribution package formats).")
 
 unset(_flavors)
-
-# Definition of existing flavors - a list for each targetDevice.
-#
-# NOTE: Each targetDevice always has a `default` flavor.
-set(existing_flavors_linux_arm64
-    "default"
-    "axis_acap"
-    "hanwha_edge1"
-    "vca_edge1"
-    "vivotek_edge1"
-    "milesight_edge1"
-    "rockchip_nvr1")
 
 # Validates the value of the configuration variable `flavors`, and initializes the
 # distribution_flavor_list variable accordingly.
@@ -41,6 +44,7 @@ set(existing_flavors_linux_arm64
 function(nx_init_distribution_flavor_list)
     set(existing_flavor_list ${existing_flavors_${targetDevice}})
     if(NOT existing_flavor_list)
+        # NOTE: Each targetDevice always has a `default` flavor.
         set(existing_flavor_list "default")
     endif()
 
