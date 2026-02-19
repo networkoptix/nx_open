@@ -7266,15 +7266,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+      <translation>Aby uniknąć nieodwracalnych zmian w archiwum, zaleca się wyłączenie opcji &quot;Zachowaj ustawienia czasu kamery&quot; przed włączeniem opcji &quot;Importuj wideo automatycznie&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+      <translation>Włączenie tego ustawienia może spowodować nieodwracalne zmiany w archiwum. Nie zaleca się włączania go, gdy opcja &quot;Importuj wideo automatycznie&quot; jest aktywna</translation>
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>Tylko okresy offline kamery lub serwera, które wystąpiły po włączeniu tej opcji, zostaną automatycznie zaimportowane. Uwaga: jeśli wyłączysz tę opcję, wszystkie okresy offline, które nie zostały jeszcze zaimportowane, zostaną utracone i nie będzie można ich później odzyskać.</translation>
     </message>
   </context>
   <context>
@@ -8384,7 +8384,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
       <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+        <numerusform>Rejestr zdarzeń dla okresu od %1 do %2 – Wyświetlane jest pierwsze %n zdarzeń. Aby znaleźć konkretne zdarzenia, dostosuj zakres dat lub zastosuj dodatkowe filtry</numerusform>
         <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
         <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
         <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
@@ -8644,7 +8644,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
-      <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
+      <translation>Nie masz uprawnień do eksportu archiwum dla niektórych z wybranych kamer. Wideo z tych kamer nie zostanie wyeksportowane do pliku wynikowego.</translation>
     </message>
   </context>
   <context>
@@ -8880,11 +8880,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
-      <translation type="unfinished">Current group is a member of all groups selected on this tab and inherits permissions from each of them.</translation>
+      <translation>Bieżąca grupa obejmuje wszystkie grupy wybrane na tej karcie i dziedziczy uprawnienia od każdej z nich.</translation>
     </message>
     <message>
       <source>Select one or multiple groups from which the current group will inherit permissions</source>
-      <translation type="unfinished">Select one or multiple groups from which the current group will inherit permissions</translation>
+      <translation>Wybierz jedną lub więcej grup, od których bieżąca grupa będzie dziedziczyć uprawnienia</translation>
     </message>
   </context>
   <context>
@@ -10409,7 +10409,7 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     <name>nx::vms::client::desktop::PlaybackPositionItem</name>
     <message>
       <source>video is paused</source>
-      <translation type="unfinished">video is paused</translation>
+      <translation>wideo jest wstrzymane</translation>
     </message>
   </context>
   <context>
@@ -11363,7 +11363,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Invalid Link</source>
-      <translation type="unfinished">Invalid Link</translation>
+      <translation>Nieprawidłowy link</translation>
     </message>
     <message>
       <source>The provided link is not valid</source>
@@ -13032,15 +13032,15 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>Brak ustawień modelu</translation>
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>Brak parametrów</translation>
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>Ustawienia parametrów</translation>
     </message>
   </context>
   <context>
@@ -13212,11 +13212,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
       <source>Contains keywords</source>
-      <translation type="unfinished">Contains keywords</translation>
+      <translation>Zawiera słowa kluczowe</translation>
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation type="unfinished">Contains list entries</translation>
+      <translation>Zawiera wpisy listy</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -13228,11 +13228,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Not contains keywords</source>
-      <translation type="unfinished">Not contains keywords</translation>
+      <translation>Nie zawiera słów kluczowych</translation>
     </message>
     <message>
       <source>Not contains list entries</source>
-      <translation type="unfinished">Not contains list entries</translation>
+      <translation>Nie zawiera wpisów listy</translation>
     </message>
   </context>
   <context>

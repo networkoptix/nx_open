@@ -4526,7 +4526,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Servicios insuficientes</translation>
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
@@ -4534,27 +4534,27 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
-      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
+      <translation>Los dispositivos configurados con la configuración &quot;Todo el archivo&quot; se cambiarán a &quot;Movimiento, objeto y marcadores&quot; cuando la copia de seguridad en la nube esté habilitada</translation>
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+      <translation>La copia de seguridad en la nube se ha detenido porque el sitio se ha cerrado. Debe estar activa para realizar una copia de seguridad en la nube. Contacte con su socio de canal para obtener ayuda.</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>La copia de seguridad en la nube continúa, pero el sitio está suspendido. Debe estar activo para modificar la configuración de la copia de seguridad o habilitar la ubicación del almacenamiento en la nube. Contacte con su socio de canal para obtener ayuda.</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>El sitio debe estar activo para habilitar la ubicación del almacenamiento en la nube. Contacte con su socio de canal para obtener ayuda.</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Sitio suspendido</translation>
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>Al deshabilitar el almacenamiento en la nube en un servidor, se deshabilitará en todos los servidores. La copia de seguridad local debe configurarse manualmente.</translation>
     </message>
   </context>
   <context>
@@ -4629,11 +4629,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>Usar para almacenar análisis y datos de movimiento</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>Almacena datos analíticos y de movimiento</translation>
     </message>
     <message>
       <source>cloud</source>
@@ -4641,7 +4641,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>Ruta de acceso</translation>
     </message>
     <message>
       <source>Type</source>
@@ -4649,7 +4649,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Purpose</source>
-      <translation type="unfinished">Purpose</translation>
+      <translation>Objetivo</translation>
     </message>
     <message>
       <source>Size</source>
@@ -4657,15 +4657,15 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Aislado</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Exclusivo</translation>
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Compartido</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -4673,27 +4673,27 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>extraíble</translation>
     </message>
     <message>
       <source>Unknown size</source>
-      <translation type="unfinished">Unknown size</translation>
+      <translation>Tamaño desconocido</translation>
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>El almacenamiento tiene diferentes políticas de lectura y escritura en los distintos servidores del sitio</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
-      <translation type="unfinished">Click on the icon to see Servers list</translation>
+      <translation>Haga clic en el icono para ver la lista de servidores</translation>
     </message>
     <message>
       <source>Read-Write Policy</source>
-      <translation type="unfinished">Read-Write Policy</translation>
+      <translation>Política de lectura y escritura</translation>
     </message>
     <message>
       <source>Adaptive</source>
-      <translation type="unfinished">Adaptive</translation>
+      <translation>Adaptativo</translation>
     </message>
   </context>
   <context>
@@ -4806,7 +4806,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Failed to save site settings</source>
-      <translation type="unfinished">Failed to save site settings</translation>
+      <translation>No se pudo guardar la configuración del sitio</translation>
     </message>
   </context>
   <context>
@@ -4893,11 +4893,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>El almacenamiento para datos analíticos no está configurado</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>El almacenamiento del sistema se utiliza para datos analíticos</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -4905,19 +4905,19 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Recomendamos elegir otra ubicación en lugar de la partición del sistema.</translation>
     </message>
     <message>
       <source>Local recording services overused</source>
-      <translation type="unfinished">Local recording services overused</translation>
+      <translation>Servicios de grabación locales sobreutilizados</translation>
     </message>
     <message>
       <source>Cloud storage services overused</source>
-      <translation type="unfinished">Cloud storage services overused</translation>
+      <translation>Servicios de almacenamiento en la nube sobreutilizados</translation>
     </message>
     <message>
       <source>Paid integrations services overused</source>
-      <translation type="unfinished">Paid integrations services overused</translation>
+      <translation>Servicios de integración de pago sobreutilizados</translation>
     </message>
     <message>
       <source>Intercom call</source>
@@ -4929,23 +4929,23 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>The Site has no internet access for time synchronization</source>
-      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+      <translation>El sitio no tiene acceso a Internet para sincronización de tiempo</translation>
     </message>
     <message>
       <source>System partition is used for analytics data</source>
-      <translation type="unfinished">System partition is used for analytics data</translation>
+      <translation>La partición del sistema se utiliza para datos analíticos</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Sitio suspendido</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Sitio cerrado</translation>
     </message>
     <message>
       <source>Email address is not set for your account</source>
-      <translation type="unfinished">Email address is not set for your account</translation>
+      <translation>La dirección de correo electrónico no está configurada para su cuenta</translation>
     </message>
     <message>
       <source>Calling...</source>
@@ -4953,31 +4953,31 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Llamada perdida</translation>
     </message>
     <message numerus="yes">
       <source>Storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage is not configured on %n servers</numerusform>
-        <numerusform>Storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>El almacenamiento no está configurado en los servidores %n</numerusform>
+        <numerusform>El almacenamiento no está configurado en los servidores %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>El almacenamiento de respaldo no está configurado en los servidores %n</numerusform>
+        <numerusform>El almacenamiento de respaldo no está configurado en los servidores %n</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule is invalid</source>
-      <translation type="unfinished">Recording schedule is invalid</translation>
+      <translation>El horario de grabación no es válido</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      <translation>
+        <numerusform>La programación de grabación no es válida en las cámaras %n</numerusform>
+        <numerusform>La programación de grabación no es válida en las cámaras %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4990,61 +4990,61 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Check out %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1</translation>
+      <translation>Echa un vistazo a %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
-      <translation type="unfinished">Remote archive synchronization failed</translation>
+      <translation>Error en la sincronización del archivo remoto</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+      <translation>
+        <numerusform>El almacenamiento de datos analíticos no está configurado en los servidores %n</numerusform>
+        <numerusform>El almacenamiento de datos analíticos no está configurado en los servidores %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      <translation>
+        <numerusform>El almacenamiento del sistema se utiliza para datos analíticos en servidores %n</numerusform>
+        <numerusform>El almacenamiento del sistema se utiliza para datos analíticos en servidores %n</numerusform>
       </translation>
     </message>
     <message>
       <source>Connect to your Site from anywhere!</source>
-      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+      <translation>¡Conéctate a tu sitio desde cualquier lugar!</translation>
     </message>
     <message>
       <source>No online server in the site has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+      <translation>Ningún servidor en línea del sitio tiene acceso a Internet para la sincronización horaria.</translation>
     </message>
     <message>
       <source>You cannot receive Site notifications by email.</source>
-      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+      <translation>No puedes recibir notificaciones del sitio por correo electrónico.</translation>
     </message>
     <message>
       <source>They cannot receive Site notifications by email.</source>
-      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+      <translation>No pueden recibir notificaciones del Sitio por correo electrónico.</translation>
     </message>
     <message>
       <source>Some cameras are set to record in a mode they do not support.</source>
-      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+      <translation>Algunas cámaras están configuradas para grabar en un modo que no admiten.</translation>
     </message>
     <message>
       <source>Site will stop functioning soon</source>
-      <translation type="unfinished">Site will stop functioning soon</translation>
+      <translation>El sitio dejará de funcionar pronto</translation>
     </message>
     <message>
       <source>Site has stopped functioning</source>
-      <translation type="unfinished">Site has stopped functioning</translation>
+      <translation>El sitio ha dejado de funcionar</translation>
     </message>
     <message>
       <source>Site will stop functioning today</source>
-      <translation type="unfinished">Site will stop functioning today</translation>
+      <translation>El sitio dejará de funcionar hoy</translation>
     </message>
     <message>
       <source>Site will stop functioning tomorrow</source>
-      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+      <translation>El sitio dejará de funcionar mañana</translation>
     </message>
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
@@ -6221,13 +6221,13 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Reset all rules to defaults?</source>
-      <translation type="unfinished">Reset all rules to defaults?</translation>
+      <translation>¿Restablecer todas las reglas a los valores predeterminados?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n rules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
-        <numerusform>Delete %n rules?</numerusform>
+      <translation>
+        <numerusform>¿Eliminar reglas %n?</numerusform>
+        <numerusform>¿Eliminar reglas %n?</numerusform>
       </translation>
     </message>
   </context>
@@ -6240,7 +6240,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>La longitud del nombre de archivo %1 es mayor que %2 caracteres.</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
@@ -6269,11 +6269,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Se requiere transcodificación de vídeo. Sesión de exportación reiniciada.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>Se requiere transcodificación de audio. Sesión de exportación reiniciada.</translation>
     </message>
   </context>
   <context>
@@ -6417,15 +6417,15 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
-      <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+      <translation>Dependiendo del tipo de recurso, permite al usuario modificar la configuración del dispositivo o controlar el videowall</translation>
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
-      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+      <translation>Permite a los usuarios acceder a un recurso y ver imágenes en vivo de una cámara.</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
-      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+      <translation>Permite al usuario controlar PTZ, utilizar audio bidireccional, disparadores suaves y botones de E/S.</translation>
     </message>
     <message>
       <source>View Live.</source>
@@ -6445,7 +6445,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
-      <translation type="unfinished">Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</translation>
+      <translation>Permite a los usuarios acceder a una transmisión de audio desde un dispositivo. Se utiliza en combinación con Ver en vivo o Ver archivo.</translation>
     </message>
   </context>
   <context>
@@ -6477,11 +6477,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
       <source>Add To List</source>
-      <translation type="unfinished">Add To List</translation>
+      <translation>Añadir a la lista</translation>
     </message>
     <message>
       <source>Create New List...</source>
-      <translation type="unfinished">Create New List...</translation>
+      <translation>Crear nueva lista...</translation>
     </message>
   </context>
   <context>
@@ -6671,35 +6671,35 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Servicios insuficientes</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required</numerusform>
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+      <translation>
+        <numerusform>%n Se requieren servicios de almacenamiento en la nube adecuados</numerusform>
+        <numerusform>%n Se requieren servicios de almacenamiento en la nube adecuados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Megapixels</source>
-      <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
-        <numerusform>%n Megapixels</numerusform>
+      <translation>
+        <numerusform>%n Megapíxeles</numerusform>
+        <numerusform>%n Megapíxeles</numerusform>
       </translation>
     </message>
     <message>
       <source>Unknown resolution</source>
-      <translation type="unfinished">Unknown resolution</translation>
+      <translation>Resolución desconocida</translation>
     </message>
     <message>
       <source>No suitable cloud storage services available</source>
-      <translation type="unfinished">No suitable cloud storage services available</translation>
+      <translation>No hay servicios de almacenamiento en la nube adecuados</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
-        <numerusform>%n suitable cloud storage services available</numerusform>
+      <translation>
+        <numerusform>%n servicios de almacenamiento en la nube adecuados disponibles</numerusform>
+        <numerusform>%n servicios de almacenamiento en la nube adecuados disponibles</numerusform>
       </translation>
     </message>
     <message>
@@ -6708,15 +6708,15 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Setting was changed</source>
-      <translation type="unfinished">Setting was changed</translation>
+      <translation>Se cambió la configuración</translation>
     </message>
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
-      <translation type="unfinished">&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</translation>
+      <translation>La opción &quot;Todo el archivo&quot; se cambió a &quot;Movimiento, Objetos, Marcadores&quot; debido a que se habilitó la copia de seguridad del almacenamiento en la nube</translation>
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation type="unfinished">Site is currently suspended</translation>
+      <translation>El sitio está actualmente suspendido</translation>
     </message>
     <message numerus="yes">
       <source>%n MP</source>
@@ -6753,20 +6753,20 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
-      <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Se están realizando copias de seguridad de más cámaras que servicios disponibles. Desactive la copia de seguridad para algunas cámaras o añada servicios más adecuados. De lo contrario, se realizará automáticamente en %1</translation>
     </message>
     <message>
       <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
       <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
-      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+      <translation>%1 Se requieren servicios de almacenamiento en la nube más adecuados para activar la copia de seguridad para todos los dispositivos seleccionados</translation>
     </message>
     <message>
       <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
-      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+      <translation>Pero aún puedes usar un interruptor común para habilitar copias de seguridad para aquellas cámaras para las que esto es posible</translation>
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>La copia de seguridad se desactivará para nuevas cámaras en todos los servidores del sitio</translation>
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
@@ -6817,27 +6817,27 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Backup settings are not available</source>
-      <translation type="unfinished">Backup settings are not available</translation>
+      <translation>La configuración de copia de seguridad no está disponible</translation>
     </message>
     <message>
       <source>Applies to all servers</source>
-      <translation type="unfinished">Applies to all servers</translation>
+      <translation>Se aplica a todos los servidores</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Sitio cerrado</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>Para realizar una copia de seguridad en un almacenamiento en la nube, el sitio debe estar en estado activo. %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>La copia de seguridad en la nube continúa, pero el sitio está suspendido. Debe estar activa para modificar los ajustes de &quot;Qué respaldar&quot; y &quot;Calidad&quot; de un dispositivo, o para habilitar la copia de seguridad en la nube. También puede deshabilitarla. %1</translation>
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>La cantidad de dispositivos seleccionados para la copia de seguridad supera los servicios disponibles. Añada servicios adicionales o reduzca la cantidad de dispositivos configurados para la copia de seguridad. En %1, el sitio limitará automáticamente la cantidad de dispositivos respaldados para que coincida con los servicios disponibles</translation>
     </message>
   </context>
   <context>
@@ -6874,12 +6874,12 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
-      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+      <translation>El progreso se mostrará una vez que se inicie el proceso de copia de seguridad</translation>
     </message>
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the site format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Las imágenes de estas cámaras están respaldadas hasta %1 %2</translation>
     </message>
   </context>
   <context>
@@ -6904,7 +6904,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>nx::vms::client::desktop::CallNotificationsListModel::Private</name>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Llamando...</translation>
     </message>
     <message>
       <source>Open</source>
@@ -6912,15 +6912,15 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Llamada perdida</translation>
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Solicitud de llamada</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Solicitud de llamada perdida</translation>
     </message>
     <message>
       <source>Source: %1</source>
@@ -7033,30 +7033,30 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on performance</translation>
+      <translation>No cambie estas configuraciones a menos que esté absolutamente seguro de su posible impacto en el rendimiento</translation>
     </message>
     <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+      <translation>Para evitar cambios irreversibles en el archivo, se recomienda deshabilitar &quot;Mantener configuración de tiempo de cámara&quot; antes de habilitar &quot;Importar video automáticamente&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+      <translation>Habilitar esta configuración puede llevar a cambios irreverbles en el archivo. No se recomienda activarlo mientras &quot;Importar vídeo automáticamente&quot; está activo</translation>
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>Solo se importarán automáticamente los periodos sin conexión de la cámara o el servidor que se produzcan después de activar esta opción. Nota: Si desactiva esta opción, se perderán los periodos sin conexión que aún no se hayan importado y no podrán recuperarse posteriormente.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
     <message>
       <source>Open Camera</source>
-      <translation type="unfinished">Open Camera</translation>
+      <translation>Cámara abierta</translation>
     </message>
     <message>
       <source>Open Camera in new Tab</source>
-      <translation type="unfinished">Open Camera in new Tab</translation>
+      <translation>Abrir la cámara en una nueva pestaña</translation>
     </message>
     <message>
       <source>Open Camera in place</source>
@@ -7064,7 +7064,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Open Layout in new Tab</source>
-      <translation type="unfinished">Open Layout in new Tab</translation>
+      <translation>Abrir diseño en una nueva pestaña</translation>
     </message>
   </context>
   <context>
@@ -7091,7 +7091,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Select Target...</source>
-      <translation type="unfinished">Select Target...</translation>
+      <translation>Seleccionar objetivo...</translation>
     </message>
   </context>
   <context>
