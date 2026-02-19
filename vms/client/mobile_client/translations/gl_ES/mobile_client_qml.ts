@@ -12,15 +12,15 @@
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>Accións</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Desactivado por horario programado</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Pechar</translation>
     </message>
   </context>
   <context>
@@ -476,66 +476,81 @@
     </message>
   </context>
   <context>
+    <name>Feed</name>
+    <message>
+      <source>Notifications Off</source>
+      <translation type="unfinished">Notifications Off</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation type="unfinished">No Notifications</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation type="unfinished">No push notifications were found.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation type="unfinished">Nothing found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation type="unfinished">No New Notifications</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation type="unfinished">View All</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Todo</translation>
+    </message>
+  </context>
+  <context>
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
       <translation>Alimentación</translation>
     </message>
     <message>
-      <source>No Notifications</source>
-      <translation>Sen notificacións</translation>
-    </message>
-    <message>
-      <source>No push notifications were found.</source>
-      <translation>Non se atoparon notificacións push.</translation>
-    </message>
-    <message>
       <source>Unviewed</source>
       <translation>Sen ver</translation>
-    </message>
-    <message>
-      <source>Viewed</source>
-      <translation>Visto</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Non se atopou nada</translation>
-    </message>
-    <message>
-      <source>Try changing the search parameters</source>
-      <translation>Proba a cambiar os parámetros de busca</translation>
-    </message>
-    <message>
-      <source>No New Notifications</source>
-      <translation>Sen novas notificacións</translation>
-    </message>
-    <message>
-      <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation>Non se atoparon novas notificacións push, pero podes ver o teu historial completo de notificacións.</translation>
-    </message>
-    <message>
-      <source>View All</source>
-      <translation>Ver todo</translation>
     </message>
     <message>
       <source>All</source>
       <translation>Todo</translation>
     </message>
     <message>
-      <source>Notifications Off</source>
-      <translation>Notificacións desactivadas</translation>
-    </message>
-    <message>
-      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>As notificacións están desactivadas actualmente para esta aplicación. Para activalas, usa a configuración do teu teléfono</translation>
-    </message>
-    <message>
-      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation>Desactivaches as notificacións push para este sitio. Para activalas, vai á páxina Configuración.</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>Configuración</translation>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -1132,6 +1147,10 @@
     <message>
       <source>Welcome, %1!</source>
       <translation>Benvida/o, %1!</translation>
+    </message>
+    <message>
+      <source>Feed</source>
+      <translation type="unfinished">Feed</translation>
     </message>
   </context>
   <context>

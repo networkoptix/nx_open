@@ -12,15 +12,15 @@
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>動作</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>已依據排程停用</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>關閉​​​</translation>
     </message>
   </context>
   <context>
@@ -474,66 +474,81 @@
     </message>
   </context>
   <context>
+    <name>Feed</name>
+    <message>
+      <source>Notifications Off</source>
+      <translation type="unfinished">Notifications Off</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation type="unfinished">No Notifications</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation type="unfinished">No push notifications were found.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation type="unfinished">Nothing found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation type="unfinished">No New Notifications</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation type="unfinished">View All</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>全部</translation>
+    </message>
+  </context>
+  <context>
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
       <translation>新聞</translation>
     </message>
     <message>
-      <source>No Notifications</source>
-      <translation>沒有通知</translation>
-    </message>
-    <message>
-      <source>No push notifications were found.</source>
-      <translation>未找到推播通知。</translation>
-    </message>
-    <message>
       <source>Unviewed</source>
       <translation>未瀏覽</translation>
-    </message>
-    <message>
-      <source>Viewed</source>
-      <translation>已瀏覽</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>未找到任何內容</translation>
-    </message>
-    <message>
-      <source>Try changing the search parameters</source>
-      <translation>嘗試更改搜尋參數</translation>
-    </message>
-    <message>
-      <source>No New Notifications</source>
-      <translation>沒有新通知</translation>
-    </message>
-    <message>
-      <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation>未發現新的推播通知，但您可以查看完整的通知記錄。</translation>
-    </message>
-    <message>
-      <source>View All</source>
-      <translation>檢視全部</translation>
     </message>
     <message>
       <source>All</source>
       <translation>全部</translation>
     </message>
     <message>
-      <source>Notifications Off</source>
-      <translation>通知關閉</translation>
-    </message>
-    <message>
-      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>此應用程式的通知功能目前已關閉，若要啟用通知，請在手機設定中啟用。</translation>
-    </message>
-    <message>
-      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation>您已停用此站點的推播通知。若要啟用推播通知，請前往「設定」頁面。</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>設定</translation>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -1130,6 +1145,10 @@
     <message>
       <source>Welcome, %1!</source>
       <translation>歡迎，%1!</translation>
+    </message>
+    <message>
+      <source>Feed</source>
+      <translation type="unfinished">Feed</translation>
     </message>
   </context>
   <context>

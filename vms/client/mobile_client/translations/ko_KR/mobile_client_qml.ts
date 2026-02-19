@@ -12,15 +12,15 @@
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>작업들</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>일정에 따라 중지됨</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>닫기</translation>
     </message>
   </context>
   <context>
@@ -474,66 +474,81 @@
     </message>
   </context>
   <context>
+    <name>Feed</name>
+    <message>
+      <source>Notifications Off</source>
+      <translation type="unfinished">Notifications Off</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation type="unfinished">No Notifications</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation type="unfinished">No push notifications were found.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation type="unfinished">Nothing found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation type="unfinished">No New Notifications</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation type="unfinished">View All</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>전체</translation>
+    </message>
+  </context>
+  <context>
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
       <translation>피드</translation>
     </message>
     <message>
-      <source>No Notifications</source>
-      <translation>알림 비활성화</translation>
-    </message>
-    <message>
-      <source>No push notifications were found.</source>
-      <translation>푸시 알림이 발견되지 않았습니다.</translation>
-    </message>
-    <message>
       <source>Unviewed</source>
       <translation>미읽음</translation>
-    </message>
-    <message>
-      <source>Viewed</source>
-      <translation>조회</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>결과 없음</translation>
-    </message>
-    <message>
-      <source>Try changing the search parameters</source>
-      <translation>검색 매개변수를 변경해보세요</translation>
-    </message>
-    <message>
-      <source>No New Notifications</source>
-      <translation>알림 없음</translation>
-    </message>
-    <message>
-      <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation>새로운 푸시 알림이 없습니다. 전체 알림 내역을 확인할 수 있습니다.</translation>
-    </message>
-    <message>
-      <source>View All</source>
-      <translation>모두 보기</translation>
     </message>
     <message>
       <source>All</source>
       <translation>전체</translation>
     </message>
     <message>
-      <source>Notifications Off</source>
-      <translation>알림이 꺼져있습니다</translation>
-    </message>
-    <message>
-      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>현재 이 앱의 알림이 비활성화되어 있습니다. 알림을 활성화하려면 휴대전화 설정에서 변경해 주세요</translation>
-    </message>
-    <message>
-      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation>이 사이트에 대한 푸시 알림을 비활성화하셨습니다. 푸시 알림을 활성화하려면 설정 페이지로 이동하세요.</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>설정</translation>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -1130,6 +1145,10 @@
     <message>
       <source>Welcome, %1!</source>
       <translation type="unfinished">Welcome, %1!</translation>
+    </message>
+    <message>
+      <source>Feed</source>
+      <translation type="unfinished">Feed</translation>
     </message>
   </context>
   <context>

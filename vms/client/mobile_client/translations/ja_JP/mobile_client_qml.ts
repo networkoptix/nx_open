@@ -12,15 +12,15 @@
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>アクション</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>スケジュールにより無効</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>閉じる</translation>
     </message>
   </context>
   <context>
@@ -474,66 +474,81 @@
     </message>
   </context>
   <context>
+    <name>Feed</name>
+    <message>
+      <source>Notifications Off</source>
+      <translation type="unfinished">Notifications Off</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation type="unfinished">No Notifications</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation type="unfinished">No push notifications were found.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation type="unfinished">Nothing found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation type="unfinished">No New Notifications</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation type="unfinished">View All</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>すべて</translation>
+    </message>
+  </context>
+  <context>
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
       <translation>フィード</translation>
     </message>
     <message>
-      <source>No Notifications</source>
-      <translation>通知はありません</translation>
-    </message>
-    <message>
-      <source>No push notifications were found.</source>
-      <translation>プッシュ通知が見つかりませんでした。</translation>
-    </message>
-    <message>
       <source>Unviewed</source>
       <translation>未読</translation>
-    </message>
-    <message>
-      <source>Viewed</source>
-      <translation>既読</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>見つかりません</translation>
-    </message>
-    <message>
-      <source>Try changing the search parameters</source>
-      <translation>異なる検索条件でお試しください。</translation>
-    </message>
-    <message>
-      <source>No New Notifications</source>
-      <translation>新しい通知はありません</translation>
-    </message>
-    <message>
-      <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation>新しいプッシュ通知は見つかりませんでした。代わりに全通知履歴を表示することもできます。</translation>
-    </message>
-    <message>
-      <source>View All</source>
-      <translation>すべて表示</translation>
     </message>
     <message>
       <source>All</source>
       <translation>すべて</translation>
     </message>
     <message>
-      <source>Notifications Off</source>
-      <translation>通知オフ</translation>
-    </message>
-    <message>
-      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>このアプリの通知は現在無効になっています。通知を有効化するには、お使いの端末の設定をご確認ください。</translation>
-    </message>
-    <message>
-      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation>このサイトのプッシュ通知は無効になっています。通知を有効化するには、設定ページに移動してください。</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>設定</translation>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -1130,6 +1145,10 @@
     <message>
       <source>Welcome, %1!</source>
       <translation>ようこそ、%1様!</translation>
+    </message>
+    <message>
+      <source>Feed</source>
+      <translation type="unfinished">Feed</translation>
     </message>
   </context>
   <context>

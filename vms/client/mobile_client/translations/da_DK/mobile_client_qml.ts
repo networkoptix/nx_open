@@ -12,15 +12,15 @@
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>Handlinger</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Deaktiveret efter tidsplan</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Luk</translation>
     </message>
   </context>
   <context>
@@ -476,66 +476,81 @@
     </message>
   </context>
   <context>
+    <name>Feed</name>
+    <message>
+      <source>Notifications Off</source>
+      <translation type="unfinished">Notifications Off</translation>
+    </message>
+    <message>
+      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+    </message>
+    <message>
+      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>No Notifications</source>
+      <translation type="unfinished">No Notifications</translation>
+    </message>
+    <message>
+      <source>No push notifications were found.</source>
+      <translation type="unfinished">No push notifications were found.</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation type="unfinished">Nothing found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
+    </message>
+    <message>
+      <source>No New Notifications</source>
+      <translation type="unfinished">No New Notifications</translation>
+    </message>
+    <message>
+      <source>No new push notifications were found, but you can view your full notification history.</source>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+    </message>
+    <message>
+      <source>View All</source>
+      <translation type="unfinished">View All</translation>
+    </message>
+    <message>
+      <source>Unviewed</source>
+      <translation type="unfinished">Unviewed</translation>
+    </message>
+    <message>
+      <source>Viewed</source>
+      <translation type="unfinished">Viewed</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Alle</translation>
+    </message>
+  </context>
+  <context>
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
       <translation>Feed</translation>
     </message>
     <message>
-      <source>No Notifications</source>
-      <translation>Ingen Notifikationer</translation>
-    </message>
-    <message>
-      <source>No push notifications were found.</source>
-      <translation>Ingen push notifikationer blev fundet.</translation>
-    </message>
-    <message>
       <source>Unviewed</source>
       <translation>Ikke vist</translation>
-    </message>
-    <message>
-      <source>Viewed</source>
-      <translation>Vist</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Intet fundet</translation>
-    </message>
-    <message>
-      <source>Try changing the search parameters</source>
-      <translation>Prøv at ændre søgeparametrene</translation>
-    </message>
-    <message>
-      <source>No New Notifications</source>
-      <translation>Ingen Nye Notifikationer</translation>
-    </message>
-    <message>
-      <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation>Ingen nye push notifikationer blev fundet, men du kan se din fulde notifikations historik.</translation>
-    </message>
-    <message>
-      <source>View All</source>
-      <translation>Vis alle</translation>
     </message>
     <message>
       <source>All</source>
       <translation>Alle</translation>
     </message>
     <message>
-      <source>Notifications Off</source>
-      <translation>Notifikationer Fra</translation>
-    </message>
-    <message>
-      <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>Notifikationer er i øjeblikket deaktiveret for denne app. For at aktivere meddelelser skal du bruge din telefon&apos;s indstillinger</translation>
-    </message>
-    <message>
-      <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation>Du deaktiverede push notifikationer for dette websted. For at aktivere dem, gå til siden Indstillinger.</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>Indstillinger</translation>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -1132,6 +1147,10 @@
     <message>
       <source>Welcome, %1!</source>
       <translation>Velkommen, %1!</translation>
+    </message>
+    <message>
+      <source>Feed</source>
+      <translation type="unfinished">Feed</translation>
     </message>
   </context>
   <context>
