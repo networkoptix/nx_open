@@ -45,11 +45,12 @@ public:
         createDataProviderFactory providerFactory,
         const std::string& localUfrag,
         const nx::network::SocketAddress& address,
-        const QList<nx::network::SocketAddress>& allAddresses,
         const SessionConfig& config,
         const std::vector<nx::network::SocketAddress>& m_stunServers,
         Purpose purpose);
     ~Session();
+
+    void start(const QList<nx::network::SocketAddress>& addresses);
     void setAddress(const nx::network::SocketAddress& address);
     std::string constructSdp();
     AnswerResult processSdpAnswer(const std::string& sdp);
@@ -111,7 +112,6 @@ private:
     std::string constructFingerprint() const;
     bool initializeMuxersInternal();
     void addProvider(std::shared_ptr<AbstractCameraDataProvider> provider);
-    void createIces(const QList<nx::network::SocketAddress>& addresses);
     SessionDescription describeUnsafe() const;
 
 private:

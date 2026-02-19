@@ -110,38 +110,42 @@ std::shared_ptr<Session> SessionPool::createInternal(
     const std::string& localUfrag,
     const SessionConfig& config)
 {
-    NX_MUTEX_LOCKER lk(&m_mutex);
-
-    const auto sessionIter = m_sessionById.find(localUfrag);
-    if (!NX_ASSERT(sessionIter != m_sessionById.end() && !sessionIter->second,
-        "Session ufrag should be taken before by takeUfrag() of emitUfrag()"))
-    {
-        return nullptr;
-    }
 
     auto server = systemContext()->resourcePool()->getResourceById<QnMediaServerResource>(
         systemContext()->peerId());
 
     if (!server)
+    {
+        NX_WARNING(this, "Server not found for session %1, peerID: %2",
+            localUfrag, systemContext()->peerId());
         return nullptr;
+    }
 
-    auto allAddresses = server->getAllAvailableAddresses();
+    std::shared_ptr<Session> session;
+    {
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        const auto sessionIter = m_sessionById.find(localUfrag);
+        if (!NX_ASSERT(sessionIter != m_sessionById.end() && !sessionIter->second,
+            "Session ufrag should be taken before by takeUfrag() of emitUfrag()"))
+        {
+            return nullptr;
+        }
 
-    std::shared_ptr<Session> session = std::make_shared<Session>(
-        systemContext(),
-        this,
-        std::move(providerFactory),
-        localUfrag,
-        address,
-        allAddresses,
-        config,
-        getStunServers(),
-        purpose);
+        session = std::make_shared<Session>(
+            systemContext(),
+            this,
+            std::move(providerFactory),
+            localUfrag,
+            address,
+            config,
+            getStunServers(),
+            purpose);
 
-    m_sessionById[session->id()] = session;
+        m_sessionById[session->id()] = session;
+    }
 
     NX_DEBUG(this, "Started session %1", localUfrag);
-
+    session->start(server->getAllAvailableAddresses());
     return session;
 }
 

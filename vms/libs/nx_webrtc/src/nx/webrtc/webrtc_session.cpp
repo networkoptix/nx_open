@@ -70,7 +70,6 @@ Session::Session(
     createDataProviderFactory providerFactory,
     const std::string& localUfrag,
     const nx::network::SocketAddress& address,
-    const QList<nx::network::SocketAddress>& allAddresses,
     const SessionConfig& config,
     const std::vector<nx::network::SocketAddress>& stunServers,
     Purpose purpose)
@@ -84,7 +83,6 @@ Session::Session(
     m_sessionPool(sessionPool),
     m_config(config)
 {
-    createIces(allAddresses);
     m_localUfrag = localUfrag;
     m_localPwd = generatePwd(24);
     m_dtls = std::make_shared<Dtls>(m_localUfrag, m_pem);
@@ -125,7 +123,7 @@ Session::~Session()
     releaseTracker(); //< Should be guarded.
 }
 
-void Session::createIces(const QList<nx::network::SocketAddress>& addresses)
+void Session::start(const QList<nx::network::SocketAddress>& addresses)
 {
     int priority = IceCandidate::kIceMaxPriority;
     int index = 0;
