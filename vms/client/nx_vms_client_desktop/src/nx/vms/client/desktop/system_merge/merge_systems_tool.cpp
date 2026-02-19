@@ -481,8 +481,14 @@ bool MergeSystemsTool::checkServerCertificateEquality(const Context& ctx)
     if (ctx.targetHandshakeChain.empty() || serverChain.empty())
         return false;
 
-    return (serverChain == ctx.targetHandshakeChain)
-        || (userProvidedChain == ctx.targetHandshakeChain);
+    // An order of intermediate certificates in `serverChain` may differ depending on
+    // the SSL handshake internal implementation.
+    //
+    // However, to verify certificate equivalence, it is sufficient to compare only
+    // the leaf certificates containing the public key.
+
+    return (serverChain[0] == ctx.targetHandshakeChain[0])
+        || (!userProvidedChain.empty() && userProvidedChain[0] == ctx.targetHandshakeChain[0]);
 }
 
 MergeSystemsStatus MergeSystemsTool::verifyTargetCertificate(const Context& ctx)
