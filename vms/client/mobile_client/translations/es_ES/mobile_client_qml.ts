@@ -387,19 +387,19 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation>Configuraciones</translation>
+      <translation>Configuración</translation>
     </message>
     <message>
       <source>No Notifications</source>
-      <translation>No hay Notificaciones</translation>
+      <translation type="unfinished">No Notifications</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation>No se encuentran notificaciones push.</translation>
+      <translation type="unfinished">No push notifications were found.</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>No encontrado</translation>
+      <translation>No hubo resultado</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -407,15 +407,15 @@
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation>No hay nuevas notificaciones</translation>
+      <translation type="unfinished">No New Notifications</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation>No hay nuevas notificaciones, pero usted puede ver el histórico de todas sus notificaciones.</translation>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation>Ver todo</translation>
+      <translation type="unfinished">View All</translation>
     </message>
     <message>
       <source>Unviewed</source>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>Viewed</source>
-      <translation>Visto</translation>
+      <translation type="unfinished">Viewed</translation>
     </message>
     <message>
       <source>All</source>

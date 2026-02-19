@@ -387,7 +387,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation>Definições</translation>
+      <translation>Confirgurações</translation>
     </message>
     <message>
       <source>No Notifications</source>

@@ -374,15 +374,15 @@
     </message>
     <message>
       <source>Notifications Off</source>
-      <translation>Notifikasi Mati</translation>
+      <translation type="unfinished">Notifications Off</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>Notifikasi saat ini dinonaktifkan untuk aplikasi ini. Untuk mengaktifkan notifikasi, gunakan pengaturan ponsel Anda&apos;</translation>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation>Anda menonaktifkan notifikasi push untuk site ini. Untuk mengaktifkannya, buka halaman Pengaturan.</translation>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -390,15 +390,15 @@
     </message>
     <message>
       <source>No Notifications</source>
-      <translation>Tidak ada Notifikasi</translation>
+      <translation type="unfinished">No Notifications</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation>Tidak ada push notifikasi yang ditemukan.</translation>
+      <translation type="unfinished">No push notifications were found.</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>Nothing found</translation>
+      <translation>Tidak ada yang ditemukan</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -406,15 +406,15 @@
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation>Tidak Ada Notifikasi Baru</translation>
+      <translation type="unfinished">No New Notifications</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation>Tidak ada push notifikasi baru yang ditemukan, tetapi Anda dapat melihat riwayat lengkap notifikasi.</translation>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation>Lihat Semua</translation>
+      <translation type="unfinished">View All</translation>
     </message>
     <message>
       <source>Unviewed</source>
@@ -422,7 +422,7 @@
     </message>
     <message>
       <source>Viewed</source>
-      <translation>Dilihat</translation>
+      <translation type="unfinished">Viewed</translation>
     </message>
     <message>
       <source>All</source>

@@ -375,15 +375,15 @@
     </message>
     <message>
       <source>Notifications Off</source>
-      <translation>Aviseringar av</translation>
+      <translation type="unfinished">Notifications Off</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>Aviseringar är för närvarande inaktiverade för den här appen. För att aktivera aviseringar använd din telefon&apos;s inställningar</translation>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation>Du inaktiverade push-meddelanden för den här platsen. För att aktivera dem, gå till sidan Inställningar.</translation>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -391,11 +391,11 @@
     </message>
     <message>
       <source>No Notifications</source>
-      <translation>Inga aviseringar</translation>
+      <translation type="unfinished">No Notifications</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation>Inga push-meddelanden hittades.</translation>
+      <translation type="unfinished">No push notifications were found.</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -407,15 +407,15 @@
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation>Inga nya aviseringar</translation>
+      <translation type="unfinished">No New Notifications</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation>Inga nya push-meddelanden hittades, men du kan se hela din notifikationshistorik.</translation>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation>Visa alla</translation>
+      <translation type="unfinished">View All</translation>
     </message>
     <message>
       <source>Unviewed</source>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>Viewed</source>
-      <translation>Visad</translation>
+      <translation type="unfinished">Viewed</translation>
     </message>
     <message>
       <source>All</source>

@@ -383,7 +383,7 @@
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation>Du har deaktivert push-varsler for dette nettstedet. Gå til Innstillinger-siden for å aktivere dem.</translation>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -395,7 +395,7 @@
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation>Ingen push-varsler ble funnet.</translation>
+      <translation type="unfinished">No push notifications were found.</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -415,7 +415,7 @@
     </message>
     <message>
       <source>View All</source>
-      <translation>Vis alle</translation>
+      <translation type="unfinished">View All</translation>
     </message>
     <message>
       <source>Unviewed</source>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>Viewed</source>
-      <translation>Sett</translation>
+      <translation type="unfinished">Viewed</translation>
     </message>
     <message>
       <source>All</source>

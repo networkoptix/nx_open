@@ -374,15 +374,15 @@
     </message>
     <message>
       <source>Notifications Off</source>
-      <translation>通知關閉</translation>
+      <translation type="unfinished">Notifications Off</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>此應用程式的通知功能目前已關閉，若要啟用通知，請在手機設定中啟用。</translation>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation>您已停用此站點的推播通知。若要啟用推播通知，請前往「設定」頁面。</translation>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -390,11 +390,11 @@
     </message>
     <message>
       <source>No Notifications</source>
-      <translation>沒有通知</translation>
+      <translation type="unfinished">No Notifications</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation>未找到推播通知。</translation>
+      <translation type="unfinished">No push notifications were found.</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -406,15 +406,15 @@
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation>沒有新通知</translation>
+      <translation type="unfinished">No New Notifications</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation>未發現新的推播通知，但您可以查看完整的通知記錄。</translation>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation>檢視全部</translation>
+      <translation type="unfinished">View All</translation>
     </message>
     <message>
       <source>Unviewed</source>
@@ -422,7 +422,7 @@
     </message>
     <message>
       <source>Viewed</source>
-      <translation>已瀏覽</translation>
+      <translation type="unfinished">Viewed</translation>
     </message>
     <message>
       <source>All</source>

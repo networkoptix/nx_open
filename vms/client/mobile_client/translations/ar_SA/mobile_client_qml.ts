@@ -403,7 +403,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>Nothing found</translation>
+      <translation>لم يتم العثور على شيء</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>

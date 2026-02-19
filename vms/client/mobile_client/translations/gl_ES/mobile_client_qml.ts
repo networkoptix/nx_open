@@ -375,15 +375,15 @@
     </message>
     <message>
       <source>Notifications Off</source>
-      <translation>Notificacións desactivadas</translation>
+      <translation type="unfinished">Notifications Off</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>As notificacións están desactivadas actualmente para esta aplicación. Para activalas, usa a configuración do teu teléfono</translation>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation>Desactivaches as notificacións push para este sitio. Para activalas, vai á páxina Configuración.</translation>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -391,11 +391,11 @@
     </message>
     <message>
       <source>No Notifications</source>
-      <translation>Sen notificacións</translation>
+      <translation type="unfinished">No Notifications</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation>Non se atoparon notificacións push.</translation>
+      <translation type="unfinished">No push notifications were found.</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -407,15 +407,15 @@
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation>Sen novas notificacións</translation>
+      <translation type="unfinished">No New Notifications</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation>Non se atoparon novas notificacións push, pero podes ver o teu historial completo de notificacións.</translation>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation>Ver todo</translation>
+      <translation type="unfinished">View All</translation>
     </message>
     <message>
       <source>Unviewed</source>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>Viewed</source>
-      <translation>Visto</translation>
+      <translation type="unfinished">Viewed</translation>
     </message>
     <message>
       <source>All</source>
