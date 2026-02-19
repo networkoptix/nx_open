@@ -90,6 +90,12 @@ bool Transcoder::createRtpEncoders(
                 if (m_encryptionData.has_value())
                     encoder->setSrtpEncryptionData(*m_encryptionData);
                 m_videoEncoders[deviceId] = std::move(encoder);
+                track->offerState = TrackState::active;
+            }
+            else
+            {
+                NX_DEBUG(this, "Can't create Video encoder for track %1, codec: %2, device: %3",
+                    track->ssrc, videoParameters->codec_id, track->deviceId);
             }
         }
     }
@@ -104,6 +110,12 @@ bool Transcoder::createRtpEncoders(
                 if (m_encryptionData.has_value())
                     encoder->setSrtpEncryptionData(*m_encryptionData);
                 m_audioEncoders[deviceId] = std::move(encoder);
+                track->offerState = TrackState::active;
+            }
+            else
+            {
+                NX_DEBUG(this, "Can't create Audio encoder for track %1, codec: %2, device: %3",
+                    track->ssrc, audioParameters->codec_id, track->deviceId);
             }
         }
     }

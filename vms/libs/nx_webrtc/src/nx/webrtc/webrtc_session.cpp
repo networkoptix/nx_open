@@ -221,7 +221,10 @@ AbstractCameraDataProviderPtr Session::createProvider(
     addProvider(provider);
 
     if (!initializeMuxersInternal())
+    {
+        NX_WARNING(this, "Can't create data provider for device %1", deviceId);
         return AbstractCameraDataProviderPtr();
+    }
 
     if (m_tracker && m_tracker->isStarted())
         m_tracker->sendOffer();
@@ -271,7 +274,6 @@ void Session::addProvider(std::shared_ptr<AbstractCameraDataProvider> provider)
         auto video = std::make_unique<Track>(Track{
             .deviceId = deviceId,
             .trackType = TrackType::video,
-            .offerState = TrackState::active,
             });
         m_tracks->addTrack(std::move(video));
     }
@@ -281,7 +283,6 @@ void Session::addProvider(std::shared_ptr<AbstractCameraDataProvider> provider)
         auto audio = std::make_unique<Track>(Track{
             .deviceId = deviceId,
             .trackType = TrackType::audio,
-            .offerState = TrackState::active,
             });
         m_tracks->addTrack(std::move(audio));
     }

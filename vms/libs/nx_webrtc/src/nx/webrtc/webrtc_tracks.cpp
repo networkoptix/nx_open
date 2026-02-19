@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/utils/random.h>
+#include <nx/utils/log/log.h>
 
 #include "webrtc_session.h"
 
@@ -198,8 +199,11 @@ std::string Tracks::getSdpForTrack(const Track* track, uint16_t /*port*/) const
 std::string TracksForSend::getSdpForTrack(const Track* track, uint16_t port) const
 {
     auto encoder = m_session->muxer()->videoEncoder(track->deviceId);
-    if (!NX_ASSERT(encoder))
+    if (!encoder)
+    {
+        NX_DEBUG(this, "Encoder is not initialized for track %1:%2", track->deviceId, track->ssrc);
         return {};
+    }
     bool isVideo = track->trackType == TrackType::video;
     return encoder->getSdpMedia(
         isVideo, track->mid, port, /*ssl*/ true).toStdString()
