@@ -75,7 +75,7 @@ T.RadioButton
                 width: parent.width
                 text: control.text
                 font: control.font
-                color: ColorTheme.colors.light1
+                color: control.checked ? ColorTheme.colors.brand_core : ColorTheme.colors.light1
                 wrapMode: Text.Wrap
             }
 

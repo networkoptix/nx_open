@@ -18,6 +18,7 @@ import Nx.Ui
 import nx.vms.client.core
 
 import "private/SessionsScreen"
+import "private/FeedScreen"
 
 AdaptiveScreen
 {
@@ -71,7 +72,7 @@ AdaptiveScreen
     rightPanel
     {
         visible: false
-        title: feedScreen.title
+        title: qsTr("Feed")
         color: ColorTheme.colors.dark5
         iconSource: feedStateProvider.buttonIconSource
         item:
@@ -82,16 +83,16 @@ AdaptiveScreen
                 return null
             }
 
-            return feedScreen
+            return feed
         }
 
         menuButton
         {
             icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
-            visible: !feedScreen.empty
-            indicator.visible: feedScreen.filtered
+            visible: !feed.empty
+            indicator.visible: feed.filtered
 
-            onClicked: feedScreen.openFilterMenu()
+            onClicked: feed.openFilterMenu()
         }
 
         onItemChanged:
@@ -171,7 +172,7 @@ AdaptiveScreen
 
         function onIsTabletLayoutChanged()
         {
-            if (LayoutController.isTabletLayout && sessionsScreen.contentItem === feedScreen)
+            if (LayoutController.isTabletLayout && sessionsScreen.contentItem === feed)
                 sessionsScreen.contentItem = sessionsScreenContent
         }
     }
@@ -181,14 +182,14 @@ AdaptiveScreen
         State
         {
             name: "watchingFeed"
-            when: sessionsScreen.contentItem === feedScreen
+            when: sessionsScreen.contentItem === feed
 
             PropertyChanges
             {
                 sessionsScreen
                 {
                     title: "%1 - %2"
-                        .arg(feedScreen.title)
+                        .arg(feed.title)
                         .arg(accessor.getData(linearizationListModel.sourceRoot, "display"))
                 }
 
@@ -203,13 +204,13 @@ AdaptiveScreen
                 rightButton
                 {
                     icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
-                    visible: !feedScreen.empty
-                    onClicked: feedScreen.openFilterMenu()
+                    visible: !feed.empty
+                    onClicked: feed.openFilterMenu()
                 }
 
                 rightButtonIndicator
                 {
-                    visible: feedScreen.filtered
+                    visible: feed.filtered
                     text: ""
                 }
             }
@@ -301,7 +302,7 @@ AdaptiveScreen
                 {
                     visible: !emptyListPlaceholder.visible && !LayoutController.isTabletLayout
                     icon.source: feedStateProvider.buttonIconSource
-                    onClicked: sessionsScreen.contentItem = feedScreen
+                    onClicked: sessionsScreen.contentItem = feed
                 }
 
                 rightButtonIndicator.text: feedStateProvider.buttonIconIndicatorText
@@ -356,12 +357,10 @@ AdaptiveScreen
         }
     }
 
-    FeedScreen
+    Feed
     {
-        id: feedScreen
+        id: feed
 
-        toolBar.visible: false
-        backgroundColor: "transparent"
         feedState: FeedStateProvider
         {
             id: feedStateProvider

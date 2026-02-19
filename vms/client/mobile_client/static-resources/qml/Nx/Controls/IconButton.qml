@@ -89,6 +89,8 @@ Control
 
             anchors.right: iconLabel.right
             anchors.top: iconLabel.top
+            width: 6
+            height: 6
             visible: false
         }
     }
