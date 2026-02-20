@@ -197,8 +197,6 @@ Item
     {
         id: separatorRepeater
 
-        visible: separatorsVisible
-
         delegate: Rectangle
         {
             property Item label: labelsRepeater.count > 0 ? labelsRepeater.itemAt(index) : null
@@ -209,6 +207,7 @@ Item
             height: 1
             width: parent.width
             color: ColorTheme.colors.dark8
+            visible: separatorsVisible
         }
     }
 
