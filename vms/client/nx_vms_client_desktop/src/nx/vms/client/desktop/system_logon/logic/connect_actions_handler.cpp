@@ -76,6 +76,7 @@
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
+#include <nx/vms/common/pixelation/pixelation_settings.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
@@ -1622,6 +1623,7 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
         idList.push_back(res->getId());
 
     NX_DEBUG(this, "Removing resources");
+    system()->pixelationSettings()->resetPixelationSettings();
     resourcePool->removeResources(resourcesToRemove);
 
     system()->showreelManager()->resetShowreels();

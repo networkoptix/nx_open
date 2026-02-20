@@ -120,4 +120,9 @@ double PixelationSettings::intensity() const
     return d->settings.intensity;
 }
 
+void PixelationSettings::resetPixelationSettings()
+{
+    d->settings = {};
+}
+
 } // namespace nx::vms::common
