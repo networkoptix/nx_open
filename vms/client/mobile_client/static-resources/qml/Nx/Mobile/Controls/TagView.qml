@@ -11,10 +11,11 @@ Flow
 {
     id: control
 
-    spacing: 6
+    spacing: 8
 
     readonly property bool hasTags: repeater.count > 0
     property alias model: repeater.model
+    property color color: ColorTheme.colors.dark11
 
     Repeater
     {
@@ -22,12 +23,11 @@ Flow
 
         delegate: Rectangle
         {
-            height: 36
+            height: 28
             width: dataRow.width
 
-            color: "transparent"
-            border.color: ColorTheme.colors.dark15
-            radius: 6
+            color: control.color
+            radius: 4
 
             Row
             {
@@ -69,7 +69,7 @@ Flow
                     text: model.modelData
                     font.pixelSize: 14
                     font.weight: 400
-                    color: ColorTheme.colors.light4
+                    color: ColorTheme.colors.light10
                     elide: Text.ElideRight
                 }
             }

@@ -304,6 +304,7 @@ Page
                 width: parent.width
                 model: d.accessor.getData(currentEventIndex, "tags")
                 visible: hasTags
+                color: ColorTheme.colors.dark8
             }
 
             Text
