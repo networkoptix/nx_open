@@ -335,7 +335,8 @@ Page
 
                 onLinkActivated: (link) =>
                 {
-                    windowContext.ui.showLinkAboutToOpenMessage(link)
+                    Workflow.openDialog("qrc:/qml/Nx/Web/LinkAboutToOpenDialog.qml",
+                        {"link": link});
                 }
             }
 
