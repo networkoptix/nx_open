@@ -257,6 +257,11 @@ void ResourceSelectionModelAdapter::setExternalFilter(IsIndexAccepted value)
     invalidateFilter();
 }
 
+void ResourceSelectionModelAdapter::resetExternalFilter()
+{
+    setExternalFilter({});
+}
+
 ResourceSelectionModelAdapter::TopLevelNodesPolicy
     ResourceSelectionModelAdapter::topLevelNodesPolicy() const
 {
