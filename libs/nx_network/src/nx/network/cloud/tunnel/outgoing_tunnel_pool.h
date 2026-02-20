@@ -54,7 +54,7 @@ public:
      * @param uuid Unique instance id, e.g. Hardware id.
      * NOTE: This method generates peer id in internal format using supplied information (name & uuid).
      */
-    void assignOwnPeerId(const std::string& name, const nx::Uuid& uuid);
+    void assignOwnPeerId(const std::string& name, nx::Uuid uuid);
 
     /**
      * NOTE: This method just sets already prepared peerId.

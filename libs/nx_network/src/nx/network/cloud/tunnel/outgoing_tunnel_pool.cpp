@@ -96,7 +96,7 @@ std::string OutgoingTunnelPool::ownPeerId() const
     return m_ownPeerId;
 }
 
-void OutgoingTunnelPool::assignOwnPeerId(const std::string& name, const nx::Uuid& uuid)
+void OutgoingTunnelPool::assignOwnPeerId(const std::string& name, nx::Uuid uuid)
 {
     NX_ASSERT(!uuid.isNull());
     const auto id = nx::utils::buildString(
