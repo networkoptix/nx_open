@@ -206,11 +206,12 @@ ListView
         ? accessor.getData(siteList.currentRoot, "type")
         : undefined
 
-    section.property: currentSearchRegExp
+    readonly property bool showSections: currentSearchRegExp
         || siteList.currentTab == OrganizationsModel.SitesTab
         || currentRootType === OrganizationsModel.Organization
         || currentRootType === OrganizationsModel.Folder
-        ? "section" : ""
+
+    section.property: "section"
     section.criteria: ViewSection.FullString
     section.delegate: ColumnLayout
     {
@@ -230,7 +231,9 @@ ListView
             : ""
 
         width: parent.width
-        spacing: 12
+        visible: siteList.showSections
+        height: siteList.showSections ? implicitHeight : 0
+        spacing: siteList.showSections ? 12 : 0
 
         Placeholder
         {
