@@ -29,12 +29,45 @@ Dialog
     maximumHeight: 440
     modality: Qt.ApplicationModal
 
+    function updateChildrenRecursively(parentIndex, checked) : int
+    {
+        const parentObjectType = taxonomyManager.objectTypeById(objectTypes.itemAt(parentIndex).id)
+        for (let i = parentIndex + 1; i < objectTypes.count;)
+        {
+            const item = objectTypes.itemAt(i)
+            const currentType = taxonomyManager.objectTypeById(item.id)
+
+            if (currentType.baseType === parentObjectType)
+            {
+                item.checked = checked
+                i = updateChildrenRecursively(i, checked)
+            }
+            else
+            {
+                return i;
+            }
+        }
+        return objectTypes.count;
+    }
+
     function updateSelected()
+    {
+        for (let i = 0; i < objectTypes.count;)
+        {
+            const item = objectTypes.itemAt(i)
+            if (item.checked !== objectTypeIds.includes(item.id))
+                i = updateChildrenRecursively(i, item.checked)
+            else
+                ++i
+        }
+    }
+
+    function updateObjectTypeIds()
     {
         let result = []
         for (let i = 0; i < objectTypes.count; ++i)
         {
-            let item = objectTypes.itemAt(i)
+            const item = objectTypes.itemAt(i)
             if (item.checked)
                 result.push(item.id)
         }
@@ -104,7 +137,11 @@ Dialog
                                 Layout.fillWidth: true
                                 Layout.leftMargin: objectType ? objectType.baseTypeDepth * 20 : 0
 
-                                onClicked: updateSelected()
+                                onClicked:
+                                {
+                                    updateSelected()
+                                    updateObjectTypeIds()
+                                }
                             }
                         }
                     }
