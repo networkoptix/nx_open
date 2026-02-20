@@ -72,21 +72,28 @@ Page
             anchors.fill: parent
             visible: sessionsScreen.state === "inPartnerOrOrg"
                 && sessionsScreen.rootType !== OrganizationsModel.ChannelPartner
-                && !searchField.visible
                 && !breadcrumb.visible
             onClicked: breadcrumb.openWith(linearizationListModel.sourceRoot?.parent)
         },
 
-        SearchEdit
+        LayoutItemProxy
         {
-            id: searchField
+            id: topSearchField
 
+            target: searchField
+            visible: false
             width: parent.width
             height: 36
             anchors.verticalCenter: parent.verticalCenter
-            placeholderText: qsTr("Search")
         }
     ]
+
+    SearchEdit
+    {
+        id: searchField
+
+        placeholderText: qsTr("Search")
+    }
 
     MouseArea
     {
@@ -130,7 +137,7 @@ Page
                     && (organizationsModel.hasChannelPartners
                         || organizationsModel.hasOrganizations)
 
-                searchField.visible: true
+                topSearchField.visible: true
             }
         },
 
@@ -154,7 +161,7 @@ Page
                     onClicked: Workflow.openSettingsScreen()
                 }
                 systemTabs.visible: false
-                searchField.visible: true
+                topSearchField.visible: true
             }
         },
 
@@ -171,9 +178,7 @@ Page
                     leftButtonImageSource:
                         "image://skin/24x24/Outline/arrow_back.svg?primary=light10"
                     onLeftButtonClicked: goBack()
-                    title: !searchField.visible
-                        ? accessor.getData(linearizationListModel.sourceRoot, "display")
-                        : ""
+                    title: accessor.getData(linearizationListModel.sourceRoot, "display")
                 }
 
                 rightButton
@@ -186,7 +191,7 @@ Page
                 rightButtonIndicator.text: feedStateProvider.buttonIconIndicatorText
 
                 systemTabs.visible: false
-                searchField.visible: false
+                contentSearchField.visible: true
             }
         }
     ]
@@ -196,7 +201,7 @@ Page
         id: breadcrumb
 
         x: siteList.x
-        y: siteList.y + 8
+        y: contentSearchField.y
         width: siteList.width
 
         onItemClicked: (nodeId) =>
@@ -293,6 +298,19 @@ Page
             visible: systemTabs.visible
         }
 
+        LayoutItemProxy
+        {
+            id: contentSearchField
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: 20
+
+            target: searchField
+            height: visible ? 36 : 0
+            visible: false
+        }
+
         Rectangle
         {
             id: systemTabs
@@ -301,6 +319,7 @@ Page
             width: parent.width
             implicitHeight: 48
             height: visible ? implicitHeight : 0
+            y: contentSearchField.y + contentSearchField.height
             z: 1
 
             visible: !sessionsScreen.searching && !organizationsModel.topLevelLoading
@@ -459,7 +478,8 @@ Page
 
             width: parent.width
             height: parent.height - systemTabs.height
-            y: systemTabs.height
+            y: systemTabs.y + systemTabs.height
+            clip: true
 
             visible: !loadingIndicator.visible
             siteModel: linearizationListModel
@@ -813,7 +833,7 @@ Page
 
     function goBack(index)
     {
-        if (searchField.visible)
+        if (searchField.text)
         {
             endSearch()
             return
@@ -876,7 +896,6 @@ Page
         if (state === "inPartnerOrOrg")
         {
             linearizationListModel.sourceRoot = siteList.currentRoot
-            searchField.visible = false
         }
 
         searchField.clear()
