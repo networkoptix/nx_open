@@ -9,7 +9,6 @@
 #include <nx/core/transcoding/filters/object_info_filter.h>
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/media/ffmpeg/frame_info.h>
-#include <nx/media/meta_data_packet.h>
 
 class TaxonomyStateWatcher: public nx::analytics::taxonomy::AbstractStateWatcher
 {
@@ -102,7 +101,7 @@ using namespace nx::core::transcoding;
 
 TEST_F(ObjectInfoFilterTest, noMetadata)
 {
-    ObjectInfoFilter filter(makeSettings(true));
+    ObjectInfoFilter filter(makeSettings(true), {.rotation = 0});
     filter.setMetadata({});
     auto image = prepareImage();
     auto referenceImage = prepareImage();
@@ -112,7 +111,7 @@ TEST_F(ObjectInfoFilterTest, noMetadata)
 
 TEST_F(ObjectInfoFilterTest, IncorrectMetadata)
 {
-    ObjectInfoFilter filter(makeSettings(true));
+    ObjectInfoFilter filter(makeSettings(true), {.rotation = 0});
 
     nx::common::metadata::ObjectMetadataPacket packet;
     packet.objectMetadataList.push_back(emptyBoundingBoxMetadata);
@@ -127,7 +126,7 @@ TEST_F(ObjectInfoFilterTest, IncorrectMetadata)
 
 TEST_F(ObjectInfoFilterTest, TypeMismatch)
 {
-    ObjectInfoFilter filter(makeSettings(false, {"car"}));
+    ObjectInfoFilter filter(makeSettings(false, {"car"}), {.rotation = 0});
 
     nx::common::metadata::ObjectMetadataPacket packet;
     packet.objectMetadataList.push_back(correctAnimalMetadata);
@@ -141,7 +140,7 @@ TEST_F(ObjectInfoFilterTest, TypeMismatch)
 
 TEST_F(ObjectInfoFilterTest, TypeMatch)
 {
-    ObjectInfoFilter filter(makeSettings(false, {"animal"}));
+    ObjectInfoFilter filter(makeSettings(false, {"animal"}), {.rotation = 0});
 
     nx::common::metadata::ObjectMetadataPacket packet;
     packet.objectMetadataList.push_back(correctAnimalMetadata);
@@ -156,7 +155,7 @@ TEST_F(ObjectInfoFilterTest, TypeMatch)
 
 TEST_F(ObjectInfoFilterTest, AllTypes)
 {
-    ObjectInfoFilter filter(makeSettings(true));
+    ObjectInfoFilter filter(makeSettings(true), {.rotation = 0});
 
     nx::common::metadata::ObjectMetadataPacket packet;
     packet.objectMetadataList.push_back(correctAnimalMetadata);
@@ -172,7 +171,7 @@ TEST_F(ObjectInfoFilterTest, AllTypes)
 
 TEST_F(ObjectInfoFilterTest, ColorSpecified)
 {
-    ObjectInfoFilter filter(makeSettings(true));
+    ObjectInfoFilter filter(makeSettings(true), {.rotation = 0});
 
     nx::common::metadata::ObjectMetadataPacket packet;
     packet.objectMetadataList.push_back(coloredCarMetadata);

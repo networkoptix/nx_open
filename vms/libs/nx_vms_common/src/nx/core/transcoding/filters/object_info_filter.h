@@ -15,7 +15,7 @@ namespace detail { class ImageToFramePainter; } // namespace detail
 class NX_VMS_COMMON_API ObjectInfoFilter: public AbstractMetadataFilter
 {
 public:
-    ObjectInfoFilter(const ObjectExportSettings& settings);
+    ObjectInfoFilter(const ObjectExportSettings& settings, const Settings& generalSettings);
     virtual ~ObjectInfoFilter() override;
 
     CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
@@ -38,7 +38,8 @@ private:
         const common::metadata::ObjectMetadata& objectMetadata,
         int width,
         int height);
-    ObjectExportSettings m_settings;
+    const ObjectExportSettings m_settings;
+    const Settings m_generalSettings;
     std::vector<nx::common::metadata::ObjectMetadataPacketPtr> m_metadata;
     std::map<Uuid, std::shared_ptr<QTextDocument>> m_descriptions;
 };

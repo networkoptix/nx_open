@@ -158,8 +158,12 @@ QSize ObjectInfoFilter::updatedResolution(const QSize& sourceSize)
     return sourceSize;
 }
 
-ObjectInfoFilter::ObjectInfoFilter(const ObjectExportSettings& settings):
-    m_settings(settings)
+ObjectInfoFilter::ObjectInfoFilter(
+    const ObjectExportSettings& settings,
+    const Settings& generalSettings)
+    :
+    m_settings(settings),
+    m_generalSettings(generalSettings)
 {
 }
 
@@ -267,7 +271,14 @@ void ObjectInfoFilter::drawDescription(
     paintArrow(&painter, tooltipGeometry, frameRect);
 
     painter.setPen(m_settings.textColor);
-    painter.translate(tooltipGeometry.topLeft());
+
+    painter.translate(tooltipGeometry.topLeft() / 2 + tooltipGeometry.bottomRight() / 2);
+    painter.rotate(m_generalSettings.rotation);
+    if (m_generalSettings.rotation == 0 || m_generalSettings.rotation == 180)
+        painter.translate(-tooltipGeometry.width() / 2, -tooltipGeometry.height() / 2);
+    else
+        painter.translate(-tooltipGeometry.height() / 2, -tooltipGeometry.width() / 2);
+
     doc->drawContents(&painter);
 
     painter.restore();
