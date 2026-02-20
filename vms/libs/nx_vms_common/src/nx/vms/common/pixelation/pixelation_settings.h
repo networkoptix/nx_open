@@ -35,6 +35,8 @@ public:
     QSet<QString> objectTypeIds() const;
     double intensity() const;
 
+    void resetPixelationSettings();
+
 signals:
     void settingsChanged();
 
