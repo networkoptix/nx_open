@@ -50,15 +50,13 @@ void SessionPool::stop()
 
     // TODO move working ice to session and use simple crear() without swap and deletion order.
     // Now it should be deleted before sessions, since ices have pointer to session.
+    decltype(m_sessionById) sessionById;
     decltype(m_tcpIces) icesTcp;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         std::swap(icesTcp, m_tcpIces);
+        std::swap(sessionById, m_sessionById);
     }
-    icesTcp.clear();
-
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    m_sessionById.clear();
 }
 
 std::vector<nx::network::SocketAddress> SessionPool::getStunServers()
@@ -187,6 +185,8 @@ std::weak_ptr<Session> SessionPool::getSession(const std::string& id)
 
 void SessionPool::onTimer(const quint64& /*timerId*/)
 {
+    std::vector<SessionPtr> sessionsToRemove;
+    decltype(m_tcpIces) tcpIcesToRemove;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         for (auto it = m_sessionById.begin(); it != m_sessionById.end();)
@@ -195,6 +195,7 @@ void SessionPool::onTimer(const quint64& /*timerId*/)
             if (ctx && ctx->hasExpired(m_keepAliveTimeout))
             {
                 NX_DEBUG(this, "Remove session on timer: %1", ctx);
+                sessionsToRemove.push_back(std::move(it->second));
                 it = m_sessionById.erase(it);
             }
             else
@@ -203,21 +204,31 @@ void SessionPool::onTimer(const quint64& /*timerId*/)
             }
         }
 
-        // Clean finished TCP Ices.
-        m_tcpIces.remove_if([](std::unique_ptr<IceTcp>& ice) {
-            return ice->isStopped();
-        });
+        for (auto it = m_tcpIces.begin(); it != m_tcpIces.end();)
+        {
+            if ((*it)->isStopped())
+            {
+                tcpIcesToRemove.push_back(std::move(*it));
+                it = m_tcpIces.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
     }
 }
 
 void SessionPool::drop(const std::string& id)
 {
+    SessionPtr toRemove;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         auto sessionIter = m_sessionById.find(id);
         if (sessionIter == m_sessionById.end())
             return; //< Already dropped by some way.
         NX_CRITICAL(sessionIter->second);
+        toRemove = std::move(sessionIter->second);
         m_sessionById.erase(sessionIter);
         NX_DEBUG(this, "Dropped session %1", id);
     }
