@@ -504,6 +504,9 @@ Item
         {
             if (editingContext)
                 editingContext.resetAccessibleByPermissionsFilter()
+
+            if (!filterButton.withPermissionsOnly)
+                tree.model.resetExternalFilter()
         }
     }
 

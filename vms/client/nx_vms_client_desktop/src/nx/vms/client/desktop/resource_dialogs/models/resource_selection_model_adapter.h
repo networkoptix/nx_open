@@ -66,6 +66,8 @@ public:
     IsIndexAccepted externalFilter() const;
     void setExternalFilter(IsIndexAccepted value);
 
+    Q_INVOKABLE void resetExternalFilter();
+
     TopLevelNodesPolicy topLevelNodesPolicy() const;
     void setTopLevelNodesPolicy(TopLevelNodesPolicy value);
 
