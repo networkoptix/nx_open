@@ -118,11 +118,6 @@
       <translation>Otentikasi dua faktor diperlukan.</translation>
     </message>
     <message>
-      <source>You can enable two-factor authentication in your %1.</source>
-      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Anda dapat mengaktifkan otentikasi dua faktor di %1Anda.</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>Koneksi gagal</translation>
     </message>
@@ -167,11 +162,6 @@
       <translation>Silakan hubungi administrator site untuk mendapatkan akses kembali.</translation>
     </message>
     <message>
-      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Untuk masuk ke Site ini, nonaktifkan &quot;Minta kode verifikasi pada setiap login dengan akun %1 Anda&quot; di %2 Anda.</translation>
-    </message>
-    <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>User ini telah dinonaktifkan oleh administrator site.</translation>
     </message>
@@ -186,6 +176,16 @@
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
       <translation>Server atau jaringan tidak tersedia. Periksa alamat dan koneksi.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Untuk masuk ke Site ini, nonaktifkan &quot;Minta kode verifikasi pada setiap login dengan akun %1 Anda&quot; di %2 Anda.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Anda dapat mengaktifkan otentikasi dua faktor di %1Anda.</translation>
     </message>
   </context>
   <context>

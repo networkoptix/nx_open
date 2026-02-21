@@ -593,41 +593,9 @@ Mégis törli?</translation>
       <translation>Számítógép</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>Meghajtó</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>%1 fájl</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>Fájl</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>Mappa</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>Mappa</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>Alias</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>Parancsikon</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>Ismeretlen</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1173,6 +1141,41 @@ Mégis törli?</translation>
     <message>
       <source>Select All</source>
       <translation>Összes kijelölése</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation>Meghajtó</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation>Fájl</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>Mappa</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>Mappa</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>Alias</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>Parancsikon</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Ismeretlen</translation>
     </message>
   </context>
 </TS>

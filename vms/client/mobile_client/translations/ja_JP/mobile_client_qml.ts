@@ -374,15 +374,15 @@
     </message>
     <message>
       <source>Notifications Off</source>
-      <translation type="unfinished">Notifications Off</translation>
+      <translation>通知オフ</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+      <translation>このアプリの通知は現在無効になっています。通知を有効化するには、お使いの端末の設定をご確認ください。</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+      <translation>このサイトのプッシュ通知は無効になっています。通知を有効化するには、設定ページに移動してください。</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -390,11 +390,11 @@
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>通知はありません</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>プッシュ通知が見つかりませんでした。</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -406,15 +406,15 @@
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation type="unfinished">No New Notifications</translation>
+      <translation>新しい通知はありません</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+      <translation>新しいプッシュ通知は見つかりませんでした。代わりに全通知履歴を表示することもできます。</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation type="unfinished">View All</translation>
+      <translation>すべて表示</translation>
     </message>
     <message>
       <source>Unviewed</source>
@@ -422,7 +422,7 @@
     </message>
     <message>
       <source>Viewed</source>
-      <translation type="unfinished">Viewed</translation>
+      <translation>既読</translation>
     </message>
     <message>
       <source>All</source>

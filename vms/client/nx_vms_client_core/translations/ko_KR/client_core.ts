@@ -118,11 +118,6 @@
       <translation>이중 인증이 필요합니다.</translation>
     </message>
     <message>
-      <source>You can enable two-factor authentication in your %1.</source>
-      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>%1에서 2단계 인증을 사용할 수 있습니다.</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>연결 실패</translation>
     </message>
@@ -167,11 +162,6 @@
       <translation>시스템 관리자에게 문의하여 다시 액세스하세요.</translation>
     </message>
     <message>
-      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>이 시스템에 로그인하려면 &quot;을 비활성화하세요. %1 계정&quot; 으로 %2에 로그인할 때마다 확인 코드를 요청하세요.</translation>
-    </message>
-    <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>이 사용자는 시스템 관리자에 의해 비활성화되었습니다.</translation>
     </message>
@@ -186,6 +176,16 @@
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
       <translation>서버 또는 네트워크를 사용할 수 없습니다. 주소와 연결 상태를 확인하십시오.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>이 시스템에 로그인하려면 &quot;을 비활성화하세요. %1 계정&quot; 으로 %2에 로그인할 때마다 확인 코드를 요청하세요.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>%1에서 2단계 인증을 사용할 수 있습니다.</translation>
     </message>
   </context>
   <context>

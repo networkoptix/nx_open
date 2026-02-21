@@ -587,41 +587,9 @@ Do you want to delete it anyway?</source>
       <translation>Bilgisayarım</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>Sürücü</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>%1 dosya</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>Dosya</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>Dosya Klasörü</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>Klasör</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>Diğer Ad</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>Kısayol</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>Belirtilmemiş</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1167,6 +1135,41 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Select All</source>
       <translation>Tümünü Seç</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation>Sürücü</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation>Dosya</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>Dosya Klasörü</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>Klasör</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>Diğer Ad</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>Kısayol</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Belirtilmemiş</translation>
     </message>
   </context>
 </TS>

@@ -594,41 +594,9 @@ Haluatko silti poistaa sen?</translation>
       <translation>Oma Tietokone</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>Asema</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>%1 Tiedosto</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>Tiedosto</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>Tiedostokansio</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>Kansio</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>Alias</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>Pikakuvake</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>Tuntematon</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1174,6 +1142,41 @@ Haluatko silti poistaa sen?</translation>
     <message>
       <source>Select All</source>
       <translation>Valitse kaikki</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation>Asema</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation>Tiedosto</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>Tiedostokansio</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>Kansio</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>Alias</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>Pikakuvake</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Tuntematon</translation>
     </message>
   </context>
 </TS>

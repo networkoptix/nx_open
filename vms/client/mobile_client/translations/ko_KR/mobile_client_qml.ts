@@ -374,15 +374,15 @@
     </message>
     <message>
       <source>Notifications Off</source>
-      <translation type="unfinished">Notifications Off</translation>
+      <translation>알림이 꺼져있습니다</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+      <translation>현재 이 앱의 알림이 비활성화되어 있습니다. 알림을 활성화하려면 휴대전화 설정에서 변경해 주세요</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+      <translation>이 사이트에 대한 푸시 알림을 비활성화하셨습니다. 푸시 알림을 활성화하려면 설정 페이지로 이동하세요.</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -390,11 +390,11 @@
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>알림 비활성화</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>푸시 알림이 발견되지 않았습니다.</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -406,15 +406,15 @@
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation type="unfinished">No New Notifications</translation>
+      <translation>알림 없음</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+      <translation>새로운 푸시 알림이 없습니다. 전체 알림 내역을 확인할 수 있습니다.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation type="unfinished">View All</translation>
+      <translation>모두 보기</translation>
     </message>
     <message>
       <source>Unviewed</source>
@@ -422,7 +422,7 @@
     </message>
     <message>
       <source>Viewed</source>
-      <translation type="unfinished">Viewed</translation>
+      <translation>조회</translation>
     </message>
     <message>
       <source>All</source>

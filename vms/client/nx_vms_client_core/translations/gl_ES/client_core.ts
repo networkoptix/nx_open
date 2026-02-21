@@ -118,11 +118,6 @@
       <translation>A autenticación en dous pasos é obrigatoria.</translation>
     </message>
     <message>
-      <source>You can enable two-factor authentication in your %1.</source>
-      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Podes activar a autenticación en dous pasos no teu %1.</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>Fallou a conexión</translation>
     </message>
@@ -167,11 +162,6 @@
       <translation>Por favor, ponte en contacto co administrador do sitio para recuperar o acceso.</translation>
     </message>
     <message>
-      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Para iniciar sesión neste sitio, desactiva &quot;Solicita un código de verificación cada vez que inicies sesión coa túa conta %1&quot; na túa %2.</translation>
-    </message>
-    <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>Esta persoa usuaria foi desactivada por unha persoa administradora do sitio.</translation>
     </message>
@@ -186,6 +176,16 @@
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
       <translation>O servidor ou a rede non están dispoñibles. Por favor, comproba o enderezo e a conexión.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Para iniciar sesión neste sitio, desactiva &quot;Solicita un código de verificación cada vez que inicies sesión coa túa conta %1&quot; na túa %2.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Podes activar a autenticación en dous pasos no teu %1.</translation>
     </message>
   </context>
   <context>

@@ -118,11 +118,6 @@
       <translation>Tvåfaktorsautentisering krävs.</translation>
     </message>
     <message>
-      <source>You can enable two-factor authentication in your %1.</source>
-      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Du kan aktivera tvåfaktorsautentisering i din %1.</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>Anslutningen misslyckades</translation>
     </message>
@@ -167,11 +162,6 @@
       <translation>Kontakta systemadministratören för att återfå åtkomst.</translation>
     </message>
     <message>
-      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>För att logga in på detta system, inaktivera &quot;Be om en verifieringskod vid varje inloggning med ditt %1 konto&quot; i ditt %2.</translation>
-    </message>
-    <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>Den här användaren är inaktiverad av systemadministratören.</translation>
     </message>
@@ -186,6 +176,16 @@
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
       <translation>Server eller nätverk är inte tillgängligt. Kontrollera adressen och anslutningen.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>För att logga in på detta system, inaktivera &quot;Be om en verifieringskod vid varje inloggning med ditt %1 konto&quot; i ditt %2.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Du kan aktivera tvåfaktorsautentisering i din %1.</translation>
     </message>
   </context>
   <context>

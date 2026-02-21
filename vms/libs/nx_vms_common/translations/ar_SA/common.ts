@@ -103,75 +103,75 @@
       <translation>بيتابايت</translation>
     </message>
     <message numerus="yes">
-      <source>Byte(s)</source>
-      <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
+      <source>Bytes</source>
+      <comment>Numerus: Full suffix for displaying bytes</comment>
+      <translation>
+        <numerusform>بايت</numerusform>
+        <numerusform>بايت</numerusform>
+        <numerusform>بايت</numerusform>
+        <numerusform>بايت</numerusform>
+        <numerusform>بايت</numerusform>
+        <numerusform>بايت</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Kilobyte(s)</source>
-      <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
+      <source>Kilobytes</source>
+      <comment>Numerus: Full suffix for displaying kilobytes</comment>
+      <translation>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Megabyte(s)</source>
-      <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
+      <source>Megabytes</source>
+      <comment>Numerus: Full suffix for displaying megabytes</comment>
+      <translation>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Gigabyte(s)</source>
-      <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
+      <source>Gigabytes</source>
+      <comment>Numerus: Full suffix for displaying gigabytes</comment>
+      <translation>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Terabyte(s)</source>
-      <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
+      <source>Terabytes</source>
+      <comment>Numerus: Full suffix for displaying terabytes</comment>
+      <translation>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Petabyte(s)</source>
-      <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
+      <source>Petabytes</source>
+      <comment>Numerus: Full suffix for displaying petabytes</comment>
+      <translation>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
       </translation>
     </message>
   </context>
@@ -312,6 +312,7 @@
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
+      <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
       <translation>
         <numerusform>%1 does not support two-way audio</numerusform>
         <numerusform>%1 does not support two-way audio</numerusform>
@@ -553,6 +554,7 @@
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
+      <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
       <translation>
         <numerusform>%1 have no input ports</numerusform>
         <numerusform>%1 have no input ports</numerusform>
@@ -581,6 +583,7 @@
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
+      <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
       <translation>
         <numerusform>%1 have no output relays</numerusform>
         <numerusform>%1 have no output relays</numerusform>
@@ -1352,7 +1355,7 @@
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
+      <comment>Numerus: Full suffix for displaying milliseconds</comment>
       <translation>
         <numerusform>مللي ثانية</numerusform>
         <numerusform>مللي ثانية</numerusform>
@@ -1364,7 +1367,7 @@
     </message>
     <message numerus="yes">
       <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
+      <comment>Numerus: Full suffix for displaying seconds</comment>
       <translation>
         <numerusform>seconds</numerusform>
         <numerusform>seconds</numerusform>
@@ -1376,7 +1379,7 @@
     </message>
     <message numerus="yes">
       <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
+      <comment>Numerus: Full suffix for displaying minutes</comment>
       <translation>
         <numerusform>دقائق</numerusform>
         <numerusform>دقائق</numerusform>
@@ -1388,7 +1391,7 @@
     </message>
     <message numerus="yes">
       <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
+      <comment>Numerus: Full suffix for displaying hours</comment>
       <translation>
         <numerusform>ساعات</numerusform>
         <numerusform>ساعات</numerusform>
@@ -1400,7 +1403,7 @@
     </message>
     <message numerus="yes">
       <source>days</source>
-      <comment>Full suffix for displaying days</comment>
+      <comment>Numerus: Full suffix for displaying days</comment>
       <translation>
         <numerusform>أيام</numerusform>
         <numerusform>أيام</numerusform>
@@ -1412,7 +1415,7 @@
     </message>
     <message numerus="yes">
       <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
+      <comment>Numerus: Full suffix for displaying weeks</comment>
       <translation>
         <numerusform>أسابيع</numerusform>
         <numerusform>أسابيع</numerusform>
@@ -1424,7 +1427,7 @@
     </message>
     <message numerus="yes">
       <source>months</source>
-      <comment>Full suffix for displaying months</comment>
+      <comment>Numerus: Full suffix for displaying months</comment>
       <translation>
         <numerusform>أشهر</numerusform>
         <numerusform>أشهر</numerusform>
@@ -1436,7 +1439,7 @@
     </message>
     <message numerus="yes">
       <source>years</source>
-      <comment>Full suffix for displaying years</comment>
+      <comment>Numerus: Full suffix for displaying years</comment>
       <translation>
         <numerusform>سنوات</numerusform>
         <numerusform>سنوات</numerusform>
@@ -1448,47 +1451,47 @@
     </message>
     <message>
       <source>Msec</source>
-      <comment>Capitalized long suffix for displaying milliseconds</comment>
+      <comment>Numerus: Capitalized long suffix for displaying milliseconds</comment>
       <translation type="unfinished">Msec</translation>
     </message>
     <message>
       <source>Sec</source>
-      <comment>Capitalized long suffix for displaying seconds</comment>
+      <comment>Numerus: Capitalized long suffix for displaying seconds</comment>
       <translation type="unfinished">Sec</translation>
     </message>
     <message>
       <source>Min</source>
-      <comment>Capitalized long suffix for displaying minutes</comment>
+      <comment>Numerus: Capitalized long suffix for displaying minutes</comment>
       <translation type="unfinished">Min</translation>
     </message>
     <message>
       <source>Hrs</source>
-      <comment>Capitalized long suffix for displaying hours</comment>
+      <comment>Numerus: Capitalized long suffix for displaying hours</comment>
       <translation type="unfinished">Hrs</translation>
     </message>
     <message>
       <source>Days</source>
-      <comment>Capitalized long suffix for displaying days</comment>
+      <comment>Numerus: Capitalized long suffix for displaying days</comment>
       <translation type="unfinished">Days</translation>
     </message>
     <message>
       <source>Wks</source>
-      <comment>Capitalized long suffix for displaying weeks</comment>
+      <comment>Numerus: Capitalized long suffix for displaying weeks</comment>
       <translation type="unfinished">Wks</translation>
     </message>
     <message>
       <source>Mos</source>
-      <comment>Capitalized long suffix for displaying months</comment>
+      <comment>Numerus: Capitalized long suffix for displaying months</comment>
       <translation type="unfinished">Mos</translation>
     </message>
     <message>
       <source>Yrs</source>
-      <comment>Capitalized long suffix for displaying years</comment>
+      <comment>Numerus: Capitalized long suffix for displaying years</comment>
       <translation type="unfinished">Yrs</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
-      <comment>Capitalized full suffix for displaying milliseconds</comment>
+      <comment>Numerus: Capitalized full suffix for displaying milliseconds</comment>
       <translation type="unfinished">
         <numerusform>Milliseconds</numerusform>
         <numerusform>Milliseconds</numerusform>
@@ -1500,7 +1503,7 @@
     </message>
     <message numerus="yes">
       <source>Seconds</source>
-      <comment>Capitalized full suffix for displaying seconds</comment>
+      <comment>Numerus: Capitalized full suffix for displaying seconds</comment>
       <translation type="unfinished">
         <numerusform>Seconds</numerusform>
         <numerusform>Seconds</numerusform>
@@ -1512,7 +1515,7 @@
     </message>
     <message numerus="yes">
       <source>Minutes</source>
-      <comment>Capitalized full suffix for displaying minutes</comment>
+      <comment>Numerus: Capitalized full suffix for displaying minutes</comment>
       <translation>
         <numerusform>Minutes</numerusform>
         <numerusform>Minutes</numerusform>
@@ -1524,7 +1527,7 @@
     </message>
     <message numerus="yes">
       <source>Hours</source>
-      <comment>Capitalized full suffix for displaying hours</comment>
+      <comment>Numerus: Capitalized full suffix for displaying hours</comment>
       <translation type="unfinished">
         <numerusform>Hours</numerusform>
         <numerusform>Hours</numerusform>
@@ -1536,7 +1539,7 @@
     </message>
     <message numerus="yes">
       <source>Days</source>
-      <comment>Capitalized fapitalized full suffix for displaying days</comment>
+      <comment>Numerus: Capitalized full suffix for displaying days</comment>
       <translation type="unfinished">
         <numerusform>Days</numerusform>
         <numerusform>Days</numerusform>
@@ -1548,7 +1551,7 @@
     </message>
     <message numerus="yes">
       <source>Weeks</source>
-      <comment>Capitalized full suffix for displaying weeks</comment>
+      <comment>Numerus: Capitalized full suffix for displaying weeks</comment>
       <translation type="unfinished">
         <numerusform>Weeks</numerusform>
         <numerusform>Weeks</numerusform>
@@ -1560,7 +1563,7 @@
     </message>
     <message numerus="yes">
       <source>Months</source>
-      <comment>Capitalized full suffix for displaying months</comment>
+      <comment>Numerus: Capitalized full suffix for displaying months</comment>
       <translation type="unfinished">
         <numerusform>Months</numerusform>
         <numerusform>Months</numerusform>
@@ -1572,7 +1575,7 @@
     </message>
     <message numerus="yes">
       <source>Years</source>
-      <comment>Capitalized full suffix for displaying years</comment>
+      <comment>Numerus: Capitalized full suffix for displaying years</comment>
       <translation type="unfinished">
         <numerusform>Years</numerusform>
         <numerusform>Years</numerusform>

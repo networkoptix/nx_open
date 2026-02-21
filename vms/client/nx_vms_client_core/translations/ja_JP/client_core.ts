@@ -118,11 +118,6 @@
       <translation>二要素認証が必要です。</translation>
     </message>
     <message>
-      <source>You can enable two-factor authentication in your %1.</source>
-      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>%1 で二要素認証を有効にできます。</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>接続に失敗しました</translation>
     </message>
@@ -167,11 +162,6 @@
       <translation>アクセスを回復するには、サイト管理者に連絡してください。</translation>
     </message>
     <message>
-      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>このサイトにログインするには、 %2 で &quot;%1 アカウントでログインするたびに確認コードを要求する&quot; を無効にしてください。</translation>
-    </message>
-    <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>このユーザーはサイト管理者によって無効にされています。</translation>
     </message>
@@ -186,6 +176,16 @@
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
       <translation>サーバーまたはネットワークが利用できません。アドレスと接続可否を確認してください。</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>このサイトにログインするには、 %2 で &quot;%1 アカウントでログインするたびに確認コードを要求する&quot; を無効にしてください。</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>%1 で二要素認証を有効にできます。</translation>
     </message>
   </context>
   <context>

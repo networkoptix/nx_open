@@ -118,11 +118,6 @@
       <translation type="unfinished">Two-factor authentication is required.</translation>
     </message>
     <message>
-      <source>You can enable two-factor authentication in your %1.</source>
-      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>Csatlakozás sikertelen</translation>
     </message>
@@ -167,11 +162,6 @@
       <translation type="unfinished">Please contact the site administrator to regain access.</translation>
     </message>
     <message>
-      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
-    </message>
-    <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation type="unfinished">This user has been disabled by a site administrator.</translation>
     </message>
@@ -186,6 +176,16 @@
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
       <translation type="unfinished">Server or network unavailable. Check the address and connection.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
     </message>
   </context>
   <context>

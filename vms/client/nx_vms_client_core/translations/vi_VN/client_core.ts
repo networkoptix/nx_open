@@ -118,11 +118,6 @@
       <translation>Yêu cầu xác thực hai yếu tố.</translation>
     </message>
     <message>
-      <source>You can enable two-factor authentication in your %1.</source>
-      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Bạn có thể bật xác thực hai yếu tố tại %1.</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>Kết nối thất bại</translation>
     </message>
@@ -167,11 +162,6 @@
       <translation>Vui lòng liên hệ với người quản trị Chi nhánh để lấy lại quyền truy cập.</translation>
     </message>
     <message>
-      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Để đăng nhập vào Chi nhánh này, hãy tắt &quot;Yêu cầu mã xác minh mỗi lần đăng nhập bằng tài khoản %1&quot; trong %2 của bạn.</translation>
-    </message>
-    <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>Người dùng này đã bị quản trị viên Chi nhánh vô hiệu hóa.</translation>
     </message>
@@ -186,6 +176,16 @@
     <message>
       <source>Server or network unavailable. Check the address and connection.</source>
       <translation>Máy chủ hoặc mạng không khả dụng. Kiểm tra địa chỉ và kết nối.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Để đăng nhập vào Chi nhánh này, hãy tắt &quot;Yêu cầu mã xác minh mỗi lần đăng nhập bằng tài khoản %1&quot; trong %2 của bạn.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Bạn có thể bật xác thực hai yếu tố tại %1.</translation>
     </message>
   </context>
   <context>

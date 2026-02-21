@@ -594,41 +594,9 @@ Vill du ta bort det ändå?</translation>
       <translation>Min Dator</translation>
     </message>
     <message>
-      <source>Drive</source>
-      <translation>Enhet</translation>
-    </message>
-    <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
       <translation>%1 fil</translation>
-    </message>
-    <message>
-      <source>File</source>
-      <translation>Fil</translation>
-    </message>
-    <message>
-      <source>File Folder</source>
-      <comment>Match Windows Explorer</comment>
-      <translation>Filmapp</translation>
-    </message>
-    <message>
-      <source>Folder</source>
-      <comment>All other platforms</comment>
-      <translation>Mapp</translation>
-    </message>
-    <message>
-      <source>Alias</source>
-      <comment>OS X Finder</comment>
-      <translation>Alias</translation>
-    </message>
-    <message>
-      <source>Shortcut</source>
-      <comment>All other platforms</comment>
-      <translation>Genväg</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>Okänd</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -1174,6 +1142,41 @@ Vill du ta bort det ändå?</translation>
     <message>
       <source>Select All</source>
       <translation>Markera alla</translation>
+    </message>
+  </context>
+  <context>
+    <name>QAbstractFileIconProvider</name>
+    <message>
+      <source>Drive</source>
+      <translation>Enhet</translation>
+    </message>
+    <message>
+      <source>File</source>
+      <translation>Fil</translation>
+    </message>
+    <message>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>Filmapp</translation>
+    </message>
+    <message>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>Mapp</translation>
+    </message>
+    <message>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>Alias</translation>
+    </message>
+    <message>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>Genväg</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>Okänd</translation>
     </message>
   </context>
 </TS>

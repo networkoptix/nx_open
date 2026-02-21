@@ -375,15 +375,15 @@
     </message>
     <message>
       <source>Notifications Off</source>
-      <translation type="unfinished">Notifications Off</translation>
+      <translation>Notifications désactivées</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+      <translation>Les notifications sont actuellement désactivées pour cette application. Pour activer les notifications, utilisez les paramètres de votre téléphone</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+      <translation>Vous avez désactivé les notifications push pour ce site. Pour les activer, allez à la page Paramètres.</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -391,11 +391,11 @@
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>Aucune notification</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>Aucune notification push n'a été trouvée.</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -407,15 +407,15 @@
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation type="unfinished">No New Notifications</translation>
+      <translation>Aucune nouvelle notification</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+      <translation>Aucune nouvelle notification push n'a été trouvée, mais vous pouvez consulter l'historique complet de vos notifications.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation type="unfinished">View All</translation>
+      <translation>Voir tout</translation>
     </message>
     <message>
       <source>Unviewed</source>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>Viewed</source>
-      <translation type="unfinished">Viewed</translation>
+      <translation>Consulté</translation>
     </message>
     <message>
       <source>All</source>
