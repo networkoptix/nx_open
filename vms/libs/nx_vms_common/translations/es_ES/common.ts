@@ -1473,7 +1473,7 @@
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Se requiere transcodificación de audio.</translation>
     </message>
   </context>
   <context>
