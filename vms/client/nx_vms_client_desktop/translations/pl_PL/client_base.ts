@@ -8349,11 +8349,11 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>Rejestr zdarzeń dla okresu od %1 do %2 – Wyświetlane jest pierwsze %n zdarzeń. Aby znaleźć konkretne zdarzenia, dostosuj zakres dat lub zastosuj dodatkowe filtry</numerusform>
+        <numerusform>Rejestr zdarzeń dla okresu od %1 do %2 – Wyświetlane jest pierwsze %n zdarzeń. Aby znaleźć konkretne zdarzenia, dostosuj zakres dat lub zastosuj dodatkowe filtry</numerusform>
+        <numerusform>Rejestr zdarzeń dla okresu od %1 do %2 – Wyświetlane jest pierwsze %n zdarzeń. Aby znaleźć konkretne zdarzenia, dostosuj zakres dat lub zastosuj dodatkowe filtry</numerusform>
+        <numerusform>Rejestr zdarzeń dla okresu od %1 do %2 – Wyświetlane jest pierwsze %n zdarzeń. Aby znaleźć konkretne zdarzenia, dostosuj zakres dat lub zastosuj dodatkowe filtry</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8619,7 +8619,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
-      <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
+      <translation>Nie masz uprawnień do eksportu archiwum dla niektórych z wybranych kamer. Wideo z tych kamer nie zostanie wyeksportowane do pliku wynikowego.</translation>
     </message>
   </context>
   <context>
@@ -8854,11 +8854,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
-      <translation type="unfinished">Current group is a member of all groups selected on this tab and inherits permissions from each of them.</translation>
+      <translation>Bieżąca grupa obejmuje wszystkie grupy wybrane na tej karcie i dziedziczy uprawnienia od każdej z nich.</translation>
     </message>
     <message>
       <source>Select one or multiple groups from which the current group will inherit permissions</source>
-      <translation type="unfinished">Select one or multiple groups from which the current group will inherit permissions</translation>
+      <translation>Wybierz jedną lub więcej grup, od których bieżąca grupa będzie dziedziczyć uprawnienia</translation>
     </message>
   </context>
   <context>
@@ -10374,7 +10374,7 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     <name>nx::vms::client::desktop::PlaybackPositionItem</name>
     <message>
       <source>video is paused</source>
-      <translation type="unfinished">video is paused</translation>
+      <translation>wideo jest wstrzymane</translation>
     </message>
   </context>
   <context>
@@ -11327,7 +11327,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Invalid Link</source>
-      <translation type="unfinished">Invalid Link</translation>
+      <translation>Nieprawidłowy link</translation>
     </message>
     <message>
       <source>The provided link is not valid</source>
@@ -13165,11 +13165,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
       <source>Contains keywords</source>
-      <translation type="unfinished">Contains keywords</translation>
+      <translation>Zawiera słowa kluczowe</translation>
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation type="unfinished">Contains list entries</translation>
+      <translation>Zawiera wpisy listy</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -13181,11 +13181,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Not contains keywords</source>
-      <translation type="unfinished">Not contains keywords</translation>
+      <translation>Nie zawiera słów kluczowych</translation>
     </message>
     <message>
       <source>Not contains list entries</source>
-      <translation type="unfinished">Not contains list entries</translation>
+      <translation>Nie zawiera wpisów listy</translation>
     </message>
   </context>
   <context>
