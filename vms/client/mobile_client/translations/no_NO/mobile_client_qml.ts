@@ -487,11 +487,11 @@
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+      <translation>Du har deaktivert push-varsler for dette nettstedet. Gå til Innstillinger-siden for å aktivere dem.</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Innstillingar</translation>
     </message>
     <message>
       <source>No Notifications</source>
@@ -499,15 +499,15 @@
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>Ingen push-varsler ble funnet.</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Ingenting funnet</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Prøv å endre søkeparametrene</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -519,7 +519,7 @@
     </message>
     <message>
       <source>View All</source>
-      <translation type="unfinished">View All</translation>
+      <translation>Vis alle</translation>
     </message>
     <message>
       <source>Unviewed</source>
@@ -527,7 +527,7 @@
     </message>
     <message>
       <source>Viewed</source>
-      <translation type="unfinished">Viewed</translation>
+      <translation>Sett</translation>
     </message>
     <message>
       <source>All</source>

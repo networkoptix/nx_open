@@ -477,55 +477,55 @@
     <name>Feed</name>
     <message>
       <source>Notifications Off</source>
-      <translation type="unfinished">Notifications Off</translation>
+      <translation>Tắt thông báo</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+      <translation>Hiện tại, tính năng thông báo đã bị tắt cho ứng dụng này. Để bật thông báo, hãy sử dụng cài đặt trên điện thoại của bạn</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+      <translation>Bạn đã tắt thông báo đẩy cho Chi nhánh này. Để bật, hãy vào trang Cài đặt.</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Cài đặt</translation>
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>Không có thông báo</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>Không tìm thấy thông báo đẩy nào.</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Không tìm thấy kết quả nào</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Hãy thử thay đổi các tham số tìm kiếm</translation>
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation type="unfinished">No New Notifications</translation>
+      <translation>Không có thông báo mới</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+      <translation>Không tìm thấy thông báo đẩy mới nào, nhưng bạn có thể xem toàn bộ lịch sử thông báo của mình.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation type="unfinished">View All</translation>
+      <translation>Xem tất cả</translation>
     </message>
     <message>
       <source>Unviewed</source>
-      <translation type="unfinished">Unviewed</translation>
+      <translation>Chưa xem</translation>
     </message>
     <message>
       <source>Viewed</source>
-      <translation type="unfinished">Viewed</translation>
+      <translation>Đã xem</translation>
     </message>
     <message>
       <source>All</source>
@@ -548,7 +548,7 @@
     </message>
     <message>
       <source>Period</source>
-      <translation type="unfinished">Period</translation>
+      <translation>Khoảng thời gian</translation>
     </message>
   </context>
   <context>
@@ -1148,7 +1148,7 @@
     </message>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>Nguồn cấp dữ liệu</translation>
     </message>
   </context>
   <context>

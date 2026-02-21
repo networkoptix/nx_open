@@ -495,7 +495,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Налаштування</translation>
     </message>
     <message>
       <source>No Notifications</source>
@@ -507,7 +507,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Нічого не знайдено</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>

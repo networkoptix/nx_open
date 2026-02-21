@@ -491,7 +491,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Ayarlar</translation>
     </message>
     <message>
       <source>No Notifications</source>
@@ -503,11 +503,11 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Hiçbir şey bulunamadı</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Arama parametrelerini değiştirmeyi deneyin</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -550,7 +550,7 @@
     </message>
     <message>
       <source>Period</source>
-      <translation type="unfinished">Period</translation>
+      <translation>Periyot</translation>
     </message>
   </context>
   <context>

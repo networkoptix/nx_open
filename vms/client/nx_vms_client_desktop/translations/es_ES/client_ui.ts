@@ -1610,7 +1610,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Fusionar sitios...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>

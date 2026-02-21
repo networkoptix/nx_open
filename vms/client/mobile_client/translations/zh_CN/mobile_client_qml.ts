@@ -489,7 +489,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>设置</translation>
     </message>
     <message>
       <source>No Notifications</source>
@@ -501,7 +501,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>未找到内容</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>

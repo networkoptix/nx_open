@@ -477,55 +477,55 @@
     <name>Feed</name>
     <message>
       <source>Notifications Off</source>
-      <translation type="unfinished">Notifications Off</translation>
+      <translation>Notifikasi Mati</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
+      <translation>Notifikasi saat ini dinonaktifkan untuk aplikasi ini. Untuk mengaktifkan notifikasi, gunakan pengaturan ponsel Anda&apos;</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
+      <translation>Anda menonaktifkan notifikasi push untuk site ini. Untuk mengaktifkannya, buka halaman Pengaturan.</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Pengaturan</translation>
     </message>
     <message>
       <source>No Notifications</source>
-      <translation type="unfinished">No Notifications</translation>
+      <translation>Tidak ada Notifikasi</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation type="unfinished">No push notifications were found.</translation>
+      <translation>Tidak ada push notifikasi yang ditemukan.</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Nothing found</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Coba ubah parameter pencarian</translation>
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation type="unfinished">No New Notifications</translation>
+      <translation>Tidak Ada Notifikasi Baru</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
+      <translation>Tidak ada push notifikasi baru yang ditemukan, tetapi Anda dapat melihat riwayat lengkap notifikasi.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation type="unfinished">View All</translation>
+      <translation>Lihat Semua</translation>
     </message>
     <message>
       <source>Unviewed</source>
-      <translation type="unfinished">Unviewed</translation>
+      <translation>Belum dilihat</translation>
     </message>
     <message>
       <source>Viewed</source>
-      <translation type="unfinished">Viewed</translation>
+      <translation>Dilihat</translation>
     </message>
     <message>
       <source>All</source>
@@ -548,7 +548,7 @@
     </message>
     <message>
       <source>Period</source>
-      <translation type="unfinished">Period</translation>
+      <translation>Periode</translation>
     </message>
   </context>
   <context>
@@ -1148,7 +1148,7 @@
     </message>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>Feed</translation>
     </message>
   </context>
   <context>
@@ -1542,7 +1542,7 @@
     </message>
     <message>
       <source>Export...</source>
-      <translation type="unfinished">Export...</translation>
+      <translation>Ekspor...</translation>
     </message>
   </context>
   <context>
