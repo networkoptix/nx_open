@@ -1131,7 +1131,7 @@
     <name>TimeSelector</name>
     <message>
       <source>Period</source>
-      <translation type="unfinished">Period</translation>
+      <translation>Okres</translation>
     </message>
   </context>
   <context>
