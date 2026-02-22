@@ -8788,7 +8788,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>Ingrese la contraseña de su cuenta</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -9045,7 +9045,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>Ingrese la contraseña de su cuenta</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -11574,7 +11574,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>Ingrese la contraseña de su cuenta</translation>
     </message>
     <message>
       <source>Save</source>
@@ -11586,7 +11586,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>¿Aplicar cambios?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -12480,7 +12480,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Toolbar</source>
