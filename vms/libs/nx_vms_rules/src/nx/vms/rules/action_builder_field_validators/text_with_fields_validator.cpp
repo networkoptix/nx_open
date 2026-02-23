@@ -57,7 +57,7 @@ ValidationResult TextWithFieldsValidator::validity(
                 return result;
             }
 
-            const auto url = QUrl{text, QUrl::StrictMode};
+            const auto url = QUrl{text, QUrl::TolerantMode};
             if (!url.isValid())
             {
                 result.validity = QValidator::State::Invalid;

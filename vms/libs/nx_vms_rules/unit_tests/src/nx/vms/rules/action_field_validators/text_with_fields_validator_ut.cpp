@@ -61,17 +61,17 @@ public:
 
     void thanFieldIsInvalid()
     {
-        EXPECT_EQ(validity(), QValidator::State::Invalid);
+        EXPECT_EQ(validity(), QValidator::State::Invalid) << text();
     }
 
     void thanFieldIsIntermediate()
     {
-        EXPECT_EQ(validity(), QValidator::State::Intermediate);
+        EXPECT_EQ(validity(), QValidator::State::Intermediate) << text();
     }
 
     void thanFieldIsAccepted()
     {
-        EXPECT_EQ(validity(), QValidator::State::Acceptable);
+        EXPECT_EQ(validity(), QValidator::State::Acceptable) << text();
     }
 
 private:
@@ -87,6 +87,8 @@ private:
             m_rule.get(),
             systemContext()).validity;
     }
+
+    std::string text() const { return textWithFields()->text().toStdString(); }
 
     TextWithFieldsValidator m_textWithFieldsValidator;
     std::unique_ptr<Rule> m_rule;
@@ -135,6 +137,24 @@ TEST_F(TextWithFieldsValidatorTest, urlWithSubstitutionIsValid)
     thanFieldIsAccepted();
 
     whenTextIs("http:://12345/{foo.bar}/12345{baz.bat}");
+    thanFieldIsAccepted();
+}
+
+TEST_F(TextWithFieldsValidatorTest, urlWithSpaces)
+{
+    whenTextIs("http://test.com/path?param=value");
+    thanFieldIsAccepted();
+
+    whenTextIs("http://te st.com/path?param=value");
+    thanFieldIsInvalid(); //< Spaces in host are not allowed.
+
+    whenTextIs("http://test.com/pa th?param=value");
+    thanFieldIsAccepted();
+
+    whenTextIs("http://test.com/path?pa ram=value");
+    thanFieldIsAccepted();
+
+    whenTextIs("http://test.com/path?param=va lue");
     thanFieldIsAccepted();
 }
 
