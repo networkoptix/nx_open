@@ -97,6 +97,7 @@ ActivityMonitor::PartitionType ActivityMonitor::getPartitionTypeByFsType(const Q
         { "fusectl", PartitionType::local},
         { "xfs", PartitionType::local},
         { "fuse.osxfs", PartitionType::local}, //< Mounted volumes when Docker host is macOS.
+        { "overlay", PartitionType::local},
         { "smbfs", PartitionType::network},
         { "nfs", PartitionType::network},
         { "nfs4", PartitionType::network},
