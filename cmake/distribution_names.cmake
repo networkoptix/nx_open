@@ -79,6 +79,8 @@ function(set_distribution_names)
         "${prefix}-qt_debug-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(testcamera_distribution_name
         "${prefix}-testcamera-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(nx_ai_manager_plugin_distribution_name
+        "${prefix}-nx_ai_manager_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(unit_tests_distribution_name
         "${prefix}-unit_tests-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(mobile_client_distribution_name
