@@ -24,6 +24,12 @@ npm install
 # Install the 'ws' package
 npm install ws
 ```
+# Enable Integration Request creation
+
+To create Integration Requests, the system setting `allowRegisteringIntegrations` must be set
+to `true`.
+
+Advanced settings can be set in the Server Admin panel at `/settings/advanced`.
 
 # How to run the application
 
