@@ -93,7 +93,7 @@ IconButton
     {
         id: mediaDownloadBackend
 
-        onErrorOccured: showMessage(title, description)
+        onErrorOccured: windowContext.ui.showMessage(title, description)
     }
 
     NxObject
