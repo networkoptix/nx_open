@@ -217,23 +217,26 @@ ListView
     {
         id: sectionItem
 
-        readonly property var sectionTextParts: section.split("\n")
+        // We cannot bind `visible` directly to `showSections` because ListView manages the
+        // `visible` property of section delegates internally, which breaks any QML binding set on
+        // it. Instead, we hide sections by returning empty sectionTextParts, which causes all
+        // child items to collapse via their own `visible: text` bindings, resulting in
+        // implicitHeight == 0.
+        readonly property var sectionTextParts: siteList.showSections ? section.split("\n") : []
 
         readonly property string sectionTitle: sectionTextParts.length > 1
             ? sectionTextParts[0]
             : ""
         readonly property string sectionDescription: sectionTextParts.length > 1
             ? sectionTextParts[1]
-            : sectionTextParts[0]
+            : (sectionTextParts[0] ?? "")
 
         readonly property string placeholderDescription: sectionTextParts.length > 2
             ? sectionTextParts[2]
             : ""
 
         width: parent.width
-        visible: siteList.showSections
-        height: siteList.showSections ? implicitHeight : 0
-        spacing: siteList.showSections ? 12 : 0
+        spacing: 12
 
         Placeholder
         {
@@ -267,6 +270,7 @@ ListView
         {
             id: descriptionText
 
+            visible: text
             Layout.topMargin: titleText.visible ? 0 : (siteList.cellsInRow == 1 ? 16 : 24)
             Layout.bottomMargin: 8
             Layout.fillWidth: true
