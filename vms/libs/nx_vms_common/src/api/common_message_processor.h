@@ -93,9 +93,9 @@ signals:
 
     void initialResourcesReceived();
 
-    void fileAdded(const QString &filename);
-    void fileUpdated(const QString &filename);
-    void fileRemoved(const QString &filename);
+    void fileAdded(const QString& filename);
+    void fileUpdated(const QString& filename);
+    void fileRemoved(const QString& filename);
 
     void videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
 
@@ -119,15 +119,15 @@ signals:
 protected:
     virtual Qt::ConnectionType handlerConnectionType() const;
 
-    virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection);
-    virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection);
+    virtual void connectToConnection(const ec2::AbstractECConnectionPtr& connection);
+    virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr& connection);
 
     virtual void handleRemotePeerFound(nx::Uuid data, nx::vms::api::PeerType peerType);
     virtual void handleRemotePeerLost(nx::Uuid data, nx::vms::api::PeerType peerType);
 
     virtual void onGotInitialNotification(const nx::vms::api::FullInfoData& fullData);
     virtual void onResourceStatusChanged(
-        const QnResourcePtr &resource,
+        const QnResourcePtr& resource,
         nx::vms::api::ResourceStatus status,
         ec2::NotificationSource source) = 0;
 
@@ -181,9 +181,9 @@ private:
         const nx::vms::api::MediaServerUserAttributesData& userAttributes);
     void on_mediaServerUserAttributesRemoved(const nx::Uuid& serverId);
 
-    void on_licenseRemoved(const QnLicensePtr &license);
+    void on_licenseRemoved(const QnLicensePtr& license);
 
-    void on_businessEventRemoved(const nx::Uuid &id);
+    void on_businessEventRemoved(const nx::Uuid& id);
 
     void on_eventRuleAddedOrUpdated(const nx::vms::api::EventRuleData& data);
 

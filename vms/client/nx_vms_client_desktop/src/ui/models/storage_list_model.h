@@ -61,7 +61,7 @@ public:
     void setServer(const QnMediaServerResourcePtr& server);
 
     nx::Uuid metadataStorageId() const;
-    void setMetadataStorageId(const nx::Uuid &id);
+    void setMetadataStorageId(const nx::Uuid& id);
 
     QnStorageModelInfo storage(const QModelIndex& index) const;
     QnStorageModelInfoList storages() const;

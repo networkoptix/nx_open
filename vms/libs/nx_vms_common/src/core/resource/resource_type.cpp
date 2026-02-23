@@ -15,7 +15,7 @@ QnResourceType::~QnResourceType()
     NX_DEBUG(this, "Destructed");
 }
 
-void QnResourceType::setParentId(const nx::Uuid &value)
+void QnResourceType::setParentId(const nx::Uuid& value)
 {
     m_parentId = value;
 }

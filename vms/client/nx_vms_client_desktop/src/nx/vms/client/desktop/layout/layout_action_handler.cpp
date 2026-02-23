@@ -345,7 +345,7 @@ void LayoutActionHandler::at_forgetLayoutPasswordAction_triggered()
     layout->storeSnapshot();
 }
 
-void LayoutActionHandler::renameLayout(const core::LayoutResourcePtr &layout, const QString &newName)
+void LayoutActionHandler::renameLayout(const core::LayoutResourcePtr& layout, const QString& newName)
 {
     auto systemContext = SystemContext::fromResource(layout);
     if (!NX_ASSERT(systemContext))
@@ -709,7 +709,7 @@ void LayoutActionHandler::removeLayoutItems(const LayoutItemIndexList& items, bo
 
     QList<nx::Uuid> orphanedUuids;
     QSet<core::LayoutResourcePtr> layouts;
-    for (const LayoutItemIndex &index : items)
+    for (const LayoutItemIndex& index: items)
     {
         if (index.layout())
         {
@@ -727,7 +727,7 @@ void LayoutActionHandler::removeLayoutItems(const LayoutItemIndexList& items, bo
     {
         QList<QnWorkbenchLayout *> layouts;
         layouts.push_front(workbench()->currentLayout());
-        for (const nx::Uuid &uuid : orphanedUuids)
+        for (const nx::Uuid& uuid: orphanedUuids)
         {
             for (QnWorkbenchLayout* layout : layouts)
             {
@@ -816,7 +816,7 @@ bool LayoutActionHandler::confirmChangeVideoWallLayout(const LayoutChange& chang
     return validator.confirmChangeVideoWallLayout(change.layout, change.removed);
 }
 
-bool LayoutActionHandler::canRemoveLayouts(const core::LayoutResourceList &layouts)
+bool LayoutActionHandler::canRemoveLayouts(const core::LayoutResourceList& layouts)
 {
     return std::ranges::all_of(
         layouts,
@@ -826,7 +826,7 @@ bool LayoutActionHandler::canRemoveLayouts(const core::LayoutResourceList &layou
         });
 }
 
-void LayoutActionHandler::removeLayouts(const core::LayoutResourceList &layouts)
+void LayoutActionHandler::removeLayouts(const core::LayoutResourceList& layouts)
 {
     if (layouts.isEmpty())
         return;

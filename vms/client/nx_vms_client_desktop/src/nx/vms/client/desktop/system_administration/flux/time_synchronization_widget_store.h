@@ -41,8 +41,8 @@ public:
 
     void addServer(const State::ServerInfo& serverInfo);
     void removeServer(const nx::Uuid& id);
-    void setServerOnline(const nx::Uuid &id, bool isOnline);
-    void setServerHasInternet(const nx::Uuid &id, bool hasInternet);
+    void setServerOnline(const nx::Uuid& id, bool isOnline);
+    void setServerHasInternet(const nx::Uuid& id, bool hasInternet);
 
     void applyChanges();
     void setReadOnly(bool value);
@@ -52,7 +52,7 @@ public:
 
     void setBaseTime(milliseconds time);
     void setElapsedTime(milliseconds time);
-    void setTimeOffsets(const TimeOffsetInfoList &offsetList, milliseconds baseTime);
+    void setTimeOffsets(const TimeOffsetInfoList& offsetList, milliseconds baseTime);
 
 signals:
     void stateChanged(const TimeSynchronizationWidgetState& state);

@@ -65,7 +65,7 @@ struct UserGroupListModel::Private
         connect(q->systemContext()->nonEditableUsersAndGroups(),
             &NonEditableUsersAndGroups::groupModified,
             q,
-            [q, this](const nx::Uuid &id)
+            [q, this](const nx::Uuid& id)
             {
                 const int row = q->groupRow(id);
                 if (row == -1)

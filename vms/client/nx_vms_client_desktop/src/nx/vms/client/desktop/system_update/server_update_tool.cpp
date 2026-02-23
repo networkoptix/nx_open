@@ -725,7 +725,7 @@ void ServerUpdateTool::stopAllUploads()
     changeUploadState(OfflineUpdateState::ready);
 }
 
-void ServerUpdateTool::startUploadsToServer(const UpdateContents& contents, const nx::Uuid &peer)
+void ServerUpdateTool::startUploadsToServer(const UpdateContents& contents, const nx::Uuid& peer)
 {
     bool started = false;
 
@@ -743,7 +743,7 @@ void ServerUpdateTool::startUploadsToServer(const UpdateContents& contents, cons
         NX_VERBOSE(this, "startUploadsToServer(%1) - not uploading anything", peer);
 }
 
-void ServerUpdateTool::stopUploadsToServer(const nx::Uuid &peer)
+void ServerUpdateTool::stopUploadsToServer(const nx::Uuid& peer)
 {
     QStringList idsToRemove;
     for (const auto& record: m_uploadStateById)

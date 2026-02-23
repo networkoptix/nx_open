@@ -40,5 +40,5 @@ public:
         const nx::vms::api::UserData& data) const;
 
     virtual QnResourcePtr createResource(
-        const nx::Uuid &resourceTypeId, const QnResourceParams &params) = 0;
+        const nx::Uuid& resourceTypeId, const QnResourceParams &params) = 0;
 };

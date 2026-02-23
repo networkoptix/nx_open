@@ -10,22 +10,22 @@
 class UuidPool {
     typedef uint offset_type;
 public:
-    UuidPool(const nx::Uuid &baseId, offset_type size = std::numeric_limits<offset_type>::max());
+    UuidPool(const nx::Uuid& baseId, offset_type size = std::numeric_limits<offset_type>::max());
 
     /** Mark id as used. */
-    void markAsUsed(const nx::Uuid &id);
+    void markAsUsed(const nx::Uuid& id);
 
     /** Mark id as free. */
-    void markAsFree(const nx::Uuid &id);
+    void markAsFree(const nx::Uuid& id);
 
     /** Get next free id. */
     nx::Uuid getFreeId() const;
 
 private:
-    offset_type offset(const nx::Uuid &id) const;
+    offset_type offset(const nx::Uuid& id) const;
 
     /** Check if id belongs to given pool. */
-    bool belongsToPool(const nx::Uuid &id) const;
+    bool belongsToPool(const nx::Uuid& id) const;
 
 private:
     const QUuid m_baseid;

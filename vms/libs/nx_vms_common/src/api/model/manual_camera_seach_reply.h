@@ -83,7 +83,7 @@ struct NX_VMS_COMMON_API QnManualCameraSearchReply
     QnManualCameraSearchReply() {}
 
     QnManualCameraSearchReply(
-        const nx::Uuid &uuid, const QnManualCameraSearchProcessStatus &processStatus)
+        const nx::Uuid& uuid, const QnManualCameraSearchProcessStatus& processStatus)
         :
         processUuid(uuid),
         status(processStatus.status),

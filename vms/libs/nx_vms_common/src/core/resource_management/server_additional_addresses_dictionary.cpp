@@ -4,23 +4,23 @@
 
 #include <nx/utils/log/assert.h>
 
-QList<nx::Url> QnServerAdditionalAddressesDictionary::additionalUrls(const nx::Uuid &serverId) const {
+QList<nx::Url> QnServerAdditionalAddressesDictionary::additionalUrls(const nx::Uuid& serverId) const {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_discoveryInfoById.value(serverId).additionalUrls;
 }
 
-QList<nx::Url> QnServerAdditionalAddressesDictionary::ignoredUrls(const nx::Uuid &serverId) const {
+QList<nx::Url> QnServerAdditionalAddressesDictionary::ignoredUrls(const nx::Uuid& serverId) const {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_discoveryInfoById.value(serverId).ignoredUrls;
 }
 
-void QnServerAdditionalAddressesDictionary::setAdditionalUrls(const nx::Uuid &serverId, const QList<nx::Url> &additionalUrls) {
+void QnServerAdditionalAddressesDictionary::setAdditionalUrls(const nx::Uuid& serverId, const QList<nx::Url>& additionalUrls) {
     NX_ASSERT(!serverId.isNull());
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_discoveryInfoById[serverId].additionalUrls = additionalUrls;
 }
 
-void QnServerAdditionalAddressesDictionary::setIgnoredUrls(const nx::Uuid &serverId, const QList<nx::Url> &additionalUrls) {
+void QnServerAdditionalAddressesDictionary::setIgnoredUrls(const nx::Uuid& serverId, const QList<nx::Url>& additionalUrls) {
     NX_ASSERT(!serverId.isNull());
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_discoveryInfoById[serverId].ignoredUrls = additionalUrls;

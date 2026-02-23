@@ -171,7 +171,7 @@ void RecursiveMembersModel::setMembersCache(MembersCache* cache)
     emit membersCacheChanged();
 
     const auto onCacheChanged =
-        [this](int, const nx::Uuid&, const nx::Uuid &parentId)
+        [this](int, const nx::Uuid&, const nx::Uuid& parentId)
         {
             if (parentId.isNull())
                 return; //< Ignore top level updates.

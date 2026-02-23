@@ -96,7 +96,7 @@ public:
     /**
      * \returns                         Universally unique identifier of this item.
      */
-    const nx::Uuid &uuid() const
+    const nx::Uuid& uuid() const
     {
         return m_uuid;
     }
@@ -104,7 +104,7 @@ public:
     /**
      * \returns                         Geometry of this item, in grid coordinates.
      */
-    const QRect &geometry() const
+    const QRect& geometry() const
     {
         return m_geometry;
     }
@@ -123,12 +123,12 @@ public:
      * \param geometry                  New geometry for this item.
      * \returns                         Whether the geometry was successfully changed.
      */
-    bool setGeometry(const QRect &geometry);
+    bool setGeometry(const QRect& geometry);
 
     /**
      * \returns                         Geometry delta of this item, in grid coordinates.
      */
-    const QRectF &geometryDelta() const
+    const QRectF& geometryDelta() const
     {
         return m_geometryDelta;
     }
@@ -139,14 +139,14 @@ public:
      * \param geometryDelta             New geometry delta for this item.
      * \returns                         Whether the geometry delta was successfully changed.
      */
-    bool setGeometryDelta(const QRectF &geometryDelta);
+    bool setGeometryDelta(const QRectF& geometryDelta);
 
     /**
      * \param combinedGeometry          New combined geometry for this item.
      *                                  New geometry and geometry delta will be calculated based on this value.
      * \returns                         Whether the combined geometry was successfully changed.
      */
-    bool setCombinedGeometry(const QRectF &combinedGeometry);
+    bool setCombinedGeometry(const QRectF& combinedGeometry);
 
     /**
      * \returns                         Combined geometry of this item.
@@ -219,7 +219,7 @@ public:
     /**
      * \returns                         Zoom rect of this item, in item-relative coordinates.
      */
-    const QRectF &zoomRect() const
+    const QRectF& zoomRect() const
     {
         return m_zoomRect;
     }
@@ -230,7 +230,7 @@ public:
      *
      * \param zoomRect                  New zoom rect for this item.
      */
-    void setZoomRect(const QRectF &zoomRect);
+    void setZoomRect(const QRectF& zoomRect);
 
     /**
      * \param                           New image enhancement params for this item.
@@ -241,7 +241,6 @@ public:
      * \param                           New dewarping enhancement params for this item.
      */
     void setDewarpingParams(const nx::vms::api::dewarping::ViewData& params);
-
 
     const nx::vms::api::ImageCorrectionData& imageEnhancement() const
     {
@@ -268,7 +267,6 @@ public:
      */
     void setRotation(qreal rotation);
 
-
     bool displayInfo() const;
     void setDisplayInfo(bool value);
 
@@ -282,7 +280,7 @@ public:
     void setDisplayRoi(bool value);
 
     QColor frameDistinctionColor() const;
-    void setFrameDistinctionColor(const QColor &value);
+    void setFrameDistinctionColor(const QColor& value);
 
     bool displayHotspots() const;
     void setDisplayHotspots(bool value);
@@ -299,7 +297,7 @@ public:
      * \returns                         Data for the given role.
      */
     template<class T>
-    T data(Qn::ItemDataRole role, const T &defaultValue = T()) const
+    T data(Qn::ItemDataRole role, const T& defaultValue = T()) const
     {
         QVariant result = data(role);
         if (result.canConvert<T>())
@@ -313,7 +311,7 @@ public:
     }
 
     template<class T>
-    void setData(int role, const T &value)
+    void setData(int role, const T& value)
     {
         setData(role, QVariant::fromValue<T>(value));
     }
@@ -322,7 +320,7 @@ public:
      * \param role                      Role to set data for.
      * \param value                     New value for the given data role.
      */
-    void setData(int role, const QVariant &value);
+    void setData(int role, const QVariant& value);
 
     static void sortByGeometryAndName(QList<QnWorkbenchItem*>& items);
 
@@ -348,7 +346,7 @@ signals:
     void dataChanged(int role);
 
 protected:
-    void setGeometryInternal(const QRect &geometry);
+    void setGeometryInternal(const QRect& geometry);
 
     void setFlagInternal(Qn::ItemFlag flag, bool value);
 

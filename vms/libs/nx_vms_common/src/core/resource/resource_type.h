@@ -21,7 +21,7 @@ public:
     void setId(const nx::Uuid& value) { m_id = value; }
     const nx::Uuid& getId() const { return m_id;}
 
-    void setParentId(const nx::Uuid &value);
+    void setParentId(const nx::Uuid& value);
     const nx::Uuid& getParentId() const { return m_parentId;}
 
     void setName(const QString& value) { m_name = value; }

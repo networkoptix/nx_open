@@ -29,13 +29,13 @@
 
 namespace QnCsvDetail {
     template<class Collection, class Output>
-    void serialize_collection(const Collection &value, QnCsvStreamWriter<Output> *stream) {
+    void serialize_collection(const Collection& value, QnCsvStreamWriter<Output>* stream) {
         typedef typename std::iterator_traits<typename boost::range_mutable_iterator<Collection>::type>::value_type value_type;
 
         QnCsv::serialize_header<value_type>(QString(), stream);
         stream->writeEndline();
 
-        for(const auto &element: value) {
+        for(const auto& element: value) {
             QnCsv::serialize(element, stream);
             stream->writeEndline();
         }
@@ -43,50 +43,48 @@ namespace QnCsvDetail {
 
 } // namespace QnCsvDetail
 
-
 QN_DECLARE_CSV_TYPE_CATEGORY(QString, QnCsv::field_tag)
 QN_DECLARE_CSV_TYPE_CATEGORY(QByteArray, QnCsv::field_tag)
 QN_DECLARE_CSV_TYPE_CATEGORY(QnLatin1Array, QnCsv::field_tag)
 
 template<class Output>
-void serialize(const bool &value, QnCsvStreamWriter<Output> *stream) {
+void serialize(const bool& value, QnCsvStreamWriter<Output>* stream) {
     stream->writeUtf8Field(value ? "true" : "false");
 }
 
 template<class Output>
-void serialize(const QString &value, QnCsvStreamWriter<Output> *stream) {
+void serialize(const QString& value, QnCsvStreamWriter<Output>* stream) {
     stream->writeField(value);
 }
 
 template<class Output>
-void serialize(const nx::Uuid &value, QnCsvStreamWriter<Output> *stream) {
+void serialize(const nx::Uuid& value, QnCsvStreamWriter<Output>* stream) {
     stream->writeUtf8Field(value.toByteArray(QUuid::WithBraces));
 }
 
 template<class Output>
-void serialize(const QUrl &value, QnCsvStreamWriter<Output> *stream) {
+void serialize(const QUrl& value, QnCsvStreamWriter<Output>* stream) {
     stream->writeUtf8Field(value.toEncoded());
 }
 
 template<class Output>
-void serialize(const nx::Url& value, QnCsvStreamWriter<Output> *stream) {
+void serialize(const nx::Url& value, QnCsvStreamWriter<Output>* stream) {
     stream->writeUtf8Field(value.toEncoded());
 }
 
 template<class Output>
-void serialize(const QByteArray &value, QnCsvStreamWriter<Output> *stream) {
+void serialize(const QByteArray& value, QnCsvStreamWriter<Output>* stream) {
     stream->writeUtf8Field(value.toBase64());
 }
 
 template<class Output>
-void serialize(const QnLatin1Array &value, QnCsvStreamWriter<Output> *stream) {
+void serialize(const QnLatin1Array& value, QnCsvStreamWriter<Output>* stream) {
     stream->writeUtf8Field(value);
 }
 
-
 #define QN_DEFINE_NUMERIC_CSV_SERIALIZATION_FUNCTIONS(TYPE, TYPE_GETTER, ... /* NUMBER_FORMAT */) \
 template<class Output>                                                          \
-void serialize(const TYPE &value, QnCsvStreamWriter<Output> *stream) {          \
+void serialize(const TYPE& value, QnCsvStreamWriter<Output>* stream) {          \
     stream->writeUtf8Field(QByteArray::number(value, ##__VA_ARGS__));           \
 }
 
@@ -98,10 +96,9 @@ QN_DEFINE_NUMERIC_CSV_SERIALIZATION_FUNCTIONS(float,              toFloat, 'g', 
 QN_DEFINE_NUMERIC_CSV_SERIALIZATION_FUNCTIONS(double,             toDouble, 'g', 17)
 #undef QN_DEFINE_NUMERIC_CSV_SERIALIZATION_FUNCTIONS
 
-
 #define QN_DEFINE_INTEGER_CONVERSION_CSV_SERIALIZATION_FUNCTIONS(TYPE, TARGET_TYPE) \
 template<class Output>                                                          \
-void serialize(const TYPE &value, QnCsvStreamWriter<Output> *stream) {          \
+void serialize(const TYPE& value, QnCsvStreamWriter<Output>* stream) {          \
     serialize(static_cast<TARGET_TYPE>(value), stream);                         \
 }
 
@@ -115,24 +112,23 @@ QN_DEFINE_INTEGER_CONVERSION_CSV_SERIALIZATION_FUNCTIONS(unsigned long,   long l
 #undef QN_DEFINE_INTEGER_CONVERSION_CSV_SERIALIZATION_FUNCTIONS
 
 template<class Output>
-void serialize(const std::chrono::milliseconds &value, QnCsvStreamWriter<Output> *stream)
+void serialize(const std::chrono::milliseconds& value, QnCsvStreamWriter<Output>* stream)
 {
     serialize(qint64(value.count()), stream);                         \
 }
 
 template<typename Clock, typename Duration, typename Output>
 void serialize(
-    const std::chrono::time_point<Clock, Duration>& timePoint, QnCsvStreamWriter<Output> *stream)
+    const std::chrono::time_point<Clock, Duration>& timePoint, QnCsvStreamWriter<Output>* stream)
 {
     using namespace std::chrono;
     serialize(duration_cast<milliseconds>(timePoint.time_since_epoch()).count(), stream);
 }
 
-
 #ifndef Q_MOC_RUN
 #define QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG) \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Output>                            \
-void serialize(const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> &value, QnCsvStreamWriter<Output> *stream) { \
+void serialize(const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)>& value, QnCsvStreamWriter<Output>* stream) { \
     QnCsvDetail::serialize_collection(value, stream);                           \
 }
 

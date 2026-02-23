@@ -65,7 +65,7 @@ int QnCameraBookmarksManager::getBookmarkTagsAsync(int maxTags, BookmarkTagsCall
     return d->getBookmarkTagsAsync(maxTags, callback);
 }
 
-void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)
+void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark& bookmark, OperationCallbackType callback)
 {
     NX_ASSERT(bookmark.isValid(), "Invalid bookmark");
     d->addCameraBookmark(bookmark, callback);
@@ -132,7 +132,7 @@ bool QnCameraBookmarksManager::changeBookmarkRest(BookmarkOperation operation,
 }
 
 void QnCameraBookmarksManager::addAcknowledge(
-    const QnCameraBookmark &bookmark,
+    const QnCameraBookmark& bookmark,
     const nx::Uuid& eventRuleId,
     OperationCallbackType callback)
 {
@@ -142,7 +142,7 @@ void QnCameraBookmarksManager::addAcknowledge(
     emit bookmarkAdded(bookmark);
 }
 
-void QnCameraBookmarksManager::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)
+void QnCameraBookmarksManager::updateCameraBookmark(const QnCameraBookmark& bookmark, OperationCallbackType callback)
 {
     NX_ASSERT(bookmark.isValid(), "Invalid bookmark");
     d->updateCameraBookmark(bookmark, callback);
@@ -150,7 +150,7 @@ void QnCameraBookmarksManager::updateCameraBookmark(const QnCameraBookmark &book
     emit bookmarkUpdated(bookmark);
 }
 
-void QnCameraBookmarksManager::deleteCameraBookmark(const nx::Uuid &bookmarkId, OperationCallbackType callback)
+void QnCameraBookmarksManager::deleteCameraBookmark(const nx::Uuid& bookmarkId, OperationCallbackType callback)
 {
     d->deleteCameraBookmark(bookmarkId, callback);
 

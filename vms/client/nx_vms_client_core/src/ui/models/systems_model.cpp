@@ -88,7 +88,7 @@ public:
 
     void at_serverChanged(
             const SystemDescriptionPtr& systemDescription,
-            const nx::Uuid &serverId,
+            const nx::Uuid& serverId,
             QnServerFields fields);
 
     void emitDataChanged(
@@ -151,7 +151,7 @@ int QnSystemsModel::getRowIndex(const QString& systemId) const
     return d->systemIdToRow.value(systemId, -1);
 }
 
-int QnSystemsModel::rowCount(const QModelIndex &parent) const
+int QnSystemsModel::rowCount(const QModelIndex& parent) const
 {
     Q_D(const QnSystemsModel);
 
@@ -161,7 +161,7 @@ int QnSystemsModel::rowCount(const QModelIndex &parent) const
     return d->internalData.count();
 }
 
-QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
+QVariant QnSystemsModel::data(const QModelIndex& index, int role) const
 {
     Q_D(const QnSystemsModel);
 
@@ -463,7 +463,7 @@ void QnSystemsModelPrivate::addSystem(const SystemDescriptionPtr& systemDescript
 
     data->connections
         << connect(systemDescription.get(), &SystemDescription::serverChanged, this,
-            [this, systemDescription] (const nx::Uuid &serverId, QnServerFields fields)
+            [this, systemDescription] (const nx::Uuid& serverId, QnServerFields fields)
             {
                 searchServerNamesHostsCache.remove(systemDescription->id());
 
@@ -577,12 +577,12 @@ void QnSystemsModelPrivate::addSystem(const SystemDescriptionPtr& systemDescript
     q->endInsertRows();
 }
 
-void QnSystemsModelPrivate::removeSystem(const QString &systemId, const nx::Uuid& localId)
+void QnSystemsModelPrivate::removeSystem(const QString& systemId, const nx::Uuid& localId)
 {
     Q_Q(QnSystemsModel);
 
     const auto removeIt = std::find_if(internalData.begin(), internalData.end(),
-        [systemId, localId](const InternalSystemDataPtr &value)
+        [systemId, localId](const InternalSystemDataPtr& value)
         {
             const auto& system = value->system;
             return system->id() == systemId || system->localId() == localId;

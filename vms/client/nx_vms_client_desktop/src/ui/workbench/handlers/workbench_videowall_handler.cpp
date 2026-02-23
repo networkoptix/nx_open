@@ -174,7 +174,7 @@ void addItemToLayout(const LayoutResourcePtr& layout, const QnVideoWallItemIndex
     QRect geometry = pc.screens[screens.first()].layoutGeometry;
     if (geometry.isValid())
     {
-        for (const LayoutItemData &item : layout->getItems())
+        for (const LayoutItemData& item : layout->getItems())
         {
             if (!item.combinedGeometry.isValid())
                 continue;
@@ -202,12 +202,12 @@ struct ScreenWidgetKey
     nx::Uuid pcUuid;
     QSet<int> screens;
 
-    ScreenWidgetKey(const nx::Uuid &pcUuid, const QSet<int> screens):
+    ScreenWidgetKey(const nx::Uuid& pcUuid, const QSet<int> screens):
         pcUuid(pcUuid), screens(screens)
     {
     }
 
-    friend bool operator<(const ScreenWidgetKey &l, const ScreenWidgetKey &r)
+    friend bool operator<(const ScreenWidgetKey& l, const ScreenWidgetKey& r)
     {
         if (l.pcUuid != r.pcUuid || (l.screens.isEmpty() && r.screens.isEmpty()))
             return l.pcUuid < r.pcUuid;
@@ -247,7 +247,7 @@ public:
         setData(Qn::VideoWallResourceRole, QVariant::fromValue(videowall));
 
         connect(videowall.data(), &QnResource::nameChanged, this,
-            [this](const QnResourcePtr &resource) { setName(resource->getName()); });
+            [this](const QnResourcePtr& resource) { setName(resource->getName()); });
     }
 
     virtual bool doSaveAsync(SaveLayoutResultFunction callback) override
@@ -443,7 +443,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         at_resPool_resourceAdded(resource);
 
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
-        [this](const QnPeerRuntimeInfo &info)
+        [this](const QnPeerRuntimeInfo& info)
         {
             if (info.data.peer.peerType == nx::vms::api::PeerType::videowallClient)
             {
@@ -460,7 +460,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         });
 
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
-        [this](const QnPeerRuntimeInfo &info)
+        [this](const QnPeerRuntimeInfo& info)
         {
             if (info.data.peer.peerType == nx::vms::api::PeerType::videowallClient)
             {
@@ -478,7 +478,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
     /* Handle simultaneous control mode enter. */
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
-        [this](const QnPeerRuntimeInfo &info)
+        [this](const QnPeerRuntimeInfo& info)
         {
             /* Ignore own info change. */
             if (info.uuid == peerId())
@@ -759,7 +759,7 @@ void QnWorkbenchVideoWallHandler::updateItemsLayout(
         });
 }
 
-bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr &videowall) const
+bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr& videowall) const
 {
     NX_ASSERT(videowall);
     if (!videowall)
@@ -872,7 +872,7 @@ void QnWorkbenchVideoWallHandler::sendMessage(const QnVideoWallControlMessage& m
     nx::vms::api::VideowallControlMessageData apiMessage;
     ec2::fromResourceToApi(localMessage, apiMessage);
 
-    for (const QnVideoWallItemIndex &index : targetList())
+    for (const QnVideoWallItemIndex& index : targetList())
     {
         apiMessage.videowallGuid = index.videowall()->getId();
         apiMessage.instanceGuid = index.uuid();
@@ -904,7 +904,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
         case QnVideoWallControlMessage::ControlStarted:
         {
             //clear stored messages with lesser sequence
-            StoredMessagesHash &stored = m_videoWallMode.storedMessages[controllerUuid];
+            StoredMessagesHash& stored = m_videoWallMode.storedMessages[controllerUuid];
             StoredMessagesHash::iterator i = stored.begin();
             while (i != stored.end())
             {
@@ -1239,7 +1239,7 @@ void QnWorkbenchVideoWallHandler::storeMessage(
 
 void QnWorkbenchVideoWallHandler::restoreMessages(const nx::Uuid& controllerUuid, qint64 sequence)
 {
-    StoredMessagesHash &stored = m_videoWallMode.storedMessages[controllerUuid];
+    StoredMessagesHash& stored = m_videoWallMode.storedMessages[controllerUuid];
     while (stored.contains(sequence + 1))
     {
         QnVideoWallControlMessage message = stored.take(++sequence);
@@ -1510,7 +1510,7 @@ QnVideoWallItemIndexList QnWorkbenchVideoWallHandler::targetList() const
 
     for (const auto& videoWall: resourcePool()->getResources<QnVideoWallResource>())
     {
-        for (const QnVideoWallItem &item : videoWall->items()->getItems())
+        for (const QnVideoWallItem& item : videoWall->items()->getItems())
         {
             if (item.layout == currentId && item.runtimeStatus.online)
                 indices << QnVideoWallItemIndex(videoWall, item.uuid);
@@ -1529,7 +1529,7 @@ LayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(
     const qreal defaultAr = QnLayoutResource::kDefaultCellAspectRatio;
 
     auto addToFiltered =
-        [&](const QnResourcePtr &resource)
+        [&](const QnResourcePtr& resource)
         {
             if (filtered.contains(resource))
                 return;
@@ -1594,7 +1594,7 @@ LayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(
         const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * filtered.size())));
 
         int i = 0;
-        for (const QnResourcePtr &resource: filtered)
+        for (const QnResourcePtr& resource: filtered)
         {
             LayoutItemData item = layoutItemFromResource(resource);
             item.flags = Qn::Pinned;
@@ -1897,7 +1897,7 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered()
     message.operation = QnVideoWallControlMessage::Exit;
     message.videowallGuid = videoWall->getId();
 
-    for (const QnVideoWallItem &item : videoWall->items()->getItems())
+    for (const QnVideoWallItem& item : videoWall->items()->getItems())
     {
         message.instanceGuid = item.uuid;
         videoWallManager->sendControlMessage(message, [](int /*requestId*/, ec2::ErrorCode) {});
@@ -2011,7 +2011,7 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered()
 
     nx::vms::api::VideowallControlMessageData message;
     message.operation = QnVideoWallControlMessage::Identify;
-    for (const QnVideoWallItemIndex &item : indices)
+    for (const QnVideoWallItemIndex& item : indices)
     {
         if (!item.isValid())
             continue;
@@ -2219,7 +2219,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         const auto& values = currentLayout->getItems().values();
         hasDesktopCamera |= std::ranges::any_of(
             values,
-            [this](const LayoutItemData &item)
+            [this](const LayoutItemData& item)
             {
                 QnResourcePtr childResource = resourcePool()->getResourceById(item.resource.id);
                 return childResource && childResource->hasFlags(Qn::desktop_camera);
@@ -2391,7 +2391,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered()
     matrix.name = tr("New Matrix %1").arg(videowall->matrices()->getItems().size() + 1);
     matrix.uuid = nx::Uuid::createUuid();
 
-    foreach(const QnVideoWallItem &item, videowall->items()->getItems())
+    foreach(const QnVideoWallItem& item, videowall->items()->getItems())
     {
         if (item.layout.isNull() || !resourcePool()->getResourceById(item.layout))
             continue;
@@ -2609,7 +2609,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr& 
     }
 }
 
-void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr &resource)
+void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr& resource)
 {
     /* Return id to the pool. */
     m_uuidPool->markAsFree(resource->getId());
@@ -3368,7 +3368,7 @@ void QnWorkbenchVideoWallHandler::filterAllowedLayoutItems(const LayoutResourceP
     }
 }
 
-void QnWorkbenchVideoWallHandler::setItemOnline(const nx::Uuid &instanceGuid, bool online)
+void QnWorkbenchVideoWallHandler::setItemOnline(const nx::Uuid& instanceGuid, bool online)
 {
     QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(instanceGuid);
     if (index.isNull())

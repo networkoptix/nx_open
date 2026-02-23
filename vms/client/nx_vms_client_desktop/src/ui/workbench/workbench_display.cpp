@@ -728,7 +728,7 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, QnWorkbenchDisplay::ItemL
     item->setZValue((int)layer * layerZSize + std::fmod(item->zValue(), layerZSize));
 }
 
-void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, QnWorkbenchDisplay::ItemLayer layer)
+void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *>& items, QnWorkbenchDisplay::ItemLayer layer)
 {
     foreach(QGraphicsItem *item, items)
         setLayer(item, layer);
@@ -768,7 +768,7 @@ QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const
     return m_widgetByRole[role];
 }
 
-QnResourceWidget *QnWorkbenchDisplay::widget(const nx::Uuid &uuid) const
+QnResourceWidget *QnWorkbenchDisplay::widget(const nx::Uuid& uuid) const
 {
     return widget(workbench()->currentLayout()->item(uuid));
 }
@@ -778,7 +778,7 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
     return m_zoomTargetWidgetByWidget.value(widget);
 }
 
-QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const
+QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF& widgetGeometry, qreal rotation) const
 {
     const auto occupiedGeometry = Geometry::rotated(widgetGeometry, rotation);
     const auto viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
@@ -1093,7 +1093,7 @@ QnResourceWidget* QnWorkbenchDisplay::activeWidget() const
     return nullptr;
 }
 
-QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resource) const
+QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr& resource) const
 {
     return m_widgetsByResource.value(resource);
 }
@@ -1145,7 +1145,7 @@ void QnWorkbenchDisplay::fitInView(bool animate)
     }
 }
 
-void QnWorkbenchDisplay::bringToFront(const QList<QGraphicsItem *> &items)
+void QnWorkbenchDisplay::bringToFront(const QList<QGraphicsItem *>& items)
 {
     QList<QGraphicsItem *> localItems = items;
 
@@ -1226,7 +1226,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     /* Note that it is important to query resource from the widget as it may differ from the one passed
      * here because of enabled / disabled state effects. */
-    QList<QnResourceWidget *> &widgetsForResource = m_widgetsByResource[widget->resource()];
+    QList<QnResourceWidget *>& widgetsForResource = m_widgetsByResource[widget->resource()];
     widgetsForResource.push_back(widget);
 
     // TODO: #sivanov Fix inconsistency between options and buttons by using flux model.
@@ -1464,7 +1464,7 @@ QMargins QnWorkbenchDisplay::viewportMargins(Qn::MarginTypes marginTypes) const
     return m_viewportAnimator->viewportMargins(marginTypes);
 }
 
-void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins, Qn::MarginType marginType)
+void QnWorkbenchDisplay::setViewportMargins(const QMargins& margins, Qn::MarginType marginType)
 {
     if (viewportMargins(marginType) == margins)
         return;
@@ -1664,7 +1664,7 @@ QRectF QnWorkbenchDisplay::boundedViewportGeometry(Qn::MarginTypes marginTypes) 
     return QnSceneTransformations::mapRectToScene(m_view, boundedRect);
 }
 
-QPoint QnWorkbenchDisplay::mapViewportToGrid(const QPoint &viewportPoint) const
+QPoint QnWorkbenchDisplay::mapViewportToGrid(const QPoint& viewportPoint) const
 {
     if (!m_view)
         return QPoint();
@@ -1672,7 +1672,7 @@ QPoint QnWorkbenchDisplay::mapViewportToGrid(const QPoint &viewportPoint) const
     return workbench()->mapper()->mapToGrid(m_view->mapToScene(viewportPoint));
 }
 
-QPoint QnWorkbenchDisplay::mapGlobalToGrid(const QPoint &globalPoint) const
+QPoint QnWorkbenchDisplay::mapGlobalToGrid(const QPoint& globalPoint) const
 {
     if (!m_view)
         return QPoint();
@@ -1680,7 +1680,7 @@ QPoint QnWorkbenchDisplay::mapGlobalToGrid(const QPoint &globalPoint) const
     return mapViewportToGrid(m_view->mapFromGlobal(globalPoint));
 }
 
-QPointF QnWorkbenchDisplay::mapViewportToGridF(const QPoint &viewportPoint) const
+QPointF QnWorkbenchDisplay::mapViewportToGridF(const QPoint& viewportPoint) const
 {
     if (!m_view)
         return QPointF();
@@ -1689,7 +1689,7 @@ QPointF QnWorkbenchDisplay::mapViewportToGridF(const QPoint &viewportPoint) cons
 
 }
 
-QPointF QnWorkbenchDisplay::mapGlobalToGridF(const QPoint &globalPoint) const
+QPointF QnWorkbenchDisplay::mapGlobalToGridF(const QPoint& globalPoint) const
 {
     if (!m_view)
         return QPoint();
@@ -2068,7 +2068,7 @@ void QnWorkbenchDisplay::at_layout_zoomLinkRemoved(QnWorkbenchItem *item, QnWork
     removeZoomLinkInternal(item, zoomTargetItem);
 }
 
-void QnWorkbenchDisplay::at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect)
+void QnWorkbenchDisplay::at_layout_boundingRectChanged(const QRect& oldRect, const QRect& newRect)
 {
     QRect backgroundBoundingRect = gridBackgroundItem() ? gridBackgroundItem()->sceneBoundingRect() : QRect();
 

@@ -11,7 +11,7 @@ namespace ec2 {
 
 // TODO: #vkutin #muskov Think where to put these globals.
 nx::vms::api::DiscoveryData toApiDiscoveryData(
-    const nx::Uuid &id, const nx::Url &url, bool ignore);
+    const nx::Uuid& id, const nx::Url& url, bool ignore);
 
 template<class QueryProcessorType>
 class QnDiscoveryManager: public AbstractDiscoveryManager

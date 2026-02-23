@@ -151,7 +151,7 @@ nx::Uuid QnStorageListModel::metadataStorageId() const
     return m_metadataStorageId;
 }
 
-void QnStorageListModel::setMetadataStorageId(const nx::Uuid &id)
+void QnStorageListModel::setMetadataStorageId(const nx::Uuid& id)
 {
     if (m_metadataStorageId == id)
         return;

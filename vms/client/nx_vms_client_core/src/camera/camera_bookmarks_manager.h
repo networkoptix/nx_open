@@ -57,7 +57,7 @@ public:
     /// @brief                  Add the bookmark to the camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.
-    void addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+    void addCameraBookmark(const QnCameraBookmark& bookmark, OperationCallbackType callback = OperationCallbackType());
 
     /** Add already created bookmark, e.g. from standalone API call. */
     void addExistingBookmark(const QnCameraBookmark& bookmark);
@@ -85,19 +85,19 @@ public:
     /// @param businessRuleId   Business rule identifier for which bookmark is created
     /// @param callback         Callback with operation result.
     void addAcknowledge(
-        const QnCameraBookmark &bookmark,
+        const QnCameraBookmark& bookmark,
         const nx::Uuid& eventRuleId,
         OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Update the existing bookmark on the camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.
-    void updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+    void updateCameraBookmark(const QnCameraBookmark& bookmark, OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Delete the existing bookmark from the camera.
     /// @param bookmark         Target bookmark id.
     /// @param callback         Callback with operation result.
-    void deleteCameraBookmark(const nx::Uuid &bookmarkId, OperationCallbackType callback = OperationCallbackType());
+    void deleteCameraBookmark(const nx::Uuid& bookmarkId, OperationCallbackType callback = OperationCallbackType());
 
     /* Queries API section */
 
@@ -135,12 +135,12 @@ signals:
     /* TODO: #dklychkov #2.6 #bookmarks Implement notification transactions for bookmarks which will call these signals. */
     // So far these signals are emitted when the user does something locally.
     /// @brief                  This signal is emitted when new bookmark was added.
-    void bookmarkAdded(const QnCameraBookmark &bookmark);
+    void bookmarkAdded(const QnCameraBookmark& bookmark);
     /// @brief                  This signal is emitted when the bookmark was updated.
-    void bookmarkUpdated(const QnCameraBookmark &bookmark);
+    void bookmarkUpdated(const QnCameraBookmark& bookmark);
     /// @brief                  This signal is emitted when the bookmark was removed.
     /// @param                  The removed bookmark GUID.
-    void bookmarkRemoved(const nx::Uuid &bookmarkId);
+    void bookmarkRemoved(const nx::Uuid& bookmarkId);
 
 private:
     nx::utils::ImplPtr<QnCameraBookmarksManagerPrivate> d;

@@ -9,12 +9,12 @@
 
 #include <nx/utils/switch.h>
 
-void serialize(const bool &value, QString *target)
+void serialize(const bool& value, QString *target)
 {
     *target = value ? QLatin1String("true") : QLatin1String("false");
 }
 
-bool deserialize(const QString &value, bool *target)
+bool deserialize(const QString& value, bool *target)
 {
     using qunicodechar = char16_t;
 
@@ -100,12 +100,12 @@ bool deserialize(const QString &value, bool *target)
     }
 }
 
-void serialize(const nx::Uuid &value, QString *target)
+void serialize(const nx::Uuid& value, QString *target)
 {
     *target = value.toString(QUuid::WithBraces);
 }
 
-bool deserialize(const QString &value, nx::Uuid *target)
+bool deserialize(const QString& value, nx::Uuid *target)
 {
     nx::Uuid result = nx::Uuid::fromStringSafe(value);
     if (result.isNull()
@@ -120,12 +120,12 @@ bool deserialize(const QString &value, nx::Uuid *target)
     return true;
 }
 
-void serialize(const QUrl &value, QString *target)
+void serialize(const QUrl& value, QString *target)
 {
     *target = value.toString();
 }
 
-bool deserialize(const QString &value, QUrl *target)
+bool deserialize(const QString& value, QUrl *target)
 {
     *target = QUrl(value);
     return true;

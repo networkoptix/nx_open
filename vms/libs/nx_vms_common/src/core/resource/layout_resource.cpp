@@ -41,7 +41,7 @@ void QnLayoutResource::setItems(const LayoutItemDataList& items)
     setItems(map);
 }
 
-void QnLayoutResource::setItems(const LayoutItemDataMap &items)
+void QnLayoutResource::setItems(const LayoutItemDataMap& items)
 {
     m_items->setItems(items);
 }
@@ -71,7 +71,7 @@ void QnLayoutResource::setUrl(const QString& value)
     }
 }
 
-LayoutItemData QnLayoutResource::getItem(const nx::Uuid &itemUuid) const
+LayoutItemData QnLayoutResource::getItem(const nx::Uuid& itemUuid) const
 {
     return m_items->getItem(itemUuid);
 }
@@ -152,22 +152,22 @@ void QnLayoutResource::updateInternal(const QnResourcePtr& source, NotifierList&
     }
 }
 
-void QnLayoutResource::addItem(const LayoutItemData &item)
+void QnLayoutResource::addItem(const LayoutItemData& item)
 {
     m_items->addItem(item);
 }
 
-void QnLayoutResource::removeItem(const LayoutItemData &item)
+void QnLayoutResource::removeItem(const LayoutItemData& item)
 {
     m_items->removeItem(item);
 }
 
-void QnLayoutResource::removeItem(const nx::Uuid &itemUuid)
+void QnLayoutResource::removeItem(const nx::Uuid& itemUuid)
 {
     m_items->removeItem(itemUuid);
 }
 
-void QnLayoutResource::updateItem(const LayoutItemData &item)
+void QnLayoutResource::updateItem(const LayoutItemData& item)
 {
     m_items->updateItem(item);
 }
@@ -294,7 +294,7 @@ void QnLayoutResource::setLogicalId(int value)
     emit logicalIdChanged(::toSharedPointer(this));
 }
 
-void QnLayoutResource::setBackgroundImageFilename(const QString &filename)
+void QnLayoutResource::setBackgroundImageFilename(const QString& filename)
 {
     {
         NX_MUTEX_LOCKER locker(&m_mutex);

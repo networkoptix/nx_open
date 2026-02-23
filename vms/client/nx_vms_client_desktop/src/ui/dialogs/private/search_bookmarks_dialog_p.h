@@ -21,7 +21,7 @@ class QnSearchBookmarksDialogPrivate : public QObject , public QnWorkbenchContex
 {
     Q_OBJECT
 public:
-    QnSearchBookmarksDialogPrivate(const QString &filterText
+    QnSearchBookmarksDialogPrivate(const QString& filterText
         , qint64 utcStartTimeMs
         , qint64 utcFinishTimeMs
         , QDialog *owner);
@@ -30,7 +30,7 @@ public:
 
     void refresh();
 
-    void setParameters(const QString &filterText
+    void setParameters(const QString& filterText
         , qint64 utcStartTimeMs
         , qint64 utcFinishTimeMs);
 
@@ -39,20 +39,20 @@ public:
 private:
     QnVirtualCameraResourceList availableCameras() const;
 
-    QnVirtualCameraResourcePtr availableCameraById(const nx::Uuid &cameraId) const;
+    QnVirtualCameraResourcePtr availableCameraById(const nx::Uuid& cameraId) const;
 
     void resetToAllAvailableCameras();
 
-    void setCameras(const QnVirtualCameraResourceList &cameras);
+    void setCameras(const QnVirtualCameraResourceList& cameras);
 
     void chooseCamera();
 
     void customContextMenuRequested();
 
     void openInNewLayout(const nx::vms::client::desktop::menu::Parameters& params,
-        const QnTimePeriod &window);
+        const QnTimePeriod& window);
 
-    bool fillActionParameters(nx::vms::client::desktop::menu::Parameters &params, QnTimePeriod &window);
+    bool fillActionParameters(nx::vms::client::desktop::menu::Parameters& params, QnTimePeriod& window);
 
     void applyModelChanges();
 

@@ -106,7 +106,7 @@ public:
         updateIndex();
     }
 
-    void setData(const QnLegacyAuditRecordRefList &data)
+    void setData(const QnLegacyAuditRecordRefList& data)
     {
         m_data = data;
         updateIndex();
@@ -270,7 +270,7 @@ QnAuditLogModel::QnAuditLogModel(QObject *parent)
 QnAuditLogModel::~QnAuditLogModel() {
 }
 
-void QnAuditLogModel::setData(const QnLegacyAuditRecordRefList &data) {
+void QnAuditLogModel::setData(const QnLegacyAuditRecordRefList& data) {
     beginResetModel();
     m_index->setData(data);
     endResetModel();
@@ -290,7 +290,7 @@ void QnAuditLogModel::clear() {
     endResetModel();
 }
 
-QString QnAuditLogModel::getResourceNameById(const nx::Uuid &id) const
+QString QnAuditLogModel::getResourceNameById(const nx::Uuid& id) const
 {
     return QnResourceDisplayInfo(resourcePool()->getResourceById(id)).toString(
         appContext()->localSettings()->resourceInfoLevel());
@@ -713,13 +713,13 @@ void QnAuditLogModel::sort(int column, Qt::SortOrder order) {
     endResetModel();
 }
 
-int QnAuditLogModel::rowCount(const QModelIndex &parent) const {
+int QnAuditLogModel::rowCount(const QModelIndex& parent) const {
     if (!parent.isValid())
         return m_index->size();
     return 0;
 }
 
-int QnAuditLogModel::columnCount(const QModelIndex &parent /* = QModelIndex()*/) const {
+int QnAuditLogModel::columnCount(const QModelIndex& parent /* = QModelIndex()*/) const {
     if (!parent.isValid())
         return m_columns.size();
     return 0;
@@ -732,7 +732,7 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
         if (section >= m_columns.size())
             return QVariant();
 
-        const Column &column = m_columns[section];
+        const Column& column = m_columns[section];
         switch (column)
         {
             case SelectRowColumn:
@@ -819,7 +819,7 @@ void QnAuditLogModel::setCheckState(Qt::CheckState state)
     emit dataChanged(index(0, 0), index(m_index->size(), m_columns.size()), QVector<int>() << Qt::CheckStateRole);
 }
 
-void QnAuditLogModel::setData(const QModelIndexList &indexList, const QVariant &value, int role)
+void QnAuditLogModel::setData(const QModelIndexList& indexList, const QVariant& value, int role)
 {
     blockSignals(true);
     for (const auto& index : indexList)
@@ -828,7 +828,7 @@ void QnAuditLogModel::setData(const QModelIndexList &indexList, const QVariant &
     emit dataChanged(index(0, 0), index(m_index->size(), m_columns.size()), QVector<int>() << role);
 }
 
-bool QnAuditLogModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool QnAuditLogModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return false;
@@ -952,12 +952,12 @@ QString QnAuditLogModel::descriptionTooltip(const QnLegacyAuditRecord *record) c
     return result;
 }
 
-QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
+QVariant QnAuditLogModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    const Column &column = m_columns[index.column()];
+    const Column& column = m_columns[index.column()];
 
     const QnLegacyAuditRecord *record = m_index->at(index.row());
 
@@ -1039,7 +1039,7 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void QnAuditLogModel::setColumns(const QList<Column> &columns)
+void QnAuditLogModel::setColumns(const QList<Column>& columns)
 {
     m_columns = columns;
 }

@@ -50,7 +50,7 @@ void TimeSynchronizationWidgetStore::initialize(
         });
 }
 
-void TimeSynchronizationWidgetStore::addServer(const State::ServerInfo &serverInfo)
+void TimeSynchronizationWidgetStore::addServer(const State::ServerInfo& serverInfo)
 {
     d->executeAction(
         [&](State state) { return Reducer::addServer(std::move(state), serverInfo); });
@@ -62,13 +62,13 @@ void TimeSynchronizationWidgetStore::removeServer(const nx::Uuid& id)
         [&](State state) { return Reducer::removeServer(std::move(state), id); });
 }
 
-void TimeSynchronizationWidgetStore::setServerOnline(const nx::Uuid &id, bool isOnline)
+void TimeSynchronizationWidgetStore::setServerOnline(const nx::Uuid& id, bool isOnline)
 {
     d->executeAction(
         [&](State state) { return Reducer::setServerOnline(std::move(state), id, isOnline); });
 }
 
-void TimeSynchronizationWidgetStore::setServerHasInternet(const nx::Uuid &id, bool hasInternet)
+void TimeSynchronizationWidgetStore::setServerHasInternet(const nx::Uuid& id, bool hasInternet)
 {
     d->executeAction(
         [&](State state) { return Reducer::setServerHasInternet(std::move(state), id, hasInternet);
@@ -103,7 +103,7 @@ void TimeSynchronizationWidgetStore::selectServer(const nx::Uuid& serverId)
         [&](State state) { return Reducer::selectServer(std::move(state), serverId); });
 }
 
-void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList &offsetList, milliseconds baseTime)
+void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList& offsetList, milliseconds baseTime)
 {
     d->executeAction(
         [&](State state)
@@ -118,7 +118,7 @@ void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList &of
 
                 if (idx >= 0)
                 {
-                    const auto &offsetInfo = offsetList[idx];
+                    const auto& offsetInfo = offsetList[idx];
                     server.osTimeOffset = offsetInfo.osTimeOffset;
                     server.vmsTimeOffset = offsetInfo.vmsTimeOffset;
                     server.timeZoneOffset = offsetInfo.timeZoneOffset;

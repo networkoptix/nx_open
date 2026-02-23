@@ -21,7 +21,7 @@ public:
     DirectSystemFinder(SearchAddressManager* searchAddressManager, QObject* parent = nullptr);
 
     SystemDescriptionList systems() const override;
-    SystemDescriptionPtr getSystem(const QString &id) const override;
+    SystemDescriptionPtr getSystem(const QString& id) const override;
 
 private:
     void updateServerData(const nx::vms::discovery::ModuleEndpoint& module);
@@ -32,7 +32,7 @@ private:
         SystemsHash::iterator systemIt, const nx::vms::discovery::ModuleEndpoint& module);
 
     void updatePrimaryAddress(const nx::vms::discovery::ModuleEndpoint& module);
-    SystemsHash::iterator getSystemItByServer(const nx::Uuid &serverId);
+    SystemsHash::iterator getSystemItByServer(const nx::Uuid& serverId);
     void removeSystem(SystemsHash::iterator it);
 
 private:

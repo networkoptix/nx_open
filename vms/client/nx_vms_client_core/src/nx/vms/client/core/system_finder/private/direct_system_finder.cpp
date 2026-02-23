@@ -59,10 +59,10 @@ SystemDescriptionList DirectSystemFinder::systems() const
     return result;
 }
 
-SystemDescriptionPtr DirectSystemFinder::getSystem(const QString &id) const
+SystemDescriptionPtr DirectSystemFinder::getSystem(const QString& id) const
 {
     const auto systemDescriptions = m_systems.values();
-    const auto predicate = [id](const SystemDescriptionPtr &desc)
+    const auto predicate = [id](const SystemDescriptionPtr& desc)
     {
         return (desc->id() == id);
     };
@@ -248,7 +248,6 @@ void DirectSystemFinder::updatePrimaryAddress(const nx::vms::discovery::ModuleEn
             return;
     }
 
-
     const auto systemDescription = systemIt.value();
     const auto url = nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
@@ -264,7 +263,7 @@ void DirectSystemFinder::updatePrimaryAddress(const nx::vms::discovery::ModuleEn
 }
 
 DirectSystemFinder::SystemsHash::iterator
-DirectSystemFinder::getSystemItByServer(const nx::Uuid &serverId)
+DirectSystemFinder::getSystemItByServer(const nx::Uuid& serverId)
 {
     const auto it = m_serverToSystem.find(serverId);
     if (it == m_serverToSystem.end())

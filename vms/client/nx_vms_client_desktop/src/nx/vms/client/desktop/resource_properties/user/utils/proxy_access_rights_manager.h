@@ -26,7 +26,7 @@ public:
     void setCurrentSubjectId(const nx::Uuid& value);
 
     virtual nx::core::access::ResourceAccessMap ownResourceAccessMap(
-        const nx::Uuid & subjectId) const override;
+        const nx::Uuid& subjectId) const override;
 
     /** Overrides current subject access rights map. */
     void setOwnResourceAccessMap(const nx::core::access::ResourceAccessMap& value);

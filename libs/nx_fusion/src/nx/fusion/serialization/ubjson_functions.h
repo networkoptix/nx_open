@@ -34,12 +34,12 @@
 namespace QnUbjsonDetail {
 
     template<class Element, class Output, class Tag>
-    void serialize_collection_element(const Element &element, QnUbjsonWriter<Output> *stream, const Tag &) {
+    void serialize_collection_element(const Element& element, QnUbjsonWriter<Output>* stream, const Tag&) {
         QnUbjson::serialize(element, stream);
     }
 
     template<class Element, class Output>
-    void serialize_collection_element(const Element &element, QnUbjsonWriter<Output> *stream, const QnCollection::map_tag &) {
+    void serialize_collection_element(const Element& element, QnUbjsonWriter<Output>* stream, const QnCollection::map_tag&) {
         stream->writeArrayStart();
         QnUbjson::serialize(element.first, stream);
         QnUbjson::serialize(element.second, stream);
@@ -47,7 +47,7 @@ namespace QnUbjsonDetail {
     }
 
     template<class Collection, class Output>
-    void serialize_collection(const Collection &value, QnUbjsonWriter<Output> *stream) {
+    void serialize_collection(const Collection& value, QnUbjsonWriter<Output>* stream) {
         stream->writeArrayStart(static_cast<int>(value.size()));
 
         for(auto pos = boost::begin(value); pos != boost::end(value); ++pos)
@@ -57,12 +57,12 @@ namespace QnUbjsonDetail {
     }
 
     template<class Collection, class Input, class Element>
-    bool deserialize_collection_element(QnUbjsonReader<Input> *stream, Collection *target, const Element *, const QnCollection::list_tag &) {
+    bool deserialize_collection_element(QnUbjsonReader<Input>* stream, Collection* target, const Element*, const QnCollection::list_tag&) {
         return QnUbjson::deserialize(stream, &*QnCollection::insert(*target, boost::end(*target), Element()));
     }
 
     template<class Collection, class Input, class Element>
-    bool deserialize_collection_element(QnUbjsonReader<Input> *stream, Collection *target, const Element *, const QnCollection::set_tag &) {
+    bool deserialize_collection_element(QnUbjsonReader<Input>* stream, Collection* target, const Element*, const QnCollection::set_tag&) {
         Element element;
         if(!QnUbjson::deserialize(stream, &element))
             return false;
@@ -72,7 +72,7 @@ namespace QnUbjsonDetail {
     }
 
     template<class Collection, class Input, class Element>
-    bool deserialize_collection_element(QnUbjsonReader<Input> *stream, Collection *target, const Element *, const QnCollection::map_tag &) {
+    bool deserialize_collection_element(QnUbjsonReader<Input>* stream, Collection* target, const Element*, const QnCollection::map_tag&) {
         if(!stream->readArrayStart())
             return false;
 
@@ -90,7 +90,7 @@ namespace QnUbjsonDetail {
     }
 
     template<class Collection, class Input>
-    bool deserialize_collection(QnUbjsonReader<Input> *stream, Collection *target) {
+    bool deserialize_collection(QnUbjsonReader<Input>* stream, Collection* target) {
         typedef typename std::iterator_traits<typename boost::range_mutable_iterator<Collection>::type>::value_type value_type;
 
         int size;
@@ -106,7 +106,7 @@ namespace QnUbjsonDetail {
             if(marker == QnUbjson::ArrayEndMarker)
                 break;
 
-            if(!deserialize_collection_element(stream, target, static_cast<const value_type *>(NULL), typename QnCollection::collection_category<Collection>::type()))
+            if(!deserialize_collection_element(stream, target, static_cast<const value_type*>(NULL), typename QnCollection::collection_category<Collection>::type()))
                 return false;
         }
 
@@ -117,7 +117,7 @@ namespace QnUbjsonDetail {
     }
 
     template<class Map, class Output>
-    void serialize_string_map(const Map &value, QnUbjsonWriter<Output> *stream) {
+    void serialize_string_map(const Map& value, QnUbjsonWriter<Output>* stream) {
         stream->writeObjectStart(static_cast<int>(value.size()));
 
         for(auto pos = boost::begin(value); pos != boost::end(value); pos++) {
@@ -129,7 +129,7 @@ namespace QnUbjsonDetail {
     }
 
     template<class Map, class Input>
-    bool deserialize_string_map(QnUbjsonReader<Input> *stream, Map *target) {
+    bool deserialize_string_map(QnUbjsonReader<Input>* stream, Map* target) {
         int size;
         if(!stream->readObjectStart(&size))
             return false;
@@ -158,12 +158,12 @@ namespace QnUbjsonDetail {
     }
 
     template<class T, class Temporary, class Output>
-    void serialize_integer(const T &value, QnUbjsonWriter<Output> *stream) {
+    void serialize_integer(const T& value, QnUbjsonWriter<Output>* stream) {
         QnUbjson::serialize(static_cast<Temporary>(value), stream);
     }
 
     template<class T, class Temporary, class Input>
-    bool deserialize_integer(QnUbjsonReader<Input> *stream, T *target) {
+    bool deserialize_integer(QnUbjsonReader<Input>* stream, T* target) {
         Temporary tmp;
         if(!QnUbjson::deserialize(stream, &tmp))
             return false;
@@ -173,16 +173,15 @@ namespace QnUbjsonDetail {
 
 } // QnUbjsonDetail
 
-
 #ifndef Q_MOC_RUN
 #define QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(TYPE, READ_METHOD, WRITE_METHOD) \
 template<class Output>                                                          \
-void serialize(const TYPE &value, QnUbjsonWriter<Output> *stream) {             \
+void serialize(const TYPE& value, QnUbjsonWriter<Output>* stream) {             \
     stream->WRITE_METHOD(value);                                                \
 }                                                                               \
                                                                                 \
 template<class Input>                                                           \
-bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                 \
+bool deserialize(QnUbjsonReader<Input>* stream, TYPE* target) {                 \
     return stream->READ_METHOD(target);                                         \
 }
 
@@ -205,15 +204,14 @@ QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(QByteArray,    readBinaryData, w
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(QJsonValue,    readJsonValue,  writeJsonValue)
 #undef QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS
 
-
 #define QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS(TYPE, TARGET_TYPE) \
 template<class Output>                                                          \
-void serialize(const TYPE &value, QnUbjsonWriter<Output> *stream) {             \
+void serialize(const TYPE& value, QnUbjsonWriter<Output>* stream) {             \
     QnUbjsonDetail::serialize_integer<TYPE, TARGET_TYPE>(value, stream);        \
 }                                                                               \
                                                                                 \
 template<class Input>                                                           \
-bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                 \
+bool deserialize(QnUbjsonReader<Input>* stream, TYPE* target) {                 \
     return QnUbjsonDetail::deserialize_integer<TYPE, TARGET_TYPE>(stream, target); \
 }
 
@@ -225,13 +223,13 @@ bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                 
 #ifndef Q_MOC_RUN
 #define QN_DEFINE_UBJSON_CHRONO_SERIALIZATION_FUNCTIONS(TYPE)                   \
 template<class Output>                                                          \
-void serialize(const std::chrono::TYPE &value, QnUbjsonWriter<Output> *stream)  \
+void serialize(const std::chrono::TYPE& value, QnUbjsonWriter<Output>* stream)  \
 {                                                                               \
     stream->writeInt64(value.count());                                          \
 }                                                                               \
                                                                                 \
 template<class Input>                                                           \
-bool deserialize(QnUbjsonReader<Input> *stream, std::chrono::TYPE *target)      \
+bool deserialize(QnUbjsonReader<Input>* stream, std::chrono::TYPE* target)      \
 {                                                                               \
     qint64 tmp = 0;                                                             \
     bool result = stream->readInt64(&tmp);                                      \
@@ -245,14 +243,14 @@ QN_DEFINE_UBJSON_CHRONO_SERIALIZATION_FUNCTIONS(microseconds)
 
 template<typename Clock, typename Duration, typename Output>
 void serialize(
-    const std::chrono::time_point<Clock, Duration>& timePoint, QnUbjsonWriter<Output> *stream)
+    const std::chrono::time_point<Clock, Duration>& timePoint, QnUbjsonWriter<Output>* stream)
 {
     using namespace std::chrono;
     stream->writeInt64(duration_cast<milliseconds>(timePoint.time_since_epoch()).count());
 }
 
 template<typename Clock, typename Duration, typename Input>
-bool deserialize(QnUbjsonReader<Input> *stream, std::chrono::time_point<Clock, Duration>* target)
+bool deserialize(QnUbjsonReader<Input>* stream, std::chrono::time_point<Clock, Duration>* target)
 {
     qint64 tmp = 0;
     if (!stream->readInt64(&tmp))
@@ -265,15 +263,14 @@ bool deserialize(QnUbjsonReader<Input> *stream, std::chrono::time_point<Clock, D
 #undef QN_DEFINE_UBJSON_CHRONO_SERIALIZATION_FUNCTIONS
 #endif
 
-
 #define QN_DEFINE_COLLECTION_UBJSON_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG, IMPL) \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Output>                            \
-void serialize(const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> &value, QnUbjsonWriter<Output> *stream) { \
+void serialize(const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)>& value, QnUbjsonWriter<Output>* stream) { \
     QnUbjsonDetail::BOOST_PP_CAT(serialize_, IMPL)(value, stream);              \
 }                                                                               \
                                                                                 \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Input>                             \
-bool deserialize(QnUbjsonReader<Input> *stream, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> *target) { \
+bool deserialize(QnUbjsonReader<Input>* stream, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)>* target) { \
     return QnUbjsonDetail::BOOST_PP_CAT(deserialize_, IMPL)(stream, target);    \
 }                                                                               \
 
@@ -293,14 +290,13 @@ QN_DEFINE_COLLECTION_UBJSON_SERIALIZATION_FUNCTIONS(std::map, (class T, class Pr
 #undef QN_DEFINE_COLLECTION_UBJSON_SERIALIZATION_FUNCTIONS
 #endif // Q_MOC_RUN
 
-
 template <class Output>
-void serialize(const QUrl &value, QnUbjsonWriter<Output> *stream) {
+void serialize(const QUrl& value, QnUbjsonWriter<Output>* stream) {
     QnUbjson::serialize(value.toString(), stream);
 }
 
 template <class T>
-bool deserialize(QnUbjsonReader<T> *stream, QUrl *target) {
+bool deserialize(QnUbjsonReader<T>* stream, QUrl* target) {
     QString tmp;
     if(!QnUbjson::deserialize(stream, &tmp))
         return false;
@@ -309,13 +305,13 @@ bool deserialize(QnUbjsonReader<T> *stream, QUrl *target) {
 }
 
 template <class Output>
-void serialize(const nx::Url& value, QnUbjsonWriter<Output> *stream)
+void serialize(const nx::Url& value, QnUbjsonWriter<Output>* stream)
 {
     QnUbjson::serialize(value.toString(), stream);
 }
 
 template <class T>
-bool deserialize(QnUbjsonReader<T> *stream, nx::Url *target)
+bool deserialize(QnUbjsonReader<T>* stream, nx::Url* target)
 {
     QString tmp;
     if(!QnUbjson::deserialize(stream, &tmp))
@@ -324,15 +320,13 @@ bool deserialize(QnUbjsonReader<T> *stream, nx::Url *target)
     return true;
 }
 
-
 template <class Output>
-void serialize(const nx::Uuid &value, QnUbjsonWriter<Output> *stream) {
+void serialize(const nx::Uuid& value, QnUbjsonWriter<Output>* stream) {
     QnUbjson::serialize(value.toRfc4122(), stream);
 }
 
-
 template <class Input>
-bool deserialize(QnUbjsonReader<Input> *stream, nx::Uuid *target)
+bool deserialize(QnUbjsonReader<Input>* stream, nx::Uuid* target)
 {
     std::array<char, 16> tmp;
     if(!stream->template readBinaryData<>(&tmp))
@@ -363,19 +357,19 @@ bool deserialize(QnUbjsonReader<Input>* stream,
 }
 
 template<class T, std::size_t N, class Output>
-void serialize(const std::array<T, N> &value, QnUbjsonWriter<Output> *stream) {
+void serialize(const std::array<T, N>& value, QnUbjsonWriter<Output>* stream) {
     stream->writeArrayStart();
-    for(const T &element: value)
+    for(const T& element: value)
         QnUbjson::serialize(element, stream);
     stream->writeArrayEnd();
 }
 
 template<class T, std::size_t N, class Input>
-bool deserialize(QnUbjsonReader<Input> *stream, std::array<T, N> *target) {
+bool deserialize(QnUbjsonReader<Input>* stream, std::array<T, N>* target) {
     if(!stream->readArrayStart())
         return false;
 
-    for(T &element: *target)
+    for(T& element: *target)
         if(!QnUbjson::deserialize(stream, &element))
             return false;
 

@@ -58,20 +58,20 @@ public:
     QSet<nx::Uuid> getServerFootageData(const nx::Uuid& serverGuid) const;
 
     /** \return list of camera id's that have footage on the selected server. */
-    QnVirtualCameraResourceList getServerFootageCameras(const QnMediaServerResourcePtr &server) const;
+    QnVirtualCameraResourceList getServerFootageCameras(const QnMediaServerResourcePtr& server) const;
 
     /** \return server list where the selected camera has footage. */
-    QnMediaServerResourceList getCameraFootageData(const nx::Uuid &cameraId, bool filterOnlineServers = false) const;
+    QnMediaServerResourceList getCameraFootageData(const nx::Uuid& cameraId, bool filterOnlineServers = false) const;
 
     /** \return server list where the selected camera has footage. */
-    QnMediaServerResourceList getCameraFootageData(const QnVirtualCameraResourcePtr &camera, bool filterOnlineServers = false) const;
+    QnMediaServerResourceList getCameraFootageData(const QnVirtualCameraResourcePtr& camera, bool filterOnlineServers = false) const;
 
     /**
     * \return                       Server list where camera was archived during specified period.
     *                               If camera history still not loaded, full camera footage server
     *                               list will be returned.
     */
-    QnMediaServerResourceList getCameraFootageData(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const;
+    QnMediaServerResourceList getCameraFootageData(const QnVirtualCameraResourcePtr& camera, const QnTimePeriod& timePeriod) const;
 
     /**
      * \return                      Server where camera was recorded on specified time.
@@ -80,7 +80,7 @@ public:
      * TODO: Fix params doc: foundPeriod and allowOfflineServers.
      * \param allowOfflineServers   Drop out offline media servers if parameter is false
      */
-    QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0) const;
+    QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr& camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0) const;
 
     /**
      * \return                      Server where camera was recorded on specified time. This function could update cache in sync mode if it isn't up to date
@@ -88,10 +88,9 @@ public:
      * \param timestamp             Timestamp in milliseconds to find
      * \param allowOfflineServers   Drop out offline media servers if parameter is false
      */
-    QnMediaServerResourcePtr getMediaServerOnTimeSync(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0);
+    QnMediaServerResourcePtr getMediaServerOnTimeSync(const QnVirtualCameraResourcePtr& camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0);
 
-
-    QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
+    QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr& camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
 
     typedef std::function<void(bool success)> callbackFunction;
     enum class StartResult
@@ -115,7 +114,7 @@ public:
      * \param camera                Target camera.
      * \returns                     True if the camera history for the given camera is already loaded, false otherwise.
      */
-    bool isCameraHistoryValid(const QnVirtualCameraResourcePtr &camera) const;
+    bool isCameraHistoryValid(const QnVirtualCameraResourcePtr& camera) const;
 
     /**
      * Update camera history for the given camera. Function returns immediately if currently loaded
@@ -142,19 +141,19 @@ signals:
      * \brief                       Notify that camera footage is changed - a server was added or removed or changed its status.
      *                              Usually it means that camera chunks must be updated (if needed).
      */
-    void cameraFootageChanged(const QnVirtualCameraResourcePtr &camera);
+    void cameraFootageChanged(const QnVirtualCameraResourcePtr& camera);
 
     /**
      * \brief                       Notify that camera in no longer valid - a server was added or goes online.
      *                              Usually it means that camera history must be updated (if needed).
      */
-    void cameraHistoryInvalidated(const QnVirtualCameraResourcePtr &camera);
+    void cameraHistoryInvalidated(const QnVirtualCameraResourcePtr& camera);
 
     /**
      * \brief                       Notify about changes in the camera history.
      *                              Usually it means that all who use camera history should update their info.
      */
-    void cameraHistoryChanged(const QnVirtualCameraResourcePtr &camera);
+    void cameraHistoryChanged(const QnVirtualCameraResourcePtr& camera);
 
 protected:
     virtual QnMediaServerResourcePtr toMediaServer(nx::Uuid guid) const;
@@ -181,16 +180,16 @@ private:
         callbackFunction callback);
 
     /** Mark camera history as dirty and subject to update. */
-    void invalidateCameraHistory(const nx::Uuid &cameraId);
+    void invalidateCameraHistory(const nx::Uuid& cameraId);
 
     void onServerRuntimeEvent(const nx::vms::api::ServerRuntimeEventData& eventData);
 
 private:
     void checkCameraHistoryDelayed(QnVirtualCameraResourcePtr cam);
-    QnMediaServerResourceList dtsCamFootageData(const QnVirtualCameraResourcePtr &camera
+    QnMediaServerResourceList dtsCamFootageData(const QnVirtualCameraResourcePtr& camera
         , bool filterOnlineServers = false) const;
     QnMediaServerResourceList getCameraFootageDataUnsafe(
-        const nx::Uuid &cameraId,
+        const nx::Uuid& cameraId,
         bool filterOnlineServers = false) const;
     bool isValidHistoryDetails(
         const nx::Uuid& cameraId,

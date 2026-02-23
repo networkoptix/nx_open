@@ -9,10 +9,10 @@
 class NX_VMS_COMMON_API QnServerAdditionalAddressesDictionary
 {
 public:
-    QList<nx::Url> additionalUrls(const nx::Uuid &serverId) const;
-    QList<nx::Url> ignoredUrls(const nx::Uuid &serverId) const;
-    void setAdditionalUrls(const nx::Uuid &serverId, const QList<nx::Url> &additionalUrls);
-    void setIgnoredUrls(const nx::Uuid &serverId, const QList<nx::Url> &additionalUrls);
+    QList<nx::Url> additionalUrls(const nx::Uuid& serverId) const;
+    QList<nx::Url> ignoredUrls(const nx::Uuid& serverId) const;
+    void setAdditionalUrls(const nx::Uuid& serverId, const QList<nx::Url>& additionalUrls);
+    void setIgnoredUrls(const nx::Uuid& serverId, const QList<nx::Url>& additionalUrls);
     void clear();
 
 private:

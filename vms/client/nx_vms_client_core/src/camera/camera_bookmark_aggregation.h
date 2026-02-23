@@ -14,18 +14,18 @@
 class NX_VMS_CLIENT_CORE_API QnCameraBookmarkAggregation
 {
 public:
-    QnCameraBookmarkAggregation(const QnCameraBookmarkList &bookmarkList = QnCameraBookmarkList());
+    QnCameraBookmarkAggregation(const QnCameraBookmarkList& bookmarkList = QnCameraBookmarkList());
 
     // @return Returns true if bookmarks list has changed
-    bool addBookmark(const QnCameraBookmark &bookmark);
+    bool addBookmark(const QnCameraBookmark& bookmark);
 
     // @return Returns true if bookmarks list has changed
-    bool mergeBookmarkList(const QnCameraBookmarkList &bookmarkList);
+    bool mergeBookmarkList(const QnCameraBookmarkList& bookmarkList);
 
-    bool removeBookmark(const nx::Uuid &bookmarkId);
+    bool removeBookmark(const nx::Uuid& bookmarkId);
 
-    void setBookmarkList(const QnCameraBookmarkList &bookmarkList);
-    const QnCameraBookmarkList &bookmarkList() const;
+    void setBookmarkList(const QnCameraBookmarkList& bookmarkList);
+    const QnCameraBookmarkList& bookmarkList() const;
 
     void clear();
 

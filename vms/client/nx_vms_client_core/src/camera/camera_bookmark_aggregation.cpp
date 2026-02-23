@@ -6,11 +6,11 @@
 #include <nx/utils/log/assert.h>
 #include <utils/common/scoped_timer.h>
 
-QnCameraBookmarkAggregation::QnCameraBookmarkAggregation(const QnCameraBookmarkList &bookmarkList) {
+QnCameraBookmarkAggregation::QnCameraBookmarkAggregation(const QnCameraBookmarkList& bookmarkList) {
     setBookmarkList(bookmarkList);
 }
 
-bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
+bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark& bookmark)
 {
 #ifdef _DEBUG
     // C++ asserts are required for unit tests to work correctly. Do not replace by NX_ASSERT.
@@ -37,7 +37,7 @@ bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
 
     if (m_bookmarkIds.contains(bookmark.guid))
     {
-        const auto predicate = [&bookmark](const QnCameraBookmark &other)
+        const auto predicate = [&bookmark](const QnCameraBookmark& other)
             { return bookmark.guid == other.guid; };
 
         auto oldIt = std::find_if(m_bookmarkList.begin(), m_bookmarkList.end(), predicate);
@@ -63,7 +63,7 @@ bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
     return true;
 }
 
-bool QnCameraBookmarkAggregation::mergeBookmarkList(const QnCameraBookmarkList &bookmarkList)
+bool QnCameraBookmarkAggregation::mergeBookmarkList(const QnCameraBookmarkList& bookmarkList)
 {
     QN_LOG_TIME(Q_FUNC_INFO);
 
@@ -74,20 +74,20 @@ bool QnCameraBookmarkAggregation::mergeBookmarkList(const QnCameraBookmarkList &
     }
 
     bool result = false;
-    for (const QnCameraBookmark &bookmark: bookmarkList)
+    for (const QnCameraBookmark& bookmark: bookmarkList)
         result |= addBookmark(bookmark);
 
     return result;
 }
 
-bool QnCameraBookmarkAggregation::removeBookmark(const nx::Uuid &bookmarkId)
+bool QnCameraBookmarkAggregation::removeBookmark(const nx::Uuid& bookmarkId)
 {
     QN_LOG_TIME(Q_FUNC_INFO);
 
     if (!m_bookmarkIds.remove(bookmarkId))
         return false;
 
-    auto it = std::find_if(m_bookmarkList.begin(), m_bookmarkList.end(), [&bookmarkId](const QnCameraBookmark &bookmark){
+    auto it = std::find_if(m_bookmarkList.begin(), m_bookmarkList.end(), [&bookmarkId](const QnCameraBookmark& bookmark){
         return bookmark.guid == bookmarkId;
     });
 
@@ -100,7 +100,7 @@ bool QnCameraBookmarkAggregation::removeBookmark(const nx::Uuid &bookmarkId)
     return true;
 }
 
-void QnCameraBookmarkAggregation::setBookmarkList(const QnCameraBookmarkList &bookmarkList)
+void QnCameraBookmarkAggregation::setBookmarkList(const QnCameraBookmarkList& bookmarkList)
 {
     QN_LOG_TIME(Q_FUNC_INFO);
     const auto newSize = bookmarkList.size();
@@ -111,11 +111,11 @@ void QnCameraBookmarkAggregation::setBookmarkList(const QnCameraBookmarkList &bo
     m_bookmarkList = bookmarkList;
     m_bookmarkIds.clear();
 
-    for (const QnCameraBookmark &bookmark: bookmarkList)
+    for (const QnCameraBookmark& bookmark: bookmarkList)
         m_bookmarkIds.insert(bookmark.guid);
 }
 
-const QnCameraBookmarkList &QnCameraBookmarkAggregation::bookmarkList() const
+const QnCameraBookmarkList& QnCameraBookmarkAggregation::bookmarkList() const
 {
     return m_bookmarkList;
 }

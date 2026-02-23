@@ -50,7 +50,7 @@ public:
 
     void removeItem(const nx::vms::common::LayoutItemData& item);
 
-    Q_INVOKABLE void removeItem(const nx::Uuid &itemUuid);
+    Q_INVOKABLE void removeItem(const nx::Uuid& itemUuid);
 
     /**
      * @note Resource replacement is not supported for item.

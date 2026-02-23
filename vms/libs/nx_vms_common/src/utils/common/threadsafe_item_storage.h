@@ -112,7 +112,6 @@ public:
         notify(notifiers);
     }
 
-
     void removeItem(const T& item)
     {
         removeItem(item.uuid);
@@ -236,7 +235,7 @@ private:
             notifiers << m_notifier->storedItemChanged(item, oldItem);
     }
 
-    void removeItemUnderLock(const nx::Uuid &uuid, Qn::NotifierList& notifiers)
+    void removeItemUnderLock(const nx::Uuid& uuid, Qn::NotifierList& notifiers)
     {
         typename ItemMap::iterator pos = m_itemByUuid.find(uuid);
         if (pos == m_itemByUuid.end())

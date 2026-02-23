@@ -159,9 +159,9 @@ public:
 
     QnResourceWidget *widget(Qn::ItemRole role) const;
 
-    QnResourceWidget *widget(const nx::Uuid &uuid) const;
+    QnResourceWidget *widget(const nx::Uuid& uuid) const;
 
-    QList<QnResourceWidget *> widgets(const QnResourcePtr &resource) const;
+    QList<QnResourceWidget *> widgets(const QnResourcePtr& resource) const;
 
     QList<QnResourceWidget *> widgets() const;
 
@@ -226,8 +226,7 @@ public:
 
     void setNormalMarginFlags(Qn::MarginFlags flags);
 
-
-    void bringToFront(const QList<QGraphicsItem *> &items);
+    void bringToFront(const QList<QGraphicsItem *>& items);
 
     void bringToFront(QGraphicsItem *item);
 
@@ -235,21 +234,20 @@ public:
 
     ItemLayer layer(QGraphicsItem *item) const;
     void setLayer(QGraphicsItem *item, ItemLayer layer);
-    void setLayer(const QList<QGraphicsItem *> &items, ItemLayer layer);
+    void setLayer(const QList<QGraphicsItem *>& items, ItemLayer layer);
     qreal layerZValue(ItemLayer layer) const;
 
     void synchronize(QnWorkbenchItem *item, bool animate);
 
     void synchronize(QnResourceWidget *widget, bool animate);
 
+    QPoint mapViewportToGrid(const QPoint& viewportPoint) const;
 
-    QPoint mapViewportToGrid(const QPoint &viewportPoint) const;
+    QPoint mapGlobalToGrid(const QPoint& globalPoint) const;
 
-    QPoint mapGlobalToGrid(const QPoint &globalPoint) const;
+    QPointF mapViewportToGridF(const QPoint& viewportPoint) const;
 
-    QPointF mapViewportToGridF(const QPoint &viewportPoint) const;
-
-    QPointF mapGlobalToGridF(const QPoint &globalPoint) const;
+    QPointF mapGlobalToGridF(const QPoint& globalPoint) const;
 
     /**
      * Status function to know if we are changing layout now.
@@ -259,7 +257,7 @@ public:
 
     QnResourceWidget *zoomTargetWidget(QnResourceWidget *widget) const;
 
-    QRectF raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const;
+    QRectF raisedGeometry(const QRectF& widgetGeometry, qreal rotation) const;
 
     QSet<QnWorkbenchItem*> draggedItems() const;
     void setDraggedItems(const QSet<QnWorkbenchItem*>& value, bool updateGeometry = true);
@@ -349,7 +347,7 @@ protected slots:
     void at_layout_itemRemoved(QnWorkbenchItem *item);
     void at_layout_zoomLinkAdded(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
     void at_layout_zoomLinkRemoved(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
-    void at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect);
+    void at_layout_boundingRectChanged(const QRect& oldRect, const QRect& newRect);
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
@@ -409,7 +407,6 @@ private:
     bool m_inChangeSelection = false;
 
     QSet<QnWorkbenchItem*> m_draggedItems;
-
 
     /* Instruments. */
 

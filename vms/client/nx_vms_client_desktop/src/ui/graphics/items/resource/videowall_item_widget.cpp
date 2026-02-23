@@ -67,7 +67,7 @@ class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor
         return static_cast<const QnVideowallItemWidget *>(object)->m_hoverProgress;
     }
 
-    virtual void set(QObject *object, const QVariant &value) const override
+    virtual void set(QObject *object, const QVariant& value) const override
     {
         QnVideowallItemWidget *widget = static_cast<QnVideowallItemWidget *>(object);
         if (qFuzzyEquals(widget->m_hoverProgress, value.toReal()))
@@ -79,9 +79,9 @@ class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor
 };
 
 QnVideowallItemWidget::QnVideowallItemWidget(
-    const QnVideoWallResourcePtr &videowall,
-    const nx::Uuid &itemUuid,
-    QnVideowallScreenWidget *parent,
+    const QnVideoWallResourcePtr& videowall,
+    const nx::Uuid& itemUuid,
+    QnVideowallScreenWidget* parent,
     QGraphicsWidget* parentWidget,
     Qt::WindowFlags windowFlags)
     :
@@ -160,7 +160,6 @@ QnVideowallItemWidget::QnVideowallItemWidget(
     updateLayout();
     updateInfo();
 }
-
 
 QnVideowallItemWidget::~QnVideowallItemWidget()
 {
@@ -241,7 +240,7 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     paintFrame(painter, paintRect);
 }
 
-void QnVideowallItemWidget::paintFrame(QPainter *painter, const QRectF &paintRect)
+void QnVideowallItemWidget::paintFrame(QPainter *painter, const QRectF& paintRect)
 {
     static const QColor kNormalFrameColor =
         nx::vms::client::core::colorTheme()->color("videoWall.itemFrame.normal");
@@ -334,7 +333,6 @@ void QnVideowallItemWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     m_dragProcessor->mousePressEvent(this, event);
 }
-
 
 void QnVideowallItemWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
