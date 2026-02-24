@@ -59,7 +59,7 @@ int getDefaultFrameSize(const AVCodec* avCodec)
         case AV_CODEC_ID_ADPCM_G726:
         case AV_CODEC_ID_PCM_MULAW:
         case AV_CODEC_ID_PCM_ALAW:
-            return 128;
+            return 240;
         default:
             return 1024;
     }
