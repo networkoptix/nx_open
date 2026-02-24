@@ -102,6 +102,7 @@ void Demuxer::setSdp(const std::string& value)
         parser->setSdpInfo(i);
         if (dynamic_cast<nx::rtp::VideoStreamParser*>(parser.get()) != nullptr)
         {
+            m_hasVideo = true;
             m_rtcpFir.sourceSsrc = i.ssrc;
             if (const Track* track = m_tracks->videoTrack(deviceId))
                 senderSsrc = track->ssrc;
@@ -109,6 +110,7 @@ void Demuxer::setSdp(const std::string& value)
         if (auto audioParser = dynamic_cast<nx::rtp::AudioStreamParser*>(parser.get());
             audioParser != nullptr)
         {
+            m_hasAudio = true;
             m_audioCodecParameters = audioParser->getCodecParameters();
             if (const Track* track = m_tracks->audioTrack(deviceId))
                 senderSsrc = track->ssrc;

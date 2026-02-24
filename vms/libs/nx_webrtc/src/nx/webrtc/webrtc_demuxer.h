@@ -25,6 +25,8 @@ public:
     nx::Buffer getRtcpFirPacket(uint32_t videoSsrc); //< Back to sender. RTCP for emitting keyframe.
     QnAbstractMediaDataPtr getNextFrame(); //< From sender.
     void setSrtpEncryptionData(const rtsp::EncryptionData& data);
+    bool hasVideo() const { return m_hasVideo; }
+    bool hasAudio() const { return m_hasAudio; }
     void setResource(QnVirtualCameraResourcePtr resource) { m_resource = resource; }
     QnVirtualCameraResourcePtr resource() { return m_resource; }
     CodecParametersConstPtr audioCodecParameters() const { return m_audioCodecParameters; }
@@ -62,6 +64,8 @@ private:
     std::unique_ptr<rtsp::SrtpEncryptor> m_encryptor;
     std::deque<QnAbstractMediaDataPtr> m_frames;
     std::deque<nx::Buffer> m_feedbacks;
+    bool m_hasVideo = false;
+    bool m_hasAudio = false;
     QnVirtualCameraResourcePtr m_resource;
     nx::rtp::RtcpFirFeedback m_rtcpFir;
     CodecParametersConstPtr m_audioCodecParameters;

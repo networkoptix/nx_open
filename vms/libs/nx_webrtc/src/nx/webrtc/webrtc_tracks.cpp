@@ -140,23 +140,19 @@ bool TracksForSend::examineSdp(const std::string& /*sdp*/)
 bool TracksForRecv::examineSdp(const std::string& sdp)
 {
     m_session->demuxer()->setSdp(sdp);
-
-#if 0
-    if (hasVideo() != m_session->demuxer()->hasVideo()
-        || hasAudio() != m_session->demuxer()->hasAudio())
+    if (!m_session->demuxer()->hasVideo()
+        || m_session->demuxer()->resource()->isAudioEnabled() != m_session->demuxer()->hasAudio())
     {
         return false;
     }
 
-    if (hasAudio())
+    if (m_session->demuxer()->resource()->isAudioEnabled())
     {
         auto audioCodecParameters = m_session->demuxer()->audioCodecParameters();
         NX_ASSERT(audioCodecParameters);
         auto layout = std::make_shared<AudioLayout>(audioCodecParameters);
         m_session->reader()->setAudioLayout(layout);
     }
-#endif
-
     return true;
 }
 
@@ -198,13 +194,18 @@ std::string Tracks::getSdpForTrack(const Track* track, uint16_t /*port*/) const
 
 std::string TracksForSend::getSdpForTrack(const Track* track, uint16_t port) const
 {
-    auto encoder = m_session->muxer()->videoEncoder(track->deviceId);
+    bool isVideo = track->trackType == TrackType::video;
+    auto encoder = isVideo
+        ? m_session->muxer()->videoEncoder(track->deviceId)
+        : m_session->muxer()->audioEncoder(track->deviceId);
+
     if (!encoder)
     {
-        NX_DEBUG(this, "Encoder is not initialized for track %1:%2", track->deviceId, track->ssrc);
+        NX_DEBUG(this, "Encoder is not initialized for track %1:%2, type: %3",
+            track->deviceId, track->ssrc, (int)track->trackType);
         return {};
     }
-    bool isVideo = track->trackType == TrackType::video;
+
     return encoder->getSdpMedia(
         isVideo, track->mid, port, /*ssl*/ true).toStdString()
         + base_type::getSdpForTrack(track, port);

@@ -146,6 +146,7 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
                 positionMs,
                 newStream,
                 std::nullopt /*speedOpt*/);
+            m_session->consumer()->startProvidersIfNeeded(); //TODO It looks suspicious.
         }
         catch (const std::exception& e)
         {
@@ -203,6 +204,13 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
     }
     else if (d.HasMember("pause"))
     {
+        const auto& pauseValue = d["pause"];
+        if (!pauseValue.IsString())
+        {
+            NX_DEBUG(this, "Invalid pause method: %1", data);
+            return;
+        }
+
         if (deviceId.isNull())
             deviceId = nx::Uuid::fromStringSafe(d["pause"].GetString());
         m_session->consumer()->pause(
