@@ -83,15 +83,16 @@ bool Transcoder::createRtpEncoders(
     bool success = false;
     if (videoParameters)
     {
-        if (const auto track = m_session->tracks()->videoTrack(deviceId))
+        if (auto track = m_session->tracks()->videoTrack(deviceId))
         {
             if (auto encoder = createRtpEncoder(videoParameters, track->ssrc, track->cname, track->mid))
             {
                 success = true;
                 if (m_encryptionData.has_value())
                     encoder->setSrtpEncryptionData(*m_encryptionData);
-                m_videoEncoders[deviceId] = std::move(encoder);
                 track->offerState = TrackState::active;
+                track->payloadType = encoder->payloadType();
+                m_videoEncoders[deviceId] = std::move(encoder);
             }
             else
             {
@@ -103,15 +104,16 @@ bool Transcoder::createRtpEncoders(
 
     if (audioParameters)
     {
-        if (const auto track = m_session->tracks()->audioTrack(deviceId))
+        if (auto track = m_session->tracks()->audioTrack(deviceId))
         {
             if (auto encoder = createRtpEncoder(audioParameters, track->ssrc, track->cname, track->mid))
             {
                 success = true;
                 if (m_encryptionData.has_value())
                     encoder->setSrtpEncryptionData(*m_encryptionData);
-                m_audioEncoders[deviceId] = std::move(encoder);
                 track->offerState = TrackState::active;
+                track->payloadType = encoder->payloadType();
+                m_audioEncoders[deviceId] = std::move(encoder);
             }
             else
             {
@@ -215,11 +217,6 @@ QnUniversalRtpEncoderPtr Transcoder::createRtpEncoder(
         return nullptr;
     }
 
-    if (Track* track = m_session->tracks()->track(ssrc))
-        track->payloadType = universalEncoder->payloadType();
-    else
-        NX_WARNING(this, "Track %1 not found", ssrc);
-
     return universalEncoder;
 }
 
@@ -250,7 +247,7 @@ QnUniversalRtpEncoder* Transcoder::videoEncoder(nx::Uuid deviceId) const
 QnUniversalRtpEncoder* Transcoder::audioEncoder(nx::Uuid deviceId) const
 {
     auto it = m_audioEncoders.find(deviceId);
-    return it != m_videoEncoders.end() ? it->second.get() : nullptr;
+    return it != m_audioEncoders.end() ? it->second.get() : nullptr;
 }
 
 bool Transcoder::constructMimeType()

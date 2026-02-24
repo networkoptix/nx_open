@@ -86,17 +86,17 @@ Session::Session(
     m_localUfrag = localUfrag;
     m_localPwd = generatePwd(24);
     m_dtls = std::make_shared<Dtls>(m_localUfrag, m_pem);
-
-    m_tracks = std::make_unique<TracksForSend>(this);
     m_transceiver = std::make_unique<Streamer>(this);
 
     if (m_purpose == Purpose::send)
     {
+        m_tracks = std::make_unique<TracksForSend>(this);
         m_consumer = std::make_unique<Consumer>(this);
         m_providerFactory = std::move(providerFactory);
     }
     else if (m_purpose == Purpose::recv)
     {
+        m_tracks = std::make_unique<TracksForRecv>(this);
         auto video = std::make_unique<Track>(Track{
             .mid = 0,
             .payloadType = 96,
@@ -112,6 +112,7 @@ Session::Session(
         });
         m_tracks->addTrack(std::move(audio));
 
+        m_transceiver = std::make_unique<Receiver>(this);
         m_demuxer = std::make_unique<Demuxer>(m_tracks.get());
     }
 }
@@ -511,12 +512,10 @@ std::string Session::constructSdp()
 
     for (size_t i = 0; i < tracks.size(); ++i)
     {
-        sdp += m_tracks->getSdpForTrack(&tracks[i], i == 0 ? port : 9);
-        if (i == 0)
-            sdp += dataChannelSdp();
-        else
-            sdp += std::string("a=bundle-only") + ENDL;
+        sdp += m_tracks->getSdpForTrack(&tracks[i], port);
+        sdp += std::string("a=bundle-only") + ENDL;
     }
+    sdp += dataChannelSdp();
     return sdp;
 }
 
@@ -538,6 +537,12 @@ AnswerResult Session::processSdpAnswer(const std::string& sdp)
             this,
             "%1: Tracks in offer and answer does not match (application track doesn't exists)",
             id());
+        return AnswerResult::failed;
+    }
+
+    if (!m_tracks->examineSdp(sdp))
+    {
+        NX_DEBUG(this, "%1: SDP examination failed", id());
         return AnswerResult::failed;
     }
 

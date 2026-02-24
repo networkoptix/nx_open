@@ -218,8 +218,6 @@ bool Tracker::processMessages()
 
     NX_VERBOSE(this, "Answer examination result: %1 in stage: %2", (int)result);
 
-    m_session->consumer()->startProvidersIfNeeded();
-
     if (!m_iceSent)
     {
         NX_VERBOSE(this, "Answer succeeded, send ice candidates");
