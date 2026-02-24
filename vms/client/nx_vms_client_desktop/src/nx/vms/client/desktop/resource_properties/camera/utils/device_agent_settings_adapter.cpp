@@ -67,7 +67,7 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
                 this,
                 [this](const nx::Uuid& engineId, const core::DeviceAgentData& data)
                 {
-                    d->store->resetDeviceAgentData(engineId, data);
+                    d->store->resetDeviceAgentData(engineId, data, /*replaceUser*/ false);
                 });
 
             connect(
