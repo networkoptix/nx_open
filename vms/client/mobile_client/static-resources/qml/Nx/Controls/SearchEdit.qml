@@ -13,6 +13,7 @@ Item
 
     property alias placeholderText: textField.placeholderText
 
+    property alias text: textField.text
     readonly property alias displayText: textField.displayText
     property bool hasClearButton: true
 

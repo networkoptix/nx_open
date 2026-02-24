@@ -12,6 +12,9 @@ MenuItem
 {
     id: control
 
+    property alias horizontalAlignment: text.horizontalAlignment
+    property alias textColor: text.color
+
     font.pixelSize: 16
     leftPadding: 20
     rightPadding: 20

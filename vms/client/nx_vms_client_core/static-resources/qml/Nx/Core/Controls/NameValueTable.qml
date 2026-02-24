@@ -50,6 +50,7 @@ Item
     property Menu contextMenu
     readonly property alias hoveredRow: highlight.rowIndex
     readonly property var hoveredItem: hoveredRow >= 0 ? items[hoveredRow] : undefined
+    property alias highlight: highlight
 
     property bool separatorsVisible: false
 

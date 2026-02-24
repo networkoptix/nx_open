@@ -116,3 +116,18 @@ function attributeFiltersFromValues(values, parentName)
 
     return result
 }
+
+function createSearchRequestText(key, values)
+{
+    const escape =
+        (str) =>
+        {
+            str = str.replace(/([\"\\\:\$])/g, '\\$1');
+            return str.includes(" ") ? `"${str}"` : str
+        }
+
+    const escapedKeyValuePairs =
+        Array.prototype.map.call(values, v => `${escape(key)}=${escape(v)}`)
+
+    return escapedKeyValuePairs.join(" ")
+}

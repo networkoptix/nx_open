@@ -8,6 +8,7 @@ import Nx.Analytics
 import Nx.Controls
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Core.EventSearch
 import Nx.Models
 import Nx.RightPanel
 
@@ -954,8 +955,11 @@ Window
 
             onSearchRequested: (attribute) =>
             {
-                if (attribute)
-                    header.searchText = createSearchRequestText(attribute.id, attribute.values)
+                if (!attribute)
+                    return
+
+                header.searchText =
+                    EventSearchHelpers.createSearchRequestText(attribute.id, attribute.values)
             }
 
             onClose:

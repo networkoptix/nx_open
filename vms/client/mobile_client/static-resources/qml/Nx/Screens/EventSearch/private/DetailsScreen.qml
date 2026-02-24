@@ -8,6 +8,7 @@ import QtQuick.Window
 import Nx.Controls
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Core.EventSearch
 import Nx.Core.Items
 import Nx.Core.Ui
 import Nx.Items
@@ -39,6 +40,7 @@ Page
     readonly property alias showControls: d.showControls
 
     signal fullscreenButtonClicked
+    signal searchRequested(string text)
 
     function share()
     {
@@ -342,10 +344,15 @@ Page
 
             AnalyticsAttributeTable
             {
+                id: attributeTable
+
                 width: parent.width
 
                 attributes: d.accessor.getData(currentEventIndex, "analyticsAttributes") ?? []
 
+                interactive: true
+                contextMenu: searchMenu
+                highlight.visible: false
                 nameFont.pixelSize: 14
                 nameColor: ColorTheme.colors.light10
                 valueFont.pixelSize: 14
@@ -356,6 +363,49 @@ Page
                 rowSpacing: 16
                 separatorsVisible: true
             }
+        }
+    }
+
+    Menu
+    {
+        id: searchMenu
+
+        property var attribute: null
+        property int margin: 20
+
+        x: margin
+        y: parent.height - height - margin
+        width: parent.width - x - margin
+
+        function popup()
+        {
+            attribute = attributeTable.hoveredItem
+            open() //< Open at the current position.
+        }
+
+        MenuItem
+        {
+            text: searchMenu.attribute?.displayedValues.join(", ") ?? ""
+            horizontalAlignment: Qt.AlignHCenter
+            textColor: ColorTheme.colors.light14
+        }
+
+        MenuItem
+        {
+            text: qsTr("Search by attribute")
+            horizontalAlignment: Qt.AlignHCenter
+
+            onClicked:
+            {
+                eventDetailsScreen.searchRequested(EventSearchHelpers.createSearchRequestText(
+                    searchMenu.attribute.id, searchMenu.attribute.values))
+            }
+        }
+
+        MenuItem
+        {
+            text: qsTr("Cancel")
+            horizontalAlignment: Qt.AlignHCenter
         }
     }
 

@@ -205,6 +205,14 @@ AdaptiveScreen
                     }
                 }
             }
+
+            function onSearchRequested(text)
+            {
+                searchField.text = text
+
+                if (LayoutController.isPortrait)
+                    screen.contentItem = searchContent
+            }
         }
     }
 
