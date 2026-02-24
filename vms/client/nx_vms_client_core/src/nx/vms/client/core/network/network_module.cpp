@@ -138,6 +138,15 @@ void NetworkModule::setSession(std::shared_ptr<RemoteSession> session)
     // This is due to the connectionClose signal in the messageProcessor, which is emitted
     // by ~RemoteSession.
     auto tmpSession = d->session;
+
+    // Stop the old session's threads (including TimeSyncManager) before nullifying sessionPtr
+    // in the certificate verifier. Otherwise a race condition occurs: TimeSyncManager runs on
+    // its own thread and calls makeAdapterFunc() which needs a valid sessionPtr. close() calls
+    // TimeSyncManager::stop() which waits for the thread to finish, guaranteeing it will no
+    // longer access sessionPtr by the time we clear it.
+    if (tmpSession)
+        tmpSession->close();
+
     d->certificateVerifier->setSession(session);
     {
         NX_MUTEX_LOCKER lock(&d->mutex);
