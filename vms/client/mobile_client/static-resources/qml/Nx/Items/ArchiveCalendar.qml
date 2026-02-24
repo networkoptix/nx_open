@@ -16,7 +16,6 @@ Pane
     id: control
 
     property real position: 0
-    property real displayOffset: 0
     property var timeZone
     property ChunkProvider chunkProvider: null
     property bool horizontal: mainWindow.width > 540
@@ -26,7 +25,7 @@ Pane
 
     function resetToCurrentPosition()
     {
-        d.monthData = d.createMonthDataFromPosition(control.position, control.displayOffset)
+        d.monthData = d.createMonthDataFromPosition(control.position)
         monthsModel.clear()
         monthsModel.append(d.prevMonthData(d.monthData))
         monthsModel.append(d.monthData)
@@ -49,7 +48,7 @@ Pane
         id: d
 
         readonly property alias ui: loader.item
-        property var monthData: createMonthDataFromDate(new Date())
+        property var monthData: createMonthDataFromPosition(new Date().getTime())
 
         function previousMonthClicked()
         {
@@ -102,14 +101,11 @@ Pane
             return result;
         }
 
-        function createMonthDataFromDate(date)
+        function createMonthDataFromPosition(position)
         {
-            return createMonthData(date.getUTCFullYear(), date.getUTCMonth() + 1)
-        }
-
-        function createMonthDataFromPosition(position, displayOffset)
-        {
-            return createMonthDataFromDate(new Date(position + displayOffset))
+            return createMonthData(
+                Number(NxGlobals.formatTimestamp(position, "yyyy", timeZone)),
+                Number(NxGlobals.formatTimestamp(position, "MM", timeZone)))
         }
 
         function prevMonthData(data)
@@ -215,7 +211,6 @@ Pane
             id: calendarMonth
 
             position: control.position
-            displayOffset: control.displayOffset
             width: d.ui.monthsList.width
             height: d.ui.monthsList.height
             year: model.year

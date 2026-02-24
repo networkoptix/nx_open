@@ -34,8 +34,6 @@ class NX_VMS_CLIENT_CORE_API CalendarModel: public QAbstractListModel
         READ allCamerasPeriodStorage
         WRITE setAllCamerasPeriodStorage
         NOTIFY allCamerasPeriodStorageChanged)
-    Q_PROPERTY(qint64 displayOffset READ displayOffset WRITE setDisplayOffset
-        NOTIFY displayOffsetChanged)
 
 public:
     enum Role
@@ -43,6 +41,7 @@ public:
         DateRole = Qt::UserRole + 1,
         HasArchiveRole,
         AnyCameraHasArchiveRole,
+        TimeRangeRole,
         IsFutureDateRole,
     };
 
@@ -73,9 +72,6 @@ public: // Properties and invokables.
     AbstractTimePeriodStorage* allCamerasPeriodStorage() const;
     void setAllCamerasPeriodStorage(AbstractTimePeriodStorage* store);
 
-    qint64 displayOffset() const;
-    void setDisplayOffset(qint64 value);
-
 public: // Overrides section.
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
@@ -90,7 +86,6 @@ signals:
     void allCamerasPeriodStorageChanged();
     void localeChanged();
     void timeZoneChanged();
-    void displayOffsetChanged();
 
 private:
     struct Private;

@@ -4,8 +4,8 @@
 
 #include <common/common_globals.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/core/time/date_range.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
+#include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
 namespace nx::vms::client::desktop {
@@ -23,11 +23,10 @@ public:
 
     bool isEmpty() const;
 
-    QmlProperty<core::DateRange> range{this, "range"};
-    QmlProperty<core::DateRange> selection{this, "selection"};
+    QmlProperty<QnTimePeriod> range{this, "range"};
+    QmlProperty<QnTimePeriod> selection{this, "selection"};
     QmlProperty<int> visibleYear{this, "visibleYear"};
     QmlProperty<int> visibleMonth{this, "visibleMonth"};
-    QmlProperty<qint64> displayOffset{this, "displayOffset"};
     QmlProperty<QTimeZone> timeZone{this, "timeZone"};
     QmlProperty<bool> periodsVisible{this, "periodsVisible"};
     QmlProperty<Qn::TimePeriodContent> timePeriodType{this, "timePeriodType"};

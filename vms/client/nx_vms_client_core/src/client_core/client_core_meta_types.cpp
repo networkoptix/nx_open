@@ -80,7 +80,6 @@
 #include <nx/vms/client/core/thumbnails/abstract_resource_thumbnail.h>
 #include <nx/vms/client/core/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/core/time/calendar_model.h>
-#include <nx/vms/client/core/time/date_range.h>
 #include <nx/vms/client/core/time/day_hours_model.h>
 #include <nx/vms/client/core/time/display_time_helper.h>
 #include <nx/vms/client/core/time/duration_formatter.h>
@@ -175,9 +174,9 @@ void registerQmlTypesInternal()
         "Nx.Utils", 1, 0, "Url", "Cannot create an instance of Url.");
     qmlRegisterUncreatableType<nx::utils::SoftwareVersion>(
         "Nx.Core", 1, 0, "SoftwareVersion", "Cannot create an instance of SoftwareVersion.");
-    qRegisterMetaType<DateRange>();
-    qmlRegisterUncreatableType<DateRange>(
-        "nx.vms.client.core", 1, 0, "DateRange", "Cannot create an instance of DateRange.");
+
+    qmlRegisterUncreatableType<QnTimePeriod>(
+        "nx.vms.common", 1, 0, "QnTimePeriod", "Cannot create an instance of QnTimePeriod.");
 
     FrameSection::registedQmlType();
     Geometry::registerQmlType();

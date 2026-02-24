@@ -198,7 +198,6 @@ void HighlightTestFixture::SetUp()
     base_type::SetUp();
 
     const auto params = base_type::GetParam();
-    model.setDisplayOffset(params.displayOffset);
 }
 
 QDate HighlightTestFixture::findHighlightedCell() const

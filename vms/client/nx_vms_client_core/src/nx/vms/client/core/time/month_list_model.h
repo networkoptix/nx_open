@@ -5,6 +5,7 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QDate>
 #include <QtCore/QLocale>
+#include <QtCore/QTimeZone>
 
 Q_MOC_INCLUDE("nx/vms/client/core/media/abstract_time_period_storage.h")
 
@@ -27,8 +28,7 @@ class NX_VMS_CLIENT_CORE_API MonthListModel: public QAbstractListModel
         READ allCamerasPeriodStorage
         WRITE setAllCamerasPeriodStorage
         NOTIFY allCamerasPeriodStorageChanged)
-    Q_PROPERTY(qint64 displayOffset READ displayOffset WRITE setDisplayOffset
-        NOTIFY displayOffsetChanged)
+    Q_PROPERTY(QTimeZone timeZone READ timeZone WRITE setTimeZone NOTIFY timeZoneChanged)
 
 public:
     enum Role
@@ -53,8 +53,8 @@ public:
     AbstractTimePeriodStorage* allCamerasPeriodStorage() const;
     void setAllCamerasPeriodStorage(AbstractTimePeriodStorage* store);
 
-    qint64 displayOffset() const;
-    void setDisplayOffset(qint64 value);
+    QTimeZone timeZone() const;
+    void setTimeZone(const QTimeZone& value);
 
     static void registerQmlType();
 
@@ -69,7 +69,7 @@ signals:
     void periodStorageChanged();
     void allCamerasPeriodStorageChanged();
     void localeChanged();
-    void displayOffsetChanged();
+    void timeZoneChanged();
 
 private:
     struct Private;

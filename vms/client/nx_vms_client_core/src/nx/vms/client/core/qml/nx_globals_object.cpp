@@ -249,9 +249,9 @@ bool NxGlobalsObject::isSequence(const QJSValue& value) const
     return value.isArray() || value.toVariant().canConvert<QVariantList>();
 }
 
-DateRange NxGlobalsObject::dateRange(const QDateTime& start, const QDateTime& end) const
+QnTimePeriod NxGlobalsObject::timePeriodFromInterval(qint64 startMs, qint64 endMs) const
 {
-    return DateRange{start, end};
+    return QnTimePeriod::fromInterval(startMs, endMs);
 }
 
 bool NxGlobalsObject::fileExists(const QString& path) const
@@ -376,6 +376,14 @@ QString NxGlobalsObject::dateInShortFormat(const QDateTime& date)
 QString NxGlobalsObject::timeInShortFormat(const QDateTime& date)
 {
     return nx::vms::time::toString(date, nx::vms::time::Format::hh_mm_ss);
+}
+
+QString NxGlobalsObject::formatTimestamp(
+    qint64 timestampMs,
+    const QString& format,
+    const QTimeZone& timeZone)
+{
+    return QLocale().toString(QDateTime::fromMSecsSinceEpoch(timestampMs, timeZone), format);
 }
 
 QString NxGlobalsObject::dateTimeInShortFormat(const QDateTime& dateTime)

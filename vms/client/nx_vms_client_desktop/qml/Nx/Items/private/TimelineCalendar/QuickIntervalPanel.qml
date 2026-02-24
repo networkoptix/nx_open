@@ -14,7 +14,7 @@ Item
 {
     height: 32
 
-    property var range: NxGlobals.dateRange(
+    property var range: NxGlobals.timePeriodFromInterval(
         new Date(1970, 1, 1), DateUtils.addDays(currentDate, 1))
     property date currentDate: new Date()
 
@@ -60,7 +60,7 @@ Item
             implicitWidth: buttonText.implicitWidth + 16
             implicitHeight: buttonText.implicitHeight
 
-            enabled: getStartDate() <= range.end && getStartDate() >= range.start
+            enabled: getStartDate() <= range.endTimeMs && getStartDate() >= range.startTimeMs
 
             function getStartDate() { return new Date(currentDate.getTime() - interval) }
 

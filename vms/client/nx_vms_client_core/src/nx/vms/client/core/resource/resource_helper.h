@@ -39,7 +39,6 @@ class ResourceHelper: public QObject
     Q_PROPERTY(bool isLayout READ isLayout NOTIFY resourceChanged)
 
     Q_PROPERTY(QTimeZone timeZone READ timeZone NOTIFY timeZoneChanged)
-    Q_PROPERTY(qint64 displayOffset READ displayOffset NOTIFY timeZoneChanged)
 
 public:
     ResourceHelper(QObject* parent = nullptr);
@@ -60,7 +59,6 @@ public:
     bool isLayout() const;
 
     QTimeZone timeZone() const;
-    qint64 displayOffset() const;
 
 signals:
     void resourceChanged();

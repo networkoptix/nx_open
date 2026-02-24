@@ -5,6 +5,7 @@
 #include <QtCore/QModelIndex>
 #include <QtCore/QObject>
 #include <QtCore/QPersistentModelIndex>
+#include <QtCore/QTimeZone>
 #include <QtCore/QVariant>
 #include <QtGui/QCursor>
 #include <QtQml/QJSValue>
@@ -14,7 +15,7 @@
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/enums.h>
-#include <nx/vms/client/core/time/date_range.h>
+#include <recording/time_period.h>
 
 class QQuickItemView;
 
@@ -64,8 +65,10 @@ public:
 
     Q_INVOKABLE bool isSequence(const QJSValue& value) const;
 
-    Q_INVOKABLE nx::vms::client::core::DateRange dateRange(
-        const QDateTime& start, const QDateTime& end) const;
+    /**
+     * @return Time period defined by bounds [startMs, endMs).
+     */
+    Q_INVOKABLE QnTimePeriod timePeriodFromInterval(qint64 startMs, qint64 endMs) const;
 
     Q_INVOKABLE QLocale numericInputLocale(const QString& basedOn = "") const;
 
@@ -101,6 +104,9 @@ public:
     Q_INVOKABLE QString dateInShortFormat(const QDateTime& date);
 
     Q_INVOKABLE QString timeInShortFormat(const QDateTime& date);
+
+    Q_INVOKABLE QString formatTimestamp(qint64 timestampMs,
+        const QString& format, const QTimeZone& timeZone = {QTimeZone::LocalTime});
 
     Q_INVOKABLE QString dateTimeInShortFormat(const QDateTime& dateTime);
 

@@ -161,28 +161,6 @@ bool ResourceHelper::isLayout() const
     return !m_resource.dynamicCast<QnLayoutResource>().isNull();
 }
 
-// FIXME: #sivanov Used in the only place in the mobile client.
-qint64 ResourceHelper::displayOffset() const
-{
-    using namespace std::chrono;
-
-    if (!m_resource)
-        return 0;
-
-    auto systemContext = SystemContext::fromResource(m_resource);
-    if (!NX_ASSERT(systemContext))
-        return 0;
-
-    if (systemContext->serverTimeWatcher()->timeMode() == ServerTimeWatcher::clientTimeMode)
-        return 0;
-
-    const milliseconds resourceOffset = seconds(ServerTimeWatcher::timeZone(
-        m_resource.dynamicCast<QnMediaResource>()).offsetFromUtc(QDateTime::currentDateTime()));
-    const milliseconds localOffset = seconds(QDateTime::currentDateTime().offsetFromUtc());
-
-    return (resourceOffset - localOffset).count();
-}
-
 QTimeZone ResourceHelper::timeZone() const
 {
     if (!m_resource)

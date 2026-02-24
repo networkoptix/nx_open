@@ -51,7 +51,7 @@ struct MonthListModel::Private
     MonthListModel* const q;
 
     int year = calendar_utils::kMinYear;
-    qint64 displayOffset = 0;
+    QTimeZone timeZone{QTimeZone::LocalTime};
     QLocale locale;
     bool hourHasArchive[(int) PeriodStorageType::count][kMonthsPerYear];
 
@@ -80,16 +80,16 @@ void MonthListModel::Private::updateArchiveInfo(PeriodStorageType type)
         store ? store->periods(Qn::RecordingContent) : QnTimePeriodList();
 
     const qint64 startPosition =
-        QDate(year, 1, 1).startOfDay().toMSecsSinceEpoch() - displayOffset;
+        QDate(year, 1, 1).startOfDay(timeZone).toMSecsSinceEpoch();
 
     const QBitArray archivePresence = calendar_utils::buildArchivePresence(
         timePeriods,
         milliseconds(startPosition),
         kMonthsPerYear,
-        [](milliseconds timestamp)
+        [this](milliseconds timestamp)
         {
             return milliseconds(QDateTime::fromMSecsSinceEpoch(
-                timestamp.count()).addMonths(1).toMSecsSinceEpoch());
+                timestamp.count(), timeZone).addMonths(1).toMSecsSinceEpoch());
         });
 
     for (int i = 0; i < kMonthsPerYear; ++i)
@@ -198,21 +198,18 @@ void MonthListModel::setAllCamerasPeriodStorage(AbstractTimePeriodStorage* store
     d->setPeriodStorage(store, PeriodStorageType::allCameras);
 }
 
-qint64 MonthListModel::displayOffset() const
+QTimeZone MonthListModel::timeZone() const
 {
-    return d->displayOffset;
+    return d->timeZone;
 }
 
-void MonthListModel::setDisplayOffset(qint64 value)
+void MonthListModel::setTimeZone(const QTimeZone& value)
 {
-    value = std::clamp<qint64>(
-        value, calendar_utils::kMinDisplayOffset, calendar_utils::kMaxDisplayOffset);
-
-    if (d->displayOffset == value)
+    if (d->timeZone == value)
         return;
 
-    d->displayOffset = value;
-    emit displayOffsetChanged();
+    d->timeZone = value;
+    emit timeZoneChanged();
 
     d->resetModelData();
 }

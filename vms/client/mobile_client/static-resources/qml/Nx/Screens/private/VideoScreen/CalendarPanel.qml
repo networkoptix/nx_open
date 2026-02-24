@@ -11,7 +11,6 @@ Popup
 
     property alias chunkProvider: calendar.chunkProvider
     property alias position: calendar.position
-    property alias displayOffset: calendar.displayOffset
     property alias timeZone: calendar.timeZone
 
     property bool horizontal: false

@@ -2,6 +2,8 @@
 
 #include "display_time_helper.h"
 
+#include <chrono>
+
 #include <QtQml/QtQml>
 
 #include <nx/vms/client/core/time/calendar_utils.h>
@@ -17,7 +19,7 @@ struct DisplayTimeHelper::Private
 
     DisplayTimeHelper* const q;
     qint64 position = 0;
-    qint64 displayOffset = 0;
+    QTimeZone timeZone{QTimeZone::LocalTime};
     QDateTime dateTime;
     nx::vms::time::FormatterPtr formatter;
 };
@@ -25,7 +27,7 @@ struct DisplayTimeHelper::Private
 DisplayTimeHelper::Private::Private(DisplayTimeHelper* owner):
     q(owner),
     position(0),
-    displayOffset(0),
+    timeZone(QTimeZone::LocalTime),
     dateTime(getDateTime()),
     formatter(nx::vms::time::Formatter::system())
 {
@@ -33,7 +35,7 @@ DisplayTimeHelper::Private::Private(DisplayTimeHelper* owner):
 
 QDateTime DisplayTimeHelper::Private::getDateTime() const
 {
-    return QDateTime::fromMSecsSinceEpoch(position + displayOffset);
+    return QDateTime::fromMSecsSinceEpoch(position, timeZone);
 }
 
 void DisplayTimeHelper::Private::handleChanges()
@@ -55,7 +57,7 @@ DisplayTimeHelper::DisplayTimeHelper(QObject* parent):
 {
     const auto updateDateTime = [this]() { d->handleChanges(); };
     connect(this, &DisplayTimeHelper::positionChanged, this, updateDateTime);
-    connect(this, &DisplayTimeHelper::displayOffsetChanged, this, updateDateTime);
+    connect(this, &DisplayTimeHelper::timeZoneChanged, this, updateDateTime);
     connect(this, &DisplayTimeHelper::localeChanged, this, updateDateTime);
     connect(this, &DisplayTimeHelper::is24HoursTimeFormatChanged, this, updateDateTime);
 }
@@ -79,21 +81,18 @@ qint64 DisplayTimeHelper::position() const
     return d->position;
 }
 
-void DisplayTimeHelper::setDisplayOffset(qint64 value)
+QTimeZone DisplayTimeHelper::timeZone() const
 {
-    value = std::clamp<qint64>(
-        value, calendar_utils::kMinDisplayOffset, calendar_utils::kMaxDisplayOffset);
-
-    if (d->displayOffset == value)
-        return;
-
-    d->displayOffset = value;
-    emit displayOffsetChanged();
+    return d->timeZone;
 }
 
-qint64 DisplayTimeHelper::displayOffset() const
+void DisplayTimeHelper::setTimeZone(const QTimeZone& value)
 {
-    return d->displayOffset;
+    if (d->timeZone == value)
+        return;
+
+    d->timeZone = value;
+    emit timeZoneChanged();
 }
 
 void DisplayTimeHelper::setLocale(const QLocale& locale)
@@ -117,6 +116,17 @@ void DisplayTimeHelper::set24HoursTimeFormat(bool value)
 bool DisplayTimeHelper::is24HoursTimeFormat() const
 {
     return d->formatter->is24HoursTimeFormat();
+}
+
+qint64 DisplayTimeHelper::displayOffset() const
+{
+    const std::chrono::milliseconds displayTimeZoneUtcOffsetMs =
+        std::chrono::seconds(QDateTime::currentDateTime(d->timeZone).offsetFromUtc());
+
+    const std::chrono::milliseconds localTimeZoneUtcOffsetMs =
+        std::chrono::seconds(QDateTime::currentDateTime().offsetFromUtc());
+
+    return (displayTimeZoneUtcOffsetMs - localTimeZoneUtcOffsetMs).count();
 }
 
 QLocale DisplayTimeHelper::locale() const

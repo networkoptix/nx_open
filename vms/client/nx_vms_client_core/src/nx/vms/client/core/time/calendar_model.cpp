@@ -12,6 +12,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/media/abstract_time_period_storage.h>
 #include <nx/vms/client/core/time/calendar_utils.h>
+#include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
 using namespace std::chrono;
@@ -38,35 +39,29 @@ int roleForPeriodStorageType(PeriodStorageType type)
 
 struct Day
 {
-    Day(const QDate& date, qint64 displayOffset);
-
-    qint64 endTime() const;
+    Day(const QDate& date, const QTimeZone& timeZone);
 
     QDate date;
     qint64 startTime = 0;
+    qint64 endTime = 0;
 
     bool hasArchive[(int) PeriodStorageType::count]{false, false};
 };
 
-Day::Day(const QDate& date, qint64 displayOffset):
+Day::Day(const QDate& date, const QTimeZone& timeZone):
     date(date),
-    startTime(QDateTime(date, QTime()).toMSecsSinceEpoch() - displayOffset)
+    startTime(date.startOfDay(timeZone).toMSecsSinceEpoch()),
+    endTime(date.addDays(1).startOfDay(timeZone).toMSecsSinceEpoch())
 {
-}
-
-qint64 Day::endTime() const
-{
-    static constexpr qint64 kMillisecondsInDay = 24 * 60 * 60 * 1000;
-    return startTime + kMillisecondsInDay - 1;
 }
 
 //-------------------------------------------------------------------------------------------------
 
 struct Month
 {
-    Month(int year = 1970, int month = 1, qint64 displayOffset = 0);
+    Month(const QTimeZone& timeZone = {QTimeZone::LocalTime}, int year = 1970, int month = 1);
 
-    void recalculateData(qint64 displayOffset);
+    void recalculateData(const QTimeZone& timeZone);
     bool containsDay(const Day& day) const;
 
     int year;
@@ -75,22 +70,22 @@ struct Month
     Day endDay;
 };
 
-Month::Month(int year, int month, qint64 displayOffset):
+Month::Month(const QTimeZone& timeZone, int year, int month):
     year(year),
     month(month),
-    startDay(QDate(year, month, 1), displayOffset),
-    endDay(QDate(year, month, QDate(year, month, 1).daysInMonth()), displayOffset)
+    startDay(QDate(year, month, 1), timeZone),
+    endDay(QDate(year, month, QDate(year, month, 1).daysInMonth()), timeZone)
 {
 }
 
-void Month::recalculateData(qint64 displayOffset)
+void Month::recalculateData(const QTimeZone& timeZone)
 {
-    *this = Month(year, month, displayOffset);
+    *this = Month(timeZone, year, month);
 }
 
 bool Month::containsDay(const Day& day) const
 {
-    return day.startTime <= endDay.endTime() && day.endTime() >= startDay.startTime;
+    return day.startTime <= endDay.endTime && day.endTime >= startDay.startTime;
 }
 
 } // namespace
@@ -106,11 +101,10 @@ struct CalendarModel::Private
 
     CalendarModel* const q;
 
-    qint64 displayOffset = 0;
     Month currentMonth;
     QList<Day> days;
     QLocale locale;
-    QTimeZone timeZone{QTimeZone::LocalTime}; //< FIXME: #sivanov Implement timezone usage.
+    QTimeZone timeZone{QTimeZone::LocalTime};
 
     Qn::TimePeriodContent timePeriodType = Qn::RecordingContent;
     AbstractTimePeriodStorage* periodStorage[(int) PeriodStorageType::count]{nullptr, nullptr};
@@ -139,7 +133,7 @@ void CalendarModel::Private::resetDaysModelData()
     {
         for (int day = 0; day < kDaysInWeek; ++day)
         {
-            days.append(Day(date, displayOffset));
+            days.append(Day(date, timeZone));
             date = date.addDays(1);
         }
     }
@@ -147,7 +141,7 @@ void CalendarModel::Private::resetDaysModelData()
     updateArchiveInfo(PeriodStorageType::currentCamera);
     updateArchiveInfo(PeriodStorageType::allCameras);
     q->endResetModel();
-    currentMonth.recalculateData(displayOffset);
+    currentMonth.recalculateData(timeZone);
 }
 
 void CalendarModel::Private::updateArchiveInfo(PeriodStorageType type)
@@ -157,13 +151,23 @@ void CalendarModel::Private::updateArchiveInfo(PeriodStorageType type)
     const QnTimePeriodList timePeriods =
         store ? store->periods(timePeriodType) : QnTimePeriodList();
 
-    const qint64 startPosition = days.first().date.startOfDay(timeZone).toMSecsSinceEpoch();
+    const qint64 startPosition = days.first().startTime;
+
+    const auto getNextPosition =
+        [this](milliseconds timestamp)
+        {
+            const auto timestampDate =
+                QDateTime::fromMSecsSinceEpoch(timestamp.count(), timeZone).date();
+
+            return std::chrono::milliseconds(
+                timestampDate.addDays(1).startOfDay(timeZone).toMSecsSinceEpoch());
+        };
 
     const QBitArray archivePresence = calendar_utils::buildArchivePresence(
         timePeriods,
         milliseconds(startPosition),
         days.size(),
-        [](milliseconds timestamp) -> milliseconds { return timestamp + 24h; });
+        getNextPosition);
 
     for (int i = 0; i < days.size(); ++i)
         days[i].hasArchive[(int) type] = archivePresence[i];
@@ -241,11 +245,13 @@ QVariant CalendarModel::data(const QModelIndex& index, int role) const
         case Qt::DisplayRole:
             return d->currentMonth.containsDay(day) ? QString::number(day.date.day()) : QString();
         case DateRole:
-            return QDateTime(day.date, QTime());
+            return day.date;
         case HasArchiveRole:
             return day.hasArchive[(int) PeriodStorageType::currentCamera];
         case AnyCameraHasArchiveRole:
             return day.hasArchive[(int) PeriodStorageType::allCameras];
+        case TimeRangeRole:
+            return QVariant::fromValue(QnTimePeriod::fromInterval(day.startTime, day.endTime));
         case IsFutureDateRole:
             return day.date > QDateTime::currentDateTimeUtc().toTimeZone(d->timeZone).date();
     }
@@ -263,6 +269,7 @@ QHash<int, QByteArray> CalendarModel::roleNames() const
             {DateRole, "date"},
             {HasArchiveRole, "hasArchive"},
             {AnyCameraHasArchiveRole, "anyCameraHasArchive"},
+            {TimeRangeRole, "timeRange"},
             {IsFutureDateRole, "isFutureDate"}
         });
     }
@@ -280,7 +287,7 @@ void CalendarModel::setYear(int year)
     if (year == d->currentMonth.year)
         return;
 
-    d->currentMonth = Month(year, d->currentMonth.month, d->displayOffset);
+    d->currentMonth = Month(d->timeZone, year, d->currentMonth.month);
     emit yearChanged();
 
     d->resetDaysModelData();
@@ -297,7 +304,7 @@ void CalendarModel::setMonth(int month)
     if (month == d->currentMonth.month)
         return;
 
-    d->currentMonth = Month(d->currentMonth.year, month, d->displayOffset);
+    d->currentMonth = Month(d->timeZone, d->currentMonth.year, month);
     emit yearChanged();
 
     d->resetDaysModelData();
@@ -337,25 +344,6 @@ AbstractTimePeriodStorage* CalendarModel::allCamerasPeriodStorage() const
 void CalendarModel::setAllCamerasPeriodStorage(AbstractTimePeriodStorage* store)
 {
     d->setPeriodStorage(store, PeriodStorageType::allCameras);
-}
-
-qint64 CalendarModel::displayOffset() const
-{
-    return d->displayOffset;
-}
-
-void CalendarModel::setDisplayOffset(qint64 value)
-{
-    value = std::clamp<qint64>(
-        value, calendar_utils::kMinDisplayOffset, calendar_utils::kMaxDisplayOffset);
-
-    if (d->displayOffset == value)
-        return;
-
-    d->displayOffset = value;
-    emit displayOffsetChanged();
-
-    d->resetDaysModelData();
 }
 
 QLocale CalendarModel::locale() const

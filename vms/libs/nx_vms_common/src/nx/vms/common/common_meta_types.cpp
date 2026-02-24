@@ -140,6 +140,8 @@ void initializeMetatypesInternal()
     qRegisterMetaType<QnScheduleTaskList>();
 
     qRegisterMetaType<Qn::TimePeriodContent>();
+
+    qRegisterMetaType<QnTimePeriod>();
     qRegisterMetaType<QnTimePeriodList>();
     qRegisterMetaType<MultiServerPeriodDataList>();
 

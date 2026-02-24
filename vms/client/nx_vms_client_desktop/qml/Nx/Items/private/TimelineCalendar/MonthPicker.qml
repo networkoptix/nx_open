@@ -10,7 +10,7 @@ import nx.vms.client.core
 Item
 {
     property alias year: monthListModel.year
-    property alias displayOffset: monthListModel.displayOffset
+    property alias timeZone: monthListModel.timeZone
     property alias locale: monthListModel.locale
     property alias periodStorage: monthListModel.periodStorage
     property alias allCamerasPeriodStorage: monthListModel.allCamerasPeriodStorage

@@ -6,6 +6,7 @@ import Nx.Core
 
 import nx.vms.client.core
 import nx.vms.client.desktop
+import nx.vms.common
 
 Item
 {
@@ -14,13 +15,14 @@ Item
     property var locale: Qt.locale()
     property alias date: dayHoursModel.date
 
-    property int minimumHour: 0
-    property int maximumHour: 23
+    property var range: NxGlobals.timePeriodFromInterval(
+        new Date(1970, 1, 1),
+        DateUtils.addDays(d.today, 1))
 
-    property int selectionStart: minimumHour
-    property int selectionEnd: maximumHour
+    property var selection: NxGlobals.timePeriodFromInterval(
+        d.today,
+        DateUtils.addDays(d.today, 1))
 
-    property alias displayOffset: dayHoursModel.displayOffset
     property alias timeZone: dayHoursModel.timeZone
     property alias timePeriodType: dayHoursModel.timePeriodType
     property alias periodStorage: dayHoursModel.periodStorage
@@ -29,7 +31,7 @@ Item
 
     implicitHeight: grid.implicitHeight
 
-    signal selectionEdited(int start, int end)
+    signal selectionEdited(var start, var end)
 
     DayHoursModel
     {
@@ -80,10 +82,14 @@ Item
 
                 property int hour: model.hour
 
+                readonly property QnTimePeriod dayRange: dayHoursModel.dayRange
+                readonly property QnTimePeriod hourRange: model.timeRange
+
                 width: grid.cellWidth
                 height: 32
 
-                enabled: hourItem.hour >= minimumHour && hourItem.hour <= maximumHour
+                enabled: hourRange.intersects(range)
+                    && dayRange.contains(selection)
                     && model.isHourValid
 
                 GlobalToolTip.text:
@@ -100,10 +106,9 @@ Item
                         bottomMargin: 1
                     }
 
-                    start: hour === selectionStart
-                    end: hour === selectionEnd
-
-                    visible: enabled && hour >= selectionStart && hour <= selectionEnd
+                    start: hourRange.contains(selection.startTimeMs)
+                    end: hourRange.contains(selection.endTimeMs - 1)
+                    visible: enabled && hourRange.intersects(selection)
                 }
 
                 Rectangle
@@ -145,22 +150,14 @@ Item
                     {
                         if (!(event.modifiers & Qt.ControlModifier))
                         {
-                            selectionStart = hour
-                            selectionEnd = hour
-                            selectionEdited(hour, hour)
+                            selectionEdited(hourRange.startTimeMs, hourRange.endTimeMs)
                             return
                         }
 
-                        if (hour < selectionStart)
-                        {
-                            selectionStart = hour
-                            selectionEdited(hour, selectionEnd)
-                        }
+                        if (hourRange.startTimeMs < selection.startTimeMs)
+                            selectionEdited(hourRange.startTimeMs, selection.endTimeMs)
                         else
-                        {
-                            selectionEnd = hour
-                            selectionEdited(selectionStart, hour)
-                        }
+                            selectionEdited(selection.startTimeMs, hourRange.endTimeMs)
                     }
                 }
             }

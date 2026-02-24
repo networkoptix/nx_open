@@ -21,7 +21,6 @@ Control
     property alias allCamerasPeriodStorage: daysSelector.allCamerasPeriodStorage
     property alias timePeriodType: daysSelector.timePeriodType
     property alias periodsVisible: daysSelector.periodsVisible
-    property alias displayOffset: daysSelector.displayOffset
     property alias timeZone: daysSelector.timeZone
 
     // We use different locales to get the region settings (like first day of week) and to get the
@@ -33,8 +32,13 @@ Control
     implicitWidth: 324
     implicitHeight: contentItem.implicitHeight
 
-    readonly property date currentDate:
-        timer.counter, new Date(new Date().getTime() + displayOffset)
+    readonly property date currentDate: timer.counter, new Date()
+
+    function setDisplayedMonth(timestamp)
+    {
+        visibleYear = Number(NxGlobals.formatTimestamp(timestamp, "yyyy", timeZone))
+        visibleMonth = Number(NxGlobals.formatTimestamp(timestamp, "MM", timeZone)) - 1
+    }
 
     Timer
     {
@@ -225,8 +229,8 @@ Control
                 locale: control.regionLocale
                 currentDate: control.currentDate
 
-                visibleYear: selection.end.getFullYear()
-                visibleMonth: selection.end.getMonth()
+                visibleYear: Number(NxGlobals.formatTimestamp(selection.endTimeMs, "yyyy", timeZone))
+                visibleMonth: Number(NxGlobals.formatTimestamp(selection.endTimeMs, "MM", timeZone)) - 1
             }
 
             Spacer {}
@@ -239,59 +243,27 @@ Control
             {
                 id: timeSelector
 
-                readonly property date visualSelectionEnd:
-                    DateUtils.addMilliseconds(control.selection.end, -1)
-
                 x: 21
                 width: parent.width - 2 * x
 
                 locale: control.regionLocale
-                date: control.selection.start
+                date: new Date(
+                    NxGlobals.formatTimestamp(selection.startTimeMs, "yyyy", timeZone),
+                    NxGlobals.formatTimestamp(selection.startTimeMs, "MM", timeZone) - 1,
+                    NxGlobals.formatTimestamp(selection.startTimeMs, "dd", timeZone))
 
-                minimumHour: DateUtils.areDatesEqual(selection.start, range.start)
-                    ? range.start.getHours() : 0
-
-                maximumHour: DateUtils.areDatesEqual(visualSelectionEnd, range.end)
-                    ? range.end.getHours() : 23
-
+                range: daysSelector.range
+                selection: daysSelector.selection
                 timePeriodType: daysSelector.timePeriodType
                 periodStorage: daysSelector.periodStorage
                 allCamerasPeriodStorage: daysSelector.allCamerasPeriodStorage
                 periodsVisible: daysSelector.periodsVisible
-                displayOffset: daysSelector.displayOffset
                 timeZone: daysSelector.timeZone
-
-                enabled: DateUtils.areDatesEqual(selection.start, visualSelectionEnd)
-
-                Binding
-                {
-                    target: timeSelector
-                    property: "selectionStart"
-                    value: control.selection.start.getHours()
-                }
-                Binding
-                {
-                    target: timeSelector
-                    property: "selectionEnd"
-                    value: timeSelector.visualSelectionEnd.getHours()
-                }
 
                 onSelectionEdited: (start, end) =>
                 {
-                    control.selection = NxGlobals.dateRange(
-                        new Date(
-                            control.selection.start.getFullYear(),
-                            control.selection.start.getMonth(),
-                            control.selection.start.getDate(),
-                            start, 0, 0),
-                        new Date(
-                            visualSelectionEnd.getFullYear(),
-                            visualSelectionEnd.getMonth(),
-                            visualSelectionEnd.getDate(),
-                            end + 1, 0, 0)
-                    )
-                    control.visibleMonth = control.selection.start.getMonth()
-                    control.visibleYear = control.selection.start.getFullYear()
+                    control.selection = NxGlobals.timePeriodFromInterval(start, end)
+                    setDisplayedMonth(selection.startTimeMs)
                 }
             }
         }
@@ -308,10 +280,13 @@ Control
             periodStorage: daysSelector.periodStorage
             allCamerasPeriodStorage: daysSelector.allCamerasPeriodStorage
             locale: control.locale
-            displayOffset: daysSelector.displayOffset
+            timeZone: daysSelector.timeZone
 
             year: visibleYear
-            currentMonth: (visibleYear === currentDate.getFullYear()) ? currentDate.getMonth() : -1
+
+            currentMonth: (visibleYear === Number(NxGlobals.formatTimestamp(currentDate, "yyyy", timeZone)))
+                ? Number(NxGlobals.formatTimestamp(currentDate, "MM", timeZone)) - 1
+                : -1
 
             Binding
             {
@@ -337,9 +312,8 @@ Control
 
             onIntervalSelected: startDate =>
             {
-                selection = NxGlobals.dateRange(startDate, range.end)
-                visibleYear = range.end.getFullYear()
-                visibleMonth = range.end.getMonth()
+                selection = NxGlobals.timePeriodFromInterval(startDate, range.endTimeMs)
+                setDisplayedMonth(range.endTimeMs)
             }
         }
     }

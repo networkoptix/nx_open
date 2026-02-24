@@ -55,7 +55,6 @@ struct DayHoursModel::Private
 
     bool amPmTime = true;
     QDate date;
-    qint64 displayOffset = 0;
     QTimeZone timeZone{QTimeZone::LocalTime};
     bool hourHasArchive[(int) PeriodStorageType::count][kHoursPerDay];
 
@@ -184,6 +183,7 @@ void DayHoursModel::setDate(const QDate& date)
 
     d->date = date;
     emit dateChanged();
+    emit dayRangeChanged();
 
     d->resetModelData();
 }
@@ -224,25 +224,6 @@ void DayHoursModel::setAllCamerasPeriodStorage(AbstractTimePeriodStorage* store)
     d->setPeriodStorage(store, PeriodStorageType::allCameras);
 }
 
-qint64 DayHoursModel::displayOffset() const
-{
-    return d->displayOffset;
-}
-
-void DayHoursModel::setDisplayOffset(qint64 value)
-{
-    value = std::clamp<qint64>(
-        value, calendar_utils::kMinDisplayOffset, calendar_utils::kMaxDisplayOffset);
-
-    if (d->displayOffset == value)
-        return;
-
-    d->displayOffset = value;
-    emit displayOffsetChanged();
-
-    d->resetModelData();
-}
-
 QTimeZone DayHoursModel::timeZone() const
 {
     return d->timeZone;
@@ -255,8 +236,17 @@ void DayHoursModel::setTimeZone(QTimeZone value)
 
     d->timeZone = value;
     emit timeZoneChanged();
+    emit dayRangeChanged();
 
     d->resetModelData();
+}
+
+QnTimePeriod DayHoursModel::dayRange() const
+{
+    auto dateTime = d->date.startOfDay(d->timeZone);
+    auto nextDayDateTime = dateTime.addDays(1);
+    return QnTimePeriod::fromInterval(
+        dateTime.toMSecsSinceEpoch(), nextDayDateTime.toMSecsSinceEpoch());
 }
 
 void DayHoursModel::registerQmlType()
@@ -276,6 +266,9 @@ QVariant DayHoursModel::data(const QModelIndex& index, int role) const
     if (!hasIndex(hour, index.column(), index.parent()))
         return QVariant();
 
+    auto dateTime = d->date.startOfDay(d->timeZone);
+    dateTime.setTime(QTime(hour, 0));
+
     switch (role)
     {
         case Qt::DisplayRole:
@@ -289,10 +282,29 @@ QVariant DayHoursModel::data(const QModelIndex& index, int role) const
         case AnyCameraHasArchiveRole:
             return d->hourHasArchive[(int) PeriodStorageType::allCameras][hour];
         case IsHourValidRole:
-        {
-            auto dateTime = d->date.startOfDay(d->timeZone);
-            dateTime.setTime(QTime(hour,0));
             return dateTime.isValid();
+        case TimeRangeRole:
+        {
+            if (!dateTime.isValid())
+                return QVariant();
+
+            auto nextHourDateTime = d->date.startOfDay(d->timeZone);
+            if (hour < 23)
+            {
+                static constexpr int kSecondsInHour = 3600;
+
+                nextHourDateTime.setTime(QTime(hour + 1, 0));
+
+                if (!nextHourDateTime.isValid())
+                    nextHourDateTime = dateTime.addSecs(kSecondsInHour);
+            }
+            else
+            {
+                nextHourDateTime = dateTime.addDays(1);
+            }
+
+            return QVariant::fromValue(QnTimePeriod::fromInterval(
+                dateTime.toMSecsSinceEpoch(), nextHourDateTime.toMSecsSinceEpoch()));
         }
     }
 
@@ -310,6 +322,7 @@ QHash<int, QByteArray> DayHoursModel::roleNames() const
             {HasArchiveRole, "hasArchive"},
             {AnyCameraHasArchiveRole, "anyCameraHasArchive"},
             {IsHourValidRole, "isHourValid"},
+            {TimeRangeRole, "timeRange"},
         });
     }
     return roleNames;

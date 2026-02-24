@@ -4,6 +4,7 @@ import QtQuick
 
 import Nx.Core
 import nx.vms.client.core
+import nx.vms.common
 
 import "date_utils.js" as DateUtils
 
@@ -11,13 +12,16 @@ Item
 {
     id: control
 
-    property var range: NxGlobals.dateRange(
-        new Date(1970, 1, 1), DateUtils.addDays(d.today, 1))
-    property var selection: NxGlobals.dateRange(d.today, DateUtils.addDays(d.today, 1))
+    property var range: NxGlobals.timePeriodFromInterval(
+        new Date(1970, 1, 1),
+        DateUtils.addDays(d.today, 1))
 
-    property alias displayOffset: calendarModel.displayOffset
+    property var selection: NxGlobals.timePeriodFromInterval(
+        d.today,
+        DateUtils.addDays(d.today, 1))
+
     property alias timeZone: calendarModel.timeZone
-    property date currentDate: new Date(new Date().getTime() + displayOffset)
+    property date currentDate: new Date()
     property alias locale: calendarModel.locale
     property alias visibleYear: calendarModel.year
     property int visibleMonth: 0
@@ -34,25 +38,16 @@ Item
 
         readonly property date today: DateUtils.stripTime(currentDate)
 
-        readonly property date rangeStartDay:
-            DateUtils.stripTime(range.start)
-        readonly property date rangeEndDay:
-            DateUtils.stripTime(DateUtils.addMilliseconds(range.end, -1))
-
-        readonly property date selectionStartDay:
-            DateUtils.stripTime(selection.start)
-        readonly property date selectionEndDay:
-            DateUtils.stripTime(DateUtils.addMilliseconds(selection.end, -1))
-
         function setSelection(start, end, endClicked)
         {
-            selection = NxGlobals.dateRange(
-                DateUtils.maxDate(start, range.start),
-                DateUtils.minDate(end, range.end))
+            selection = NxGlobals.timePeriodFromInterval(
+                Math.max(start, range.startTimeMs),
+                Math.min(end, range.endTimeMs))
 
-            const clickedDate = endClicked ? selection.end : selection.start
-            visibleYear = clickedDate.getFullYear()
-            visibleMonth = clickedDate.getMonth()
+            const clickedDate = endClicked ? selection.endTimeMs : selection.startTimeMs
+
+            visibleYear = Number(NxGlobals.formatTimestamp(clickedDate, "yyyy", timeZone))
+            visibleMonth = Number(NxGlobals.formatTimestamp(clickedDate, "MM", timeZone)) - 1
         }
     }
 
@@ -81,14 +76,13 @@ Item
             {
                 id: calendarDay
 
-                readonly property date date: model.date
-
-                readonly property bool current: DateUtils.areDatesEqual(date, d.today)
+                readonly property QnTimePeriod dayRange: model.timeRange
+                readonly property bool current: dayRange.contains(currentDate.getTime())
 
                 width: grid.cellWidth
                 height: grid.cellHeight
 
-                enabled: date >= d.rangeStartDay && date <= d.rangeEndDay
+                enabled: range.intersects(dayRange)
 
                 SelectionMarker
                 {
@@ -101,9 +95,9 @@ Item
                         bottomMargin: 1
                     }
 
-                    start: DateUtils.areDatesEqual(date, d.selectionStartDay)
-                    end: DateUtils.areDatesEqual(date, d.selectionEndDay)
-                    visible: date >= d.selectionStartDay && date <= d.selectionEndDay
+                    start: dayRange.contains(selection.startTimeMs)
+                    end: dayRange.contains(selection.endTimeMs - 1)
+                    visible: dayRange.intersects(selection)
                 }
 
                 Rectangle
@@ -126,7 +120,7 @@ Item
                     y: 6
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    text: calendarDay.date.getDate()
+                    text: model.date.getDate()
                     color:
                     {
                         return (model.date.getMonth() === visibleMonth)
@@ -155,19 +149,17 @@ Item
                     {
                         if (!(event.modifiers & Qt.ControlModifier))
                         {
-                            d.setSelection(
-                                calendarDay.date, DateUtils.addDays(calendarDay.date, 1))
+                            d.setSelection(dayRange.startTimeMs, dayRange.endTimeMs)
                             return
                         }
 
-                        if (calendarDay.date < selection.start)
+                        if (dayRange.startTimeMs < selection.startTimeMs)
                         {
-                            d.setSelection(calendarDay.date, selection.end)
+                            d.setSelection(dayRange.startTimeMs, selection.endTimeMs)
                         }
                         else
                         {
-                            d.setSelection(
-                                selection.start, DateUtils.addDays(calendarDay.date, 1), true)
+                            d.setSelection(selection.startTimeMs, dayRange.endTimeMs, true)
                         }
                     }
                 }

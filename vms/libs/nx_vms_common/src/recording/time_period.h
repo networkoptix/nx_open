@@ -13,6 +13,14 @@ namespace nx::vms::api { struct ServerTimePeriod; }
 
 struct NX_VMS_COMMON_API QnTimePeriod
 {
+    Q_GADGET
+
+    Q_PROPERTY(qint64 startTimeMs MEMBER startTimeMs)
+    Q_PROPERTY(qint64 endTimeMs READ endTimeMs WRITE setEndTimeMs)
+    Q_PROPERTY(qint64 durationMs MEMBER durationMs)
+
+public:
+
     /**
      * Infinite duration value.
      */
@@ -85,18 +93,18 @@ struct NX_VMS_COMMON_API QnTimePeriod
 
     bool isContainedIn(const QnTimePeriod& other) const;
 
-    bool contains(qint64 timeMs) const;
+    Q_INVOKABLE bool contains(qint64 timeMs) const;
     bool contains(std::chrono::milliseconds time) const { return contains(time.count()); }
-    bool contains(const QnTimePeriod &timePeriod) const;
+    Q_INVOKABLE bool contains(const QnTimePeriod& timePeriod) const;
 
     /**
      * Expand period so it will contain target period.
      * \param timePeriod                Target time period.
      */
-    void addPeriod(const QnTimePeriod &timePeriod);
+    void addPeriod(const QnTimePeriod& timePeriod);
 
-    QnTimePeriod intersected(const QnTimePeriod &other) const;
-    bool intersects(const QnTimePeriod &other) const;
+    QnTimePeriod intersected(const QnTimePeriod& other) const;
+    Q_INVOKABLE bool intersects(const QnTimePeriod& other) const;
     void clear();
 
     /** Time value bound by this period. */
@@ -190,7 +198,7 @@ using OptionalTimePeriod = std::optional<QnTimePeriod>;
 
 NX_VMS_COMMON_API QnTimePeriod variantMapToTimePeriod(const QVariantMap& map);
 NX_VMS_COMMON_API void PrintTo(const QnTimePeriod& period, ::std::ostream* os);
-NX_VMS_COMMON_API QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
+NX_VMS_COMMON_API QDebug operator<<(QDebug dbg, const QnTimePeriod& period);
 NX_VMS_COMMON_API std::string toString(const QnTimePeriod& period);
 
 // QDataStream operators for QVariant serialization.

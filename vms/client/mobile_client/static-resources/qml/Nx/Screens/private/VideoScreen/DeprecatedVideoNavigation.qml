@@ -700,7 +700,7 @@ Item
                     id: timeHelper
 
                     position: timeline.position
-                    displayOffset: controller.resourceHelper.displayOffset
+                    timeZone: controller.resourceHelper.timeZone
                 }
 
                 Text
@@ -843,7 +843,6 @@ Item
         id: calendarPanel
 
         position: timeline.position
-        displayOffset: controller.resourceHelper.displayOffset
         timeZone: controller.resourceHelper.timeZone
         chunkProvider: cameraChunkProvider
 

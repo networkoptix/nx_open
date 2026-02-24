@@ -70,7 +70,12 @@ void HelperTestFixture::SetUp()
     const auto params = GetParam();
     helper.setLocale(kTestLocale);
     helper.setPosition(kTestPosition);
-    helper.setDisplayOffset(params.when.displayOffset.count());
+
+    const auto displayOffsetSec = duration_cast<seconds>(params.when.displayOffset);
+    const auto localTimeZone = QDateTime::fromMSecsSinceEpoch(kTestPosition, QTimeZone::LocalTime);
+    const auto displayTimeZone = QTimeZone(localTimeZone.offsetFromUtc() + displayOffsetSec.count());
+
+    helper.setTimeZone(displayTimeZone);
 }
 
 TEST_P(HelperTestFixture, TestVisualValues)

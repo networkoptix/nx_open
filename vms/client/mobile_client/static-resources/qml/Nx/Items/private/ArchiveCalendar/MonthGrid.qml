@@ -4,13 +4,13 @@ import QtQuick 2.6
 
 import Nx.Core 1.0
 import nx.vms.client.core 1.0
+import nx.vms.common
 
 Item
 {
     id: control
 
     property real position: new Date()
-    property alias displayOffset: calendarModel.displayOffset
     property alias timeZone: calendarModel.timeZone
     property alias locale: calendarModel.locale
     property alias year: calendarModel.year
@@ -18,8 +18,6 @@ Item
     property alias periodStorage: calendarModel.periodStorage
 
     signal picked(real position)
-
-    readonly property date positionDate: new Date(position + displayOffset)
 
     Grid
     {
@@ -44,10 +42,8 @@ Item
             {
                 id: calendarDay
 
-                property bool current:
-                    model.date.getFullYear() === positionDate.getFullYear()
-                        && model.date.getMonth() === positionDate.getMonth()
-                        && model.date.getDate() === positionDate.getDate()
+                readonly property QnTimePeriod dayRange: model.timeRange
+                readonly property bool current: dayRange.contains(position)
 
                 width: grid.cellWidth
                 height: grid.cellHeight
@@ -100,7 +96,7 @@ Item
                     id: clickArea
 
                     anchors.fill: parent
-                    onClicked: control.picked(model.date.getTime() - displayOffset)
+                    onClicked: control.picked(dayRange.startTimeMs)
                 }
             }
         }

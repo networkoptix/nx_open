@@ -9,6 +9,7 @@
 
 #include <common/common_globals.h>
 #include <nx/utils/impl_ptr.h>
+#include <recording/time_period.h>
 
 Q_MOC_INCLUDE("nx/vms/client/core/media/abstract_time_period_storage.h")
 
@@ -33,10 +34,9 @@ class NX_VMS_CLIENT_CORE_API DayHoursModel: public QAbstractListModel
         READ allCamerasPeriodStorage
         WRITE setAllCamerasPeriodStorage
         NOTIFY allCamerasPeriodStorageChanged)
-    Q_PROPERTY(qint64 displayOffset READ displayOffset WRITE setDisplayOffset
-        NOTIFY displayOffsetChanged)
     Q_PROPERTY(QTimeZone timeZone READ timeZone WRITE setTimeZone
         NOTIFY timeZoneChanged)
+    Q_PROPERTY(QnTimePeriod dayRange READ dayRange NOTIFY dayRangeChanged)
 
 public:
     enum Role
@@ -44,6 +44,7 @@ public:
         HourRole = Qt::UserRole + 1,
         HasArchiveRole,
         AnyCameraHasArchiveRole,
+        TimeRangeRole,
         IsHourValidRole,
     };
 
@@ -65,11 +66,10 @@ public:
     AbstractTimePeriodStorage* allCamerasPeriodStorage() const;
     void setAllCamerasPeriodStorage(AbstractTimePeriodStorage* store);
 
-    qint64 displayOffset() const;
-    void setDisplayOffset(qint64 value);
-
     QTimeZone timeZone() const;
     void setTimeZone(QTimeZone value);
+
+    QnTimePeriod dayRange() const;
 
     static void registerQmlType();
 
@@ -85,8 +85,8 @@ signals:
     void timePeriodTypeChanged();
     void periodStorageChanged();
     void allCamerasPeriodStorageChanged();
-    void displayOffsetChanged();
     void timeZoneChanged();
+    void dayRangeChanged();
 
 private:
     struct Private;
