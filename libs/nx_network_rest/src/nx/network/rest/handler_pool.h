@@ -54,8 +54,10 @@ public:
     Handler* findHandlerOrThrow(
         Request* request, const QString& pathIgnorePrefix = QString()) const;
 
-    Handler* findCrudHandlerOrThrow(
-        Request* request, const QString& pathIgnorePrefix = QString()) const;
+    // Handler* findCrudHandlerOrThrow(Request* request, std::move_only_function<QString>)
+    Handler* findCrudHandlerOrThrow(Request* request,
+        const std::function<void(const PathRouter::Result&)>& onFound = nullptr,
+        const QString& pathIgnorePrefix = QString()) const;
 
     void registerRedirectRule(const QString& path, const QString& newPath);
     std::optional<QString> getRedirectRule(const QString& path);
