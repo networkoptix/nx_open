@@ -101,7 +101,8 @@ void SimpleMotionSearchListModel::Private::updateMotionPeriods(qint64 startTimeM
         return; //< Do not update if new data is outside of interest period.
 
     q->fetchData({.direction = core::EventSearch::FetchDirection::newer,
-        .centralPointUs = microseconds(Facade::startTime(data.at(data.size() / 2)))});
+        .centralPointUs = microseconds(Facade::startTime(data.at(data.size() / 2))),
+        .liveUpdate = true});
 }
 
 QnTimePeriodList SimpleMotionSearchListModel::Private::periods() const

@@ -300,7 +300,8 @@ void BookmarkSearchListModel::dynamicUpdate(const qint64& centralPointMs)
 {
     d->requestFetch({
         .direction = EventSearch::FetchDirection::newer,
-        .centralPointUs = milliseconds(centralPointMs)},
+        .centralPointUs = milliseconds(centralPointMs),
+        .liveUpdate = true},
         {}, detail::MultiRequestIdHolder::Mode::dynamic);
 }
 

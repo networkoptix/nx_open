@@ -187,12 +187,14 @@ void VmsEventSearchListModel::Private::fetchLive()
         {
             return core::FetchRequest{
                 .direction = FetchDirection::older,
-                .centralPointUs = microseconds(qnSyncTime->currentUSecsSinceEpoch())};
+                .centralPointUs = microseconds(qnSyncTime->currentUSecsSinceEpoch()),
+                .liveUpdate = true};
         }
 
         return core::FetchRequest{
             .direction = FetchDirection::newer,
-            .centralPointUs = Facade::startTime(*data.begin())};
+            .centralPointUs = Facade::startTime(*data.begin()),
+            .liveUpdate = true};
     }();
 
     requestFetch(request, {}, MultiRequestIdHolder::Mode::dynamic);
