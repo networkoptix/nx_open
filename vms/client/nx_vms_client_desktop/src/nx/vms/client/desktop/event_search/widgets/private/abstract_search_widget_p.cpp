@@ -285,8 +285,15 @@ void AbstractSearchWidgetPrivate::setupModels()
     connect(m_mainModel.data(), &core::AbstractSearchListModel::fetchCommitStarted, this,
         [this](const FetchRequest& request)
         {
-            ui->ribbon->setInsertionMode(UpdateMode::instant,
-                request.direction == FetchDirection::newer);
+            if (request.liveUpdate)
+            {
+                ui->ribbon->setInsertionMode(UpdateMode::animated, /*scrollDown*/ false);
+            }
+            else
+            {
+                ui->ribbon->setInsertionMode(UpdateMode::instant,
+                    /*scrollDown*/ request.direction == FetchDirection::newer);
+            }
         });
 
     connect(m_mainModel.data(), &core::AbstractSearchListModel::fetchFinished, this,
@@ -296,7 +303,7 @@ void AbstractSearchWidgetPrivate::setupModels()
         {
             m_dataFetched = fetchResult != core::EventSearch::FetchResult::failed
                 && fetchResult != core::EventSearch::FetchResult::cancelled;
-            ui->ribbon->setInsertionMode(UpdateMode::animated, false);
+            ui->ribbon->setInsertionMode(UpdateMode::animated, /*scrollDown*/ false);
             setIndicatorVisible(request.direction, false);
             handleItemCountChanged();
         });

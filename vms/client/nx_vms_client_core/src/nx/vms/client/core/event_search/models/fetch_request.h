@@ -18,12 +18,15 @@ struct NX_VMS_CLIENT_CORE_API FetchRequest
         MEMBER direction)
     Q_PROPERTY(std::chrono::microseconds centralPointUs
         MEMBER centralPointUs)
+    Q_PROPERTY(bool liveUpdate
+        MEMBER liveUpdate)
 
 public:
     static void registerQmlType();
 
     EventSearch::FetchDirection direction = EventSearch::FetchDirection::older;
     std::chrono::microseconds centralPointUs;
+    bool liveUpdate = false;
 
     QnTimePeriod period(const OptionalTimePeriod& interestPeriod) const;
 };
