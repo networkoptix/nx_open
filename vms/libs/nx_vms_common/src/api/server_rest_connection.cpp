@@ -404,24 +404,24 @@ Handle ServerConnection::cameraHistoryAsync(
     return executeGet("/ec2/cameraHistory", request.toParams(), std::move(callback), executor);
 }
 
-Handle ServerConnection::backupPositionAsyncV1(const nx::Uuid& serverId,
+Handle ServerConnection::backupPositionAsyncV4(const nx::Uuid& serverId,
     const nx::Uuid& deviceId,
-    Callback<nx::vms::api::BackupPositionExV1> callback,
+    Callback<nx::vms::api::BackupPositionExV4> callback,
     nx::utils::AsyncHandlerExecutor executor)
 {
     const auto requestStr =
-        NX_FMT("/rest/v1/servers/%1/backupPositions/%2").args(serverId, deviceId);
+        NX_FMT("/rest/v4/servers/%1/backupPositions/%2").args(serverId, deviceId);
     return executeGet(requestStr, nx::network::rest::Params(), std::move(callback), executor);
 }
 
-Handle ServerConnection::setBackupPositionAsyncV1(const nx::Uuid& serverId,
+Handle ServerConnection::setBackupPositionAsyncV4(const nx::Uuid& serverId,
     const nx::Uuid& deviceId,
-    const nx::vms::api::BackupPositionV1& backupPosition,
-    Callback<nx::vms::api::BackupPositionV1> callback,
+    const nx::vms::api::BackupPositionV4& backupPosition,
+    Callback<nx::vms::api::BackupPositionV4> callback,
     nx::utils::AsyncHandlerExecutor executor)
 {
     const auto requestStr =
-        NX_FMT("/rest/v1/servers/%1/backupPositions/%2").args(serverId, deviceId);
+        NX_FMT("/rest/v4/servers/%1/backupPositions/%2").args(serverId, deviceId);
     return executePut(
         requestStr,
         nx::network::rest::Params(),
@@ -431,12 +431,12 @@ Handle ServerConnection::setBackupPositionAsyncV1(const nx::Uuid& serverId,
         executor);
 }
 
-Handle ServerConnection::setBackupPositionsAsyncV1(const nx::Uuid& serverId,
-    const nx::vms::api::BackupPositionV1& backupPosition,
-    Callback<nx::vms::api::BackupPositionV1> callback,
+Handle ServerConnection::setBackupPositionsAsyncV4(const nx::Uuid& serverId,
+    const nx::vms::api::BackupPositionV4& backupPosition,
+    Callback<nx::vms::api::BackupPositionV4> callback,
     nx::utils::AsyncHandlerExecutor executor)
 {
-    const auto requestStr = NX_FMT("/rest/v1/servers/%1/backupPositions", serverId);
+    const auto requestStr = NX_FMT("/rest/v4/servers/%1/backupPositions", serverId);
     return executePut(
         requestStr,
         nx::network::rest::Params(),

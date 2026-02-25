@@ -853,14 +853,15 @@ void QnMediaServerResource::setHardwareDecodingEnabled(bool value)
     );
 }
 
-bool QnMediaServerResource::hasActiveBackupStorages() const
+bool QnMediaServerResource::hasActiveBackupStorages(bool cloudOnly) const
 {
     return std::ranges::any_of(getStorages(),
-        [](const auto& storageResource)
+        [cloudOnly](const auto& storageResource)
         {
             const auto statusFlags = storageResource->runtimeStatusFlags();
             return !statusFlags.testFlag(nx::vms::api::StorageRuntimeFlag::disabled)
                 && storageResource->isBackup()
-                && storageResource->isUsedForWriting();
+                && storageResource->isUsedForWriting()
+                && (!cloudOnly || storageResource->isCloudStorage());
         });
 }
