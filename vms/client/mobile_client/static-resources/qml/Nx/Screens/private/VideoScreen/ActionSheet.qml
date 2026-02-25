@@ -46,6 +46,8 @@ AdaptiveSheet
 
         delegate: Button
         {
+            id: delegate
+            
             readonly property bool prolonged: model.type === CameraButton.Type.prolonged
             readonly property string iconSource: model.iconPath
             readonly property string hintText: model.hint + model.name
@@ -181,7 +183,7 @@ AdaptiveSheet
                         actionVisualizer.showFailure(hintText)
                     else if (!prolonged)
                         actionVisualizer.showSuccess(hintText)
-                    else if (controller.actionIsActive(model.id))
+                    else if (controller.actionIsActive(model.id) && delegate.down)
                         actionVisualizer.showActivity(visualizer, name, iconSource)
                 }
 

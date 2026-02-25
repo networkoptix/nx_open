@@ -112,15 +112,23 @@ bool TwoWayAudioCameraButtonController::Private::start(const CameraButtonData& b
 
 bool TwoWayAudioCameraButtonController::Private::stop(const CameraButtonData& button)
 {
-    if (unmuteAudioOnStreamingStop)
-    {
-        unmuteAudioOnStreamingStop = false;
-        nx::audio::AudioDevice::instance()->setMute(false);
-    }
+    auto unmuteIfNeeded =
+        [this]()
+        {
+            if (!unmuteAudioOnStreamingStop)
+                return;
+
+            unmuteAudioOnStreamingStop = false;
+            nx::audio::AudioDevice::instance()->setMute(false);
+        };
+
+    unmuteIfNeeded();
 
     return controller->stop(
-        [this, button](bool success)
+        [this, button, unmuteIfNeeded](bool success)
         {
+            unmuteIfNeeded();
+
             if (!q->actionIsActive(button.id))
                 return;
 
