@@ -36,14 +36,27 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
 
 NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
 
-nx::vms::api::BackupPositionV1 backupPositionFromCurrentTime()
+bool usesCloudBackupStorage(const QnMediaServerResourcePtr& server)
+{
+    if (server.isNull())
+        return false;
+
+    return server->hasActiveBackupStorages(/*cloudOnly*/ true);
+}
+
+nx::vms::api::BackupPositionV4 backupPositionFromCurrentTime(
+    const QnMediaServerResourcePtr& server)
 {
     const auto currentTimePointMs = system_clock::time_point(qnSyncTime->value());
 
-    nx::vms::api::BackupPositionV1 result;
-    result.positionHighMs = currentTimePointMs;
-    result.positionLowMs = currentTimePointMs;
-    result.bookmarkStartPositionMs = currentTimePointMs;
+    nx::vms::api::BackupPositionV4 result;
+    result.media.positionHighMs = currentTimePointMs;
+    result.media.positionLowMs = currentTimePointMs;
+    result.media.bookmarkHighStartPositionMs = currentTimePointMs;
+    result.media.bookmarkLowStartPositionMs = currentTimePointMs;
+
+    if (usesCloudBackupStorage(server))
+        result.cloud = result.media;
 
     return result;
 }
@@ -175,7 +188,7 @@ void BackupStatusWidget::setupSkipBackupButton()
                 return;
 
             const auto cameras = backupEnabledCameras(m_server);
-            const auto userBackupPosition = backupPositionFromCurrentTime();
+            const auto userBackupPosition = backupPositionFromCurrentTime(m_server);
             const auto mutex = std::make_shared<nx::Mutex>();
             const auto requestHandles = std::make_shared<std::set<rest::Handle>>();
 
@@ -183,7 +196,7 @@ void BackupStatusWidget::setupSkipBackupButton()
 
             const auto callback =
                 [this, mutex, requestHandles]
-                (bool /*success*/, rest::Handle requestId, nx::vms::api::BackupPositionV1 result)
+                (bool /*success*/, rest::Handle requestId, nx::vms::api::BackupPositionV4 /*result*/)
                 {
                     NX_MUTEX_LOCKER lock(mutex.get());
                     if (auto count = requestHandles->erase(requestId);
@@ -204,7 +217,7 @@ void BackupStatusWidget::setupSkipBackupButton()
                 return;
 
             NX_MUTEX_LOCKER lock(mutex.get());
-            requestHandles->insert(context->connectedServerApi()->setBackupPositionsAsyncV1(
+            requestHandles->insert(context->connectedServerApi()->setBackupPositionsAsyncV4(
                 m_server->getId(), userBackupPosition, callback));
         });
 }
@@ -252,7 +265,7 @@ void BackupStatusWidget::updateBackupStatus()
     const auto actualPositionCallback = nx::utils::guarded(this,
         [this, mutex, server = m_server, backupPositionRequestHandles, currentTimePoint,
             backupTimePoints]
-        (bool success, rest::Handle requestId, nx::vms::api::BackupPositionExV1 actualPosition)
+        (bool success, rest::Handle requestId, nx::vms::api::BackupPositionExV4 actualPosition)
         {
             NX_MUTEX_LOCKER lock(mutex.get());
             if (auto count = backupPositionRequestHandles->erase(requestId); count > 0 && success)
@@ -277,11 +290,14 @@ void BackupStatusWidget::updateBackupStatus()
                         return duration_cast<milliseconds>(backupPosition.time_since_epoch());
                     };
 
-                backupTimePoints->push_back(
-                    backupTimePoint(actualPosition.positionLowMs, actualPosition.toBackupLowMs));
+                auto effectiveMedia = actualPosition.getEffectiveMedia(
+                    usesCloudBackupStorage(m_server));
 
                 backupTimePoints->push_back(
-                    backupTimePoint(actualPosition.positionHighMs, actualPosition.toBackupHighMs));
+                    backupTimePoint(effectiveMedia.positionLowMs, actualPosition.toBackupLowMs));
+
+                backupTimePoints->push_back(
+                    backupTimePoint(effectiveMedia.positionHighMs, actualPosition.toBackupHighMs));
 
                 if (backupPositionRequestHandles->empty())
                 {
@@ -304,7 +320,7 @@ void BackupStatusWidget::updateBackupStatus()
     for (const auto& camera: cameras)
     {
         NX_MUTEX_LOCKER lock(mutex.get());
-        backupPositionRequestHandles->insert(m_server->restConnection()->backupPositionAsyncV1(
+        backupPositionRequestHandles->insert(m_server->restConnection()->backupPositionAsyncV4(
             m_server->getId(),
             camera->getId(),
             actualPositionCallback));

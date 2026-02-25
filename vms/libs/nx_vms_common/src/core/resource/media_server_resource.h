@@ -179,7 +179,7 @@ public:
     bool isHardwareDecodingEnabled() const;
     void setHardwareDecodingEnabled(bool value);
 
-    bool hasActiveBackupStorages() const;
+    bool hasActiveBackupStorages(bool cloudOnly = false) const;
 
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;

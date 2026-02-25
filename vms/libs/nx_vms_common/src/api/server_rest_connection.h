@@ -155,20 +155,20 @@ public:
         Callback<nx::vms::api::CameraHistoryDataList> callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
-    Handle backupPositionAsyncV1(const nx::Uuid& serverId,
+    Handle backupPositionAsyncV4(const nx::Uuid& serverId,
         const nx::Uuid& deviceId,
-        Callback<nx::vms::api::BackupPositionExV1> callback,
+        Callback<nx::vms::api::BackupPositionExV4> callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
-    Handle setBackupPositionAsyncV1(const nx::Uuid& serverId,
+    Handle setBackupPositionAsyncV4(const nx::Uuid& serverId,
         const nx::Uuid& deviceId,
-        const nx::vms::api::BackupPositionV1& backupPosition,
-        Callback<nx::vms::api::BackupPositionV1> callback,
+        const nx::vms::api::BackupPositionV4& backupPosition,
+        Callback<nx::vms::api::BackupPositionV4> callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
-    Handle setBackupPositionsAsyncV1(const nx::Uuid& serverId,
-        const nx::vms::api::BackupPositionV1& backupPosition,
-        Callback<nx::vms::api::BackupPositionV1> callback,
+    Handle setBackupPositionsAsyncV4(const nx::Uuid& serverId,
+        const nx::vms::api::BackupPositionV4& backupPosition,
+        Callback<nx::vms::api::BackupPositionV4> callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle getServerLocalTime(
