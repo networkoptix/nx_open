@@ -70,18 +70,29 @@ AbstractTimelineController
             if (timelineController.updating)
                 return
 
-            if (timeline.positioning)
+            if (timeline.positioning || !timeline.positionAtLive)
                 controller.setPosition(timeline.positionMs)
-            else if (!timeline.positionAtLive)
-                controller.forcePosition(timeline.positionMs, true)
+        }
+
+        function onPositionAtLiveChanged()
+        {
+            if (timeline.positionAtLive && !timeline.positioning)
+                controller.playLive()
         }
 
         function onPositioningChanged()
         {
             if (timeline.positioning)
+            {
                 controller.preview()
+            }
             else if (controller.playing)
-                controller.play()
+            {
+                if (timeline.positionAtLive)
+                    controller.playLive()
+                else
+                    controller.play()
+            }
         }
     }
 }

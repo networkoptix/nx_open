@@ -55,9 +55,14 @@ class NX_MEDIA_API Player: public QObject
     Q_PROPERTY(QVideoSink* videoSurface READ videoSurface WRITE setVideoSurface NOTIFY videoSurfaceChanged)
 
     /**
-     * Current playback UTC position at msec.
+     * Current playback UTC position (msec).
      */
     Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
+
+    /**
+     * Last video frame position (msec).
+     */
+    Q_PROPERTY(qint64 displayedPosition READ displayedPosition NOTIFY positionChanged)
 
     /**
      * Playback speed factor. For example '2' - mean 2x play speed.
@@ -208,6 +213,7 @@ public:
     void unsetVideoSurface(QVideoSink* videoSink, int channel = 0);
 
     qint64 position() const;
+    qint64 displayedPosition() const;
     /**
      * Position to play in UTC milliseconds
      */

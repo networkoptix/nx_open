@@ -272,6 +272,9 @@ QString LabelFormatter::objectTimestamp(qint64 timestampMs, const QTimeZone& tim
 
 QString LabelFormatter::cameraTimestamp(qint64 timestampMs, const QTimeZone& timeZone) const
 {
+    if (timestampMs == -1)
+        return {};
+
     const auto dt = QDateTime::fromMSecsSinceEpoch(timestampMs, timeZone);
     const auto text = d->amPm
         ? d->locale.toString(dt, "d MMM yy h:mm:ss AP")

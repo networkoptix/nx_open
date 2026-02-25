@@ -1007,7 +1007,7 @@ Page
                 color: ColorTheme.colors.light4
 
                 text: timeline.labelFormatter.cameraTimestamp(
-                    controller.mediaPlayer.position, timeline.timeZone)
+                    controller.mediaPlayer.displayedPosition, timeline.timeZone)
             }
         }
 

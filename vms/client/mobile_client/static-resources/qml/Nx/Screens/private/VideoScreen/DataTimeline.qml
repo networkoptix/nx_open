@@ -19,7 +19,7 @@ Rectangle
 
     property real positionMs: NxGlobals.syncNowMs()
     property bool positionAtLive: true //< Position marker is at live.
-    readonly property bool positioning: dragHandler.draggingTimeMarker && dragHandler.active
+    readonly property bool positioning: dragHandler.draggingTimeMarker
 
     readonly property alias startTimeMs: timeScale.startTimeMs
     readonly property alias durationMs: timeScale.durationMs
@@ -78,8 +78,17 @@ Rectangle
     // the center of the window with the new position.
     function setPosition(timeMs)
     {
-        positionAtLive = false
-        positionMs = timeMs
+        const nowMs = NxGlobals.syncNowMs()
+        if (timeMs >= nowMs)
+        {
+            positionMs = nowMs
+            positionAtLive = true
+        }
+        else
+        {
+            positionAtLive = false
+            positionMs = timeMs
+        }
 
         if (!contains(positionMs))
             scrollTo(positionMs)
@@ -211,7 +220,10 @@ Rectangle
 
             function setPosition(y)
             {
-                timeline.setPosition(positionToTime(Math.max(0, Math.min(y, height - 1))))
+                if (timeline.windowAtLive && y < 0.01)
+                    timeline.setPosition(NxGlobals.syncNowMs())
+                else
+                    timeline.setPosition(positionToTime(Math.max(0, Math.min(y, height - 1))))
             }
 
             function setStartTimeMs(value)

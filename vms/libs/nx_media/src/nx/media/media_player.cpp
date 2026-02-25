@@ -1093,6 +1093,11 @@ qint64 Player::position() const
     return std::min(d->lastSeekTimeMs, d->positionMs);
 }
 
+qint64 Player::displayedPosition() const
+{
+    return d->lastVideoPtsMs.value_or(-1);
+}
+
 Player::AutoJumpPolicy Player::autoJumpPolicy() const
 {
     return d->autoJumpPolicy;
