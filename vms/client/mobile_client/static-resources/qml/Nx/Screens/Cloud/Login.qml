@@ -22,6 +22,8 @@ Page
 
     signal gotResult(value: string)
 
+    title: qsTr("Log In")
+
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
     WebView

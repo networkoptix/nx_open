@@ -64,6 +64,15 @@ QuickControls.Page
                 id: warningPanel
             }
         }
+
+        Rectangle
+        {
+            anchors.bottom: parent.bottom
+            height: 1
+            width: parent.width
+            visible: toolBar.visible || warningPanel.opened
+            color: ColorTheme.colors.dark7 //< Keep in sync with main window background color.
+        }
     }
 
     background: Rectangle
