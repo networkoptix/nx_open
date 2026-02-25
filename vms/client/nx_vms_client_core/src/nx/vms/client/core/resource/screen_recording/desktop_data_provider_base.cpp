@@ -124,9 +124,9 @@ bool DesktopDataProviderBase::encodeAndPutAudioData(uint8_t* buffer, int size, i
     if (!m_audioEncoder.sendFrame(buffer, size))
         return false;
 
-    QnWritableCompressedAudioDataPtr packet;
     while (!needToStop())
     {
+        QnWritableCompressedAudioDataPtr packet;
         if (!m_audioEncoder.receivePacket(packet))
             return false;
 
