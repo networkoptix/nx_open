@@ -5393,7 +5393,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Өөрчлөлтүүдийг хэрэгжүүлж чадсангүй</translation>
     </message>
     <message>
       <source>Stop Video Wall?</source>
@@ -8601,7 +8601,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Өөрчлөлтүүдийг хэрэгжүүлж чадсангүй</translation>
     </message>
     <message>
       <source>Delete groups</source>
@@ -8872,7 +8872,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Өөрчлөлтүүдийг хэрэгжүүлж чадсангүй</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -11635,7 +11635,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Өөрчлөлтүүдийг хэрэгжүүлж чадсангүй</translation>
     </message>
     <message>
       <source>Apply changes?</source>
