@@ -85,11 +85,16 @@ private:
 PathRouter::PathRouter(): m_root(std::make_unique<Item>()) {}
 PathRouter::~PathRouter() {}
 
-Handler* PathRouter::findHandlerOrThrow(Request* request, const QString& pathIgnorePrefix) const
+Handler* PathRouter::findHandlerOrThrow(Request* request,
+    const std::function<void(const Result&)>& onFound,
+    const QString& pathIgnorePrefix) const
 {
     auto result = m_root->findHandler(*request, pathIgnorePrefix);
     if (!result.handler)
         return nullptr;
+
+    if (onFound)
+        onFound(result);
 
     bool needModify = true;
     if (const auto& context = request->jsonRpcContext())

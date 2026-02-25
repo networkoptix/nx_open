@@ -61,25 +61,26 @@ void HandlerPool::registerHandler(
 
 Handler* HandlerPool::findHandlerOrThrow(Request* request, const QString& pathIgnorePrefix) const
 {
-    if (auto handler = findCrudHandlerOrThrow(request, pathIgnorePrefix))
+    if (auto handler = findCrudHandlerOrThrow(request, /*onFound*/ nullptr, pathIgnorePrefix))
         return handler;
 
     return findHandler(
         request->method(), nx::network::url::normalizedPath(request->path(), pathIgnorePrefix));
 }
 
-Handler* HandlerPool::findCrudHandlerOrThrow(
-    Request* request, const QString& pathIgnorePrefix) const
+Handler* HandlerPool::findCrudHandlerOrThrow(Request* request,
+    const std::function<void(const PathRouter::Result&)>& onFound,
+    const QString& pathIgnorePrefix) const
 {
     const auto& method = request->method();
     if (auto it = m_crudHandlers.find(method); it != m_crudHandlers.end())
     {
-        if (auto handler = it->second.findHandlerOrThrow(request, pathIgnorePrefix))
+        if (auto handler = it->second.findHandlerOrThrow(request, onFound, pathIgnorePrefix))
             return handler;
     }
     if (auto it = m_crudHandlers.find(kAnyHttpMethod); it != m_crudHandlers.end())
     {
-        if (auto handler = it->second.findHandlerOrThrow(request, pathIgnorePrefix))
+        if (auto handler = it->second.findHandlerOrThrow(request, onFound, pathIgnorePrefix))
             return handler;
     }
     return nullptr;

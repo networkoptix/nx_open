@@ -52,7 +52,9 @@ public:
     PathRouter(const PathRouter&) = delete;
     PathRouter& operator=(const PathRouter&) = delete;
 
-    Handler* findHandlerOrThrow(Request* request, const QString& pathIgnorePrefix = {}) const;
+    Handler* findHandlerOrThrow(Request* request,
+        const std::function<void(const PathRouter::Result&)>& onFound = nullptr,
+        const QString& pathIgnorePrefix = {}) const;
     void addHandler(const QString& path, std::unique_ptr<Handler> handler);
 
     std::vector<std::pair<QString, QString>> findOverlaps(const Request& request) const;
