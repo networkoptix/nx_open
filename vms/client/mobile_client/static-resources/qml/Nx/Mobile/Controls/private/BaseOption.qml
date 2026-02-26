@@ -5,7 +5,6 @@ import QtQuick.Controls
 
 import Nx.Core
 import Nx.Controls
-import Nx.Ui
 
 /**
 * Implements basic option control implementation. It contains option text, description and area
@@ -37,7 +36,7 @@ Control
     background: Rectangle
     {
         color: ColorTheme.colors.dark6
-        radius: LayoutController.isTabletLayout ? 8 : 0
+        radius: 8
 
         MaterialEffect
         {
@@ -85,7 +84,7 @@ Control
 
                 width: parent.width
                 color: ColorTheme.colors.light16
-                font.pixelSize: 12
+                font.pixelSize: 14
                 wrapMode: Text.Wrap
                 elide: Text.ElideRight
             }

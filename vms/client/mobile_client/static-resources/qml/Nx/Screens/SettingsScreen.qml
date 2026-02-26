@@ -149,11 +149,10 @@ AdaptiveScreen
             component SettingsNavigationItem: Button
             {
                 property Item page
-                property int margin: LayoutController.isTabletLayout ? 20 : 0
 
                 Layout.fillWidth: true
-                Layout.leftMargin: margin
-                Layout.rightMargin: margin
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
                 Layout.preferredHeight: LayoutController.isTabletLayout ? 40 : 56
 
                 leftPadding: LayoutController.isTabletLayout ? 8 : 16
@@ -176,7 +175,7 @@ AdaptiveScreen
 
                 borderColor: backgroundColor
 
-                radius: LayoutController.isTabletLayout ? 4 : 0
+                radius: 8
 
                 icon.width: 24
                 icon.height: 24
@@ -198,9 +197,8 @@ AdaptiveScreen
 
             SettingsNavigationItem
             {
-                id: interfaceSettingsItem
+                Layout.topMargin: 20
 
-                Layout.topMargin: margin
                 page: interfaceSettingsPage
                 icon.source: "image://skin/24x24/Solid/interface.svg?primary=light1"
             }
@@ -225,8 +223,6 @@ AdaptiveScreen
 
             SettingsNavigationItem
             {
-                id: notificationsSwitch
-
                 icon.source: "image://skin/24x24/Solid/notifications.svg?primary=light1"
                 text: qsTr("Notifications")
                 page: pushExpertModePage
@@ -234,18 +230,12 @@ AdaptiveScreen
 
             SettingsNavigationItem
             {
-                id: appInfoOption
-
-                Layout.bottomMargin: margin
                 page: appInfoPage
                 icon.source: "image://skin/24x24/Solid/info.svg?primary=light1"
             }
 
             SettingsNavigationItem
             {
-                id: developerSettings
-
-                Layout.bottomMargin: margin
                 page: developerSettingsPage
                 icon.source: "image://skin/24x24/Solid/developer_settings.svg?primary=light1"
                 visible: settingsScreen.contentItem === page

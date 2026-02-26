@@ -5,7 +5,6 @@ import QtQuick.Controls as QuickControls
 
 import Nx.Controls
 import Nx.Core
-import Nx.Ui
 
 import nx.vms.client.mobile
 
@@ -23,7 +22,7 @@ QuickControls.Page
     signal settingsSaved
     signal error
 
-    padding: LayoutController.isTablet ? 20 : 0
+    padding: 20
 
     background: Rectangle
     {

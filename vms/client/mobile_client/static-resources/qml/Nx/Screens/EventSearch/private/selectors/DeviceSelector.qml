@@ -6,7 +6,6 @@ import Nx.Core
 import Nx.Controls
 import Nx.Mobile
 import Nx.Mobile.Controls
-import Nx.Ui
 
 import nx.vms.client.core
 
@@ -69,7 +68,7 @@ OptionSelector
 
             delegate: StyledCheckBox
             {
-                backgroundRadius: LayoutController.isTabletLayout ? 8 : 0
+                backgroundRadius: 8
                 rightPadding: 18
                 height: 56
                 width: (parent && parent.width) ?? 0

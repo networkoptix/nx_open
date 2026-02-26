@@ -86,7 +86,7 @@ T.RadioButton
                 width: parent.width
                 visible: !!text
                 wrapMode: Text.Wrap
-                font.pixelSize: 13
+                font.pixelSize: 14
                 color: ColorTheme.colors.light12
             }
         }

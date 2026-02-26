@@ -5,7 +5,6 @@ import QtQuick
 import Nx.Core
 import Nx.Controls
 import Nx.Mobile.Controls
-import Nx.Ui
 
 // TODO: update comment below.
 /**
@@ -41,20 +40,21 @@ Item
     FocusScope
     {
         anchors.fill: parent
+
         Flickable
         {
             id: flickable
 
-            width: parent.width
-            height: parent.height - y
-            contentWidth: optionSelectorItem.width
+            anchors.fill: parent
+            anchors.margins: 20
+
             contentHeight: delegateLoader.height
 
             Loader
             {
                 id: delegateLoader
 
-                width: optionSelectorItem.width
+                width: flickable.width
 
                 sourceComponent: selector && selector.screenDelegate
 

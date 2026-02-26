@@ -390,13 +390,10 @@ AdaptiveScreen
         LayoutItemProxy
         {
             anchors.top: landscapeSearchProxy.bottom
-            anchors.topMargin: 8
+            anchors.topMargin: 4
             anchors.left: parent.left
-            anchors.leftMargin: 24
             anchors.right: parent.right
-            anchors.rightMargin: 24
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 8
 
             clip: true
             target: filtersItem
@@ -424,7 +421,6 @@ AdaptiveScreen
                 id: leftPanelPopupProxy
 
                 anchors.fill: parent
-                anchors.margins: 16
             }
         }
 

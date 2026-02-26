@@ -5,7 +5,6 @@ import QtQuick
 import Nx.Core
 import Nx.Controls
 import Nx.Mobile.Controls
-import Nx.Ui
 
 import "./helpers.js" as ValueHelpers
 
@@ -46,7 +45,7 @@ Column
 
             height: 56
             width: parent.width
-            backgroundRadius: LayoutController.isTabletLayout ? 8 : 0
+            backgroundRadius: 8
             checkedBackgroundColor: ColorTheme.colors.dark8
             text: d.getTextValue(index)
             checked: d.selectedIndex === index

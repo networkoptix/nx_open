@@ -26,7 +26,8 @@ Item
     Flickable
     {
         anchors.fill: parent
-        contentWidth: parent.width
+        anchors.margins: 20
+
         contentHeight: optionSelectors.height
 
         Column
@@ -34,8 +35,7 @@ Item
             id: optionSelectors
 
             spacing: 4
-            width: filtersItem.width
-
+            width: parent.width
 
             TimeSelector
             {
@@ -43,7 +43,6 @@ Item
 
                 value: controller.searchSetup.timeSelection
                 onValueChanged: filtersItem.controller.searchSetup.timeSelection = value
-                height: 56
 
                 onClicked: filtersItem.selectorClicked(timeSelector)
             }
@@ -52,7 +51,6 @@ Item
             {
                 id: deviceSelector
 
-                height: 56
                 onValueChanged:
                 {
                     filtersItem.controller.searchSetup.cameraSelection = value.selection
@@ -69,7 +67,6 @@ Item
 
             SwitchSelector
             {
-                height: 56
                 visible: windowContext.mainSystemContext.featureAccess.canUseShareBookmark
                     && (controller?.bookmarkSearchSetup ?? false)
 

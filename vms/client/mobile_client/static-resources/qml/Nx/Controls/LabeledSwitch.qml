@@ -5,7 +5,6 @@ import QtQuick.Window 2.0
 import QtQuick.Controls 2.4
 
 import Nx.Core 1.0
-import Nx.Ui
 
 import "private"
 
@@ -46,7 +45,7 @@ Control
         id: backgroundRectangle
 
         color: ColorTheme.colors.dark6
-        radius: LayoutController.isTablet ? 8 : 0
+        radius: 8
 
         MaterialEffect
         {
@@ -126,7 +125,7 @@ Control
 
                 visible: text.length
                 wrapMode: Text.Wrap
-                font.pixelSize: 13
+                font.pixelSize: 14
                 color: control.extraTextStandardColor
             }
         }
