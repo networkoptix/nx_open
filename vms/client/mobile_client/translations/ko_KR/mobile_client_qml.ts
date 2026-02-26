@@ -306,6 +306,14 @@
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
       <translation>공유 옵션을 설정한 후 공유하면 재생 링크를 생성하기 위한 새 북마크 대화 상자가 열립니다</translation>
     </message>
+    <message>
+      <source>Search by attribute</source>
+      <translation type="unfinished">Search by attribute</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
+    </message>
   </context>
   <context>
     <name>DeveloperSettingsPage</name>
@@ -683,6 +691,10 @@
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>%1에 연결할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>

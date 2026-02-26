@@ -306,6 +306,14 @@
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
       <translation>Deling åbner den nye bogmærke dialogboks for at generere et afspilningslink efter indstilling af delingsindstillingerne</translation>
     </message>
+    <message>
+      <source>Search by attribute</source>
+      <translation type="unfinished">Search by attribute</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
+    </message>
   </context>
   <context>
     <name>DeveloperSettingsPage</name>
@@ -685,6 +693,10 @@
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Kan ikke oprette forbindelse til %1</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>
