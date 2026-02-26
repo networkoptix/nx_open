@@ -27,6 +27,8 @@ public:
         nx::Uuid deviceId,
         Consumer::StreamStatus result);
 
+    std::string idForToStringFromPtr() const;
+
 protected:
     void updateMetrics(int value);
 

@@ -22,6 +22,11 @@ Streamer::~Streamer()
 {
 }
 
+std::string Streamer::idForToStringFromPtr() const
+{
+    return m_session->id();
+}
+
 bool Streamer::start(Ice* ice, Dtls* dtls)
 {
     NX_ASSERT(ice);
@@ -119,8 +124,7 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
     if (!d.IsObject())
         return;
 
-    nx::Uuid deviceId = parseDeviceId(d);
-
+    nx::Uuid deviceId = parseDeviceId(d); // TODO https://networkoptix.atlassian.net/browse/VMS-61664
     if (auto it = d.FindMember("add"); it != d.MemberEnd())
     {
         const auto& addObj = it->value;
@@ -129,6 +133,7 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
 
         if (deviceId.isNull())
             deviceId = parseDeviceId(addObj);
+
         if (deviceId.isNull())
             return;
 

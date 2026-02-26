@@ -75,6 +75,7 @@ Session::Session(
     Purpose purpose)
     :
     m_SystemContext(context),
+    m_localUfrag(localUfrag),
     m_purpose(purpose),
     m_localAddress(address),
     m_pem(ssl::Context::instance()->getDefaultCertificate()),
@@ -83,7 +84,6 @@ Session::Session(
     m_sessionPool(sessionPool),
     m_config(config)
 {
-    m_localUfrag = localUfrag;
     m_localPwd = generatePwd(24);
     m_dtls = std::make_shared<Dtls>(m_localUfrag, m_pem);
     m_transceiver = std::make_unique<Streamer>(this);
@@ -157,8 +157,7 @@ void Session::start(const QList<nx::network::SocketAddress>& addresses)
         [this](const nx::network::SocketAddress& mappedAddress,
             std::unique_ptr<nx::network::AbstractDatagramSocket>&& socket)
         {
-            NX_DEBUG(this, "%1: Got Srflx remote addres: %2, local address: %3",
-                id(),
+            NX_DEBUG(this, "Got Srflx remote addres: %1, local address: %2",
                 mappedAddress.toString(),
                 socket ? socket->getLocalAddress().toString() : "null");
             // 1. Create IceUdp with given socket.
@@ -201,7 +200,7 @@ void Session::start(const QList<nx::network::SocketAddress>& addresses)
 
 void Session::gotIceFromTracker(const IceCandidate& iceCandidate)
 {
-    NX_DEBUG(this, "Got ice srflx from peer: %1 -> %2", id(), iceCandidate.serialize());
+    NX_DEBUG(this, "Got ice srflx from peer: %1", iceCandidate.serialize());
 
     NX_MUTEX_LOCKER lk(&m_mutex);
     if (m_punchedUdpIce)
@@ -334,9 +333,8 @@ bool Session::initializeMuxersInternal()
             if (transcodePolicy.disableTranscoding && videoTranscodingRequired)
             {
                 NX_DEBUG(this,
-                    "%1: Video transcoding is disabled(source codec: %2) in the server settings. "
-                    "Feature unavailable. RTP",
-                    id(),
+                    "Video transcoding is disabled(source codec: %1) in the server settings. "
+                    "Feature unavailable",
                     videoCodecParamaters->codec_id);
                 return false;
             }
@@ -369,8 +367,8 @@ bool Session::initializeMuxersInternal()
                 if (!provider->addVideoTranscoder(config, m_transcodingSettings))
                     return false;
 
-                NX_DEBUG(this, "%1: Video transcoding started, target codec: %2",
-                    id(), config.targetCodecId);
+                NX_DEBUG(this, "Video transcoding started, target codec: %1",
+                    config.targetCodecId);
             }
         }
 
@@ -386,8 +384,7 @@ bool Session::initializeMuxersInternal()
                 if (!provider->addAudioTranscoder(audioCodecId))
                     return false;
 
-                NX_DEBUG(this, "%1: Audio transcoding started, target codec: %2",
-                    id(), audioCodecId);
+                NX_DEBUG(this, "Audio transcoding started, target codec: %1", audioCodecId);
             }
         }
 
@@ -522,11 +519,11 @@ std::string Session::constructSdp()
 AnswerResult Session::processSdpAnswer(const std::string& sdp)
 {
     m_sdpParseResult = SdpParseResult::parse(sdp);
-    NX_DEBUG(this, "%1: Sdp parsed, got remote: %2/%3", id(), m_sdpParseResult.iceUfrag, m_sdpParseResult.icePwd);
+    NX_DEBUG(this, "Sdp parsed, got remote: %1/%2", m_sdpParseResult.iceUfrag, m_sdpParseResult.icePwd);
 
     if (m_sdpParseResult.fingerprint.type == Fingerprint::Type::none)
     {
-        NX_DEBUG(this, "%1: No DTLS fingerprint in answer", id());
+        NX_DEBUG(this, "No DTLS fingerprint in answer");
         return AnswerResult::failed;
     }
     m_dtls->setFingerprint(m_sdpParseResult.fingerprint);
@@ -534,15 +531,13 @@ AnswerResult Session::processSdpAnswer(const std::string& sdp)
     if (m_sdpParseResult.tracksState[kDataChannelMid] != TrackState::active)
     {
         NX_DEBUG(
-            this,
-            "%1: Tracks in offer and answer does not match (application track doesn't exists)",
-            id());
+            this, "Tracks in offer and answer does not match (application track doesn't exists)");
         return AnswerResult::failed;
     }
 
     if (!m_tracks->examineSdp(sdp))
     {
-        NX_DEBUG(this, "%1: SDP examination failed", id());
+        NX_DEBUG(this, "SDP examination failed");
         return AnswerResult::failed;
     }
 
@@ -598,7 +593,7 @@ bool Session::lock()
     if (isLocked())
         return false;
 
-    NX_DEBUG(this, "Locked session %1", id());
+    NX_DEBUG(this, "Locked session");
     m_timer.invalidate();
     return true;
 }
@@ -606,7 +601,7 @@ bool Session::lock()
 void Session::unlock()
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
-    NX_DEBUG(this, "Unlocked session %1", id());
+    NX_DEBUG(this, "Unlocked session");
     m_timer.restart();
 }
 
@@ -669,6 +664,11 @@ void Session::stopAllProviders()
     }
     for (const auto& [_, provider]: providers)
         provider->stop();
+}
+
+std::string Session::idForToStringFromPtr() const
+{
+    return m_localUfrag;
 }
 
 } // namespace nx::webrtc
