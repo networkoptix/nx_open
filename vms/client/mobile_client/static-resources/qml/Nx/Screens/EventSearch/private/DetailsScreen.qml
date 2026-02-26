@@ -263,107 +263,182 @@ Page
         state: "cannotDecryptMedia"
     }
 
-    Flickable
+    GridLayout
     {
-        width: parent.width
+        id: detailsLayout
+
+        readonly property real kHorizontalLayoutRatio: 1.5
+        property bool horizontal: width / height > kHorizontalLayoutRatio
 
         anchors.top: panel.bottom
-        anchors.topMargin: 14
+        anchors.right: parent.right
+        anchors.left: parent.left
         anchors.bottom: parent.bottom
+        anchors.margins: 20
 
-        contentWidth: parent.width
-        contentHeight: scrollableData.height
+        rowSpacing: 20
+        columnSpacing: 20
 
-        clip: true
+        flow: horizontal ? GridLayout.LeftToRight : GridLayout.TopToBottom
 
-        Column
+        Flickable
         {
-            id: scrollableData
+            visible: detailsLayout.horizontal
+            contentHeight: contentItem.childrenRect.height
+            clip: true
 
-            width: parent.width - leftPadding - rightPadding
-            leftPadding: 15
-            rightPadding: 15
-            spacing: 14
+            Layout.fillWidth: true
+            Layout.preferredWidth: detailsLayout.width / 2
+            Layout.fillHeight: detailsLayout.horizontal
+            Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+            Layout.minimumHeight: 0
+            Layout.minimumWidth: 0
 
-            Text
+            LayoutItemProxy
             {
                 width: parent.width
-                elide: Text.ElideRight
-                wrapMode: Text.WrapAnywhere
-                maximumLineCount: 2
-
-                color: ColorTheme.colors.light16
-                font.pixelSize: 16
-                font.weight: Font.Medium
-
-                text: d.accessor.getData(currentEventIndex, "resource").name
+                target: detailsLayoutItem
             }
+        }
 
-            MobileControls.TagView
+        Rectangle
+        {
+            id: separator
+
+            implicitWidth: 1
+
+            visible: detailsLayout.horizontal
+            color: ColorTheme.colors.dark9
+
+            Layout.fillHeight: true
+        }
+
+        Flickable
+        {
+            clip: true
+            contentHeight: contentItem.childrenRect.height
+
+            Layout.fillWidth: true
+            Layout.preferredWidth: detailsLayout.width / 2
+            Layout.fillHeight: true
+
+            ColumnLayout
             {
                 width: parent.width
-                model: d.accessor.getData(currentEventIndex, "tags")
-                visible: hasTags
-                color: ColorTheme.colors.dark8
-            }
+                spacing: detailsLayout.columnSpacing
 
-            Text
-            {
-                id: titleText
-
-                width: parent.width
-
-                elide: Text.ElideRight
-                wrapMode: Text.WrapAnywhere
-                maximumLineCount: 2
-
-                color: ColorTheme.colors.light4
-                font.pixelSize: 20
-                font.weight: Font.Medium
-
-                text: d.accessor.getData(currentEventIndex, "display")
-            }
-
-            Text
-            {
-                id: descriptionText
-
-                width: parent.width
-                color: ColorTheme.colors.light10
-                font.pixelSize: 14
-                font.weight: Font.Normal
-                wrapMode: Text.Wrap
-                text: d.accessor.getData(currentEventIndex, "description")
-                visible: !!text
-
-                onLinkActivated: (link) =>
+                LayoutItemProxy
                 {
-                    Workflow.openDialog("qrc:/qml/Nx/Web/LinkAboutToOpenDialog.qml",
-                        {"link": link});
+                    target: detailsLayoutItem
+                    visible: !detailsLayout.horizontal
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+
+                AnalyticsAttributeTable
+                {
+                    id: attributeTable
+
+                    attributes: d.accessor.getData(currentEventIndex, "analyticsAttributes") ?? []
+
+                    interactive: true
+                    contextMenu: searchMenu
+                    highlight.visible: false
+                    nameFont.pixelSize: 14
+                    nameColor: ColorTheme.colors.light10
+                    valueFont.pixelSize: 14
+                    valueColor: ColorTheme.colors.light6
+                    valueFont.weight: Font.Medium
+                    valueAlignment: Text.AlignRight
+                    colorBoxSize: 18
+                    rowSpacing: 16
+                    separatorsVisible: true
+
+                    Layout.fillWidth: true
                 }
             }
+        }
+    }
 
-            AnalyticsAttributeTable
+    ColumnLayout
+    {
+        id: detailsLayoutItem
+
+        spacing: 20
+
+        Preview
+        {
+            id: previewImage
+
+            previewId: d.accessor.getData(currentEventIndex, "previewId")
+            previewState: d.accessor.getData(currentEventIndex, "previewState")
+            visible: previewState !== EventSearch.PreviewState.missing
+
+            Layout.fillWidth: true
+        }
+
+        Text
+        {
+            text: d.accessor.getData(currentEventIndex, "resource").name
+            visible: !!text
+
+            elide: Text.ElideRight
+            wrapMode: Text.WrapAnywhere
+            maximumLineCount: 2
+
+            color: ColorTheme.colors.light16
+            font.pixelSize: 18
+            font.weight: Font.Medium
+
+            Layout.fillWidth: true
+        }
+
+        Text
+        {
+            id: titleText
+
+            text: d.accessor.getData(currentEventIndex, "display")
+            visible: !!text
+
+            elide: Text.ElideRight
+            wrapMode: Text.WrapAnywhere
+            maximumLineCount: 2
+
+            color: ColorTheme.colors.light4
+            font.pixelSize: detailsLayout.horizontal ? 24 : 18
+            font.weight: Font.Medium
+
+            Layout.fillWidth: true
+        }
+
+        Text
+        {
+            id: descriptionText
+
+            text: d.accessor.getData(currentEventIndex, "description")
+            visible: !!text
+
+            color: ColorTheme.colors.light10
+            font.pixelSize: 14
+            font.weight: Font.Normal
+            wrapMode: Text.Wrap
+
+            Layout.fillWidth: true
+
+            onLinkActivated: (link) =>
             {
-                id: attributeTable
-
-                width: parent.width
-
-                attributes: d.accessor.getData(currentEventIndex, "analyticsAttributes") ?? []
-
-                interactive: true
-                contextMenu: searchMenu
-                highlight.visible: false
-                nameFont.pixelSize: 14
-                nameColor: ColorTheme.colors.light10
-                valueFont.pixelSize: 14
-                valueColor: ColorTheme.colors.light6
-                valueFont.weight: Font.Medium
-                valueAlignment: Text.AlignRight
-                colorBoxSize: 18
-                rowSpacing: 16
-                separatorsVisible: true
+                Workflow.openDialog("qrc:/qml/Nx/Web/LinkAboutToOpenDialog.qml", {"link": link});
             }
+        }
+
+        MobileControls.TagView
+        {
+            Layout.fillWidth: true
+
+            model: d.accessor.getData(currentEventIndex, "tags")
+            visible: hasTags
+            color: ColorTheme.colors.dark8
         }
     }
 
