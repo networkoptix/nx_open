@@ -297,7 +297,14 @@ api::EventInfo serialize(const BasicEvent* event, UuidList ruleIds)
 nx::vms::api::rules::RuleV4 toApi(
     const nx::vms::rules::Engine* engine, const nx::vms::api::rules::Rule& rule)
 {
-    return toApi(engine->buildRule(rule).get());
+    auto builtRule = engine->buildRule(rule);
+    auto apiRule = toApi(builtRule.get());
+
+    if (nx::vms::rules::isProlonged(engine, builtRule->actionBuilders().front()))
+    {
+        apiRule.prolonged = true;
+    }
+    return apiRule;
 }
 
 nx::vms::api::rules::RuleV4 toApi(const Rule* rule, bool allowEmptyArrays)
