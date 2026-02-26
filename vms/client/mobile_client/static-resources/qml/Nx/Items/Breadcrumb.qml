@@ -17,6 +17,11 @@ Popup
     signal itemClicked(var nodeId)
 
     padding: 0
+    topPadding: 0
+    bottomPadding: 0
+    leftPadding: 0
+    rightPadding: 0
+    
     popupType: Popup.Item
 
     onAboutToShow:
