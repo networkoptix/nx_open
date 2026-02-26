@@ -131,20 +131,6 @@ struct CloudSystemFinder::Private
         clientPool->sendRequest(context);
     }
 
-    bool tryRemoveAlienServerUnderLock(const nx::vms::api::ModuleInformation& serverInfo)
-    {
-        const auto serverId = serverInfo.id;
-        for (auto it = systems.begin(); it != systems.end(); ++it)
-        {
-            const auto cloudSystemId = it.key();
-            const bool remove = (cloudSystemId != serverInfo.cloudSystemId);
-            const auto system = it.value();
-            if (remove && system->containsServer(serverId))
-                system->removeServer(serverId);
-        }
-        return true;
-    }
-
     void clearServersUnderLock(QnCloudSystemDescriptionPtr systemDescription)
     {
         const auto currentServers = systemDescription->servers();
@@ -200,10 +186,7 @@ struct CloudSystemFinder::Private
         if (!success
             || !parseModuleInformation(
                 context->response.messageBody.toRawByteArray(), &moduleInformation)
-                // Prevent hanging of fake online cloud servers.
-            || !tryRemoveAlienServerUnderLock(moduleInformation)
-            || (cloudSystemId != moduleInformation.cloudSystemId)
-            )
+            || cloudSystemId != moduleInformation.cloudSystemId)
         {
             clearServersUnderLock(systemDescription);
             return;
