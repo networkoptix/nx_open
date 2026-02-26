@@ -51,7 +51,7 @@ AdaptiveScreen
 
     leftPanel
     {
-        title: qsTr("Structure")
+        title: rootIndex === NxGlobals.invalidModelIndex() ? "" : qsTr("Resources")
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/resource_tree.svg?primary=dark1"
         interactive: rootIndex !== NxGlobals.invalidModelIndex()

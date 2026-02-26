@@ -32,6 +32,8 @@ Page
         implicitHeight: 56
         implicitWidth: root.width
 
+        visible: root.title || root.interactive
+
         Rectangle
         {
             anchors.fill: parent
