@@ -226,9 +226,7 @@ AdaptiveScreen
             {
                 leftButton
                 {
-                    icon.source: cloudUserProfileWatcher.avatarUrl
-                    icon.width: 32
-                    icon.height: 32
+                    imageSource: cloudUserProfileWatcher.avatarUrl
                     onClicked: Workflow.openCloudSummaryScreen(cloudUserProfileWatcher)
                 }
                 sessionsScreen
