@@ -3,6 +3,7 @@
 #pragma once
 
 #include <algorithm>
+#include <numeric>
 #include <ranges>
 
 #include <nx/ranges/closure.h>
