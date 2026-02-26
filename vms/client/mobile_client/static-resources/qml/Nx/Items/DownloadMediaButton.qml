@@ -4,6 +4,7 @@ import QtQuick
 
 import Nx.Controls
 import Nx.Core
+import Nx.Ui
 
 import nx.vms.client.mobile
 
@@ -93,7 +94,7 @@ IconButton
     {
         id: mediaDownloadBackend
 
-        onErrorOccured: windowContext.ui.showMessage(title, description)
+        onErrorOccured: (title, description) => Workflow.openStandardDialog(title, description)
     }
 
     NxObject
