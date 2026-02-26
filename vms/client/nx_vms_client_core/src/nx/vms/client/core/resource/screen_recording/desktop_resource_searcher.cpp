@@ -43,7 +43,7 @@ bool DesktopResourceSearcher::isResourceTypeSupported(nx::Uuid /*resourceTypeId*
 }
 
 QnResourcePtr DesktopResourceSearcher::createResource(
-    const nx::Uuid& /*resourceTypeId*/,
+    nx::Uuid /*resourceTypeId*/,
     const QnResourceParams& /*params*/)
 {
     return QnResourcePtr();

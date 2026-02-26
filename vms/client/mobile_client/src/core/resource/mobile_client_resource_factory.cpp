@@ -12,7 +12,7 @@
 #include "mobile_client_camera.h"
 
 QnResourcePtr QnMobileClientResourceFactory::createResource(
-    const nx::Uuid& resourceTypeId,
+    nx::Uuid resourceTypeId,
     const QnResourceParams&)
 {
     using namespace nx::vms::common;

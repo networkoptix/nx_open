@@ -21,7 +21,7 @@ public:
     */
     virtual AuditHandle notifyPlaybackStarted(
         const nx::network::rest::audit::Record& auditRecord,
-        const nx::Uuid& id,
+        nx::Uuid id,
         qint64 timestampUsec,
         bool isExport = false) = 0;
 

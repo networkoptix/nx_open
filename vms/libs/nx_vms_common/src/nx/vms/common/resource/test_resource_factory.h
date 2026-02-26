@@ -16,7 +16,7 @@ public:
     TestResourceFactory(QObject *parent = nullptr): QObject(parent) {}
 
     virtual QnResourcePtr createResource(
-        const nx::Uuid& resourceTypeId,
+        nx::Uuid resourceTypeId,
         const QnResourceParams& params) override;
 };
 

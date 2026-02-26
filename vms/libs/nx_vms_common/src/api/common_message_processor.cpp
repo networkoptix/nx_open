@@ -962,23 +962,23 @@ void QnCommonMessageProcessor::resetUserGroups(const UserGroupDataList& userGrou
     }
 }
 
-bool QnCommonMessageProcessor::canRemoveResource(const nx::Uuid&, ec2::NotificationSource)
+bool QnCommonMessageProcessor::canRemoveResource(nx::Uuid, ec2::NotificationSource)
 {
     return true;
 }
 
-void QnCommonMessageProcessor::removeResourceIgnored(const nx::Uuid&)
+void QnCommonMessageProcessor::removeResourceIgnored(nx::Uuid)
 {
 }
 
 bool QnCommonMessageProcessor::canRemoveResourceProperty(
-    const nx::Uuid& /*resourceId*/, const QString& /*propertyName*/)
+    nx::Uuid /*resourceId*/, const QString& /*propertyName*/)
 {
     return true;
 }
 
 void QnCommonMessageProcessor::refreshIgnoredResourceProperty(
-    const nx::Uuid& /*resourceId*/, const QString& /*propertyName*/)
+    nx::Uuid /*resourceId*/, const QString& /*propertyName*/)
 {
 }
 

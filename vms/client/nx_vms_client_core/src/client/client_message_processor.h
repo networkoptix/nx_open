@@ -52,7 +52,7 @@ protected:
 
     virtual void handleRemotePeerFound(nx::Uuid peer, nx::vms::api::PeerType peerType) override;
     virtual void handleRemotePeerLost(nx::Uuid peer, nx::vms::api::PeerType peerType) override;
-    virtual void removeHardwareIdMapping(const nx::Uuid& id) override;
+    virtual void removeHardwareIdMapping(nx::Uuid id) override;
 
 signals:
     void hardwareIdMappingRemoved(const nx::Uuid& id);

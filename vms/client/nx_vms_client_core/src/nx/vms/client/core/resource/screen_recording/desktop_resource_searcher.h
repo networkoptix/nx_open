@@ -31,7 +31,7 @@ public:
     virtual bool isVirtualResource() const override { return true; }
 
 protected:
-    virtual QnResourcePtr createResource(const nx::Uuid& resourceTypeId,
+    virtual QnResourcePtr createResource(nx::Uuid resourceTypeId,
         const QnResourceParams& params) override;
 
 private:

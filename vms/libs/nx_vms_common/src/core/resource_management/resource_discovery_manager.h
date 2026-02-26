@@ -79,7 +79,7 @@ public:
     void setResourceProcessor(QnResourceProcessor* processor);
     QnAbstractResourceSearcher* searcherByManufacturer(const QString& manufacturer) const;
 
-    virtual QnResourcePtr createResource(const nx::Uuid& resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(nx::Uuid resourceTypeId, const QnResourceParams& params) override;
 
     virtual void stop() override;
     virtual void pleaseStop() override;

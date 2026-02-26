@@ -205,7 +205,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(nx::Uuid peer, nx::vms::api:
     }
 }
 
-void QnClientMessageProcessor::removeHardwareIdMapping(const nx::Uuid& id)
+void QnClientMessageProcessor::removeHardwareIdMapping(nx::Uuid id)
 {
     emit hardwareIdMappingRemoved(id);
 }

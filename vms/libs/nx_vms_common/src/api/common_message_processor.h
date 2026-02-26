@@ -85,7 +85,7 @@ public:
     void resetEventRules(const nx::vms::api::EventRuleDataList& eventRules);
     void resetVmsRules(const nx::vms::api::rules::RuleList& vmsRules);
     virtual void addHardwareIdMapping(const nx::vms::api::HardwareIdMapping& /*data*/) {}
-    virtual void removeHardwareIdMapping(const nx::Uuid& /*id*/) {}
+    virtual void removeHardwareIdMapping(nx::Uuid /*id*/) {}
 
 signals:
     void connectionOpened();
@@ -138,12 +138,12 @@ protected:
     void resetLicenses(const nx::vms::api::LicenseDataList& licenses);
     void resetCamerasWithArchiveList(const nx::vms::api::ServerFootageDataList& cameraHistoryList);
 
-    virtual bool canRemoveResource(const nx::Uuid& resourceId, ec2::NotificationSource source);
-    virtual void removeResourceIgnored(const nx::Uuid& resourceId);
+    virtual bool canRemoveResource(nx::Uuid resourceId, ec2::NotificationSource source);
+    virtual void removeResourceIgnored(nx::Uuid resourceId);
 
-    virtual bool canRemoveResourceProperty(const nx::Uuid& resourceId, const QString& propertyName);
+    virtual bool canRemoveResourceProperty(nx::Uuid resourceId, const QString& propertyName);
     virtual void refreshIgnoredResourceProperty(
-        const nx::Uuid& resourceId, const QString& propertyName);
+        nx::Uuid resourceId, const QString& propertyName);
 
     virtual QnResourceFactory* getResourceFactory() const = 0;
 

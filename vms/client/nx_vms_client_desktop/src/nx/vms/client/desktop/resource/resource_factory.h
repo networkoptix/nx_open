@@ -12,7 +12,7 @@ public:
     virtual QnMediaServerResourcePtr createServer() const override;
 
     virtual QnResourcePtr createResource(
-        const nx::Uuid& resourceTypeId,
+        nx::Uuid resourceTypeId,
         const QnResourceParams& params) override;
 
     virtual QnLayoutResourcePtr createLayout() const override;
