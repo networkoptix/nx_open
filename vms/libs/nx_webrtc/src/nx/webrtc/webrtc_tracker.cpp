@@ -19,7 +19,8 @@ using namespace nx::network;
 using namespace nx;
 
 Tracker::Tracker(Session* session):
-    m_session(session)
+    m_session(session),
+    m_sessionId(session->id())
 {
     const std::string iceCandidatesIni = ::ini().webrtcIceCandidates;
     if (!iceCandidatesIni.empty())
@@ -205,6 +206,7 @@ bool Tracker::processMessages()
      */
 
     AnswerResult result = examineAnswer();
+    NX_VERBOSE(this, "Answer examination result: %1", (int)result);
     if (result == AnswerResult::again)
     {
         sendOffer();
@@ -214,8 +216,6 @@ bool Tracker::processMessages()
     {
         return false;
     }
-
-    NX_VERBOSE(this, "Answer examination result: %1 in stage: %2", (int)result);
 
     if (!m_iceSent)
     {
@@ -259,6 +259,11 @@ void Tracker::onBytesRead(SystemError::ErrorCode errorCode, std::size_t /*bytesT
         m_buffer.clear();
         readMessage();
     }
+}
+
+std::string Tracker::idForToStringFromPtr() const
+{
+    return m_sessionId;
 }
 
 } // namespace nx::webrtc

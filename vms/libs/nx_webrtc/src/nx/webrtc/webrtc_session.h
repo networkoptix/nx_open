@@ -107,6 +107,8 @@ public:
 
     bool removeProvider(nx::Uuid deviceId);
 
+    std::string idForToStringFromPtr() const;
+
 private:
     std::string dataChannelSdp() const;
     std::string constructFingerprint() const;
@@ -118,6 +120,8 @@ private:
     mutable nx::Mutex m_mutex;
 
     nx::vms::common::SystemContext* m_SystemContext = nullptr;
+    std::string m_localPwd;
+    const std::string m_localUfrag;
     Purpose m_purpose = Purpose::send;
     std::unique_ptr<Tracks> m_tracks;
     std::unique_ptr<AbstractIceDelegate> m_transceiver;
@@ -126,8 +130,6 @@ private:
     std::unique_ptr<Consumer> m_consumer; //< Streaming side. Can be null.
     std::unique_ptr<Demuxer> m_demuxer; //< Receiving side. Can be null.
     std::shared_ptr<Reader> m_reader; //< Receiving side. Can be null.
-    std::string m_localUfrag;
-    std::string m_localPwd;
     SdpParseResult m_sdpParseResult;
     nx::network::SocketAddress m_localAddress;
     nx::network::ssl::Pem m_pem;

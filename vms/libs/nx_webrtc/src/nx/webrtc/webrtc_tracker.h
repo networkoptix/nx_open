@@ -25,6 +25,8 @@ public:
     void sendOffer();
     bool isStarted() const { return m_started; }
 
+    std::string idForToStringFromPtr() const;
+
 private:
     void readMessage();
     bool processMessages();
@@ -44,6 +46,7 @@ private:
     std::atomic<bool> m_started{};
     bool m_iceSent = false;
     bool m_srflxReceived = false;
+    std::string m_sessionId;
 };
 
 } // namespace nx::webrtc
