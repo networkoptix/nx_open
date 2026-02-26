@@ -53,12 +53,15 @@ struct NX_VMS_API RuleV4: public IdData
     /**%apidoc[opt] String comment explaining the rule. */
     QString comment;
 
+    /**%apidoc[readonly] Action requires an event to be prolonged. */
+    std::optional<bool> prolonged;
+
     /**%apidoc[proprietary] */
     std::optional<std::string> etag;
 };
 
 #define nx_vms_api_rules_RuleV4_Fields \
-    IdData_Fields(event)(action)(enabled)(schedule)(comment)(etag)
+    IdData_Fields(event)(action)(enabled)(schedule)(comment)(prolonged)(etag)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(RuleV4, (json))
 NX_REFLECTION_INSTRUMENT(RuleV4, nx_vms_api_rules_RuleV4_Fields)
 
