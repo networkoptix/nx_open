@@ -306,6 +306,14 @@
         <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Search by attribute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DeveloperSettingsPage</name>
@@ -685,6 +693,10 @@
         <source>Cannot connect to %1</source>
         <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>Log In</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
