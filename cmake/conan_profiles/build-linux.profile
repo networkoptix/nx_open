@@ -1,4 +1,5 @@
 include(default)
+include(common.profile)
 
 [settings]
 compiler=gcc
