@@ -1153,15 +1153,15 @@
         <translation></translation>
     </message>
     <message>
-        <source>Structure</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Welcome, %1!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Feed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resources</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
