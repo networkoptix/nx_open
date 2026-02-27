@@ -10056,7 +10056,7 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     </message>
     <message>
       <source>Uploading offline update packages to Servers...</source>
-      <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+      <translation>Przesyłanie pakietów aktualizacji offline na serwery...</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
@@ -10181,14 +10181,14 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     </message>
     <message>
       <source>You do not have permission to edit settings of some cameras</source>
-      <translation type="unfinished">You do not have permission to edit settings of some cameras</translation>
+      <translation>Nie masz uprawnień do edycji ustawień niektórych kamer</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
     <message>
       <source>You do not have permissions to modify this user</source>
-      <translation type="unfinished">You do not have permissions to modify this user</translation>
+      <translation>Nie masz uprawnień do modyfikacji tego użytkownika</translation>
     </message>
     <message>
       <source>You cannot modify a user with a non-unique login</source>
@@ -10520,23 +10520,23 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+      <translation>Integracja może wchodzić w interakcję z klientem stacjonarnym i żądać dostępu do sesji użytkownika</translation>
     </message>
     <message>
       <source>Proxy this integration through the server</source>
-      <translation type="unfinished">Proxy this integration through the server</translation>
+      <translation>Przekaż tę integrację przez serwer proxy</translation>
     </message>
     <message>
       <source>Proxy this web page through the server</source>
-      <translation type="unfinished">Proxy this web page through the server</translation>
+      <translation>Przekieruj tę stronę internetową przez serwer proxy</translation>
     </message>
     <message>
       <source>Allow opening this integration without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+      <translation>Zezwól na otwarcie tej integracji bez sprawdzania certyfikatu SSL</translation>
     </message>
     <message>
       <source>Allow opening this web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+      <translation>Zezwól na otwieranie tej strony internetowej bez sprawdzania certyfikatu SSL</translation>
     </message>
     <message>
       <source>New Web Page</source>
@@ -10548,7 +10548,7 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     </message>
     <message>
       <source>New Proxied Web Page</source>
-      <translation type="unfinished">New Proxied Web Page</translation>
+      <translation>Nowa strona internetowa z serwerem proxy</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -10719,7 +10719,7 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     <name>nx::vms::client::desktop::RestApiHelper</name>
     <message>
       <source>Password confirmation is required to apply changes</source>
-      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+      <translation>Aby zastosować zmiany, wymagane jest potwierdzenie hasła</translation>
     </message>
     <message>
       <source>Confirm</source>
@@ -11034,7 +11034,7 @@ Nadal możesz zmienić jakość i FPS bezpośrednio w kamerze.</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+      <translation>Znaki wodne będą wyświetlane w obrazach na żywo, w archiwizowanych i eksportowanych nagraniach tylko dla użytkowników nie będących administratorami. Ty i inni administratorzy ich nie zobaczycie.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
@@ -11379,7 +11379,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>The provided link is not valid</source>
-      <translation type="unfinished">The provided link is not valid</translation>
+      <translation>Podany link jest nieprawidłowy</translation>
     </message>
   </context>
   <context>
@@ -11496,11 +11496,11 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Add more services or fix overuse by stopping using services for some devices.</source>
-      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
+      <translation>Dodaj więcej usług lub rozwiąż problem nadmiernego korzystania z nich, wyłączając usługi dla niektórych urządzeń.</translation>
     </message>
     <message>
       <source>If no action is taken, required number of services will be released automatically on %1.</source>
-      <translation type="unfinished">If no action is taken, required number of services will be released automatically on %1.</translation>
+      <translation>Jeśli żadne działanie nie zostanie podjęte, wymagana liczba usług zostanie automatycznie zwolniona %1.</translation>
     </message>
     <message>
       <source>Some features may not be available.</source>
@@ -11789,11 +11789,11 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
-      <translation type="unfinished">Group is not found in the LDAP database.</translation>
+      <translation>Grupa nie została znaleziona w bazie danych LDAP.</translation>
     </message>
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
-      <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
+      <translation>Grupa ma inną grupę jako element nadrzędny i podrzędny lub jest częścią takiego cyklicznego łańcucha odwołań. Może to prowadzić do nieprawidłowego obliczenia uprawnień.</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11805,18 +11805,18 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Istnieje wiele grup o tej nazwie. Aby zachować przejrzystą i uporządkowaną strukturę, zalecamy nadanie każdej grupie unikalnej nazwy.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
       <source>Invalid JSON</source>
-      <translation type="unfinished">Invalid JSON</translation>
+      <translation>Nieprawidłowy JSON</translation>
     </message>
     <message>
       <source>Invalid request</source>
-      <translation type="unfinished">Invalid request</translation>
+      <translation>Nieprawidłowe żądanie</translation>
     </message>
     <message>
       <source>Method not found</source>
@@ -11840,7 +11840,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Invalid encoding charset</source>
-      <translation type="unfinished">Invalid encoding charset</translation>
+      <translation>Nieprawidłowy zestaw znaków kodowania</translation>
     </message>
     <message>
       <source>Application Error</source>

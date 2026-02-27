@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
@@ -696,7 +696,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Logg inn</translation>
     </message>
   </context>
   <context>
@@ -1153,16 +1153,16 @@
       <translation>Ingen tilgjengelige systemer ble funnet. Be om tilgang til eksisterende systemer eller koble til en lokal server</translation>
     </message>
     <message>
-      <source>Structure</source>
-      <translation type="unfinished">Structure</translation>
-    </message>
-    <message>
       <source>Welcome, %1!</source>
       <translation type="unfinished">Welcome, %1!</translation>
     </message>
     <message>
       <source>Feed</source>
       <translation type="unfinished">Feed</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>

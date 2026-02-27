@@ -308,11 +308,11 @@
     </message>
     <message>
       <source>Search by attribute</source>
-      <translation type="unfinished">Search by attribute</translation>
+      <translation>Sök efter attribut</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
@@ -696,7 +696,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Logga in</translation>
     </message>
   </context>
   <context>
@@ -1153,16 +1153,16 @@
       <translation>Inga tillgängliga platser hittades. Begär åtkomst till befintliga webbplatser eller anslut till en lokal server</translation>
     </message>
     <message>
-      <source>Structure</source>
-      <translation>Struktur</translation>
-    </message>
-    <message>
       <source>Welcome, %1!</source>
       <translation>Välkommen, %1!</translation>
     </message>
     <message>
       <source>Feed</source>
       <translation>Flöde</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>

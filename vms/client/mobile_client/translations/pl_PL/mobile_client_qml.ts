@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>
@@ -700,7 +700,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Zaloguj się</translation>
     </message>
   </context>
   <context>
@@ -1157,16 +1157,16 @@
       <translation>Nie znaleziono dostępnych witryn. Poproś o dostęp do istniejących witryn lub połącz się z serwerem lokalnym</translation>
     </message>
     <message>
-      <source>Structure</source>
-      <translation>Struktura</translation>
-    </message>
-    <message>
       <source>Welcome, %1!</source>
       <translation>Witaj, %1!</translation>
     </message>
     <message>
       <source>Feed</source>
       <translation>Strumień</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>

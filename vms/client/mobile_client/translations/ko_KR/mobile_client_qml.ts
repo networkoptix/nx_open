@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>취소</translation>
     </message>
   </context>
   <context>
@@ -694,7 +694,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>로그인</translation>
     </message>
   </context>
   <context>
@@ -1151,16 +1151,16 @@
       <translation>접근 가능한 사이트를 찾을 수 없습니다. 기존 사이트에 대한 접근을 요청하거나 로컬 서버에 연결하세요</translation>
     </message>
     <message>
-      <source>Structure</source>
-      <translation type="unfinished">Structure</translation>
-    </message>
-    <message>
       <source>Welcome, %1!</source>
       <translation type="unfinished">Welcome, %1!</translation>
     </message>
     <message>
       <source>Feed</source>
       <translation>피드</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>

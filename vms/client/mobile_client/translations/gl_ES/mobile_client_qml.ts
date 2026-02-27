@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
   </context>
   <context>
@@ -696,7 +696,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Iniciar sesión</translation>
     </message>
   </context>
   <context>
@@ -1153,16 +1153,16 @@
       <translation>Non se atoparon sitios web accesibles. Solicita acceso a sitios web existentes ou conéctate a un servidor local</translation>
     </message>
     <message>
-      <source>Structure</source>
-      <translation>Estrutura</translation>
-    </message>
-    <message>
       <source>Welcome, %1!</source>
       <translation>Benvida/o, %1!</translation>
     </message>
     <message>
       <source>Feed</source>
       <translation>Alimentación</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>

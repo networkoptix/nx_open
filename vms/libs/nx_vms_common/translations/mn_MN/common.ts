@@ -1890,7 +1890,7 @@
     </message>
     <message>
       <source>License server.</source>
-      <translation type="unfinished">License server.</translation>
+      <translation>Лицензийн сервер.</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update.</source>

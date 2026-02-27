@@ -308,11 +308,11 @@
     </message>
     <message>
       <source>Search by attribute</source>
-      <translation type="unfinished">Search by attribute</translation>
+      <translation>属性で検索</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>キャンセル</translation>
     </message>
   </context>
   <context>
@@ -694,7 +694,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>ログイン</translation>
     </message>
   </context>
   <context>
@@ -1151,16 +1151,16 @@
       <translation>アクセス可能なサイトが見つかりません。既存サイトへのアクセス権をリクエストするか、ローカルサーバーに接続してください。</translation>
     </message>
     <message>
-      <source>Structure</source>
-      <translation>構成</translation>
-    </message>
-    <message>
       <source>Welcome, %1!</source>
       <translation>ようこそ、%1様!</translation>
     </message>
     <message>
       <source>Feed</source>
       <translation>フィード</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>

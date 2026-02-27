@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel</translation>
     </message>
   </context>
   <context>
@@ -1151,16 +1151,16 @@
       <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
     </message>
     <message>
-      <source>Structure</source>
-      <translation type="unfinished">Structure</translation>
-    </message>
-    <message>
       <source>Welcome, %1!</source>
       <translation type="unfinished">Welcome, %1!</translation>
     </message>
     <message>
       <source>Feed</source>
       <translation type="unfinished">Feed</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>

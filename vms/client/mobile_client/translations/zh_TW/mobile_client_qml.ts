@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>取消</translation>
     </message>
   </context>
   <context>
@@ -694,7 +694,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>登入</translation>
     </message>
   </context>
   <context>
@@ -1151,16 +1151,16 @@
       <translation>未找到可造訪的站點。請求存取站點或連接到區域網路中的伺服器</translation>
     </message>
     <message>
-      <source>Structure</source>
-      <translation>結構</translation>
-    </message>
-    <message>
       <source>Welcome, %1!</source>
       <translation>歡迎，%1!</translation>
     </message>
     <message>
       <source>Feed</source>
       <translation>新聞</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>

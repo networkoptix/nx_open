@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel</translation>
     </message>
   </context>
   <context>
@@ -694,7 +694,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Masuk</translation>
     </message>
   </context>
   <context>
@@ -1151,16 +1151,16 @@
       <translation>Tidak ditemukan site yang dapat diakses. Minta akses ke site yang ada atau koneksikan ke server lokal</translation>
     </message>
     <message>
-      <source>Structure</source>
-      <translation>Struktur</translation>
-    </message>
-    <message>
       <source>Welcome, %1!</source>
       <translation>Selamat datang, %1!</translation>
     </message>
     <message>
       <source>Feed</source>
       <translation>Feed</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>

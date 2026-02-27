@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
   </context>
   <context>
@@ -696,7 +696,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Log ind</translation>
     </message>
   </context>
   <context>
@@ -1153,16 +1153,16 @@
       <translation>Ingen tilgængelige sites blev fundet. Anmod om adgang til eksisterende sites eller om forbindelse til en lokal server</translation>
     </message>
     <message>
-      <source>Structure</source>
-      <translation>Struktur</translation>
-    </message>
-    <message>
       <source>Welcome, %1!</source>
       <translation>Velkommen, %1!</translation>
     </message>
     <message>
       <source>Feed</source>
       <translation>Feed</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>

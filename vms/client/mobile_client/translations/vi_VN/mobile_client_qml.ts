@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Hủy bỏ</translation>
     </message>
   </context>
   <context>
@@ -694,7 +694,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -1151,16 +1151,16 @@
       <translation>Không tìm thấy Chi nhánh nào có thể truy cập được. Hãy yêu cầu quyền truy cập vào các Chi nhánh hiện có hoặc kết nối với máy chủ cục bộ</translation>
     </message>
     <message>
-      <source>Structure</source>
-      <translation type="unfinished">Structure</translation>
-    </message>
-    <message>
       <source>Welcome, %1!</source>
       <translation type="unfinished">Welcome, %1!</translation>
     </message>
     <message>
       <source>Feed</source>
       <translation>Nguồn cấp dữ liệu</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>
