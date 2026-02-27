@@ -641,18 +641,24 @@ Page
         from: preview.startTimeMs
         to: preview.startTimeMs + preview.durationMs
 
+        readonly property real handlePosition:
+            slider.visualPosition * (slider.width - slider.leftPadding - slider.rightPadding)
+                + slider.leftPadding - handle.width / 2
+
         handle: Rectangle
         {
             id: handle
             width: 24
             height: 24
 
-            x: slider.visualPosition * (slider.width - slider.leftPadding - slider.rightPadding)
-                + slider.leftPadding - handle.width / 2
+            x: slider.handlePosition
             anchors.verticalCenter: slider.verticalCenter
 
             radius: 12
-            color: ColorTheme.colors.light10
+            color: ColorTheme.colors.dark14
+
+            border.width: 4
+            border.color: ColorTheme.colors.light4
         }
 
         background: Rectangle
@@ -661,8 +667,15 @@ Page
 
             width: parent.width
             height: 4
-            color: ColorTheme.colors.light17
+            color: ColorTheme.colors.dark14
             anchors.verticalCenter: slider.verticalCenter
+
+            Rectangle
+            {
+                width: slider.handlePosition
+                height: parent.height
+                color: ColorTheme.colors.brand
+            }
         }
 
         onValueChanged:
