@@ -1160,7 +1160,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Tài nguyên</translation>
     </message>
   </context>
   <context>

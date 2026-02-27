@@ -1166,7 +1166,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Ресурси</translation>
     </message>
   </context>
   <context>

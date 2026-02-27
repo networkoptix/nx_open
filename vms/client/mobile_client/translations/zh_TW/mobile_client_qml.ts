@@ -1160,7 +1160,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>資源</translation>
     </message>
   </context>
   <context>

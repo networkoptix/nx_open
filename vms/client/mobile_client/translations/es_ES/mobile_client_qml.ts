@@ -308,7 +308,7 @@
     </message>
     <message>
       <source>Search by attribute</source>
-      <translation type="unfinished">Search by attribute</translation>
+      <translation>Buscar por atributo</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1162,7 +1162,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Recursos</translation>
     </message>
   </context>
   <context>

@@ -308,7 +308,7 @@
     </message>
     <message>
       <source>Search by attribute</source>
-      <translation type="unfinished">Search by attribute</translation>
+      <translation>Cari berdasarkan atribut</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1160,7 +1160,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Resources</translation>
     </message>
   </context>
   <context>

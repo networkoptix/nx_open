@@ -1162,7 +1162,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Resurssit</translation>
     </message>
   </context>
   <context>

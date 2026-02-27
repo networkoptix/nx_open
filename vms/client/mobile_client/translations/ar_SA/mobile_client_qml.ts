@@ -1170,7 +1170,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Resources</translation>
     </message>
   </context>
   <context>
