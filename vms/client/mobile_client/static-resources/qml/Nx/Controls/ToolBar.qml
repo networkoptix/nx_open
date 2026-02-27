@@ -55,10 +55,11 @@ ToolBarBase
     {
         id: centerControlContainer
         anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+
         anchors.left: leftControlContainer.right
         anchors.leftMargin: 20
-        anchors.right: rightControlContainer.implicitWidth ? rightControlContainer.left : parent.right
-        anchors.rightMargin: 20
+
         height: parent.height
 
         MouseArea
@@ -84,7 +85,7 @@ ToolBarBase
                 controlsRow.width > 0 ? controlsRow.width + 8 : 0
 
             readonly property bool fitsInCenter:
-                parent.width / 2 + implicitWidth / 2 < parent.width - controlsRowWidth
+                implicitWidth / 2 < parent.width / 2 - controlsRowWidth
 
             readonly property bool hasRightControl: rightControlContainer.children.length > 0
 
