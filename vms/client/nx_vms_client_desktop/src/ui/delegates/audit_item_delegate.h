@@ -30,6 +30,7 @@ private:
     void paintDescription(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index, const QnLegacyAuditRecord* record) const;
     void paintUserActivity(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
     void paintFocusRect(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option) const;
+    void paintUsernamePlaceholder(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option) const;
 
     int cachedTextWidth(const QFont& font, const QString& textData, bool isBold = false) const;
 

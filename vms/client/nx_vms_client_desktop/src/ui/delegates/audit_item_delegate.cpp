@@ -40,6 +40,8 @@ namespace
     /* Margin at the top and bottom of each detail line in description: */
     const int kDetailLineVerticalMargin = 1;
 
+    static const QString kUsernamePlaceholder(QnAuditItemDelegate::tr("internal"));
+
     /* Measure text width the right way: */
     int textWidth(const QFont& font, const QString& text)
     {
@@ -194,6 +196,13 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QM
         default:
             result = defaultSizeHint(option, index);
             break;
+    }
+
+    if (column == QnAuditLogModel::UserNameColumn && index.data().toString().isEmpty())
+    {
+        QFont italicFont(option.font);
+        italicFont.setItalic(true);
+        result.setWidth(cachedTextWidth(italicFont, kUsernamePlaceholder));
     }
 
     result.setWidth(result.width() + nx::style::Metrics::kStandardPadding * 2);
@@ -388,9 +397,9 @@ void QnAuditItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& s
 
     /* Draw audit item: */
     const QnLegacyAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnLegacyAuditRecord*>();
+    const auto column = static_cast<QnAuditLogModel::Column>(index.data(Qn::ColumnDataRole).toInt());
     if (record)
     {
-        QnAuditLogModel::Column column = static_cast<QnAuditLogModel::Column>(index.data(Qn::ColumnDataRole).toInt());
         switch (column)
         {
             case QnAuditLogModel::TimestampColumn:
@@ -419,7 +428,11 @@ void QnAuditItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& s
                 break;
         }
     }
-
+    if (column == QnAuditLogModel::UserNameColumn && index.data().toString().isEmpty())
+    {
+        paintUsernamePlaceholder(style, painter, option);
+        return;
+    }
     /* Else perform default painting: */
     base_type::paint(painter, option, index);
 }
@@ -633,4 +646,13 @@ void QnAuditItemDelegate::paintFocusRect(const QStyle* style, QPainter* painter,
     frameOption.QStyleOption::operator=(option);
     frameOption.rect = style->subElementRect(QStyle::SE_ItemViewItemFocusRect, &option, option.widget);
     style->drawPrimitive(QStyle::PE_FrameFocusRect, &frameOption, painter, option.widget);
+}
+
+void QnAuditItemDelegate::paintUsernamePlaceholder(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option) const
+{
+    QStyleOptionViewItem itemOption(option);
+    itemOption.font.setItalic(true);
+    itemOption.text = kUsernamePlaceholder;
+
+    style->drawControl(QStyle::CE_ItemViewItem, &itemOption, painter, itemOption.widget);
 }

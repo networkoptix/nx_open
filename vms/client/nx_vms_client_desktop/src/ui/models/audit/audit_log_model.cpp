@@ -1031,9 +1031,13 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
         }
 
     case Qt::ToolTipRole:
-        if (column == DescriptionColumn)
-            return descriptionTooltip(record);
-        break;
+        {
+            if (column == DescriptionColumn)
+                return descriptionTooltip(record);
+            if (column == UserNameColumn && textData(column, record).isEmpty())
+                return tr("This action was performed by a plugin.");
+            break;
+        }
     }
 
     return QVariant();
