@@ -15,6 +15,7 @@ extern "C" {
 #include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/vms/api/data/server_timezone_information.h>
 #include <transcoding/ffmpeg_muxer.h>
 #include <transcoding/media_transcoder.h>
 #include <transcoding/transcoding_utils.h>
@@ -96,6 +97,8 @@ public:
     */
     int finalize(nx::utils::ByteArray* const result);
 
+    void setTimeZone(const nx::vms::api::ServerTimeZoneInformation& value);
+
 private:
     bool transcodePacketInternal(const QnConstAbstractMediaDataPtr& media);
     bool finalizeInternal(nx::utils::ByteArray* const result);
@@ -115,4 +118,5 @@ private:
     int m_eofCounter = 0;
     BeforeOpenCallback m_beforeOpenCallback;
     const Config m_config;
+    std::optional<nx::vms::api::ServerTimeZoneInformation> m_timeZone;
 };
