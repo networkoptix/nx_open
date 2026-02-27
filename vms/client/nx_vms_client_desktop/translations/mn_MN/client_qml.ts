@@ -3098,7 +3098,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Хуулбарлах</translation>
     </message>
     <message>
       <source>Delete</source>
