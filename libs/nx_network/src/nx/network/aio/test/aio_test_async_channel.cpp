@@ -2,10 +2,7 @@
 
 #include "aio_test_async_channel.h"
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace test {
+namespace nx::network::aio::test {
 
 AsyncChannel::AsyncChannel(
     nx::utils::bstream::AbstractInput* input,
@@ -329,7 +326,4 @@ void AsyncChannel::performAsyncSend(const nx::Locker<nx::Mutex>&)
         });
 }
 
-} // namespace test
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::test

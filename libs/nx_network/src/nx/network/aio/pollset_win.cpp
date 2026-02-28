@@ -11,9 +11,7 @@
 #include "../common_socket_impl.h"
 #include "../system_socket.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 static const size_t INITIAL_FDSET_SIZE = 1024;
 static const size_t FDSET_INCREASE_STEP = 1024;
@@ -522,8 +520,6 @@ PollSet::const_iterator PollSet::end() const
     return _end;
 }
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio
 
 #endif

@@ -6,8 +6,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 //-------------------------------------------------------------------------------------------------
 // MeanTimeFetcher::TimeFetcherContext
@@ -136,5 +135,4 @@ void MeanTimeFetcher::timeFetchingDone(
         sumOfReceivedRtt / collectedValuesCount);
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

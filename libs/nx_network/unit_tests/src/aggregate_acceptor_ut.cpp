@@ -6,9 +6,7 @@
 #include <nx/network/test_support/acceptor_stub.h>
 #include <nx/utils/random.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 // TODO: #akolesnikov Move here corresponding tests from MultipleServerSocket tests.
 
@@ -140,6 +138,4 @@ TEST_F(AggregateAcceptor, acceptor_invokes_handler_within_acceptAsync)
     thenOtherAcceptorsWereNotStarted();
 }
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

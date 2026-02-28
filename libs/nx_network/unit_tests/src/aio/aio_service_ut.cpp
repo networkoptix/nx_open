@@ -10,10 +10,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace test {
+namespace nx::network::aio::test {
 
 namespace {
 
@@ -192,7 +189,4 @@ TEST_F(AIOService, duplicate_start_monitoring_call_is_ignored)
     thenEventHasBeenReported();
 }
 
-} // namespace test
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::test

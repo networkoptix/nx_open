@@ -11,9 +11,7 @@
 #include "stun_message_parser_buffer.h"
 #include "stun_message_serializer_buffer.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 namespace error {
 
@@ -375,6 +373,4 @@ struct NX_NETWORK_API RequestedTransport: Unknown
 
 } // namespace attrs
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

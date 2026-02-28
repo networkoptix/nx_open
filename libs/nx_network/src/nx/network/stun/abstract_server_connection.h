@@ -15,9 +15,7 @@
 
 #include "message.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 class AbstractServerConnection
 {
@@ -45,6 +43,4 @@ public:
     virtual void setInactivityTimeout(std::optional<std::chrono::milliseconds> value) = 0;
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

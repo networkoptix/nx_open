@@ -9,8 +9,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 struct TemporaryKeyOptions
 {
@@ -343,5 +342,4 @@ std::string TemporaryKeyKeeper<Value>::contextString(ValueConstIterator contextI
     return contextString(contextIt->first, contextIt->second);
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

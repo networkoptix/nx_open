@@ -7,9 +7,7 @@
 #include "../custom_handshake_connection_acceptor.h"
 #include "../socket_delegate.h"
 
-namespace nx {
-namespace network {
-namespace ssl {
+namespace nx::network::ssl {
 
 class Context;
 
@@ -102,6 +100,4 @@ private:
     void stopWhileInAioThread();
 };
 
-} // namespace ssl
-} // namespace network
-} // namespace nx
+} // namespace nx::network::ssl

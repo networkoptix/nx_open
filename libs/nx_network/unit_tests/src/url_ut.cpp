@@ -5,10 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/network/url/url_parse_helper.h>
 
-namespace nx {
-namespace network {
-namespace url {
-namespace test {
+namespace nx::network::url::test {
 
 TEST(UrlGetEndpoint, defaultPortCorrespondsToUrlScheme)
 {
@@ -69,7 +66,4 @@ TEST(Url, ipv6_host)
     ASSERT_EQ(kUrl, url.toString());
 }
 
-} // namespace test
-} // namespace url
-} // namespace network
-} // namespace nx
+} // namespace nx::network::url::test

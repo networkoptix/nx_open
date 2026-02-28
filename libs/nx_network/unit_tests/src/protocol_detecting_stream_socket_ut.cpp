@@ -10,9 +10,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 class ProtocolDetectingStreamSocket:
     public ::testing::Test
@@ -119,6 +117,4 @@ TEST_F(
     assertSendFailsWith(SystemError::invalidData);
 }
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

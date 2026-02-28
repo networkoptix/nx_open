@@ -25,9 +25,7 @@
 
 #include "synchronous_tcp_server.h"
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 namespace {
 
@@ -2463,6 +2461,4 @@ REGISTER_TYPED_TEST_SUITE_P(StreamSocketAcceptance,
     existing_timer_can_be_changed
 );
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

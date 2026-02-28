@@ -5,9 +5,7 @@
 #include <nx/network/time/mean_time_fetcher.h>
 #include <nx/network/time/time_protocol_client.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 class MeanTimeFetcher:
     public network::MeanTimeFetcher
@@ -27,6 +25,4 @@ INSTANTIATE_TYPED_TEST_SUITE_P(
     BasicTimeProtocolClient,
     MeanTimeFetcher);
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

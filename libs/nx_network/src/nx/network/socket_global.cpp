@@ -21,8 +21,7 @@
 #include "nx_network_ini.h"
 #include "socket_factory.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 namespace {
 
@@ -484,5 +483,4 @@ SocketGlobalsHolder* SocketGlobalsHolder::instance()
     return s_holderInstance;
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

@@ -14,9 +14,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 class SocketUdt:
     public ::testing::Test
@@ -470,6 +468,4 @@ INSTANTIATE_TYPED_TEST_SUITE_P(UdtStreamSocket, SocketOptions, UdtStreamSocketFa
 INSTANTIATE_TYPED_TEST_SUITE_P(UdtStreamSocket, SocketOptionsDefaultValue, UdtStreamSocketFactory);
 #endif
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

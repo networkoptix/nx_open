@@ -13,10 +13,7 @@
 #include <nx/utils/interruption_flag.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace test {
+namespace nx::network::aio::test {
 
 class NX_NETWORK_API AsyncChannel:
     public AbstractAsyncChannel
@@ -108,7 +105,4 @@ private:
         std::size_t bytesTransferred);
 };
 
-} // namespace test
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::test

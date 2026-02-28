@@ -15,10 +15,7 @@
 #include "pollset_test_common.h"
 #include "pollset_performance_tests.h"
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace test {
+namespace nx::network::aio::test {
 
 constexpr std::size_t kBytesToSend = 128;
 
@@ -234,7 +231,4 @@ TEST_F(UnifiedPollSetSpecificTests, removing_socket_which_has_error_event_report
     }
 }
 
-} // namespace test
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::test

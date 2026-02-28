@@ -17,9 +17,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/barrier_handler.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 namespace {
 
@@ -65,7 +63,6 @@ nx::Buffer readNBytes(SocketType* clientSocket, std::size_t count)
             return buffer.substr(0, bufDataSize);
     }
 }
-
 
 enum class ErrorHandling
 {
@@ -797,9 +794,7 @@ REGISTER_TYPED_TEST_SUITE_P(SocketOptionsDefaultValue,
     reuse_addr,
     non_blocking_mode);
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test
 
 typedef nx::network::test::StopType StopType;
 

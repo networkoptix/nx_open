@@ -10,10 +10,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/system_network_headers.h>
 
-namespace nx {
-namespace network {
-namespace stun {
-namespace test {
+namespace nx::network::stun::test {
 
 static const Buffer DEFAULT_TID("012345670123456789ABCDEF");
 
@@ -440,7 +437,4 @@ TEST_F(StunMessageSerializer, fingerprint_is_added_to_every_message_if_enabled)
     andSerializedMessageContainsFingerprint(expectedFingerprint);
 }
 
-} // namespace test
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun::test

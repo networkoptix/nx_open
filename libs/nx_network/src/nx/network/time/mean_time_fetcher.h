@@ -7,8 +7,7 @@
 
 #include "abstract_accurate_time_fetcher.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 /**
  * Fetches time from multiple time fetchers. If all succeeded than returns mean value.
@@ -56,5 +55,4 @@ private:
         std::chrono::milliseconds rtt);
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

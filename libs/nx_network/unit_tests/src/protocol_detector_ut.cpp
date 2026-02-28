@@ -7,9 +7,7 @@
 #include <nx/network/protocol_detector.h>
 #include <nx/utils/random.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 class ProtocolDetector:
     public ::testing::Test
@@ -84,6 +82,4 @@ TEST_F(ProtocolDetector, detects_unknown_protocol)
     thenMatchReported(ProtocolMatchResult::unknownProtocol);
 }
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

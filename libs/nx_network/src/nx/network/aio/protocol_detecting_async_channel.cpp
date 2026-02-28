@@ -4,9 +4,7 @@
 
 #include "buffered_async_channel.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 ProtocolDetectingAsyncChannel::ProtocolDetectingAsyncChannel(
     std::unique_ptr<AbstractAsyncChannel> dataSource)
@@ -31,6 +29,4 @@ void ProtocolDetectingAsyncChannel::stopWhileInAioThread()
     base_type::cleanUp();
 }
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

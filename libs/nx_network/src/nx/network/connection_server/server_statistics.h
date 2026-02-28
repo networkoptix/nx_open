@@ -7,9 +7,7 @@
 
 #include <nx/reflect/instrument.h>
 
-namespace nx {
-namespace network {
-namespace server {
+namespace nx::network::server {
 
 struct NX_NETWORK_API Statistics
 {
@@ -58,6 +56,4 @@ private:
     const std::vector<const AbstractStatisticsProvider*> m_providers;
 };
 
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server

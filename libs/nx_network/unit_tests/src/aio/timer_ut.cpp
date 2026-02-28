@@ -6,10 +6,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace test {
+namespace nx::network::aio::test {
 
 class AioTimer:
     public ::testing::Test
@@ -137,7 +134,4 @@ TEST_F(AioTimer, cancelled_timer_is_not_raised)
     assertTimerEventNotRaised(timeout*10);
 }
 
-} // namespace test
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::test

@@ -19,8 +19,7 @@
 #include "aio/basic_pollable.h"
 #include "socket_global.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 using ReverseConnectionCompletionHandler =
     nx::MoveOnlyFunc<void(SystemError::ErrorCode)>;
@@ -610,5 +609,4 @@ private:
     }
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

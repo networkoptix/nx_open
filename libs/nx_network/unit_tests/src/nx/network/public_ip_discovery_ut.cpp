@@ -7,9 +7,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/utils.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 static const QString kPublicIpAddress(lit("127.0.0.1"));
 
@@ -111,6 +109,4 @@ TEST_F(PublicIPDiscovery, cancellation)
     assertIfFinderDidNotWaitForEventHandlerToReturn();
 }
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

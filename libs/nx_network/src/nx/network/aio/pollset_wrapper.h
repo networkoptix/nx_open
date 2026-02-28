@@ -4,12 +4,9 @@
 
 #include <memory>
 
-
 #include "abstract_pollset.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 template<typename OldPollSetIterator>
 class PollSetIteratorWrapper:
@@ -114,6 +111,4 @@ private:
     OldPollSetImplementation m_oldPollSet;
 };
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

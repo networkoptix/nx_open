@@ -6,9 +6,7 @@
 
 #include <nx/utils/log/assert.h>
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 MessageSerializerBuffer::MessageSerializerBuffer(nx::Buffer* buffer):
     m_buffer(buffer)
@@ -122,6 +120,4 @@ std::size_t MessageSerializerBuffer::remainingCapacity() const
     return m_buffer->capacity() - m_buffer->size();
 }
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

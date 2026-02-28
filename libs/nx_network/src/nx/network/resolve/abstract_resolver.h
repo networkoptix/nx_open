@@ -10,8 +10,7 @@
 #include "../socket_common.h"
 #include "address_entry.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 struct ResolveResult
 {
@@ -33,5 +32,4 @@ public:
         ResolveResult* resolveResult) = 0;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

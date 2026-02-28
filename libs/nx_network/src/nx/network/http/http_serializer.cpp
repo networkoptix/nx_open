@@ -2,9 +2,7 @@
 
 #include "http_serializer.h"
 
-namespace nx {
-namespace network {
-namespace http {
+namespace nx::network::http {
 
 void MessageSerializer::setMessage(const Message* message)
 {
@@ -21,6 +19,4 @@ nx::network::server::SerializerState MessageSerializer::serialize(
     return nx::network::server::SerializerState::done;
 }
 
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http

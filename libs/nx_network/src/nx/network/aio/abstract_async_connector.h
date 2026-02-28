@@ -8,9 +8,7 @@
 #include "../socket_common.h"
 #include "basic_pollable.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 /**
  * Constructs a proper socket type and establishes a connection to the given address.
@@ -33,6 +31,4 @@ public:
         ConnectHandler handler) = 0;
 };
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

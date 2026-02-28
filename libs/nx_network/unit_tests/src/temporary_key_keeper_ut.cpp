@@ -5,9 +5,7 @@
 #include <nx/network/temporary_key_keeper.h>
 #include <nx/utils/time.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 using namespace std::chrono_literals;
 
@@ -261,6 +259,4 @@ TEST(TemporaryKeyKeeper, BindingExpiration)
     ASSERT_EQ(0, keeper.size());
 }
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

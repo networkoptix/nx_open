@@ -2,8 +2,7 @@
 
 #include "time_protocol_server.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 std::shared_ptr<TimeProtocolServer::ConnectionType> TimeProtocolServer::createConnection(
     std::unique_ptr<AbstractStreamSocket> socket)
@@ -11,5 +10,4 @@ std::shared_ptr<TimeProtocolServer::ConnectionType> TimeProtocolServer::createCo
     return std::make_shared<TimeProtocolConnection>(std::move(socket));
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

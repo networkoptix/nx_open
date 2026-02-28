@@ -4,9 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client):
     m_client(std::move(client))
@@ -163,6 +161,4 @@ void AsyncClientUser::reportReconnect()
         });
 }
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

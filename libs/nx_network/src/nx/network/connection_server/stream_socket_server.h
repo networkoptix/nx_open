@@ -24,9 +24,7 @@
 #include "detail/connection_statistics.h"
 #include "detail/server_statistics_calculator.h"
 
-namespace nx {
-namespace network {
-namespace server {
+namespace nx::network::server {
 
 template<class _ConnectionType>
 class StreamConnectionHolder
@@ -397,6 +395,4 @@ private:
     }
 };
 
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server

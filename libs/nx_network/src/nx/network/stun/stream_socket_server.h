@@ -6,9 +6,7 @@
 
 #include "server_connection.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 class AbstractMessageHandler;
 
@@ -47,6 +45,4 @@ private:
     AbstractMessageHandler* m_messageHandler = nullptr;
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

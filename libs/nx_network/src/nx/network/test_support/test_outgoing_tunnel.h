@@ -6,10 +6,7 @@
 
 #include <nx/network/cloud/tunnel/connector_factory.h>
 
-namespace nx {
-namespace network {
-namespace cloud {
-namespace test {
+namespace nx::network::cloud::test {
 
 template<typename SocketType, typename... OutgoingTunnelConnectionArgs>
 class OutgoingTunnelConnection:
@@ -125,7 +122,4 @@ private:
     std::tuple<OutgoingTunnelConnectionArgs...> m_outgoingTunnelConnectionArgs;
 };
 
-} // namespace test
-} // namespace cloud
-} // namespace network
-} // namespace nx
+} // namespace nx::network::cloud::test

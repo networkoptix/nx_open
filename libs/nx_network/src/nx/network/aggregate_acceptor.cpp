@@ -7,8 +7,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 AggregateAcceptor::AcceptorContext::AcceptorContext(
     std::unique_ptr<AbstractStreamSocketAcceptor> acceptor)
@@ -245,5 +244,4 @@ void AggregateAcceptor::removeByIterator(FindIteratorFunc findIterator)
     socketRemovedPromise.get_future().wait();
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

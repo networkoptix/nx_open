@@ -4,8 +4,7 @@
 
 #include <QDateTime>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 PortMapping::PortMapping()
     : requestTime(0), lifeTime(0)
@@ -18,5 +17,4 @@ quint32 PortMapping::timeLeft()
     return QDateTime::currentDateTime().toSecsSinceEpoch() + lifeTime - requestTime;
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

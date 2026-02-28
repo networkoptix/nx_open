@@ -4,8 +4,7 @@
 
 #include <nx/utils/random.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 DummySocket::DummySocket():
     m_localAddress(HostAddress::localhost, nx::utils::random::number<quint16>(5'000, 50'000))
@@ -223,5 +222,4 @@ void DummySocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     return m_basicPollable.bindToAioThread(aioThread);
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

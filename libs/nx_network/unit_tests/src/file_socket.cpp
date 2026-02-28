@@ -2,8 +2,7 @@
 
 #include "file_socket.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 FileSocket::FileSocket(const std::string& filePath):
     m_filePath(filePath),
@@ -51,5 +50,4 @@ bool FileSocket::isConnected() const
     return m_file.is_open();
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

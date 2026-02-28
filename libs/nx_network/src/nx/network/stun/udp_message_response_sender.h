@@ -10,9 +10,7 @@
 
 #include "abstract_server_connection.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 class UdpServer;
 
@@ -50,6 +48,4 @@ private:
     nx::utils::Counter::ScopedIncrement m_scopedIncrement;
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

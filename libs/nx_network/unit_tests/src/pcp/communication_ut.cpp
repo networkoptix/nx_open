@@ -11,9 +11,7 @@
 
 #include "data_stream_helpers.h"
 
-namespace nx {
-namespace network {
-namespace pcp {
+namespace nx::network::pcp::test {
 
 class TestEvents : public Listener::Events
 {
@@ -48,6 +46,4 @@ TEST(PcpCommunication, Simple)
     QThread::sleep(1);
 }
 
-} // namespace pcp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::pcp::test

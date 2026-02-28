@@ -2,8 +2,7 @@
 
 #include "socket_attributes_cache.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 namespace {
 
@@ -44,5 +43,4 @@ bool verifySocketAttributes(
         && verifyAttribute(socket, &AbstractSocket::getSendTimeout, attributes.sendTimeout);
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

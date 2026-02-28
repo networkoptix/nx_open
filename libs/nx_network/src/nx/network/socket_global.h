@@ -14,8 +14,7 @@
 #include "debug/object_counters.h"
 #include "socket_common.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 namespace aio { class AIOService; }
 class AddressResolver;
@@ -180,5 +179,4 @@ private:
     std::unique_ptr<SocketGlobals::InitGuard> m_socketGlobalsGuard;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

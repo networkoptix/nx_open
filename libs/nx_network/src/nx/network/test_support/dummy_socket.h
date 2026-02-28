@@ -6,8 +6,7 @@
 
 #include "../aio/basic_pollable.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 /**
  * Base class for socket, reading/writing data from/to any source (e.g., file).
@@ -88,5 +87,4 @@ private:
     aio::BasicPollable m_basicPollable;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

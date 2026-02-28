@@ -4,9 +4,7 @@
 
 #include <nx/utils/buffer.h>
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 class NX_NETWORK_API MessageSerializerBuffer
 {
@@ -37,6 +35,4 @@ private:
     std::uint16_t* m_headerLength = nullptr;
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

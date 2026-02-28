@@ -23,8 +23,7 @@
 #include "resolve/predefined_host_resolver.h"
 #include "resolve/system_resolver.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 //-------------------------------------------------------------------------------------------------
 // class DnsResolver::ResolveTask
@@ -287,5 +286,4 @@ bool DnsResolver::isExpired(const ResolveTask& task) const
     return nx::utils::monotonicTime() >= task.creationTime + m_resolveTimeout;
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

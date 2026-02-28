@@ -4,10 +4,7 @@
 
 #include <nx/network/url/url_builder.h>
 
-namespace nx {
-namespace network {
-namespace stun {
-namespace test {
+namespace nx::network::stun::test {
 
 static const char* const kStunOverHttpPath = "/StunOverHttp";
 
@@ -130,7 +127,4 @@ void StunOverHttpServerFixture::processStunMessage(nx::network::stun::MessageCon
     ctx.connection->sendMessage(std::move(response), nullptr);
 }
 
-} // namespace test
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun::test

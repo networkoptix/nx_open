@@ -13,9 +13,7 @@
 
 typedef int UDTSOCKET;
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 class ConstIteratorImpl;
 
@@ -182,6 +180,4 @@ private:
     void removePhantomSockets(std::map<UDTSOCKET, int>* const udtFdSet);
 };
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

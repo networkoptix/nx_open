@@ -9,8 +9,7 @@
 #include <nx/utils/system_network_headers.h>
 #include <nx/utils/time.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 TimeProtocolConnection::TimeProtocolConnection(
     std::unique_ptr<AbstractStreamSocket> _socket)
@@ -87,5 +86,4 @@ void TimeProtocolConnection::triggerConnectionClosedEvent(SystemError::ErrorCode
         handler(reason, watcher.interrupted());
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

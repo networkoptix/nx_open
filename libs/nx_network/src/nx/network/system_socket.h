@@ -24,8 +24,7 @@
 #include "socket_factory.h"
 #include "system_socket_address.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class CommonSocketImpl;
 
@@ -380,5 +379,4 @@ private:
 
 qint64 NX_NETWORK_API totalSocketBytesSent();
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

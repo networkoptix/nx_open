@@ -6,10 +6,7 @@
 
 #include <nx/network/upnp/upnp_device_searcher.h>
 
-namespace nx {
-namespace network {
-namespace upnp {
-namespace test {
+namespace nx::network::upnp::test {
 
 TEST(Upnp, Urn)
 {
@@ -69,7 +66,4 @@ TEST(UpnpDeviceSearcher, DISABLED_General)
     QThread::sleep(5);
 }
 
-} // namespace test
-} // namespace upnp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::upnp::test

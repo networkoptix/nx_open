@@ -18,10 +18,7 @@
 
 #include "stun_over_http_server_fixture.h"
 
-namespace nx {
-namespace network {
-namespace stun {
-namespace test {
+namespace nx::network::stun::test {
 
 class AsyncClientWithHttpTunneling:
     public StunOverHttpServerFixture
@@ -246,7 +243,4 @@ INSTANTIATE_TYPED_TEST_SUITE_P(
     StunAsyncClientAcceptanceTest,
     StunAsyncClientWithHttpTunnelingVsStunServerTestTypes);
 
-} // namespace test
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun::test

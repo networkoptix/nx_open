@@ -7,9 +7,7 @@
 
 #include "messaging.h"
 
-namespace nx {
-namespace network {
-namespace pcp {
+namespace nx::network::pcp {
 
 class NX_NETWORK_API Sender
 {
@@ -40,8 +38,6 @@ inline
 QDataStream& operator<<(QDataStream& s, const Sender::EmptyMessage&)
 { return s; }
 
-} // namespace pcp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::pcp
 
 #endif // SENDER_H

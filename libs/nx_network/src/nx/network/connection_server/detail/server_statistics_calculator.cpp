@@ -2,10 +2,7 @@
 
 #include "server_statistics_calculator.h"
 
-namespace nx {
-namespace network {
-namespace server {
-namespace detail {
+namespace nx::network::server::detail {
 
 StatisticsCalculator::StatisticsCalculator():
     m_connectionsPerMinuteCalculator(std::chrono::minutes(1)),
@@ -43,7 +40,4 @@ void StatisticsCalculator::connectionAccepted()
     m_connectionsPerMinuteCalculator.add(1);
 }
 
-} // namespace detail
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server::detail

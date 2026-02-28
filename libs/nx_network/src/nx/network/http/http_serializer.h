@@ -7,9 +7,7 @@
 
 #include "http_types.h"
 
-namespace nx {
-namespace network {
-namespace http {
+namespace nx::network::http {
 
 class NX_NETWORK_API MessageSerializer:
     public nx::network::server::AbstractMessageSerializer<Message>
@@ -25,6 +23,4 @@ private:
     const Message* m_message = nullptr;
 };
 
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http

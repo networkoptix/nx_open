@@ -3,10 +3,8 @@
 #pragma once
 
 #include "event_type.h"
-#include "pollable.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class Pollable;
 
@@ -25,5 +23,4 @@ public:
 };
 
 } // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network

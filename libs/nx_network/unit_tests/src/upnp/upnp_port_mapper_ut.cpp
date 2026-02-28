@@ -7,10 +7,7 @@
 
 #include "upnp_port_mapper_mocked.h"
 
-namespace nx {
-namespace network {
-namespace upnp {
-namespace test {
+namespace nx::network::upnp::test {
 
 using namespace std::literals::chrono_literals;
 
@@ -139,7 +136,4 @@ TEST_F(UpnpPortMapper, DISABLED_RealRouter)
     QThread::sleep(60 * 60);
 }
 
-} // namespace test
-} // namespace upnp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::upnp::test

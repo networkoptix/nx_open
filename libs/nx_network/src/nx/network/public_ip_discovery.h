@@ -10,8 +10,7 @@
 #include <nx/network/http/async_http_client_reply.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class NX_NETWORK_API PublicIPDiscovery:
     public QObject,
@@ -67,5 +66,4 @@ private:
     QString toString(Stage value) const;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

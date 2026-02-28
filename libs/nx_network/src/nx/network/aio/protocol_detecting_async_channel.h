@@ -10,9 +10,7 @@
 #include "../protocol_detector.h"
 #include "abstract_async_channel.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 /**
  * 1. Reads data from another channel.
@@ -388,6 +386,4 @@ protected:
     virtual void stopWhileInAioThread() override;
 };
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

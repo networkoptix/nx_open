@@ -11,9 +11,7 @@
 
 #include "abstract_msg_body_source.h"
 
-namespace nx {
-namespace network {
-namespace http {
+namespace nx::network::http {
 
 template<typename AsyncChannel>
 class AsyncChannelMessageBodySource:
@@ -152,6 +150,4 @@ std::unique_ptr<AsyncChannelMessageBodySource<AsyncChannel>>
         std::move(asyncChannel));
 }
 
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http

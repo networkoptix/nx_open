@@ -19,10 +19,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace stun {
-namespace test {
+namespace nx::network::stun::test {
 
 class AbstractStunServer
 {
@@ -786,7 +783,4 @@ REGISTER_TYPED_TEST_SUITE_P(StunAsyncClientAcceptanceTest,
     reconnecting_to_another_server_while_original_is_still_alive,
     response_is_not_delivered_after_cancel);
 
-} // namespace test
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun::test

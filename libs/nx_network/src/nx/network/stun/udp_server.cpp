@@ -11,9 +11,7 @@
 #include "abstract_server_connection.h"
 #include "udp_message_response_sender.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 UdpServer::UdpServer(AbstractMessageHandler* messageHandler):
     m_messagePipeline(
@@ -130,6 +128,4 @@ void UdpServer::ioFailure(SystemError::ErrorCode)
     //TODO #akolesnikov
 }
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

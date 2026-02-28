@@ -6,10 +6,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/time.h>
 
-namespace nx {
-namespace network {
-namespace server {
-namespace test {
+namespace nx::network::server::test {
 
 class UserKey: public testing::Test {};
 
@@ -191,7 +188,4 @@ TEST_F(UserLocker, second_user_from_same_ip_is_not_blocked)
     ASSERT_FALSE(isUserLocked(user));
 }
 
-} // namespace test
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server::test

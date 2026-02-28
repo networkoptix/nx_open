@@ -2,8 +2,7 @@
 
 #include "stream_server_socket_to_acceptor_wrapper.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 StreamServerSocketToAcceptorWrapper::StreamServerSocketToAcceptorWrapper(
     std::unique_ptr<AbstractStreamServerSocket> serverSocket)
@@ -37,5 +36,4 @@ void StreamServerSocketToAcceptorWrapper::stopWhileInAioThread()
     m_serverSocket->pleaseStopSync();
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

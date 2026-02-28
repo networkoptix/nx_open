@@ -5,9 +5,7 @@
 #include "aio_service.h"
 #include "../socket_global.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 Timer::Timer(aio::AbstractAioThread* aioThread):
     BasicPollable(aioThread),
@@ -134,6 +132,4 @@ void Timer::eventTriggered(Pollable* sock, aio::EventType eventType) throw()
         m_aioService.stopMonitoring(&pollable(), EventType::etTimedOut);
 }
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

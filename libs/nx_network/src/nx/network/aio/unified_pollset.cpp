@@ -9,9 +9,7 @@
 #include "../udt/udt_socket.h"
 #include "../udt/udt_socket_impl.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 namespace {
 
@@ -596,6 +594,4 @@ void UnifiedPollSet::removePhantomSockets(std::map<UDTSOCKET, int>* const udtFdS
     }
 }
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

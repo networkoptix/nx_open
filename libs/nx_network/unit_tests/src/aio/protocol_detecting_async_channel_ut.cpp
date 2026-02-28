@@ -15,10 +15,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace test {
+namespace nx::network::aio::test {
 
 class ProtocolDetectingAsyncChannel:
     public ::testing::Test
@@ -249,7 +246,4 @@ TEST_F(ProtocolDetectingAsyncChannel, data_source_eof_is_reported)
     thenEofIsReported();
 }
 
-} // namespace test
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::test

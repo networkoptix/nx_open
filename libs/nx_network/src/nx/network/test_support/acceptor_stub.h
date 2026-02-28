@@ -9,9 +9,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 class NX_NETWORK_API AcceptorStub:
     public cloud::AbstractConnectionAcceptor
@@ -92,6 +90,4 @@ private:
     std::shared_ptr<cloud::AbstractConnectionAcceptor> m_target;
 };
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

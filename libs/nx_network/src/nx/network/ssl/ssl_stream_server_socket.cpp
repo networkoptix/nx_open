@@ -5,9 +5,7 @@
 #include "encryption_detecting_stream_socket.h"
 #include "ssl_stream_socket.h"
 
-namespace nx {
-namespace network {
-namespace ssl {
+namespace nx::network::ssl {
 
 namespace detail {
 
@@ -289,6 +287,4 @@ void StreamServerSocket::stopWhileInAioThread()
     m_timer.pleaseStopSync();
 }
 
-} // namespace ssl
-} // namespace network
-} // namespace nx
+} // namespace nx::network::ssl

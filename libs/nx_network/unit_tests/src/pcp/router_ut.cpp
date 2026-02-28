@@ -10,9 +10,7 @@
 
 #include "data_stream_helpers.h"
 
-namespace nx {
-namespace network {
-namespace pcp {
+namespace nx::network::pcp::test {
 
 class TestRouter : protected pcp::Router
 {
@@ -55,6 +53,4 @@ TEST(PcpRouter, DISABLED_RealMap)
     EXPECT_GT(mapping.lifeTime, 0U);
 }
 
-} // namespace pcp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::pcp::test

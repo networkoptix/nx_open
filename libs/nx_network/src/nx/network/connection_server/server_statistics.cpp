@@ -2,9 +2,7 @@
 
 #include "server_statistics.h"
 
-namespace nx {
-namespace network {
-namespace server {
+namespace nx::network::server {
 
 void Statistics::add(const Statistics& right)
 {
@@ -41,6 +39,4 @@ Statistics AggregateStatisticsProvider::statistics() const
     return result;
 }
 
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server

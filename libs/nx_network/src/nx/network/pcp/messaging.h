@@ -12,9 +12,7 @@
     #include <netinet/in.h>
 #endif
 
-namespace nx {
-namespace network {
-namespace pcp {
+namespace nx::network::pcp {
 
 /** Port Control Protocol (PCP)
  *  for details: https://tools.ietf.org/html/rfc6887
@@ -108,8 +106,6 @@ NX_NETWORK_API QDataStream& operator>>(QDataStream& stream, PeerMessage& data);
 
 QByteArray NX_NETWORK_API makeRandomNonce();
 
-} // namespace pcp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::pcp
 
 #endif // PCP_MESSAGING_H

@@ -7,8 +7,7 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/utils/system_error.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 /**
  * Socket configuration attributes ready to apply to any AbstractSocket.
@@ -389,5 +388,4 @@ public:
     }
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

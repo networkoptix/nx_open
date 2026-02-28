@@ -21,10 +21,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/sync_call.h>
 
-namespace nx {
-namespace network {
-namespace stun {
-namespace test {
+namespace nx::network::stun::test {
 
 static std::unique_ptr<AbstractDatagramSocket> datagramSocket()
 {
@@ -256,7 +253,6 @@ private:
             std::make_tuple(errorCode, std::move(response)));
     }
 };
-
 
 TEST_F(UdpClient, server_reports_port)
 {
@@ -781,7 +777,4 @@ TEST_F(UdpClientRedirect, content_server_does_not_respond)
 //{
 //}
 
-} // namespace test
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun::test

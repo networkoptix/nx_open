@@ -4,10 +4,7 @@
 
 #include <gtest/gtest.h>
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace test {
+namespace nx::network::aio::test {
 
 template<typename T>
 class PollSetPerformance:
@@ -72,7 +69,4 @@ TYPED_TEST_P(PollSetPerformance, add_remove)
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(PollSetPerformance);
 REGISTER_TYPED_TEST_SUITE_P(PollSetPerformance, add_remove);
 
-} // namespace test
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::test

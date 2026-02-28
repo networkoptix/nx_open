@@ -9,9 +9,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 static constexpr char kTunnelTag[] = "STUN over HTTP tunnel";
 
@@ -541,6 +539,4 @@ void AsyncClientWithHttpTunneling::reportReconnect()
     }
 }
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

@@ -4,15 +4,11 @@
 
 #include <nx/network/time/time_protocol_client.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 INSTANTIATE_TYPED_TEST_SUITE_P(
     TimeProtocolClient,
     BasicTimeProtocolClient,
     TimeProtocolClient);
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

@@ -6,9 +6,7 @@
 #include <nx/utils/time.h>
 #include <nx/utils/timer_manager.h>
 
-namespace nx {
-namespace network {
-namespace server {
+namespace nx::network::server {
 
 void UserLockerSettings::load(const SettingsReader& settings)
 {
@@ -71,6 +69,4 @@ bool UserLocker::isLocked() const
         && (*m_userLockedUntil > nx::utils::monotonicTime());
 }
 
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server

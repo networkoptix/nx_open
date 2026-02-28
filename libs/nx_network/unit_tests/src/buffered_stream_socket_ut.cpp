@@ -6,9 +6,7 @@
 #include <nx/network/buffered_stream_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 class BufferedStreamSocket:
     public ::testing::Test
@@ -105,6 +103,4 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
             nx::Buffer());
     })
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

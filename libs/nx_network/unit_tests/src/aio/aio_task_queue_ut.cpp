@@ -9,11 +9,7 @@
 
 #include <nx/utils/scope_guard.h>
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace detail {
-namespace test {
+namespace nx::network::aio::detail::test {
 
 namespace {
 
@@ -156,8 +152,4 @@ TEST_F(AioTaskQueue, posted_calls_are_not_freed_by_queue_when_cancelling)
     assertFunctorsWereNotRemovedByCancelButReturnedtoTheCaller();
 }
 
-} // namespace test
-} // namespace detail
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::detail::test

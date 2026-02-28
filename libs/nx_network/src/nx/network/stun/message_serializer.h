@@ -12,9 +12,7 @@
 #include "message.h"
 #include "stun_message_serializer_buffer.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 /**
  * Serializes message to buffer.
@@ -117,6 +115,4 @@ private:
     bool m_alwaysAddFingerprint = true;
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

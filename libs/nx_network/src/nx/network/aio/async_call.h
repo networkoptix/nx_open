@@ -8,9 +8,7 @@
 
 #include "basic_pollable.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 /**
  * Invokes functor asynchronously in a specific aio-thread.
@@ -49,6 +47,4 @@ private:
     void removeAioObjectDelayed();
 };
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

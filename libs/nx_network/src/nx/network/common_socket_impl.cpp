@@ -2,8 +2,7 @@
 
 #include "common_socket_impl.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 static std::atomic<SocketSequence> socketSequenceCounter(1);
 
@@ -13,5 +12,4 @@ CommonSocketImpl::CommonSocketImpl():
 {
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

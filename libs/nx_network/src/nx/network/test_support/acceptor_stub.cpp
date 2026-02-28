@@ -4,9 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 std::atomic<int> AcceptorStub::instanceCount(0);
 
@@ -218,6 +216,4 @@ void AcceptorDelegate::setAcceptErrorHandler(ErrorHandler handler)
     m_target->setAcceptErrorHandler(std::move(handler));
 }
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

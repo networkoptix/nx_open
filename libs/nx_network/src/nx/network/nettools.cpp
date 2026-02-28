@@ -67,8 +67,7 @@ static const std::chrono::seconds kUpdateNetworkInterfacesTimeout(10);
 
 } // namespace
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 void setInterfaceListFilter(const QList<QHostAddress>& ifList)
 {
@@ -628,5 +627,4 @@ QString getMacFromPrimaryIF()
     return QString::fromLatin1(mac);
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

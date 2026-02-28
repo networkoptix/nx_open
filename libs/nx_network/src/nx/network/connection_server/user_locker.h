@@ -15,9 +15,7 @@
 
 class SettingsReader;
 
-namespace nx {
-namespace network {
-namespace server {
+namespace nx::network::server {
 
 struct NX_NETWORK_API UserLockerSettings
 {
@@ -85,6 +83,4 @@ public:
     }
 };
 
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server

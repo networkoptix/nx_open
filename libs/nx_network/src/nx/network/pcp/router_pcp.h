@@ -8,9 +8,7 @@
 #include <nx/network/socket_factory.h>
 #include <nx/utils/subscription.h>
 
-namespace nx {
-namespace network {
-namespace pcp {
+namespace nx::network::pcp {
 
 class NX_NETWORK_API Router
 {
@@ -40,8 +38,6 @@ private:
     std::unique_ptr<AbstractDatagramSocket> m_serverSocket;
 };
 
-} // namespace pcp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::pcp
 
 #endif // ROUTER_H

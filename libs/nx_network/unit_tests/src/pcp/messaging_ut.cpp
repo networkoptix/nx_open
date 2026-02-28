@@ -6,9 +6,7 @@
 
 #include "data_stream_helpers.h"
 
-namespace nx {
-namespace network {
-namespace pcp {
+namespace nx::network::pcp::test {
 
 static const auto ipHex = QByteArray(16, 'a') + QByteArray(16, 'b');
 static const auto ipBin = QByteArray::fromHex(ipHex);
@@ -78,6 +76,4 @@ TEST(PcpMessaging, PeerMessage)
     EXPECT_EQ(ipBin,    h2.remoteIp);
 }
 
-} // namespace pcp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::pcp::test

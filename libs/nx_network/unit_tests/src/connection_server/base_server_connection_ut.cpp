@@ -9,10 +9,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace server {
-namespace test {
+namespace nx::network::server::test {
 
 namespace {
 
@@ -379,7 +376,4 @@ TEST_F(ConnectionServerBaseServerConnection, close_handler_tells_if_connection_i
     ASSERT_TRUE(destroyed.get_future().get());
 }
 
-} // namespace test
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server::test

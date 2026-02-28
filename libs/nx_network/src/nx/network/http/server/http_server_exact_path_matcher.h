@@ -10,9 +10,7 @@
 #include "../http_types.h"
 #include "request_matcher.h"
 
-namespace nx {
-namespace network {
-namespace http {
+namespace nx::network::http {
 
 template<typename Mapped>
 class ExactPathMatcher
@@ -54,6 +52,4 @@ private:
     std::map<std::string, Mapped, Comparator> m_pathToMapped;
 };
 
-} // namespace http
-} // namespace network
-} // namespace nx
+} // namespace nx::network::http

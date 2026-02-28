@@ -8,9 +8,7 @@
 
 #include <QDateTime>
 
-namespace nx {
-namespace network {
-namespace pcp {
+namespace nx::network::pcp {
 
 nx::utils::Guard Client::mapPort(const SocketAddress& address)
 {
@@ -30,6 +28,4 @@ nx::utils::Guard Client::subscribe(const std::function<void(Mapping)>& callback)
         });
 }
 
-} // namespace pcp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::pcp

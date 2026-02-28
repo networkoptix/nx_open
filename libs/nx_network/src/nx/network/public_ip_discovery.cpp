@@ -26,8 +26,7 @@ static const std::regex kIpRegExpr(kIpRegExprValue);
 
 } // namespace
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 PublicIPDiscovery::PublicIPDiscovery(QStringList primaryUrls):
     m_stage(Stage::idle),
@@ -242,5 +241,4 @@ QString PublicIPDiscovery::toString(Stage value) const
     }
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

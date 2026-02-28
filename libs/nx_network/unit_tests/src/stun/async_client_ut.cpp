@@ -17,10 +17,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace stun {
-namespace test {
+namespace nx::network::stun::test {
 
 static constexpr int kTestMethodNumber = stun::MethodType::userMethod + 1;
 
@@ -472,7 +469,4 @@ INSTANTIATE_TYPED_TEST_SUITE_P(
     StunAsyncClientAcceptanceTest,
     AsyncClientTestTypes);
 
-} // namespace test
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun::test

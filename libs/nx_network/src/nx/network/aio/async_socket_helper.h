@@ -22,9 +22,7 @@
 #include "aio_event_handler.h"
 #include "basic_pollable.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 // TODO #akolesnikov Come up with new name for this class or remove it.
 // TODO #akolesnikov Also, some refactor needed to use AsyncSocketImplHelper with server socket.
@@ -966,6 +964,4 @@ private:
     }
 };
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

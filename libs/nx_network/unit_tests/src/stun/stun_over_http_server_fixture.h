@@ -14,10 +14,7 @@
 #include <nx/network/test_support/stun_async_client_acceptance_tests.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace stun {
-namespace test {
+namespace nx::network::stun::test {
 
 class StunOverHttpServer:
     public AbstractStunServer
@@ -61,7 +58,4 @@ private:
     void processStunMessage(nx::network::stun::MessageContext ctx);
 };
 
-} // namespace test
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun::test

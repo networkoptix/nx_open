@@ -10,10 +10,7 @@
 #include <nx/network/aio/pollset_factory.h>
 #include <nx/network/socket_global.h>
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace test {
+namespace nx::network::aio::test {
 
 class TestPollable:
     public aio::BasicPollable
@@ -335,7 +332,4 @@ TEST_F(PerformanceBasicPollableDispatch, regularPollSet)
     printResult();
 }
 
-} // namespace test
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::test

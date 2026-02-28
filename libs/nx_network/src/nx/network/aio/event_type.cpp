@@ -2,9 +2,7 @@
 
 #include "event_type.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 const char* toString(EventType eventType)
 {
@@ -25,6 +23,4 @@ const char* toString(EventType eventType)
     }
 }
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

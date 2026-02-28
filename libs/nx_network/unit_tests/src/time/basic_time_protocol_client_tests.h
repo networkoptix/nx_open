@@ -9,9 +9,7 @@
 #include <nx/utils/sync_call.h>
 #include <nx/utils/time.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 template<typename TimeProtocolClientType>
 class BasicTimeProtocolClient:
@@ -147,6 +145,4 @@ REGISTER_TYPED_TEST_SUITE_P(BasicTimeProtocolClient,
     reusing_same_instance,
     reusing_same_instance_after_error);
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

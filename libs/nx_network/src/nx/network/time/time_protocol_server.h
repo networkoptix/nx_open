@@ -6,8 +6,7 @@
 
 #include "time_protocol_connection.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class NX_NETWORK_API TimeProtocolServer:
     public server::StreamSocketServer<TimeProtocolServer, TimeProtocolConnection>
@@ -20,5 +19,4 @@ protected:
         std::unique_ptr<AbstractStreamSocket> _socket) override;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

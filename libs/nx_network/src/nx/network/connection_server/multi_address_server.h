@@ -12,9 +12,7 @@
 
 #include "server_statistics.h"
 
-namespace nx {
-namespace network {
-namespace server {
+namespace nx::network::server {
 
 /**
  * Listens multiple addresses by creating multiple servers (SocketServerType).
@@ -229,6 +227,4 @@ std::unique_ptr<SocketServerType> catMultiAddressServers(
     return one;
 }
 
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server

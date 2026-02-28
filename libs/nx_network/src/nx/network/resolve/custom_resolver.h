@@ -6,8 +6,7 @@
 
 #include "abstract_resolver.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 template<typename Func>
 class CustomResolver:
@@ -37,5 +36,4 @@ static std::unique_ptr<CustomResolver<Func>> makeCustomResolver(Func func)
     return std::make_unique<CustomResolver<Func>>(std::move(func));
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

@@ -10,9 +10,7 @@
 #include "abstract_async_channel.h"
 #include "basic_pollable.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 /**
  * Listens supplied channel for incoming data and sends same data in response.
@@ -160,6 +158,4 @@ std::unique_ptr<AsyncChannelReflector<ChannelToReflectType>> makeAsyncChannelRef
         std::move(channelToReflect));
 }
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

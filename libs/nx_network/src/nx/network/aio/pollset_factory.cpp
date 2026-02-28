@@ -2,14 +2,11 @@
 
 #include "pollset_factory.h"
 
-
 #include "pollset.h"
 #include "pollset_wrapper.h"
 #include "unified_pollset.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 PollSetFactory* s_instance = nullptr;
 
@@ -51,6 +48,4 @@ PollSetFactory* PollSetFactory::instance()
     return s_instance;
 }
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

@@ -4,8 +4,7 @@
 
 #include "socket_global.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 namespace detail {
 
@@ -65,5 +64,4 @@ void StreamServerSocketDelegate::cancelIoInAioThread()
     return m_target->cancelIOSync();
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

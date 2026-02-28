@@ -10,10 +10,7 @@
 
 #include "../server_statistics.h"
 
-namespace nx {
-namespace network {
-namespace server {
-namespace detail {
+namespace nx::network::server::detail {
 
 class NX_NETWORK_API StatisticsCalculator
 {
@@ -34,7 +31,4 @@ private:
     mutable nx::Mutex m_mutex;
 };
 
-} // namespace detail
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server::detail

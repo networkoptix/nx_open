@@ -10,9 +10,7 @@
 
 #include <nx/utils/buffer.h>
 
-namespace nx {
-namespace network {
-namespace server {
+namespace nx::network::server {
 
 enum class ParserState
 {
@@ -89,6 +87,4 @@ public:
         size_t* bytesWritten) = 0;
 };
 
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server

@@ -4,9 +4,7 @@
 
 #include <nx/utils/log/assert.h>
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 AsyncCall::AsyncCall():
     m_aioObject(std::make_shared<network::aio::BasicPollable>())
@@ -38,6 +36,4 @@ void AsyncCall::removeAioObjectDelayed()
         });
 }
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

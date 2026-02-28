@@ -2,10 +2,7 @@
 
 #include "upnp_port_mapper_mocked.h"
 
-namespace nx {
-namespace network {
-namespace upnp {
-namespace test {
+namespace nx::network::upnp::test {
 
 AsyncClientMock::AsyncClientMock():
     m_disabledPort(80)
@@ -165,7 +162,4 @@ AsyncClientMock& PortMapperMocked::clientMock()
     return *static_cast< AsyncClientMock* >(m_upnpClient.get());
 }
 
-} // namespace test
-} // namespace upnp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::upnp::test

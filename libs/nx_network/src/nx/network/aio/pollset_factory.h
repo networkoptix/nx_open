@@ -6,9 +6,7 @@
 
 #include "abstract_pollset.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 class NX_NETWORK_API PollSetFactory
 {
@@ -27,6 +25,4 @@ private:
     bool m_udtEnabled;
 };
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

@@ -60,8 +60,7 @@ typedef void raw_type; // Type used for raw data on this platform
     #endif
 #endif
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 #if defined(__arm__) //< Some 32-bit ARM devices lack the kernel support for the atomic int64.
     qint64 totalSocketBytesSent() { return 0; }
@@ -2118,5 +2117,4 @@ template class Socket<AbstractDatagramSocket>;
 template class CommunicatingSocket<AbstractStreamSocket>;
 template class CommunicatingSocket<AbstractDatagramSocket>;
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

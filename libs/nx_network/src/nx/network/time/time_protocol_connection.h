@@ -8,8 +8,7 @@
 #include <nx/network/connection_server/detail/connection_statistics.h>
 #include <nx/utils/interruption_flag.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class NX_NETWORK_API TimeProtocolConnection:
     public network::aio::BasicPollable
@@ -41,5 +40,4 @@ private:
     void triggerConnectionClosedEvent(SystemError::ErrorCode reason);
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

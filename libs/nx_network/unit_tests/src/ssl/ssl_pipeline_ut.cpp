@@ -10,10 +10,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/string.h>
 
-namespace nx {
-namespace network {
-namespace ssl {
-namespace test {
+namespace nx::network::ssl::test {
 
 class TestPipeline
 {
@@ -467,7 +464,4 @@ TEST_F(SslPipelineThirstyFlags, write_thirsty)
     testWriteThirstyFlag(serverPipeline(), clientPipeline());
 }
 
-} // namespace test
-} // namespace ssl
-} // namespace network
-} // namespace nx
+} // namespace nx::network::ssl::test

@@ -8,9 +8,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 constexpr int kEveryIndicationMethod = 0;
 
@@ -133,6 +131,4 @@ public:
     virtual void setKeepAliveOptions(KeepAliveOptions options) = 0;
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

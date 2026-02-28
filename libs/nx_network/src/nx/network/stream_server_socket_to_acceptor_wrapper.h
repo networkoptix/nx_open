@@ -5,8 +5,7 @@
 #include "abstract_socket.h"
 #include "abstract_stream_socket_acceptor.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 // TODO: #akolesnikov Remove this class when AbstractStreamServerSocket inherits AbstractStreamSocketAcceptor.
 class NX_NETWORK_API StreamServerSocketToAcceptorWrapper:
@@ -29,5 +28,4 @@ private:
     virtual void stopWhileInAioThread() override;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

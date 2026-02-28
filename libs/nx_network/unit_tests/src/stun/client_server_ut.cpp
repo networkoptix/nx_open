@@ -18,10 +18,7 @@
 #include <nx/utils/system_network_headers.h>
 #include <nx/utils/test_support/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace stun {
-namespace test {
+namespace nx::network::stun::test {
 
 class TestServer:
     public SocketServer
@@ -336,7 +333,4 @@ TEST_F(StunClientServerTest, cancellation)
     server.reset();
 }
 
-} // namespace test
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun::test

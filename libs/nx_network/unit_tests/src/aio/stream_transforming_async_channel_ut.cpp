@@ -8,10 +8,7 @@
 #include <nx/network/aio/test/aio_test_async_channel.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace aio {
-namespace test {
+namespace nx::network::aio::test {
 
 class Converter:
     public nx::utils::bstream::Converter
@@ -513,7 +510,4 @@ TEST_F(StreamTransformingAsyncChannelIoErrors, send_timeout_on_underlying_channe
 //TEST_F(StreamTransformingAsyncChannel, removing_in_completion_handler)
 //TEST_F(StreamTransformingAsyncChannel, raw_channel_io_method_calls_handler_within_method_call)
 
-} // namespace test
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio::test

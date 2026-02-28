@@ -4,8 +4,7 @@
 
 #include <nx/network/retry_timer.h>
 
-namespace nx {
-namespace network {
+namespace nx::network::test {
 
 TEST(RetryTimer, tryCount)
 {
@@ -87,5 +86,4 @@ TEST(RetryTimer, delayCalculation)
     }
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

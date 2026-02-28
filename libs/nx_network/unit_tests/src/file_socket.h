@@ -6,8 +6,7 @@
 
 #include <nx/network/test_support/dummy_socket.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 /**
  * Reads data from file. Sent data is just ignored.
@@ -34,5 +33,4 @@ private:
     size_t m_bytesRead;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

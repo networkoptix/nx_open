@@ -6,8 +6,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/system_network_headers.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 SystemError::ErrorCode PredefinedHostResolver::resolve(
     std::string_view name,
@@ -96,5 +95,4 @@ void PredefinedHostResolver::removeMapping(
         it->second.end());
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

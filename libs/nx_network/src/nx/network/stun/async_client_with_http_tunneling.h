@@ -13,9 +13,7 @@
 
 #include "async_client.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 /**
  * Establishes STUN over HTTP tunnel if http url is supplied.
@@ -152,6 +150,4 @@ private:
     void reportReconnect();
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

@@ -15,9 +15,7 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/uuid.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 constexpr char kUnknownHostName[] = "unknown.host";
 
@@ -391,6 +389,4 @@ TEST_F(UdpSocket, DISABLED_Performance)
     clientThread.join();
 }
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

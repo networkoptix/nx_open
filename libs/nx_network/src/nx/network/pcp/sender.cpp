@@ -5,9 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
-namespace nx {
-namespace network {
-namespace pcp {
+namespace nx::network::pcp {
 
 Sender::Sender(const HostAddress& server)
     : m_socket(SocketFactory::createDatagramSocket())
@@ -40,6 +38,4 @@ void Sender::send(std::shared_ptr<nx::Buffer> request)
         });
 }
 
-} // namespace pcp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::pcp

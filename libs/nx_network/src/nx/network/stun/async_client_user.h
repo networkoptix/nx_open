@@ -5,9 +5,7 @@
 #include <nx/network/stun/abstract_async_client.h>
 #include <nx/utils/async_operation_guard.h>
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 /**
  * AsyncClient wrapper which lives in a designated AIO thread.
@@ -62,6 +60,4 @@ protected:
     bool m_terminated = false;
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

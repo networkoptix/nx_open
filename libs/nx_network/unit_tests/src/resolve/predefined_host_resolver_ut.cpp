@@ -6,9 +6,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/algorithm.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 class PredefinedHostResolver:
     public ::testing::Test
@@ -139,6 +137,4 @@ TEST_F(PredefinedHostResolver, low_level_domain_is_resolved_if_mapped)
     assertNameIsResolvedTo("b", aEntry);
 }
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

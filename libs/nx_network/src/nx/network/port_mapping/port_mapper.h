@@ -5,8 +5,7 @@
 
 #include <nx/network/socket_factory.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class PortMapping
 {
@@ -28,7 +27,6 @@ public:
 };
 */
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network
 
 #endif // PORT_MAPPER_H

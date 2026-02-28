@@ -8,10 +8,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx {
-namespace network {
-namespace stun {
-namespace attrs {
+namespace nx::network::stun::attrs {
 
 //-------------------------------------------------------------------------------------------------
 // class AttributeFactory
@@ -280,7 +277,6 @@ FingerPrint::FingerPrint(uint32_t crc32_):
 {
 }
 
-
 MessageIntegrity::MessageIntegrity(nx::Buffer hmac):
     BufferedValue(std::move(hmac))
 {
@@ -296,7 +292,6 @@ Unknown::Unknown(int userType_, nx::Buffer value):
     userType(userType_)
 {
 }
-
 
 //-------------------------------------------------------------------------------------------------
 // IntAttribute
@@ -380,7 +375,4 @@ RequestedTransport::RequestedTransport(Transport transport):
     setBuffer({value, kRequestedTransportValueSize});
 }
 
-} // namespace attrs
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun::attrs

@@ -6,8 +6,7 @@
 
 #include "abstract_socket.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 namespace detail {
 
@@ -356,5 +355,4 @@ protected:
     virtual void cancelIoInAioThread() override;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

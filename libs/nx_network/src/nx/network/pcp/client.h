@@ -7,9 +7,7 @@
 #include <nx/network/socket_factory.h>
 #include <nx/utils/subscription.h>
 
-namespace nx {
-namespace network {
-namespace pcp {
+namespace nx::network::pcp {
 
 /** PCP Mapping information */
 struct NX_NETWORK_API Mapping
@@ -38,6 +36,4 @@ private:
     nx::utils::Subscription<Mapping> m_subscription;
 };
 
-} // namespace pcp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::pcp

@@ -12,9 +12,7 @@
 #include "message_serializer.h"
 #include "unreliable_message_pipeline.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 class AbstractMessageHandler;
 
@@ -88,6 +86,4 @@ private:
     virtual void ioFailure(SystemError::ErrorCode) override;
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

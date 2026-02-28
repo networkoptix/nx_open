@@ -2,13 +2,6 @@
 
 #include "relay_api_http_paths.h"
 
-namespace nx {
-namespace cloud {
-namespace relay {
-namespace api {
+namespace nx::cloud::relay::api {
 
-
-} // namespace api
-} // namespace relay
-} // namespace cloud
-} // namespace nx
+} // namespace nx::cloud::relay::api

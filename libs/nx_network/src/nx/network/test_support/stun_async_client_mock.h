@@ -6,10 +6,7 @@
 
 #include <nx/network/stun/async_client.h>
 
-namespace nx {
-namespace network {
-namespace stun {
-namespace test {
+namespace nx::network::stun::test {
 
 class AsyncClientMock:
     public AbstractAsyncClient
@@ -106,7 +103,4 @@ private:
     }
 };
 
-} // namespace test
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun::test

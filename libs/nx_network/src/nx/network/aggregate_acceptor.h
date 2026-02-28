@@ -9,8 +9,7 @@
 #include "abstract_stream_socket_acceptor.h"
 #include "aio/timer.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class NX_NETWORK_API AggregateAcceptor:
     public AbstractStreamSocketAcceptor
@@ -68,5 +67,4 @@ private:
     void removeByIterator(FindIteratorFunc findIterator);
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

@@ -4,8 +4,7 @@
 
 #include "abstract_resolver.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class TextIpAddressResolver:
     public AbstractResolver
@@ -17,5 +16,4 @@ public:
         ResolveResult* resolveResult) override;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

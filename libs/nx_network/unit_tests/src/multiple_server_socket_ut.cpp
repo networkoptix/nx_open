@@ -13,9 +13,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/utils.h>
 
-namespace nx {
-namespace network {
-namespace test {
+namespace nx::network::test {
 
 class MultipleServerSocketTester:
     public network::MultipleServerSocket
@@ -426,6 +424,4 @@ TEST_F(PerformanceMultipleServerSocketAsyncAccept, regular_tcp_server_socket)
     printResults(testResult);
 }
 
-} // namespace test
-} // namespace network
-} // namespace nx
+} // namespace nx::network::test

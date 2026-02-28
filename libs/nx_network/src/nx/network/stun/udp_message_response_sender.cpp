@@ -4,9 +4,7 @@
 
 #include "udp_server.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 UDPMessageResponseSender::UDPMessageResponseSender(
     UdpServer* udpServer,
@@ -67,6 +65,4 @@ void UDPMessageResponseSender::setInactivityTimeout(
     // So, connection-related logic like this one is not appropriate.
 }
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

@@ -5,12 +5,9 @@
 #include <memory>
 #include <type_traits>
 
-
 #include "abstract_async_channel.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
 
 /**
  * Adapts type Adaptee to AbstractAsyncChannel.
@@ -81,6 +78,4 @@ std::unique_ptr<AbstractAsyncChannel> makeAsyncChannelAdapter(AdapteePtr adaptee
     return std::make_unique<Adapter>(std::move(adaptee));
 }
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

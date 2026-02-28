@@ -7,8 +7,7 @@
 #include "abstract_socket.h"
 #include "aio/basic_pollable.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class NX_NETWORK_API AbstractStreamSocketAcceptor:
     public aio::BasicPollable
@@ -25,5 +24,4 @@ public:
     virtual void cancelIOSync() = 0;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

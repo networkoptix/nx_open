@@ -9,10 +9,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace network {
-namespace upnp {
-namespace test {
+namespace nx::network::upnp::test {
 
 /**
  * UpnpAsyncClient implementation for tests.
@@ -78,7 +75,4 @@ public:
     AsyncClientMock& clientMock();
 };
 
-} // namespace test
-} // namespace upnp
-} // namespace network
-} // namespace nx
+} // namespace nx::network::upnp::test
