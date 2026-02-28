@@ -2047,6 +2047,10 @@ Clave de licencia: %2</translation>
       <source>Camera settings...</source>
       <translation>Ajustes de la cámara...</translation>
     </message>
+    <message>
+      <source>internal</source>
+      <translation type="unfinished">internal</translation>
+    </message>
   </context>
   <context>
     <name>QnAuditLogDialog</name>
@@ -2381,6 +2385,10 @@ Clave de licencia: %2</translation>
     <message>
       <source>Server</source>
       <translation>Servidor</translation>
+    </message>
+    <message>
+      <source>This action was performed by a plugin.</source>
+      <translation type="unfinished">This action was performed by a plugin.</translation>
     </message>
   </context>
   <context>
