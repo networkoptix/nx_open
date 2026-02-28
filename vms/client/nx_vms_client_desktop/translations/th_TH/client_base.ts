@@ -2028,6 +2028,10 @@ License Key: %2</translation>
       <source>Camera settings...</source>
       <translation>การตั้งค่ากล้อง...</translation>
     </message>
+    <message>
+      <source>internal</source>
+      <translation type="unfinished">internal</translation>
+    </message>
   </context>
   <context>
     <name>QnAuditLogDialog</name>
@@ -2356,6 +2360,10 @@ License Key: %2</translation>
     <message>
       <source>Server</source>
       <translation>เซอร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>This action was performed by a plugin.</source>
+      <translation type="unfinished">This action was performed by a plugin.</translation>
     </message>
   </context>
   <context>
