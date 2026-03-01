@@ -2049,7 +2049,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>internal</source>
-      <translation type="unfinished">internal</translation>
+      <translation>intern</translation>
     </message>
   </context>
   <context>
@@ -2388,7 +2388,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation type="unfinished">This action was performed by a plugin.</translation>
+      <translation>Denne handling blev udført af et plugin.</translation>
     </message>
   </context>
   <context>
