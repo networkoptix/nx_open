@@ -10,7 +10,9 @@
 #include <cassert>
 #include <thread>
 
-#include <boost/asio/io_service.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/executor_work_guard.hpp>
+#include <boost/asio/post.hpp>
 #include <boost/bind.hpp>
 
 #include <nx/utils/log/log.h>
@@ -19,9 +21,9 @@ namespace nx::utils {
 
 struct TaskRunner::Impl
 {
-    boost::asio::io_service ioService;
+    boost::asio::io_context ioService;
     std::deque<std::thread> threadPool;
-    std::unique_ptr<boost::asio::io_service::work> ioServiceWork;
+    std::optional<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>> ioServiceWork;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -42,13 +44,13 @@ void TaskRunner::activateObjectHook()
     NX_ASSERT(m_impl->threadPool.empty());
 
     // Make sure that ioService run() will not return.
-    m_impl->ioServiceWork.reset(new boost::asio::io_service::work(m_impl->ioService));
+    m_impl->ioServiceWork.emplace(m_impl->ioService.get_executor());
 
     // Start running of tasks.
     for(int threadIndex = 0; threadIndex < m_threadsNumber; ++threadIndex)
     {
         m_impl->threadPool.emplace_back(std::thread(
-            boost::bind(&boost::asio::io_service::run, &m_impl->ioService)));
+            [this] { m_impl->ioService.run(); }));
     }
 }
 
@@ -77,7 +79,7 @@ void TaskRunner::clear()
 void TaskRunner::runTask(Task task)
 {
     std::shared_ptr<Task> copyTask(new Task(std::move(task)));
-    m_impl->ioService.post([ copyTask ] { (*copyTask)(); });
+    boost::asio::post(m_impl->ioService, [ copyTask ] { (*copyTask)(); });
 }
 
 } // namespace nx::utils
