@@ -160,6 +160,8 @@ ModuleConnector::InformationReader::~InformationReader()
 {
     if (m_httpClient)
         m_httpClient->pleaseStopSync();
+    if (m_socket)
+        m_socket->pleaseStopSync(); //< Socket is not BasicPollable.
 }
 
 void ModuleConnector::InformationReader::setHandler(
