@@ -1731,6 +1731,12 @@ bool OrganizationsFilterModel::lessThan(const QModelIndex& left, const QModelInd
     if (leftIsPartner != rightIsPartner)
         return leftIsPartner;
 
+    // 'Organizations' section goes next.
+    const bool leftIsOrganization = leftType == OrganizationsModel::Organization;
+    const bool rightIsOrganization = rightType == OrganizationsModel::Organization;
+    if (leftIsOrganization != rightIsOrganization)
+        return leftIsOrganization;
+
     if (!leftInCurrentRoot || !m_currentRoot.isValid())
     {
         // Other sections go in alphabetical order.
