@@ -4,7 +4,6 @@ import QtQuick
 
 import Nx.Controls
 import Nx.Settings
-import Nx.Ui
 
 BaseSettingsPage
 {
@@ -78,8 +77,7 @@ BaseSettingsPage
 
         function openRestartDialog()
         {
-            Workflow.openStandardDialog(
-                qsTr("Please restart the app to apply changes"))
+            Workflow.openDialog(Qt.resolvedUrl("RestartRequiredPopup.qml"))
         }
     }
 }

@@ -36,6 +36,21 @@ NxObject
         {
             Workflow.openSessionsScreen()
         }
+
+        function onGenericError(title, errorText)
+        {
+            Workflow.openStandardPopup(title, errorText)
+        }
+
+        function onTwoFactorAuthError(title, errorText)
+        {
+            Workflow.openDialog(
+                Qt.resolvedUrl("../Web/TwoFactorAuthenticationErrorDialog.qml"),
+                {
+                    "title": title,
+                    "messages": [errorText]
+                })
+        }
     }
 
     Binding

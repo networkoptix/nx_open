@@ -1,13 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
+import QtQuick
 
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Settings 1.0
-import Nx.Ui 1.0
+import Nx.Core
+import Nx.Controls
+import Nx.Mobile.Popups
+import Nx.Settings
 
-import nx.vms.client.core 1.0
+import nx.vms.client.core
 
 BaseSettingsPage
 {
@@ -25,19 +25,7 @@ BaseSettingsPage
             if (appContext.settings.savePasswords)
                 return
 
-            var dialog = Workflow.openStandardDialog(
-                "", qsTr("How to handle saved passwords?"),
-                [
-                    qsTr("Keep"),
-                    {"id": "DELETE", "text": qsTr("Delete"), "accented": true}
-                ], true)
-
-            dialog.buttonClicked.connect(
-                function(buttonId)
-                {
-                    if (buttonId == "DELETE")
-                        appContext.credentialsHelper.clearSavedPasswords()
-                })
+            howToHandleSavedPasswordsDialog.open()
         }
     }
 
@@ -45,7 +33,7 @@ BaseSettingsPage
     {
         width: parent.width
         height: serverCertCheckGroup.implicitHeight
-        radius: LayoutController.isTablet ? 8 : 0
+        radius: 8
         color: ColorTheme.colors.dark6
 
         Column
@@ -123,7 +111,7 @@ BaseSettingsPage
                     === Certificate.ValidationLevel.strict
                 text: qsTr("Strict")
                 extraText: qsTr("Connect only servers with public certificates")
-                backgroundRadius: LayoutController.isTablet ? 8 : 0
+                backgroundRadius: 8
 
                 visible: line.visible
 
@@ -133,5 +121,36 @@ BaseSettingsPage
                 }
             }
         }
+    }
+
+    PopupBase
+    {
+        id: howToHandleSavedPasswordsDialog
+
+        withCloseButton: false
+        icon: "image://skin/48x48/Solid/warning.svg?primary=yellow"
+        title: qsTr("How to handle saved passwords?")
+
+        buttonBoxButtons:
+        [
+            PopupButton
+            {
+                text: qsTr("Keep")
+
+                onClicked: howToHandleSavedPasswordsDialog.close()
+            },
+
+            PopupButton
+            {
+                text: qsTr("Delete")
+                accented: true
+
+                onClicked:
+                {
+                    appContext.credentialsHelper.clearSavedPasswords()
+                    howToHandleSavedPasswordsDialog.close()
+                }
+            }
+        ]
     }
 }

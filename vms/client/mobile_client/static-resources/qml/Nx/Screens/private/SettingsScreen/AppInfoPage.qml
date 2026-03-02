@@ -4,7 +4,6 @@ import QtQuick
 
 import Nx.Core
 import Nx.Core.Controls
-import Nx.Ui
 
 BaseSettingsPage
 {
@@ -19,14 +18,14 @@ BaseSettingsPage
         textToCopy: `${companyNameText.text} ${versionText.text}`
     }
 
-    title: qsTr("App Info")
+    title: qsTr("About")
 
     Rectangle
     {
         width: parent.width
         height: contentColumn.height
         color: ColorTheme.colors.dark6
-        radius: LayoutController.isTablet ? 8 : 0
+        radius: 8
 
         Column
         {

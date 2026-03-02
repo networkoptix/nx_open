@@ -8,6 +8,7 @@
 
 #include <core/resource/mobile_client_resource_factory.h>
 #include <mobile_client/mobile_client_settings.h>
+#include <mobile_client/mobile_client_ui_controller.h>
 #include <nx/build_info.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/guarded_callback.h>
@@ -219,7 +220,7 @@ void ApplicationContext::Private::initializeMainSystemContext()
                 executeLater(
                     [this, error]()
                     {
-                        windowContext->uiController()->showMessage(
+                        emit windowContext->deprecatedUiController()->genericError(
                             error.shortText, error.longText);
                     }, q);
             }));

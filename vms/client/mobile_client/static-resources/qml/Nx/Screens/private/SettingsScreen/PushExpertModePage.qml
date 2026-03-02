@@ -5,8 +5,8 @@ import QtQuick 2.6
 import Nx.Core
 import Nx.Controls
 import Nx.Mobile
+import Nx.Mobile.Popups
 import Nx.Settings
-import Nx.Ui
 
 BaseSettingsPage
 {
@@ -49,10 +49,10 @@ BaseSettingsPage
     Item
     {
         id: content
-        enabled: !appContext.pushManager.userUpdateInProgress
 
-        width: pushExpertModePage.width
-        height: pushExpertModePage.height
+        width: parent.width
+        height: pushExpertModePage.availableHeight
+        enabled: !appContext.pushManager.userUpdateInProgress
 
         Column
         {
@@ -64,7 +64,7 @@ BaseSettingsPage
             {
                 width: parent.width
                 height: notificationSourceGroup.implicitHeight
-                radius: LayoutController.isTablet ? 8 : 0
+                radius: 8
                 color: ColorTheme.colors.dark6
 
                 Column
@@ -82,9 +82,7 @@ BaseSettingsPage
 
                         text: qsTr("Notifications")
                         manualStateChange: true
-
-                        showIndicator:
-                            appContext.pushManager.loggedIn && appContext.pushManager.hasOsPermission
+                        showIndicator: d.loggedInAndHasPermissions
 
                         onClicked:
                         {
@@ -122,11 +120,12 @@ BaseSettingsPage
                         {
                             id: line
 
+                            anchors.bottom: parent.bottom
                             x: parent.leftPadding
                             width: parent.width - x - parent.rightPadding
-                            anchors.bottom: parent.bottom
-
                             height: 1
+                            visible: notificationsSwitch.showIndicator
+                                && notificationsSwitch.checkState === Qt.Checked
                             color: ColorTheme.colors.dark8
                         }
                     }
@@ -135,6 +134,8 @@ BaseSettingsPage
                     {
                         id: simpleModeRadioButton
 
+                        visible: d.loggedInAndHasPermissions
+                            && notificationsSwitch.checkState === Qt.Checked
                         width: parent.width
                         text: qsTr("All Sites")
                     }
@@ -143,9 +144,11 @@ BaseSettingsPage
                     {
                         id: expertModeRadioButton
 
+                        visible: d.loggedInAndHasPermissions
+                            && notificationsSwitch.checkState === Qt.Checked
                         width: parent.width
                         text: qsTr("Selected Sites")
-                        backgroundRadius: LayoutController.isTablet ? 8 : 0
+                        backgroundRadius: 8
                     }
                 }
             }
@@ -230,13 +233,54 @@ BaseSettingsPage
         target: appContext.pushManager
         function onShowPushSettingsErrorMessage(title, message)
         {
-            windowContext.ui.showMessage(title, message)
+            d.openErrorDialog(title, message)
         }
+    }
+
+    PopupBase
+    {
+        id: saveDialog
+
+        withCloseButton: false
+        icon: "image://skin/48x48/Solid/warning.svg?primary=yellow"
+        title: qsTr("Save changes?")
+
+        buttonBoxButtons:
+        [
+            PopupButton
+            {
+                text: qsTr("No")
+
+                onClicked:
+                {
+                    d.reset()
+                    pushExpertModePage.settingsSaved()
+
+                    saveDialog.close()
+                }
+            },
+
+            PopupButton
+            {
+                text: qsTr("Yes")
+                accented: true
+
+                onClicked:
+                {
+                    d.tryApplyAndReturn()
+
+                    saveDialog.close()
+                }
+            }
+        ]
     }
 
     NxObject
     {
         id: d
+
+        readonly property bool loggedInAndHasPermissions: appContext.pushManager.loggedIn
+            && appContext.pushManager.hasOsPermission
 
         property bool hasChanges:
         {
@@ -249,6 +293,18 @@ BaseSettingsPage
 
         property PushSystemsSelectionModel selectionModel: PushSystemsSelectionModel {}
 
+        function openErrorDialog(title, message = "")
+        {
+            Workflow.openDialog(
+                "qrc:/qml/Nx/Mobile/Popups/StandardPopup.qml",
+                {
+                    "title": qsTr("At least one site has to be selected"),
+                    "messages": [message],
+                    "icon": "image://skin/48x48/Solid/warning.svg?primary=yellow",
+                    "accentedOkButton": true
+                })
+        }
+
         function tryApplyAndReturn(successCallback)
         {
             if (!d.selectionModel)
@@ -257,8 +313,7 @@ BaseSettingsPage
             const expertMode = expertModeRadioButton.checked
             if (expertMode && !d.selectionModel.selectedSystems.length)
             {
-                Workflow.openStandardDialog(
-                    qsTr("At least one site has to be selected"))
+                openErrorDialog(qsTr("At least one site has to be selected"))
                 return
             }
 
@@ -296,24 +351,7 @@ BaseSettingsPage
                 return
             }
 
-            var saveButton = {id: "saveChangesButton", text: qsTr("Yes")}
-            var goBackButton = {id: "goBackButton", text: qsTr("No")}
-            var buttons = [goBackButton, saveButton];
-
-            var dialog = Workflow.openStandardDialog("", qsTr("Save changes?"), buttons, true)
-            dialog.buttonClicked.connect(
-                function(buttonId)
-                {
-                    switch(buttonId)
-                    {
-                        case "saveChangesButton":
-                            d.tryApplyAndReturn()
-                            break
-                        case "goBackButton":
-                            reset()
-                            pushExpertModePage.settingsSaved()
-                    }
-                });
+            saveDialog.open()
         }
 
         function reset()

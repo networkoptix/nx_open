@@ -117,6 +117,9 @@ signals:
 
     void currentScreenChanged();
 
+    void genericError(const QString& title, const QString& errorText);
+    void twoFactorAuthError(const QString& title, const QString& errorText);
+
 private:
     QScopedPointer<QnMobileClientUiControllerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QnMobileClientUiController)

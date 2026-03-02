@@ -67,7 +67,7 @@ function openSessionsScreenWithWarning(systemName, errorText)
         ? stackView.currentItem
         : stackView.replace(null, Qt.resolvedUrl("../Screens/SessionsScreen.qml"))
     if (item)
-        Qt.callLater(() => windowContext.ui.showConnectionErrorMessage(systemName, errorText))
+        Qt.callLater(() => openStandardPopup(systemName, errorText))
 }
 
 function openSitePlaceholderScreen(systemName)
@@ -231,6 +231,17 @@ function openStandardDialog(title, message = "", buttonsModel = ["OK"], disableA
             "message": message,
             "disableAutoClose": disableAutoClose,
             "buttonsModel": buttonsModel
+        }
+    )
+}
+
+function openStandardPopup(title, message)
+{
+    return openDialog(
+        "../Mobile/Popups/StandardPopup.qml",
+        {
+            "title": title,
+            "messages": [message]
         }
     )
 }

@@ -44,7 +44,7 @@ AdaptiveScreen
         }
 
         saveSettingsHandler.target = contentItem
-        saveSettingsHandler.queuedItem = newItem
+        saveSettingsHandler.successHandler = () => settingsScreen.contentItem = newItem
 
         contentItem.saveSettings()
     }
@@ -53,13 +53,13 @@ AdaptiveScreen
     {
         id: saveSettingsHandler
 
-        property var queuedItem
+        property var successHandler
 
         target: null
 
         function onSettingsSaved()
         {
-            settingsScreen.contentItem = queuedItem
+            successHandler()
             settingsScreen.enabled = true
         }
 
@@ -89,7 +89,19 @@ AdaptiveScreen
 
                 PropertyChanges
                 {
-                    backButton.onClicked: Workflow.popCurrentScreen()
+                    backButton.onClicked:
+                    {
+                        if (settingsScreen.contentItem === settingsNavigation)
+                        {
+                            Workflow.popCurrentScreen()
+                            return
+                        }
+
+                        saveSettingsHandler.target = settingsScreen.contentItem
+                        saveSettingsHandler.successHandler = () => Workflow.popCurrentScreen()
+
+                        settingsScreen.contentItem.saveSettings()
+                    }
                 }
             },
             State
@@ -205,6 +217,12 @@ AdaptiveScreen
 
             SettingsNavigationItem
             {
+                icon.source: "image://skin/24x24/Solid/notifications.svg?primary=light1"
+                page: pushExpertModePage
+            }
+
+            SettingsNavigationItem
+            {
                 page: securitySettingsPage
                 icon.source: "image://skin/24x24/Solid/security.svg?primary=light1"
             }
@@ -219,13 +237,6 @@ AdaptiveScreen
             {
                 page: betaFeaturesPage
                 icon.source: "image://skin/24x24/Solid/beta_features.svg?primary=light1"
-            }
-
-            SettingsNavigationItem
-            {
-                icon.source: "image://skin/24x24/Solid/notifications.svg?primary=light1"
-                text: qsTr("Notifications")
-                page: pushExpertModePage
             }
 
             SettingsNavigationItem

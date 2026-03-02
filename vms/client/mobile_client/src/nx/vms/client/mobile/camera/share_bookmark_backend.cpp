@@ -11,6 +11,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <mobile_client/mobile_client_settings.h>
+#include <mobile_client/mobile_client_ui_controller.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
@@ -132,7 +133,7 @@ void ShareBookmarkBackend::Private::showErrorMessage() const
     {
         if (const auto windowContext = context->windowContext())
         {
-            windowContext->uiController()->showMessage(
+            emit windowContext->deprecatedUiController()->genericError(
                 ShareBookmarkBackend::tr("Error"),
                 ShareBookmarkBackend::tr("Cannot share bookmark."));
         }

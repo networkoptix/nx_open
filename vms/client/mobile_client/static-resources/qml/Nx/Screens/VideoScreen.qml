@@ -1067,7 +1067,7 @@ Page
     {
         id: mediaDownloadBackend
         resource: controller.resource
-        onErrorOccured: windowContext.ui.showMessage(title, description)
+        onErrorOccured: Workflow.openStandardPopup(title, description)
     }
 
     DownloadMediaDurationSheet

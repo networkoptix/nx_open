@@ -17,17 +17,6 @@
 
 namespace nx::vms::client::mobile {
 
-namespace {
-
-QString titleForConnectionError(const QString& systemName)
-{
-    return systemName.isEmpty()
-        ? UiController::tr("Cannot connect to the Server")
-        : UiController::tr("Cannot connect to the Site \"%1\"", "%1 is a site name").arg(systemName);
-}
-
-} // namespace
-
 struct UiController::Private
 {
     UiController* const q;
@@ -77,29 +66,6 @@ detail::Screens* UiController::screens() const
     return d->screens.get();
 }
 
-void UiController::showConnectionErrorMessage(
-    core::RemoteConnectionErrorCode errorCode,
-    const QString& systemName,
-    const QString& errorText) const
-{
-    const bool is2faError =
-        errorCode == core::RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa ||
-        errorCode == core::RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled;
-    if (!is2faError)
-    {
-        showConnectionErrorMessage(systemName, errorText);
-        return;
-    }
-
-    QmlWrapperHelper::showPopup(
-        windowContext(),
-        QUrl("Nx/Web/TwoFactorAuthenticationErrorDialog.qml"),
-        QVariantMap {
-            {"title", titleForConnectionError(systemName)},
-            {"messages", QStringList{errorText}}
-        });
-}
-
 bool UiController::tryRestoreLastUsedConnection()
 {
     // TODO: 5.1+ Make startup parameters handling and using of last(used)Connection the same both
@@ -139,22 +105,6 @@ bool UiController::tryRestoreLastUsedConnection()
 
     NX_DEBUG(this, "Can't restore last used session since user is not logged to the cloud.");
     return false;
-}
-
-void UiController::showMessage(const QString& title, const QString& message) const
-{
-    QmlWrapperHelper::showPopup(windowContext(), QUrl("Nx/Mobile/Popups/StandardPopup.qml"),
-        QVariantMap {
-            {"title", title},
-            {"messages", QStringList{message}}
-        });
-}
-
-void UiController::showConnectionErrorMessage(
-    const QString& systemName,
-    const QString& errorText) const
-{
-    showMessage(titleForConnectionError(systemName), errorText);
 }
 
 } // namespace nx::vms::client::mobile

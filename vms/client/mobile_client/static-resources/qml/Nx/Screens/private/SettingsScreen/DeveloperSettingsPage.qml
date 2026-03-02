@@ -8,7 +8,6 @@ import Nx.Core
 import Nx.Dialogs
 import Nx.Screens
 import Nx.Settings
-import Nx.Ui
 
 import nx.vms.client.core
 import nx.vms.client.mobile
@@ -372,7 +371,7 @@ BaseSettingsPage
 
         function openRestartDialog()
         {
-            Workflow.openStandardDialog("Please restart the app to apply the changes")
+            Workflow.openDialog(Qt.resolvedUrl("RestartRequiredPopup.qml"))
         }
 
         property string logSessionId: windowContext.logManager.remoteLogSessionId()

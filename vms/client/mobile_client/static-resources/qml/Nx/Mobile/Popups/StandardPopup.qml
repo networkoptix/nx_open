@@ -6,10 +6,16 @@ PopupBase
 {
     id: control
 
+    property alias accentedOkButton: okButton.accented
+
+    withCloseButton: false
+
     buttonBoxButtons:
     [
         PopupButton
         {
+            id: okButton
+
             text: qsTr("OK")
             onClicked: control.close()
         }

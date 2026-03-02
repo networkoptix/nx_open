@@ -15,6 +15,7 @@ Popup
 
     readonly property int gap: 20
     property bool autoClose: false
+    property alias withCloseButton: closeButton.visible
     property alias icon: icon.source
     property alias title: title.text
     property var messages: []

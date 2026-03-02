@@ -101,7 +101,8 @@ void WindowContext::Private::initializeCloudStatusHandling()
         {
             const auto description =
                 core::errorDescription(core::RemoteConnectionErrorCode::cloudSessionExpired, {}, {});
-            q->uiController()->showMessage(description.shortText, description.longText);
+            emit q->deprecatedUiController()->genericError(
+                description.shortText, description.longText);
         });
 }
 
@@ -121,8 +122,10 @@ WindowContext::WindowContext(QObject* parent):
 
     d->uriHandler = std::make_unique<QnMobileClientUriHandler>(d->deprecatedUiController.get());
 
-    connect(appContext()->pushManager(), &PushNotificationManager::showPushActivateErrorMessage,
-        d->uiController.get(), &UiController::showMessage);
+    connect(appContext()->pushManager(),
+        &PushNotificationManager::showPushActivateErrorMessage,
+        d->deprecatedUiController.get(),
+        &QnMobileClientUiController::genericError);
 
     connect(d->sessionManager.get(), &SessionManager::hasSessionChanged, this,
         []() { appContext()->settings()->clear("selectedObjectsType"); });

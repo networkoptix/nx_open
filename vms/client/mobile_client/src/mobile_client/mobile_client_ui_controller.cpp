@@ -114,8 +114,20 @@ QnMobileClientUiController::QnMobileClientUiController(
                 const auto errorText =
                     UiMessages::getConnectionErrorText(errorCode, moduleInformation);
 
-                uiController()->showConnectionErrorMessage(
-                    errorCode, moduleInformation.systemName, errorText);
+                using nx::vms::client::core::RemoteConnectionErrorCode;
+                const bool is2faError =
+                    errorCode == RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa
+                        || errorCode == RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled;
+
+                const auto title = moduleInformation.systemName.isEmpty()
+                    ? tr("Cannot connect to the Server")
+                    : tr("Cannot connect to the Site \"%1\"", "%1 is a site name")
+                        .arg(moduleInformation.systemName);
+
+                if (is2faError)
+                    emit twoFactorAuthError(title, errorText);
+                else
+                    emit genericError(title, errorText);
             }
         };
     connect(sessionManager(), &SessionManager::sessionFinishedWithError, this, handleSessionError);
