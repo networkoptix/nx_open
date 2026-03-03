@@ -271,7 +271,7 @@ ListView
             id: descriptionText
 
             visible: text
-            Layout.topMargin: titleText.visible ? 0 : (siteList.cellsInRow == 1 ? 16 : 24)
+            Layout.topMargin: sectionTitle ? 0 : (siteList.cellsInRow == 1 ? 16 : 24)
             Layout.bottomMargin: 8
             Layout.fillWidth: true
 
