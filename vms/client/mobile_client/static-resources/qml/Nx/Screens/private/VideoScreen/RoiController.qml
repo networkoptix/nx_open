@@ -15,7 +15,6 @@ Item
     property Item viewport: null
 
     property bool motionSearchMode: false
-    property alias motionProvider: mediaPlayerMotionProvider
     property string motionFilter
 
     readonly property bool hasCustomVisualArea: motionFilter != d.kDefaultFilter
@@ -23,7 +22,9 @@ Item
     readonly property bool drawingRoi: allowDrawing && d.toBool(
         d.customInitialPoint && d.selectionRoi && d.selectionRoi.expandingFinished)
 
-    signal requestUnallowedDrawing()
+    property rect customRoi: Qt.rect(0, 0, 1, 1)
+
+    signal unallowedDrawingRequested()
     signal emptyRoiCleared()
 
     function clearCustomRoi()
@@ -39,6 +40,7 @@ Item
         updateDefaultRoi()
 
         controller.motionFilter = ""
+        controller.customRoi = Qt.rect(0, 0, 1, 1)
     }
 
     function updateDefaultRoi()
@@ -116,32 +118,6 @@ Item
         d.handleMouseReleased()
     }
 
-    RoundedMask
-    {
-        // TODO: turn off motion area data gethering when not visible.
-        visible: controller.motionSearchMode
-
-        anchors.fill: parent
-
-        opacity: 1
-        cellCountX: 44
-        cellCountY: 32
-        fillColor: ColorTheme.transparent(ColorTheme.colors.red_l2, 0.15)
-        lineColor: ColorTheme.transparent(ColorTheme.colors.red_l2, 0.5)
-
-        MediaPlayerMotionProvider
-        {
-            id: mediaPlayerMotionProvider
-
-            onMotionMaskChanged: motionMaskItem.motionMask = mediaPlayerMotionProvider.motionMask(0)
-        }
-
-        maskTextureProvider: MotionMaskItem
-        {
-            id: motionMaskItem
-        }
-    }
-
     MotionRoi
     {
         id: firstRoi
@@ -170,7 +146,7 @@ Item
         onTriggered:
         {
             if (!motionSearchMode)
-                controller.requestUnallowedDrawing()
+                controller.unallowedDrawingRequested()
         }
     }
 
@@ -336,6 +312,11 @@ Item
 
             var filterResult = getMotionFilter(first, second)
             controller.motionFilter = filterResult.filter
+
+            controller.customRoi = first && second
+                ? getRectangle(first, second)
+                : Qt.rect(0, 0, 1, 1)
+
             if (!filterResult.correctBounds)
             {
                 controller.clearCustomRoi()

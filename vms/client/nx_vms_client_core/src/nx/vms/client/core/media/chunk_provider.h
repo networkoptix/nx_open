@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QRectF>
 
 #include <common/common_globals.h>
 #include <nx/utils/impl_ptr.h>
@@ -26,7 +27,10 @@ class NX_VMS_CLIENT_CORE_API ChunkProvider:
     Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
     Q_PROPERTY(bool loadingMotion READ isLoadingMotion NOTIFY loadingMotionChanged)
     Q_PROPERTY(bool loadingAnalytics READ isLoadingAnalytics NOTIFY loadingAnalyticsChanged)
-    Q_PROPERTY(QString motionFilter READ motionFilter WRITE setMotionFilter NOTIFY motionFilterChanged)
+    Q_PROPERTY(QString motionFilter READ motionFilter WRITE setMotionFilter
+        NOTIFY motionFilterChanged)
+    Q_PROPERTY(QRectF analyticsRoi READ analyticsRoi WRITE setAnalyticsRoi
+        NOTIFY analyticsRoiChanged)
 
 public:
     explicit ChunkProvider(QObject* parent = nullptr);
@@ -39,6 +43,9 @@ public:
 
     QString motionFilter() const;
     void setMotionFilter(const QString& value);
+
+    QRectF analyticsRoi() const;
+    void setAnalyticsRoi(const QRectF& value);
 
     bool isLoading() const;
     bool isLoadingMotion() const;
@@ -58,6 +65,7 @@ signals:
     void loadingMotionChanged();
     void loadingAnalyticsChanged();
     void motionFilterChanged();
+    void analyticsRoiChanged();
 
 private:
     QnResource* rawResource() const;

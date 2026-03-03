@@ -39,7 +39,7 @@ public:
     const QnTimePeriodList& periods() const;
 
     const QString& filter() const;
-    void setFilter(const QString& filter);
+    bool setFilter(const QString& filter);
 
     bool loading() const;
 
@@ -94,12 +94,16 @@ public:
             return result;
         }()};
 
+    QRectF analyticsRoi{0, 0, 1, 1};
+
     explicit Private(ChunkProvider* q);
 
     // This is a workaround for our servers often having analytics chunks without analytics DB.
     // An API request is sent to find out the earliest object track the analytics DB contains.
     void updateAnalyticsBottom();
     void resetAnalyticsBottom();
+
+    void updateAnalyticsFilter();
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -153,6 +157,18 @@ void ChunkProvider::Private::resetAnalyticsBottom()
     analyticsUpdateHandle = 0;
     analyticsUpdateTimer.stop();
     providers.at(Qn::AnalyticsContent)->setForcedBottomBound(std::nullopt, /*notifyChange*/ false);
+}
+
+void ChunkProvider::Private::updateAnalyticsFilter()
+{
+    Filter filter;
+    if (q->resource())
+        filter.deviceIds.insert(q->resource()->getId());
+
+    if (analyticsRoi != QRectF{0, 0, 1, 1})
+        filter.boundingBox = analyticsRoi;
+
+    providers.at(Qn::AnalyticsContent)->setFilter(QString::fromUtf8(QJson::serialized(filter)));
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -265,16 +281,17 @@ const QString& ChunkProvider::ChunkProviderInternal::filter() const
     return m_filter;
 }
 
-void ChunkProvider::ChunkProviderInternal::setFilter(const QString& filter)
+bool ChunkProvider::ChunkProviderInternal::setFilter(const QString& filter)
 {
     if (m_filter == filter)
-        return;
+        return false;
 
     m_filter = filter;
-    emit q->motionFilterChanged();
 
     setLoading(true);
     update();
+
+    return true;
 }
 
 void ChunkProvider::ChunkProviderInternal::update()
@@ -288,7 +305,8 @@ void ChunkProvider::ChunkProviderInternal::updateInternal()
     if (!m_loader)
         return;
 
-    m_loader->load(m_filter, 1);
+    const int detailLevelMs = m_contentType == Qn::AnalyticsContent ? 1000 : 1;
+    m_loader->load(m_filter, detailLevelMs);
 
     if (const auto camera = m_loader->resource().dynamicCast<QnVirtualCameraResource>())
     {
@@ -362,6 +380,7 @@ void ChunkProvider::setRawResource(QnResource* value)
         provider->setResource(resource);
 
     d->updateAnalyticsBottom();
+    d->updateAnalyticsFilter();
     emit resourceChanged();
 }
 
@@ -429,7 +448,24 @@ QString ChunkProvider::motionFilter() const
 
 void ChunkProvider::setMotionFilter(const QString& value)
 {
-    d->providers.at(Qn::MotionContent)->setFilter(value);
+    if (d->providers.at(Qn::MotionContent)->setFilter(value))
+        emit motionFilterChanged();
+}
+
+QRectF ChunkProvider::analyticsRoi() const
+{
+    return d->analyticsRoi;
+}
+
+void ChunkProvider::setAnalyticsRoi(const QRectF& value)
+{
+    if (d->analyticsRoi == value) //< Internally a fuzzy comparison.
+        return;
+
+    d->analyticsRoi = value;
+    d->updateAnalyticsFilter();
+
+    emit analyticsRoiChanged();
 }
 
 } // namespace nx::vms::client::core

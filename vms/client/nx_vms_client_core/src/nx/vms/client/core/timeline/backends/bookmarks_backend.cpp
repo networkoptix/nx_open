@@ -27,7 +27,7 @@ milliseconds timestamp(const QnCameraBookmark& source) { return source.startTime
 
 struct BookmarksBackend::Private
 {
-    QWeakPointer<QnResource> resource;
+    const QWeakPointer<QnResource> resource;
 };
 
 BookmarksBackend::BookmarksBackend(const QnResourcePtr& resource):

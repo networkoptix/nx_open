@@ -15,11 +15,13 @@ ScalableContentHolder
 {
     id: control
 
-    readonly property bool fisheyeMode: fisheyeModeController.fisheyeMode
+    readonly property alias fisheyeMode: fisheyeModeController.fisheyeMode
+
+    property bool showMotion: false
 
     property alias mediaPlayer: videoContent.mediaPlayer
     property alias resourceHelper: videoContent.resourceHelper
-    property alias motionController: motionSearchController
+    property alias roiController: roiController
 
     property alias videoCenterHeightOffsetFactor: videoContent.videoCenterHeightOffsetFactor
     property size fitSize: videoContent.boundedSize(width, height)
@@ -46,7 +48,7 @@ ScalableContentHolder
         }
     }
 
-    allowCompositeEvents: !motionController.drawingRoi && !fisheyeMode
+    allowCompositeEvents: !roiController.drawingRoi && !fisheyeMode
     minContentWidth: width
     minContentHeight: height
     maxContentWidth:
@@ -77,7 +79,7 @@ ScalableContentHolder
         id: fisheyeModeController
 
         property bool fisheyeModeInternal:
-            !motionController.motionSearchMode
+            !roiController.motionSearchMode
             && resourceHelper.fisheyeParams.enabled
 
         property bool fisheyeMode: false
@@ -187,9 +189,42 @@ ScalableContentHolder
 
         onSourceSizeChanged: fitToBounds()
 
-        MotionController
+        RoundedMask
         {
-            id: motionSearchController
+            id: motionDisplay
+
+            readonly property bool showMotion: control.showMotion && !control.fisheyeMode
+
+            visible: motionDisplay.showMotion
+            parent: videoContent.videoOutput
+
+            anchors.fill: parent
+
+            opacity: 1
+            cellCountX: 44
+            cellCountY: 32
+            fillColor: ColorTheme.transparent(ColorTheme.colors.red_l2, 0.15)
+            lineColor: ColorTheme.transparent(ColorTheme.colors.red_l2, 0.5)
+
+            MediaPlayerMotionProvider
+            {
+                id: mediaPlayerMotionProvider
+
+                mediaPlayer: motionDisplay.showMotion ? videoContent.mediaPlayer : null
+
+                onMotionMaskChanged:
+                    motionMaskItem.motionMask = mediaPlayerMotionProvider.motionMask(0)
+            }
+
+            maskTextureProvider: MotionMaskItem
+            {
+                id: motionMaskItem
+            }
+        }
+
+        RoiController
+        {
+            id: roiController
 
             dragThreshold: control.mouseArea.drag.threshold
             parent: videoContent.videoOutput
@@ -198,38 +233,37 @@ ScalableContentHolder
 
             allowDrawing: !control.fisheyeMode
             cameraRotation: control.resourceHelper.customRotation
-            motionProvider.mediaPlayer: videoContent.mediaPlayer
 
             Connections
             {
                 target: control.mouseArea
-                enabled: motionSearchController.enabled
+                enabled: roiController.enabled
 
                 function onPressed(mouse)
                 {
-                    motionSearchController.handlePressed(
-                        control.mapToItem(motionSearchController, mouse.x, mouse.y))
+                    roiController.handlePressed(
+                        control.mapToItem(roiController, mouse.x, mouse.y))
                 }
 
                 function onReleased()
                 {
-                    motionSearchController.handleReleased()
+                    roiController.handleReleased()
                 }
 
                 function onPositionChanged(mouse)
                 {
-                    motionSearchController.handlePositionChanged(
-                        control.mapToItem(motionSearchController, mouse.x, mouse.y))
+                    roiController.handlePositionChanged(
+                        control.mapToItem(roiController, mouse.x, mouse.y))
                 }
 
                 function onCanceled()
                 {
-                    motionSearchController.handleCancelled()
+                    roiController.handleCancelled()
                 }
 
                 function onDoubleClicked()
                 {
-                    motionSearchController.handleCancelled()
+                    roiController.handleCancelled()
                 }
             }
 
@@ -239,7 +273,7 @@ ScalableContentHolder
 
                 function onMovementEnded()
                 {
-                    motionSearchController.updateDefaultRoi()
+                    roiController.updateDefaultRoi()
                 }
             }
 
@@ -256,7 +290,7 @@ ScalableContentHolder
         id: d
 
         property bool showRoiHint:
-            motionController.motionSearchMode && !motionController.drawingRoi && falseDragging
+            roiController.motionSearchMode && !roiController.drawingRoi && falseDragging
 
         Timer
         {

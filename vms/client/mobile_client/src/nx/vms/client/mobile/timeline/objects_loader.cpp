@@ -586,7 +586,8 @@ struct ObjectsLoader::Private
         analyticsBackend =
             std::make_shared<CachingProxyBackend<ObjectTrackList>>(
                 std::make_shared<AggregatingProxyBackend<ObjectTrackList>>(
-                    std::make_shared<AnalyticsBackend>(chunkProvider->resource())));
+                    std::make_shared<AnalyticsBackend>(
+                        chunkProvider->resource(), chunkProvider->analyticsRoi())));
 
         return analyticsBackend;
     }
@@ -685,6 +686,21 @@ void ObjectsLoader::setChunkProvider(core::ChunkProvider* value)
                 return;
 
             d->clear();
+            d->handleWindowChanged();
+        });
+
+    connect(d->chunkProvider, &core::ChunkProvider::analyticsRoiChanged, this,
+        [this]()
+        {
+            if (d->objectsType != ObjectsType::analytics)
+            {
+                d->analyticsBackend.reset();
+                return;
+            }
+
+            d->clear();
+            d->analyticsBackend.reset();
+            d->initializeLoaderDelegate();
             d->handleWindowChanged();
         });
 

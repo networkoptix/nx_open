@@ -291,14 +291,14 @@ Page
             MotionAreaButton
             {
                 visible: selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.motion
-                    && video.motionController.customRoiExists
+                    && video.roiController.customRoiExists
 
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: qsTr("Area")
                 icon.source: lp("/images/close.png")
 
-                onClicked: video.motionController.clearCustomRoi()
+                onClicked: video.roiController.clearCustomRoi()
             }
         ]
 
@@ -385,6 +385,10 @@ Page
 
         readonly property bool shown: dummyLoader.status != Loader.Ready && !screenshot.visible
 
+        readonly property bool supportsRoi: d.hasArchive && !video.fisheyeMode && !d.ptzMode
+            && (videoScreen.selectedObjectsType === Timeline.ObjectsLoader.ObjectsType.analytics
+                || videoScreen.selectedObjectsType === Timeline.ObjectsLoader.ObjectsType.motion)
+
         width: parent.width
         height: width / (16.0 / 9.0)
 
@@ -395,11 +399,19 @@ Page
         mediaPlayer: controller.mediaPlayer
         videoCenterHeightOffsetFactor: 1 / 3
 
-        motionController
+        showMotion: videoScreen.selectedObjectsType === Timeline.ObjectsLoader.ObjectsType.motion
+             && !d.ptzMode
+
+        roiController
         {
-            allowDrawing: motionController.motionSearchMode
-            motionSearchMode: controller.chunkContentType === CommonGlobals.MotionContent
-            enabled: d.hasArchive && !d.ptzMode
+            // At this point we're using a legacy ROI design and a legacy ROI drawing mechanism
+            // crudely adapted for the new needs.
+
+            allowDrawing: true
+            motionSearchMode: true
+
+            enabled: video.supportsRoi
+            visible: video.supportsRoi
         }
 
         readonly property string roiHintText: qsTr("Tap and hold to select an area")
@@ -415,7 +427,7 @@ Page
 
         Connections
         {
-            target: video.motionController
+            target: video.roiController
 
             function onEmptyRoiCleared()
             {
@@ -1021,7 +1033,8 @@ Page
         id: cameraChunkProvider
 
         resource: controller.resource
-        motionFilter: video.motionController.motionFilter
+        motionFilter: video.roiController.motionFilter
+        analyticsRoi: video.roiController.customRoi
     }
 
     CalendarPanel

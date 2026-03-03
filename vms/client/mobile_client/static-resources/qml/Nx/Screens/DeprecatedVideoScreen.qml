@@ -183,13 +183,13 @@ Page
         [
             MotionAreaButton
             {
-                visible: video.motionController.customRoiExists
+                visible: video.roiController.customRoiExists
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: qsTr("Area")
                 icon.source: lp("/images/close.png")
 
-                onClicked: video.motionController.clearCustomRoi()
+                onClicked: video.roiController.clearCustomRoi()
             }
         ]
 
@@ -276,8 +276,9 @@ Page
         resourceHelper: controller.resourceHelper
         mediaPlayer: controller.mediaPlayer
         videoCenterHeightOffsetFactor: 1 / 3
-        motionController.motionSearchMode: navigator.motionSearchMode
-        motionController.enabled: navigator.hasArchive && !d.ptzMode
+        roiController.motionSearchMode: navigator.motionSearchMode
+        roiController.enabled: navigator.hasArchive && !d.ptzMode
+        showMotion: navigator.motionSearchMode
 
         onClicked: toggleUi()
 
@@ -292,7 +293,7 @@ Page
 
         Connections
         {
-            target: video.motionController
+            target: video.roiController
 
             function onDrawingRoiChanged()
             {
@@ -303,7 +304,7 @@ Page
                 showUi()
             }
 
-            function onRequestUnallowedDrawing()
+            function onUnallowedDrawingRequested()
             {
                 banner.showText(qsTr("Enable motion search first to select an area"))
             }
@@ -557,18 +558,18 @@ Page
         {
             id: navigator
 
-            drawingRoi: video.motionController.motionSearchMode && video.motionController.drawingRoi
+            drawingRoi: video.roiController.motionSearchMode && video.roiController.drawingRoi
             changingMotionRoi:
             {
-                return video.motionController.drawingRoi
+                return video.roiController.drawingRoi
                     ? false
-                    : video.moving && !video.motionController.customRoiExists
+                    : video.moving && !video.roiController.customRoiExists
             }
 
             onWarningTextChanged: banner.showText(warningText)
 
-            hasCustomRoi: video.motionController.customRoiExists
-            hasCustomVisualArea: video.motionController.hasCustomVisualArea
+            hasCustomRoi: video.roiController.customRoiExists
+            hasCustomVisualArea: video.roiController.hasCustomVisualArea
             canViewArchive: controller.accessRightsHelper.canViewArchive
             animatePlaybackControls: d.animatePlaybackControls
             controller: controller
@@ -600,7 +601,7 @@ Page
                 switchToCamera(camerasModel.nextResource(controller.resource))
             }
 
-            motionFilter: video.fisheyeMode ? "" : video.motionController.motionFilter
+            motionFilter: video.fisheyeMode ? "" : video.roiController.motionFilter
         }
     }
 
