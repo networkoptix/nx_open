@@ -560,6 +560,14 @@
       <source>Period</source>
       <translation>Periode</translation>
     </message>
+    <message>
+      <source>Details</source>
+      <translation type="unfinished">Details</translation>
+    </message>
+    <message>
+      <source>No data</source>
+      <translation type="unfinished">No data</translation>
+    </message>
   </context>
   <context>
     <name>FiltersItem</name>
