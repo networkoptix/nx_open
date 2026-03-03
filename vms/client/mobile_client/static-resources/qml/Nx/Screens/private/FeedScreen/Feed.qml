@@ -31,6 +31,8 @@ Item
 
     property alias filterModel: filterModel
 
+    property var selectedNotification: null
+
     function openFilterMenu()
     {
         filterMenu.open()
@@ -265,11 +267,26 @@ Item
                     viewed: model.viewed ?? true
                     url: model.url
                     expanded: feed.searching
+                    selected: LayoutController.isTabletLayout && model.id === feed.selectedNotification?.id
 
                     onClicked:
                     {
-                        if (model.url)
-                            windowContext.uriHandler.handleUrl(model.url)
+                        if (LayoutController.isTabletLayout)
+                        {
+                            feed.selectedNotification = {
+                                "id": model.id,
+                                "title": model.title,
+                                "description": model.description,
+                                "image": model.image,
+                                "time": model.time,
+                                "url": model.url
+                            }
+                        }
+                        else
+                        {
+                            if (model.url)
+                                windowContext.uriHandler.handleUrl(model.url)
+                        }
 
                         feedState.setViewed(model.id, true)
                         feedState.update()

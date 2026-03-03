@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
 import Nx.Controls
 import Nx.Core
@@ -40,6 +41,19 @@ AdaptiveScreen
     }
 
     leftPanelButtonIndicator.visible: feed.filtered
+
+    rightPanel
+    {
+        title: qsTr("Details")
+        color: ColorTheme.colors.dark5
+        interactive: true
+        item: LayoutController.isTabletLayout && feed.selectedNotification
+            ? notificationDetailsItem
+            : null
+
+        onItemChanged: rightPanel.visible = !!rightPanel.item
+        onCloseButtonClicked: feed.selectedNotification = null
+    }
 
     customRightControl: IconButton
     {
@@ -94,6 +108,118 @@ AdaptiveScreen
                 onToggled: feed.filterModel.filter = PushNotificationFilterModel.All
 
                 ButtonGroup.group: filtersButtonGroup
+            }
+        }
+    }
+
+    Item
+    {
+        id: notificationDetailsItem
+
+        MouseArea
+        {
+            anchors.fill: parent
+
+            onClicked:
+            {
+                const url = feed.selectedNotification?.url
+                if (url)
+                    windowContext.uriHandler.handleUrl(url)
+            }
+        }
+
+        Image //< TODO: It must be player here if there is something to view.
+        {
+            id: notificationDetailImage
+
+            width: parent.width
+            height: 180
+
+            visible: status != Image.Null
+            fillMode: Image.PreserveAspectCrop
+
+            source: feed.selectedNotification?.image ?? ""
+
+            Rectangle
+            {
+                anchors.fill: parent
+
+                visible: notificationDetailImage.status != Image.Ready
+                color: ColorTheme.colors.dark8
+
+                Text
+                {
+                    anchors.centerIn: parent
+
+                    visible: notificationDetailImage.status === Image.Error
+                    text: qsTr("No data")
+                    font.pixelSize: 12
+                    color: ColorTheme.colors.dark17
+                }
+            }
+        }
+
+        Flickable
+        {
+            id: notificationDetailsFlickable
+
+            anchors.fill: parent
+            anchors.margins: 20
+            anchors.topMargin: 20 + (notificationDetailImage.visible ? notificationDetailImage.height : 0)
+
+            contentHeight: notificationDetailsColumn.implicitHeight
+            clip: true
+
+            Connections
+            {
+                target: feed
+
+                function onSelectedNotificationChanged()
+                {
+                    notificationDetailsFlickable.contentY = 0
+                }
+            }
+
+            ColumnLayout
+            {
+                id: notificationDetailsColumn
+
+                width: parent.width
+                spacing: 16
+
+                Text
+                {
+                    Layout.fillWidth: true
+
+                    text: feed.selectedNotification?.title ?? ""
+                    visible: !!text
+                    font.pixelSize: 18
+                    color: ColorTheme.colors.light4
+                    wrapMode: Text.WordWrap
+                }
+
+                Text
+                {
+                    Layout.fillWidth: true
+
+                    text: feed.selectedNotification?.description ?? ""
+                    visible: !!text
+                    font.pixelSize: 16
+                    color: ColorTheme.colors.light10
+                    wrapMode: Text.WordWrap
+                }
+
+                Text
+                {
+                    Layout.fillWidth: true
+
+                    font.pixelSize: 14
+                    font.capitalization: Font.AllUppercase
+                    font.weight: Font.Medium
+
+                    color: ColorTheme.colors.light16
+                    text: feed.selectedNotification?.time ?? ""
+                }
             }
         }
     }

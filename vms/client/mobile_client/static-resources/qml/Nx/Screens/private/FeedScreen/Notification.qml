@@ -22,6 +22,7 @@ Control
     property bool viewed: false
     property string url: ""
     property bool expanded: false
+    property bool selected: false
 
     readonly property int kTitleRightPadding: 24
 
@@ -34,6 +35,9 @@ Control
     {
         color: viewed ? ColorTheme.colors.dark6 : ColorTheme.colors.dark9
         radius: 10
+
+        border.color: ColorTheme.colors.brand
+        border.width: control.selected ? 1 : 0
 
         Rectangle
         {
