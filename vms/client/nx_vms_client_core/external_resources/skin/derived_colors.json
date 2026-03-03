@@ -332,7 +332,7 @@
     },
 
     "mobileTimeline": {
-        "background": "dark6",
+        "background": "dark5",
         "chunks": {
             "background": "#162E18",
             "recording": "#47A44B",

@@ -26,7 +26,8 @@ import "private/VideoScreen/Timeline" as Timeline
 
 Page
 {
-    id: videoScreen
+    id: modernVideoScreen //< For the FT purposes must be different from the DeprecatedVideoScreen id.
+
     objectName: "videoScreen"
 
     property Resource initialResource
@@ -49,9 +50,101 @@ Page
     LayoutMirroring.enabled: false
     LayoutMirroring.childrenInherit: true
 
+    states:
+    [
+        State
+        {
+            name: "withoutNavigator"
+            when: !modernVideoScreen.ownsNavigator
+
+            AnchorChanges
+            {
+                target: navigationBar
+
+                anchors.top: undefined
+                anchors.bottom: modernVideoScreen.contentItem.bottom
+                anchors.left: modernVideoScreen.contentItem.left
+                anchors.right: modernVideoScreen.contentItem.right
+            }
+
+            PropertyChanges
+            {
+                video.y: (navigationBar.y - video.height) / 2
+
+                bottomBar.color: ColorTheme.colors.dark6
+            }
+        },
+
+        State
+        {
+            name: "navigatorOnTheRight"
+            when: modernVideoScreen.ownsNavigator && !LayoutController.isPortrait
+
+            AnchorChanges
+            {
+                target: navigatorProxyItem
+
+                anchors.top: undefined
+                anchors.left: undefined
+                anchors.right: modernVideoScreen.contentItem.right
+                anchors.bottom: undefined
+            }
+
+            AnchorChanges
+            {
+                target: navigationBar
+
+                anchors.bottom: modernVideoScreen.contentItem.bottom
+                anchors.left: modernVideoScreen.contentItem.left
+                anchors.right: navigatorProxyItem.left
+            }
+
+            PropertyChanges
+            {
+                navigatorProxyItem.width: 360
+                navigatorProxyItem.height: modernVideoScreen.height
+                navigatorProxyItem.y: -modernVideoScreen.toolBar.height
+
+                modernVideoScreen.toolBar.width: modernVideoScreen.width - navigatorProxyItem.width
+
+                video.y: (navigationBar.y - video.height) / 2
+                video.width: modernVideoScreen.width - navigatorProxyItem.width
+
+                bottomBar.color: ColorTheme.colors.dark6
+            }
+        },
+
+        State
+        {
+            name: "navigatorOnTheBottom"
+            when: modernVideoScreen.ownsNavigator && LayoutController.isPortrait
+
+            AnchorChanges
+            {
+                target: navigationBar
+
+                anchors.top: video.bottom
+                anchors.left: modernVideoScreen.contentItem.left
+                anchors.right: modernVideoScreen.contentItem.right
+            }
+
+            AnchorChanges
+            {
+                target: navigatorProxyItem
+
+                anchors.top: navigationBar.bottom
+                anchors.right: modernVideoScreen.contentItem.right
+                anchors.left: modernVideoScreen.contentItem.left
+                anchors.bottom: modernVideoScreen.contentItem.bottom
+            }
+        }
+    ]
+
     VideoScreenController
     {
         id: controller
+
+        videoScreen: modernVideoScreen
 
         chunkContentType:
         {
@@ -97,7 +190,11 @@ Page
             }
         }
 
-        resourceHelper.onResourceRemoved: Workflow.popCurrentScreen()
+        resourceHelper.onResourceRemoved:
+        {
+            if (modernVideoScreen.activePage)
+                Workflow.popCurrentScreen()
+        }
     }
 
     NxObject
@@ -421,13 +518,11 @@ Page
     {
         id: navigationBar
 
-        width: parent.width
-        height: navigationBarContent.height + navigationBarContent.contentMargin * 2
-        y: LayoutController.isTabletLayout && !videoScreen.activePage ? parent.height - height : video.y + video.height
-        color: LayoutController.isTabletLayout && !videoScreen.activePage ? "transparent" : ColorTheme.colors.dark4
+        implicitHeight: navigationBarContent.height + navigationBarContent.contentMargin * 2
+        color: LayoutController.isTabletLayout && !modernVideoScreen.activePage ? "transparent" : ColorTheme.colors.dark4
 
         readonly property bool hasChunkNavigation:
-            videoScreen.selectedObjectsType !== Timeline.ObjectsLoader.ObjectsType.bookmarks
+            modernVideoScreen.selectedObjectsType !== Timeline.ObjectsLoader.ObjectsType.bookmarks
 
         Item
         {
@@ -654,12 +749,17 @@ Page
 
     ProxyItem
     {
-        anchors.top: navigationBar.bottom
-        anchors.bottom: parent.bottom
-        width: parent.width
+        id: navigatorProxyItem
+
+        implicitWidth: 360
         target: navigator
-        visible: !LayoutController.isTabletLayout || videoScreen.activePage
+        visible: modernVideoScreen.ownsNavigator
     }
+
+    // Whether the given video screen owns the navigator item. If the video screen owns navigator
+    // item, it should position it itself, otherwise the navigator is positioned by the parent
+    // item of the video screen.
+    property bool ownsNavigator: true
 
     property Item navigatorItem: Item
     {
@@ -676,7 +776,7 @@ Page
             visible: d.canViewArchive
 
             chunkProvider: cameraChunkProvider
-            objectsType: videoScreen.selectedObjectsType
+            objectsType: modernVideoScreen.selectedObjectsType
 
             interactive: !objectsTypeSheet.opened && !timelineObjectSheet.opened
                 && !ptzSheet.opened && !actionSheet.opened
@@ -970,9 +1070,7 @@ Page
     {
         id: content
 
-        anchors.top: video.top
-        anchors.bottom: video.bottom
-        width: parent.width
+        anchors.fill: video
 
         Rectangle
         {
@@ -981,9 +1079,9 @@ Page
             height: 56
             visible: video.shown
 
-            x: -windowParams.leftMargin
-            width: videoScreen.width
             anchors.bottom: content.bottom
+            anchors.right: content.right
+            anchors.left: content.left
 
             gradient: Gradient
             {
@@ -1033,10 +1131,7 @@ Page
 
             readonly property bool needOffset: item && item.onlyCompactTitleIsVisible
 
-            y: needOffset ? -header.height : 0
-            x: -windowParams.leftMargin
-            width: videoScreen.width
-            height: videoScreen.height + (needOffset ? 0 : header.height)
+            anchors.fill: parent
 
             visible: active
             active: d.cameraWarningVisible
@@ -1094,7 +1189,7 @@ Page
         {
             id: preloader
 
-            parent: videoScreen
+            parent: modernVideoScreen
             visible: false
         }
 
@@ -1103,9 +1198,9 @@ Page
             id: moveOnTapOverlay
 
             x: -windowParams.leftMargin
-            width: videoScreen.width
+            width: modernVideoScreen.width
             height: parent.height
-            parent: videoScreen
+            parent: modernVideoScreen
 
             onClicked:
             {

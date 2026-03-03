@@ -172,7 +172,7 @@ private:
         QN_DECLARE_RW_PROPERTY(
             bool,
             newTimelinePrototype, setNewTimelinePrototype,
-            NewTimelinePrototype, false)
+            NewTimelinePrototype, true)
 
         QN_DECLARE_RW_PROPERTY(
             QString,

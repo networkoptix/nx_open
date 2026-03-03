@@ -39,6 +39,7 @@ Page
     {
         id: controller
 
+        videoScreen: videoScreen
         chunkContentType: navigator.motionSearchMode
             ? CommonGlobals.MotionContent
             : CommonGlobals.RecordingContent

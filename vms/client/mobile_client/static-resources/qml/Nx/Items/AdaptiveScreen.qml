@@ -366,13 +366,6 @@ Item
 
     Keys.onPressed: (event) =>
     {
-        if (event.key === Qt.Key_F11)
-        {
-            root.fullscreen = !root.fullscreen
-            event.accepted = true
-            return
-        }
-
         if (!CoreUtils.keyIsBack(event.key))
             return
 

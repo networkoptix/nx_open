@@ -30,9 +30,9 @@ AdaptiveScreen
 
     contentItem: (!windowContext.deprecatedUiController.resource || resourceHelper.isLayout)
         ? camerasGrid
-        : videoItem
+        : videoScreenLoader.item
     overlayItem: overlayItem
-    longContent: contentItem === videoItem
+    longContent: contentItem === videoScreenLoader.item
 
     customLeftControl: ToolBarButton
     {
@@ -45,7 +45,7 @@ AdaptiveScreen
             State
             {
                 name: "returnToLayout"
-                when: resourcesScreen.contentItem === videoItem
+                when: resourcesScreen.contentItem === videoScreenLoader.item
                     && (resourceHelper.isLayout
                         || resourceHelper.resource === null
                         || (resourceHelper.isCamera && !LayoutController.isTabletLayout))
@@ -56,7 +56,7 @@ AdaptiveScreen
                     leftControl.onClicked:
                     {
                         resourcesScreen.filterIds = []
-                        videoItem.controller.stop()
+                        videoScreenLoader.item.controller.stop()
                         resourcesScreen.contentItem = camerasGrid
 
                         if (resourceHelper.isCamera)
@@ -82,10 +82,10 @@ AdaptiveScreen
     customRightControl: ToolBarButton
     {
         icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
-        visible: resourcesScreen.contentItem === videoItem
+        visible: resourcesScreen.contentItem === videoScreenLoader.item
         onClicked:
         {
-            videoItem.menu.open()
+            videoScreenLoader.item.menu.open()
         }
     }
 
@@ -108,7 +108,7 @@ AdaptiveScreen
         iconSource: "image://skin/24x24/Outline/timeline.svg?primary=dark1"
         interactive: true
         visible: false
-        item: resourcesScreen.contentItem === videoItem ? videoItem.navigatorItem : null
+        item: resourcesScreen.contentItem === videoScreenLoader.item ? videoScreenLoader.item.navigatorItem : null
     }
 
     ResourceTreeItem
@@ -118,7 +118,7 @@ AdaptiveScreen
         onLayoutSelected: (layoutResource) =>
         {
             resourcesScreen.filterIds = []
-            videoItem.controller.stop()
+            videoScreenLoader.item?.controller.stop()
             windowContext.deprecatedUiController.resource = layoutResource
             resourcesScreen.contentItem = camerasGrid
             rightPanel.visible = false
@@ -129,13 +129,21 @@ AdaptiveScreen
 
         onCameraSelected: (cameraResource) =>
         {
-            resourcesScreen.filterIds = []
-            windowContext.deprecatedUiController.resource = cameraResource
-            resourcesScreen.contentItem = videoItem
-            videoItem.controller.start(cameraResource, -1)
-
             if (!LayoutController.isTabletLayout)
                 splash.close()
+
+            windowContext.deprecatedUiController.resource = cameraResource
+            if (LayoutController.isMobile)
+            {
+                Workflow.openVideoScreen(cameraResource)
+            }
+            else
+            {
+                resourcesScreen.filterIds = []
+
+                resourcesScreen.contentItem = videoScreenLoader.item
+                videoScreenLoader.item.controller.start(cameraResource, -1)
+            }
         }
 
         onVisibleChanged:
@@ -163,12 +171,19 @@ AdaptiveScreen
         {
             stopMediaPlayers()
 
-            videoItem.initialScreenshot = thumbnailUrl ?? ""
-            videoItem.camerasModel = camerasModel
-            videoItem.controller.start(resource, -1)
+            if (LayoutController.isMobile)
+            {
+                Workflow.openVideoScreen(resource, thumbnailUrl, undefined, camerasModel)
+            }
+            else
+            {
+                videoScreenLoader.item.initialScreenshot = thumbnailUrl ?? ""
+                videoScreenLoader.item.camerasModel = camerasModel
+                videoScreenLoader.item.controller.start(resource, -1)
 
-            resourcesScreen.filterIds = []
-            resourcesScreen.contentItem = videoItem
+                resourcesScreen.filterIds = []
+                resourcesScreen.contentItem = videoScreenLoader.item
+            }
         }
 
         DummyMessage
@@ -196,24 +211,32 @@ AdaptiveScreen
         }
     }
 
-    VideoScreen
+    Loader
     {
-        id: videoItem
+        id: videoScreenLoader
 
-        toolBar.visible: false
-        backgroundColor: ColorTheme.colors.dark4
+        active: LayoutController.isTablet
 
-        padding: resourcesScreen.fullscreen
-            ? 0
-            : (LayoutController.isTabletLayout ? 20 : 0)
-
-        onSelectedObjectsTypeChanged:
-            appContext.settings.selectedObjectsType = selectedObjectsType
-
-        Component.onCompleted:
+        sourceComponent: Component
         {
-            selectedObjectsType = appContext.settings.selectedObjectsType
-                ?? Timeline.ObjectsLoader.ObjectsType.motion
+            VideoScreen
+            {
+                toolBar.visible: false
+                backgroundColor: ColorTheme.colors.dark4
+                ownsNavigator: !LayoutController.isTabletLayout
+                padding: resourcesScreen.fullscreen
+                    ? 0
+                    : (LayoutController.isTabletLayout ? 20 : 0)
+
+                onSelectedObjectsTypeChanged:
+                    appContext.settings.selectedObjectsType = selectedObjectsType
+
+                Component.onCompleted:
+                {
+                    selectedObjectsType = appContext.settings.selectedObjectsType
+                        ?? Timeline.ObjectsLoader.ObjectsType.motion
+                }
+            }
         }
     }
 
@@ -334,7 +357,7 @@ AdaptiveScreen
 
     Component.onCompleted:
     {
-        if (resourceHelper.isCamera)
-            videoItem.controller.start(resourceHelper.resource, -1)
+        if (contentItem === videoScreenLoader.item)
+            videoScreenLoader.item.controller.start(resourceHelper.resource, -1)
     }
 }

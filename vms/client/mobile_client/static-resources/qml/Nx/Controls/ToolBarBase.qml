@@ -24,8 +24,7 @@ ToolBar
         sourceComponent: useGradientBackground
             ? gradientBackground
             : standardBackground
-        x: -windowParams.leftMargin
-        width: mainWindow.width + windowParams.leftMargin
+        width: parent.width
         height: parent.height
     }
 

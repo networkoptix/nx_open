@@ -16,6 +16,7 @@ NxObject
 {
     id: controller
 
+    required property var videoScreen
     property AbstractTimelineController timelineController
     property ChunkProvider chunkProvider
     property int chunkContentType: CommonGlobals.RecordingContent
@@ -193,7 +194,7 @@ NxObject
             if (!audioController.audioEnabled)
                 return false
 
-            if (videoScreen.activePage)
+            if (controller.videoScreen.activePage)
                 return true
 
             return windowContext.deprecatedUiController.currentScreen === Controller.CameraSettingsScreen
