@@ -2049,7 +2049,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>internal</source>
-      <translation type="unfinished">internal</translation>
+      <translation>interno</translation>
     </message>
   </context>
   <context>
@@ -2388,7 +2388,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation type="unfinished">This action was performed by a plugin.</translation>
+      <translation>Esta acción foi realizada por un plugin.</translation>
     </message>
   </context>
   <context>
