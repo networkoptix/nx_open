@@ -12,11 +12,14 @@ struct GetSessionResponse
     /* True if the session exists and valid */
     bool active = false;
 
-    /* True if the session was verified with a second factor*/
+    /* True if the session was verified with a second factor */
     bool mfaVerified = false;
+
+    /* For SSO sessions, IdP refresh token */
+    std::optional<std::string> ssoRefreshToken;
 };
 
-NX_REFLECTION_INSTRUMENT(GetSessionResponse, (active)(mfaVerified))
+NX_REFLECTION_INSTRUMENT(GetSessionResponse, (active)(mfaVerified)(ssoRefreshToken))
 
 struct IssueServiceTokenResponse
 {
