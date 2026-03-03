@@ -34,7 +34,7 @@ AdaptiveSheet
     {
         id: motionsButton
 
-        text: qsTr("Motions")
+        text: qsTr("Motion")
         icon.source: "image://skin/24x24/Outline/motion.svg"
         objectsType: Timeline.ObjectsLoader.ObjectsType.motion
         width: parent.width

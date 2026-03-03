@@ -32,7 +32,7 @@ Item
                 {
                     "objectName": "motionSearchMenuButton",
                     "iconSource": "image://skin/20x20/Solid/motion.svg",
-                    "text": qsTr("Motions"),
+                    "text": qsTr("Motion"),
                 },
                 */
                 {
