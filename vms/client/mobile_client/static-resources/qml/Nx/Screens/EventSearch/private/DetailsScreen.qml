@@ -270,30 +270,34 @@ Page
 
         readonly property real kHorizontalLayoutRatio: 1.5
         property bool horizontal: width / height > kHorizontalLayoutRatio
+            && attributeTable.attributes.length > 0
 
         anchors.top: panel.bottom
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        anchors.margins: 20
 
-        rowSpacing: 20
-        columnSpacing: 20
+        rowSpacing: 0
+        columnSpacing: 0
 
         flow: horizontal ? GridLayout.LeftToRight : GridLayout.TopToBottom
+        clip: true
 
-        Flickable
+        ScrollView
         {
             visible: detailsLayout.horizontal
-            contentHeight: contentItem.childrenRect.height
-            clip: true
+
+            padding: 20
+            contentWidth: availableWidth
+            contentItem.clip: false
 
             Layout.fillWidth: true
             Layout.preferredWidth: detailsLayout.width / 2
             Layout.fillHeight: detailsLayout.horizontal
-            Layout.alignment: Qt.AlignLeft | Qt.AlignTop
             Layout.minimumHeight: 0
             Layout.minimumWidth: 0
+
+            background: ScrollViewShadow { }
 
             LayoutItemProxy
             {
@@ -312,21 +316,26 @@ Page
             color: ColorTheme.colors.dark9
 
             Layout.fillHeight: true
+            Layout.topMargin: 20
+            Layout.bottomMargin: 20
         }
 
-        Flickable
+        ScrollView
         {
-            clip: true
-            contentHeight: contentItem.childrenRect.height
+            contentWidth: availableWidth
+            contentItem.clip: false
+            padding: 20
 
             Layout.fillWidth: true
             Layout.preferredWidth: detailsLayout.width / 2
             Layout.fillHeight: true
 
+            background: ScrollViewShadow { }
+
             ColumnLayout
             {
                 width: parent.width
-                spacing: detailsLayout.columnSpacing
+                spacing: 20
 
                 LayoutItemProxy
                 {
@@ -343,6 +352,7 @@ Page
 
                     attributes: d.accessor.getData(currentEventIndex, "analyticsAttributes") ?? []
 
+                    visible: attributes.length > 0
                     interactive: true
                     contextMenu: searchMenu
                     highlight.visible: false
