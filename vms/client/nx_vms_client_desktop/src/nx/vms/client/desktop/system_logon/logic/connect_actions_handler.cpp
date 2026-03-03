@@ -1705,4 +1705,9 @@ void ConnectActionsHandler::reportServerSelectionFailure()
     QnMessageBox::critical(mainWindowWidget(), tr("Failed to connect to the selected server"));
 }
 
+void ConnectActionsHandler::reconnectToCloudIfNeeded()
+{
+    d->reconnectToCloudIfNeeded();
+}
+
 } // namespace nx::vms::client::desktop

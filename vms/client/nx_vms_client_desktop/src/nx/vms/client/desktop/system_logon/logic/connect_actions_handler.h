@@ -63,6 +63,8 @@ public:
 
     LogicalState logicalState() const;
 
+    void reconnectToCloudIfNeeded();
+
 signals:
     void stateChanged(LogicalState logicalValue, QPrivateSignal);
 

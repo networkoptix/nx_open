@@ -48,6 +48,7 @@
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
@@ -90,6 +91,7 @@
 #include <nx/vms/client/desktop/style/old_style.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
+#include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
@@ -575,7 +577,15 @@ struct ApplicationContext::Private
             q,
             [this]()
             {
-                q->mainWindowContext()->menu()->trigger(menu::LoginToCloud, {Qn::ForceRole, true});
+                if (qnCloudStatusWatcher->cloudLogin().isEmpty())
+                {
+                    q->mainWindowContext()->menu()->trigger(
+                        menu::LoginToCloud, {Qn::ForceRole, true});
+                }
+                else
+                {
+                    q->mainWindowContext()->connectActionsHandler()->reconnectToCloudIfNeeded();
+                }
             });
     }
 
