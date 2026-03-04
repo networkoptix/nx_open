@@ -345,6 +345,7 @@ Page
                     interactive: true
                     contextMenu: searchMenu
                     highlight.visible: false
+                    enableTooltip: false
                     nameFont.pixelSize: 14
                     nameColor: ColorTheme.colors.light10
                     valueFont.pixelSize: 14

@@ -52,6 +52,7 @@ Item
     readonly property var hoveredItem: hoveredRow >= 0 ? items[hoveredRow] : undefined
     property alias highlight: highlight
 
+    property bool enableTooltip: true
     property bool separatorsVisible: false
 
     property real tableLineHeight: CoreSettings.iniConfigValue("attributeTableLineHeightFactor")
@@ -221,12 +222,14 @@ Item
         hoverEnabled: true
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-        onPositionChanged: (mouse) =>
+        function update(mouse)
         {
             if (mouse.buttons !== Qt.NoButton)
                 return
 
             const row = grid.childAt(grid.leftPadding, mouse.y)
+                || grid.childAt(grid.leftPadding, mouse.y + grid.rowSpacing)
+
             if (!row)
                 return
 
@@ -246,14 +249,17 @@ Item
             }
         }
 
+        onPositionChanged: (mouse) => update(mouse)
+
         onExited:
         {
             highlight.rowIndex = -1
             toolTip.hide()
         }
 
-        onClicked:
+        onClicked: (mouse) =>
         {
+            update(mouse)
             if (contextMenu)
                 contextMenu.popup()
         }
@@ -268,7 +274,7 @@ Item
         readonly property var colors: dataItem?.colors ?? []
 
         parent: grid
-        visible: !!dataItem
+        visible: enableTooltip && !!dataItem
         popupType: Popup.Window
 
         contentItem: Row
