@@ -258,7 +258,12 @@ AdaptiveScreen
             {
                 leftButton
                 {
-                    icon.source: ""
+                    icon.source: "image://skin/24x24/Outline/account_box.svg?primary=light10"
+                    icon.width: 24
+                    icon.height: 24
+                    width: 36
+                    height: 36
+                    backgroundColor: ColorTheme.colors.dark7
                     onClicked: Workflow.openCloudLoginScreen()
                 }
                 sessionsScreen
