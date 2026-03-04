@@ -289,8 +289,10 @@ ScalableContentHolder
     {
         id: d
 
-        property bool showRoiHint:
-            roiController.motionSearchMode && !roiController.drawingRoi && falseDragging
+        property bool showRoiHint: roiController.motionSearchMode
+            && roiController.enabled
+            && !roiController.drawingRoi
+            && falseDragging
 
         Timer
         {

@@ -385,9 +385,14 @@ Page
 
         readonly property bool shown: dummyLoader.status != Loader.Ready && !screenshot.visible
 
-        readonly property bool supportsRoi: d.hasArchive && !video.fisheyeMode && !d.ptzMode
-            && (videoScreen.selectedObjectsType === Timeline.ObjectsLoader.ObjectsType.analytics
-                || videoScreen.selectedObjectsType === Timeline.ObjectsLoader.ObjectsType.motion)
+        readonly property bool supportsRoi:
+        {
+            const type = modernVideoScreen.selectedObjectsType
+
+            return d.hasArchive && !video.fisheyeMode && !d.ptzMode
+                && (type === Timeline.ObjectsLoader.ObjectsType.analytics
+                    || type === Timeline.ObjectsLoader.ObjectsType.motion)
+        }
 
         width: parent.width
         height: width / (16.0 / 9.0)
@@ -399,8 +404,8 @@ Page
         mediaPlayer: controller.mediaPlayer
         videoCenterHeightOffsetFactor: 1 / 3
 
-        showMotion: videoScreen.selectedObjectsType === Timeline.ObjectsLoader.ObjectsType.motion
-             && !d.ptzMode
+        showMotion: !d.ptzMode
+            && modernVideoScreen.selectedObjectsType === Timeline.ObjectsLoader.ObjectsType.motion
 
         roiController
         {
