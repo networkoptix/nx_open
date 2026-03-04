@@ -1407,7 +1407,7 @@
     <name>LogSettingsDialog</name>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Идэвхжүүлэх</translation>
     </message>
     <message>
       <source>Logging Level</source>
@@ -2356,7 +2356,7 @@
     </message>
     <message>
       <source>Storage Locations</source>
-      <translation type="unfinished">Storage Locations</translation>
+      <translation>Хадгалах байршил</translation>
     </message>
     <message>
       <source>Reindex Archive</source>

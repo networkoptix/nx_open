@@ -2584,7 +2584,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Идэвхжүүлэх</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -3120,7 +3120,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Идэвхжүүлэх</translation>
     </message>
     <message>
       <source>Disable</source>
