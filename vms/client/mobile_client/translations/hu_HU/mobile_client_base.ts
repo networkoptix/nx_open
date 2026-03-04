@@ -88,7 +88,7 @@
     <name>nx::vms::client::mobile::UiController</name>
     <message>
       <source>Cannot connect to the Server</source>
-      <translation type="unfinished">Cannot connect to the Server</translation>
+      <translation>Nem lehet kapcsolódni a szerverhez</translation>
     </message>
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
