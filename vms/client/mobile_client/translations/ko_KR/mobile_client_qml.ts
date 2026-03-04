@@ -1007,7 +1007,7 @@
     <name>RestartRequiredPopup</name>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation type="unfinished">Please restart the app to apply changes</translation>
+      <translation>변경 사항을 적용하려면 앱을 재시작하세요</translation>
     </message>
   </context>
   <context>

@@ -1007,7 +1007,7 @@
     <name>RestartRequiredPopup</name>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation type="unfinished">Please restart the app to apply changes</translation>
+      <translation>Vui lòng khởi động lại ứng dụng để áp dụng thay đổi</translation>
     </message>
   </context>
   <context>

@@ -26,7 +26,7 @@
     <name>QnMobileClientUiController</name>
     <message>
       <source>Cannot connect to the Server</source>
-      <translation type="unfinished">Cannot connect to the Server</translation>
+      <translation>ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>

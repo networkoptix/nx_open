@@ -1009,7 +1009,7 @@
     <name>RestartRequiredPopup</name>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation type="unfinished">Please restart the app to apply changes</translation>
+      <translation>Veuillez redémarrer l'application pour appliquer les modifications</translation>
     </message>
   </context>
   <context>

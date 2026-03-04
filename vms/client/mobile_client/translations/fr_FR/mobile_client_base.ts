@@ -27,12 +27,12 @@
     <name>QnMobileClientUiController</name>
     <message>
       <source>Cannot connect to the Server</source>
-      <translation type="unfinished">Cannot connect to the Server</translation>
+      <translation>Impossible de se connecter au serveur</translation>
     </message>
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>Impossible de se connecter au site &quot;%1&quot;</translation>
     </message>
   </context>
   <context>

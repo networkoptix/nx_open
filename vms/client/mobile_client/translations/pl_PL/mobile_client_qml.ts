@@ -1013,7 +1013,7 @@
     <name>RestartRequiredPopup</name>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation type="unfinished">Please restart the app to apply changes</translation>
+      <translation>Uruchom ponownie aplikację, aby zastosować zmiany</translation>
     </message>
   </context>
   <context>
