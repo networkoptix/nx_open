@@ -1336,7 +1336,7 @@
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Архив байхгүй</translation>
     </message>
     <message>
       <source>LIVE</source>
