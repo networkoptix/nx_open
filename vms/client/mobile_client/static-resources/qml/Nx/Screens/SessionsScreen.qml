@@ -298,7 +298,7 @@ AdaptiveScreen
                 {
                     title: searchField.displayText
                         ? ""
-                        : accessor.getData(linearizationListModel.sourceRoot, "display")
+                        : accessor.getData(sessionsScreen.rootIndex, "display")
                 }
 
                 rightButton
@@ -352,11 +352,21 @@ AdaptiveScreen
         function resetSourceRoot()
         {
             linearizationListModel.sourceRoot = Qt.binding(
-                () => (localSitesVisible
-                    && !sessionsScreen.searching
-                    && sessionsScreen.rootIndex === NxGlobals.invalidModelIndex())
-                        ? organizationsModel.sitesRoot
-                        : sessionsScreen.rootIndex)
+                () =>
+                {
+                    if (sessionsScreen.searching
+                        && sessionsScreen.rootIndex !== NxGlobals.invalidModelIndex()
+                        && sessionsScreen.rootIndex !== organizationsModel.sitesRoot)
+                    {
+                        return NxGlobals.invalidModelIndex()
+                    }
+
+                    return (localSitesVisible
+                        && !sessionsScreen.searching
+                        && sessionsScreen.rootIndex === NxGlobals.invalidModelIndex())
+                            ? organizationsModel.sitesRoot
+                            : sessionsScreen.rootIndex
+                })
         }
     }
 
@@ -1002,6 +1012,24 @@ AdaptiveScreen
         function onRowsRemoved() { updateVisibility() }
     }
 
+    Connections
+    {
+        target: siteList
+
+        function onSearchTextChanged()
+        {
+            if (sessionsScreen.state !== "inPartnerOrOrg")
+                return
+
+            const sourceRoot = sessionsScreen.searching
+                ? NxGlobals.invalidModelIndex()
+                : sessionsScreen.rootIndex
+
+            linearizationListModel.sourceRoot = sourceRoot
+            siteList.currentRoot = sessionsScreen.rootIndex
+        }
+    }
+
     function goInto(newIndex, animate = true)
     {
         endSearch()
@@ -1104,7 +1132,10 @@ AdaptiveScreen
             return
 
         if (state === "inPartnerOrOrg")
-            linearizationListModel.sourceRoot = siteList.currentRoot
+        {
+            linearizationListModel.sourceRoot = sessionsScreen.rootIndex
+            siteList.currentRoot = sessionsScreen.rootIndex
+        }
 
         searchField.clear()
         searchField.resetFocus()
