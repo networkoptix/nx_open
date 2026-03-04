@@ -8669,7 +8669,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Los sitios se fusionarán en breve</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
@@ -8872,7 +8872,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
@@ -11602,7 +11602,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>
@@ -12702,7 +12702,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valor</translation>
     </message>
   </context>
   <context>
@@ -12728,7 +12728,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valor</translation>
     </message>
   </context>
   <context>
