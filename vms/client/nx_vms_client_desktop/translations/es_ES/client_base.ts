@@ -4180,7 +4180,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>To access certificate details, enable the Audit Trail feature.</source>
-      <translation type="unfinished">To access certificate details, enable the Audit Trail feature.</translation>
+      <translation>Para acceder a los detalles del certificado, habilite la función Audit Trail.</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
@@ -5118,11 +5118,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Allow optimize device settings</source>
-      <translation type="unfinished">Allow optimize device settings</translation>
+      <translation>Permitir optimizar la configuración del dispositivo</translation>
     </message>
     <message>
       <source>Allow optimize camera settings</source>
-      <translation type="unfinished">Allow optimize camera settings</translation>
+      <translation>Permitir optimizar la configuración de la cámara</translation>
     </message>
   </context>
   <context>
@@ -5159,7 +5159,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Custom access rights</source>
-      <translation type="unfinished">Custom access rights</translation>
+      <translation>Derechos de acceso personalizados</translation>
     </message>
   </context>
   <context>
@@ -5226,15 +5226,15 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>QnWebResourceWidget</name>
     <message>
       <source>Integration settings...</source>
-      <translation type="unfinished">Integration settings...</translation>
+      <translation>Configuración de integración...</translation>
     </message>
     <message>
       <source>Web Page settings...</source>
-      <translation type="unfinished">Web Page settings...</translation>
+      <translation>Configuración de la página web...</translation>
     </message>
     <message>
       <source>Auto-refresh every %1</source>
-      <translation type="unfinished">Auto-refresh every %1</translation>
+      <translation>Actualización automática cada %1</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -5443,7 +5443,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>La pantalla está bloqueada y no se puede cambiar</translation>
     </message>
     <message>
       <source>Site shut down</source>
@@ -5451,11 +5451,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Para agregar un Video Wall, el sitio debe estar en estado activo. %1</translation>
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
-      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+      <translation>No se puede encontrar la versión de cliente compatible: %1</translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
@@ -5665,14 +5665,14 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message numerus="yes">
       <source>Delete %n layouts?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>¿Eliminar diseños %n?</numerusform>
         <numerusform>Delete %n layouts?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n items were not deleted.</source>
       <translation type="unfinished">
-        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n Los elementos no fueron eliminados.</numerusform>
         <numerusform>%n items were not deleted.</numerusform>
       </translation>
     </message>
@@ -5704,7 +5704,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>Los diseños %n se comparten con otros usuarios, por lo que también se eliminarán de sus cuentas.</numerusform>
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
     </message>
@@ -5717,17 +5717,17 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Unable to move device</source>
-      <translation type="unfinished">Unable to move device</translation>
+      <translation>No se puede mover el dispositivo</translation>
     </message>
     <message>
       <source>Maximum number of devices for this server is reached</source>
-      <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+      <translation>Se alcanzó el número máximo de dispositivos para este servidor</translation>
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerus form depends on the amount of layouts</comment>
       <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>Estos diseños se comparten con otros usuarios, por lo que también se eliminarán de sus cuentas.</numerusform>
         <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
     </message>
@@ -5735,7 +5735,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
       <comment>Numerus form depends on the amount of web pages</comment>
       <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+        <numerusform>Está a punto de migrar estas páginas web al servidor &quot;%1&quot;. Estas páginas web representan todo el contenido solicitado, y su servidor proxy cambiará al servidor &quot;%1&quot;.</numerusform>
         <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
@@ -5744,7 +5744,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>RestErrorStrings</name>
     <message>
       <source>Error code: %1</source>
-      <translation type="unfinished">Error code: %1</translation>
+      <translation>Código de error: %1</translation>
     </message>
   </context>
   <context>
@@ -5849,7 +5849,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Servidor de origen y servidores %n</numerusform>
         <numerusform>Source Server and %n Servers</numerusform>
       </translation>
     </message>
@@ -5916,9 +5916,9 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n grupos</numerusform>
+        <numerusform>%n Grupos</numerusform>
       </translation>
     </message>
     <message>
@@ -5931,11 +5931,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Is listed</source>
-      <translation type="unfinished">Is listed</translation>
+      <translation>Está listado</translation>
     </message>
     <message>
       <source>Is not listed</source>
-      <translation type="unfinished">Is not listed</translation>
+      <translation>No está en la lista</translation>
     </message>
     <message>
       <source>In</source>
@@ -5943,30 +5943,30 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message numerus="yes">
       <source>%n removed devices</source>
-      <translation type="unfinished">
-        <numerusform>%n removed devices</numerusform>
-        <numerusform>%n removed devices</numerusform>
+      <translation>
+        <numerusform>%n dispositivos eliminados</numerusform>
+        <numerusform>%n dispositivos eliminados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
-        <numerusform>%n removed cameras</numerusform>
+      <translation>
+        <numerusform>%n eliminó las cámaras</numerusform>
+        <numerusform>%n eliminó las cámaras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed servers</source>
-      <translation type="unfinished">
-        <numerusform>%n removed servers</numerusform>
-        <numerusform>%n removed servers</numerusform>
+      <translation>
+        <numerusform>%n eliminó servidores</numerusform>
+        <numerusform>%n eliminó servidores</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
-        <numerusform>%n removed layouts</numerusform>
+      <translation>
+        <numerusform>%n diseños eliminados</numerusform>
+        <numerusform>%n diseños eliminados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6017,23 +6017,23 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>TierUsageStrings</name>
     <message>
       <source>Number of servers per Site</source>
-      <translation type="unfinished">Number of servers per Site</translation>
+      <translation>Número de servidores por sitio</translation>
     </message>
     <message>
       <source>Number of devices per server</source>
-      <translation type="unfinished">Number of devices per server</translation>
+      <translation>Número de dispositivos por servidor</translation>
     </message>
     <message>
       <source>Number of items on layout</source>
-      <translation type="unfinished">Number of items on layout</translation>
+      <translation>Número de elementos en el diseño</translation>
     </message>
     <message>
       <source>Number of days of archive</source>
-      <translation type="unfinished">Number of days of archive</translation>
+      <translation>Número de días de archivo</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -6041,7 +6041,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Cross-Site features</source>
-      <translation type="unfinished">Cross-Site features</translation>
+      <translation>Funciones entre sitios</translation>
     </message>
   </context>
   <context>
@@ -6129,7 +6129,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Users with Digest Authentication</source>
-      <translation type="unfinished">Users with Digest Authentication</translation>
+      <translation>Usuarios con autenticación Digest</translation>
     </message>
     <message>
       <source>No users found</source>
@@ -6676,7 +6676,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message numerus="yes">
       <source>%n MP</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n MP</numerusform>
         <numerusform>%n MP</numerusform>
       </translation>
@@ -7053,7 +7053,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Open Camera in place</source>
-      <translation type="unfinished">Open Camera in place</translation>
+      <translation>Abrir cámara</translation>
     </message>
     <message>
       <source>Open Layout in new Tab</source>
@@ -7068,11 +7068,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Puntiagudo</translation>
     </message>
     <message>
       <source>Place Hotspot</source>
-      <translation type="unfinished">Place Hotspot</translation>
+      <translation>Lugar de Hotspot</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -7099,15 +7099,15 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Puntiagudo</translation>
     </message>
     <message>
       <source>Target resource does not exist</source>
-      <translation type="unfinished">Target resource does not exist</translation>
+      <translation>El recurso de destino no existe</translation>
     </message>
     <message>
       <source>Select Camera or Layout...</source>
-      <translation type="unfinished">Select Camera or Layout...</translation>
+      <translation>Seleccionar cámara o diseño...</translation>
     </message>
     <message>
       <source>Target</source>
@@ -7118,7 +7118,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
     <message>
       <source>Select Hotspot Target</source>
-      <translation type="unfinished">Select Hotspot Target</translation>
+      <translation>Seleccionar el Hotspot objetivo</translation>
     </message>
     <message>
       <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
@@ -9094,15 +9094,15 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Logs download canceled</source>
-      <translation type="unfinished">Logs download canceled</translation>
+      <translation>Descarga de registros cancelada</translation>
     </message>
     <message>
       <source>Downloading logs...</source>
-      <translation type="unfinished">Downloading logs...</translation>
+      <translation>Descargando registros...</translation>
     </message>
     <message>
       <source>Logs download failed</source>
-      <translation type="unfinished">Logs download failed</translation>
+      <translation>Error en la descarga de registros</translation>
     </message>
   </context>
   <context>
@@ -9113,27 +9113,27 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Downloading...</source>
-      <translation type="unfinished">Downloading...</translation>
+      <translation>Descargando...</translation>
     </message>
     <message>
       <source>Download completed with errors</source>
-      <translation type="unfinished">Download completed with errors</translation>
+      <translation>Descarga completada con errores</translation>
     </message>
     <message>
       <source>Download success</source>
-      <translation type="unfinished">Download success</translation>
+      <translation>Descarga exitosa</translation>
     </message>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n seleccionado:</numerusform>
-        <numerusform>%n selected:</numerusform>
+        <numerusform>%n seleccionado:</numerusform>
       </translation>
     </message>
     <message>
       <source>Retry (%1)</source>
-      <translation type="unfinished">Retry (%1)</translation>
+      <translation>Reintentar (%1)</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -9144,27 +9144,27 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::LookupListActionHandler</name>
     <message>
       <source>Network request failed</source>
-      <translation type="unfinished">Network request failed</translation>
+      <translation>Solicitud de red fallida</translation>
     </message>
     <message>
       <source>Lookup List remove request failed</source>
-      <translation type="unfinished">Lookup List remove request failed</translation>
+      <translation>La solicitud de eliminación de la lista de búsqueda falló</translation>
     </message>
     <message>
       <source>Could not add object to the List</source>
-      <translation type="unfinished">Could not add object to the List</translation>
+      <translation>No se pudo agregar el objeto a la lista</translation>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
-      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+      <translation>Un objeto&apos;no tiene atributos que coincidan con la lista seleccionada</translation>
     </message>
     <message>
       <source>Object was added to the List</source>
-      <translation type="unfinished">Object was added to the List</translation>
+      <translation>Se agregó objeto a la lista</translation>
     </message>
     <message>
       <source>An object has been added to the &quot;%1&quot; successfully</source>
-      <translation type="unfinished">An object has been added to the &quot;%1&quot; successfully</translation>
+      <translation>Se ha añadido un objeto a &quot;%1&quot; con éxito</translation>
     </message>
   </context>
   <context>
@@ -9187,14 +9187,14 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Cualquier %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListExportProcessor</name>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>Archivos de texto</translation>
     </message>
     <message>
       <source>All</source>
@@ -9202,7 +9202,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Export List</source>
-      <translation type="unfinished">Export List</translation>
+      <translation>Lista de exportación</translation>
     </message>
   </context>
   <context>
@@ -9210,22 +9210,22 @@ Site performance is degraded.</translation>
     <message>
       <source>Value</source>
       <comment>A value of some attribute</comment>
-      <translation type="unfinished">Value</translation>
+      <translation>Valor</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
-      <translation type="unfinished">Import Lookup List</translation>
+      <translation>Importar Lista de Búsqueda</translation>
     </message>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>Archivos de texto</translation>
     </message>
     <message>
       <source>All other text files</source>
-      <translation type="unfinished">All other text files</translation>
+      <translation>Todos los demás archivos de texto</translation>
     </message>
   </context>
   <context>
@@ -9266,11 +9266,11 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+      <translation>Este grupo ha sido asignado en organización y solo se puede administrar en organización</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>El usuario ha sido asignado a este grupo en cuanto a organización y solo se puede des asignar en cuanto a organización</translation>
     </message>
   </context>
   <context>
@@ -9313,7 +9313,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
-      <translation type="unfinished">Enter your account password to merge Sites</translation>
+      <translation>Ingrese la contraseña de su cuenta para fusionar sitios</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9322,35 +9322,35 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
-      <translation type="unfinished">Merging Sites...</translation>
+      <translation>Fusionando sitios...</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
-      <translation type="unfinished">This is the current Site URL.</translation>
+      <translation>Esta es la URL actual del sitio.</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>Los servidores del otro sitio aparecerán en el árbol de recursos cuando finalice la sincronización de la base de datos.</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Los sitios se fusionarán en breve</translation>
     </message>
     <message>
       <source>Failed to merge Sites</source>
-      <translation type="unfinished">Failed to merge Sites</translation>
+      <translation>No se pudieron fusionar los sitios</translation>
     </message>
     <message>
       <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
+      <translation>Remoto</translation>
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>Actual (%1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
-      <translation type="unfinished">Remote (%1)</translation>
+      <translation>Remoto (%1)</translation>
     </message>
     <message>
       <source>Success</source>
@@ -9393,64 +9393,64 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Site was not found.</source>
-      <translation type="unfinished">Site was not found.</translation>
+      <translation>No se encontró el sitio.</translation>
     </message>
     <message>
       <source>The discovered Site %1 has an incompatible version %2.</source>
       <comment>%1 is name of Site, %2 is version information</comment>
-      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+      <translation>El sitio descubierto %1 tiene una versión incompatible %2.</translation>
     </message>
     <message>
       <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+      <translation>El sitio seleccionado tiene una versión de software anterior que es incompatible con el sitio actual. Actualice el sitio seleccionado a la versión más reciente para integrarlo con el actual.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+      <translation>Estás a punto de fusionar sitios con licencias Starter.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Sólo se permite una licencia Starter por Sitio, por lo que la segunda licencia se desactivará.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+      <translation>Está a punto de fusionar sitios con licencias NVR.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Solo se permite una licencia NVR por sitio, por lo que la segunda licencia se desactivará.</translation>
     </message>
     <message>
       <source>Could not configure the remote Site %1.</source>
       <comment>%1 is name of the Site</comment>
-      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+      <translation>No se pudo configurar el sitio remoto %1.</translation>
     </message>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</translation>
+      <translation>El sitio %1 solo se puede fusionar con sitios que no sean%1. El nombre y la contraseña del sitio se toman del sitio %1.</translation>
     </message>
     <message>
       <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
+      <translation>Ambos sitios están conectados a %1. No se permite la fusión.</translation>
     </message>
     <message>
       <source>%1 sites have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 sites have different owners. Merge is not allowed.</translation>
+      <translation>Los sitios %1 tienen diferentes propietarios. No se permite la fusión.</translation>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>No se pueden fusionar los sitios porque tienen al menos un servidor con el mismo ID. Elimine este servidor e inténtelo de nuevo.</translation>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
-      <translation type="unfinished">Site name is not configured yet.</translation>
+      <translation>El nombre del sitio aún no está configurado.</translation>
     </message>
     <message>
       <source>Maximum number of Servers for the Site is reached.</source>
-      <translation type="unfinished">Maximum number of Servers for the Site is reached.</translation>
+      <translation>Se alcanzó el número máximo de servidores para el sitio.</translation>
     </message>
   </context>
   <context>
@@ -9480,8 +9480,8 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
 You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
-You can force motion detection, but it may lead to a substantial increase in CPU load.</translation>
+      <translation>La detección de movimiento está actualmente deshabilitada para esta cámara porque la transmisión de video excede la resolución %1 * %2.
+Puede forzar la detección de movimiento, pero puede generar un aumento sustancial en la carga de la CPU.</translation>
     </message>
   </context>
   <context>
@@ -9751,16 +9751,16 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Uploading offline update packages to Servers...</source>
-      <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+      <translation>Cargando paquetes de actualización sin conexión a los servidores...</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+      <translation>Las versiones del sistema operativo de algunos componentes ya no son compatibles. Elimínelos del sitio o actualice su sistema operativo a una versión compatible.</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">Incompatible %1 instance. To update disconnect Site from %1 first.</translation>
+      <translation>Instancia %1 incompatible. Para actualizar, desconecte primero el sitio de %1.</translation>
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>

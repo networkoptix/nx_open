@@ -1216,7 +1216,7 @@
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Төгсгөл</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -1883,7 +1883,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>Имэйлүүд</translation>
     </message>
     <message>
       <source>RHI backend</source>
@@ -3903,7 +3903,7 @@ License Key: %2</translation>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation type="unfinished">Enter URL</translation>
+      <translation>URL оруулна уу</translation>
     </message>
     <message>
       <source>URL</source>
@@ -7803,7 +7803,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Нууц үг оруулна уу...</translation>
     </message>
     <message>
       <source>Administrator password</source>
@@ -8480,7 +8480,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Идэвхжүүлэх</translation>
     </message>
   </context>
   <context>
@@ -10704,7 +10704,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
-      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+      <translation>Видео урсгалыг шифрлэх нь CPU ашиглалтыг мэдэгдэхүйц нэмэгдүүлж болзошгүй</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
