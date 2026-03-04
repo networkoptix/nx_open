@@ -356,7 +356,9 @@ Page
             visible: (controller.systemContext?.hasViewBookmarksPermission
                 && !(controller.resource?.flags & ResourceFlag.cross_system)) ?? false
             height: visible ? implicitHeight : 0
-            onTriggered: Workflow.openEventSearchScreen(/*push*/ true, controller.resource.id, camerasModel)
+
+            onTriggered:
+                Workflow.openEventSearchScreen(/*push*/ true, controller.resource.id, camerasModel)
         }
 
         MenuItem
@@ -366,7 +368,12 @@ Page
             visible: (controller.systemContext?.hasSearchObjectsPermission
                 && !(controller.resource?.flags & ResourceFlag.cross_system)) ?? false
             height: visible ? implicitHeight : 0
-            onTriggered: Workflow.openEventSearchScreen(/*push*/ true, controller.resource.id, camerasModel, true)
+
+            onTriggered:
+            {
+                Workflow.openEventSearchScreen(
+                    /*push*/ true, controller.resource.id, camerasModel, true)
+            }
         }
 
         MenuItem
@@ -536,7 +543,10 @@ Page
         id: navigationBar
 
         implicitHeight: navigationBarContent.height + navigationBarContent.contentMargin * 2
-        color: LayoutController.isTabletLayout && !modernVideoScreen.activePage ? "transparent" : ColorTheme.colors.dark4
+
+        color: LayoutController.isTabletLayout && !modernVideoScreen.activePage
+            ? "transparent"
+            : ColorTheme.colors.dark4
 
         readonly property bool hasChunkNavigation:
             modernVideoScreen.selectedObjectsType !== Timeline.ObjectsLoader.ObjectsType.bookmarks
@@ -546,6 +556,7 @@ Page
             id: navigationBarContent
 
             readonly property real contentMargin: 12
+            readonly property real availableWidth: navigationBar.width - contentMargin * 2
 
             component ExpandCollapseAnimation: NumberAnimation { duration: 150 }
 
@@ -570,12 +581,6 @@ Page
 
                     onClicked:
                         calendarPanel.open()
-                }
-
-                Item
-                {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
                 }
 
                 Row
@@ -640,8 +645,10 @@ Page
 
                             property bool expanded: false
 
-                            readonly property real expandedWidth: navigationBarContent.width
-                                - playPauseButton.width - playBar.spacing
+                            readonly property real expandedWidth:
+                                navigationBarContent.availableWidth
+                                    - playPauseButton.width
+                                    - playBar.spacing
 
                             color: playBar.backgroundColor
                             radius: playBar.roundingRadius
@@ -744,12 +751,6 @@ Page
                         onClicked:
                             controller.jumpForward()
                     }
-                }
-
-                Item
-                {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
                 }
 
                 Item
