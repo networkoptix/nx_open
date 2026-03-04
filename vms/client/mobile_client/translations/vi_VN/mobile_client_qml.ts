@@ -65,7 +65,7 @@
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation>Vui lòng khởi động lại ứng dụng để áp dụng thay đổi</translation>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>

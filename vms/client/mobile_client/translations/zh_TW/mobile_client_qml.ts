@@ -65,7 +65,7 @@
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation>請重新啟動應用程式以套用變更。</translation>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>

@@ -65,7 +65,7 @@
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation>Por favor, reinicia a aplicación para aplicar os cambios</translation>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>

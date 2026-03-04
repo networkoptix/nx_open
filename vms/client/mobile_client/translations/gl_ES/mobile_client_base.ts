@@ -96,12 +96,12 @@
     <name>nx::vms::client::mobile::UiController</name>
     <message>
       <source>Cannot connect to the Server</source>
-      <translation>Non se pode conectar ao servidor</translation>
+      <translation type="unfinished">Cannot connect to the Server</translation>
     </message>
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation>Non se pode conectar co sitio &quot;%1&quot;</translation>
+      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
     </message>
   </context>
   <context>

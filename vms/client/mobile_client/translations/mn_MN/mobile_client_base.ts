@@ -96,7 +96,7 @@
     <name>nx::vms::client::mobile::UiController</name>
     <message>
       <source>Cannot connect to the Server</source>
-      <translation>Серверт холбогдох боломжгүй байна</translation>
+      <translation type="unfinished">Cannot connect to the Server</translation>
     </message>
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
