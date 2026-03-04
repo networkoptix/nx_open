@@ -52,7 +52,7 @@ NX_REFLECTION_INSTRUMENT(AccountRegistrationData, AccountRegistrationData_Fields
 
 NX_REFLECTION_INSTRUMENT(AccountData, AccountData_Fields)
 
-NX_REFLECTION_INSTRUMENT(AccountStatusData, (statusCode))
+NX_REFLECTION_INSTRUMENT(AccountStatusData, (statusCode)(hasPassword))
 
 //-------------------------------------------------------------------------------------------------
 // class AccountConfirmationCode

@@ -153,6 +153,9 @@ struct AccountStatusData
 {
     /**%apidoc[readonly] Account status. */
     AccountStatus statusCode = AccountStatus::invalid;
+
+    /**%apidoc[readonly] Shows if this account has a password. */
+    bool hasPassword = false;
 };
 
 struct AccountConfirmationCode
